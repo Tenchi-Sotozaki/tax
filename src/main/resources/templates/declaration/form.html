@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}"
+      lang="ja">
+<head>
+    <title>宿泊税情報登録/編集</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <div class="row mb-3">
+        <div class="col">
+            <h4 class="fw-bold">
+                <i class="bi bi-pencil-square me-2 text-primary"></i>
+                宿泊税情報登録/編集
+            </h4>
+            <hr>
+        </div>
+    </div>
+
+    <!-- アラートエリア -->
+    <div id="alertArea"></div>
+
+    <form id="declarationForm" novalidate>
+
+        <!-- 基本情報 -->
+        <div class="card mb-4">
+            <div class="card-header bg-light fw-semibold">基本情報</div>
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label for="collectorId" class="form-label required-label">特別徴収義務者ID</label>
+                        <input type="text" class="form-control" id="collectorId" name="collectorId"
+                               maxlength="20" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="facilityId" class="form-label required-label">宿泊施設ID</label>
+                        <input type="text" class="form-control" id="facilityId" name="facilityId"
+                               maxlength="20" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="paymentYearMonth" class="form-label required-label">納入年月（YYYYMM）</label>
+                        <input type="text" class="form-control" id="paymentYearMonth" name="paymentYearMonth"
+                               maxlength="6" placeholder="例：202504" required pattern="\d{6}">
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="totalNights" class="form-label required-label">総宿泊数</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="totalNights" name="totalNights"
+                                   min="0" required>
+                            <span class="input-group-text">泊</span>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="exemptNights" class="form-label required-label">課税対象外宿泊数</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="exemptNights" name="exemptNights"
+                                   min="0" required>
+                            <span class="input-group-text">泊</span>
+                        </div>
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 税区分明細 -->
+        <div class="card mb-4">
+            <div class="card-header bg-light fw-semibold">税区分別宿泊数</div>
+            <div class="card-body p-0">
+                <table class="table table-bordered table-hover mb-0" id="detailTable">
+                    <thead class="table-secondary text-center">
+                        <tr>
+                            <th style="width:30%">税区分</th>
+                            <th style="width:20%">設定税額（円/泊）</th>
+                            <th style="width:20%">課税対象宿泊数（泊）</th>
+                            <th style="width:20%">小計（円）</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailTableBody">
+                        <!-- JavaScriptで動的生成 -->
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td colspan="3" class="text-end pe-3">納入合計金額</td>
+                            <td class="text-end pe-3" id="totalPaymentAmount">0 円</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- ボタン -->
+        <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-outline-secondary" id="clearBtn">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>クリア
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="bi bi-save me-1"></i>登録
+            </button>
+        </div>
+
+    </form>
+
+    <!-- 確認モーダル -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">登録確認</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>以下の内容で登録します。よろしいですか？</p>
+                    <dl class="row small" id="confirmContent"></dl>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-primary" id="confirmSubmitBtn">
+                        <i class="bi bi-check-lg me-1"></i>確定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/declaration-form.js}"></script>
+</th:block>
+</body>
+</html>

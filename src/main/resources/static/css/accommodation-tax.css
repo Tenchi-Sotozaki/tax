@@ -1,0 +1,34 @@
+/* 必須ラベル */
+.required-label::after {
+    content: " ※";
+    color: #dc3545;
+    font-size: 0.8em;
+}
+
+/* フッター固定 */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+    flex: 1;
+}
+
+/* テーブル内数値は右寄せ */
+#detailTable td.text-end,
+#detailTable th.text-end {
+    font-variant-numeric: tabular-nums;
+}
+
+/* 合計行強調 */
+#totalPaymentAmount {
+    font-size: 1.1rem;
+    color: #0d6efd;
+}
+
+/* ローディングスピナー */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.65;
+}
