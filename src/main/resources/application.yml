@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/accommodation_tax_db
-    username: ${postgres}
-    password: ${desw321}
+    username: postgres
+    password: desw321
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
