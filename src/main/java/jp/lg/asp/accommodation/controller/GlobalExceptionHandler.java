@@ -14,7 +14,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(assignableTypes = {
+        AccommodationTaxDeclarationController.class
+})
 public class GlobalExceptionHandler {
 
     /**

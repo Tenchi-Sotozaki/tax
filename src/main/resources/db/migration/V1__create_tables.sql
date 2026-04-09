@@ -35,7 +35,7 @@ CREATE TABLE accommodation_tax_declaration (
     declaration_id        BIGSERIAL       NOT NULL,
     collector_id          VARCHAR(20)     NOT NULL,
     facility_id           VARCHAR(20)     NOT NULL,
-    payment_year_month    CHAR(6)         NOT NULL,
+    payment_year_month    VARCHAR(6)      NOT NULL,
     total_nights          INTEGER         NOT NULL DEFAULT 0,
     exempt_nights         INTEGER         NOT NULL DEFAULT 0,
     total_payment_amount  NUMERIC(15, 0)  NOT NULL DEFAULT 0,

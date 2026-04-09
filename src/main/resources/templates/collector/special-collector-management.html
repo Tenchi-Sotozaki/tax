@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}"
+      lang="ja">
+<head>
+    <title>特別徴収義務者管理台帳</title>
+</head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+
+    <h2 class="page-title">
+        <i class="bi bi-building me-2"></i>特別徴収義務者管理
+    </h2>
+
+    <!-- 抽出条件エリア -->
+    <div class="card search-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-search me-2"></i>抽出条件</h5>
+        </div>
+        <div class="card-body">
+            <form id="searchForm">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="designationNumber" class="form-label">指定番号</label>
+                        <input type="text" class="form-control" id="designationNumber" placeholder="例：12345678">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="obligorName" class="form-label">特別徴収義務者名</label>
+                        <input type="text" class="form-control" id="obligorName" placeholder="事業者名を入力">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="facilityName" class="form-label">施設名</label>
+                        <input type="text" class="form-control" id="facilityName" placeholder="施設名を入力">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="businessType" class="form-label">営業種別</label>
+                        <select class="form-select" id="businessType">
+                            <option value="">すべて</option>
+                            <option value="hotel">ホテル</option>
+                            <option value="ryokan">旅館</option>
+                            <option value="simple">簡易宿所</option>
+                            <option value="minshuku">民宿</option>
+                            <option value="pension">ペンション</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="consolidationTarget" class="form-label">合算対象</label>
+                        <select class="form-select" id="consolidationTarget">
+                            <option value="">すべて</option>
+                            <option value="target">対象</option>
+                            <option value="non-target">非対象</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="personalNumber" class="form-label">個人番号</label>
+                        <input type="text" class="form-control" id="personalNumber" placeholder="個人番号を入力">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="corporateNumber" class="form-label">法人番号</label>
+                        <input type="text" class="form-control" id="corporateNumber" placeholder="法人番号を入力">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="bi bi-search me-1"></i>検索
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="clearForm()">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>クリア
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ボタンエリア -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="btn-group-custom d-flex gap-2">
+            <a th:href="@{/collector/collector-registration}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>新規登録/編集
+            </a>
+            <button type="button" class="btn btn-danger" disabled>
+                <i class="bi bi-trash me-1"></i>削除
+            </button>
+            <a th:href="@{/collector/tax-manager-registration}" class="btn btn-info">
+                <i class="bi bi-person-plus me-1"></i>納税管理人登録/編集
+            </a>
+            <a th:href="@{/declaration/consolidated-declaration-registration}" class="btn btn-warning">
+                <i class="bi bi-file-earmark-plus me-1"></i>合算申告登録/編集
+            </a>
+        </div>
+        <div class="text-muted">
+            <small>検索結果: <span id="resultCount">5</span> 件</small>
+        </div>
+    </div>
+
+    <!-- 情報一覧エリア -->
+    <div class="table-container">
+        <table class="table table-striped table-hover mb-0">
+            <thead>
+                <tr>
+                    <th style="width: 60px;" class="text-center">選択</th>
+                    <th style="width: 120px;">登録番号</th>
+                    <th>事業所名称</th>
+                    <th style="width: 120px;">営業種別</th>
+                    <th style="width: 150px;">氏名</th>
+                    <th style="width: 100px;" class="text-center">合算対象</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-center">
+                        <input type="radio" name="selectedRow" value="1" class="form-check-input">
+                    </td>
+                    <td>
+                        <a th:href="@{/declaration/payment-management(id='T001001')}" class="registration-link">T001001</a>
+                    </td>
+                    <td>グランドホテル東京</td>
+                    <td>ホテル</td>
+                    <td>田中 太郎</td>
+                    <td class="text-center"><span class="badge badge-target">対象</span></td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <input type="radio" name="selectedRow" value="2" class="form-check-input">
+                    </td>
+                    <td>
+                        <a th:href="@{/declaration/payment-management(id='R002001')}" class="registration-link">R002001</a>
+                    </td>
+                    <td>温泉旅館やまと</td>
+                    <td>旅館</td>
+                    <td>佐藤 花子</td>
+                    <td class="text-center"><span class="badge badge-non-target">非対象</span></td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <input type="radio" name="selectedRow" value="3" class="form-check-input">
+                    </td>
+                    <td>
+                        <a th:href="@{/declaration/payment-management(id='S003001')}" class="registration-link">S003001</a>
+                    </td>
+                    <td>シティイン新宿</td>
+                    <td>簡易宿所</td>
+                    <td>鈴木 一郎</td>
+                    <td class="text-center"><span class="badge badge-target">対象</span></td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <input type="radio" name="selectedRow" value="4" class="form-check-input">
+                    </td>
+                    <td>
+                        <a th:href="@{/declaration/payment-management(id='M004001')}" class="registration-link">M004001</a>
+                    </td>
+                    <td>海辺の民宿しおかぜ</td>
+                    <td>民宿</td>
+                    <td>高橋 美咲</td>
+                    <td class="text-center"><span class="badge badge-target">対象</span></td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <input type="radio" name="selectedRow" value="5" class="form-check-input">
+                    </td>
+                    <td>
+                        <a th:href="@{/declaration/payment-management(id='P005001')}" class="registration-link">P005001</a>
+                    </td>
+                    <td>森のペンション風の丘</td>
+                    <td>ペンション</td>
+                    <td>山田 健太</td>
+                    <td class="text-center"><span class="badge badge-non-target">非対象</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ページネーション -->
+    <nav aria-label="ページネーション" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1">前へ</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">次へ</a></li>
+        </ul>
+    </nav>
+
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        function clearForm() { document.getElementById('searchForm').reset(); }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButton = document.querySelector('.btn-danger');
+            document.querySelectorAll('input[name="selectedRow"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    deleteButton.disabled = false;
+                });
+            });
+            deleteButton.addEventListener('click', function () {
+                if (document.querySelector('input[name="selectedRow"]:checked')) {
+                    if (confirm('選択した項目を削除しますか？')) {
+                        alert('削除処理を実行します。');
+                    }
+                }
+            });
+            document.getElementById('searchForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+</th:block>
+</body>
+</html>

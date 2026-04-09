@@ -1,0 +1,270 @@
+/* 宿泊税申告システム 共通CSS */
+
+/* 基本設定 */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* ナビバー */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* サイドバー */
+.sidebar {
+    position: fixed;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    margin: 0.125rem 0.5rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.sidebar .nav-link.active {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+    font-weight: 600;
+}
+
+/* メインコンテンツ */
+main {
+    margin-top: 56px;
+    padding-top: 1rem;
+}
+
+/* カード */
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.card-header {
+    border-bottom: none;
+    font-weight: 600;
+}
+
+/* フォーム */
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* 必須バッジ */
+.badge {
+    font-size: 0.7em;
+    padding: 0.25em 0.5em;
+}
+
+/* エラーメッセージ */
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* ボタン */
+.btn {
+    font-weight: 500;
+    border-radius: 0.5rem;
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+}
+
+/* ユーティリティ */
+.bg-light-subtle {
+    background-color: #f8f9fa !important;
+}
+
+/* テーブル */
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.table th {
+    background-color: #f1f3f4;
+    color: #495057;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+/* 検索カード */
+.search-card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 8px;
+}
+
+.search-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+/* ページタイトル */
+.page-title {
+    color: #2c3e50;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+/* リンク */
+.registration-link {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.registration-link:hover {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+/* バッジ */
+.badge-target {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.badge-non-target {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* ボタングループ */
+.btn-group-custom {
+    gap: 0.5rem;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 767.98px) {
+    .sidebar {
+        top: 5rem;
+        padding-top: 0;
+    }
+    
+    main {
+        margin-top: 5rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* 必須ラベル */
+.required-label::after {
+    content: " ※";
+    color: #dc3545;
+    font-size: 0.8em;
+}
+
+/* フッター固定 */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f0f4f8;
+}
+main {
+    flex: 1;
+}
+
+/* カード */
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+.card-header {
+    border-bottom: none;
+}
+
+/* テーブル数値右寄せ */
+#detailTable td.text-end,
+#detailTable th.text-end {
+    font-variant-numeric: tabular-nums;
+}
+
+/* 合計行強調 */
+#totalPaymentAmount {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+/* ローディングスピナー */
+.btn-loading {
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+/* ナビバー */
+.navbar {
+    min-height: 56px;
+}
+
+/* モードバッジ */
+#modeLabel {
+    border-radius: 0.5rem;
+}
+
+/* input-group アイコン */
+.input-group-text {
+    border-color: #dee2e6;
+}
+
+/* テーブルヘッダー */
+#detailTable thead th {
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+}
+
+/* 明細行ホバー */
+#detailTable tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+/* フォームコントロールフォーカス */
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}

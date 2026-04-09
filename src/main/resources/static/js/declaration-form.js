@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (id) {
         editingDeclarationId = id;
         loadDeclaration(id);
-        document.getElementById('submitBtn').textContent = '更新';
+        document.getElementById('submitBtn').innerHTML = '<i class="bi bi-save me-1"></i>更新';
+        const label = document.getElementById('modeLabel');
+        if (label) label.innerHTML = '<i class="bi bi-pencil me-1"></i>編集中 ID: ' + id;
     }
 });
 

@@ -1,0 +1,358 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}" lang="ja">
+<head><title>宿泊税納入情報登録/編集</title></head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 class="h2">
+                        <i class="bi bi-calculator me-2 text-primary"></i>宿泊税納入情報登録/編集
+                    </h2>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6" id="modeLabel">
+                            <i class="bi bi-plus-circle me-1"></i>新規登録
+                        </span>
+                    </div>
+                </div>
+
+                <!-- アラートエリア -->
+                <div id="alertArea"></div>
+
+                <form id="paymentForm" novalidate>
+                    <!-- 納税額情報エリア -->
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-currency-yen me-2"></i>納税額情報
+                            </h5>
+                        </div>
+                        <div class="card-body bg-light-subtle">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="registrationDate" class="form-label fw-medium">
+                                        登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="date" class="form-control" id="registrationDate" name="registrationDate" required>
+                                    <div class="invalid-feedback text-danger small">※登録日を入力してください</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="obligorName" class="form-label fw-medium">
+                                        特別徴収義務者 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="obligorName" name="obligorName" placeholder="自動入力されます" readonly required>
+                                    <div class="invalid-feedback text-danger small">※特別徴収義務者を選択してください</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="facilityName" class="form-label fw-medium">
+                                        宿泊施設名称 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="facilityName" name="facilityName" placeholder="自動入力されます" readonly required>
+                                    <div class="invalid-feedback text-danger small">※宿泊施設名称を選択してください</div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="paymentYearMonth" class="form-label fw-medium">
+                                        納入年月 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="month" class="form-control" id="paymentYearMonth" name="paymentYearMonth" required>
+                                    <div class="invalid-feedback text-danger small">※納入年月を入力してください</div>
+                                </div>
+                                
+                                <!-- 税区分① -->
+                                <div class="col-md-12">
+                                    <div class="border rounded p-3 bg-white">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="bi bi-1-circle me-1"></i>税区分① (〜7,000円未満)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <label for="taxableNights1" class="form-label fw-medium">課税対象宿泊数</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="taxableNights1" name="taxableNights1" min="0" value="0">
+                                                    <span class="input-group-text">泊</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="taxAmount1" class="form-label fw-medium">税額</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="taxAmount1" name="taxAmount1" value="200" readonly>
+                                                    <span class="input-group-text">円/泊</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 税区分② -->
+                                <div class="col-md-12">
+                                    <div class="border rounded p-3 bg-white">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="bi bi-2-circle me-1"></i>税区分② (7,000円〜15,000円未満)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <label for="taxableNights2" class="form-label fw-medium">課税対象宿泊数</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="taxableNights2" name="taxableNights2" min="0" value="0">
+                                                    <span class="input-group-text">泊</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="taxAmount2" class="form-label fw-medium">税額</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="taxAmount2" name="taxAmount2" value="500" readonly>
+                                                    <span class="input-group-text">円/泊</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 税区分③ -->
+                                <div class="col-md-12">
+                                    <div class="border rounded p-3 bg-white">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="bi bi-3-circle me-1"></i>税区分③ (15,000円以上)
+                                        </h6>
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <label for="taxableNights3" class="form-label fw-medium">課税対象宿泊数</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="taxableNights3" name="taxableNights3" min="0" value="0">
+                                                    <span class="input-group-text">泊</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="taxAmount3" class="form-label fw-medium">税額</label>
+                                                <div class="input-group">
+                                                    <input type="number" class="form-control" id="taxAmount3" name="taxAmount3" value="1000" readonly>
+                                                    <span class="input-group-text">円/泊</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <label for="exemptNights" class="form-label fw-medium">課税対象外宿泊数</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="exemptNights" name="exemptNights" min="0" value="0">
+                                        <span class="input-group-text">泊</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="totalNights" class="form-label fw-medium">総宿泊数</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="totalNights" name="totalNights" readonly>
+                                        <span class="input-group-text">泊</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="totalPaymentAmount" class="form-label fw-medium">納入金額</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control fw-bold text-primary" id="totalPaymentAmount" name="totalPaymentAmount" readonly>
+                                        <span class="input-group-text">円</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- エラーメッセージエリア -->
+                                <div class="col-md-12">
+                                    <div class="alert alert-warning d-none" id="monthlyReportError">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>月計表の登録をしてください
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 更生/修正エリア -->
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-warning text-dark py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-pencil-square me-2"></i>更生/修正
+                            </h5>
+                        </div>
+                        <div class="card-body bg-light-subtle">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="changeType" class="form-label fw-medium">変更の区分</label>
+                                    <select class="form-select" id="changeType" name="changeType">
+                                        <option value="">選択してください</option>
+                                        <option value="correction">更生</option>
+                                        <option value="revision">修正</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="changeTargetMonth" class="form-label fw-medium">変更対象年月</label>
+                                    <input type="month" class="form-control" id="changeTargetMonth" name="changeTargetMonth">
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="changeReason" class="form-label fw-medium">変更理由</label>
+                                    <textarea class="form-control" id="changeReason" name="changeReason" rows="3" placeholder="変更理由を入力してください"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- アクションボタンエリア -->
+                    <div class="d-flex justify-content-center gap-3 py-4 mb-5">
+                        <button type="button" class="btn btn-info btn-lg px-4" data-bs-toggle="modal" data-bs-target="#monthlyReportModal">
+                            <i class="bi bi-table me-2"></i>月計表登録
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="registerBtn">
+                            <i class="bi bi-save me-2"></i>登録する
+                        </button>
+                        <button type="submit" class="btn btn-success btn-lg px-5" id="updateBtn" style="display: none;">
+                            <i class="bi bi-arrow-repeat me-2"></i>更新する
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
+                            <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+                        </button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <!-- 月計表登録モーダル -->
+    <div class="modal fade" id="monthlyReportModal" tabindex="-1" aria-labelledby="monthlyReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="monthlyReportModalLabel">
+                        <i class="bi bi-table me-2"></i>月計表登録
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="閉じる"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-primary text-center">
+                                <tr>
+                                    <th style="width: 15%;">日付</th>
+                                    <th style="width: 17%;">宿泊数<br>(税区分①)</th>
+                                    <th style="width: 17%;">宿泊数<br>(税区分②)</th>
+                                    <th style="width: 17%;">宿泊数<br>(税区分③)</th>
+                                    <th style="width: 17%;">課税免除</th>
+                                    <th style="width: 17%;">合計</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center fw-medium">1日</td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td class="text-center fw-bold">0</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center fw-medium">2日</td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td class="text-center fw-bold">0</td>
+                                </tr>
+                                <tr class="text-muted">
+                                    <td class="text-center">...</td>
+                                    <td class="text-center">（省略）</td>
+                                    <td class="text-center">（省略）</td>
+                                    <td class="text-center">（省略）</td>
+                                    <td class="text-center">（省略）</td>
+                                    <td class="text-center">...</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center fw-medium">31日</td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td><input type="number" class="form-control form-control-sm text-center" min="0" value="0"></td>
+                                    <td class="text-center fw-bold">0</td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr class="fw-bold">
+                                    <td class="text-center bg-primary text-white">合計</td>
+                                    <td class="text-center">0</td>
+                                    <td class="text-center">0</td>
+                                    <td class="text-center">0</td>
+                                    <td class="text-center">0</td>
+                                    <td class="text-center text-primary">0</td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td class="text-center bg-secondary text-white">税額(円)</td>
+                                    <td class="text-center">200</td>
+                                    <td class="text-center">500</td>
+                                    <td class="text-center">1,000</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center">-</td>
+                                </tr>
+                                <tr class="fw-bold">
+                                    <td class="text-center bg-success text-white">納入額(円)</td>
+                                    <td class="text-center">0</td>
+                                    <td class="text-center">0</td>
+                                    <td class="text-center">0</td>
+                                    <td class="text-center">-</td>
+                                    <td class="text-center text-success fs-5">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>閉じる
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 自動計算機能
+        function calculateTotals() {
+            const nights1 = parseInt(document.getElementById('taxableNights1').value) || 0;
+            const nights2 = parseInt(document.getElementById('taxableNights2').value) || 0;
+            const nights3 = parseInt(document.getElementById('taxableNights3').value) || 0;
+            const exempt = parseInt(document.getElementById('exemptNights').value) || 0;
+            
+            const tax1 = parseInt(document.getElementById('taxAmount1').value) || 0;
+            const tax2 = parseInt(document.getElementById('taxAmount2').value) || 0;
+            const tax3 = parseInt(document.getElementById('taxAmount3').value) || 0;
+            
+            // 総宿泊数計算
+            const totalNights = nights1 + nights2 + nights3 + exempt;
+            document.getElementById('totalNights').value = totalNights;
+            
+            // 納入金額計算
+            const totalAmount = (nights1 * tax1) + (nights2 * tax2) + (nights3 * tax3);
+            document.getElementById('totalPaymentAmount').value = totalAmount;
+        }
+
+        // イベントリスナー設定
+        document.addEventListener('DOMContentLoaded', function() {
+            // 宿泊数入力時の自動計算
+            ['taxableNights1', 'taxableNights2', 'taxableNights3', 'exemptNights'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateTotals);
+            });
+
+            // フォーム送信
+            document.getElementById('paymentForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('納入情報を登録します。');
+            });
+
+            // 月計表登録ボタン
+            document.querySelector('[data-bs-target="#monthlyReportModal"]').addEventListener('click', function() {
+                console.log('月計表登録モーダルを開きます。');
+            });
+
+            // 初期計算実行
+            calculateTotals();
+        });
+    </script>
+    </div></main></div></div>
+    <script>(function(){const p=location.pathname.split('/').pop();document.querySelectorAll('.sidebar-link').forEach(l=>{if(l.getAttribute('href')===p){l.classList.remove('text-white-50');l.classList.add('text-white','fw-medium');const c=l.closest('.accordion-collapse');if(c){c.classList.add('show');c.previousElementSibling?.querySelector('.accordion-button')?.classList.remove('collapsed');}}});})();</script>
+</body>
+</html>

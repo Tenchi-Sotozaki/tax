@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}"
+      lang="ja">
+<head><title>特別徴収義務者登録/編集</title></head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2 class="h2">
+            <i class="bi bi-person-plus me-2 text-primary"></i>特別徴収義務者登録/編集
+        </h2>
+    </div>
+
+    <!-- 登録成功メッセージ -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form id="registerForm" th:action="@{/collector/collector-registration}" th:object="${collectorForm}" method="post">
+
+        <!-- バリデーションエラー件数サマリー -->
+        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+        </div>
+
+        <!-- ===== 特別徴収義務者情報 ===== -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>特別徴収義務者情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label for="registrationDate" class="form-label fw-medium">
+                            登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="date" class="form-control" id="registrationDate"
+                               th:field="*{registrationDate}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}"
+                             th:errors="*{registrationDate}"></div>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-primary">
+                            <i class="bi bi-search me-1"></i>情報検索
+                        </button>
+                    </div>
+                    <div class="col-md-4"></div>
+
+                    <div class="col-md-6">
+                        <label for="obligorAddress" class="form-label fw-medium">
+                            住所 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="obligorAddress"
+                               th:field="*{obligorAddress}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('obligorAddress')}"
+                             th:errors="*{obligorAddress}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="obligorName" class="form-label fw-medium">
+                            氏名 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="obligorName"
+                               th:field="*{obligorName}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('obligorName')}"
+                             th:errors="*{obligorName}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="personalCorporateNumber" class="form-label fw-medium">個人/法人番号</label>
+                        <input type="text" class="form-control" id="personalCorporateNumber"
+                               th:field="*{personalCorporateNumber}" placeholder="自動入力されます" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="obligorPhone" class="form-label fw-medium">
+                            電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="tel" class="form-control" id="obligorPhone"
+                               th:field="*{obligorPhone}" th:errorclass="is-invalid"
+                               placeholder="例：03-1234-5678">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('obligorPhone')}"
+                             th:errors="*{obligorPhone}"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 宿泊施設情報 ===== -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-building me-2"></i>宿泊施設情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-12">
+                        <label for="facilityAddress" class="form-label fw-medium">
+                            所在地 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="facilityAddress"
+                               th:field="*{facilityAddress}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('facilityAddress')}"
+                             th:errors="*{facilityAddress}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="facilityNameKana" class="form-label fw-medium">
+                            ふりがな名称 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="facilityNameKana"
+                               th:field="*{facilityNameKana}" th:errorclass="is-invalid"
+                               placeholder="ひらがなで入力">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('facilityNameKana')}"
+                             th:errors="*{facilityNameKana}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="facilityPhone" class="form-label fw-medium">
+                            電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="tel" class="form-control" id="facilityPhone"
+                               th:field="*{facilityPhone}" th:errorclass="is-invalid"
+                               placeholder="例：03-1234-5678">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('facilityPhone')}"
+                             th:errors="*{facilityPhone}"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="floorArea" class="form-label fw-medium">延床面積</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="floorArea"
+                                   th:field="*{floorArea}" step="0.01">
+                            <span class="input-group-text">㎡</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="floors" class="form-label fw-medium">階層（地上/地下）</label>
+                        <input type="text" class="form-control" id="floors"
+                               th:field="*{floors}" placeholder="例：地上3階、地下1階">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="roomCount" class="form-label fw-medium">
+                            客室数 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="roomCount"
+                                   th:field="*{roomCount}" th:errorclass="is-invalid" min="1">
+                            <span class="input-group-text">室</span>
+                        </div>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('roomCount')}"
+                             th:errors="*{roomCount}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="capacity" class="form-label fw-medium">
+                            収容人数 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="capacity"
+                                   th:field="*{capacity}" th:errorclass="is-invalid" min="1">
+                            <span class="input-group-text">人</span>
+                        </div>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('capacity')}"
+                             th:errors="*{capacity}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="businessStartDate" class="form-label fw-medium">
+                            営業開始予定日 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="date" class="form-control" id="businessStartDate"
+                               th:field="*{businessStartDate}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('businessStartDate')}"
+                             th:errors="*{businessStartDate}"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 営業許可等情報 ===== -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-check me-2"></i>営業許可等情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-12">
+                        <label for="licenseAddress" class="form-label fw-medium">住所</label>
+                        <input type="text" class="form-control" id="licenseAddress"
+                               th:field="*{licenseAddress}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="licenseNameKana" class="form-label fw-medium">ふりがな氏名</label>
+                        <input type="text" class="form-control" id="licenseNameKana"
+                               th:field="*{licenseNameKana}" placeholder="ひらがなで入力">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="licensePhone" class="form-label fw-medium">電話番号</label>
+                        <input type="tel" class="form-control" id="licensePhone"
+                               th:field="*{licensePhone}" placeholder="例：03-1234-5678">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="businessType" class="form-label fw-medium">
+                            営業種別 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <select class="form-select" id="businessType"
+                                th:field="*{businessType}" th:errorclass="is-invalid">
+                            <option value="">選択してください</option>
+                            <option value="hotel">ホテル</option>
+                            <option value="ryokan">旅館</option>
+                            <option value="simple">簡易宿所</option>
+                            <option value="minpaku">民泊</option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('businessType')}"
+                             th:errors="*{businessType}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="licenseNumber" class="form-label fw-medium">
+                            許可番号 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="licenseNumber"
+                               th:field="*{licenseNumber}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('licenseNumber')}"
+                             th:errors="*{licenseNumber}"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 書類送付先情報 ===== -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>書類送付先情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-12">
+                        <label for="mailAddress" class="form-label fw-medium">
+                            住所 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="mailAddress"
+                               th:field="*{mailAddress}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('mailAddress')}"
+                             th:errors="*{mailAddress}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="mailNameKana" class="form-label fw-medium">
+                            ふりがな氏名 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="mailNameKana"
+                               th:field="*{mailNameKana}" th:errorclass="is-invalid"
+                               placeholder="ひらがなで入力">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('mailNameKana')}"
+                             th:errors="*{mailNameKana}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="mailPhone" class="form-label fw-medium">
+                            電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="tel" class="form-control" id="mailPhone"
+                               th:field="*{mailPhone}" th:errorclass="is-invalid"
+                               placeholder="例：03-1234-5678">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('mailPhone')}"
+                             th:errors="*{mailPhone}"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== その他の情報 ===== -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-gear me-2"></i>その他の情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">eLTAX申請</label>
+                        <div class="mt-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       th:field="*{eltaxApplication}" id="eltaxYes" value="yes">
+                                <label class="form-check-label" for="eltaxYes">有</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       th:field="*{eltaxApplication}" id="eltaxNo" value="no">
+                                <label class="form-check-label" for="eltaxNo">無</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="taxCycle" class="form-label fw-medium">納税周期</label>
+                        <select class="form-select" id="taxCycle" th:field="*{taxCycle}">
+                            <option value="">選択してください</option>
+                            <option value="monthly">月次</option>
+                            <option value="quarterly">四半期</option>
+                            <option value="annually">年次</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="remarks" class="form-label fw-medium">備考</label>
+                        <textarea class="form-control" id="remarks" rows="3"
+                                  th:field="*{remarks}" placeholder="特記事項があれば入力してください"></textarea>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== アクションボタン ===== -->
+        <div class="d-flex justify-content-center gap-3 py-4 mb-5">
+            <button type="button" id="openConfirmModalBtn" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-save me-2"></i>登録する
+            </button>
+            <a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+            </a>
+        </div>
+
+    </form>
+
+    <!-- 確認モーダル（共通フラグメント） -->
+    <div th:replace="~{layout/components :: confirmModal('registerModal', '登録確認', '入力した内容で登録します。よろしいですか？', 'registerForm')}"></div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        document.getElementById('openConfirmModalBtn').addEventListener('click', function () {
+            const form = document.getElementById('registerForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            new bootstrap.Modal(document.getElementById('registerModal')).show();
+        });
+    </script>
+</th:block>
+</body>
+</html>

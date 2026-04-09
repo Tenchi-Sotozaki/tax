@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}" lang="ja">
+<head><title>納税周期登録</title></head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 class="h2">
+                        <i class="bi bi-calendar-check me-2 text-primary"></i>納税周期登録
+                    </h2>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6" id="modeLabel">
+                            <i class="bi bi-plus-circle me-1"></i>新規登録
+                        </span>
+                    </div>
+                </div>
+
+                <!-- アラートエリア -->
+                <div id="alertArea"></div>
+
+                <form id="taxCycleForm" novalidate>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-calendar3 me-2"></i>納税周期情報
+                            </h5>
+                        </div>
+                        <div class="card-body bg-light-subtle">
+
+                            <!-- 全体エラー -->
+                            <div id="errorDuplicate" class="alert alert-danger d-none" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>※納税周期が重複しないよう選択してください
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="taxCycle" class="form-label fw-medium">
+                                        納税周期 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <select class="form-select" id="taxCycle" name="taxCycle" required>
+                                        <option value="1" selected>1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                    </select>
+                                    <div id="taxCycleError" class="text-danger small mt-1 d-none">※納税周期を選択してください</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- アクションボタンエリア -->
+                    <div class="d-flex justify-content-center gap-3 py-4 mb-5">
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="registerBtn">
+                            <i class="bi bi-save me-2"></i>登録する
+                        </button>
+                        <button type="button" class="btn btn-success btn-lg px-5" id="updateBtn">
+                            <i class="bi bi-arrow-repeat me-2"></i>更新する
+                        </button>
+                        <button type="button" class="btn btn-danger btn-lg px-4" id="deleteBtn">
+                            <i class="bi bi-trash me-2"></i>削除する
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
+                            <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+                        </button>
+                    </div>
+                </form>
+            
+    </div></main></div></div>
+
+    <!-- 削除確認モーダル -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>削除確認
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">この納税周期情報を削除しますか？</p>
+                    <p class="text-muted small mb-0">※削除した情報は復元できません。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>キャンセル
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="bi bi-trash me-1"></i>削除する
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('taxCycleForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            document.getElementById('taxCycleError').classList.add('d-none');
+            document.getElementById('taxCycle').classList.remove('is-invalid');
+            document.getElementById('errorDuplicate').classList.add('d-none');
+
+            const taxCycle = document.getElementById('taxCycle');
+            if (!taxCycle.value) {
+                document.getElementById('taxCycleError').classList.remove('d-none');
+                taxCycle.classList.add('is-invalid');
+                return;
+            }
+
+            // TODO: 登録処理
+        });
+
+        document.getElementById('updateBtn').addEventListener('click', function () {
+            // TODO: 更新処理
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', function () {
+            new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+            // TODO: 削除処理
+        });
+    </script>
+    <script>(function(){const p=location.pathname.split('/').pop();document.querySelectorAll('.sidebar-link').forEach(l=>{if(l.getAttribute('href')===p){l.classList.remove('text-white-50');l.classList.add('text-white','fw-medium');const c=l.closest('.accordion-collapse');if(c){c.classList.add('show');c.previousElementSibling?.querySelector('.accordion-button')?.classList.remove('collapsed');}}});})();</script>
+</body>
+</html>

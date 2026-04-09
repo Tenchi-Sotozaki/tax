@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<body>
+
+<!--
+  確認モーダル フラグメント
+  使用例:
+    <div th:replace="~{layout/components :: confirmModal('myModalId', '登録確認', '登録します。よろしいですか？', 'myFormId')}"></div>
+
+  引数:
+    modalId  - モーダルのHTML id属性値
+    title    - モーダルのタイトル文字列
+    message  - モーダルの本文メッセージ
+    formId   - 送信対象フォームのHTML id属性値
+-->
+<div th:fragment="confirmModal(modalId, title, message, formId)"
+     class="modal fade"
+     th:id="${modalId}"
+     tabindex="-1"
+     th:aria-labelledby="${modalId + 'Label'}"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" th:id="${modalId + 'Label'}">
+                    <i class="bi bi-check2-square me-2"></i>
+                    <span th:text="${title}">確認</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0" th:text="${message}">よろしいですか？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>キャンセル
+                </button>
+                <button type="button" class="btn btn-primary"
+                        th:data-form-id="${formId}"
+                        onclick="document.getElementById(this.dataset.formId).submit()">
+                    <i class="bi bi-check-lg me-1"></i>登録する
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

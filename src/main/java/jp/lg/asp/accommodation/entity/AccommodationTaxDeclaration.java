@@ -26,7 +26,6 @@ public class AccommodationTaxDeclaration {
     @JoinColumn(name = "facility_id", nullable = false)
     private AccommodationFacility facility;
 
-    /** 納入年月 YYYYMM */
     @Column(name = "payment_year_month", nullable = false, length = 6)
     private String paymentYearMonth;
 

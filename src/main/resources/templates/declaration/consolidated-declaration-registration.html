@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}" lang="ja">
+<head><title>宿泊税合算申告情報登録</title></head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 class="h2">
+                        <i class="bi bi-files me-2 text-primary"></i>宿泊税合算申告情報登録
+                    </h2>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
+                            <i class="bi bi-plus-circle me-1"></i>新規登録
+                        </span>
+                    </div>
+                </div>
+
+                <!-- アラートエリア -->
+                <div id="alertArea"></div>
+
+                <form id="consolidatedDeclarationForm" novalidate>
+                    <!-- 申告情報エリア -->
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-file-earmark-plus me-2"></i>申告情報
+                            </h5>
+                        </div>
+                        <div class="card-body bg-light-subtle">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="registrationDate" class="form-label fw-medium">
+                                        登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="date" class="form-control" id="registrationDate" name="registrationDate" required>
+                                    <div class="invalid-feedback text-danger small">※登録日を入力してください</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="obligorName" class="form-label fw-medium">
+                                        特別徴収義務者 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="obligorName" name="obligorName" 
+                                           value="株式会社グランドホテル東京" readonly required>
+                                    <div class="invalid-feedback text-danger small">※特別徴収義務者を選択してください</div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="applicablePeriod" class="form-label fw-medium">
+                                        適用時期 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="month" class="form-control" id="applicablePeriod" name="applicablePeriod" required>
+                                    <div class="invalid-feedback text-danger small">※適用時期を入力してください</div>
+                                </div>
+                                
+                                <div class="col-md-12">
+                                    <label class="form-label fw-medium">
+                                        施設名一覧 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <div class="mt-2">
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <div class="form-check p-3 border rounded bg-white">
+                                                    <input class="form-check-input" type="checkbox" id="facility1" name="facilities" value="facility1" required>
+                                                    <label class="form-check-label fw-medium" for="facility1">
+                                                        <i class="bi bi-building me-2 text-primary"></i>グランドホテル東京本館
+                                                    </label>
+                                                    <div class="small text-muted mt-1">東京都新宿区西新宿1-1-1</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check p-3 border rounded bg-white">
+                                                    <input class="form-check-input" type="checkbox" id="facility2" name="facilities" value="facility2">
+                                                    <label class="form-check-label fw-medium" for="facility2">
+                                                        <i class="bi bi-building me-2 text-primary"></i>グランドホテル東京別館
+                                                    </label>
+                                                    <div class="small text-muted mt-1">東京都新宿区西新宿1-2-1</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check p-3 border rounded bg-white">
+                                                    <input class="form-check-input" type="checkbox" id="facility3" name="facilities" value="facility3">
+                                                    <label class="form-check-label fw-medium" for="facility3">
+                                                        <i class="bi bi-building me-2 text-primary"></i>グランドホテル東京アネックス
+                                                    </label>
+                                                    <div class="small text-muted mt-1">東京都新宿区西新宿1-3-1</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check p-3 border rounded bg-white">
+                                                    <input class="form-check-input" type="checkbox" id="facility4" name="facilities" value="facility4">
+                                                    <label class="form-check-label fw-medium" for="facility4">
+                                                        <i class="bi bi-building me-2 text-primary"></i>グランドホテル東京スイート
+                                                    </label>
+                                                    <div class="small text-muted mt-1">東京都新宿区西新宿1-4-1</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="invalid-feedback text-danger small d-block" id="facilitiesError" style="display: none !important;">
+                                        ※施設を1つ以上選択してください
+                                    </div>
+                                </div>
+                                
+                                <!-- 選択された施設の表示エリア -->
+                                <div class="col-md-12" id="selectedFacilitiesArea" style="display: none;">
+                                    <div class="alert alert-info border-info">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-info-circle-fill me-2"></i>
+                                            <strong>選択された施設</strong>
+                                        </div>
+                                        <div id="selectedFacilitiesList"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- アクションボタンエリア -->
+                    <div class="d-flex justify-content-center gap-3 py-4 mb-5">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-save me-2"></i>登録する
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
+                            <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+                        </button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

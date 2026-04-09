@@ -1,0 +1,244 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}" lang="ja">
+<head><title>一般ユーザー登録</title></head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h2 class="h2">
+                        <i class="bi bi-person-plus me-2 text-primary"></i>一般ユーザー登録
+                    </h2>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6" id="modeLabel">
+                            <i class="bi bi-plus-circle me-1"></i>新規登録
+                        </span>
+                    </div>
+                </div>
+
+                <!-- アラートエリア -->
+                <div id="alertArea"></div>
+
+                <form id="userRegistrationForm" novalidate>
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-person-vcard me-2"></i>ユーザー情報
+                            </h5>
+                        </div>
+                        <div class="card-body bg-light-subtle">
+                            <div class="row g-3">
+
+                                <!-- 登録日 -->
+                                <div class="col-md-4">
+                                    <label for="registrationDate" class="form-label fw-medium">
+                                        登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="date" class="form-control" id="registrationDate" name="registrationDate" required>
+                                    <div id="registrationDateError" class="text-danger small mt-1 d-none">※登録日を入力してください</div>
+                                </div>
+
+                                <div class="col-md-8"></div>
+
+                                <!-- 職員番号(ID) -->
+                                <div class="col-md-4">
+                                    <label for="staffId" class="form-label fw-medium">
+                                        職員番号(ID) <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="staffId" name="staffId" required>
+                                    <div id="staffIdError" class="text-danger small mt-1 d-none">※職員番号(ID)を入力してください</div>
+                                </div>
+
+                                <!-- 氏名 -->
+                                <div class="col-md-4">
+                                    <label for="fullName" class="form-label fw-medium">
+                                        氏名 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="fullName" name="fullName" required>
+                                    <div id="fullNameError" class="text-danger small mt-1 d-none">※氏名を入力してください</div>
+                                </div>
+
+                                <!-- ふりがな -->
+                                <div class="col-md-4">
+                                    <label for="fullNameKana" class="form-label fw-medium">
+                                        ふりがな <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="fullNameKana" name="fullNameKana" placeholder="ひらがなで入力" required>
+                                    <div id="fullNameKanaError" class="text-danger small mt-1 d-none">※ふりがなを入力してください</div>
+                                </div>
+
+                                <!-- 部署 -->
+                                <div class="col-md-6">
+                                    <label for="department" class="form-label fw-medium">
+                                        部署 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="department" name="department" required>
+                                    <div id="departmentError" class="text-danger small mt-1 d-none">※部署を入力してください</div>
+                                </div>
+
+                                <div class="col-md-6"></div>
+
+                                <!-- パスワード -->
+                                <div class="col-md-4">
+                                    <label for="password" class="form-label fw-medium">
+                                        パスワード <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="password" class="form-control" id="password" name="password" autocomplete="new-password" required>
+                                    <div id="passwordError" class="text-danger small mt-1 d-none">※パスワードを入力してください</div>
+                                </div>
+
+                                <!-- パスワード(確認用) -->
+                                <div class="col-md-4">
+                                    <label for="passwordConfirm" class="form-label fw-medium">
+                                        パスワード(確認用) <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" autocomplete="new-password" required>
+                                    <div id="passwordConfirmError" class="text-danger small mt-1 d-none">※パスワード(確認用)を入力してください</div>
+                                    <div id="passwordMismatchError" class="text-danger small mt-1 d-none">※パスワードが一致しません</div>
+                                </div>
+
+                                <div class="col-md-4"></div>
+
+                                <!-- 権限 -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-medium">
+                                        権限 <span class="badge bg-danger text-white ms-1">必須</span>
+                                    </label>
+                                    <div class="d-flex flex-wrap gap-4 mt-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="roleAdmin" name="roles" value="admin">
+                                            <label class="form-check-label" for="roleAdmin">管理者</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="roleUser" name="roles" value="user">
+                                            <label class="form-check-label" for="roleUser">一般ユーザー</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="roleReadonly" name="roles" value="readonly">
+                                            <label class="form-check-label" for="roleReadonly">閲覧のみ</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="roleApprover" name="roles" value="approver">
+                                            <label class="form-check-label" for="roleApprover">承認者</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="roleAuditor" name="roles" value="auditor">
+                                            <label class="form-check-label" for="roleAuditor">監査</label>
+                                        </div>
+                                    </div>
+                                    <div id="rolesError" class="text-danger small mt-1 d-none">※権限を1つ以上選択してください</div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- アクションボタンエリア -->
+                    <div class="d-flex justify-content-center gap-3 py-4 mb-5">
+                        <button type="submit" class="btn btn-primary btn-lg px-5" id="registerBtn">
+                            <i class="bi bi-save me-2"></i>登録する
+                        </button>
+                        <button type="button" class="btn btn-success btn-lg px-5" id="updateBtn">
+                            <i class="bi bi-arrow-repeat me-2"></i>更新する
+                        </button>
+                        <button type="button" class="btn btn-danger btn-lg px-4" id="deleteBtn">
+                            <i class="bi bi-trash me-2"></i>削除する
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
+                            <i class="bi bi-arrow-left me-2"></i>メニューに戻る
+                        </button>
+                    </div>
+                </form>
+            
+    </div></main></div></div>
+
+    <!-- 削除確認モーダル -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>削除確認
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">このユーザー情報を削除しますか？</p>
+                    <p class="text-muted small mb-0">※削除した情報は復元できません。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>キャンセル
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="bi bi-trash me-1"></i>削除する
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('userRegistrationForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // エラーリセット
+            document.querySelectorAll('.text-danger.small').forEach(el => el.classList.add('d-none'));
+            document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+            let valid = true;
+
+            const fields = [
+                { id: 'registrationDate', errorId: 'registrationDateError' },
+                { id: 'staffId',          errorId: 'staffIdError' },
+                { id: 'fullName',         errorId: 'fullNameError' },
+                { id: 'fullNameKana',     errorId: 'fullNameKanaError' },
+                { id: 'department',       errorId: 'departmentError' },
+                { id: 'password',         errorId: 'passwordError' },
+                { id: 'passwordConfirm',  errorId: 'passwordConfirmError' },
+            ];
+
+            fields.forEach(({ id, errorId }) => {
+                const el = document.getElementById(id);
+                if (!el.value.trim()) {
+                    document.getElementById(errorId).classList.remove('d-none');
+                    el.classList.add('is-invalid');
+                    valid = false;
+                }
+            });
+
+            // パスワード一致チェック
+            const pw = document.getElementById('password');
+            const pwc = document.getElementById('passwordConfirm');
+            if (pw.value && pwc.value && pw.value !== pwc.value) {
+                document.getElementById('passwordMismatchError').classList.remove('d-none');
+                pwc.classList.add('is-invalid');
+                valid = false;
+            }
+
+            // 権限チェック
+            if (!document.querySelector('input[name="roles"]:checked')) {
+                document.getElementById('rolesError').classList.remove('d-none');
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            // TODO: 登録処理
+        });
+
+        document.getElementById('updateBtn').addEventListener('click', function () {
+            // TODO: 更新処理
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', function () {
+            new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+            // TODO: 削除処理
+        });
+    </script>
+    <script>(function(){const p=location.pathname.split('/').pop();document.querySelectorAll('.sidebar-link').forEach(l=>{if(l.getAttribute('href')===p){l.classList.remove('text-white-50');l.classList.add('text-white','fw-medium');const c=l.closest('.accordion-collapse');if(c){c.classList.add('show');c.previousElementSibling?.querySelector('.accordion-button')?.classList.remove('collapsed');}}});})();</script>
+</body>
+</html>

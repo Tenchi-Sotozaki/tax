@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}"
+      lang="ja">
+<head>
+    <title>ユーザー検索</title>
+</head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2 class="h2">
+            <i class="bi bi-person-search me-2 text-primary"></i>ユーザー検索
+        </h2>
+    </div>
+
+    <!-- 検索条件エリア -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>検索条件</h5>
+        </div>
+        <div class="card-body bg-light-subtle">
+            <form id="searchForm">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="staffId" class="form-label fw-medium">職員番号(ID)</label>
+                        <input type="text" class="form-control" id="staffId" name="staffId" placeholder="職員番号を入力">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="fullName" class="form-label fw-medium">氏名</label>
+                        <input type="text" class="form-control" id="fullName" name="fullName" placeholder="氏名を入力">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="department" class="form-label fw-medium">部署</label>
+                        <input type="text" class="form-control" id="department" name="department" placeholder="部署を入力">
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search me-1"></i>検索
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearBtn">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>クリア
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 操作ボタン＆件数 -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <a th:href="@{/admin/user-registration}" class="btn btn-success">
+            <i class="bi bi-person-plus me-1"></i>ユーザー登録
+        </a>
+        <span class="text-muted small">検索結果：<span id="resultCount">5</span> 件</span>
+    </div>
+
+    <!-- 一覧テーブル -->
+    <div class="card shadow-sm mb-5">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th style="width: 140px;">ID</th>
+                        <th style="width: 160px;">氏名</th>
+                        <th style="width: 180px;">ふりがな</th>
+                        <th>部署</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <a th:href="@{/admin/user-registration(id='U001')}" class="text-primary fw-medium text-decoration-none">
+                                <i class="bi bi-person me-1"></i>U001
+                            </a>
+                        </td>
+                        <td>田中 太郎</td>
+                        <td class="text-muted">たなか たろう</td>
+                        <td>税務課</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a th:href="@{/admin/user-registration(id='U002')}" class="text-primary fw-medium text-decoration-none">
+                                <i class="bi bi-person me-1"></i>U002
+                            </a>
+                        </td>
+                        <td>佐藤 花子</td>
+                        <td class="text-muted">さとう はなこ</td>
+                        <td>収納管理課</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a th:href="@{/admin/user-registration(id='U003')}" class="text-primary fw-medium text-decoration-none">
+                                <i class="bi bi-person me-1"></i>U003
+                            </a>
+                        </td>
+                        <td>鈴木 一郎</td>
+                        <td class="text-muted">すずき いちろう</td>
+                        <td>総務課</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a th:href="@{/admin/user-registration(id='U004')}" class="text-primary fw-medium text-decoration-none">
+                                <i class="bi bi-person me-1"></i>U004
+                            </a>
+                        </td>
+                        <td>高橋 美咲</td>
+                        <td class="text-muted">たかはし みさき</td>
+                        <td>税務課</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a th:href="@{/admin/user-registration(id='U005')}" class="text-primary fw-medium text-decoration-none">
+                                <i class="bi bi-person me-1"></i>U005
+                            </a>
+                        </td>
+                        <td>山田 健太</td>
+                        <td class="text-muted">やまだ けんた</td>
+                        <td>情報システム課</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<th:block layout:fragment="scripts">
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            // TODO: 検索処理
+        });
+        document.getElementById('clearBtn').addEventListener('click', function () {
+            document.getElementById('searchForm').reset();
+        });
+    </script>
+</th:block>
+</body>
+</html>
