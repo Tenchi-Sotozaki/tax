@@ -11,6 +11,9 @@ import java.time.LocalDate;
 @Data
 public class CollectorForm {
 
+    // 編集時のID保持用（新規登録時は null）
+    private Long id;
+
     // ===== 特別徴収義務者情報 =====
 
     @NotNull(message = "登録日は必須です")

@@ -5,24 +5,36 @@
       lang="ja">
 <head><title>特別徴収義務者登録/編集</title></head>
 <body>
-<div layout:fragment="content" class="container-fluid p-4">
+<div layout:fragment="content" class="container-fluid p-4"
+     th:with="formAction=${isEdit} ? '/collector/edit/' + ${editId} : '/collector/registration'">
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h2 class="h2">
-            <i class="bi bi-person-plus me-2 text-primary"></i>特別徴収義務者登録/編集
+            <i class="bi bi-person-plus me-2 text-primary"></i>
+            <span th:text="${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録'"></span>
         </h2>
+        <span class="badge px-3 py-2 fs-6"
+              th:classappend="${isEdit} ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle'">
+            <i th:class="${isEdit} ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1'"></i>
+            <span th:text="${isEdit} ? '編集' : '新規登録'"></span>
+        </span>
     </div>
 
-    <!-- 登録成功メッセージ -->
+    <!-- 登録・更新成功メッセージ -->
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>
         <span th:text="${successMessage}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 
-    <form id="registerForm" th:action="@{/collector/collector-registration}" th:object="${collectorForm}" method="post">
+    <form id="registerForm"
+          th:action="@{${formAction}}"
+          th:object="${collectorForm}" method="post">
 
-        <!-- バリデーションエラー件数サマリー -->
+        <!-- 編集時のID保持 -->
+        <input th:if="${isEdit}" type="hidden" th:field="*{id}">
+
+        <!-- バリデーションエラーサマリー -->
         <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
@@ -335,8 +347,10 @@
 
         <!-- ===== アクションボタン ===== -->
         <div class="d-flex justify-content-center gap-3 py-4 mb-5">
-            <button type="button" id="openConfirmModalBtn" class="btn btn-primary btn-lg px-5">
-                <i class="bi bi-save me-2"></i>登録する
+            <button type="button" id="openConfirmModalBtn" class="btn btn-lg px-5"
+                    th:classappend="${isEdit} ? 'btn-success' : 'btn-primary'">
+                <i th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+                <span th:text="${isEdit} ? '更新する' : '登録する'"></span>
             </button>
             <a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
                 <i class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -346,7 +360,8 @@
     </form>
 
     <!-- 確認モーダル（共通フラグメント） -->
-    <div th:replace="~{layout/components :: confirmModal('registerModal', '登録確認', '入力した内容で登録します。よろしいですか？', 'registerForm')}"></div>
+    <div th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? '入力した内容で更新します。よろしいですか？' : '入力した内容で登録します。よろしいですか？', 'registerForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新する' : '登録する')}"></div>
+
 </div>
 
 <th:block layout:fragment="scripts">

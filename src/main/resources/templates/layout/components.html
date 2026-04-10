@@ -4,16 +4,21 @@
 
 <!--
   確認モーダル フラグメント
-  使用例:
-    <div th:replace="~{layout/components :: confirmModal('myModalId', '登録確認', '登録します。よろしいですか？', 'myFormId')}"></div>
-
   引数:
     modalId  - モーダルのHTML id属性値
-    title    - モーダルのタイトル文字列
+    title    - モーダルのタイトル
     message  - モーダルの本文メッセージ
     formId   - 送信対象フォームのHTML id属性値
+    btnClass - 実行ボタンのBootstrapクラス（例: btn-primary, btn-danger）
+    btnLabel - 実行ボタンのラベル（例: 登録する, 削除する）
+
+  使用例（登録確認）:
+    <div th:replace="~{layout/components :: confirmModal('myModal','登録確認','登録します。よろしいですか？','myForm','btn-primary','登録する')}"></div>
+
+  使用例（削除確認）:
+    <div th:replace="~{layout/components :: confirmModal('deleteModal','削除確認','削除します。よろしいですか？','deleteForm-1','btn-danger','削除する')}"></div>
 -->
-<div th:fragment="confirmModal(modalId, title, message, formId)"
+<div th:fragment="confirmModal(modalId, title, message, formId, btnClass, btnLabel)"
      class="modal fade"
      th:id="${modalId}"
      tabindex="-1"
@@ -21,9 +26,10 @@
      aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header"
+                 th:classappend="${btnClass == 'btn-danger'} ? 'bg-danger text-white' : 'bg-primary text-white'">
                 <h5 class="modal-title" th:id="${modalId + 'Label'}">
-                    <i class="bi bi-check2-square me-2"></i>
+                    <i th:class="${btnClass == 'btn-danger'} ? 'bi bi-exclamation-triangle me-2' : 'bi bi-check2-square me-2'"></i>
                     <span th:text="${title}">確認</span>
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="閉じる"></button>
@@ -35,10 +41,12 @@
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-lg me-1"></i>キャンセル
                 </button>
-                <button type="button" class="btn btn-primary"
+                <button type="button" class="btn"
+                        th:classappend="${btnClass}"
                         th:data-form-id="${formId}"
                         onclick="document.getElementById(this.dataset.formId).submit()">
-                    <i class="bi bi-check-lg me-1"></i>登録する
+                    <i th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>
+                    <span th:text="${btnLabel}">実行</span>
                 </button>
             </div>
         </div>

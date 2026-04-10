@@ -22,10 +22,9 @@ public class MainViewController {
 
     // ========== 特別徴収義務者管理 ==========
 
-    @GetMapping("/collector/list")
-    public String collectorList() {
-        return "collector/special-collector-management";
-    }
+    // GET /collector/list → CollectorController#list に委譲済み
+    // GET /collector/registration  → CollectorController#showRegistrationForm
+    // GET /collector/edit/{id}     → CollectorController#showEditForm
 
     @GetMapping("/collector/tax-manager-registration")
     public String taxManagerRegistration() {

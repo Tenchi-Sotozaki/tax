@@ -4,7 +4,7 @@ import jp.lg.asp.accommodation.dto.*;
 import jp.lg.asp.accommodation.entity.*;
 import jp.lg.asp.accommodation.exception.*;
 import jp.lg.asp.accommodation.repository.*;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,13 +12,23 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class AccommodationTaxDeclarationService {
 
     private final AccommodationTaxDeclarationRepository declarationRepository;
     private final AccommodationFacilityRepository facilityRepository;
     private final SpecialCollectorRepository collectorRepository;
     private final TaxCategoryRepository taxCategoryRepository;
+
+    public AccommodationTaxDeclarationService(
+            @Lazy AccommodationTaxDeclarationRepository declarationRepository,
+            @Lazy AccommodationFacilityRepository facilityRepository,
+            @Lazy SpecialCollectorRepository collectorRepository,
+            @Lazy TaxCategoryRepository taxCategoryRepository) {
+        this.declarationRepository = declarationRepository;
+        this.facilityRepository = facilityRepository;
+        this.collectorRepository = collectorRepository;
+        this.taxCategoryRepository = taxCategoryRepository;
+    }
 
     /**
      * 申告を新規登録する。
