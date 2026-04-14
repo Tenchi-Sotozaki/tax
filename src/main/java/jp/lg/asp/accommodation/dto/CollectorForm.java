@@ -44,7 +44,10 @@ public class CollectorForm {
     @NotBlank(message = "施設の電話番号は必須です")
     private String facilityPhone;
 
+    @NotNull(message = "延床面積は必須です")
     private Double floorArea;
+
+    @NotBlank(message = "階層は必須です")
     private String floors;
 
     @NotNull(message = "客室数は必須です")
@@ -58,8 +61,14 @@ public class CollectorForm {
 
     // ===== 営業許可等情報 =====
 
+    @NotBlank(message = "営業許可の住所は必須です")
     private String licenseAddress;
+
+    @NotBlank(message = "営業許可のふりがなは必須です")
     private String licenseNameKana;
+
+    @Pattern(regexp = "^[0-9-]{10,15}$", message = "有効な電話番号を入力してください（例：03-1234-5678）")
+    @NotBlank(message = "営業許可の電話番号は必須です")
     private String licensePhone;
 
     @NotBlank(message = "営業種別は必須です")
@@ -67,6 +76,18 @@ public class CollectorForm {
 
     @NotBlank(message = "許可番号は必須です")
     private String licenseNumber;
+
+    // ===== 施設所有者情報 =====
+
+    @NotBlank(message = "所有者の住所は必須です")
+    private String ownerAddress;
+
+    @NotBlank(message = "所有者のふりがなは必須です")
+    private String ownerNameKana;
+
+    @Pattern(regexp = "^[0-9-]{10,15}$", message = "有効な電話番号を入力してください（例：03-1234-5678）")
+    @NotBlank(message = "所有者の電話番号は必須です")
+    private String ownerPhone;
 
     // ===== 書類送付先情報 =====
 
@@ -85,4 +106,13 @@ public class CollectorForm {
     private String eltaxApplication;
     private String taxCycle;
     private String remarks;
+
+    // ===== 施設営業休止/再開/廃止情報（編集時のみ使用） =====
+
+    private String declarationCategory;         // 休止 / 再開 / 廃止
+    private LocalDate suspensionStartDate;
+    private LocalDate suspensionEndDate;
+    private boolean suspensionEndDateUndecided;
+    private LocalDate resumptionOrAbolitionDate;
+    private String suspensionOrAbolitionReason;
 }

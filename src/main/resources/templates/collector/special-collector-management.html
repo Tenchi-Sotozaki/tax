@@ -81,12 +81,15 @@
             <a th:href="@{/collector/registration}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-1"></i>新規登録
             </a>
-            <a th:href="@{/collector/tax-manager-registration}" class="btn btn-info">
+            <button type="button" id="btnTaxManager" class="btn btn-info">
                 <i class="bi bi-person-plus me-1"></i>納税管理人登録/編集
-            </a>
-            <a th:href="@{/declaration/consolidated-declaration-registration}" class="btn btn-warning">
+            </button>
+            <button type="button" id="btnConsolidated" class="btn btn-warning">
                 <i class="bi bi-file-earmark-plus me-1"></i>合算申告登録/編集
-            </a>
+            </button>
+            <button type="button" id="btnPaymentLedger" class="btn btn-outline-info">
+                <i class="bi bi-currency-yen me-1"></i>納入金額管理台帳
+            </button>
         </div>
         <span class="text-muted small">
             検索結果: <span th:text="${#lists.size(items)}">0</span> 件
@@ -98,6 +101,7 @@
         <table class="table table-striped table-hover mb-0">
             <thead>
                 <tr>
+                    <th style="width: 50px;" class="text-center">選択</th>
                     <th style="width: 120px;">登録番号</th>
                     <th>事業所名称</th>
                     <th style="width: 150px;">施設名</th>
@@ -108,9 +112,14 @@
             </thead>
             <tbody>
                 <tr th:each="item : ${items}">
+                    <td class="text-center">
+                        <input type="checkbox" name="selectedId" class="form-check-input row-select"
+                               th:data-id="${item.id}">
+                    </td>
                     <td>
-                        <a th:href="@{/declaration/payment-management(id=${item.registrationNo})}"
-                           class="registration-link" th:text="${item.registrationNo}"></a>
+                        <a th:href="@{/declaration/payment-ledger/{id}(id=${item.id})}"
+                           class="text-decoration-none fw-bold"
+                           th:text="${item.registrationNo}"></a>
                     </td>
                     <td th:text="${item.obligorName}"></td>
                     <td th:text="${item.facilityName}"></td>
@@ -178,6 +187,64 @@
                 modal.querySelector('[data-form-id]').dataset.formId = 'deleteForm-' + id;
                 new bootstrap.Modal(modal).show();
             });
+        });
+
+        // 行全体クリックで選択（操作列のボタンは除外）
+        document.querySelectorAll('tbody tr').forEach(function(row) {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', function(e) {
+                // 編集・削除ボタンは除外
+                if (e.target.closest('.btn')) return;
+                // チェックボックス直接クリックはデフォルト動作に任せる
+                if (e.target.classList.contains('row-select')) return;
+
+                const cb = row.querySelector('.row-select');
+                if (!cb) return;
+
+                if (cb.checked) {
+                    cb.checked = false;
+                } else {
+                    document.querySelectorAll('.row-select').forEach(o => o.checked = false);
+                    cb.checked = true;
+                }
+            });
+        });
+
+        // チェックボックス直接クリック時も他を解除
+        document.querySelectorAll('.row-select').forEach(function(cb) {
+            cb.addEventListener('click', function(e) {
+                e.stopPropagation();
+                document.querySelectorAll('.row-select').forEach(function(other) {
+                    if (other !== cb) other.checked = false;
+                });
+            });
+        });
+
+        document.getElementById('btnTaxManager').addEventListener('click', function() {
+            const selected = document.querySelector('.row-select:checked');
+            if (!selected) {
+                alert('特別徴収義務者を選択してください。');
+                return;
+            }
+            location.href = '/accommodation-tax/tax-manager/edit/' + selected.dataset.id;
+        });
+
+        document.getElementById('btnConsolidated').addEventListener('click', function() {
+            const selected = document.querySelector('.row-select:checked');
+            if (!selected) {
+                alert('特別徴収義務者を選択してください。');
+                return;
+            }
+            location.href = '/accommodation-tax/consolidated/register/' + selected.dataset.id;
+        });
+
+        document.getElementById('btnPaymentLedger').addEventListener('click', function() {
+            const selected = document.querySelector('.row-select:checked');
+            if (!selected) {
+                alert('事業者を選択してください。');
+                return;
+            }
+            location.href = '/accommodation-tax/declaration/payment-ledger/' + selected.dataset.id;
         });
     </script>
 </th:block>

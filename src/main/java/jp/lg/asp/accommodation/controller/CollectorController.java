@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
 import jp.lg.asp.accommodation.dto.CollectorForm;
-import jp.lg.asp.accommodation.dto.CollectorListItem;
 import jp.lg.asp.accommodation.dto.CollectorSearchForm;
 import jp.lg.asp.accommodation.service.CollectorService;
 import lombok.RequiredArgsConstructor;
@@ -25,62 +24,57 @@ public class CollectorController {
 
     private final CollectorService collectorService;
 
+    private static final String LIST_VIEW = "collector/special-collector-management";
+    private static final String FORM_VIEW = "collector/collector-registration";
+
     // ========== 一覧・検索 ==========
 
-    /** GET /collector/list — 一覧・検索 */
     @GetMapping("/list")
     public String list(@ModelAttribute CollectorSearchForm searchForm, Model model) {
-        model.addAttribute("items", collectorService.search(searchForm));
+        model.addAttribute("items",      collectorService.search(searchForm));
         model.addAttribute("searchForm", searchForm);
-        return "collector/special-collector-management";
+        return LIST_VIEW;
     }
 
     // ========== 新規登録 ==========
 
-    /** GET /collector/registration — 新規登録画面 */
     @GetMapping("/registration")
     public String showRegistrationForm(Model model) {
         model.addAttribute("collectorForm", new CollectorForm());
         model.addAttribute("isEdit", false);
-        return "collector/collector-registration";
+        return FORM_VIEW;
     }
 
-    /** POST /collector/registration — 新規登録実行 */
     @PostMapping("/registration")
     public String register(
-            @Validated @ModelAttribute("collectorForm") CollectorForm collectorForm,
+            @Validated @ModelAttribute("collectorForm") CollectorForm form,
             BindingResult bindingResult,
             Model model,
             RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("isEdit", false);
-            return "collector/collector-registration";
+            return FORM_VIEW;
         }
-
-        // TODO: DB登録処理
-        log.info("特別徴収義務者登録: {}", collectorForm.getObligorName());
+        collectorService.register(form);
         redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
         return "redirect:/collector/list";
     }
 
     // ========== 編集 ==========
 
-    /** GET /collector/edit/{id} — 編集画面 */
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        CollectorForm form = collectorService.getCollectorById(id);
-        model.addAttribute("collectorForm", form);
+        model.addAttribute("collectorForm", collectorService.getCollectorById(id));
         model.addAttribute("isEdit", true);
         model.addAttribute("editId", id);
-        return "collector/collector-registration";
+        return FORM_VIEW;
     }
 
-    /** POST /collector/edit/{id} — 更新実行 */
     @PostMapping("/edit/{id}")
     public String update(
             @PathVariable Long id,
-            @Validated @ModelAttribute("collectorForm") CollectorForm collectorForm,
+            @Validated @ModelAttribute("collectorForm") CollectorForm form,
             BindingResult bindingResult,
             Model model,
             RedirectAttributes redirectAttributes) {
@@ -88,25 +82,18 @@ public class CollectorController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("isEdit", true);
             model.addAttribute("editId", id);
-            return "collector/collector-registration";
+            return FORM_VIEW;
         }
-
-        // TODO: DB更新処理
-        log.info("特別徴収義務者更新: id={}, name={}", id, collectorForm.getObligorName());
+        collectorService.update(id, form);
         redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
         return "redirect:/collector/list";
     }
 
     // ========== 削除 ==========
 
-    /** POST /collector/delete/{id} — 削除実行 */
     @PostMapping("/delete/{id}")
-    public String delete(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes) {
-
-        // TODO: DB削除処理
-        log.info("特別徴収義務者削除: id={}", id);
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        collectorService.delete(id);
         redirectAttributes.addFlashAttribute("successMessage", "ID:" + id + " のデータを削除しました。");
         return "redirect:/collector/list";
     }

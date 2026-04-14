@@ -147,18 +147,24 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label for="floorArea" class="form-label fw-medium">延床面積</label>
+                        <label for="floorArea" class="form-label fw-medium">
+                            延床面積 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
                         <div class="input-group">
                             <input type="number" class="form-control" id="floorArea"
-                                   th:field="*{floorArea}" step="0.01">
+                                   th:field="*{floorArea}" th:errorclass="is-invalid" step="0.01">
                             <span class="input-group-text">㎡</span>
                         </div>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('floorArea')}" th:errors="*{floorArea}"></div>
                     </div>
 
                     <div class="col-md-4">
-                        <label for="floors" class="form-label fw-medium">階層（地上/地下）</label>
+                        <label for="floors" class="form-label fw-medium">
+                            階層（地上/地下） <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
                         <input type="text" class="form-control" id="floors"
-                               th:field="*{floors}" placeholder="例：地上3階、地下1階">
+                               th:field="*{floors}" th:errorclass="is-invalid" placeholder="例：地上3階、地下1階">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('floors')}" th:errors="*{floors}"></div>
                     </div>
 
                     <div class="col-md-4">
@@ -210,21 +216,30 @@
                 <div class="row g-3">
 
                     <div class="col-md-12">
-                        <label for="licenseAddress" class="form-label fw-medium">住所</label>
+                        <label for="licenseAddress" class="form-label fw-medium">
+                            住所 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
                         <input type="text" class="form-control" id="licenseAddress"
-                               th:field="*{licenseAddress}">
+                               th:field="*{licenseAddress}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('licenseAddress')}" th:errors="*{licenseAddress}"></div>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="licenseNameKana" class="form-label fw-medium">ふりがな氏名</label>
+                        <label for="licenseNameKana" class="form-label fw-medium">
+                            ふりがな氏名 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
                         <input type="text" class="form-control" id="licenseNameKana"
-                               th:field="*{licenseNameKana}" placeholder="ひらがなで入力">
+                               th:field="*{licenseNameKana}" th:errorclass="is-invalid" placeholder="ひらがなで入力">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('licenseNameKana')}" th:errors="*{licenseNameKana}"></div>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="licensePhone" class="form-label fw-medium">電話番号</label>
+                        <label for="licensePhone" class="form-label fw-medium">
+                            電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
                         <input type="tel" class="form-control" id="licensePhone"
-                               th:field="*{licensePhone}" placeholder="例：03-1234-5678">
+                               th:field="*{licensePhone}" th:errorclass="is-invalid" placeholder="例：03-1234-5678">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('licensePhone')}" th:errors="*{licensePhone}"></div>
                     </div>
 
                     <div class="col-md-6">
@@ -251,6 +266,45 @@
                                th:field="*{licenseNumber}" th:errorclass="is-invalid">
                         <div class="invalid-feedback" th:if="${#fields.hasErrors('licenseNumber')}"
                              th:errors="*{licenseNumber}"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 施設所有者情報 ===== -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-person-check me-2"></i>施設所有者情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-12">
+                        <label for="ownerAddress" class="form-label fw-medium">
+                            住所 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="ownerAddress"
+                               th:field="*{ownerAddress}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('ownerAddress')}" th:errors="*{ownerAddress}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="ownerNameKana" class="form-label fw-medium">
+                            ふりがな氏名 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="ownerNameKana"
+                               th:field="*{ownerNameKana}" th:errorclass="is-invalid" placeholder="ひらがなで入力">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('ownerNameKana')}" th:errors="*{ownerNameKana}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="ownerPhone" class="form-label fw-medium">
+                            電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="tel" class="form-control" id="ownerPhone"
+                               th:field="*{ownerPhone}" th:errorclass="is-invalid" placeholder="例：03-1234-5678">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('ownerPhone')}" th:errors="*{ownerPhone}"></div>
                     </div>
 
                 </div>
@@ -339,6 +393,71 @@
                         <label for="remarks" class="form-label fw-medium">備考</label>
                         <textarea class="form-control" id="remarks" rows="3"
                                   th:field="*{remarks}" placeholder="特記事項があれば入力してください"></textarea>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 施設営業休止/再開/廃止情報（編集時のみ表示） ===== -->
+        <div class="card mb-4 shadow-sm" th:if="${isEdit}">
+            <div class="card-header bg-warning text-dark py-3">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>施設営業休止/再開/廃止情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-medium">申告区分</label>
+                        <div class="mt-1">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       th:field="*{declarationCategory}" id="catSuspension" value="休止">
+                                <label class="form-check-label" for="catSuspension">休止</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       th:field="*{declarationCategory}" id="catResumption" value="再開">
+                                <label class="form-check-label" for="catResumption">再開</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       th:field="*{declarationCategory}" id="catAbolition" value="廃止">
+                                <label class="form-check-label" for="catAbolition">廃止</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="suspensionStartDate" class="form-label fw-medium">休止期間（開始日）</label>
+                        <input type="date" class="form-control" id="suspensionStartDate"
+                               th:field="*{suspensionStartDate}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="suspensionEndDate" class="form-label fw-medium">休止期間（終了日）</label>
+                        <input type="date" class="form-control" id="suspensionEndDate"
+                               th:field="*{suspensionEndDate}">
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="suspensionEndDateUndecided"
+                                   th:field="*{suspensionEndDateUndecided}">
+                            <label class="form-check-label" for="suspensionEndDateUndecided">未定</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="resumptionOrAbolitionDate" class="form-label fw-medium">再開または廃止日</label>
+                        <input type="date" class="form-control" id="resumptionOrAbolitionDate"
+                               th:field="*{resumptionOrAbolitionDate}">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="suspensionOrAbolitionReason" class="form-label fw-medium">休止または廃止理由</label>
+                        <input type="text" class="form-control" id="suspensionOrAbolitionReason"
+                               th:field="*{suspensionOrAbolitionReason}">
                     </div>
 
                 </div>

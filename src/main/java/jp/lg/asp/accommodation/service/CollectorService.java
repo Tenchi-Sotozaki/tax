@@ -3,71 +3,41 @@ package jp.lg.asp.accommodation.service;
 import jp.lg.asp.accommodation.dto.CollectorForm;
 import jp.lg.asp.accommodation.dto.CollectorListItem;
 import jp.lg.asp.accommodation.dto.CollectorSearchForm;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import jp.lg.asp.accommodation.dto.FacilityDto;
+import jp.lg.asp.accommodation.dto.TaxManagerForm;
 
 import java.util.List;
 
-@Service
-public class CollectorService {
+/**
+ * 特別徴収義務者管理 Service インターフェース。
+ * DB実装後はこのインターフェースを変えずに実装クラスのみ差し替える。
+ */
+public interface CollectorService {
 
-    // -------------------------------------------------------------------------
-    // ダミーデータ（DB実装後は Repository に差し替える）
-    // -------------------------------------------------------------------------
-    private static final List<CollectorListItem> DUMMY_LIST = List.of(
-        new CollectorListItem(1L, "T001001", "グランドホテル東京",   "グランドホテル東京本館", "hotel",   "ホテル",   "target"),
-        new CollectorListItem(2L, "R002001", "温泉旅館やまと",       "やまと本館",             "ryokan",  "旅館",     "non-target"),
-        new CollectorListItem(3L, "S003001", "シティイン新宿",       "シティイン新宿",         "simple",  "簡易宿所", "target"),
-        new CollectorListItem(4L, "M004001", "海辺の民宿しおかぜ",   "しおかぜ",               "minshuku","民宿",     "target"),
-        new CollectorListItem(5L, "P005001", "森のペンション風の丘", "風の丘",                 "pension", "ペンション","non-target")
-    );
+    /** 検索条件に合致する一覧を返す */
+    List<CollectorListItem> search(CollectorSearchForm form);
 
-    // -------------------------------------------------------------------------
-    // 検索
-    // TODO: DB実装後は DUMMY_LIST を使った処理を削除し、
-    //       collectorRepository.findByCondition(form) 等に差し替える。
-    // -------------------------------------------------------------------------
+    /** IDで1件取得してフォームに変換する */
+    CollectorForm getCollectorById(Long id);
 
-    /**
-     * 検索条件に合致する特別徴収義務者の一覧を返す。
-     * 条件が空の場合は全件返す。
-     */
-    public List<CollectorListItem> search(CollectorSearchForm form) {
-        return DUMMY_LIST.stream()
-                .filter(item -> !StringUtils.hasText(form.getRegistrationNo())
-                        || item.getRegistrationNo().contains(form.getRegistrationNo()))
-                .filter(item -> !StringUtils.hasText(form.getObligorName())
-                        || item.getObligorName().contains(form.getObligorName()))
-                .filter(item -> !StringUtils.hasText(form.getFacilityName())
-                        || item.getFacilityName().contains(form.getFacilityName()))
-                .filter(item -> !StringUtils.hasText(form.getBusinessType())
-                        || item.getBusinessType().equals(form.getBusinessType()))
-                .filter(item -> !StringUtils.hasText(form.getConsolidationTarget())
-                        || item.getConsolidationTarget().equals(form.getConsolidationTarget()))
-                .toList();
-    }
+    /** 義務者名を取得する */
+    String getObligorName(String obligorId);
 
-    // -------------------------------------------------------------------------
-    // 1件取得
-    // TODO: DB実装後は collectorRepository.findById(id) に差し替える。
-    // -------------------------------------------------------------------------
+    /** 施設一覧を取得する */
+    List<FacilityDto> getFacilities(String obligorId);
 
-    public CollectorForm getCollectorById(Long id) {
-        CollectorForm form = new CollectorForm();
-        form.setId(id);
-        form.setObligorName("グランドホテル東京（ID:" + id + "）");
-        form.setObligorAddress("東京都新宿区西新宿1-1-1");
-        form.setObligorPhone("03-1234-5678");
-        form.setFacilityAddress("東京都新宿区西新宿1-1-1");
-        form.setFacilityNameKana("ぐらんどほてるとうきょう");
-        form.setFacilityPhone("03-1234-5678");
-        form.setRoomCount(100);
-        form.setCapacity(200);
-        form.setBusinessType("hotel");
-        form.setLicenseNumber("LIC-" + id);
-        form.setMailAddress("東京都新宿区西新宿1-1-1");
-        form.setMailNameKana("たなか たろう");
-        form.setMailPhone("03-1234-5678");
-        return form;
-    }
+    /** 納税管理人フォームの初期値を生成する */
+    TaxManagerForm buildTaxManagerForm(Long collectorId);
+
+    /** 特別徴収義務者を登録する */
+    void register(CollectorForm form);
+
+    /** 特別徴収義務者を更新する */
+    void update(Long id, CollectorForm form);
+
+    /** 特別徴収義務者を削除する */
+    void delete(Long id);
+
+    /** 納税管理人を登録・更新する */
+    void saveTaxManager(Long collectorId, TaxManagerForm form);
 }

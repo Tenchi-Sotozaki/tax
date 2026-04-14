@@ -25,11 +25,7 @@ public class MainViewController {
     // GET /collector/list → CollectorController#list に委譲済み
     // GET /collector/registration  → CollectorController#showRegistrationForm
     // GET /collector/edit/{id}     → CollectorController#showEditForm
-
-    @GetMapping("/collector/tax-manager-registration")
-    public String taxManagerRegistration() {
-        return "collector/tax-manager-registration";
-    }
+    // GET /tax-manager/edit/{id}   → TaxManagerController#showForm
 
     // ========== 申告・納付管理 ==========
 
@@ -37,6 +33,9 @@ public class MainViewController {
     public String consolidatedDeclarationRegistration() {
         return "declaration/consolidated-declaration-registration";
     }
+
+    // 合算申告登録 → ConsolidatedDeclarationController#showForm に委譲済み
+    // GET /consolidated/register/{obligorId}
 
     @GetMapping("/declaration/payment-management")
     public String paymentManagement() {

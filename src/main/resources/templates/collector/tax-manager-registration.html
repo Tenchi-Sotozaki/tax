@@ -1,227 +1,341 @@
-﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/layout}" lang="ja">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}"
+      lang="ja">
 <head><title>納税管理人登録/編集</title></head>
 <body>
 <div layout:fragment="content" class="container-fluid p-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2 class="h2">
-                        <i class="bi bi-person-gear me-2 text-primary"></i>納税管理人登録/編集
-                    </h2>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6" id="modeLabel">
-                            <i class="bi bi-plus-circle me-1"></i>新規登録
-                        </span>
-                    </div>
-                </div>
 
-                <!-- アラートエリア -->
-                <div id="alertArea"></div>
-
-                <form id="taxManagerForm" novalidate>
-                    <!-- 納税管理人情報エリア -->
-                    <div class="card mb-4 shadow-sm">
-                        <div class="card-header bg-primary text-white py-3">
-                            <h5 class="mb-0">
-                                <i class="bi bi-person-vcard me-2"></i>納税管理人情報
-                            </h5>
-                        </div>
-                        <div class="card-body bg-light-subtle">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label for="registrationDate" class="form-label fw-medium">
-                                        登録日 <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <input type="date" class="form-control" id="registrationDate" name="registrationDate" required>
-                                    <div class="invalid-feedback text-danger small">※登録日を入力してください</div>
-                                </div>
-                                <div class="col-md-4 d-flex align-items-end">
-                                    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addressSearchModal">
-                                        <i class="bi bi-search me-1"></i>宛名検索
-                                    </button>
-                                </div>
-                                <div class="col-md-4"></div>
-                                
-                                <div class="col-md-6">
-                                    <label for="obligorName" class="form-label fw-medium">
-                                        特別徴収義務者 <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="obligorName" name="obligorName" placeholder="自動入力されます" readonly required>
-                                    <div class="invalid-feedback text-danger small">※特別徴収義務者を選択してください</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="facilityName" class="form-label fw-medium">
-                                        施設名称 <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="facilityName" name="facilityName" placeholder="自動入力されます" readonly required>
-                                    <div class="invalid-feedback text-danger small">※施設名称を選択してください</div>
-                                </div>
-                                
-                                <div class="col-md-12">
-                                    <label for="managerAddress" class="form-label fw-medium">
-                                        住所（所在地） <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="managerAddress" name="managerAddress" required>
-                                    <div class="invalid-feedback text-danger small">※住所を入力してください</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label for="managerName" class="form-label fw-medium">
-                                        氏名 <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="managerName" name="managerName" required>
-                                    <div class="invalid-feedback text-danger small">※氏名を入力してください</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="managerNameKana" class="form-label fw-medium">
-                                        ふりがな <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="managerNameKana" name="managerNameKana" placeholder="ひらがなで入力" required>
-                                    <div class="invalid-feedback text-danger small">※ふりがなを入力してください</div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <label for="managerPhone" class="form-label fw-medium">
-                                        電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <input type="tel" class="form-control" id="managerPhone" name="managerPhone" placeholder="例：03-1234-5678" required>
-                                    <div class="invalid-feedback text-danger small">※電話番号を入力してください</div>
-                                </div>
-                                <div class="col-md-6 d-flex align-items-end">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="exemptionFlag" name="exemptionFlag">
-                                        <label class="form-check-label fw-medium" for="exemptionFlag">
-                                            選任免除
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-12" id="exemptionReasonArea" style="display: none;">
-                                    <label for="exemptionReason" class="form-label fw-medium">
-                                        選任免除理由 <span class="badge bg-danger text-white ms-1">必須</span>
-                                    </label>
-                                    <textarea class="form-control" id="exemptionReason" name="exemptionReason" rows="3" placeholder="選任免除の理由を入力してください"></textarea>
-                                    <div class="invalid-feedback text-danger small">※選任免除理由を入力してください</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- アクションボタンエリア -->
-                    <div class="d-flex justify-content-center gap-3 py-4 mb-5">
-                        <button type="submit" class="btn btn-primary btn-lg px-5" id="registerBtn">
-                            <i class="bi bi-save me-2"></i>登録する
-                        </button>
-                        <button type="submit" class="btn btn-success btn-lg px-5" id="updateBtn" style="display: none;">
-                            <i class="bi bi-arrow-repeat me-2"></i>更新する
-                        </button>
-                        <button type="button" class="btn btn-danger btn-lg px-4" id="deleteBtn" style="display: none;">
-                            <i class="bi bi-trash me-2"></i>削除する
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
-                            <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-                        </button>
-                    </div>
-                </form>
-            </main>
-        </div>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2 class="h2">
+            <i class="bi bi-person-gear me-2 text-primary"></i>納税管理人登録/編集
+        </h2>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
+            <i class="bi bi-plus-circle me-1"></i>新規登録
+        </span>
     </div>
 
-    <!-- 宛名検索モーダル -->
-    <div class="modal fade" id="addressSearchModal" tabindex="-1" aria-labelledby="addressSearchModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    <!-- 成功メッセージ -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form id="taxManagerForm"
+          th:action="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
+          th:object="${taxManagerForm}" method="post">
+
+        <!-- バリデーションエラーサマリー -->
+        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+        </div>
+
+        <!-- 納税管理人情報 -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管理人情報</h5>
+            </div>
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <label for="registrationDate" class="form-label fw-medium">
+                            登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="date" class="form-control" id="registrationDate"
+                               th:field="*{registrationDate}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}"
+                             th:errors="*{registrationDate}"></div>
+                    </div>
+
+                    <!-- 宛名検索ボタン -->
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-info"
+                                data-bs-toggle="modal" data-bs-target="#addressSearchModal">
+                            <i class="bi bi-search me-1"></i>宛名検索
+                        </button>
+                    </div>
+                    <div class="col-md-4"></div>
+
+                    <!-- 特別徴収義務者名（readonly） -->
+                    <div class="col-md-6">
+                        <label for="obligorName" class="form-label fw-medium">
+                            特別徴収義務者 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="obligorName"
+                               th:field="*{obligorName}" readonly>
+                    </div>
+
+                    <!-- 施設名称（readonly） -->
+                    <div class="col-md-6">
+                        <label for="facilityName" class="form-label fw-medium">
+                            施設名称 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="facilityName"
+                               th:field="*{facilityName}" readonly>
+                    </div>
+
+                    <!-- 住所（宛名検索で自動入力） -->
+                    <div class="col-md-12">
+                        <label for="managerAddress" class="form-label fw-medium">
+                            住所（所在地） <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="managerAddress"
+                               th:field="*{managerAddress}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerAddress')}"
+                             th:errors="*{managerAddress}"></div>
+                    </div>
+
+                    <!-- 氏名（宛名検索で自動入力） -->
+                    <div class="col-md-6">
+                        <label for="managerName" class="form-label fw-medium">
+                            氏名 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="managerName"
+                               th:field="*{managerName}" th:errorclass="is-invalid">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerName')}"
+                             th:errors="*{managerName}"></div>
+                    </div>
+
+                    <!-- ふりがな（宛名検索で自動入力） -->
+                    <div class="col-md-6">
+                        <label for="managerNameKana" class="form-label fw-medium">
+                            ふりがな <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="text" class="form-control" id="managerNameKana"
+                               th:field="*{managerNameKana}" th:errorclass="is-invalid"
+                               placeholder="ひらがなで入力">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerNameKana')}"
+                             th:errors="*{managerNameKana}"></div>
+                    </div>
+
+                    <!-- 電話番号（宛名検索で自動入力） -->
+                    <div class="col-md-6">
+                        <label for="managerPhone" class="form-label fw-medium">
+                            電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <input type="tel" class="form-control" id="managerPhone"
+                               th:field="*{managerPhone}" th:errorclass="is-invalid"
+                               placeholder="例：03-1234-5678">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerPhone')}"
+                             th:errors="*{managerPhone}"></div>
+                    </div>
+
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="exemptionFlag"
+                                   th:field="*{exemptionFlag}">
+                            <label class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" id="exemptionReasonArea" style="display: none;">
+                        <label for="exemptionReason" class="form-label fw-medium">
+                            選任免除理由 <span class="badge bg-danger text-white ms-1">必須</span>
+                        </label>
+                        <textarea class="form-control" id="exemptionReason" rows="3"
+                                  th:field="*{exemptionReason}"
+                                  placeholder="選任免除の理由を入力してください"></textarea>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- アクションボタン -->
+        <div class="d-flex justify-content-center gap-3 py-4 mb-5">
+            <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-save me-2"></i>登録する
+            </button>
+            <a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+            </a>
+        </div>
+
+    </form>
+
+    <!-- ========== 宛名検索モーダル ========== -->
+    <div class="modal fade" id="addressSearchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title" id="addressSearchModalLabel">
+                    <h5 class="modal-title">
                         <i class="bi bi-search me-2"></i>宛名検索
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="閉じる"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addressSearchForm">
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <label for="searchAddressNumber" class="form-label fw-medium">宛名番号</label>
-                                <input type="text" class="form-control" id="searchAddressNumber" name="searchAddressNumber" placeholder="宛名番号を入力">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="searchName" class="form-label fw-medium">氏名</label>
-                                <input type="text" class="form-control" id="searchName" name="searchName" placeholder="氏名を入力">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="searchAddress" class="form-label fw-medium">住所</label>
-                                <input type="text" class="form-control" id="searchAddress" name="searchAddress" placeholder="住所を入力">
-                            </div>
+
+                    <!-- 検索条件 -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label for="searchAddressNumber" class="form-label fw-medium">宛名番号</label>
+                            <input type="text" class="form-control" id="searchAddressNumber" placeholder="例：A001001">
                         </div>
-                        
-                        <div class="d-flex justify-content-center mb-3">
-                            <button type="submit" class="btn btn-primary">
+                        <div class="col-md-3">
+                            <label for="searchName" class="form-label fw-medium">氏名</label>
+                            <input type="text" class="form-control" id="searchName" placeholder="氏名を入力">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchAddress" class="form-label fw-medium">住所</label>
+                            <input type="text" class="form-control" id="searchAddress" placeholder="住所を入力">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary w-100" id="btnAddressSearch">
                                 <i class="bi bi-search me-1"></i>検索する
                             </button>
                         </div>
-                    </form>
-                    
-                    <!-- 検索結果エリア -->
+                    </div>
+
+                    <!-- 検索結果テーブル -->
                     <div id="searchResultArea" style="display: none;">
                         <hr>
-                        <h6 class="fw-bold mb-3">検索結果</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-medium">検索結果</span>
+                            <span class="text-muted small"><span id="searchResultCount">0</span> 件</span>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead class="table-light">
+                            <table class="table table-striped table-hover align-middle mb-0">
+                                <thead class="table-primary">
                                     <tr>
-                                        <th style="width: 60px;" class="text-center">選択</th>
-                                        <th>宛名番号</th>
-                                        <th>氏名</th>
+                                        <th style="width: 120px;">宛名番号</th>
+                                        <th style="width: 140px;">氏名</th>
+                                        <th style="width: 160px;">ふりがな</th>
                                         <th>住所</th>
+                                        <th style="width: 120px;">電話番号</th>
+                                        <th style="width: 80px;" class="text-center">選択</th>
                                     </tr>
                                 </thead>
-                                <tbody id="searchResultTableBody">
-                                    <!-- 検索結果がここに動的に追加される -->
+                                <tbody id="searchResultBody">
+                                    <!-- Fetch API で動的生成 -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
+
+                    <!-- 検索結果なし -->
+                    <div id="searchNoResult" class="text-center text-muted py-4" style="display: none;">
+                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                        該当する宛名が見つかりませんでした。
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                         <i class="bi bi-x-lg me-1"></i>閉じる
                     </button>
-                    <button type="button" class="btn btn-primary" id="selectAddressBtn" style="display: none;">
-                        <i class="bi bi-check-lg me-1"></i>選択する
-                    </button>
                 </div>
             </div>
         </div>
     </div>
+    <!-- ========== /宛名検索モーダル ========== -->
 
-    <!-- 削除確認モーダル -->
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-exclamation-triangle me-2"></i>削除確認
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-0">この納税管理人情報を削除しますか？</p>
-                    <p class="text-muted small mb-0">※削除した情報は復元できません。</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-lg me-1"></i>キャンセル
-                    </button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
-                        <i class="bi bi-trash me-1"></i>削除する
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
 
-    </div></main></div></div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/tax-manager-form.js"></script>
-    <script>(function(){const p=location.pathname.split('/').pop();document.querySelectorAll('.sidebar-link').forEach(l=>{if(l.getAttribute('href')===p){l.classList.remove('text-white-50');l.classList.add('text-white','fw-medium');const c=l.closest('.accordion-collapse');if(c){c.classList.add('show');c.previousElementSibling?.querySelector('.accordion-button')?.classList.remove('collapsed');}}});})();</script>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        // 選任免除チェックで理由欄を表示/非表示
+        document.getElementById('exemptionFlag').addEventListener('change', function () {
+            document.getElementById('exemptionReasonArea').style.display =
+                this.checked ? 'block' : 'none';
+        });
+
+        // ========== 宛名検索 ==========
+        document.getElementById('btnAddressSearch').addEventListener('click', async function () {
+            const addressNumber = document.getElementById('searchAddressNumber').value.trim();
+            const name          = document.getElementById('searchName').value.trim();
+            const address       = document.getElementById('searchAddress').value.trim();
+
+            // クエリパラメータ組み立て
+            const params = new URLSearchParams();
+            if (addressNumber) params.append('addressNumber', addressNumber);
+            if (name)          params.append('name', name);
+            if (address)       params.append('address', address);
+
+            const contextPath = /*[[@{/}]]*/ '/accommodation-tax/';
+            const url = contextPath + 'api/address/search?' + params.toString();
+
+            try {
+                const res  = await fetch(url, { credentials: 'same-origin' });
+                const data = await res.json();
+                renderSearchResults(data);
+            } catch (e) {
+                console.error('宛名検索エラー:', e);
+                alert('検索中にエラーが発生しました。');
+            }
+        });
+
+        function renderSearchResults(data) {
+            const tbody       = document.getElementById('searchResultBody');
+            const resultArea  = document.getElementById('searchResultArea');
+            const noResult    = document.getElementById('searchNoResult');
+            const countEl     = document.getElementById('searchResultCount');
+
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                resultArea.style.display = 'none';
+                noResult.style.display   = 'block';
+                return;
+            }
+
+            noResult.style.display   = 'none';
+            resultArea.style.display = 'block';
+            countEl.textContent      = data.length;
+
+            data.forEach(function (item) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${escHtml(item.addressNumber)}</td>
+                    <td>${escHtml(item.name)}</td>
+                    <td class="text-muted">${escHtml(item.nameKana)}</td>
+                    <td>${escHtml(item.address)}</td>
+                    <td>${escHtml(item.phone)}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-primary btn-sm btn-select-address">
+                            <i class="bi bi-check-lg me-1"></i>選択
+                        </button>
+                    </td>`;
+
+                // 「選択」ボタン押下でメインフォームに自動入力
+                tr.querySelector('.btn-select-address').addEventListener('click', function () {
+                    document.getElementById('managerAddress').value  = item.address;
+                    document.getElementById('managerName').value     = item.name;
+                    document.getElementById('managerNameKana').value = item.nameKana;
+                    document.getElementById('managerPhone').value    = item.phone;
+
+                    // モーダルを閉じる
+                    bootstrap.Modal.getInstance(
+                        document.getElementById('addressSearchModal')
+                    ).hide();
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // XSS対策
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // モーダルを開くたびに検索結果をリセット
+        document.getElementById('addressSearchModal').addEventListener('show.bs.modal', function () {
+            document.getElementById('searchAddressNumber').value = '';
+            document.getElementById('searchName').value          = '';
+            document.getElementById('searchAddress').value       = '';
+            document.getElementById('searchResultBody').innerHTML = '';
+            document.getElementById('searchResultArea').style.display = 'none';
+            document.getElementById('searchNoResult').style.display   = 'none';
+        });
+    </script>
+</th:block>
 </body>
 </html>
