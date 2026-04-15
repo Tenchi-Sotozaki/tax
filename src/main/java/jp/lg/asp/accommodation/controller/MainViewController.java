@@ -1,0 +1,81 @@
+package jp.lg.asp.accommodation.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class MainViewController {
+
+    // ========== 認証 ==========
+
+    @GetMapping("/login")
+    public String login() {
+        return "auth/login";
+    }
+
+    // ========== メイン（リダイレクト） ==========
+
+    @GetMapping({"/", "/declarations/form"})
+    public String root() {
+        return "redirect:/collector/list";
+    }
+
+    // ========== 特別徴収義務者管理 ==========
+
+    // GET /collector/list → CollectorController#list に委譲済み
+    // GET /collector/registration  → CollectorController#showRegistrationForm
+    // GET /collector/edit/{id}     → CollectorController#showEditForm
+    // GET /tax-manager/edit/{id}   → TaxManagerController#showForm
+
+    // ========== 申告・納付管理 ==========
+
+    @GetMapping("/declaration/consolidated-declaration-registration")
+    public String consolidatedDeclarationRegistration() {
+        return "declaration/consolidated-declaration-registration";
+    }
+
+    // 合算申告登録 → ConsolidatedDeclarationController#showForm に委譲済み
+    // GET /consolidated/register/{obligorId}
+
+    @GetMapping("/declaration/payment-management")
+    public String paymentManagement() {
+        return "declaration/payment-management";
+    }
+
+    @GetMapping("/declaration/payment-registration")
+    public String paymentRegistration() {
+        return "declaration/payment-registration";
+    }
+
+    // ========== システム管理 ==========
+
+    @GetMapping("/admin/user-search")
+    public String userSearch() {
+        return "admin/user-search";
+    }
+
+    @GetMapping("/admin/user-registration")
+    public String userRegistration() {
+        return "admin/user-registration";
+    }
+
+    @GetMapping("/admin/tax-system-inquiry")
+    public String taxSystemInquiry() {
+        return "admin/tax-system-inquiry";
+    }
+
+    @GetMapping("/admin/tax-system-registration")
+    public String taxSystemRegistration() {
+        return "admin/tax-system-registration";
+    }
+
+    @GetMapping("/admin/tax-cycle-inquiry")
+    public String taxCycleInquiry() {
+        return "admin/tax-cycle-inquiry";
+    }
+
+    @GetMapping("/admin/tax-cycle-registration")
+    public String taxCycleRegistration() {
+        return "admin/tax-cycle-registration";
+    }
+}
