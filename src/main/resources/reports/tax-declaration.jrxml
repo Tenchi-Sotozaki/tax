@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tax-declaration" language="groovy" columnCount="1" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<parameter name="registrationNo" class="java.lang.String"/>
+	<parameter name="submissionYear" class="java.lang.String"/>
+	<parameter name="submissionMonth" class="java.lang.String"/>
+	<parameter name="submissionDay" class="java.lang.String"/>
+	<parameter name="obligorName" class="java.lang.String"/>
+	<parameter name="obligorAddress" class="java.lang.String"/>
+	<parameter name="obligorNumber" class="java.lang.String"/>
+	<parameter name="facilityName" class="java.lang.String"/>
+	<parameter name="facilityAddress" class="java.lang.String"/>
+	<parameter name="obligorPhone" class="java.lang.String"/>
+	<parameter name="targetYear1" class="java.lang.String"/>
+	<parameter name="targetMonth1" class="java.lang.String"/>
+	<parameter name="countTier1_1" class="java.lang.Integer"/>
+	<parameter name="taxTier1_1" class="java.lang.Long"/>
+	<parameter name="countTier2_1" class="java.lang.Integer"/>
+	<parameter name="taxTier2_1" class="java.lang.Long"/>
+	<parameter name="countTier3_1" class="java.lang.Integer"/>
+	<parameter name="taxTier3_1" class="java.lang.Long"/>
+	<parameter name="taxableCount1" class="java.lang.Integer"/>
+	<parameter name="exemptCount1" class="java.lang.Integer"/>
+	<parameter name="totalCount1" class="java.lang.Integer"/>
+	<parameter name="totalTax1" class="java.lang.Long"/>
+	<parameter name="targetYear2" class="java.lang.String"/>
+	<parameter name="targetMonth2" class="java.lang.String"/>
+	<parameter name="countTier1_2" class="java.lang.Integer"/>
+	<parameter name="taxTier1_2" class="java.lang.Long"/>
+	<parameter name="countTier2_2" class="java.lang.Integer"/>
+	<parameter name="taxTier2_2" class="java.lang.Long"/>
+	<parameter name="countTier3_2" class="java.lang.Integer"/>
+	<parameter name="taxTier3_2" class="java.lang.Long"/>
+	<parameter name="taxableCount2" class="java.lang.Integer"/>
+	<parameter name="exemptCount2" class="java.lang.Integer"/>
+	<parameter name="totalCount2" class="java.lang.Integer"/>
+	<parameter name="totalTax2" class="java.lang.Long"/>
+	<parameter name="targetYear3" class="java.lang.String"/>
+	<parameter name="targetMonth3" class="java.lang.String"/>
+	<parameter name="countTier1_3" class="java.lang.Integer"/>
+	<parameter name="taxTier1_3" class="java.lang.Long"/>
+	<parameter name="countTier2_3" class="java.lang.Integer"/>
+	<parameter name="taxTier2_3" class="java.lang.Long"/>
+	<parameter name="countTier3_3" class="java.lang.Integer"/>
+	<parameter name="taxTier3_3" class="java.lang.Long"/>
+	<parameter name="taxableCount3" class="java.lang.Integer"/>
+	<parameter name="exemptCount3" class="java.lang.Integer"/>
+	<parameter name="totalCount3" class="java.lang.Integer"/>
+	<parameter name="totalTax3" class="java.lang.Long"/>
+	<queryString><![CDATA[]]></queryString>
+	<detail>
+		<band height="842">
+			<image>
+				<reportElement x="0" y="0" width="595" height="842"/>
+				<imageExpression class="java.io.InputStream"><![CDATA[this.getClass().getResourceAsStream("/reports/占冠村宿泊税申告書テンプレート.png")]]></imageExpression>
+			</image>
+						<textField><reportElement x="300" y="198" width="230" height="20"/><textFieldExpression><![CDATA[$P{obligorName}]]></textFieldExpression></textField>
+						<textField><reportElement x="300" y="170" width="230" height="20"/><textFieldExpression><![CDATA[$P{obligorAddress}]]></textFieldExpression></textField>
+						<textField><reportElement x="300" y="225" width="230" height="20"/><textFieldExpression><![CDATA[$P{obligorNumber}]]></textFieldExpression></textField>
+						<textField><reportElement x="180" y="302" width="290" height="15"/><textFieldExpression><![CDATA[$P{facilityName}]]></textFieldExpression></textField>
+						<textField><reportElement x="230" y="284" width="320" height="15"/><textFieldExpression><![CDATA[$P{facilityAddress}]]></textFieldExpression></textField>
+						<textField><reportElement x="420" y="67" width="120" height="20"/><textFieldExpression><![CDATA[$P{registrationNo}]]></textFieldExpression></textField>
+						<textField><reportElement x="460" y="117" width="20" height="15"/><textFieldExpression><![CDATA[$P{submissionMonth}]]></textFieldExpression></textField>
+						<textField><reportElement x="500" y="117" width="20" height="15"/><textFieldExpression><![CDATA[$P{submissionDay}]]></textFieldExpression></textField>
+						<textField><reportElement x="390" y="117" width="50" height="15"/><textFieldExpression><![CDATA[$P{submissionYear}]]></textFieldExpression></textField>
+						<textField><reportElement x="250" y="248" width="280" height="14"/><textFieldExpression><![CDATA[$P{obligorPhone}]]></textFieldExpression></textField>
+						<textField><reportElement x="40" y="378" width="35" height="13"/><textFieldExpression><![CDATA[$P{targetYear1}]]></textFieldExpression></textField>
+						<textField><reportElement x="40" y="395" width="35" height="13"/><textFieldExpression><![CDATA[$P{targetMonth1}]]></textFieldExpression></textField>
+						<textField><reportElement x="40" y="654" width="35" height="13"/><textFieldExpression><![CDATA[$P{targetMonth3}]]></textFieldExpression></textField>
+						<textField><reportElement x="40" y="526" width="35" height="13"/><textFieldExpression><![CDATA[$P{targetMonth2}]]></textFieldExpression></textField>
+						<textField><reportElement x="40" y="635" width="35" height="13"/><textFieldExpression><![CDATA[$P{targetYear3}]]></textFieldExpression></textField>
+						<textField><reportElement x="40" y="506" width="35" height="13"/><textFieldExpression><![CDATA[$P{targetYear2}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="340" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier1_1}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="359" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier2_1}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="378" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier3_1}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="470" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier1_2}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="508" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier3_2}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="489" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier2_2}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="599" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier1_3}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="636" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier3_3}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="618" width="35" height="13"/><textFieldExpression><![CDATA[$P{countTier2_3}]]></textFieldExpression></textField>
+						<textField><reportElement x="450" y="340" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier1_1}]]></textFieldExpression></textField>
+						<textField><reportElement x="450" y="359" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier2_1}]]></textFieldExpression></textField>
+						<textField><reportElement x="450" y="378" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier3_1}]]></textFieldExpression></textField>
+						<textField><reportElement x="455" y="470" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier1_2}]]></textFieldExpression></textField>
+						<textField><reportElement x="455" y="489" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier2_2}]]></textFieldExpression></textField>
+						<textField><reportElement x="455" y="508" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier3_2}]]></textFieldExpression></textField>
+						<textField><reportElement x="455" y="599" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier1_3}]]></textFieldExpression></textField>
+						<textField><reportElement x="455" y="618" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier2_3}]]></textFieldExpression></textField>
+						<textField><reportElement x="455" y="636" width="65" height="13"/><textFieldExpression><![CDATA[$P{taxTier3_3}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="526" width="35" height="13"/><textFieldExpression><![CDATA[$P{taxableCount2}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="544" width="35" height="13"/><textFieldExpression><![CDATA[$P{exemptCount2}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="563" width="35" height="13"/><textFieldExpression><![CDATA[$P{totalCount2}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="655" width="35" height="13"/><textFieldExpression><![CDATA[$P{taxableCount3}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="674" width="35" height="13"/><textFieldExpression><![CDATA[$P{exemptCount3}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="692" width="35" height="13"/><textFieldExpression><![CDATA[$P{totalCount3}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="397" width="35" height="13"/><textFieldExpression><![CDATA[$P{taxableCount1}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="415" width="35" height="13"/><textFieldExpression><![CDATA[$P{exemptCount1}]]></textFieldExpression></textField>
+						<textField><reportElement x="308" y="433" width="35" height="13"/><textFieldExpression><![CDATA[$P{totalCount1}]]></textFieldExpression></textField>
+						<textField><reportElement x="445" y="414" width="75" height="13"/><textFieldExpression><![CDATA[$P{totalTax1}]]></textFieldExpression></textField>
+						<textField><reportElement x="445" y="542" width="75" height="13"/><textFieldExpression><![CDATA[$P{totalTax2}]]></textFieldExpression></textField>
+						<textField><reportElement x="445" y="672" width="75" height="13"/><textFieldExpression><![CDATA[$P{totalTax3}]]></textFieldExpression></textField>
+		</band>
+	</detail>
+</jasperReport>
