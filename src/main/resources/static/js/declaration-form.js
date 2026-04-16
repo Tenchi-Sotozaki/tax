@@ -1,16 +1,45 @@
 'use strict';
 
 // -----------------------------------------------------------------------
-// 定数
+// PDF URL 生成（共通）
 // -----------------------------------------------------------------------
+function buildPdfUrl() {
+    const obligorId = document.querySelector('input[name="obligorId"]')?.value
+                   || document.querySelector('input[name="taxDeclarationForm.obligorId"]')?.value
+                   || '';
+    return `/accommodation-tax/declaration/pdf/${obligorId}`;
+}
+
+// -----------------------------------------------------------------------
+// プレビュー（新タブでPDFを開く）
+// -----------------------------------------------------------------------
+function onPreview() {
+    window.open(buildPdfUrl(), '_blank');
+}
+
+// -----------------------------------------------------------------------
+// 印刷（iframe経由で印刷ダイアログを表示）
+// -----------------------------------------------------------------------
+function onPrint() {
+    const frame = document.getElementById('printFrame');
+    frame.onload = function () {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+    };
+    frame.src = buildPdfUrl();
+}
+
 const API_BASE = '/accommodation-tax/api/declarations';
 
 // 税区分マスタ（サーバーと同期。将来的にAPIから取得する場合はinitTaxCategories()を修正）
+// 税区分マスタ（新仕様）
 const TAX_CATEGORIES = [
-    { code: '01', name: '税区分①（〜7,000円未満）',         taxAmount: 200 },
-    { code: '02', name: '税区分②（7,000円〜15,000円未満）', taxAmount: 500 },
-    { code: '03', name: '税区分③（15,000円以上）',          taxAmount: 1000 },
+    { code: '01', name: '区分1（20,000円未満）',              taxAmount: 200 },
+    { code: '02', name: '区分2（20,000円以上50,000円未満）', taxAmount: 400 },
+    { code: '03', name: '区分3（50,000円以上）',              taxAmount: 1000 },
 ];
+
+const MONTH_COUNT = 3;
 
 // -----------------------------------------------------------------------
 // 状態
@@ -39,50 +68,55 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // -----------------------------------------------------------------------
-// 税区分明細行の描画
+// 税区分明細行の描画（3ヶ月分）
 // -----------------------------------------------------------------------
 function renderDetailRows() {
-    const tbody = document.getElementById('detailTableBody');
-    tbody.innerHTML = '';
-
-    TAX_CATEGORIES.forEach(cat => {
-        const tr = document.createElement('tr');
-        tr.dataset.code = cat.code;
-        tr.innerHTML = `
-            <td>${cat.name}</td>
-            <td class="text-end pe-3">${cat.taxAmount.toLocaleString()} 円</td>
-            <td>
-                <input type="number" class="form-control form-control-sm taxable-nights"
-                       data-code="${cat.code}" data-tax="${cat.taxAmount}"
-                       min="0" value="0" required>
-                <div class="invalid-feedback"></div>
-            </td>
-            <td class="text-end pe-3 subtotal" id="subtotal-${cat.code}">0 円</td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    // 宿泊数変更時に小計・合計を再計算
-    tbody.querySelectorAll('.taxable-nights').forEach(input => {
-        input.addEventListener('input', recalculate);
-    });
+    for (let monthIndex = 0; monthIndex < MONTH_COUNT; monthIndex++) {
+        const tbody = document.getElementById('detailTableBody_' + monthIndex);
+        if (!tbody) continue;
+        tbody.innerHTML = '';
+        TAX_CATEGORIES.forEach(cat => {
+            const tr = document.createElement('tr');
+            tr.dataset.code = cat.code;
+            tr.innerHTML = `
+                <td>${cat.name}</td>
+                <td class="text-end pe-3">${cat.taxAmount.toLocaleString()} 円</td>
+                <td>
+                    <input type="number" class="form-control form-control-sm taxable-nights"
+                           data-month="${monthIndex}" data-code="${cat.code}" data-tax="${cat.taxAmount}"
+                           min="0" value="0" required>
+                    <div class="invalid-feedback"></div>
+                </td>
+                <td class="text-end pe-3 subtotal" id="subtotal-${monthIndex}-${cat.code}">0 円</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        tbody.querySelectorAll('.taxable-nights').forEach(input => {
+            input.addEventListener('input', () => recalculateMonth(monthIndex));
+        });
+    }
 }
 
 // -----------------------------------------------------------------------
-// 小計・合計の再計算
+// 小計・合計の再計算（1ヶ月分）
 // -----------------------------------------------------------------------
-function recalculate() {
+function recalculateMonth(monthIndex) {
     let total = 0;
-    document.querySelectorAll('.taxable-nights').forEach(input => {
+    document.querySelectorAll(`.taxable-nights[data-month="${monthIndex}"]`).forEach(input => {
         const nights = parseInt(input.value, 10) || 0;
         const tax    = parseInt(input.dataset.tax, 10);
         const sub    = nights * tax;
         total += sub;
-        document.getElementById(`subtotal-${input.dataset.code}`).textContent =
-            sub.toLocaleString() + ' 円';
+        const cell = document.getElementById(`subtotal-${monthIndex}-${input.dataset.code}`);
+        if (cell) cell.textContent = sub.toLocaleString() + ' 円';
     });
-    document.getElementById('totalPaymentAmount').textContent =
-        total.toLocaleString() + ' 円';
+    const totalEl = document.getElementById('totalPaymentAmount_' + monthIndex);
+    if (totalEl) totalEl.textContent = total.toLocaleString() + ' 円';
+}
+
+// 全月分再計算
+function recalculate() {
+    for (let i = 0; i < MONTH_COUNT; i++) recalculateMonth(i);
 }
 
 // -----------------------------------------------------------------------
@@ -92,6 +126,8 @@ function bindEvents() {
     document.getElementById('declarationForm').addEventListener('submit', onSubmit);
     document.getElementById('clearBtn').addEventListener('click', onClear);
     document.getElementById('confirmSubmitBtn').addEventListener('click', onConfirmSubmit);
+    document.getElementById('btnPreview')?.addEventListener('click', onPreview);
+    document.getElementById('btnPrint')?.addEventListener('click', onPrint);
 }
 
 // -----------------------------------------------------------------------
@@ -188,17 +224,20 @@ async function loadDeclaration(id) {
 }
 
 function fillForm(data) {
-    document.getElementById('collectorId').value      = data.collectorId;
-    document.getElementById('facilityId').value       = data.facilityId;
-    document.getElementById('paymentYearMonth').value = data.paymentYearMonth;
-    document.getElementById('totalNights').value      = data.totalNights;
-    document.getElementById('exemptNights').value     = data.exemptNights;
+    document.getElementById('collectorId').value      = data.collectorId ?? '';
+    document.getElementById('facilityId').value       = data.facilityId ?? '';
 
-    data.details.forEach(d => {
-        const input = document.querySelector(`.taxable-nights[data-code="${d.taxCategoryCode}"]`);
-        if (input) input.value = d.taxableNights;
+    (data.months ?? []).forEach((m, monthIndex) => {
+        const ymEl = document.getElementById('paymentYearMonth_' + monthIndex);
+        if (ymEl) ymEl.value = m.targetYearMonth ?? '';
+
+        (m.details ?? []).forEach(d => {
+            const input = document.querySelector(
+                `.taxable-nights[data-month="${monthIndex}"][data-code="${d.taxCategoryCode}"]`);
+            if (input) input.value = d.taxableNights ?? 0;
+        });
+        recalculateMonth(monthIndex);
     });
-    recalculate();
 }
 
 // -----------------------------------------------------------------------
@@ -216,21 +255,25 @@ function onClear() {
 // リクエストボディ組み立て
 // -----------------------------------------------------------------------
 function buildRequestBody() {
-    const details = [];
-    document.querySelectorAll('.taxable-nights').forEach(input => {
-        details.push({
-            taxCategoryCode: input.dataset.code,
-            taxableNights:   parseInt(input.value, 10) || 0,
+    const months = [];
+    for (let monthIndex = 0; monthIndex < MONTH_COUNT; monthIndex++) {
+        const ymEl = document.getElementById('paymentYearMonth_' + monthIndex);
+        const details = [];
+        document.querySelectorAll(`.taxable-nights[data-month="${monthIndex}"]`).forEach(input => {
+            details.push({
+                taxCategoryCode: input.dataset.code,
+                taxableNights:   parseInt(input.value, 10) || 0,
+            });
         });
-    });
-
+        months.push({
+            targetYearMonth: ymEl?.value?.trim() ?? '',
+            details,
+        });
+    }
     return {
-        collectorId:      document.getElementById('collectorId').value.trim(),
-        facilityId:       document.getElementById('facilityId').value.trim(),
-        paymentYearMonth: document.getElementById('paymentYearMonth').value.trim(),
-        totalNights:      parseInt(document.getElementById('totalNights').value, 10) || 0,
-        exemptNights:     parseInt(document.getElementById('exemptNights').value, 10) || 0,
-        details,
+        collectorId: document.getElementById('collectorId')?.value?.trim() ?? '',
+        facilityId:  document.getElementById('facilityId')?.value?.trim() ?? '',
+        months,
     };
 }
 

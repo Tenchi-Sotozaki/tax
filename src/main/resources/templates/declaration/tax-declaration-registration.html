@@ -27,9 +27,6 @@
     <form th:action="@{/declaration/register}" th:object="${taxDeclarationForm}" method="post">
 
         <input type="hidden" th:field="*{obligorId}">
-        <!-- 合計値（JS で計算してセット） -->
-        <input type="hidden" id="totalGuestCount" th:field="*{totalGuestCount}">
-        <input type="hidden" id="totalTaxAmount"  th:field="*{totalTaxAmount}">
 
         <!-- バリデーションエラーサマリー -->
         <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
@@ -37,7 +34,7 @@
             入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
         </div>
 
-        <!-- ① 基本情報エリア -->
+        <!-- 基本情報 -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>基本情報</h5>
@@ -48,109 +45,97 @@
                         <label class="form-label fw-medium">特別徴収義務者名</label>
                         <input type="text" class="form-control" th:value="${obligorName}" readonly>
                     </div>
-                    <div class="col-md-4">
-                        <label for="targetYearMonth" class="form-label fw-medium">
-                            申告年月 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="month" class="form-control" id="targetYearMonth"
-                               th:field="*{targetYearMonth}" th:errorclass="is-invalid">
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('targetYearMonth')}"
-                             th:errors="*{targetYearMonth}"></div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- ② 申告情報エリア（3段階税率テーブル） -->
-        <div class="card mb-4 shadow-sm">
+        <!-- 3ヶ月分申告エリア -->
+        <div th:each="month, stat : *{months}" class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>申告情報（3段階税率）</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-month me-2"></i>
+                    <span th:text="${stat.index + 1} + 'ヶ月目'"></span>
+                </h5>
             </div>
-            <div class="card-body bg-light-subtle p-0">
+            <div class="card-body bg-light-subtle">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-medium">申告年月</label>
+                        <input type="month" class="form-control"
+                               th:field="*{months[__${stat.index}__].targetYearMonth}">
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle mb-0">
                         <thead class="table-primary text-center">
                             <tr>
-                                <th style="width: 30%;">区分</th>
-                                <th style="width: 20%;">税率（円/泊）</th>
-                                <th style="width: 20%;">宿泊数（泊）</th>
-                                <th style="width: 20%;">税額（円）</th>
+                                <th style="width:30%">区分</th>
+                                <th style="width:20%">税率（円/泊）</th>
+                                <th style="width:25%">宿泊数（泊）</th>
+                                <th style="width:25%">税額（円）</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- 区分1 -->
                             <tr>
-                                <td class="ps-3">
-                                    <span class="fw-medium">区分1</span>
-                                    <div class="text-muted small">1人1泊 2万円未満</div>
-                                </td>
-                                <td class="text-end pe-3 fw-bold">100 円</td>
-                                <td>
-                                    <input type="number" class="form-control text-end tier-count"
-                                           id="guestCountTier1" th:field="*{guestCountTier1}"
-                                           min="0" data-rate="100">
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control text-end bg-light tier-tax"
-                                           id="taxAmountTier1" th:field="*{taxAmountTier1}"
-                                           readonly>
-                                </td>
-                            </tr>
-                            <!-- 区分2 -->
-                            <tr>
-                                <td class="ps-3">
-                                    <span class="fw-medium">区分2</span>
-                                    <div class="text-muted small">1人1泊 2万円以上5万円未満</div>
-                                </td>
+                                <td class="ps-3"><span class="fw-medium">区分1</span><div class="text-muted small">20,000円未満</div></td>
                                 <td class="text-end pe-3 fw-bold">200 円</td>
                                 <td>
                                     <input type="number" class="form-control text-end tier-count"
-                                           id="guestCountTier2" th:field="*{guestCountTier2}"
-                                           min="0" data-rate="200">
+                                           th:field="*{months[__${stat.index}__].guestCountTier1}"
+                                           th:attr="data-rate=200, data-month=${stat.index}" min="0">
                                 </td>
-                                <td>
-                                    <input type="number" class="form-control text-end bg-light tier-tax"
-                                           id="taxAmountTier2" th:field="*{taxAmountTier2}"
-                                           readonly>
-                                </td>
+                                <td class="text-end pe-3 tier-tax"
+                                    th:id="'taxDisplay_' + ${stat.index} + '_1'">0</td>
+                                <input type="hidden"
+                                       th:field="*{months[__${stat.index}__].taxAmountTier1}">
                             </tr>
-                            <!-- 区分3 -->
                             <tr>
-                                <td class="ps-3">
-                                    <span class="fw-medium">区分3</span>
-                                    <div class="text-muted small">1人1泊 5万円以上</div>
-                                </td>
-                                <td class="text-end pe-3 fw-bold">500 円</td>
+                                <td class="ps-3"><span class="fw-medium">区分2</span><div class="text-muted small">20,000円以上50,000円未満</div></td>
+                                <td class="text-end pe-3 fw-bold">400 円</td>
                                 <td>
                                     <input type="number" class="form-control text-end tier-count"
-                                           id="guestCountTier3" th:field="*{guestCountTier3}"
-                                           min="0" data-rate="500">
+                                           th:field="*{months[__${stat.index}__].guestCountTier2}"
+                                           th:attr="data-rate=400, data-month=${stat.index}" min="0">
                                 </td>
+                                <td class="text-end pe-3 tier-tax"
+                                    th:id="'taxDisplay_' + ${stat.index} + '_2'">0</td>
+                                <input type="hidden"
+                                       th:field="*{months[__${stat.index}__].taxAmountTier2}">
+                            </tr>
+                            <tr>
+                                <td class="ps-3"><span class="fw-medium">区分3</span><div class="text-muted small">50,000円以上</div></td>
+                                <td class="text-end pe-3 fw-bold">1,000 円</td>
                                 <td>
-                                    <input type="number" class="form-control text-end bg-light tier-tax"
-                                           id="taxAmountTier3" th:field="*{taxAmountTier3}"
-                                           readonly>
+                                    <input type="number" class="form-control text-end tier-count"
+                                           th:field="*{months[__${stat.index}__].guestCountTier3}"
+                                           th:attr="data-rate=1000, data-month=${stat.index}" min="0">
                                 </td>
+                                <td class="text-end pe-3 tier-tax"
+                                    th:id="'taxDisplay_' + ${stat.index} + '_3'">0</td>
+                                <input type="hidden"
+                                       th:field="*{months[__${stat.index}__].taxAmountTier3}">
+                            </tr>
+                            <tr class="table-light">
+                                <td class="ps-3"><span class="fw-medium">課税対象外</span><div class="text-muted small">免税</div></td>
+                                <td class="text-end pe-3 text-muted">-</td>
+                                <td>
+                                    <input type="number" class="form-control text-end exempt-count"
+                                           th:field="*{months[__${stat.index}__].exemptGuestCount}"
+                                           th:attr="data-month=${stat.index}" min="0">
+                                </td>
+                                <td class="text-end pe-3 text-muted">-</td>
                             </tr>
                         </tbody>
                         <tfoot class="table-light fw-bold">
                             <tr>
                                 <td colspan="2" class="text-end pe-3">合計</td>
-                                <td>
-                                    <input type="number" class="form-control text-end bg-light fw-bold"
-                                           id="displayTotalCount" readonly value="0">
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control text-end bg-light fw-bold text-primary"
-                                           id="displayTotalTax" readonly value="0">
-                                </td>
+                                <td class="text-end pe-3"
+                                    th:id="'totalCount_' + ${stat.index}">0</td>
+                                <td class="text-end pe-3 text-primary"
+                                    th:id="'totalTax_' + ${stat.index}">0</td>
                             </tr>
                         </tfoot>
                     </table>
-                </div>
-                <div class="p-3 text-muted small">
-                    <i class="bi bi-info-circle me-1"></i>
-                    宿泊数を入力すると税額・合計が自動計算されます。
                 </div>
             </div>
         </div>
@@ -188,69 +173,97 @@
             <button type="submit" class="btn btn-primary btn-lg px-5">
                 <i class="bi bi-save me-2"></i>登録する
             </button>
-            <a th:href="@{/declaration/pdf/{id}(id=${taxDeclarationForm.obligorId})}"
-               class="btn btn-outline-secondary btn-lg px-4" target="_blank">
-                <i class="bi bi-file-earmark-pdf me-2"></i>申告書PDF出力
-            </a>
+            <button type="button" id="btnPreview" class="btn btn-outline-info btn-lg px-4">
+                <i class="bi bi-eye me-2"></i>プレビュー
+            </button>
+            <button type="button" id="btnPrint" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-printer me-2"></i>印刷
+            </button>
             <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
                 <i class="bi bi-arrow-left me-2"></i>戻る
             </button>
         </div>
 
     </form>
+
+    <!-- 印刷用非表示iframe -->
+    <iframe id="printFrame" style="display:none;"></iframe>
 </div>
 
 <th:block layout:fragment="scripts">
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            // ===== 3段階税率: 自動計算 =====
-            function calcTierTax(countInput) {
-                const count = parseInt(countInput.value) || 0;
-                const rate  = parseInt(countInput.dataset.rate) || 0;
-                // 対応する税額フィールドを更新（同じ行の .tier-tax）
-                const row   = countInput.closest('tr');
-                const taxInput = row.querySelector('.tier-tax');
-                taxInput.value = count * rate;
-                calcTotals();
-            }
-
-            function calcTotals() {
+            function calcMonth(monthIndex) {
                 let totalCount = 0;
                 let totalTax   = 0;
-                document.querySelectorAll('.tier-count').forEach(function (input) {
+                document.querySelectorAll('.tier-count[data-month="' + monthIndex + '"]').forEach(function (input) {
                     const count = parseInt(input.value) || 0;
                     const rate  = parseInt(input.dataset.rate) || 0;
+                    const tax   = count * rate;
+                    const tier  = input.name.match(/guestCountTier(\d)/)?.[1];
+                    if (tier) {
+                        const disp = document.getElementById('taxDisplay_' + monthIndex + '_' + tier);
+                        if (disp) disp.textContent = tax.toLocaleString();
+                        const hidden = document.querySelector('input[name="months[' + monthIndex + '].taxAmountTier' + tier + ']"]');
+                        if (hidden) hidden.value = tax;
+                    }
                     totalCount += count;
-                    totalTax   += count * rate;
+                    totalTax   += tax;
                 });
-                document.getElementById('displayTotalCount').value = totalCount;
-                document.getElementById('displayTotalTax').value   = totalTax;
-                // hidden フィールドにも反映（POST で送信される）
-                document.getElementById('totalGuestCount').value = totalCount;
-                document.getElementById('totalTaxAmount').value  = totalTax;
+                const exempt = parseInt(document.querySelector('.exempt-count[data-month="' + monthIndex + '"]')?.value) || 0;
+                totalCount += exempt;
+                const tc = document.getElementById('totalCount_' + monthIndex);
+                const tt = document.getElementById('totalTax_'   + monthIndex);
+                if (tc) tc.textContent = totalCount.toLocaleString();
+                if (tt) tt.textContent = totalTax.toLocaleString();
             }
 
             document.querySelectorAll('.tier-count').forEach(function (input) {
                 input.addEventListener('input', function () {
                     if (parseInt(this.value) < 0) this.value = 0;
-                    calcTierTax(this);
+                    calcMonth(parseInt(this.dataset.month));
                 });
             });
 
-            // ===== 更正理由エリアの表示切替 =====
+            document.querySelectorAll('.exempt-count').forEach(function (input) {
+                input.addEventListener('input', function () {
+                    if (parseInt(this.value) < 0) this.value = 0;
+                    calcMonth(parseInt(this.dataset.month));
+                });
+            });
+
+            // 更正理由エリアの表示切替
             function toggleCorrectionArea() {
                 const checked = document.getElementById('isCorrection').checked;
-                document.getElementById('correctionReasonArea').style.display =
-                    checked ? 'block' : 'none';
+                document.getElementById('correctionReasonArea').style.display = checked ? 'block' : 'none';
+            }
+            document.getElementById('isCorrection').addEventListener('change', toggleCorrectionArea);
+            toggleCorrectionArea();
+
+            // 初期計算
+            for (let i = 0; i < 3; i++) calcMonth(i);
+
+            // ===== PDF URL 生成 =====
+            function buildPdfUrl() {
+                const obligorId = document.querySelector('input[name="obligorId"]')?.value ?? '';
+                return '/accommodation-tax/declaration/pdf/' + obligorId;
             }
 
-            document.getElementById('isCorrection').addEventListener('change', toggleCorrectionArea);
+            // ===== プレビュー =====
+            document.getElementById('btnPreview').addEventListener('click', function () {
+                window.open(buildPdfUrl(), '_blank');
+            });
 
-            // 初期ロード時に実行
-            toggleCorrectionArea();
-            // 既存値がある場合に合計を再計算
-            document.querySelectorAll('.tier-count').forEach(calcTierTax);
+            // ===== 印刷 =====
+            document.getElementById('btnPrint').addEventListener('click', function () {
+                const frame = document.getElementById('printFrame');
+                frame.onload = function () {
+                    frame.contentWindow.focus();
+                    frame.contentWindow.print();
+                };
+                frame.src = buildPdfUrl();
+            });
         });
     </script>
 </th:block>

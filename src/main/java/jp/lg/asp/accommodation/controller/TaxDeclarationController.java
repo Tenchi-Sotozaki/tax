@@ -100,8 +100,7 @@ public class TaxDeclarationController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("inline",
-                "tax-declaration-" + id + ".pdf");
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"tax-declaration-" + id + ".pdf\"");
         headers.setContentLength(pdf.length);
 
         return ResponseEntity.ok().headers(headers).body(pdf);

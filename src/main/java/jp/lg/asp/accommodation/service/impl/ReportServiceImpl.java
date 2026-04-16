@@ -64,14 +64,6 @@ public class ReportServiceImpl implements ReportService {
     public byte[] generateDeclarationPdf(String id) {
         TaxDeclarationForm form = new TaxDeclarationForm();
         form.setObligorId(id);
-        form.setGuestCountTier1(0);
-        form.setGuestCountTier2(0);
-        form.setGuestCountTier3(0);
-        form.setTaxAmountTier1(200);
-        form.setTaxAmountTier2(500);
-        form.setTaxAmountTier3(1000);
-        form.setTotalGuestCount(0);
-        form.setTotalTaxAmount(0);
         return generateDeclarationPdf(form);
     }
 
@@ -90,40 +82,34 @@ public class ReportServiceImpl implements ReportService {
         params.put("facilityName",   "テストホテル 札幌");
         params.put("facilityAddress","北海道札幌市中央区北1条西1丁目");
         params.put("registrationNo", "12345");
-        // TODO: DB実装後は form.getTargetYearMonth() を和暦に変換する
         params.put("submissionYear",  "令和8");
         params.put("submissionMonth", "4");
         params.put("submissionDay",   "1");
 
-        // ===== 月1（申告対象月）: form の値をそのまま使用 =====
-        params.put("targetYear1",    "令和8");
-        params.put("targetMonth1",   "4");
-        params.put("countTier1_1",   nvlInt(form.getGuestCountTier1()));
-        params.put("taxTier1_1",     nvlLong(form.getTaxAmountTier1()));
-        params.put("countTier2_1",   nvlInt(form.getGuestCountTier2()));
-        params.put("taxTier2_1",     nvlLong(form.getTaxAmountTier2()));
-        params.put("countTier3_1",   nvlInt(form.getGuestCountTier3()));
-        params.put("taxTier3_1",     nvlLong(form.getTaxAmountTier3()));
-        params.put("taxableCount1",  nvlInt(form.getTotalGuestCount()));
-        params.put("exemptCount1",   0);
-        params.put("totalCount1",    nvlInt(form.getTotalGuestCount()));
-        params.put("totalTax1",      nvlLong(form.getTotalTaxAmount()));
+        // ===== 3ヶ月分マッピング =====
+        for (int i = 0; i < 3; i++) {
+            String s = String.valueOf(i + 1);
+            TaxDeclarationForm.MonthlyData m = form.getMonth(i);
 
-        // ===== 月2・月3（TODO: DB実装後は複数月データを取得する） =====
-        for (int i = 2; i <= 3; i++) {
-            String s = String.valueOf(i);
-            params.put("targetYear"  + s, "");
-            params.put("targetMonth" + s, "");
-            params.put("countTier1_" + s, 0);
-            params.put("taxTier1_"   + s, 0L);
-            params.put("countTier2_" + s, 0);
-            params.put("taxTier2_"   + s, 0L);
-            params.put("countTier3_" + s, 0);
-            params.put("taxTier3_"   + s, 0L);
-            params.put("taxableCount" + s, 0);
-            params.put("exemptCount"  + s, 0);
-            params.put("totalCount"   + s, 0);
-            params.put("totalTax"     + s, 0L);
+            // 対象年月（TODO: 和暦変換実装後は変換メソッドを呼び出す）
+            if (m.getTargetYearMonth() != null) {
+                params.put("targetYear"  + s, "令和" + (m.getTargetYearMonth().getYear() - 2018));
+                params.put("targetMonth" + s, String.valueOf(m.getTargetYearMonth().getMonthValue()));
+            } else {
+                params.put("targetYear"  + s, "");
+                params.put("targetMonth" + s, "");
+            }
+
+            params.put("countTier1_" + s, nvlInt(m.getGuestCountTier1()));
+            params.put("taxTier1_"   + s, nvlLong(m.getTaxAmountTier1()));
+            params.put("countTier2_" + s, nvlInt(m.getGuestCountTier2()));
+            params.put("taxTier2_"   + s, nvlLong(m.getTaxAmountTier2()));
+            params.put("countTier3_" + s, nvlInt(m.getGuestCountTier3()));
+            params.put("taxTier3_"   + s, nvlLong(m.getTaxAmountTier3()));
+            params.put("taxableCount" + s, nvlInt(m.getTotalGuestCount()));
+            params.put("exemptCount"  + s, nvlInt(m.getExemptGuestCount()));
+            params.put("totalCount"   + s, nvlInt(m.getTotalGuestCount()));
+            params.put("totalTax"     + s, nvlLong(m.getTotalTaxAmount()));
         }
 
         return params;
@@ -133,7 +119,7 @@ public class ReportServiceImpl implements ReportService {
         return value != null ? value : 0;
     }
 
-    private long nvlLong(Integer value) {
-        return value != null ? value.longValue() : 0L;
+    private long nvlLong(Long value) {
+        return value != null ? value : 0L;
     }
 }
