@@ -14,4 +14,6 @@ public class CollectorListItem {
     private String businessType;
     private String businessTypeLabel;
     private String consolidationTarget; // "target" or "non-target"
+    /** ステータス: 1=営業中 / 2=休止 / 3=廃止 */
+    private String status;
 }
