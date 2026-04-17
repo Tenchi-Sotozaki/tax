@@ -23,11 +23,11 @@ public class CollectorServiceImpl implements CollectorService {
     // private final AccommodationFacilityRepository facilityRepository;
 
     private static final List<CollectorListItem> DUMMY_LIST = List.of(
-        new CollectorListItem(1L, "T001001", "グランドホテル東京",   "グランドホテル東京本館", "hotel",    "ホテル",     "target"),
-        new CollectorListItem(2L, "R002001", "温泉旅館やまと",       "やまと本館",             "ryokan",   "旅館",       "non-target"),
-        new CollectorListItem(3L, "S003001", "シティイン新宿",       "シティイン新宿",         "simple",   "簡易宿所",   "target"),
-        new CollectorListItem(4L, "M004001", "海辺の民宿しおかぜ",   "しおかぜ",               "minshuku", "民宿",       "target"),
-        new CollectorListItem(5L, "P005001", "森のペンション風の丘", "風の丘",                 "pension",  "ペンション", "non-target")
+        new CollectorListItem(1L, "T001001", "グランドホテル東京",   "グランドホテル東京本館", "hotel",    "ホテル",     "target",     "1"),
+        new CollectorListItem(2L, "R002001", "温泉旅館やまと",       "やまと本館",             "ryokan",   "旅館",       "non-target", "1"),
+        new CollectorListItem(3L, "S003001", "シティイン新宿",       "シティイン新宿",         "simple",   "簡易宿所",   "target",     "2"),
+        new CollectorListItem(4L, "M004001", "海辺の民宿しおかぜ",   "しおかぜ",               "minshuku", "民宿",       "target",     "1"),
+        new CollectorListItem(5L, "P005001", "森のペンション風の丘", "風の丘",                 "pension",  "ペンション", "non-target", "3")
     );
 
     @Override
