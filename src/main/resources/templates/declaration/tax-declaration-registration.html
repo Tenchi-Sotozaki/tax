@@ -34,14 +34,14 @@
             入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
         </div>
 
-        <!-- ① 基本情報エリア -->
+        <!-- 基本情報 -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>基本情報</h5>
             </div>
             <div class="card-body bg-light-subtle">
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label fw-medium">特別徴収義務者名</label>
                         <input type="text" class="form-control" th:value="${obligorName}" readonly>
                     </div>
@@ -49,74 +49,93 @@
             </div>
         </div>
 
-        <!-- ② 申告情報エリア -->
-        <div class="card mb-4 shadow-sm">
+        <!-- 3ヶ月分申告エリア -->
+        <div th:each="month, stat : *{months}" class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>申告情報</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-month me-2"></i>
+                    <span th:text="${stat.index + 1} + 'ヶ月目'"></span>
+                </h5>
             </div>
             <div class="card-body bg-light-subtle">
-                <div class="row g-3">
-
-                    <!-- 申告年月 -->
+                <div class="row g-3 mb-3">
                     <div class="col-md-4">
-                        <label for="targetYearMonth" class="form-label fw-medium">
-                            申告年月 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="month" class="form-control" id="targetYearMonth"
-                               th:field="*{targetYearMonth}" th:errorclass="is-invalid">
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('targetYearMonth')}"
-                             th:errors="*{targetYearMonth}"></div>
+                        <label class="form-label fw-medium">申告年月</label>
+                        <input type="month" class="form-control"
+                               th:field="*{months[__${stat.index}__].targetYearMonth}">
                     </div>
-
-                    <!-- 課税対象宿泊数 -->
-                    <div class="col-md-4">
-                        <label for="taxableGuestCount" class="form-label fw-medium">
-                            課税対象宿泊数 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="taxableGuestCount"
-                                   th:field="*{taxableGuestCount}" th:errorclass="is-invalid" min="0">
-                            <span class="input-group-text">泊</span>
-                        </div>
-                        <div class="invalid-feedback d-block"
-                             th:if="${#fields.hasErrors('taxableGuestCount')}"
-                             th:errors="*{taxableGuestCount}"></div>
-                    </div>
-
-                    <!-- 月計表入力ボタン（IDを monthlyTaxModal に統一） -->
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="button" class="btn btn-outline-primary w-100"
-                                data-bs-toggle="modal" data-bs-target="#monthlyTaxModal">
-                            <i class="bi bi-table me-1"></i>月計表から入力する
-                        </button>
-                    </div>
-
-                    <!-- 設定税額 -->
-                    <div class="col-md-4">
-                        <label for="taxRate" class="form-label fw-medium">
-                            設定税額（円/泊） <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="taxRate"
-                                   th:field="*{taxRate}" th:errorclass="is-invalid" min="0">
-                            <span class="input-group-text">円/泊</span>
-                        </div>
-                        <div class="invalid-feedback d-block"
-                             th:if="${#fields.hasErrors('taxRate')}"
-                             th:errors="*{taxRate}"></div>
-                    </div>
-
-                    <!-- 納入金額（自動計算・readonly） -->
-                    <div class="col-md-4">
-                        <label for="totalTaxAmount" class="form-label fw-medium">納入金額</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control bg-light fw-bold text-primary"
-                                   id="totalTaxAmount" th:field="*{totalTaxAmount}" readonly>
-                            <span class="input-group-text">円</span>
-                        </div>
-                        <div class="form-text text-muted">課税対象宿泊数 × 設定税額で自動計算されます</div>
-                    </div>
-
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-primary text-center">
+                            <tr>
+                                <th style="width:30%">区分</th>
+                                <th style="width:20%">税率（円/泊）</th>
+                                <th style="width:25%">宿泊数（泊）</th>
+                                <th style="width:25%">税額（円）</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="ps-3"><span class="fw-medium">区分1</span><div class="text-muted small">20,000円未満</div></td>
+                                <td class="text-end pe-3 fw-bold">200 円</td>
+                                <td>
+                                    <input type="number" class="form-control text-end tier-count"
+                                           th:field="*{months[__${stat.index}__].guestCountTier1}"
+                                           th:attr="data-rate=200, data-month=${stat.index}" min="0">
+                                </td>
+                                <td class="text-end pe-3 tier-tax"
+                                    th:id="'taxDisplay_' + ${stat.index} + '_1'">0</td>
+                                <input type="hidden"
+                                       th:field="*{months[__${stat.index}__].taxAmountTier1}">
+                            </tr>
+                            <tr>
+                                <td class="ps-3"><span class="fw-medium">区分2</span><div class="text-muted small">20,000円以上50,000円未満</div></td>
+                                <td class="text-end pe-3 fw-bold">400 円</td>
+                                <td>
+                                    <input type="number" class="form-control text-end tier-count"
+                                           th:field="*{months[__${stat.index}__].guestCountTier2}"
+                                           th:attr="data-rate=400, data-month=${stat.index}" min="0">
+                                </td>
+                                <td class="text-end pe-3 tier-tax"
+                                    th:id="'taxDisplay_' + ${stat.index} + '_2'">0</td>
+                                <input type="hidden"
+                                       th:field="*{months[__${stat.index}__].taxAmountTier2}">
+                            </tr>
+                            <tr>
+                                <td class="ps-3"><span class="fw-medium">区分3</span><div class="text-muted small">50,000円以上</div></td>
+                                <td class="text-end pe-3 fw-bold">1,000 円</td>
+                                <td>
+                                    <input type="number" class="form-control text-end tier-count"
+                                           th:field="*{months[__${stat.index}__].guestCountTier3}"
+                                           th:attr="data-rate=1000, data-month=${stat.index}" min="0">
+                                </td>
+                                <td class="text-end pe-3 tier-tax"
+                                    th:id="'taxDisplay_' + ${stat.index} + '_3'">0</td>
+                                <input type="hidden"
+                                       th:field="*{months[__${stat.index}__].taxAmountTier3}">
+                            </tr>
+                            <tr class="table-light">
+                                <td class="ps-3"><span class="fw-medium">課税対象外</span><div class="text-muted small">免税</div></td>
+                                <td class="text-end pe-3 text-muted">-</td>
+                                <td>
+                                    <input type="number" class="form-control text-end exempt-count"
+                                           th:field="*{months[__${stat.index}__].exemptGuestCount}"
+                                           th:attr="data-month=${stat.index}" min="0">
+                                </td>
+                                <td class="text-end pe-3 text-muted">-</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="table-light fw-bold">
+                            <tr>
+                                <td colspan="2" class="text-end pe-3">合計</td>
+                                <td class="text-end pe-3"
+                                    th:id="'totalCount_' + ${stat.index}">0</td>
+                                <td class="text-end pe-3 text-primary"
+                                    th:id="'totalTax_' + ${stat.index}">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
         </div>
@@ -128,7 +147,6 @@
             </div>
             <div class="card-body bg-light-subtle">
                 <div class="row g-3">
-
                     <div class="col-md-12">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="isCorrection"
@@ -138,7 +156,6 @@
                             </label>
                         </div>
                     </div>
-
                     <div class="col-md-12" id="correctionReasonArea" style="display: none;">
                         <label for="correctionReason" class="form-label fw-medium">
                             更正理由 <span class="badge bg-danger text-white ms-1">必須</span>
@@ -147,7 +164,6 @@
                                   th:field="*{correctionReason}"
                                   placeholder="更正または修正の理由を入力してください"></textarea>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -157,11 +173,12 @@
             <button type="submit" class="btn btn-primary btn-lg px-5">
                 <i class="bi bi-save me-2"></i>登録する
             </button>
-            <a th:href="@{/declaration/pdf/{id}(id=${taxDeclarationForm.obligorId})}"
-               class="btn btn-outline-secondary btn-lg px-4"
-               target="_blank">
-                <i class="bi bi-file-earmark-pdf me-2"></i>申告書PDF出力
-            </a>
+            <button type="button" id="btnPreview" class="btn btn-outline-info btn-lg px-4">
+                <i class="bi bi-eye me-2"></i>プレビュー
+            </button>
+            <button type="button" id="btnPrint" class="btn btn-outline-secondary btn-lg px-4">
+                <i class="bi bi-printer me-2"></i>印刷
+            </button>
             <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
                 <i class="bi bi-arrow-left me-2"></i>戻る
             </button>
@@ -169,120 +186,84 @@
 
     </form>
 
-    <!-- ===== 月計表登録モーダル ===== -->
-    <div class="modal fade" id="monthlyTaxModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-table me-2"></i>月計表登録
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-muted small mb-3">日ごとの宿泊数を入力してください。合計は自動計算されます。</p>
-                    <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
-                        <table class="table table-bordered table-sm align-middle mb-0">
-                            <thead class="table-primary text-center sticky-top">
-                                <tr>
-                                    <th style="width: 80px;">日付</th>
-                                    <th>宿泊数（泊）</th>
-                                </tr>
-                            </thead>
-                            <tbody id="monthlyTableBody"></tbody>
-                            <tfoot class="table-light">
-                                <tr>
-                                    <td class="fw-bold text-center">合計</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm fw-bold text-primary"
-                                               id="monthlyTotal" readonly value="0">
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-lg me-1"></i>キャンセル
-                    </button>
-                    <button type="button" class="btn btn-primary" id="btnConfirmMonthly">
-                        <i class="bi bi-check-lg me-1"></i>確定して反映する
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- 印刷用非表示iframe -->
+    <iframe id="printFrame" style="display:none;"></iframe>
 </div>
 
 <th:block layout:fragment="scripts">
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            // ===== 月計表: 1日〜31日の行を動的生成 =====
-            const tbody = document.getElementById('monthlyTableBody');
-            for (let day = 1; day <= 31; day++) {
-                const tr = document.createElement('tr');
-                tr.innerHTML =
-                    '<td class="text-center fw-medium">' + day + '日</td>' +
-                    '<td><input type="number" class="form-control form-control-sm daily-count" min="0" value="0"></td>';
-                tbody.appendChild(tr);
-            }
-
-            // ===== 月計表: 合計の自動計算 =====
-            function calcMonthlyTotal() {
-                let total = 0;
-                document.querySelectorAll('.daily-count').forEach(function (input) {
-                    const v = parseInt(input.value);
-                    total += (isNaN(v) || v < 0) ? 0 : v;
+            function calcMonth(monthIndex) {
+                let totalCount = 0;
+                let totalTax   = 0;
+                document.querySelectorAll('.tier-count[data-month="' + monthIndex + '"]').forEach(function (input) {
+                    const count = parseInt(input.value) || 0;
+                    const rate  = parseInt(input.dataset.rate) || 0;
+                    const tax   = count * rate;
+                    const tier  = input.name.match(/guestCountTier(\d)/)?.[1];
+                    if (tier) {
+                        const disp = document.getElementById('taxDisplay_' + monthIndex + '_' + tier);
+                        if (disp) disp.textContent = tax.toLocaleString();
+                        const hidden = document.querySelector('input[name="months[' + monthIndex + '].taxAmountTier' + tier + ']"]');
+                        if (hidden) hidden.value = tax;
+                    }
+                    totalCount += count;
+                    totalTax   += tax;
                 });
-                document.getElementById('monthlyTotal').value = total;
+                const exempt = parseInt(document.querySelector('.exempt-count[data-month="' + monthIndex + '"]')?.value) || 0;
+                totalCount += exempt;
+                const tc = document.getElementById('totalCount_' + monthIndex);
+                const tt = document.getElementById('totalTax_'   + monthIndex);
+                if (tc) tc.textContent = totalCount.toLocaleString();
+                if (tt) tt.textContent = totalTax.toLocaleString();
             }
 
-            tbody.addEventListener('input', function (e) {
-                if (e.target.classList.contains('daily-count')) {
-                    if (parseInt(e.target.value) < 0) e.target.value = 0;
-                    calcMonthlyTotal();
-                }
+            document.querySelectorAll('.tier-count').forEach(function (input) {
+                input.addEventListener('input', function () {
+                    if (parseInt(this.value) < 0) this.value = 0;
+                    calcMonth(parseInt(this.dataset.month));
+                });
             });
 
-            // ===== 月計表: 「確定して反映する」ボタン =====
-            document.getElementById('btnConfirmMonthly').addEventListener('click', function () {
-                const total = parseInt(document.getElementById('monthlyTotal').value) || 0;
-                const guestInput = document.getElementById('taxableGuestCount');
-                guestInput.value = total;
-                guestInput.dispatchEvent(new Event('input'));
-                bootstrap.Modal.getInstance(document.getElementById('monthlyTaxModal')).hide();
+            document.querySelectorAll('.exempt-count').forEach(function (input) {
+                input.addEventListener('input', function () {
+                    if (parseInt(this.value) < 0) this.value = 0;
+                    calcMonth(parseInt(this.dataset.month));
+                });
             });
 
-            // ===== 月計表: モーダルを開くたびにリセット =====
-            document.getElementById('monthlyTaxModal').addEventListener('show.bs.modal', function () {
-                document.querySelectorAll('.daily-count').forEach(function (input) { input.value = 0; });
-                document.getElementById('monthlyTotal').value = 0;
-            });
-
-            // ===== 自動計算: 宿泊数 × 税額 → 納入金額 =====
-            function calcTotal() {
-                const guestCount = parseInt(document.getElementById('taxableGuestCount').value) || 0;
-                const taxRate    = parseInt(document.getElementById('taxRate').value)           || 0;
-                document.getElementById('totalTaxAmount').value = guestCount * taxRate;
-            }
-
-            document.getElementById('taxableGuestCount').addEventListener('input', calcTotal);
-            document.getElementById('taxRate').addEventListener('input', calcTotal);
-
-            // ===== 更正理由エリアの表示切替 =====
+            // 更正理由エリアの表示切替
             function toggleCorrectionArea() {
                 const checked = document.getElementById('isCorrection').checked;
                 document.getElementById('correctionReasonArea').style.display = checked ? 'block' : 'none';
             }
-
             document.getElementById('isCorrection').addEventListener('change', toggleCorrectionArea);
-
-            // 初期ロード時に実行
             toggleCorrectionArea();
-            calcTotal();
+
+            // 初期計算
+            for (let i = 0; i < 3; i++) calcMonth(i);
+
+            // ===== PDF URL 生成 =====
+            function buildPdfUrl() {
+                const obligorId = document.querySelector('input[name="obligorId"]')?.value ?? '';
+                return '/accommodation-tax/declaration/pdf/' + obligorId;
+            }
+
+            // ===== プレビュー =====
+            document.getElementById('btnPreview').addEventListener('click', function () {
+                window.open(buildPdfUrl(), '_blank');
+            });
+
+            // ===== 印刷 =====
+            document.getElementById('btnPrint').addEventListener('click', function () {
+                const frame = document.getElementById('printFrame');
+                frame.onload = function () {
+                    frame.contentWindow.focus();
+                    frame.contentWindow.print();
+                };
+                frame.src = buildPdfUrl();
+            });
         });
     </script>
 </th:block>

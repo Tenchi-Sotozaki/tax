@@ -73,22 +73,19 @@ public class DeclarationServiceImpl implements DeclarationService {
         // TODO: DB実装後は既存申告データを取得してフォームに詰め替え
         TaxDeclarationForm form = new TaxDeclarationForm();
         form.setObligorId(obligorId);
-        form.setTaxRate(200);
-        form.setTaxableGuestCount(0);
-        form.setTotalTaxAmount(0);
         form.setIsCorrection(false);
         return form;
     }
 
     @Override
     public void registerDeclaration(TaxDeclarationForm form) {
-        // 納入金額をサーバー側で再計算（改ざん防止）
-        int total = (form.getTaxableGuestCount() != null ? form.getTaxableGuestCount() : 0)
-                  * (form.getTaxRate()           != null ? form.getTaxRate()           : 0);
-        form.setTotalTaxAmount(total);
+        // 各月の合計をサーバー側で再計算（改ざん防止）
+        if (form.getMonths() != null) {
+            form.getMonths().forEach(m -> { if (m != null) m.recalculate(); });
+        }
         // TODO: declarationRepository.save(toEntity(form)) に差し替え
-        log.info("宿泊税申告登録: obligorId={}, yearMonth={}, total={}",
-                form.getObligorId(), form.getTargetYearMonth(), total);
+        log.info("宿泊税申告登録: obligorId={}, months={}",
+                form.getObligorId(), form.getMonths() != null ? form.getMonths().size() : 0);
     }
 
     @Override
