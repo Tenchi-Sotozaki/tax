@@ -28,43 +28,59 @@
         <div class="card-body">
             <form th:action="@{/collector/list}" th:object="${searchForm}" method="get">
                 <div class="row g-3">
+                    <!-- 1行目: 指定番号 / 氏名名称 / 施設名称 / 営業種別 -->
                     <div class="col-md-3">
-                        <label for="registrationNo" class="form-label">登録番号</label>
-                        <input type="text" class="form-control" id="registrationNo"
-                               th:field="*{registrationNo}" placeholder="例：T001001">
+                        <label class="form-label">指定番号</label>
+                        <input type="text" class="form-control" th:field="*{shiteiNo}" placeholder="指定番号">
                     </div>
                     <div class="col-md-3">
-                        <label for="obligorName" class="form-label">氏名/名称</label>
-                        <input type="text" class="form-control" id="obligorName"
-                               th:field="*{obligorName}" placeholder="事業者名を入力">
+                        <label class="form-label">氏名/名称</label>
+                        <input type="text" class="form-control" th:field="*{name}" placeholder="事業者名">
                     </div>
                     <div class="col-md-3">
-                        <label for="facilityName" class="form-label">施設名</label>
-                        <input type="text" class="form-control" id="facilityName"
-                               th:field="*{facilityName}" placeholder="施設名を入力">
+                        <label class="form-label">施設名称</label>
+                        <input type="text" class="form-control" th:field="*{shisetsuName}" placeholder="施設名">
                     </div>
                     <div class="col-md-3">
-                        <label for="businessType" class="form-label">営業種別</label>
-                        <select class="form-select" id="businessType" th:field="*{businessType}">
-                            <option value="">すべて</option>
-                            <option value="hotel">ホテル</option>
-                            <option value="ryokan">旅館</option>
-                            <option value="simple">簡易宿所</option>
-                            <option value="minshuku">民宿</option>
-                            <option value="pension">ペンション</option>
+                        <label class="form-label">営業種別</label>
+                        <select class="form-select" th:field="*{kyokaShu}">
+                            <option value="999">すべて</option>
+                            <option value="1">ホテル</option>
+                            <option value="2">旅館</option>
+                            <option value="3">簡易宿所</option>
+                            <option value="4">民泊</option>
+                        </select>
+                    </div>
+                    <!-- 2行目: 合算対象 / ステータス / 個人番号 / 法人番号 -->
+                    <div class="col-md-3">
+                        <label class="form-label">合算対象</label>
+                        <select class="form-select" th:field="*{gasanTaisho}">
+                            <option value="999">すべて</option>
+                            <option value="1">非対象</option>
+                            <option value="2">対象</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="consolidationTarget" class="form-label">合算対象</label>
-                        <select class="form-select" id="consolidationTarget" th:field="*{consolidationTarget}">
-                            <option value="">すべて</option>
-                            <option value="target">対象</option>
-                            <option value="non-target">非対象</option>
+                        <label class="form-label">ステータス</label>
+                        <select class="form-select" th:field="*{status}">
+                            <option value="4">すべて</option>
+                            <option value="1">営業中</option>
+                            <option value="2">休止</option>
+                            <option value="3">廃止</option>
                         </select>
                     </div>
-                    <div class="col-md-9 d-flex align-items-end gap-2">
+                    <div class="col-md-3">
+                        <label class="form-label">個人番号</label>
+                        <input type="text" class="form-control" th:field="*{kojinNo}" placeholder="個人番号">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">法人番号</label>
+                        <input type="text" class="form-control" th:field="*{hojinNo}" placeholder="法人番号">
+                    </div>
+                    <!-- 検索ボタン -->
+                    <div class="col-12 d-flex gap-2 pt-1">
                         <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-search me-1"></i>検索
+                            <i class="bi bi-search me-1"></i>検索する
                         </button>
                         <a th:href="@{/collector/list}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-counterclockwise me-1"></i>リセット

@@ -34,16 +34,19 @@ public class CollectorServiceImpl implements CollectorService {
     public List<CollectorListItem> search(CollectorSearchForm form) {
         // TODO: collectorRepository.findByCondition(form) に差し替え
         return DUMMY_LIST.stream()
-                .filter(i -> !StringUtils.hasText(form.getRegistrationNo())
-                        || i.getRegistrationNo().contains(form.getRegistrationNo()))
-                .filter(i -> !StringUtils.hasText(form.getObligorName())
-                        || i.getObligorName().contains(form.getObligorName()))
-                .filter(i -> !StringUtils.hasText(form.getFacilityName())
-                        || i.getFacilityName().contains(form.getFacilityName()))
-                .filter(i -> !StringUtils.hasText(form.getBusinessType())
-                        || i.getBusinessType().equals(form.getBusinessType()))
-                .filter(i -> !StringUtils.hasText(form.getConsolidationTarget())
-                        || i.getConsolidationTarget().equals(form.getConsolidationTarget()))
+                .filter(i -> !StringUtils.hasText(form.getShiteiNo())
+                        || i.getRegistrationNo().contains(form.getShiteiNo()))
+                .filter(i -> !StringUtils.hasText(form.getName())
+                        || i.getObligorName().contains(form.getName()))
+                .filter(i -> !StringUtils.hasText(form.getShisetsuName())
+                        || i.getFacilityName().contains(form.getShisetsuName()))
+                .filter(i -> !StringUtils.hasText(form.getKyokaShu())
+                        || "999".equals(form.getKyokaShu())
+                        || i.getBusinessType().equals(form.getKyokaShu()))
+                .filter(i -> !StringUtils.hasText(form.getGasanTaisho())
+                        || "999".equals(form.getGasanTaisho())
+                        || ("2".equals(form.getGasanTaisho()) && "target".equals(i.getConsolidationTarget()))
+                        || ("1".equals(form.getGasanTaisho()) && "non-target".equals(i.getConsolidationTarget())))
                 .toList();
     }
 
