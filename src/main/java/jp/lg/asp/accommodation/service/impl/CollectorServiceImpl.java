@@ -5,127 +5,222 @@ import jp.lg.asp.accommodation.dto.CollectorListItem;
 import jp.lg.asp.accommodation.dto.CollectorSearchForm;
 import jp.lg.asp.accommodation.dto.FacilityDto;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
+import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.GassanUchi;
+import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.GassanUchiRepository;
+import jp.lg.asp.accommodation.repository.NokanRepository;
+import jp.lg.asp.accommodation.repository.ShoyushaRepository;
+import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.CollectorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CollectorServiceImpl implements CollectorService {
 
-    // TODO: DB実装後は以下のRepositoryを注入して差し替える
-    // private final SpecialCollectorRepository collectorRepository;
-    // private final AccommodationFacilityRepository facilityRepository;
-
-    private static final List<CollectorListItem> DUMMY_LIST = List.of(
-        new CollectorListItem(1L, "T001001", "グランドホテル東京",   "グランドホテル東京本館", "hotel",    "ホテル",     "target",     "1"),
-        new CollectorListItem(2L, "R002001", "温泉旅館やまと",       "やまと本館",             "ryokan",   "旅館",       "non-target", "1"),
-        new CollectorListItem(3L, "S003001", "シティイン新宿",       "シティイン新宿",         "simple",   "簡易宿所",   "target",     "2"),
-        new CollectorListItem(4L, "M004001", "海辺の民宿しおかぜ",   "しおかぜ",               "minshuku", "民宿",       "target",     "1"),
-        new CollectorListItem(5L, "P005001", "森のペンション風の丘", "風の丘",                 "pension",  "ペンション", "non-target", "3")
-    );
+    private final TokugimuRepository tokugimuRepository;
+    private final AtenaRepository atenaRepository;
+    private final GassanUchiRepository gassanUchiRepository;
+    private final ShoyushaRepository shoyushaRepository;
+    private final NokanRepository nokanRepository;
+    
+    // 固定の自治体コード（実際の運用では設定ファイルから取得）
+    private static final String JICHITAI_CD = "01234";
 
     @Override
+    @Transactional(readOnly = true)
     public List<CollectorListItem> search(CollectorSearchForm form) {
-        // TODO: collectorRepository.findByCondition(form) に差し替え
-        return DUMMY_LIST.stream()
-                .filter(i -> !StringUtils.hasText(form.getShiteiNo())
-                        || i.getRegistrationNo().contains(form.getShiteiNo()))
-                .filter(i -> !StringUtils.hasText(form.getName())
-                        || i.getObligorName().contains(form.getName()))
-                .filter(i -> !StringUtils.hasText(form.getShisetsuName())
-                        || i.getFacilityName().contains(form.getShisetsuName()))
-                .filter(i -> !StringUtils.hasText(form.getKyokaShu())
-                        || "999".equals(form.getKyokaShu())
-                        || i.getBusinessType().equals(form.getKyokaShu()))
-                .filter(i -> !StringUtils.hasText(form.getGasanTaisho())
-                        || "999".equals(form.getGasanTaisho())
-                        || ("2".equals(form.getGasanTaisho()) && "target".equals(i.getConsolidationTarget()))
-                        || ("1".equals(form.getGasanTaisho()) && "non-target".equals(i.getConsolidationTarget())))
-                .toList();
+        // データベースから検索
+        List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
+            form.getShiteiNo(),
+            form.getName(),
+            form.getShisetsuName(),
+            form.getKyokaShu(),
+            form.getKojinNo(),
+            form.getHojinNo()
+        );
+
+        if (tokugimuList.isEmpty()) {
+            return List.of();
+        }
+
+        // 関連データを一括取得
+        List<BigDecimal> atenaNos = tokugimuList.stream().map(Tokugimu::getAtenaNo).toList();
+        List<String> shiteiNos = tokugimuList.stream().map(Tokugimu::getShiteiNo).toList();
+        
+        Map<BigDecimal, Atena> atenaMap = atenaRepository.findByJichitaiCdAndAtenaNoIn(JICHITAI_CD, atenaNos)
+            .stream().collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
+        
+        Map<String, Boolean> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(JICHITAI_CD, shiteiNos)
+            .stream().collect(Collectors.toMap(GassanUchi::getShiteiNo, g -> true, (a, b) -> a));
+
+        // 結果をDTOに変換
+        return tokugimuList.stream()
+            .map(t -> {
+                Atena atena = atenaMap.get(t.getAtenaNo());
+                boolean isGassanTarget = gassanMap.containsKey(t.getShiteiNo());
+                String status = t.getStatus();
+                
+                // ステータスフィルタリング
+                if (form.getStatus() != null && !"4".equals(form.getStatus()) && !form.getStatus().equals(status)) {
+                    return null;
+                }
+                
+                // 合算対象フィルタリング
+                if (form.getGasanTaisho() != null && !"999".equals(form.getGasanTaisho())) {
+                    boolean shouldBeTarget = "2".equals(form.getGasanTaisho());
+                    if (shouldBeTarget != isGassanTarget) {
+                        return null;
+                    }
+                }
+                
+                return new CollectorListItem(
+                    t.getAtenaNo().longValue(), // IDとして宛名番号を使用
+                    t.getShiteiNo(),
+                    atena != null ? atena.getName() : t.getKyokaName(),
+                    t.getShisetsuName(),
+                    t.getKyokaShu(),
+                    getBusinessTypeLabel(t.getKyokaShu()),
+                    isGassanTarget ? "target" : "non-target",
+                    status,
+                    atena != null ? atena.getKojinNo() : null,
+                    atena != null ? atena.getHojinNo() : null
+                );
+            })
+            .filter(item -> item != null)
+            .toList();
+    }
+    
+    private String getBusinessTypeLabel(String kyokaShu) {
+        return switch (kyokaShu != null ? kyokaShu : "") {
+            case "1" -> "ホテル";
+            case "2" -> "旅館";
+            case "3" -> "簡易宿所";
+            case "4" -> "民泊";
+            default -> "";
+        };
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CollectorForm getCollectorById(Long id) {
-        // TODO: collectorRepository.findById(id).map(this::toForm).orElseThrow() に差し替え
+        // 宛名番号からデータを取得
+        BigDecimal atenaNo = BigDecimal.valueOf(id);
+        Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo)
+            .orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
+        
         CollectorForm form = new CollectorForm();
         form.setId(id);
-        form.setObligorName("グランドホテル東京（ID:" + id + "）");
-        form.setObligorAddress("東京都新宿区西新宿1-1-1");
-        form.setObligorPhone("03-1234-5678");
-        form.setFacilityAddress("東京都新宿区西新宿1-1-1");
-        form.setFacilityNameKana("ぐらんどほてるとうきょう");
-        form.setFacilityPhone("03-1234-5678");
-        form.setRoomCount(100);
-        form.setCapacity(200);
-        form.setBusinessType("hotel");
-        form.setLicenseNumber("LIC-" + id);
-        form.setMailAddress("東京都新宿区西新宿1-1-1");
-        form.setMailNameKana("たなか たろう");
-        form.setMailPhone("03-1234-5678");
+        form.setObligorName(atena.getName());
+        // 他のフィールドは必要に応じて追加
+        
         return form;
     }
 
     @Override
     public String getObligorName(String obligorId) {
-        // TODO: collectorRepository.findById(obligorId).getName() に差し替え
-        return switch (obligorId != null ? obligorId : "") {
-            case "1" -> "グランドホテル東京";
-            case "2" -> "温泉旅館やまと";
-            case "3" -> "シティイン新宿";
-            default  -> "株式会社グランドホテル東京（ID:" + obligorId + "）";
-        };
+        try {
+            Long id = Long.parseLong(obligorId);
+            BigDecimal atenaNo = BigDecimal.valueOf(id);
+            Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo).orElse(null);
+            return atena != null ? atena.getName() : "不明";
+        } catch (NumberFormatException e) {
+            log.warn("無効なID形式: {}", obligorId);
+            return "不明";
+        }
     }
 
     @Override
     public List<FacilityDto> getFacilities(String obligorId) {
-        // TODO: facilityRepository.findByCollectorId(obligorId) に差し替え
+        // 施設情報は別テーブルから取得する予定ですが、今はダミーデータを返します
         String name = getObligorName(obligorId);
         return List.of(
-            new FacilityDto(obligorId + "-F1", name + " 本館",      "東京都新宿区西新宿1-1-1"),
-            new FacilityDto(obligorId + "-F2", name + " 別館",      "東京都新宿区西新宿1-2-1"),
-            new FacilityDto(obligorId + "-F3", name + " アネックス","東京都新宿区西新宿1-3-1"),
-            new FacilityDto(obligorId + "-F4", name + " スイート",  "東京都新宿区西新宿1-4-1")
+            new FacilityDto(obligorId + "-F1", name + " 本館", "東京都新宿区西新宿1-1-1")
         );
     }
 
     @Override
     public TaxManagerForm buildTaxManagerForm(Long collectorId) {
-        // TODO: DB実装後は既存の納税管理人データを取得してフォームに詰め替え
         CollectorForm collector = getCollectorById(collectorId);
         TaxManagerForm form = new TaxManagerForm();
         form.setCollectorId(collectorId);
         form.setObligorName(collector.getObligorName());
-        form.setFacilityName("グランドホテル東京本館（ID:" + collectorId + "）");
         return form;
     }
 
     @Override
+    @Transactional
     public void register(CollectorForm form) {
-        // TODO: collectorRepository.save(toEntity(form)) に差し替え
+        // 実装予定
         log.info("特別徴収義務者登録: {}", form.getObligorName());
     }
 
     @Override
+    @Transactional
     public void update(Long id, CollectorForm form) {
-        // TODO: collectorRepository.save(toEntity(form)) に差し替え
+        // 実装予定
         log.info("特別徴収義務者更新: id={}, name={}", id, form.getObligorName());
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        // TODO: collectorRepository.deleteById(id) に差し替え
-        log.info("特別徴収義務者削除: id={}", id);
+        BigDecimal atenaNo = BigDecimal.valueOf(id);
+        
+        // 削除対象の特別徴収義務者情報を取得
+        Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo)
+            .orElseThrow(() -> new RuntimeException("削除対象の特別徴収義務者が見つかりません: " + id));
+        
+        String shiteiNo = tokugimu.getShiteiNo();
+        String obligorName = tokugimu.getKyokaName();
+        
+        try {
+            // 関連データを順番に削除
+            log.info("特別徴収義務者削除開始: id={}, 指定番号={}, 名称={}", id, shiteiNo, obligorName);
+            
+            // 1. 所有者情報を削除
+            shoyushaRepository.deleteByJichitaiCdAndShiteiNo(JICHITAI_CD, shiteiNo);
+            log.debug("所有者情報削除完了: 指定番号={}", shiteiNo);
+            
+            // 2. 納税管理人情報を削除
+            nokanRepository.deleteByJichitaiCdAndShiteiNo(JICHITAI_CD, shiteiNo);
+            log.debug("納税管理人情報削除完了: 指定番号={}", shiteiNo);
+            
+            // 3. 合算申告内訳を削除
+            gassanUchiRepository.deleteByJichitaiCdAndShiteiNo(JICHITAI_CD, shiteiNo);
+            log.debug("合算申告内訳削除完了: 指定番号={}", shiteiNo);
+            
+            // 4. 特別徴収義務者情報を削除
+            tokugimuRepository.deleteByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo);
+            log.debug("特別徴収義務者情報削除完了: 宛名番号={}", atenaNo);
+            
+            // 5. 宛名情報を削除（最後に削除）
+            atenaRepository.deleteByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo);
+            log.debug("宛名情報削除完了: 宛名番号={}", atenaNo);
+            
+            log.info("特別徴収義務者削除完了: id={}, 指定番号={}, 名称={}", id, shiteiNo, obligorName);
+            
+        } catch (Exception e) {
+            log.error("特別徴収義務者削除エラー: id={}, 指定番号={}, 名称={}", id, shiteiNo, obligorName, e);
+            throw new RuntimeException("特別徴収義務者の削除に失敗しました: " + obligorName, e);
+        }
     }
 
     @Override
+    @Transactional
     public void saveTaxManager(Long collectorId, TaxManagerForm form) {
-        // TODO: taxManagerRepository.save(toEntity(form)) に差し替え
+        // 実装予定
         log.info("納税管理人登録: collectorId={}, manager={}", collectorId, form.getManagerName());
     }
 }
