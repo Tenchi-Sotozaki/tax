@@ -1,21 +1,21 @@
 package jp.lg.asp.accommodation.dto;
 
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
 
-import java.time.LocalDate;
+import lombok.Data;
 
 @Data
 public class TaxManagerForm {
 
-    // 遷移元から引き継ぐ情報（readonly表示用）
-    private Long collectorId;
+	private Long collectorId;
+    
     private String obligorName;
     private String facilityName;
 
-    // 納税管理人情報
     @NotNull(message = "登録日は必須です")
     private LocalDate registrationDate;
 
