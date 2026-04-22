@@ -38,7 +38,35 @@ public class TaxManagerService {
             
             form.setObligorName((String) result.get("kyoka_name"));
             form.setFacilityName((String) result.get("shisetsu_name"));
-            
+         // 3. ★納税管理人のデータが既に存在するかチェック
+            String checkSql = "SELECT COUNT(*) FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
+            Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, shiteiNo);
+
+            if (count != null && count > 0) {
+                // =============== 既に登録されている場合（編集モード） ===============
+                form.setEdit(true); 
+
+                // 登録済みのデータを取得してFormにセットする
+                String nokanSql = "SELECT toroku_ymd, name, name_kana, jusho, tel, menjo_kbn, menjo_riyu FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
+                Map<String, Object> nokanResult = jdbcTemplate.queryForMap(nokanSql, shiteiNo);
+
+                java.sql.Date torokuYmd = (java.sql.Date) nokanResult.get("toroku_ymd");
+                if (torokuYmd != null) {
+                    form.setRegistrationDate(torokuYmd.toLocalDate());
+                }
+                form.setManagerName((String) nokanResult.get("name"));
+                form.setManagerNameKana((String) nokanResult.get("name_kana"));
+                form.setManagerAddress((String) nokanResult.get("jusho"));
+                form.setManagerPhone((String) nokanResult.get("tel"));
+                
+                String menjoKbn = (String) nokanResult.get("menjo_kbn");
+                form.setExemptionFlag("1".equals(menjoKbn));
+                form.setExemptionReason((String) nokanResult.get("menjo_riyu"));
+
+            } else {
+                // =============== 登録されていない場合（新規登録モード） ===============
+                form.setEdit(false);
+            }
         } catch (Exception e) {
             log.warn("データの取得に失敗しました。ID: {}", id, e);
             form.setObligorName("データ取得エラー");
@@ -59,19 +87,50 @@ public class TaxManagerService {
         // 保存時も、Long型のIDから指定番号（shitei_no）に変換して使います
         String shiteiNo = collectorService.getShiteiNoById(id);
 
-        String sql = "INSERT INTO t_nokan " +
-                     "(jichitai_cd, shitei_no, rno, toroku_ymd, shinkoku_ymd, name, name_kana, jusho, tel, menjo_kbn, menjo_riyu, new_flg, del_flg, add_dt, add_user, upd_dt, upd_user, version) " +
-                     "VALUES ('01202', ?, 1, ?, CURRENT_DATE, ?, ?, ?, ?, ?, ?, '1', '0', CURRENT_TIMESTAMP, 'sys', CURRENT_TIMESTAMP, 'sys', 1)";
+        // 1. 既にデータが存在するかチェックする
+        String checkSql = "SELECT COUNT(*) FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
+        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, shiteiNo);
 
-        jdbcTemplate.update(sql, 
-                shiteiNo, 
-                form.getRegistrationDate(), 
-                form.getManagerName(), 
-                form.getManagerNameKana(), 
-                form.getManagerAddress(), 
-                form.getManagerPhone(), 
-                menjoKbn, 
-                form.getExemptionReason()
-        );
+        if (count != null && count > 0) {
+            // ==========================================
+            // パターンA：既に存在する場合は UPDATE（更新）
+            // ==========================================
+            String updateSql = "UPDATE t_nokan SET " +
+                    "toroku_ymd = ?, name = ?, name_kana = ?, jusho = ?, tel = ?, " +
+                    "menjo_kbn = ?, menjo_riyu = ?, upd_dt = CURRENT_TIMESTAMP, upd_user = 'sys' " +
+                    "WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
+
+            jdbcTemplate.update(updateSql,
+                    form.getRegistrationDate(),
+                    form.getManagerName(),
+                    form.getManagerNameKana(),
+                    form.getManagerAddress(),
+                    form.getManagerPhone(),
+                    menjoKbn,
+                    form.getExemptionReason(),
+                    shiteiNo // WHERE句の条件用
+            );
+            log.info("納税管理人情報を更新しました。指定番号: {}", shiteiNo);
+
+        } else {
+            // ==========================================
+            // パターンB：存在しない場合は INSERT（新規登録）
+            // ==========================================
+            String insertSql = "INSERT INTO t_nokan " +
+                    "(jichitai_cd, shitei_no, rno, toroku_ymd, shinkoku_ymd, name, name_kana, jusho, tel, menjo_kbn, menjo_riyu, new_flg, del_flg, add_dt, add_user, upd_dt, upd_user, version) " +
+                    "VALUES ('01202', ?, 1, ?, CURRENT_DATE, ?, ?, ?, ?, ?, ?, '1', '0', CURRENT_TIMESTAMP, 'sys', CURRENT_TIMESTAMP, 'sys', 1)";
+
+            jdbcTemplate.update(insertSql,
+                    shiteiNo,
+                    form.getRegistrationDate(),
+                    form.getManagerName(),
+                    form.getManagerNameKana(),
+                    form.getManagerAddress(),
+                    form.getManagerPhone(),
+                    menjoKbn,
+                    form.getExemptionReason()
+            );
+            log.info("納税管理人情報を新規登録しました。指定番号: {}", shiteiNo);
+        }
     }
-}
+}    

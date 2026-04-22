@@ -34,4 +34,6 @@ public class TaxManagerForm {
 
     private boolean exemptionFlag;
     private String exemptionReason;
+    
+    private boolean isEdit;
 }
