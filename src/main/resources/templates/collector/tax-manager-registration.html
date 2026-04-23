@@ -1,362 +1,348 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}"
-      lang="ja">
-<head><title th:text="${isEdit ? '納税管理人編集' : '納税管理人登録'}">納税管理人登録/編集</title></head>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+	<title th:text="${isView ? '納税管理人照会' : (isEdit ? '納税管理人編集' : '納税管理人登録')}">納税管理人登録/編集</title>
+</head>
+
 <body>
-<div layout:fragment="content" class="container-fluid p-4">
+	<div layout:fragment="content" class="container-fluid p-4">
 
-	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-	        <h2 class="h2">
-	            <i class="bi bi-person-lines-fill me-2 text-primary" th:if="${isView}"></i>
-	            <i class="bi bi-person-gear me-2 text-primary" th:unless="${isView}"></i>
-	            <span th:text="${isView ? '納税管理人照会' : (edit ? '納税管理人編集' : '納税管理人登録')}"></span>
-	        </h2>
-	        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
-	            <i th:class="${isView ? 'bi bi-eye me-1' : (edit ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
-	            <span th:text="${isView ? '照会' : (edit ? '編集' : '新規登録')}"></span>
-	        </span>
-	    </div>
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h2 class="h2">
+				<i class="bi bi-person-lines-fill me-2 text-primary" th:if="${isView}"></i>
+				<i class="bi bi-person-gear me-2 text-primary" th:unless="${isView}"></i>
+				<span th:text="${isView ? '納税管理人照会' : (isEdit ? '納税管理人編集' : '納税管理人登録')}"></span>
+			</h2>
+			<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
+			    <i th:class="${isView ? 'bi bi-eye me-1' : (isEdit ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
+			    <span th:text="${isView ? '照会' : (isEdit ? '編集' : '新規登録')}"></span>
+			</span>
+		</div>
 
-    <!-- 成功メッセージ -->
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <span th:text="${successMessage}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-	<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-	        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-	        <span th:text="${errorMessage}"></span>
-	        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-	    </div>
-		
-    <form id="taxManagerForm"
-          th:action="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
-          th:object="${taxManagerForm}" method="post">
-		  
-		  <input type="hidden" th:field="*{collectorId}" />
-		  
-<input type="hidden" th:field="*{edit}" />
-        <!-- バリデーションエラーサマリー -->
-        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
-        </div>
+		<!-- 成功メッセージ -->
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i>
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i>
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 
-        <!-- 納税管理人情報 -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管理人情報</h5>
-            </div>
-            <div class="card-body bg-light-subtle">
-                <div class="row g-3">
+		<form id="taxManagerForm" th:action="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
+			th:object="${taxManagerForm}" method="post">
 
-                    <div class="col-md-4">
-                        <label for="registrationDate" class="form-label fw-medium">
-                            登録日 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                       <input type="date" class="form-control" th:field="*{registrationDate}" th:readonly="${isView}">
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}"
-                             th:errors="*{registrationDate}"></div>
-                    </div>
+			<input type="hidden" th:field="*{collectorId}" />
 
-                    <!-- 宛名検索ボタン -->
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="button" class="btn btn-outline-info"
-                                data-bs-toggle="modal" data-bs-target="#addressSearchModal">
-                            <i class="bi bi-search me-1"></i>宛名検索
-                        </button>
-                    </div>
-                    <div class="col-md-4"></div>
+			<input type="hidden" th:field="*{edit}" />
+			<!-- バリデーションエラーサマリー -->
+			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+				<i class="bi bi-exclamation-triangle-fill me-2"></i>
+				入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+			</div>
 
-                    <!-- 特別徴収義務者名（readonly） -->
-                    <div class="col-md-6">
-                        <label for="obligorName" class="form-label fw-medium">
-                            特別徴収義務者 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="text" class="form-control" th:field="*{managerName}"th:readonly="${isView}">
-                    </div>
+			<!-- 納税管理人情報 -->
+			<div class="card mb-4 shadow-sm">
+				<div class="card-header bg-primary text-white py-3">
+					<h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管理人情報</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div class="row g-3">
 
-                    <!-- 施設名称（readonly） -->
-                    <div class="col-md-6">
-                        <label for="facilityName" class="form-label fw-medium">
-                            施設名称 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="text" class="form-control" id="facilityName"
-                               th:field="*{facilityName}" readonly>
-                    </div>
+						<div class="col-md-4">
+							<label for="registrationDate" class="form-label fw-medium">
+								登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+							</label>
+							<input type="date" class="form-control" th:field="*{registrationDate}"
+								th:readonly="${isView}">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}"
+								th:errors="*{registrationDate}"></div>
+						</div>
 
-                    <!-- 住所（宛名検索で自動入力） -->
-                    <div class="col-md-12">
-                        <label for="managerAddress" class="form-label fw-medium">
-                            住所（所在地） <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="text" class="form-control" id="managerAddress"
-                               th:field="*{managerAddress}" th:errorclass="is-invalid">
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerAddress')}"
-                             th:errors="*{managerAddress}"></div>
-                    </div>
+						<!-- 宛名検索ボタン -->
+						<div class="col-md-4 d-flex align-items-end">
+							<button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
+								data-bs-target="#addressSearchModal">
+								<i class="bi bi-search me-1"></i>宛名検索
+							</button>
+						</div>
+						<div class="col-md-4"></div>
 
-                    <!-- 氏名（宛名検索で自動入力） -->
-                    <div class="col-md-6">
-                        <label for="managerName" class="form-label fw-medium">
-                            氏名 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="text" class="form-control" id="managerName"
-                               th:field="*{managerName}" th:errorclass="is-invalid">
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerName')}"
-                             th:errors="*{managerName}"></div>
-                    </div>
+						<div class="col-md-6">
+						    <label class="form-label fw-medium">特別徴収義務者</label>
+						    <input type="text" class="form-control" th:field="*{obligorName}" readonly>
+						</div>
 
-                    <!-- ふりがな（宛名検索で自動入力） -->
-                    <div class="col-md-6">
-                        <label for="managerNameKana" class="form-label fw-medium">
-                            ふりがな <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="text" class="form-control" id="managerNameKana"
-                               th:field="*{managerNameKana}" th:errorclass="is-invalid"
-                               placeholder="ひらがなで入力">
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerNameKana')}"
-                             th:errors="*{managerNameKana}"></div>
-                    </div>
+						<div class="col-md-6">
+						    <label class="form-label fw-medium">施設名称</label>
+						    <input type="text" class="form-control" th:field="*{facilityName}" readonly>
+						</div>
 
-                    <!-- 電話番号（宛名検索で自動入力） -->
-                    <div class="col-md-6">
-                        <label for="managerPhone" class="form-label fw-medium">
-                            電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <input type="tel" class="form-control" id="managerPhone"
-                               th:field="*{managerPhone}" th:errorclass="is-invalid"
-                               placeholder="例：03-1234-5678">
-                        <div class="invalid-feedback" th:if="${#fields.hasErrors('managerPhone')}"
-                             th:errors="*{managerPhone}"></div>
-                    </div>
+						<div class="col-md-12">
+						    <label class="form-label fw-medium">住所（所在地）</label>
+						    <input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}"
+						        th:errorclass="is-invalid" th:readonly="${isView}">
+						</div>
 
-                    <div class="col-md-6 d-flex align-items-end">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" th:field="*{exemptionFlag}" th:disabled="${isView}">
-                            <label class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
-                        </div>
-                    </div>
+						<div class="col-md-6">
+						    <label class="form-label fw-medium">氏名</label>
+						    <input type="text" class="form-control" id="managerName" th:field="*{managerName}"
+						        th:errorclass="is-invalid" th:readonly="${isView}">
+						</div>
 
-                    <div class="col-md-12" id="exemptionReasonArea" style="display: none;">
-                        <label for="exemptionReason" class="form-label fw-medium">
-                            選任免除理由 <span class="badge bg-danger text-white ms-1">必須</span>
-                        </label>
-                        <textarea class="form-control" id="exemptionReason" rows="3"
-                                  th:field="*{exemptionReason}"
-                                  placeholder="選任免除の理由を入力してください"></textarea>
-                    </div>
+						<div class="col-md-6">
+						    <label class="form-label fw-medium">ふりがな</label>
+						    <input type="text" class="form-control" id="managerNameKana" th:field="*{managerNameKana}"
+						        th:errorclass="is-invalid" th:readonly="${isView}">
+						</div>
 
-                </div>
-            </div>
-        </div>
+						<div class="col-md-6">
+						    <label class="form-label fw-medium">電話番号</label>
+						    <input type="tel" class="form-control" id="managerPhone" th:field="*{managerPhone}"
+						        th:errorclass="is-invalid" th:readonly="${isView}">
+						</div>
 
-        <!-- アクションボタン -->
-		<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-		            
-		            <button type="submit" class="btn btn-primary btn-lg px-5" th:if="${!isView}">
-		                <i class="bi bi-save me-2"></i>
-		                <span th:text="${edit ? '更新する' : '登録する'}"></span>
-		            </button>
-		            
-		            <a th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}" 
-		               class="btn btn-primary btn-lg px-5" th:if="${isView}">
-		                <i class="bi bi-pencil-square me-2"></i>編集する
-		            </a>
+						<div class="col-md-6 d-flex align-items-end">
+						    <div class="form-check">
+						        <input class="form-check-input" type="checkbox" th:field="*{exemptionFlag}"
+						            id="exemptionFlag" th:disabled="${isView}">
+						        <label class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
+						    </div>
+						</div>
 
-		            <a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
-		                <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-		            </a>
-		        </div>
+						<div class="col-md-12" id="exemptionReasonArea" style="display: none;">
+						    <label for="exemptionReason" class="form-label fw-medium">
+						        選任免除理由 
+						        <span class="badge bg-danger text-white ms-1" th:if="${!isView}">必須</span>
+						    </label>
+						    <textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}"
+						        th:readonly="${isView}" th:errorclass="is-invalid" 
+						        placeholder="選任免除の理由を入力してください"></textarea>
+						    <div class="invalid-feedback" th:if="${#fields.hasErrors('exemptionReason')}"
+						        th:errors="*{exemptionReason}"></div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-    </form>
+			<!-- アクションボタン -->
+			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
-    <!-- ========== 宛名検索モーダル ========== -->
-    <div class="modal fade" id="addressSearchModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-search me-2"></i>宛名検索
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
+				<button type="submit" class="btn btn-primary btn-lg px-5" th:if="${!isView}">
+				    <i class="bi bi-save me-2"></i>
+				    <span th:text="${isEdit ? '更新する' : '登録する'}"></span>
+				</button>
 
-                    <!-- 検索条件 -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-3">
-                            <label for="searchAddressNumber" class="form-label fw-medium">宛名番号</label>
-                            <input type="text" class="form-control" id="searchAddressNumber" placeholder="例：A001001">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="searchName" class="form-label fw-medium">氏名</label>
-                            <input type="text" class="form-control" id="searchName" placeholder="氏名を入力">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="searchAddress" class="form-label fw-medium">住所</label>
-                            <input type="text" class="form-control" id="searchAddress" placeholder="住所を入力">
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="button" class="btn btn-primary w-100" id="btnAddressSearch">
-                                <i class="bi bi-search me-1"></i>検索する
-                            </button>
-                        </div>
-                    </div>
+				<a th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
+					class="btn btn-primary btn-lg px-5" th:if="${isView}">
+					<i class="bi bi-pencil-square me-2"></i>編集する
+				</a>
 
-                    <!-- 検索結果テーブル -->
-                    <div id="searchResultArea" style="display: none;">
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="fw-medium">検索結果</span>
-                            <span class="text-muted small"><span id="searchResultCount">0</span> 件</span>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle mb-0">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th style="width: 120px;">宛名番号</th>
-                                        <th style="width: 140px;">氏名</th>
-                                        <th style="width: 160px;">ふりがな</th>
-                                        <th>住所</th>
-                                        <th style="width: 120px;">電話番号</th>
-                                        <th style="width: 80px;" class="text-center">選択</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="searchResultBody">
-                                    <!-- Fetch API で動的生成 -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+				<a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+			</div>
 
-                    <!-- 検索結果なし -->
-                    <div id="searchNoResult" class="text-center text-muted py-4" style="display: none;">
-                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                        該当する宛名が見つかりませんでした。
-                    </div>
+		</form>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-lg me-1"></i>閉じる
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ========== /宛名検索モーダル ========== -->
+		<!-- ========== 宛名検索モーダル ========== -->
+		<div class="modal fade" id="addressSearchModal" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header bg-info text-white">
+						<h5 class="modal-title">
+							<i class="bi bi-search me-2"></i>宛名検索
+						</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
 
-</div>
+						<!-- 検索条件 -->
+						<div class="row g-3 mb-3">
+							<div class="col-md-3">
+								<label for="searchAddressNumber" class="form-label fw-medium">宛名番号</label>
+								<input type="text" class="form-control" id="searchAddressNumber"
+									placeholder="例：A001001">
+							</div>
+							<div class="col-md-3">
+								<label for="searchName" class="form-label fw-medium">氏名</label>
+								<input type="text" class="form-control" id="searchName" placeholder="氏名を入力">
+							</div>
+							<div class="col-md-4">
+								<label for="searchAddress" class="form-label fw-medium">住所</label>
+								<input type="text" class="form-control" id="searchAddress" placeholder="住所を入力">
+							</div>
+							<div class="col-md-2 d-flex align-items-end">
+								<button type="button" class="btn btn-primary w-100" id="btnAddressSearch">
+									<i class="bi bi-search me-1"></i>検索する
+								</button>
+							</div>
+						</div>
 
-<th:block layout:fragment="scripts">
-    <script th:inline="javascript">
-        // 選任免除チェックで理由欄を表示/非表示
-        document.getElementById('exemptionFlag').addEventListener('change', function () {
-            document.getElementById('exemptionReasonArea').style.display =
-                this.checked ? 'block' : 'none';
-        });
+						<!-- 検索結果テーブル -->
+						<div id="searchResultArea" style="display: none;">
+							<hr>
+							<div class="d-flex justify-content-between align-items-center mb-2">
+								<span class="fw-medium">検索結果</span>
+								<span class="text-muted small"><span id="searchResultCount">0</span> 件</span>
+							</div>
+							<div class="table-responsive">
+								<table class="table table-striped table-hover align-middle mb-0">
+									<thead class="table-primary">
+										<tr>
+											<th style="width: 120px;">宛名番号</th>
+											<th style="width: 140px;">氏名</th>
+											<th style="width: 160px;">ふりがな</th>
+											<th>住所</th>
+											<th style="width: 120px;">電話番号</th>
+											<th style="width: 80px;" class="text-center">選択</th>
+										</tr>
+									</thead>
+									<tbody id="searchResultBody">
+										<!-- Fetch API で動的生成 -->
+									</tbody>
+								</table>
+							</div>
+						</div>
 
-        // ========== 宛名検索 ==========
-        document.getElementById('btnAddressSearch').addEventListener('click', async function () {
-            const addressNumber = document.getElementById('searchAddressNumber').value.trim();
-            const name          = document.getElementById('searchName').value.trim();
-            const address       = document.getElementById('searchAddress').value.trim();
+						<!-- 検索結果なし -->
+						<div id="searchNoResult" class="text-center text-muted py-4" style="display: none;">
+							<i class="bi bi-inbox fs-3 d-block mb-2"></i>
+							該当する宛名が見つかりませんでした。
+						</div>
 
-            // クエリパラメータ組み立て
-            const params = new URLSearchParams();
-            if (addressNumber) params.append('addressNumber', addressNumber);
-            if (name)          params.append('name', name);
-            if (address)       params.append('address', address);
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>閉じる
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- ========== /宛名検索モーダル ========== -->
 
-            const contextPath = /*[[@{/}]]*/ '/accommodation-tax/';
-            const url = contextPath + 'api/address/search?' + params.toString();
+	</div>
 
-            try {
-                const res  = await fetch(url, { credentials: 'same-origin' });
-                const data = await res.json();
-                renderSearchResults(data);
-            } catch (e) {
-                console.error('宛名検索エラー:', e);
-                alert('検索中にエラーが発生しました。');
-            }
-        });
+	<th:block layout:fragment="scripts">
+	    <script th:inline="javascript">
+	        // 画面が準備できたら実行
+	        document.addEventListener('DOMContentLoaded', function() {
+				// --- ① 選任免除の表示制御 ---
+				const exemptionFlag = document.getElementById('exemptionFlag');
+				const exemptionReasonArea = document.getElementById('exemptionReasonArea');
 
-        function renderSearchResults(data) {
-            const tbody       = document.getElementById('searchResultBody');
-            const resultArea  = document.getElementById('searchResultArea');
-            const noResult    = document.getElementById('searchNoResult');
-            const countEl     = document.getElementById('searchResultCount');
+				if (exemptionFlag && exemptionReasonArea) {
+				    // 表示・非表示を切り替える関数
+				    const toggleExemptionArea = () => {
+				        if (exemptionFlag.checked) {
+				            exemptionReasonArea.style.setProperty('display', 'block', 'important');
+				        } else {
+				            exemptionReasonArea.style.setProperty('display', 'none', 'important');
+				        }
+				    };
 
-            tbody.innerHTML = '';
+				    // 1. 画面読み込み時に実行（照会モードやエラー復帰時用）
+				    toggleExemptionArea();
 
-            if (data.length === 0) {
-                resultArea.style.display = 'none';
-                noResult.style.display   = 'block';
-                return;
-            }
+				    // 2. チェックボックス操作時に実行
+				    exemptionFlag.addEventListener('change', toggleExemptionArea);
+				}
 
-            noResult.style.display   = 'none';
-            resultArea.style.display = 'block';
-            countEl.textContent      = data.length;
+	            // --- ② 宛名検索ボタン ---
+	            const btnSearch = document.getElementById('btnAddressSearch');
+	            if (btnSearch) {
+	                btnSearch.addEventListener('click', async function () {
+	                    const addressNumber = document.getElementById('searchAddressNumber').value.trim();
+	                    const name = document.getElementById('searchName').value.trim();
+	                    const address = document.getElementById('searchAddress').value.trim();
 
-            data.forEach(function (item) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${escHtml(item.addressNumber)}</td>
-                    <td>${escHtml(item.name)}</td>
-                    <td class="text-muted">${escHtml(item.nameKana)}</td>
-                    <td>${escHtml(item.address)}</td>
-                    <td>${escHtml(item.phone)}</td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-primary btn-sm btn-select-address">
-                            <i class="bi bi-check-lg me-1"></i>選択
-                        </button>
-                    </td>`;
+	                    const params = new URLSearchParams();
+	                    if (addressNumber) params.append('addressNumber', addressNumber);
+	                    if (name) params.append('name', name);
+	                    if (address) params.append('address', address);
 
-                // 「選択」ボタン押下でメインフォームに自動入力
-                tr.querySelector('.btn-select-address').addEventListener('click', function () {
-                    document.getElementById('managerAddress').value  = item.address;
-                    document.getElementById('managerName').value     = item.name;
-                    document.getElementById('managerNameKana').value = item.nameKana;
-                    document.getElementById('managerPhone').value    = item.phone;
+	                    const contextPath = /*[[@{/}]]*/ '/accommodation-tax/';
+	                    const url = contextPath + 'api/address/search?' + params.toString();
 
-                    // モーダルを閉じる
-                    bootstrap.Modal.getInstance(
-                        document.getElementById('addressSearchModal')
-                    ).hide();
-                });
+	                    try {
+	                        const res = await fetch(url, {credentials: 'same-origin'});
+	                        const data = await res.json();
+	                        renderSearchResults(data);
+	                    } catch (e) {
+	                        console.error('宛名検索エラー:', e);
+	                        alert('検索中にエラーが発生しました。');
+	                    }
+	                });
+	            }
 
-                tbody.appendChild(tr);
-            });
-        }
+	            // --- ③ モーダルリセット ---
+	            const searchModal = document.getElementById('addressSearchModal');
+	            if (searchModal) {
+	                searchModal.addEventListener('show.bs.modal', function () {
+	                    document.getElementById('searchAddressNumber').value = '';
+	                    document.getElementById('searchName').value = '';
+	                    document.getElementById('searchAddress').value = '';
+	                    document.getElementById('searchResultBody').innerHTML = '';
+	                    document.getElementById('searchResultArea').style.display = 'none';
+	                    document.getElementById('searchNoResult').style.display = 'none';
+	                });
+	            }
+	        }); // ★ ここが足りていませんでした！
 
-        // XSS対策
-        function escHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
-        }
+	        // --- 検索結果の表示（ここはイベントの外でOK） ---
+	        function renderSearchResults(data) {
+	            const tbody = document.getElementById('searchResultBody');
+	            const resultArea = document.getElementById('searchResultArea');
+	            const noResult = document.getElementById('searchNoResult');
+	            const countEl = document.getElementById('searchResultCount');
 
-        // モーダルを開くたびに検索結果をリセット
-        document.getElementById('addressSearchModal').addEventListener('show.bs.modal', function () {
-            document.getElementById('searchAddressNumber').value = '';
-            document.getElementById('searchName').value          = '';
-            document.getElementById('searchAddress').value       = '';
-            document.getElementById('searchResultBody').innerHTML = '';
-            document.getElementById('searchResultArea').style.display = 'none';
-            document.getElementById('searchNoResult').style.display   = 'none';
-        });
-		
-		// 画面読み込み時に初期状態を反映する
-		        if (document.getElementById('exemptionFlag').checked) {
-		            document.getElementById('exemptionReasonArea').style.display = 'block';
-		        }
-    </script>
-</th:block>
+	            tbody.innerHTML = '';
+	            if (data.length === 0) {
+	                resultArea.style.display = 'none';
+	                noResult.style.display = 'block';
+	                return;
+	            }
+
+	            noResult.style.display = 'none';
+	            resultArea.style.display = 'block';
+	            countEl.textContent = data.length;
+
+	            data.forEach(function (item) {
+	                const tr = document.createElement('tr');
+	                tr.innerHTML = `
+	                    <td>${escHtml(item.addressNumber)}</td>
+	                    <td>${escHtml(item.name)}</td>
+	                    <td class="text-muted">${escHtml(item.nameKana)}</td>
+	                    <td>${escHtml(item.address)}</td>
+	                    <td>${escHtml(item.phone)}</td>
+	                    <td class="text-center">
+	                        <button type="button" class="btn btn-primary btn-sm btn-select-address">
+	                            <i class="bi bi-check-lg me-1"></i>選択
+	                        </button>
+	                    </td>`;
+
+	                tr.querySelector('.btn-select-address').addEventListener('click', function () {
+	                    document.getElementById('managerAddress').value = item.address;
+	                    document.getElementById('managerName').value = item.name;
+	                    document.getElementById('managerNameKana').value = item.nameKana;
+	                    document.getElementById('managerPhone').value = item.phone;
+	                    bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
+	                });
+	                tbody.appendChild(tr);
+	            });
+	        }
+
+	        function escHtml(str) {
+	            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	        }
+	    </script>
+	</th:block>
 </body>
+
 </html>

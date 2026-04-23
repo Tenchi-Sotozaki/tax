@@ -6,8 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
-import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import lombok.Data;
 @Data
 public class TaxManagerForm {
 
@@ -17,6 +18,7 @@ public class TaxManagerForm {
     private String facilityName;
 
     @NotNull(message = "登録日は必須です")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate registrationDate;
 
     @NotBlank(message = "住所（所在地）は必須です")
@@ -35,5 +37,5 @@ public class TaxManagerForm {
     private boolean exemptionFlag;
     private String exemptionReason;
     
-    private boolean isEdit;
+    private boolean edit;
 }

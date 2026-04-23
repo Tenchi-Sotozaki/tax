@@ -23,54 +23,50 @@ public class TaxManagerService {
     /**
      * IDからデータを取得し、画面表示用のFormを作成する
      */
-    public TaxManagerForm getById(Long id) {
+public TaxManagerForm getById(Long id) {
         TaxManagerForm form = new TaxManagerForm();
         form.setCollectorId(id);
-        form.setRegistrationDate(LocalDate.now()); // 登録日の初期値を今日にする
+        
+        // 初期値として今日の日付をセット（データがない場合のデフォルト）
+        form.setRegistrationDate(LocalDate.now());
 
         try {
-            // 1. Long型のIDから、String型の指定番号（shitei_no）を取得する
+            // 1. 指定番号（shitei_no）を取得
             String shiteiNo = collectorService.getShiteiNoById(id);
 
-            // 2. 指定番号を使って、t_tokugimuテーブルから名称を取得
-            String sql = "SELECT kyoka_name, shisetsu_name FROM t_tokugimu WHERE shitei_no = ? AND del_flg = '0'";
-            Map<String, Object> result = jdbcTemplate.queryForMap(sql, shiteiNo);
+            // 2. 特別徴収義務者テーブル（t_tokugimu）から施設情報を取得
+            String sqlTokugimu = "SELECT kyoka_name, shisetsu_name FROM t_tokugimu WHERE shitei_no = ? AND del_flg = '0'";
+            Map<String, Object> resTokugimu = jdbcTemplate.queryForMap(sqlTokugimu, shiteiNo);
+            form.setObligorName((String) resTokugimu.get("kyoka_name"));
+            form.setFacilityName((String) resTokugimu.get("shisetsu_name"));
+
+            // 3. 納税管理人テーブル（t_nokan）から保存済みのデータを取得
+            String sqlNokan = "SELECT toroku_ymd, name, name_kana, jusho, tel, menjo_kbn, menjo_riyu " +
+                              "FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1 AND del_flg = '0'";
             
-            form.setObligorName((String) result.get("kyoka_name"));
-            form.setFacilityName((String) result.get("shisetsu_name"));
-         // 3. ★納税管理人のデータが既に存在するかチェック
-            String checkSql = "SELECT COUNT(*) FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
-            Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, shiteiNo);
+            var nokanList = jdbcTemplate.queryForList(sqlNokan, shiteiNo);
 
-            if (count != null && count > 0) {
-                // =============== 既に登録されている場合（編集モード） ===============
-                form.setEdit(true); 
-
-                // 登録済みのデータを取得してFormにセットする
-                String nokanSql = "SELECT toroku_ymd, name, name_kana, jusho, tel, menjo_kbn, menjo_riyu FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
-                Map<String, Object> nokanResult = jdbcTemplate.queryForMap(nokanSql, shiteiNo);
-
-                java.sql.Date torokuYmd = (java.sql.Date) nokanResult.get("toroku_ymd");
-                if (torokuYmd != null) {
-                    form.setRegistrationDate(torokuYmd.toLocalDate());
-                }
-                form.setManagerName((String) nokanResult.get("name"));
-                form.setManagerNameKana((String) nokanResult.get("name_kana"));
-                form.setManagerAddress((String) nokanResult.get("jusho"));
-                form.setManagerPhone((String) nokanResult.get("tel"));
+            if (!nokanList.isEmpty()) {
+                // データが存在する場合（編集・照会モード）
+                form.setEdit(true);
+                Map<String, Object> resNokan = nokanList.get(0);
                 
-                String menjoKbn = (String) nokanResult.get("menjo_kbn");
-                form.setExemptionFlag("1".equals(menjoKbn));
-                form.setExemptionReason((String) nokanResult.get("menjo_riyu"));
-
-            } else {
-                // =============== 登録されていない場合（新規登録モード） ===============
-                form.setEdit(false);
+                // DBから取得した「登録日」をセット
+                if (resNokan.get("toroku_ymd") != null) {
+                    form.setRegistrationDate(((java.sql.Date) resNokan.get("toroku_ymd")).toLocalDate());
+                }
+                
+                // 保存されている管理人の情報をセット
+                form.setManagerName((String) resNokan.get("name"));
+                form.setManagerNameKana((String) resNokan.get("name_kana"));
+                form.setManagerAddress((String) resNokan.get("jusho"));
+                form.setManagerPhone((String) resNokan.get("tel"));
+                form.setExemptionFlag("1".equals(resNokan.get("menjo_kbn")));
+                form.setExemptionReason((String) resNokan.get("menjo_riyu"));
             }
+
         } catch (Exception e) {
-            log.warn("データの取得に失敗しました。ID: {}", id, e);
-            form.setObligorName("データ取得エラー");
-            form.setFacilityName("データ取得エラー");
+            log.warn("データの取得に失敗しました。ID: {}", id, e.getMessage());
         }
 
         return form;
