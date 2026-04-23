@@ -19,6 +19,7 @@ spring:
       filter:
         enabled: true
 
+
 server:
   port: 8080
   servlet:
@@ -27,3 +28,7 @@ server:
 logging:
   level:
     jp.lg.asp: INFO
+
+app:
+  jichitai:
+    code: '01202'

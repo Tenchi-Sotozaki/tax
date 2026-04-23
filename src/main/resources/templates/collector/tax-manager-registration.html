@@ -65,11 +65,10 @@
 						</div>
 
 						<!-- 宛名検索ボタン -->
-						<div class="col-md-4 d-flex align-items-end">
-							<button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
-								data-bs-target="#addressSearchModal">
-								<i class="bi bi-search me-1"></i>宛名検索
-							</button>
+						<div class="col-md-4 d-flex align-items-end" th:if="${!isView}">
+						    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addressSearchModal">
+						        <i class="bi bi-search me-1"></i>宛名検索
+						    </button>
 						</div>
 						<div class="col-md-4"></div>
 

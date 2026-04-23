@@ -1,132 +1,127 @@
 package jp.lg.asp.accommodation.service;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.time.LocalDateTime;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
+import jp.lg.asp.accommodation.entity.TaxManager;
+import jp.lg.asp.accommodation.entity.TaxManagerId;
+import jp.lg.asp.accommodation.repository.TaxManagerRepository;
+import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaxManagerService {
 
-    private final JdbcTemplate jdbcTemplate;
-    // 既に存在するCollectorServiceを呼び出して、IDから指定番号を検索できるようにします！
-    private final CollectorService collectorService; 
+    private final TaxManagerRepository taxManagerRepository;
+    private final TokugimuRepository tokugimuRepository;
+    private final CollectorService collectorService;
+
+    // application.yml (app.jichitai.code) から自治体コードを注入
+    @Value("${app.jichitai.code}")
+    private String jichitaiCd;
 
     /**
      * IDからデータを取得し、画面表示用のFormを作成する
      */
-public TaxManagerForm getById(Long id) {
+    @Transactional(readOnly = true) // ★必ず readOnly を付ける
+    public TaxManagerForm getById(Long id) {
         TaxManagerForm form = new TaxManagerForm();
         form.setCollectorId(id);
-        
-        // 初期値として今日の日付をセット（データがない場合のデフォルト）
         form.setRegistrationDate(LocalDate.now());
 
+        // 指定番号が取れない場合や、リポジトリでエラーが出た場合に備えて
+        // メソッド全体ではなく、個別の処理を try-catch で保護し、
+        // 失敗しても「空のフォーム」を返すようにします。
         try {
-            // 1. 指定番号（shitei_no）を取得
             String shiteiNo = collectorService.getShiteiNoById(id);
 
-            // 2. 特別徴収義務者テーブル（t_tokugimu）から施設情報を取得
-            String sqlTokugimu = "SELECT kyoka_name, shisetsu_name FROM t_tokugimu WHERE shitei_no = ? AND del_flg = '0'";
-            Map<String, Object> resTokugimu = jdbcTemplate.queryForMap(sqlTokugimu, shiteiNo);
-            form.setObligorName((String) resTokugimu.get("kyoka_name"));
-            form.setFacilityName((String) resTokugimu.get("shisetsu_name"));
+            // 1. 特別徴収義務者の取得
+            tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .ifPresent(tokugimu -> {
+                    form.setObligorName(tokugimu.getKyokaName());
+                    form.setFacilityName(tokugimu.getShisetsuName());
+                });
 
-            // 3. 納税管理人テーブル（t_nokan）から保存済みのデータを取得
-            String sqlNokan = "SELECT toroku_ymd, name, name_kana, jusho, tel, menjo_kbn, menjo_riyu " +
-                              "FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1 AND del_flg = '0'";
-            
-            var nokanList = jdbcTemplate.queryForList(sqlNokan, shiteiNo);
-
-            if (!nokanList.isEmpty()) {
-                // データが存在する場合（編集・照会モード）
+            // 2. 納税管理人の取得
+            TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+            taxManagerRepository.findById(nokanId).ifPresent(nokan -> {
                 form.setEdit(true);
-                Map<String, Object> resNokan = nokanList.get(0);
                 
-                // DBから取得した「登録日」をセット
-                if (resNokan.get("toroku_ymd") != null) {
-                    form.setRegistrationDate(((java.sql.Date) resNokan.get("toroku_ymd")).toLocalDate());
-                }
+                // --- 以下を修正 ---
+                // getRegistrationDate() -> getTorokuYmd()
+                form.setRegistrationDate(nokan.getTorokuYmd());
                 
-                // 保存されている管理人の情報をセット
-                form.setManagerName((String) resNokan.get("name"));
-                form.setManagerNameKana((String) resNokan.get("name_kana"));
-                form.setManagerAddress((String) resNokan.get("jusho"));
-                form.setManagerPhone((String) resNokan.get("tel"));
-                form.setExemptionFlag("1".equals(resNokan.get("menjo_kbn")));
-                form.setExemptionReason((String) resNokan.get("menjo_riyu"));
-            }
-
+                form.setManagerName(nokan.getName());
+                form.setManagerNameKana(nokan.getNameKana());
+                
+                // getAddress() -> getJusho()
+                form.setManagerAddress(nokan.getJusho());
+                
+                // getPhone() -> getTel()
+                form.setManagerPhone(nokan.getTel());
+                
+                // getExemptionKbn() -> getMenjoKbn()
+                form.setExemptionFlag("1".equals(nokan.getMenjoKbn()));
+                
+                // getExemptionReason() -> getMenjoRiyu()
+                form.setExemptionReason(nokan.getMenjoRiyu());
+                // ------------------
+            });
         } catch (Exception e) {
-            log.warn("データの取得に失敗しました。ID: {}", id, e.getMessage());
+            // エラーをログに出すが、例外は投げない（画面を表示させるため）
+            log.warn("データの取得中にエラーが発生しました。新規登録として処理します: {}", e.getMessage());
         }
 
         return form;
     }
-
     /**
-     * 入力されたFormのデータをDB（t_nokan）に保存する
+     * 保存処理（リポジトリを使用）
      */
     @Transactional
     public void save(Long id, TaxManagerForm form) {
-        // 選任免除フラグの boolean を '1' か '0' に変換
-        String menjoKbn = form.isExemptionFlag() ? "1" : "0";
-
-        // 保存時も、Long型のIDから指定番号（shitei_no）に変換して使います
         String shiteiNo = collectorService.getShiteiNoById(id);
+        LocalDateTime now = LocalDateTime.now();
 
-        // 1. 既にデータが存在するかチェックする
-        String checkSql = "SELECT COUNT(*) FROM t_nokan WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
-        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, shiteiNo);
+        // 1. 既存データを取得（なければ新規作成）
+        TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+        TaxManager entity = taxManagerRepository.findById(nokanId)
+                .orElse(new TaxManager());
 
-        if (count != null && count > 0) {
-            // ==========================================
-            // パターンA：既に存在する場合は UPDATE（更新）
-            // ==========================================
-            String updateSql = "UPDATE t_nokan SET " +
-                    "toroku_ymd = ?, name = ?, name_kana = ?, jusho = ?, tel = ?, " +
-                    "menjo_kbn = ?, menjo_riyu = ?, upd_dt = CURRENT_TIMESTAMP, upd_user = 'sys' " +
-                    "WHERE jichitai_cd = '01202' AND shitei_no = ? AND rno = 1";
+        // 2. 定義書に基づき値をマッピング
+        entity.setJichitaiCd(jichitaiCd);
+        entity.setShiteiNo(shiteiNo);
+        entity.setRno(1);
+        entity.setMenjoKbn(form.isExemptionFlag() ? "1" : "0");
+        entity.setTorokuYmd(form.getRegistrationDate());
+        
+        // ★必須項目：申告年月日（画面の登録日をセット）
+        entity.setShinkokuYmd(form.getRegistrationDate()); 
 
-            jdbcTemplate.update(updateSql,
-                    form.getRegistrationDate(),
-                    form.getManagerName(),
-                    form.getManagerNameKana(),
-                    form.getManagerAddress(),
-                    form.getManagerPhone(),
-                    menjoKbn,
-                    form.getExemptionReason(),
-                    shiteiNo // WHERE句の条件用
-            );
-            log.info("納税管理人情報を更新しました。指定番号: {}", shiteiNo);
+        entity.setName(form.getManagerName());
+        entity.setNameKana(form.getManagerNameKana());
+        entity.setJusho(form.getManagerAddress());
+        entity.setTel(form.getManagerPhone());
+        entity.setMenjoRiyu(form.getExemptionReason());
+        
+        entity.setNewFlg("1");
+        entity.setDelFlg("0");
 
-        } else {
-            // ==========================================
-            // パターンB：存在しない場合は INSERT（新規登録）
-            // ==========================================
-            String insertSql = "INSERT INTO t_nokan " +
-                    "(jichitai_cd, shitei_no, rno, toroku_ymd, shinkoku_ymd, name, name_kana, jusho, tel, menjo_kbn, menjo_riyu, new_flg, del_flg, add_dt, add_user, upd_dt, upd_user, version) " +
-                    "VALUES ('01202', ?, 1, ?, CURRENT_DATE, ?, ?, ?, ?, ?, ?, '1', '0', CURRENT_TIMESTAMP, 'sys', CURRENT_TIMESTAMP, 'sys', 1)";
-
-            jdbcTemplate.update(insertSql,
-                    shiteiNo,
-                    form.getRegistrationDate(),
-                    form.getManagerName(),
-                    form.getManagerNameKana(),
-                    form.getManagerAddress(),
-                    form.getManagerPhone(),
-                    menjoKbn,
-                    form.getExemptionReason()
-            );
-            log.info("納税管理人情報を新規登録しました。指定番号: {}", shiteiNo);
+        // 3. 共通項目の手動セット（本来は共通処理で行うのが望ましいですが、一旦ここで）
+        if (entity.getAddDt() == null) {
+            entity.setAddDt(now);
+            entity.setAddUser("system");
         }
+        entity.setUpdDt(now);
+        entity.setUpdUser("system");
+        entity.setVersion(1); // 簡易的に1をセット
+
+        taxManagerRepository.save(entity);
     }
-}    
+}
