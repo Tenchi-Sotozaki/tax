@@ -1,3 +1,4 @@
+------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_tokugimu (
   jichitai_cd char(5) NOT NULL,
   shitei_no char(8) NOT NULL,
@@ -860,7 +861,7 @@ CREATE TABLE IF NOT EXISTS m_role (
   jichitai_cd char(5) NOT NULL,
   role_id numeric(5) NOT NULL,
   name varchar(200) NOT NULL,
-  busho varchar(200) NOT NULL,
+  add_user varchar(200) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
   version numeric(5) NOT NULL,
@@ -870,7 +871,7 @@ COMMENT ON TABLE m_role IS '権限管理マスタ';
 COMMENT ON COLUMN m_role.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_role.role_id IS '権限ロールＩＤ';
 COMMENT ON COLUMN m_role.name IS '権限名称';
-COMMENT ON COLUMN m_role.busho IS '作成者';
+COMMENT ON COLUMN m_role.add_user IS '作成者';
 COMMENT ON COLUMN m_role.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_role.upd_user IS '更新者';
 COMMENT ON COLUMN m_role.version IS 'バージョン';
@@ -881,7 +882,7 @@ CREATE TABLE IF NOT EXISTS m_role_dtl (
   role_id numeric(5) NOT NULL,
   screen_id char(10) NOT NULL,
   permission char(1) NOT NULL,
-  busho varchar(200) NOT NULL,
+  add_user varchar(200) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
   version numeric(5) NOT NULL,
@@ -892,7 +893,7 @@ COMMENT ON COLUMN m_role_dtl.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_role_dtl.role_id IS '権限ロールＩＤ';
 COMMENT ON COLUMN m_role_dtl.screen_id IS '画面ＩＤ';
 COMMENT ON COLUMN m_role_dtl.permission IS '権限';
-COMMENT ON COLUMN m_role_dtl.busho IS '作成者';
+COMMENT ON COLUMN m_role_dtl.add_user IS '作成者';
 COMMENT ON COLUMN m_role_dtl.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_role_dtl.upd_user IS '更新者';
 COMMENT ON COLUMN m_role_dtl.version IS 'バージョン';
@@ -902,7 +903,7 @@ CREATE TABLE IF NOT EXISTS m_screen (
   jichitai_cd char(5) NOT NULL,
   screen_id char(10) NOT NULL,
   screen_name varchar(100) NOT NULL,
-  busho varchar(200) NOT NULL,
+  add_user varchar(200) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
   version numeric(5) NOT NULL,
@@ -912,43 +913,8 @@ COMMENT ON TABLE m_screen IS '画面管理マスタ';
 COMMENT ON COLUMN m_screen.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_screen.screen_id IS '画面ＩＤ';
 COMMENT ON COLUMN m_screen.screen_name IS '画面名称';
-COMMENT ON COLUMN m_screen.busho IS '作成者';
+COMMENT ON COLUMN m_screen.add_user IS '作成者';
 COMMENT ON COLUMN m_screen.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_screen.upd_user IS '更新者';
 COMMENT ON COLUMN m_screen.version IS 'バージョン';
 
-------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS m_atena (
-  jichitai_cd char(5) NOT NULL,
-  atena_no numeric(15) NOT NULL,
-  kbn char(1) NOT NULL,
-  kojin_no char(64),
-  hojin_no char(13),
-  name varchar(200) NOT NULL,
-  name_kana varchar(200),
-  yubin_no varchar(10),
-  jusho varchar(200),
-  tel1 varchar(20),
-  tel2 varchar(20),
-  add_user varchar(20) NOT NULL,
-  upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
-  CONSTRAINT m_atena_pkey PRIMARY KEY (jichitai_cd, atena_no)
-);
-COMMENT ON TABLE m_atena IS '宛名管理マスタ';
-COMMENT ON COLUMN m_atena.jichitai_cd IS '自治体コード';
-COMMENT ON COLUMN m_atena.atena_no IS '宛名番号';
-COMMENT ON COLUMN m_atena.kbn IS '区分';
-COMMENT ON COLUMN m_atena.kojin_no IS '個人番号';
-COMMENT ON COLUMN m_atena.hojin_no IS '法人番号';
-COMMENT ON COLUMN m_atena.name IS '名称';
-COMMENT ON COLUMN m_atena.name_kana IS '名称かな';
-COMMENT ON COLUMN m_atena.yubin_no IS '郵便番号';
-COMMENT ON COLUMN m_atena.jusho IS '住所';
-COMMENT ON COLUMN m_atena.tel1 IS '電話番号1';
-COMMENT ON COLUMN m_atena.tel2 IS '電話番号2';
-COMMENT ON COLUMN m_atena.add_user IS '作成者';
-COMMENT ON COLUMN m_atena.upd_dt IS '更新日時';
-COMMENT ON COLUMN m_atena.upd_user IS '更新者';
-COMMENT ON COLUMN m_atena.version IS 'バージョン';

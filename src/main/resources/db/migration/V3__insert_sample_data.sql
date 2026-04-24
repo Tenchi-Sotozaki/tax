@@ -1,11 +1,4 @@
 -- サンプルデータ挿入（テスト用）
-
--- 宛名マスタのサンプルデータ
-INSERT INTO m_atena (jichitai_cd, atena_no, kbn, kojin_no, hojin_no, name, name_kana, yubin_no, jusho, tel1, tel2, add_user, upd_dt, upd_user, version) VALUES
-('01234', 1001, '2', null, '1234567890123', 'グランドホテル東京', 'ぐらんどほてるとうきょう', '160-0023', '東京都新宿区西新宿1-1-1', '03-1234-5678', null, 'system', CURRENT_TIMESTAMP, 'system', 1),
-('01234', 1002, '1', '123456789012', null, '温泉旅館やまと', 'おんせんりょかんやまと', '100-0001', '東京都千代田区千代田1-1', '03-2345-6789', null, 'system', CURRENT_TIMESTAMP, 'system', 1),
-('01234', 1003, '2', null, '3456789012345', 'シティイン新宿', 'してぃいんしんじゅく', '160-0022', '東京都新宿区新宿3-1-1', '03-3456-7890', null, 'system', CURRENT_TIMESTAMP, 'system', 1);
-
 -- 特別徴収義務者テーブルのサンプルデータ
 INSERT INTO t_tokugimu (jichitai_cd, shitei_no, rno, toroku_ymd, shinkoku_ymd, henko_ymd, atena_no, shisetsu_name, shisetsu_name_kana, shisetsu_yubin_no, shisetsu_jusho, shisetsu_tel, yuka_menseki, chijo_kai, chika_kai, kyakushitsu_su, shuyo_su, kyoka_name, kyoka_name_kana, kyoka_yubin_no, kyoka_jusho, kyoka_tel, kyoka_shu, kyoka_no, soufusaki_name, soufusaki_name_kana, soufusaki_yubin_no, soufusaki_jusho, soufusaki_tel, biko, eigyo_st_ymd, eigyo_ed_ymd, kyushi_st_ymd, kyushi_ed_ymd, kyuhaishi_riyu, eltax_umu, nokigen, new_flg, del_flg, add_dt, add_user, upd_dt, upd_user, version) VALUES
 ('01234', 'T0010001', 1, '2024-01-01', '2024-01-01', '2024-01-01', 1001, 'グランドホテル東京本館', 'ぐらんどほてるとうきょうほんかん', '160-0023', '東京都新宿区西新宿1-1-1', '03-1234-5678', 5000.00, 10, 2, 100, 200, 'グランドホテル東京', 'ぐらんどほてるとうきょう', '160-0023', '東京都新宿区西新宿1-1-1', '03-1234-5678', '1', 'HOTEL-001', 'グランドホテル東京', 'ぐらんどほてるとうきょう', '160-0023', '東京都新宿区西新宿1-1-1', '03-1234-5678', null, '2024-01-01', null, null, null, null, '1', '01', '1', '0', CURRENT_TIMESTAMP, 'system', CURRENT_TIMESTAMP, 'system', 1),
