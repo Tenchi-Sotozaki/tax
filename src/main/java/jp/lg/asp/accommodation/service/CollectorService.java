@@ -40,4 +40,7 @@ public interface CollectorService {
 
     /** 納税管理人を登録・更新する */
     void saveTaxManager(Long collectorId, TaxManagerForm form);
+
+    /** IDから指定番号を取得する */
+    String getShiteiNoById(Long id);
 }

@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jp.lg.asp.accommodation.dto.taxManagerForm;
-import jp.lg.asp.accommodation.entity.taxManager;
-import jp.lg.asp.accommodation.entity.taxManagerId;
-import jp.lg.asp.accommodation.repository.taxManagerRepository;
+import jp.lg.asp.accommodation.dto.TaxManagerForm;
+import jp.lg.asp.accommodation.entity.TaxManager;
+import jp.lg.asp.accommodation.entity.TaxManagerId;
+import jp.lg.asp.accommodation.repository.TaxManagerRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class taxManagerService {
+public class TaxManagerService {
 
-	private final taxManagerRepository taxManagerRepository;
+	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
 	private final CollectorService collectorService;
 
@@ -32,8 +32,8 @@ public class taxManagerService {
 	 * IDからデータを取得し、画面表示用のFormを作成する
 	 */
 	@Transactional(readOnly = true) // ★必ず readOnly を付ける
-	public taxManagerForm getById(Long id) {
-		taxManagerForm form = new taxManagerForm();
+	public TaxManagerForm getById(Long id) {
+		TaxManagerForm form = new TaxManagerForm();
 		form.setCollectorId(id);
 		form.setRegistrationDate(LocalDate.now());
 
@@ -51,7 +51,7 @@ public class taxManagerService {
 					});
 
 			// 2. 納税管理人の取得
-			taxManagerId nokanId = new taxManagerId(jichitaiCd, shiteiNo, 1);
+			TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
 			taxManagerRepository.findById(nokanId).ifPresent(nokan -> {
 				form.setEdit(true);
 
@@ -87,14 +87,14 @@ public class taxManagerService {
 	 * 保存処理
 	 */
 	@Transactional
-	public void save(Long id, taxManagerForm form) {
+	public void save(Long id, TaxManagerForm form) {
 		String shiteiNo = collectorService.getShiteiNoById(id);
 		LocalDateTime now = LocalDateTime.now();
 
 		// 1. 既存データを取得（なければ新規作成）
-		taxManagerId nokanId = new taxManagerId(jichitaiCd, shiteiNo, 1);
-		taxManager entity = taxManagerRepository.findById(nokanId)
-				.orElse(new taxManager());
+		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+		TaxManager entity = taxManagerRepository.findById(nokanId)
+				.orElse(new TaxManager());
 
 		// 2. 定義書に基づき値をマッピング
 		entity.setJichitaiCd(jichitaiCd);

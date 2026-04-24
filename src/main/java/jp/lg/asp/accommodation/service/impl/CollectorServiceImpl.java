@@ -223,4 +223,13 @@ public class CollectorServiceImpl implements CollectorService {
         // 実装予定
         log.info("納税管理人登録: collectorId={}, manager={}", collectorId, form.getManagerName());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getShiteiNoById(Long id) {
+        BigDecimal atenaNo = BigDecimal.valueOf(id);
+        return tokugimuRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo)
+            .map(Tokugimu::getShiteiNo)
+            .orElseThrow(() -> new RuntimeException("指定番号が見つかりません: " + id));
+    }
 }
