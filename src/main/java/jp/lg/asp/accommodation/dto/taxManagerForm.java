@@ -1,22 +1,24 @@
 package jp.lg.asp.accommodation.dto;
 
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.Data;
-
-import java.time.LocalDate;
-
 @Data
-public class TaxManagerForm {
+public class taxManagerForm {
 
-    // 遷移元から引き継ぐ情報（readonly表示用）
-    private Long collectorId;
+	private Long collectorId;
+    
     private String obligorName;
     private String facilityName;
 
-    // 納税管理人情報
     @NotNull(message = "登録日は必須です")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate registrationDate;
 
     @NotBlank(message = "住所（所在地）は必須です")
@@ -34,4 +36,6 @@ public class TaxManagerForm {
 
     private boolean exemptionFlag;
     private String exemptionReason;
+    
+    private boolean edit;
 }

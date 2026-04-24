@@ -21,7 +21,7 @@ public class AccommodationTaxDeclarationDetail {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tax_category_code", nullable = false)
-    private TaxCategory taxCategory;
+    private taxCategory taxCategory;
 
     /** 課税対象宿泊数 */
     @Column(name = "taxable_nights", nullable = false)
