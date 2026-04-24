@@ -17,8 +17,9 @@
 				<span th:text="${isView ? '納税管理人照会' : (isEdit ? '納税管理人編集' : '納税管理人登録')}"></span>
 			</h2>
 			<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
-			    <i th:class="${isView ? 'bi bi-eye me-1' : (isEdit ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
-			    <span th:text="${isView ? '照会' : (isEdit ? '編集' : '新規登録')}"></span>
+				<i
+					th:class="${isView ? 'bi bi-eye me-1' : (isEdit ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
+				<span th:text="${isView ? '照会' : (isEdit ? '編集' : '新規登録')}"></span>
 			</span>
 		</div>
 
@@ -66,64 +67,65 @@
 
 						<!-- 宛名検索ボタン -->
 						<div class="col-md-4 d-flex align-items-end" th:if="${!isView}">
-						    <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addressSearchModal">
-						        <i class="bi bi-search me-1"></i>宛名検索
-						    </button>
+							<button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
+								data-bs-target="#addressSearchModal">
+								<i class="bi bi-search me-1"></i>宛名検索
+							</button>
 						</div>
 						<div class="col-md-4"></div>
 
 						<div class="col-md-6">
-						    <label class="form-label fw-medium">特別徴収義務者</label>
-						    <input type="text" class="form-control" th:field="*{obligorName}" readonly>
+							<label class="form-label fw-medium">特別徴収義務者</label>
+							<input type="text" class="form-control" th:field="*{obligorName}" readonly>
 						</div>
 
 						<div class="col-md-6">
-						    <label class="form-label fw-medium">施設名称</label>
-						    <input type="text" class="form-control" th:field="*{facilityName}" readonly>
+							<label class="form-label fw-medium">施設名称</label>
+							<input type="text" class="form-control" th:field="*{facilityName}" readonly>
 						</div>
 
 						<div class="col-md-12">
-						    <label class="form-label fw-medium">住所（所在地）</label>
-						    <input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}"
-						        th:errorclass="is-invalid" th:readonly="${isView}">
+							<label class="form-label fw-medium">住所（所在地）</label>
+							<input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}"
+								th:errorclass="is-invalid" th:readonly="${isView}">
 						</div>
 
 						<div class="col-md-6">
-						    <label class="form-label fw-medium">氏名</label>
-						    <input type="text" class="form-control" id="managerName" th:field="*{managerName}"
-						        th:errorclass="is-invalid" th:readonly="${isView}">
+							<label class="form-label fw-medium">氏名</label>
+							<input type="text" class="form-control" id="managerName" th:field="*{managerName}"
+								th:errorclass="is-invalid" th:readonly="${isView}">
 						</div>
 
 						<div class="col-md-6">
-						    <label class="form-label fw-medium">ふりがな</label>
-						    <input type="text" class="form-control" id="managerNameKana" th:field="*{managerNameKana}"
-						        th:errorclass="is-invalid" th:readonly="${isView}">
+							<label class="form-label fw-medium">ふりがな</label>
+							<input type="text" class="form-control" id="managerNameKana" th:field="*{managerNameKana}"
+								th:errorclass="is-invalid" th:readonly="${isView}">
 						</div>
 
 						<div class="col-md-6">
-						    <label class="form-label fw-medium">電話番号</label>
-						    <input type="tel" class="form-control" id="managerPhone" th:field="*{managerPhone}"
-						        th:errorclass="is-invalid" th:readonly="${isView}">
+							<label class="form-label fw-medium">電話番号</label>
+							<input type="tel" class="form-control" id="managerPhone" th:field="*{managerPhone}"
+								th:errorclass="is-invalid" th:readonly="${isView}">
 						</div>
 
 						<div class="col-md-6 d-flex align-items-end">
-						    <div class="form-check">
-						        <input class="form-check-input" type="checkbox" th:field="*{exemptionFlag}"
-						            id="exemptionFlag" th:disabled="${isView}">
-						        <label class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
-						    </div>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" th:field="*{exemptionFlag}"
+									id="exemptionFlag" th:disabled="${isView}">
+								<label class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
+							</div>
 						</div>
 
 						<div class="col-md-12" id="exemptionReasonArea" style="display: none;">
-						    <label for="exemptionReason" class="form-label fw-medium">
-						        選任免除理由 
-						        <span class="badge bg-danger text-white ms-1" th:if="${!isView}">必須</span>
-						    </label>
-						    <textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}"
-						        th:readonly="${isView}" th:errorclass="is-invalid" 
-						        placeholder="選任免除の理由を入力してください"></textarea>
-						    <div class="invalid-feedback" th:if="${#fields.hasErrors('exemptionReason')}"
-						        th:errors="*{exemptionReason}"></div>
+							<label for="exemptionReason" class="form-label fw-medium">
+								選任免除理由
+								<span class="badge bg-danger text-white ms-1" th:if="${!isView}">必須</span>
+							</label>
+							<textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}"
+								th:readonly="${isView}" th:errorclass="is-invalid"
+								placeholder="選任免除の理由を入力してください"></textarea>
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('exemptionReason')}"
+								th:errors="*{exemptionReason}"></div>
 						</div>
 					</div>
 				</div>
@@ -133,8 +135,8 @@
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
 				<button type="submit" class="btn btn-primary btn-lg px-5" th:if="${!isView}">
-				    <i class="bi bi-save me-2"></i>
-				    <span th:text="${isEdit ? '更新する' : '登録する'}"></span>
+					<i class="bi bi-save me-2"></i>
+					<span th:text="${isEdit ? '更新する' : '登録する'}"></span>
 				</button>
 
 				<a th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
@@ -229,92 +231,92 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-	    <script th:inline="javascript">
-	        // 画面が準備できたら実行
-	        document.addEventListener('DOMContentLoaded', function() {
+		<script th:inline="javascript">
+			// 画面が準備できたら実行
+			document.addEventListener('DOMContentLoaded', function () {
 				// --- ① 選任免除の表示制御 ---
 				const exemptionFlag = document.getElementById('exemptionFlag');
 				const exemptionReasonArea = document.getElementById('exemptionReasonArea');
 
 				if (exemptionFlag && exemptionReasonArea) {
-				    // 表示・非表示を切り替える関数
-				    const toggleExemptionArea = () => {
-				        if (exemptionFlag.checked) {
-				            exemptionReasonArea.style.setProperty('display', 'block', 'important');
-				        } else {
-				            exemptionReasonArea.style.setProperty('display', 'none', 'important');
-				        }
-				    };
+					// 表示・非表示を切り替える関数
+					const toggleExemptionArea = () => {
+						if (exemptionFlag.checked) {
+							exemptionReasonArea.style.setProperty('display', 'block', 'important');
+						} else {
+							exemptionReasonArea.style.setProperty('display', 'none', 'important');
+						}
+					};
 
-				    // 1. 画面読み込み時に実行（照会モードやエラー復帰時用）
-				    toggleExemptionArea();
+					// 1. 画面読み込み時に実行（照会モードやエラー復帰時用）
+					toggleExemptionArea();
 
-				    // 2. チェックボックス操作時に実行
-				    exemptionFlag.addEventListener('change', toggleExemptionArea);
+					// 2. チェックボックス操作時に実行
+					exemptionFlag.addEventListener('change', toggleExemptionArea);
 				}
 
-	            // --- ② 宛名検索ボタン ---
-	            const btnSearch = document.getElementById('btnAddressSearch');
-	            if (btnSearch) {
-	                btnSearch.addEventListener('click', async function () {
-	                    const addressNumber = document.getElementById('searchAddressNumber').value.trim();
-	                    const name = document.getElementById('searchName').value.trim();
-	                    const address = document.getElementById('searchAddress').value.trim();
+				// --- ② 宛名検索ボタン ---
+				const btnSearch = document.getElementById('btnAddressSearch');
+				if (btnSearch) {
+					btnSearch.addEventListener('click', async function () {
+						const addressNumber = document.getElementById('searchAddressNumber').value.trim();
+						const name = document.getElementById('searchName').value.trim();
+						const address = document.getElementById('searchAddress').value.trim();
 
-	                    const params = new URLSearchParams();
-	                    if (addressNumber) params.append('addressNumber', addressNumber);
-	                    if (name) params.append('name', name);
-	                    if (address) params.append('address', address);
+						const params = new URLSearchParams();
+						if (addressNumber) params.append('addressNumber', addressNumber);
+						if (name) params.append('name', name);
+						if (address) params.append('address', address);
 
-	                    const contextPath = /*[[@{/}]]*/ '/accommodation-tax/';
-	                    const url = contextPath + 'api/address/search?' + params.toString();
+						const contextPath = /*[[@{/}]]*/ '/accommodation-tax/';
+						const url = contextPath + 'api/address/search?' + params.toString();
 
-	                    try {
-	                        const res = await fetch(url, {credentials: 'same-origin'});
-	                        const data = await res.json();
-	                        renderSearchResults(data);
-	                    } catch (e) {
-	                        console.error('宛名検索エラー:', e);
-	                        alert('検索中にエラーが発生しました。');
-	                    }
-	                });
-	            }
+						try {
+							const res = await fetch(url, {credentials: 'same-origin'});
+							const data = await res.json();
+							renderSearchResults(data);
+						} catch (e) {
+							console.error('宛名検索エラー:', e);
+							alert('検索中にエラーが発生しました。');
+						}
+					});
+				}
 
-	            // --- ③ モーダルリセット ---
-	            const searchModal = document.getElementById('addressSearchModal');
-	            if (searchModal) {
-	                searchModal.addEventListener('show.bs.modal', function () {
-	                    document.getElementById('searchAddressNumber').value = '';
-	                    document.getElementById('searchName').value = '';
-	                    document.getElementById('searchAddress').value = '';
-	                    document.getElementById('searchResultBody').innerHTML = '';
-	                    document.getElementById('searchResultArea').style.display = 'none';
-	                    document.getElementById('searchNoResult').style.display = 'none';
-	                });
-	            }
-	        }); // ★ ここが足りていませんでした！
+				// --- ③ モーダルリセット ---
+				const searchModal = document.getElementById('addressSearchModal');
+				if (searchModal) {
+					searchModal.addEventListener('show.bs.modal', function () {
+						document.getElementById('searchAddressNumber').value = '';
+						document.getElementById('searchName').value = '';
+						document.getElementById('searchAddress').value = '';
+						document.getElementById('searchResultBody').innerHTML = '';
+						document.getElementById('searchResultArea').style.display = 'none';
+						document.getElementById('searchNoResult').style.display = 'none';
+					});
+				}
+			}); // ★ ここが足りていませんでした！
 
-	        // --- 検索結果の表示（ここはイベントの外でOK） ---
-	        function renderSearchResults(data) {
-	            const tbody = document.getElementById('searchResultBody');
-	            const resultArea = document.getElementById('searchResultArea');
-	            const noResult = document.getElementById('searchNoResult');
-	            const countEl = document.getElementById('searchResultCount');
+			// --- 検索結果の表示（ここはイベントの外でOK） ---
+			function renderSearchResults(data) {
+				const tbody = document.getElementById('searchResultBody');
+				const resultArea = document.getElementById('searchResultArea');
+				const noResult = document.getElementById('searchNoResult');
+				const countEl = document.getElementById('searchResultCount');
 
-	            tbody.innerHTML = '';
-	            if (data.length === 0) {
-	                resultArea.style.display = 'none';
-	                noResult.style.display = 'block';
-	                return;
-	            }
+				tbody.innerHTML = '';
+				if (data.length === 0) {
+					resultArea.style.display = 'none';
+					noResult.style.display = 'block';
+					return;
+				}
 
-	            noResult.style.display = 'none';
-	            resultArea.style.display = 'block';
-	            countEl.textContent = data.length;
+				noResult.style.display = 'none';
+				resultArea.style.display = 'block';
+				countEl.textContent = data.length;
 
-	            data.forEach(function (item) {
-	                const tr = document.createElement('tr');
-	                tr.innerHTML = `
+				data.forEach(function (item) {
+					const tr = document.createElement('tr');
+					tr.innerHTML = `
 	                    <td>${escHtml(item.addressNumber)}</td>
 	                    <td>${escHtml(item.name)}</td>
 	                    <td class="text-muted">${escHtml(item.nameKana)}</td>
@@ -326,21 +328,21 @@
 	                        </button>
 	                    </td>`;
 
-	                tr.querySelector('.btn-select-address').addEventListener('click', function () {
-	                    document.getElementById('managerAddress').value = item.address;
-	                    document.getElementById('managerName').value = item.name;
-	                    document.getElementById('managerNameKana').value = item.nameKana;
-	                    document.getElementById('managerPhone').value = item.phone;
-	                    bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
-	                });
-	                tbody.appendChild(tr);
-	            });
-	        }
+					tr.querySelector('.btn-select-address').addEventListener('click', function () {
+						document.getElementById('managerAddress').value = item.address;
+						document.getElementById('managerName').value = item.name;
+						document.getElementById('managerNameKana').value = item.nameKana;
+						document.getElementById('managerPhone').value = item.phone;
+						bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
+					});
+					tbody.appendChild(tr);
+				});
+			}
 
-	        function escHtml(str) {
-	            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-	        }
-	    </script>
+			function escHtml(str) {
+				return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+			}
+		</script>
 	</th:block>
 </body>
 
