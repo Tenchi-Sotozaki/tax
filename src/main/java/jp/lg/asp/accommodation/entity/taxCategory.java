@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "tax_category")
 @Getter @Setter
-public class TaxCategory {
+public class taxCategory {
 
     @Id
     @Column(name = "tax_category_code", length = 2)

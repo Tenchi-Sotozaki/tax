@@ -14,8 +14,8 @@ import lombok.Data;
 @Entity
 @Table(name = "t_nokan")
 @Data
-@IdClass(TaxManagerId.class)
-public class TaxManager {
+@IdClass(taxManagerId.class)
+public class taxManager {
 
     @Id
     @Column(name = "jichitai_cd", length = 5, nullable = false)

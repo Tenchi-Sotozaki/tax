@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaxManagerId implements Serializable {
+public class taxManagerId implements Serializable {
 
     private String jichitaiCd; // 自治体コード
     private String shiteiNo;   // 指定番号
