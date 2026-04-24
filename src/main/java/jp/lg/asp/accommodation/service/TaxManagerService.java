@@ -22,7 +22,7 @@ public class TaxManagerService {
 
 	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
-	private final CollectorService collectorService;
+	private final TokugimuService collectorService;
 
 	// application.yml (app.jichitai.code) から自治体コードを注入
 	@Value("${app.jichitai.code}")
