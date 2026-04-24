@@ -39,8 +39,11 @@ public class TokugimuForm {
 	@NotBlank(message = "所在地は必須です")
 	private String facilityAddress;
 
-	@NotBlank(message = "ふりがな名称は必須です")
+	@NotBlank(message = "ふりがなは必須です")
 	private String facilityNameKana;
+
+	@NotBlank(message = "名称は必須です")
+	private String facilityName;
 
 	@Pattern(regexp = "^[0-9-]{10,15}$", message = "有効な電話番号を入力してください（例：03-1234-5678）")
 	@NotBlank(message = "施設の電話番号は必須です")
@@ -49,8 +52,11 @@ public class TokugimuForm {
 	@NotNull(message = "延床面積は必須です")
 	private Double floorArea;
 
-	@NotBlank(message = "階層は必須です")
-	private String floors;
+	@NotBlank(message = "地上階は必須です")
+	private String aboveGroundFloor;
+
+	@NotBlank(message = "地下階は必須です")
+	private String basementFloor;
 
 	@NotNull(message = "客室数は必須です")
 	private Integer roomCount;
@@ -58,16 +64,22 @@ public class TokugimuForm {
 	@NotNull(message = "収容人数は必須です")
 	private Integer capacity;
 
-	@NotNull(message = "営業開始予定日は必須です")
+	@NotNull(message = "営業開始(予定)日は必須です")
 	private LocalDate businessStartDate;
 
 	// ===== 営業許可等情報 =====
+
+	@NotBlank(message = "営業許可の郵便番号は必須です")
+	private String licenseAddressNo;
 
 	@NotBlank(message = "営業許可の住所は必須です")
 	private String licenseAddress;
 
 	@NotBlank(message = "営業許可のふりがなは必須です")
 	private String licenseNameKana;
+
+	@NotBlank(message = "営業許可の氏名は必須です")
+	private String licenseName;
 
 	@Pattern(regexp = "^[0-9-]{10,15}$", message = "有効な電話番号を入力してください（例：03-1234-5678）")
 	@NotBlank(message = "営業許可の電話番号は必須です")
@@ -81,17 +93,26 @@ public class TokugimuForm {
 
 	// ===== 施設所有者情報 =====
 
+	@NotBlank(message = "所有者の郵便番号は必須です")
+	private String ownerAddressNo;
+
 	@NotBlank(message = "所有者の住所は必須です")
 	private String ownerAddress;
 
 	@NotBlank(message = "所有者のふりがなは必須です")
 	private String ownerNameKana;
 
+	@NotBlank(message = "所有者の氏名は必須です")
+	private String ownerName;
+
 	@Pattern(regexp = "^[0-9-]{10,15}$", message = "有効な電話番号を入力してください（例：03-1234-5678）")
 	@NotBlank(message = "所有者の電話番号は必須です")
 	private String ownerPhone;
 
 	// ===== 書類送付先情報 =====
+
+	@NotBlank(message = "書類送付先の郵便番号は必須です")
+	private String mailAddressNo;
 
 	@NotBlank(message = "書類送付先の住所は必須です")
 	private String mailAddress;
