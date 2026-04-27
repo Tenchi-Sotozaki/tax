@@ -35,7 +35,7 @@ public class TaxManagerController {
 
 		TaxManagerForm form = new TaxManagerForm();
 		form.setCollectorId(id);
-		form.setObligorName(collectorForm.getTokugimuName());
+		form.setObligorName(collectorForm.getName());
 		// TODO: DB実装後は施設名を正しく取得する
 		form.setFacilityName("グランドホテル東京本館（ID:" + id + "）");
 

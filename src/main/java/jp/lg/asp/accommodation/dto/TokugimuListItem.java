@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 public class TokugimuListItem {
 
 	private Long id;
-	private String registrationNo;
-	private String obligorName;
-	private String facilityName;
+	private String shiteiNo;
+	private String name;
+	private String shisetsuName;
 	private String businessType;
 	private String businessTypeLabel;
 	private String consolidationTarget; // "target" or "non-target"
@@ -24,12 +24,12 @@ public class TokugimuListItem {
 	private String hojinNo;
 
 	// コンストラクタ（既存のコードとの互換性のため）
-	public TokugimuListItem(Long id, String registrationNo, String obligorName, String facilityName,
+	public TokugimuListItem(Long id, String shiteiNo, String name, String shisetsuName,
 			String businessType, String businessTypeLabel, String consolidationTarget, String status) {
 		this.id = id;
-		this.registrationNo = registrationNo;
-		this.obligorName = obligorName;
-		this.facilityName = facilityName;
+		this.shiteiNo = shiteiNo;
+		this.name = name;
+		this.shisetsuName = shisetsuName;
 		this.businessType = businessType;
 		this.businessTypeLabel = businessTypeLabel;
 		this.consolidationTarget = consolidationTarget;

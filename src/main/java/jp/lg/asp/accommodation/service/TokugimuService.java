@@ -2,11 +2,10 @@ package jp.lg.asp.accommodation.service;
 
 import java.util.List;
 
-import jp.lg.asp.accommodation.dto.CollectorSearchForm;
-import jp.lg.asp.accommodation.dto.FacilityDto;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
+import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 
 /**
  * 特別徴収義務者管理 Service インターフェース。
@@ -15,16 +14,13 @@ import jp.lg.asp.accommodation.dto.TokugimuListItem;
 public interface TokugimuService {
 
 	/** 検索条件に合致する一覧を返す */
-	List<TokugimuListItem> search(CollectorSearchForm form);
+	List<TokugimuListItem> search(TokugimuSearchForm form);
 
 	/** IDで1件取得してフォームに変換する */
 	TokugimuForm getTokugimuById(Long id);
 
 	/** 義務者名を取得する */
 	String getTokugimuName(String obligorId);
-
-	/** 施設一覧を取得する */
-	List<FacilityDto> getFacilities(String obligorId);
 
 	/** 納税管理人フォームの初期値を生成する */
 	TaxManagerForm buildTaxManagerForm(Long collectorId);
