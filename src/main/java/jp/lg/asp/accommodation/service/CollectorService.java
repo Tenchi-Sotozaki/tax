@@ -12,6 +12,7 @@ import jp.lg.asp.accommodation.dto.TaxManagerForm;
  * 特別徴収義務者管理 Service インターフェース。
  * DB実装後はこのインターフェースを変えずに実装クラスのみ差し替える。
  */
+
 public interface CollectorService {
 
     /** 検索条件に合致する一覧を返す */
