@@ -1,12 +1,12 @@
 package jp.lg.asp.accommodation.service;
 
+import java.util.List;
+
 import jp.lg.asp.accommodation.dto.CollectorForm;
 import jp.lg.asp.accommodation.dto.CollectorListItem;
 import jp.lg.asp.accommodation.dto.CollectorSearchForm;
 import jp.lg.asp.accommodation.dto.FacilityDto;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
-
-import java.util.List;
 
 /**
  * 特別徴収義務者管理 Service インターフェース。
@@ -40,4 +40,6 @@ public interface CollectorService {
 
     /** 納税管理人を登録・更新する */
     void saveTaxManager(Long collectorId, TaxManagerForm form);
+    
+    String getShiteiNoById(Long id);
 }
