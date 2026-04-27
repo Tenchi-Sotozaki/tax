@@ -55,4 +55,15 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
         @Param("jichitaiCd") String jichitaiCd,
         @Param("atenaNo") BigDecimal atenaNo
     );
+
+    @Query("""
+        SELECT t FROM Tokugimu t
+        WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo
+        AND t.newFlg = '1' AND t.delFlg = '0'
+        ORDER BY t.rno DESC
+        """)
+    Optional<Tokugimu> findByJichitaiCdAndShiteiNo(
+        @Param("jichitaiCd") String jichitaiCd,
+        @Param("shiteiNo") String shiteiNo
+    );
 }

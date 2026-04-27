@@ -231,9 +231,11 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:inline="javascript">
-			// 画面が準備できたら実行
-			document.addEventListener('DOMContentLoaded', function () {
+		<script th:src="@{/js/t_tax_manager_registration.js}"></script>
+	</th:block>
+</body>
+
+</html>
 				// --- ① 選任免除の表示制御 ---
 				const exemptionFlag = document.getElementById('exemptionFlag');
 				const exemptionReasonArea = document.getElementById('exemptionReasonArea');

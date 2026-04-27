@@ -34,6 +34,13 @@ public class Tokugimu {
     @Column(name = "henko_ymd", nullable = false)
     private LocalDate henkoYmd;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+        @JoinColumn(name = "jichitai_cd", referencedColumnName = "jichitai_cd", insertable = false, updatable = false),
+        @JoinColumn(name = "atena_no", referencedColumnName = "atena_no", insertable = false, updatable = false)
+    })
+    private Atena atena;
+
     @Column(name = "atena_no", nullable = false, precision = 15)
     private BigDecimal atenaNo;
 

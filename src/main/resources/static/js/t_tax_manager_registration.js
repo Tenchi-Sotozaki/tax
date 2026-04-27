@@ -394,3 +394,100 @@ function setFieldValue(id, value) {
         el.value = value;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // 選任免除の表示制御
+    const exemptionFlag = document.getElementById('exemptionFlag');
+    const exemptionReasonArea = document.getElementById('exemptionReasonArea');
+    if (exemptionFlag && exemptionReasonArea) {
+        const toggleExemptionArea = () => {
+            exemptionReasonArea.style.setProperty('display', exemptionFlag.checked ? 'block' : 'none', 'important');
+        };
+        toggleExemptionArea();
+        exemptionFlag.addEventListener('change', toggleExemptionArea);
+    }
+
+    // 宛名検索ボタン
+    const btnSearch = document.getElementById('btnAddressSearch');
+    if (btnSearch) {
+        btnSearch.addEventListener('click', async function () {
+            const params = new URLSearchParams();
+            const addressNumber = document.getElementById('searchAddressNumber').value.trim();
+            const name          = document.getElementById('searchName').value.trim();
+            const address       = document.getElementById('searchAddress').value.trim();
+            if (addressNumber) params.append('addressNumber', addressNumber);
+            if (name)          params.append('name', name);
+            if (address)       params.append('address', address);
+
+            const contextPath = document.querySelector('meta[name="context-path"]')?.content ?? '/accommodation-tax/';
+            try {
+                const res  = await fetch(contextPath + 'api/address/search?' + params, { credentials: 'same-origin' });
+                const data = await res.json();
+                renderSearchResults(data);
+            } catch (e) {
+                console.error('宛名検索エラー:', e);
+                alert('検索中にエラーが発生しました。');
+            }
+        });
+    }
+
+    // モーダルリセット
+    const searchModal = document.getElementById('addressSearchModal');
+    if (searchModal) {
+        searchModal.addEventListener('show.bs.modal', function () {
+            document.getElementById('searchAddressNumber').value = '';
+            document.getElementById('searchName').value          = '';
+            document.getElementById('searchAddress').value       = '';
+            document.getElementById('searchResultBody').innerHTML = '';
+            document.getElementById('searchResultArea').style.display  = 'none';
+            document.getElementById('searchNoResult').style.display    = 'none';
+        });
+    }
+});
+
+function renderSearchResults(data) {
+    const tbody      = document.getElementById('searchResultBody');
+    const resultArea = document.getElementById('searchResultArea');
+    const noResult   = document.getElementById('searchNoResult');
+    const countEl    = document.getElementById('searchResultCount');
+
+    tbody.innerHTML = '';
+    if (data.length === 0) {
+        resultArea.style.display = 'none';
+        noResult.style.display   = 'block';
+        return;
+    }
+    noResult.style.display   = 'none';
+    resultArea.style.display = 'block';
+    countEl.textContent      = data.length;
+
+    data.forEach(function (item) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${escHtml(item.addressNumber)}</td>
+            <td>${escHtml(item.name)}</td>
+            <td class="text-muted">${escHtml(item.nameKana)}</td>
+            <td>${escHtml(item.address)}</td>
+            <td>${escHtml(item.phone)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-primary btn-sm btn-select-address">
+                    <i class="bi bi-check-lg me-1"></i>選択
+                </button>
+            </td>`;
+        tr.querySelector('.btn-select-address').addEventListener('click', function () {
+            document.getElementById('managerAddress').value  = item.address;
+            document.getElementById('managerName').value     = item.name;
+            document.getElementById('managerNameKana').value = item.nameKana;
+            document.getElementById('managerPhone').value    = item.phone;
+            bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
+        });
+        tbody.appendChild(tr);
+    });
+}
+
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}

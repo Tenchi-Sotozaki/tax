@@ -375,3 +375,14 @@ function setRadioValue(name, value) {
         if (el) el.checked = true;
     }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('openConfirmModalBtn').addEventListener('click', function () {
+        const form = document.getElementById('registerForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        new bootstrap.Modal(document.getElementById('registerModal')).show();
+    });
+});
