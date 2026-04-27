@@ -1,202 +1,125 @@
 'use strict';
 
 // -----------------------------------------------------------------------
-// 定数
-// -----------------------------------------------------------------------
-const API_BASE = '/accommodation-tax/api/collectors';
-
-// -----------------------------------------------------------------------
-// 状態
-// -----------------------------------------------------------------------
-let editingCollectorId = null; // 編集時にセット
-const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
-const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-
-// -----------------------------------------------------------------------
 // 初期化
 // -----------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
-    
-    // URLパラメータに id があれば編集モードで読み込む
-    const params = new URLSearchParams(location.search);
-    const id = params.get('id');
-    if (id) {
-        editingCollectorId = id;
-        loadCollector(id);
-        switchToEditMode();
-    }
 });
 
 // -----------------------------------------------------------------------
 // イベントバインド
 // -----------------------------------------------------------------------
 function bindEvents() {
-    document.getElementById('registrationForm').addEventListener('submit', onSubmit);
-    
-    // 情報検索ボタン
-    document.querySelector('.btn-outline-primary').addEventListener('click', onSearchInfo);
-    
-    // 申告区分の変更で関連フィールドの表示制御
-    document.querySelectorAll('input[name="declarationType"]').forEach(radio => {
+    // 確認モーダルを開くボタン
+    const openModalBtn = document.getElementById('openConfirmModalBtn');
+    if (openModalBtn) {
+        openModalBtn.addEventListener('click', () => {
+            const form = document.getElementById('registerForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            new bootstrap.Modal(document.getElementById('registerModal')).show();
+        });
+    }
+
+    // 宛名検索モーダル初期化
+    initAddressSearchModal();
+
+    // 申告区分ラジオボタン
+    document.querySelectorAll('input[name="declarationCategory"]').forEach(radio => {
         radio.addEventListener('change', onDeclarationTypeChange);
     });
-    
-    // 未定チェックボックスで終了日の制御
-    document.getElementById('undecidedPeriod').addEventListener('change', onUndecidedChange);
-}
 
-// -----------------------------------------------------------------------
-// フォーム送信
-// -----------------------------------------------------------------------
-function onSubmit(e) {
-    e.preventDefault();
-    clearAllErrors();
-
-    if (!validateForm()) return;
-
-    const data = buildRequestBody();
-    submitData(data);
-}
-
-// -----------------------------------------------------------------------
-// データ送信
-// -----------------------------------------------------------------------
-async function submitData(data) {
-    const isEdit = !!editingCollectorId;
-    const url = isEdit ? `${API_BASE}/${editingCollectorId}` : API_BASE;
-    const method = isEdit ? 'PUT' : 'POST';
-    
-    const btn = isEdit ? document.getElementById('updateBtn') : document.getElementById('registerBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>送信中...';
-
-    try {
-        const res = await fetch(url, {
-            method,
-            headers: buildHeaders(),
-            body: JSON.stringify(data),
-        });
-
-        const json = await res.json();
-
-        if (!res.ok) {
-            handleApiError(json);
-            return;
-        }
-
-        showAlert('success',
-            `<i class="bi bi-check-circle me-2"></i>` +
-            `特別徴収義務者を${isEdit ? '更新' : '登録'}しました。`
-        );
-        
-        if (!isEdit) {
-            editingCollectorId = json.collectorId;
-            switchToEditMode();
-            history.replaceState(null, '', `?id=${json.collectorId}`);
-        }
-
-    } catch (err) {
-        showAlert('danger', '<i class="bi bi-exclamation-triangle me-2"></i>通信エラーが発生しました。');
-        console.error(err);
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = isEdit 
-            ? '<i class="bi bi-arrow-repeat me-2"></i>更新する'
-            : '<i class="bi bi-save me-2"></i>登録する';
+    // 未定チェックボックス
+    const undecided = document.getElementById('suspensionEndDateUndecided');
+    if (undecided) {
+        undecided.addEventListener('change', onUndecidedChange);
     }
 }
 
 // -----------------------------------------------------------------------
-// 既存データの読み込み（編集モード）
-// -----------------------------------------------------------------------
-async function loadCollector(id) {
-    try {
-        const res = await fetch(`${API_BASE}/${id}`, { headers: buildHeaders() });
-        if (!res.ok) {
-            showAlert('danger', `特別徴収義務者ID: ${id} の読み込みに失敗しました。`);
-            return;
-        }
-        const data = await res.json();
-        fillForm(data);
-    } catch (err) {
-        showAlert('danger', '通信エラーが発生しました。');
-        console.error(err);
-    }
-}
-
-// -----------------------------------------------------------------------
-// フォームにデータを設定
-// -----------------------------------------------------------------------
-function fillForm(data) {
-    // 基本情報
-    setFieldValue('registrationDate', data.registrationDate);
-    setFieldValue('obligorAddress', data.obligorAddress);
-    setFieldValue('obligorName', data.obligorName);
-    setFieldValue('personalCorporateNumber', data.personalCorporateNumber);
-    setFieldValue('obligorPhone', data.obligorPhone);
-    
-    // 宿泊施設情報
-    setFieldValue('facilityAddress', data.facilityAddress);
-    setFieldValue('facilityNameKana', data.facilityNameKana);
-    setFieldValue('facilityPhone', data.facilityPhone);
-    setFieldValue('floorArea', data.floorArea);
-    setFieldValue('floors', data.floors);
-    setFieldValue('roomCount', data.roomCount);
-    setFieldValue('capacity', data.capacity);
-    setFieldValue('businessStartDate', data.businessStartDate);
-    
-    // 営業許可等情報
-    setFieldValue('licenseAddress', data.licenseAddress);
-    setFieldValue('licenseNameKana', data.licenseNameKana);
-    setFieldValue('licensePhone', data.licensePhone);
-    setFieldValue('businessType', data.businessType);
-    setFieldValue('licenseNumber', data.licenseNumber);
-    
-    // 施設所有者情報
-    setFieldValue('ownerAddress', data.ownerAddress);
-    setFieldValue('ownerNameKana', data.ownerNameKana);
-    setFieldValue('ownerPhone', data.ownerPhone);
-    
-    // 書類送付先情報
-    setFieldValue('mailAddress', data.mailAddress);
-    setFieldValue('mailNameKana', data.mailNameKana);
-    setFieldValue('mailPhone', data.mailPhone);
-    
-    // その他の情報
-    setRadioValue('eltaxApplication', data.eltaxApplication);
-    setFieldValue('taxCycle', data.taxCycle);
-    setFieldValue('remarks', data.remarks);
-    
-    // 休止/再開/廃止情報
-    setRadioValue('declarationType', data.declarationType);
-    setFieldValue('suspendStartDate', data.suspendStartDate);
-    setFieldValue('suspendEndDate', data.suspendEndDate);
-    setFieldValue('undecidedPeriod', data.undecidedPeriod);
-    setFieldValue('resumeOrCloseDate', data.resumeOrCloseDate);
-    setFieldValue('suspendOrCloseReason', data.suspendOrCloseReason);
-}
-
-// -----------------------------------------------------------------------
-// 編集モードに切り替え
-// -----------------------------------------------------------------------
-function switchToEditMode() {
-    document.getElementById('registerBtn').style.display = 'none';
-    document.getElementById('updateBtn').style.display = 'inline-block';
-    
-    const label = document.getElementById('modeLabel');
-    if (label) {
-        label.innerHTML = '<i class="bi bi-pencil me-1"></i>編集中';
-        label.className = 'badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 fs-6';
-    }
-}
-
-// -----------------------------------------------------------------------
-// 情報検索
+// 宛名検索
 // -----------------------------------------------------------------------
 function onSearchInfo() {
-    // モック実装
     alert('情報検索機能は実装中です。');
+}
+
+// -----------------------------------------------------------------------
+// 宛名検索モーダル
+// -----------------------------------------------------------------------
+const ADDR_API = '/accommodation-tax/api/address/search';
+
+function initAddressSearchModal() {
+    const searchBtn = document.getElementById('addrSearchBtn');
+    if (!searchBtn) return;
+
+    searchBtn.addEventListener('click', async () => {
+        const no      = document.getElementById('addrSearchNo').value.trim();
+        const name    = document.getElementById('addrSearchName').value.trim();
+        const address = document.getElementById('addrSearchAddress').value.trim();
+
+        const params = new URLSearchParams();
+        if (no)      params.set('addressNumber', no);
+        if (name)    params.set('name', name);
+        if (address) params.set('address', address);
+
+        try {
+            const res  = await fetch(`${ADDR_API}?${params}`);
+            const data = await res.json();
+            renderAddressResults(data);
+        } catch (err) {
+            document.getElementById('addrSearchResult').innerHTML =
+                '<p class="text-danger small">通信エラーが発生しました。</p>';
+        }
+    });
+
+    // Enterキーで検索
+    ['addrSearchNo', 'addrSearchName', 'addrSearchAddress'].forEach(id => {
+        document.getElementById(id)?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); searchBtn.click(); }
+        });
+    });
+}
+
+function renderAddressResults(data) {
+    const container = document.getElementById('addrSearchResult');
+    if (!data.length) {
+        container.innerHTML = '<p class="text-muted text-center small">該当する宛名が見つかりませんでした。</p>';
+        return;
+    }
+    const rows = data.map(d => `
+        <tr style="cursor:pointer" onclick="selectAddress(${JSON.stringify(d)})">
+            <td>${d.addressNumber}</td>
+            <td>${d.name}</td>
+            <td>${d.nameKana}</td>
+            <td>${d.address}</td>
+            <td>${d.phone}</td>
+        </tr>`).join('');
+    container.innerHTML = `
+        <p class="small text-muted mb-1">行をクリックすると自動入力されます。</p>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-bordered mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th>宛名番号</th><th>氏名</th><th>ふりがな</th><th>住所</th><th>電話番号</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+}
+
+function selectAddress(d) {
+    // 特別徴収義務者情報エリアに自動入力
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+    set('tokugimuAddress', d.address);
+    set('name',            d.name);
+    set('tokugimuPhone',   d.phone);
+
+    // モーダルを閉じる
+    bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
 }
 
 // -----------------------------------------------------------------------
@@ -204,24 +127,21 @@ function onSearchInfo() {
 // -----------------------------------------------------------------------
 function onDeclarationTypeChange(e) {
     const value = e.target.value;
-    const suspendFields = ['suspendStartDate', 'suspendEndDate', 'undecidedPeriod'];
-    const resumeCloseField = 'resumeOrCloseDate';
-    
-    // すべてのフィールドを一旦無効化
-    suspendFields.forEach(id => {
-        const el = document.getElementById(id);
+    const suspendStart  = document.getElementById('suspensionStartDate');
+    const suspendEnd    = document.getElementById('suspensionEndDate');
+    const undecided     = document.getElementById('suspensionEndDateUndecided');
+    const resumeClose   = document.getElementById('resumptionOrAbolitionDate');
+
+    [suspendStart, suspendEnd, undecided, resumeClose].forEach(el => {
         if (el) el.disabled = true;
     });
-    document.getElementById(resumeCloseField).disabled = true;
-    
-    // 選択された区分に応じて有効化
-    if (value === 'suspend') {
-        suspendFields.forEach(id => {
-            const el = document.getElementById(id);
+
+    if (value === '休止') {
+        [suspendStart, suspendEnd, undecided].forEach(el => {
             if (el) el.disabled = false;
         });
-    } else if (value === 'resume' || value === 'close') {
-        document.getElementById(resumeCloseField).disabled = false;
+    } else if (value === '再開' || value === '廃止') {
+        if (resumeClose) resumeClose.disabled = false;
     }
 }
 
@@ -229,160 +149,12 @@ function onDeclarationTypeChange(e) {
 // 未定チェックボックス変更時の制御
 // -----------------------------------------------------------------------
 function onUndecidedChange(e) {
-    const endDateField = document.getElementById('suspendEndDate');
+    const endDate = document.getElementById('suspensionEndDate');
+    if (!endDate) return;
     if (e.target.checked) {
-        endDateField.disabled = true;
-        endDateField.value = '';
+        endDate.disabled = true;
+        endDate.value = '';
     } else {
-        endDateField.disabled = false;
+        endDate.disabled = false;
     }
 }
-
-// -----------------------------------------------------------------------
-// リクエストボディ組み立て
-// -----------------------------------------------------------------------
-function buildRequestBody() {
-    return {
-        registrationDate: getFieldValue('registrationDate'),
-        obligorAddress: getFieldValue('obligorAddress'),
-        obligorName: getFieldValue('obligorName'),
-        personalCorporateNumber: getFieldValue('personalCorporateNumber'),
-        obligorPhone: getFieldValue('obligorPhone'),
-        
-        facilityAddress: getFieldValue('facilityAddress'),
-        facilityNameKana: getFieldValue('facilityNameKana'),
-        facilityPhone: getFieldValue('facilityPhone'),
-        floorArea: parseFloat(getFieldValue('floorArea')) || null,
-        floors: getFieldValue('floors'),
-        roomCount: parseInt(getFieldValue('roomCount')) || null,
-        capacity: parseInt(getFieldValue('capacity')) || null,
-        businessStartDate: getFieldValue('businessStartDate'),
-        
-        licenseAddress: getFieldValue('licenseAddress'),
-        licenseNameKana: getFieldValue('licenseNameKana'),
-        licensePhone: getFieldValue('licensePhone'),
-        businessType: getFieldValue('businessType'),
-        licenseNumber: getFieldValue('licenseNumber'),
-        
-        ownerAddress: getFieldValue('ownerAddress'),
-        ownerNameKana: getFieldValue('ownerNameKana'),
-        ownerPhone: getFieldValue('ownerPhone'),
-        
-        mailAddress: getFieldValue('mailAddress'),
-        mailNameKana: getFieldValue('mailNameKana'),
-        mailPhone: getFieldValue('mailPhone'),
-        
-        eltaxApplication: getRadioValue('eltaxApplication'),
-        taxCycle: getFieldValue('taxCycle'),
-        remarks: getFieldValue('remarks'),
-        
-        declarationType: getRadioValue('declarationType'),
-        suspendStartDate: getFieldValue('suspendStartDate'),
-        suspendEndDate: getFieldValue('suspendEndDate'),
-        undecidedPeriod: document.getElementById('undecidedPeriod').checked,
-        resumeOrCloseDate: getFieldValue('resumeOrCloseDate'),
-        suspendOrCloseReason: getFieldValue('suspendOrCloseReason')
-    };
-}
-
-// -----------------------------------------------------------------------
-// フロントバリデーション
-// -----------------------------------------------------------------------
-function validateForm() {
-    let valid = true;
-
-    // 必須項目チェック
-    const required = [
-        'registrationDate', 'obligorName', 'obligorPhone',
-        'facilityAddress', 'facilityNameKana', 'facilityPhone', 'roomCount', 'capacity', 'businessStartDate',
-        'businessType', 'licenseNumber',
-        'mailAddress', 'mailNameKana', 'mailPhone'
-    ];
-
-    required.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el.value.trim()) {
-            setFieldError(el, '必須項目です');
-            valid = false;
-        }
-    });
-
-    return valid;
-}
-
-// -----------------------------------------------------------------------
-// APIエラーハンドリング
-// -----------------------------------------------------------------------
-function handleApiError(json) {
-    if (json.fieldErrors && json.fieldErrors.length > 0) {
-        const list = json.fieldErrors.map(e => `<li>${e}</li>`).join('');
-        showAlert('danger', `<ul class="mb-0">${list}</ul>`);
-    } else {
-        showAlert('danger',
-            `<i class="bi bi-exclamation-triangle me-2"></i>${json.message || 'エラーが発生しました。'}`
-        );
-    }
-}
-
-// -----------------------------------------------------------------------
-// ユーティリティ関数
-// -----------------------------------------------------------------------
-function buildHeaders() {
-    const headers = { 'Content-Type': 'application/json' };
-    if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
-    return headers;
-}
-
-function showAlert(type, html) {
-    document.getElementById('alertArea').innerHTML = `
-        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-            ${html}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>`;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function setFieldError(el, message) {
-    el.classList.add('is-invalid');
-    const fb = el.parentElement.querySelector('.invalid-feedback');
-    if (fb) fb.textContent = message;
-}
-
-function clearAllErrors() {
-    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-}
-
-function getFieldValue(id) {
-    const el = document.getElementById(id);
-    return el ? el.value.trim() : '';
-}
-
-function setFieldValue(id, value) {
-    const el = document.getElementById(id);
-    if (el && value !== undefined && value !== null) {
-        el.value = value;
-    }
-}
-
-function getRadioValue(name) {
-    const el = document.querySelector(`input[name="${name}"]:checked`);
-    return el ? el.value : '';
-}
-
-function setRadioValue(name, value) {
-    if (value) {
-        const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
-        if (el) el.checked = true;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('openConfirmModalBtn').addEventListener('click', function () {
-        const form = document.getElementById('registerForm');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-        new bootstrap.Modal(document.getElementById('registerModal')).show();
-    });
-});

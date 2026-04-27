@@ -6,76 +6,66 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class MainViewController {
 
-    // ========== 認証 ==========
+	// ========== 認証 ==========
 
-    @GetMapping("/login")
-    public String login() {
-        return "auth/login";
-    }
+	@GetMapping("/login")
+	public String login() {
+		return "auth/login";
+	}
 
-    // ========== メイン（リダイレクト） ==========
+	// ========== メイン（リダイレクト） ==========
 
-    @GetMapping({"/", "/declarations/form"})
-    public String root() {
-        return "redirect:/collector/list";
-    }
+	@GetMapping({ "/", "/declarations/form" })
+	public String root() {
+		return "redirect:/collector/list";
+	}
 
-    // ========== 特別徴収義務者管理 ==========
+	// ========== 申告・納付管理 ==========
 
-    // GET /collector/list → CollectorController#list に委譲済み
-    // GET /collector/registration  → CollectorController#showRegistrationForm
-    // GET /collector/edit/{id}     → CollectorController#showEditForm
-    // GET /tax-manager/edit/{id}   → TaxManagerController#showForm
+	@GetMapping("/declaration/consolidated-declaration-registration")
+	public String consolidatedDeclarationRegistration() {
+		return "declaration/consolidated-declaration-registration";
+	}
 
-    // ========== 申告・納付管理 ==========
+	@GetMapping("/declaration/payment-management")
+	public String paymentManagement() {
+		return "declaration/payment-management";
+	}
 
-    @GetMapping("/declaration/consolidated-declaration-registration")
-    public String consolidatedDeclarationRegistration() {
-        return "declaration/consolidated-declaration-registration";
-    }
+	@GetMapping("/declaration/payment-registration")
+	public String paymentRegistration() {
+		return "declaration/payment-registration";
+	}
 
-    // 合算申告登録 → ConsolidatedDeclarationController#showForm に委譲済み
-    // GET /consolidated/register/{obligorId}
+	// ========== システム管理 ==========
 
-    @GetMapping("/declaration/payment-management")
-    public String paymentManagement() {
-        return "declaration/payment-management";
-    }
+	@GetMapping("/admin/user-search")
+	public String userSearch() {
+		return "admin/user-search";
+	}
 
-    @GetMapping("/declaration/payment-registration")
-    public String paymentRegistration() {
-        return "declaration/payment-registration";
-    }
+	@GetMapping("/admin/user-registration")
+	public String userRegistration() {
+		return "admin/user-registration";
+	}
 
-    // ========== システム管理 ==========
+	@GetMapping("/admin/tax-system-inquiry")
+	public String taxSystemInquiry() {
+		return "admin/tax-system-inquiry";
+	}
 
-    @GetMapping("/admin/user-search")
-    public String userSearch() {
-        return "admin/user-search";
-    }
+	@GetMapping("/admin/tax-system-registration")
+	public String taxSystemRegistration() {
+		return "admin/tax-system-registration";
+	}
 
-    @GetMapping("/admin/user-registration")
-    public String userRegistration() {
-        return "admin/user-registration";
-    }
+	@GetMapping("/admin/tax-cycle-inquiry")
+	public String taxCycleInquiry() {
+		return "admin/tax-cycle-inquiry";
+	}
 
-    @GetMapping("/admin/tax-system-inquiry")
-    public String taxSystemInquiry() {
-        return "admin/tax-system-inquiry";
-    }
-
-    @GetMapping("/admin/tax-system-registration")
-    public String taxSystemRegistration() {
-        return "admin/tax-system-registration";
-    }
-
-    @GetMapping("/admin/tax-cycle-inquiry")
-    public String taxCycleInquiry() {
-        return "admin/tax-cycle-inquiry";
-    }
-
-    @GetMapping("/admin/tax-cycle-registration")
-    public String taxCycleRegistration() {
-        return "admin/tax-cycle-registration";
-    }
+	@GetMapping("/admin/tax-cycle-registration")
+	public String taxCycleRegistration() {
+		return "admin/tax-cycle-registration";
+	}
 }

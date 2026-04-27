@@ -21,14 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/collector")
+@RequestMapping("/tokugimu")
 public class TokugimuController {
 
 	private final TokugimuService tokugimuService;
 	private final NozeiShukiService nozeiShukiService;
 
-	private static final String LIST_VIEW = "collector/tTokugimuDaicho";
-	private static final String FORM_VIEW = "collector/tTokugimuConfig";
+	private static final String LIST_VIEW = "tokugimu/tTokugimuDaicho";
+	private static final String FORM_VIEW = "tokugimu/tTokugimuConfig";
 
 	// ========== 一覧・検索 ==========
 
@@ -63,7 +63,19 @@ public class TokugimuController {
 		}
 		tokugimuService.register(form);
 		redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
-		return "redirect:/collector/list";
+		return "redirect:/tokugimu/list";
+	}
+
+	// ========== 照会 ==========
+
+	@GetMapping("/view/{id}")
+	public String showViewForm(@PathVariable Long id, Model model) {
+		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
+		model.addAttribute("isView", true);
+		model.addAttribute("isEdit", false);
+		model.addAttribute("editId", id);
+		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+		return FORM_VIEW;
 	}
 
 	// ========== 編集 ==========
@@ -71,6 +83,7 @@ public class TokugimuController {
 	@GetMapping("/edit/{id}")
 	public String showEditForm(@PathVariable Long id, Model model) {
 		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
+		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", true);
 		model.addAttribute("editId", id);
 		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
@@ -93,7 +106,7 @@ public class TokugimuController {
 		}
 		tokugimuService.update(id, form);
 		redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
-		return "redirect:/collector/list";
+		return "redirect:/tokugimu/list";
 	}
 
 	// ========== 削除 ==========
@@ -102,6 +115,6 @@ public class TokugimuController {
 	public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
 		tokugimuService.delete(id);
 		redirectAttributes.addFlashAttribute("successMessage", "ID:" + id + " のデータを削除しました。");
-		return "redirect:/collector/list";
+		return "redirect:/tokugimu/list";
 	}
 }

@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     nav('btnView',            '照会する特別徴収義務者を選択してください。',
-                              '/accommodation-tax/collector/edit/{id}');
+                              '/accommodation-tax/tokugimu/edit/{id}');
     nav('btnTaxManager',      '特別徴収義務者を選択してください。',
                               '/accommodation-tax/tax-manager/edit/{id}');
     nav('btnTaxManagerView',  '特別徴収義務者を選択してください。',
