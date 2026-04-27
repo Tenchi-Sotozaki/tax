@@ -13,7 +13,7 @@ import lombok.Data;
 public class TaxManagerForm {
 
 	private Long collectorId;
-    
+	
     private String obligorName;
     private String facilityName;
 

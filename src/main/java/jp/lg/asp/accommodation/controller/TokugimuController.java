@@ -28,7 +28,9 @@ public class TokugimuController {
 	private final NozeiShukiService nozeiShukiService;
 
 	private static final String LIST_VIEW = "collector/tTokugimuDaicho";
-	private static final String FORM_VIEW = "collector/tTokugimuConfig";
+	// TokugimuController.java
+	// 修正前: private static final String FORM_VIEW = "collector/tTokugimuConfig";
+	private static final String FORM_VIEW = "collector/tax-manager-registration";
 
 	// ========== 一覧・検索 ==========
 
@@ -39,25 +41,27 @@ public class TokugimuController {
 		return LIST_VIEW;
 	}
 
-	// ========== 新規登録 ==========
-
+	// --- 新規登録 ---
 	@GetMapping("/registration")
 	public String showRegistrationForm(Model model) {
-		model.addAttribute("TokugimuForm", new TokugimuForm());
-		model.addAttribute("isEdit", false);
-		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
-		return FORM_VIEW;
+	    model.addAttribute("taxManagerForm", new TokugimuForm()); 
+	    model.addAttribute("isEdit", false);
+	    model.addAttribute("isView", false); 
+	    model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+	    return FORM_VIEW;
 	}
+
 
 	@PostMapping("/registration")
 	public String register(
-			@Validated @ModelAttribute("TokugimuForm") TokugimuForm form,
+			@Validated @ModelAttribute("taxManagerForm") TokugimuForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
 			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 			return FORM_VIEW;
 		}
@@ -66,27 +70,28 @@ public class TokugimuController {
 		return "redirect:/collector/list";
 	}
 
-	// ========== 編集 ==========
-
+	// --- 編集 ---
 	@GetMapping("/edit/{id}")
 	public String showEditForm(@PathVariable Long id, Model model) {
-		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
-		model.addAttribute("isEdit", true);
-		model.addAttribute("editId", id);
-		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
-		return FORM_VIEW;
+	    model.addAttribute("taxManagerForm", tokugimuService.getTokugimuById(id));
+	    model.addAttribute("isEdit", true);
+	    model.addAttribute("isView", false); // ★修正2: これを追加！
+	    model.addAttribute("editId", id);
+	    model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+	    return FORM_VIEW;
 	}
 
 	@PostMapping("/edit/{id}")
 	public String update(
 			@PathVariable Long id,
-			@Validated @ModelAttribute("TokugimuForm") TokugimuForm form,
+			@Validated @ModelAttribute("taxManagerForm") TokugimuForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", true);
+			model.addAttribute("isView", false);
 			model.addAttribute("editId", id);
 			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 			return FORM_VIEW;

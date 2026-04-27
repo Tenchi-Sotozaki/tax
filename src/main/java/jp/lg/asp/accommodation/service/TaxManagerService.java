@@ -22,7 +22,7 @@ public class TaxManagerService {
 
 	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
-	private final CollectorService collectorService;
+	private final TokugimuService tokugimuService;
 
 	// application.yml (app.jichitai.code) から自治体コードを注入
 	@Value("${app.jichitai.code}")
@@ -41,7 +41,7 @@ public class TaxManagerService {
 		// メソッド全体ではなく、個別の処理を try-catch で保護し、
 		// 失敗しても「空のフォーム」を返すようにします。
 		try {
-			String shiteiNo = collectorService.getShiteiNoById(id);
+			String shiteiNo = tokugimuService.getShiteiNoById(id);
 
 			// 1. 特別徴収義務者の取得
 			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
@@ -88,7 +88,7 @@ public class TaxManagerService {
 	 */
 	@Transactional
 	public void save(Long id, TaxManagerForm form) {
-		String shiteiNo = collectorService.getShiteiNoById(id);
+		String shiteiNo = tokugimuService.getShiteiNoById(id);
 		LocalDateTime now = LocalDateTime.now();
 
 		// 1. 既存データを取得（なければ新規作成）
