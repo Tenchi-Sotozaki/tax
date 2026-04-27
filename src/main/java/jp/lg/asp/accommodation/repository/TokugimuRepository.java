@@ -1,16 +1,17 @@
 package jp.lg.asp.accommodation.repository;
 
-import jp.lg.asp.accommodation.entity.Tokugimu;
-import jp.lg.asp.accommodation.entity.TokugimuId;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.entity.TokugimuId;
 
 @Repository
 public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> {
@@ -66,4 +67,5 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
         @Param("jichitaiCd") String jichitaiCd,
         @Param("shiteiNo") String shiteiNo
     );
+    
 }

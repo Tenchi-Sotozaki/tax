@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
 import jp.lg.asp.accommodation.entity.TaxManager;
 import jp.lg.asp.accommodation.entity.TaxManagerId;
+import jp.lg.asp.accommodation.entity.taxManagerId;
 import jp.lg.asp.accommodation.repository.TaxManagerRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class TaxManagerService {
 
 	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
-	private final TokugimuService collectorService;
+	private final CollectorService collectorService;
 
 	// application.yml (app.jichitai.code) から自治体コードを注入
 	@Value("${app.jichitai.code}")
@@ -51,7 +52,7 @@ public class TaxManagerService {
 					});
 
 			// 2. 納税管理人の取得
-			TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+			taxManagerId nokanId = new taxManagerId(jichitaiCd, shiteiNo, 1);
 			taxManagerRepository.findById(nokanId).ifPresent(nokan -> {
 				form.setEdit(true);
 
