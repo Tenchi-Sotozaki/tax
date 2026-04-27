@@ -1,5 +1,13 @@
 package jp.lg.asp.accommodation.service.impl;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import jp.lg.asp.accommodation.dto.CollectorForm;
 import jp.lg.asp.accommodation.dto.CollectorListItem;
 import jp.lg.asp.accommodation.dto.CollectorSearchForm;
@@ -16,13 +24,6 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.CollectorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -222,5 +223,14 @@ public class CollectorServiceImpl implements CollectorService {
     public void saveTaxManager(Long collectorId, TaxManagerForm form) {
         // 実装予定
         log.info("納税管理人登録: collectorId={}, manager={}", collectorId, form.getManagerName());
+    }
+    
+    @Override
+    public String getShiteiNoById(Long id) {
+        // collectorRepository ではなく tokugimuRepository を使用する
+        BigDecimal atenaNo = BigDecimal.valueOf(id);
+        return tokugimuRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo)
+                .map(tokugimu -> tokugimu.getShiteiNo())
+                .orElse(null);
     }
 }

@@ -1,16 +1,16 @@
 package jp.lg.asp.accommodation.repository;
 
-import jp.lg.asp.accommodation.entity.Tokugimu;
-import jp.lg.asp.accommodation.entity.TokugimuId;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.entity.TokugimuId;
 
 @Repository
 public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> {
@@ -41,18 +41,10 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
         WHERE t.jichitaiCd = :jichitaiCd AND t.atenaNo = :atenaNo
         AND t.newFlg = '1' AND t.delFlg = '0'
         """)
-    Optional<Tokugimu> findByJichitaiCdAndAtenaNo(
-        @Param("jichitaiCd") String jichitaiCd,
-        @Param("atenaNo") BigDecimal atenaNo
-    );
+
+    Optional<Tokugimu> findByJichitaiCdAndAtenaNo(String jichitaiCd, BigDecimal atenaNo);
     
-    @Modifying
-    @Query("""
-        DELETE FROM Tokugimu t
-        WHERE t.jichitaiCd = :jichitaiCd AND t.atenaNo = :atenaNo
-        """)
-    void deleteByJichitaiCdAndAtenaNo(
-        @Param("jichitaiCd") String jichitaiCd,
-        @Param("atenaNo") BigDecimal atenaNo
-    );
+        Optional<Tokugimu> findByJichitaiCdAndShiteiNo(String jichitaiCd, String shiteiNo);
+
+        void deleteByJichitaiCdAndAtenaNo(String jichitaiCd, BigDecimal atenaNo);
 }

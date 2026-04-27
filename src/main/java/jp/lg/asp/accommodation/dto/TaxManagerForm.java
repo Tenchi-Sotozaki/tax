@@ -10,12 +10,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.Data;
 @Data
-public class taxManagerForm {
+public class TaxManagerForm {
 
 	private Long collectorId;
-    
     private String obligorName;
     private String facilityName;
+    private String atenaNo;
 
     @NotNull(message = "登録日は必須です")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

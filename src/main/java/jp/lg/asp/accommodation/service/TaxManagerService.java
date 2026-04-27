@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -7,20 +8,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jp.lg.asp.accommodation.dto.taxManagerForm;
-import jp.lg.asp.accommodation.entity.taxManager;
-import jp.lg.asp.accommodation.entity.taxManagerId;
-import jp.lg.asp.accommodation.repository.taxManagerRepository;
+import jp.lg.asp.accommodation.dto.TaxManagerForm;
+import jp.lg.asp.accommodation.entity.TaxManager;
+import jp.lg.asp.accommodation.entity.TaxManagerId;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
+import jp.lg.asp.accommodation.repository.TaxManagerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class taxManagerService {
+public class TaxManagerService {
 
-	private final taxManagerRepository taxManagerRepository;
+	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
 	private final CollectorService collectorService;
 
@@ -32,8 +33,8 @@ public class taxManagerService {
 	 * IDからデータを取得し、画面表示用のFormを作成する
 	 */
 	@Transactional(readOnly = true) // ★必ず readOnly を付ける
-	public taxManagerForm getById(Long id) {
-		taxManagerForm form = new taxManagerForm();
+	public TaxManagerForm getById(Long id) {
+		TaxManagerForm form = new TaxManagerForm();
 		form.setCollectorId(id);
 		form.setRegistrationDate(LocalDate.now());
 
@@ -41,40 +42,47 @@ public class taxManagerService {
 		// メソッド全体ではなく、個別の処理を try-catch で保護し、
 		// 失敗しても「空のフォーム」を返すようにします。
 		try {
-			String shiteiNo = collectorService.getShiteiNoById(id);
+			// 引数の id は「宛名番号（atenaNo）」として渡ってくるため、直接 tokugimu を引きにいきます
+			BigDecimal atenaNo = BigDecimal.valueOf(id);
 
-			// 1. 特別徴収義務者の取得
-			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+			// 1. 特別徴収義務者（親）の取得
+			tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
 					.ifPresent(tokugimu -> {
+						
+						// ★ここで確実に画面ヘッダー用の情報をセットします
 						form.setObligorName(tokugimu.getKyokaName());
 						form.setFacilityName(tokugimu.getShisetsuName());
+
+						// tokugimu から確実な指定番号（shiteiNo）を取り出します
+						String shiteiNo = tokugimu.getShiteiNo();
+
+						// 2. 納税管理人の取得（親の処理の中で確実に行う）
+						TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+						taxManagerRepository.findById(nokanId).ifPresent(nokan -> {
+							form.setEdit(true);
+							form.setRegistrationDate(nokan.getTorokuYmd());
+
+							// ▼▼▼ 追加：宛名マスタ(m_atena)と連携している場合はマスタの最新情報を優先 ▼▼▼
+							if (nokan.getAtena() != null) {
+								form.setAtenaNo(nokan.getAtenaNo()); // 宛名番号
+								form.setManagerName(nokan.getAtena().getName());
+								form.setManagerNameKana(nokan.getAtena().getNameKana());
+								form.setManagerAddress(nokan.getAtena().getJusho());
+								form.setManagerPhone(nokan.getAtena().getTel1()); // 電話番号1を使用
+							} else {
+								// 紐づいていない場合は t_nokan 直接の値を使用
+								form.setManagerName(nokan.getName());
+								form.setManagerNameKana(nokan.getNameKana());
+								form.setManagerAddress(nokan.getJusho());
+								form.setManagerPhone(nokan.getTel());
+							}
+							// ▲▲▲ 宛名マスタ連携処理ここまで ▲▲▲
+
+							form.setExemptionFlag("1".equals(nokan.getMenjoKbn()));
+							form.setExemptionReason(nokan.getMenjoRiyu());
+						});
 					});
 
-			// 2. 納税管理人の取得
-			taxManagerId nokanId = new taxManagerId(jichitaiCd, shiteiNo, 1);
-			taxManagerRepository.findById(nokanId).ifPresent(nokan -> {
-				form.setEdit(true);
-
-				// --- 以下を修正 ---
-				// getRegistrationDate() -> getTorokuYmd()
-				form.setRegistrationDate(nokan.getTorokuYmd());
-
-				form.setManagerName(nokan.getName());
-				form.setManagerNameKana(nokan.getNameKana());
-
-				// getAddress() -> getJusho()
-				form.setManagerAddress(nokan.getJusho());
-
-				// getPhone() -> getTel()
-				form.setManagerPhone(nokan.getTel());
-
-				// getExemptionKbn() -> getMenjoKbn()
-				form.setExemptionFlag("1".equals(nokan.getMenjoKbn()));
-
-				// getExemptionReason() -> getMenjoRiyu()
-				form.setExemptionReason(nokan.getMenjoRiyu());
-				// ------------------
-			});
 		} catch (Exception e) {
 			// エラーをログに出すが、例外は投げない（画面を表示させるため）
 			log.warn("データの取得中にエラーが発生しました。新規登録として処理します: {}", e.getMessage());
@@ -82,19 +90,18 @@ public class taxManagerService {
 
 		return form;
 	}
-
 	/**
 	 * 保存処理
 	 */
 	@Transactional
-	public void save(Long id, taxManagerForm form) {
+	public void save(Long id, TaxManagerForm form) {
 		String shiteiNo = collectorService.getShiteiNoById(id);
 		LocalDateTime now = LocalDateTime.now();
 
 		// 1. 既存データを取得（なければ新規作成）
-		taxManagerId nokanId = new taxManagerId(jichitaiCd, shiteiNo, 1);
-		taxManager entity = taxManagerRepository.findById(nokanId)
-				.orElse(new taxManager());
+		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+		TaxManager entity = taxManagerRepository.findById(nokanId)
+				.orElse(new TaxManager());
 
 		// 2. 定義書に基づき値をマッピング
 		entity.setJichitaiCd(jichitaiCd);
