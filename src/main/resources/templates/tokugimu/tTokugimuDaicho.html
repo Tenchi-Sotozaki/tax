@@ -271,8 +271,7 @@ tbody tr.row-selected {
 		</form>
 
 		<!-- 削除確認モーダル -->
-		<div
-			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータをデータベースから完全に削除します。関連するすべてのデータも削除されます。この操作は取り消せません。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}"></div>
+		<div th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}"></div>
 
 	</div>
 

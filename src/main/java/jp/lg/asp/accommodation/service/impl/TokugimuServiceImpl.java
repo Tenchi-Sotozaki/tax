@@ -19,8 +19,6 @@ import jp.lg.asp.accommodation.entity.GassanUchi;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
-import jp.lg.asp.accommodation.repository.NokanRepository;
-import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokugimuService;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +32,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
 	private final GassanUchiRepository gassanUchiRepository;
-	private final ShoyushaRepository shoyushaRepository;
-	private final NokanRepository nokanRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
@@ -295,24 +291,12 @@ public class TokugimuServiceImpl implements TokugimuService {
 		Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
 				.orElseThrow(() -> new RuntimeException("削除対象の特別徴収義務者が見つかりません: " + id));
 
-		String shiteiNo = tokugimu.getShiteiNo();
 		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo).orElse(null);
 		String obligorName = atena != null ? atena.getName() : tokugimu.getKyokaName();
 
-		try {
-			log.info("特別徴収義務者削除開始: id={}, 指定番号={}, 名称={}", id, shiteiNo, obligorName);
-
-			shoyushaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-			nokanRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-			gassanUchiRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-			tokugimuRepository.deleteByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo);
-			atenaRepository.deleteByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo);
-
-			log.info("特別徴収義務者削除完了: id={}, 指定番号={}, 名称={}", id, shiteiNo, obligorName);
-		} catch (Exception e) {
-			log.error("特別徴収義務者削除エラー: id={}, 指定番号={}, 名称={}", id, shiteiNo, obligorName, e);
-			throw new RuntimeException("特別徴収義務者の削除に失敗しました: " + obligorName, e);
-		}
+		log.info("特別徴収義務者論理削除: id={}, 指定番号={}, 名称={}", id, tokugimu.getShiteiNo(), obligorName);
+		tokugimuRepository.deleteByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo);
+		log.info("特別徴収義務者論理削除完了: id={}", id);
 	}
 
 	@Override

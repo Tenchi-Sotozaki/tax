@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     nav('btnView',            '照会する特別徴収義務者を選択してください。',
-                              '/accommodation-tax/tokugimu/edit/{id}');
+                              '/accommodation-tax/tokugimu/view/{id}');
     nav('btnTaxManager',      '特別徴収義務者を選択してください。',
                               '/accommodation-tax/tax-manager/edit/{id}');
     nav('btnTaxManagerView',  '特別徴収義務者を選択してください。',
@@ -71,7 +71,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('btnDelete')?.addEventListener('click', () => {
         const id = requireSelected('削除するレコードを選択してください。');
-        if (id) document.querySelector('.delete-btn[data-id="' + id + '"]')?.click();
+        if (!id) return;
+        const modal = document.getElementById('deleteModal');
+        modal.querySelector('[data-form-id]').dataset.formId = 'deleteForm-' + id;
+        new bootstrap.Modal(modal).show();
     });
     document.getElementById('btnCorrection')?.addEventListener('click', () => {
         const id = requireSelected('特別徴収義務者を選択してください。');
