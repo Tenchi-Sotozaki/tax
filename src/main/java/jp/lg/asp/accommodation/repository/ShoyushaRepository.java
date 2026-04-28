@@ -1,17 +1,26 @@
 package jp.lg.asp.accommodation.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import jp.lg.asp.accommodation.entity.Shoyusha;
+import jp.lg.asp.accommodation.entity.ShoyushaId;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public class ShoyushaRepository {
+public interface ShoyushaRepository extends JpaRepository<Shoyusha, ShoyushaId> {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @Query("SELECT s FROM Shoyusha s WHERE s.jichitaiCd = :jichitaiCd AND s.shiteiNo = :shiteiNo ORDER BY s.idx")
+    List<Shoyusha> findByJichitaiCdAndShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo);
 
-    public void deleteByJichitaiCdAndShiteiNo(String jichitaiCd, String shiteiNo) {
-        String sql = "DELETE FROM t_shoyusha WHERE jichitai_cd = ? AND shitei_no = ?";
-        jdbcTemplate.update(sql, jichitaiCd, shiteiNo);
-    }
+    @Modifying
+    @Query("DELETE FROM Shoyusha s WHERE s.jichitaiCd = :jichitaiCd AND s.shiteiNo = :shiteiNo")
+    void deleteByJichitaiCdAndShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo);
 }

@@ -15,6 +15,9 @@ public class TokugimuForm {
     // 編集時のID保持用（新規登録時は null）
     private Long id;
 
+    // 宛名番号（宛名検索で選択した m_atena.atena_no）
+    private Long atenaNo;
+
     // ===== 特別徴収義務者情報 (m_atena) =====
 
     @NotNull(message = "登録日は必須です")

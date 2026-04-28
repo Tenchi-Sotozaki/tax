@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +17,11 @@ import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.GassanUchi;
+import jp.lg.asp.accommodation.entity.Shoyusha;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
+import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokugimuService;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +35,15 @@ public class TokugimuServiceImpl implements TokugimuService {
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
 	private final GassanUchiRepository gassanUchiRepository;
+	private final ShoyushaRepository shoyushaRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
+
+	private String getCurrentUser() {
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		return (auth != null && auth.isAuthenticated()) ? auth.getName() : "system";
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -107,10 +116,13 @@ public class TokugimuServiceImpl implements TokugimuService {
 		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
 				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
 		Tokugimu t = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
+				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
 
 		TokugimuForm form = new TokugimuForm();
 		form.setId(id);
+		form.setAtenaNo(id);
+		form.setRegistrationDate(t.getTorokuYmd());
 
 		// 特別徴収義務者情報 (Atena)
 		form.setName(atena.getName());
@@ -153,6 +165,16 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setTaxCycle(t.getNokigen());
 		form.setRemarks(t.getBiko());
 
+		// 施設所有者情報 (Shoyusha)
+		shoyushaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo())
+				.stream().findFirst().ifPresent(s -> {
+					form.setOwnerName(s.getShoyushaName());
+					form.setOwnerNameKana(s.getShoyushaNameKana());
+					form.setOwnerAddressNo(s.getShoyushaYubinNo());
+					form.setOwnerAddress(s.getShoyushaJusho());
+					form.setOwnerPhone(s.getShoyushaTel());
+				});
+
 		// 休止/廃止情報 (Tokugimu)
 		form.setSuspensionStartDate(t.getKyushiStYmd());
 		form.setSuspensionEndDate(t.getKyushiEdYmd());
@@ -183,29 +205,30 @@ public class TokugimuServiceImpl implements TokugimuService {
 		return form;
 	}
 
+	private String generateShiteiNo() {
+		int max = tokugimuRepository.findMaxShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
+		return String.format("%08d", max + 1);
+	}
+
 	@Override
 	@Transactional
 	public void register(TokugimuForm form) {
 		LocalDateTime now = LocalDateTime.now();
-		String systemUser = "system";
+		String systemUser = getCurrentUser();
 
-		Atena atena = new Atena();
-		atena.setJichitaiCd(jichitaiCd);
-		atena.setName(form.getName());
-		atena.setJusho(form.getTokugimuAddress());
-		atena.setTel1(form.getTokugimuPhone());
-		atena.setKojinNo(form.getPersonalNumber());
-		atena.setHojinNo(form.getCorporateNumber());
-		atena.setKbn("1");
-		atena.setUpdDt(now);
-		atena.setAddUser(systemUser);
-		atena.setUpdUser(systemUser);
-		atena.setVersion(BigDecimal.ONE);
-		Atena savedAtena = atenaRepository.save(atena);
+		if (form.getAtenaNo() == null) {
+			throw new IllegalArgumentException("宛名番号が指定されていません。宛名検索から選択してください。");
+		}
+		BigDecimal atenaNo = BigDecimal.valueOf(form.getAtenaNo());
+		atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
+				.orElseThrow(() -> new IllegalArgumentException("指定された宛名番号が見つかりません: " + form.getAtenaNo()));
+
+		String shiteiNo = generateShiteiNo();
 
 		Tokugimu t = new Tokugimu();
 		t.setJichitaiCd(jichitaiCd);
-		t.setAtenaNo(savedAtena.getAtenaNo());
+		t.setShiteiNo(shiteiNo);
+		t.setAtenaNo(atenaNo);
 		t.setRno(BigDecimal.ONE);
 		t.setTorokuYmd(form.getRegistrationDate());
 		t.setShinkokuYmd(form.getRegistrationDate());
@@ -219,7 +242,25 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setUpdUser(systemUser);
 		t.setVersion(BigDecimal.ONE);
 		tokugimuRepository.save(t);
-		log.info("特別徴収義務者登録完了: name={}", form.getName());
+
+		Shoyusha s = new Shoyusha();
+		s.setJichitaiCd(jichitaiCd);
+		s.setShiteiNo(shiteiNo);
+		s.setRno(BigDecimal.ONE);
+		s.setIdx(BigDecimal.ONE);
+		s.setShoyushaName(form.getOwnerName());
+		s.setShoyushaNameKana(form.getOwnerNameKana());
+		s.setShoyushaYubinNo(form.getOwnerAddressNo());
+		s.setShoyushaJusho(form.getOwnerAddress());
+		s.setShoyushaTel(form.getOwnerPhone());
+		s.setAddDt(now);
+		s.setAssUser(systemUser);
+		s.setUpdDt(now);
+		s.setUpdUser(systemUser);
+		s.setVersion(BigDecimal.ONE);
+		shoyushaRepository.save(s);
+
+		log.info("特別徴収義務者登録完了: atenaNo={}, shiteiNo={}", atenaNo, shiteiNo);
 	}
 
 	@Override
@@ -227,7 +268,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	public void update(Long id, TokugimuForm form) {
 		BigDecimal atenaNo = BigDecimal.valueOf(id);
 		LocalDateTime now = LocalDateTime.now();
-		String systemUser = "system";
+		String systemUser = getCurrentUser();
 
 		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
 				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
@@ -239,12 +280,32 @@ public class TokugimuServiceImpl implements TokugimuService {
 		atenaRepository.save(atena);
 
 		Tokugimu t = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
+				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
 		t.setHenkoYmd(form.getRegistrationDate());
 		applyFormToTokugimu(t, form);
 		t.setUpdDt(now);
 		t.setUpdUser(systemUser);
 		tokugimuRepository.save(t);
+
+		shoyushaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo());
+		Shoyusha s = new Shoyusha();
+		s.setJichitaiCd(jichitaiCd);
+		s.setShiteiNo(t.getShiteiNo());
+		s.setRno(t.getRno());
+		s.setIdx(BigDecimal.ONE);
+		s.setShoyushaName(form.getOwnerName());
+		s.setShoyushaNameKana(form.getOwnerNameKana());
+		s.setShoyushaYubinNo(form.getOwnerAddressNo());
+		s.setShoyushaJusho(form.getOwnerAddress());
+		s.setShoyushaTel(form.getOwnerPhone());
+		s.setAddDt(now);
+		s.setAssUser(systemUser);
+		s.setUpdDt(now);
+		s.setUpdUser(systemUser);
+		s.setVersion(BigDecimal.ONE);
+		shoyushaRepository.save(s);
+
 		log.info("特別徴収義務者更新完了: id={}, name={}", id, form.getName());
 	}
 
@@ -289,13 +350,17 @@ public class TokugimuServiceImpl implements TokugimuService {
 		BigDecimal atenaNo = BigDecimal.valueOf(id);
 
 		Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
+				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("削除対象の特別徴収義務者が見つかりません: " + id));
 
 		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo).orElse(null);
 		String obligorName = atena != null ? atena.getName() : tokugimu.getKyokaName();
 
 		log.info("特別徴収義務者論理削除: id={}, 指定番号={}, 名称={}", id, tokugimu.getShiteiNo(), obligorName);
-		tokugimuRepository.deleteByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo);
+		tokugimu.setDelFlg("1");
+		tokugimu.setUpdDt(LocalDateTime.now());
+		tokugimu.setUpdUser(getCurrentUser());
+		tokugimuRepository.save(tokugimu);
 		log.info("特別徴収義務者論理削除完了: id={}", id);
 	}
 
@@ -310,6 +375,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	public String getShiteiNoById(Long id) {
 		BigDecimal atenaNo = BigDecimal.valueOf(id);
 		return tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
+				.stream().findFirst()
 				.map(Tokugimu::getShiteiNo)
 				.orElseThrow(() -> new RuntimeException("指定番号が見つかりません: " + id));
 	}

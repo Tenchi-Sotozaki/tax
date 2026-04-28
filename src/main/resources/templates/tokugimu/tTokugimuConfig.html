@@ -30,6 +30,8 @@
 
 			<!-- 編集時のID保持 -->
 			<input th:if="${isEdit}" type="hidden" th:field="*{id}">
+			<!-- 宛名番号保持 -->
+			<input type="hidden" th:field="*{atenaNo}" id="atenaNo">
 
 			<!-- バリデーションエラーサマリー -->
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
@@ -51,9 +53,11 @@
 
 						<div class="col-md-4">
 							<label for="registrationDate" class="form-label fw-medium">
-								登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+								登録日 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="date" class="form-control" id="registrationDate"
-								th:field="*{registrationDate}" th:errorclass="is-invalid">
+								th:field="*{registrationDate}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('registrationDate')}"
 								th:errors="*{registrationDate}"></div>
@@ -69,7 +73,8 @@
 
 						<div class="col-md-6">
 							<label for="tokugimuAddress" class="form-label fw-medium">
-								住所 <span class="badge bg-danger text-white ms-1">必須</span>
+								住所 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="tokugimuAddress"
 								th:field="*{tokugimuAddress}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly>
@@ -80,7 +85,7 @@
 
 						<div class="col-md-6">
 							<label for="name" class="form-label fw-medium"> 氏名 <span
-								class="badge bg-danger text-white ms-1">必須</span>
+								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="name"
 								th:field="*{name}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly>
@@ -102,10 +107,11 @@
 
 						<div class="col-md-6">
 							<label for="tokugimuPhone" class="form-label fw-medium">
-								電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+								電話番号 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="tel" class="form-control" id="tokugimuPhone"
 								th:field="*{tokugimuPhone}" th:errorclass="is-invalid"
-								placeholder="自動入力されます">
+								placeholder="自動入力されます" readonly>
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tokugimuPhone')}"
 								th:errors="*{tokugimuPhone}"></div>
@@ -127,9 +133,11 @@
 
 						<div class="col-md-4">
 							<label for="facilityAddressNo" class="form-label fw-medium">
-								所在地(郵便番号) <span class="badge bg-danger text-white ms-1">必須</span>
+								所在地(郵便番号) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="facilityAddressNo"
-								th:field="*{facilityAddressNo}" th:errorclass="is-invalid">
+								th:field="*{facilityAddressNo}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityAddressNo')}"
 								th:errors="*{facilityAddressNo}"></div>
@@ -137,9 +145,11 @@
 
 						<div class="col-md-8">
 							<label for="facilityAddress" class="form-label fw-medium">
-								所在地(住所) <span class="badge bg-danger text-white ms-1">必須</span>
+								所在地(住所) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="facilityAddress"
-								th:field="*{facilityAddress}" th:errorclass="is-invalid">
+								th:field="*{facilityAddress}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityAddress')}"
 								th:errors="*{facilityAddress}"></div>
@@ -147,9 +157,11 @@
 
 						<div class="col-md-6">
 							<label for="facilityName" class="form-label fw-medium">
-								施設名称 <span class="badge bg-danger text-white ms-1">必須</span>
+								施設名称 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="facilityName"
-								th:field="*{facilityName}" th:errorclass="is-invalid">
+								th:field="*{facilityName}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityName')}"
 								th:errors="*{facilityName}"></div>
@@ -157,10 +169,11 @@
 
 						<div class="col-md-6">
 							<label for="facilityNameKana" class="form-label fw-medium">
-								施設名称(ふりがな) <span class="badge bg-danger text-white ms-1">必須</span>
+								施設名称(ふりがな) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="facilityNameKana"
 								th:field="*{facilityNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入力">
+								placeholder="ひらがなで入力" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityNameKana')}"
 								th:errors="*{facilityNameKana}"></div>
@@ -168,10 +181,11 @@
 
 						<div class="col-md-6">
 							<label for="facilityPhone" class="form-label fw-medium">
-								電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+								電話番号 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="tel" class="form-control" id="facilityPhone"
 								th:field="*{facilityPhone}" th:errorclass="is-invalid"
-								placeholder="例）03-1234-5678">
+								placeholder="例）03-1234-5678" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityPhone')}"
 								th:errors="*{facilityPhone}"></div>
@@ -179,12 +193,13 @@
 
 						<div class="col-md-4">
 							<label for="floorArea" class="form-label fw-medium"> 延床面積
-								<span class="badge bg-danger text-white ms-1">必須</span>
+								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label>
 							<div class="input-group">
 								<input type="number" class="form-control" id="floorArea"
-									th:field="*{floorArea}" th:errorclass="is-invalid" step="0.01">
-								<span class="input-group-text">㎡</span>
+									th:readonly="${isView}" th:field="*{floorArea}"
+									th:errorclass="is-invalid" step="0.01"> <span
+									class="input-group-text">㎡</span>
 							</div>
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('floorArea')}"
@@ -193,10 +208,11 @@
 
 						<div class="col-md-4">
 							<label for="aboveGroundFloor" class="form-label fw-medium">
-								階層（地上）<span class="badge bg-danger text-white ms-1">必須</span>
+								階層（地上）<span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="floors"
 								th:field="*{aboveGroundFloor}" th:errorclass="is-invalid"
-								placeholder="施設の地上階数を入力する">
+								placeholder="施設の地上階数を入力する" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('aboveGroundFloor')}"
 								th:errors="*{aboveGroundFloor}"></div>
@@ -204,10 +220,11 @@
 
 						<div class="col-md-4">
 							<label for="basementFloor" class="form-label fw-medium">
-								階層（地下）<span class="badge bg-danger text-white ms-1">必須</span>
+								階層（地下）<span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="basementFloor"
 								th:field="*{basementFloor}" th:errorclass="is-invalid"
-								placeholder="施設の地下階数を入力する">
+								placeholder="施設の地下階数を入力する" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('basementFloor')}"
 								th:errors="*{basementFloor}"></div>
@@ -215,12 +232,13 @@
 
 						<div class="col-md-4">
 							<label for="roomCount" class="form-label fw-medium"> 客室数
-								<span class="badge bg-danger text-white ms-1">必須</span>
+								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label>
 							<div class="input-group">
 								<input type="number" class="form-control" id="roomCount"
-									th:field="*{roomCount}" th:errorclass="is-invalid" min="1">
-								<span class="input-group-text">室</span>
+									th:readonly="${isView}" th:field="*{roomCount}"
+									th:errorclass="is-invalid" min="1"> <span
+									class="input-group-text">室</span>
 							</div>
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('roomCount')}"
@@ -229,12 +247,13 @@
 
 						<div class="col-md-6">
 							<label for="capacity" class="form-label fw-medium"> 収容人数
-								<span class="badge bg-danger text-white ms-1">必須</span>
+								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label>
 							<div class="input-group">
 								<input type="number" class="form-control" id="capacity"
-									th:field="*{capacity}" th:errorclass="is-invalid" min="1">
-								<span class="input-group-text">人</span>
+									th:readonly="${isView}" th:field="*{capacity}"
+									th:errorclass="is-invalid" min="1"> <span
+									class="input-group-text">人</span>
 							</div>
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></div>
@@ -242,9 +261,11 @@
 
 						<div class="col-md-6">
 							<label for="businessStartDate" class="form-label fw-medium">
-								営業開始（予定）日 <span class="badge bg-danger text-white ms-1">必須</span>
+								営業開始（予定）日 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="date" class="form-control" id="businessStartDate"
-								th:field="*{businessStartDate}" th:errorclass="is-invalid">
+								th:field="*{businessStartDate}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('businessStartDate')}"
 								th:errors="*{businessStartDate}"></div>
@@ -266,9 +287,11 @@
 
 						<div class="col-md-4">
 							<label for="licenseAddressNo" class="form-label fw-medium">
-								住所(郵便番号) <span class="badge bg-danger text-white ms-1">必須</span>
+								住所(郵便番号) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="licenseAddressNo"
-								th:field="*{licenseAddressNo}" th:errorclass="is-invalid">
+								th:field="*{licenseAddressNo}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseAddressNo')}"
 								th:errors="*{licenseAddressNo}"></div>
@@ -276,9 +299,11 @@
 
 						<div class="col-md-8">
 							<label for="licenseAddress" class="form-label fw-medium">
-								住所 <span class="badge bg-danger text-white ms-1">必須</span>
+								住所 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="licenseAddress"
-								th:field="*{licenseAddress}" th:errorclass="is-invalid">
+								th:field="*{licenseAddress}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseAddress')}"
 								th:errors="*{licenseAddress}"></div>
@@ -286,9 +311,10 @@
 
 						<div class="col-md-6">
 							<label for="licenseName" class="form-label fw-medium"> 氏名
-								<span class="badge bg-danger text-white ms-1">必須</span>
+								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="licenseName"
-								th:field="*{licenseName}" th:errorclass="is-invalid">
+								th:field="*{licenseName}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseName')}"
 								th:errors="*{licenseName}"></div>
@@ -296,10 +322,11 @@
 
 						<div class="col-md-6">
 							<label for="licenseNameKana" class="form-label fw-medium">
-								氏名(ふりがな) <span class="badge bg-danger text-white ms-1">必須</span>
+								氏名(ふりがな) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="licenseNameKana"
 								th:field="*{licenseNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入力">
+								placeholder="ひらがなで入力" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseNameKana')}"
 								th:errors="*{licenseNameKana}"></div>
@@ -307,10 +334,11 @@
 
 						<div class="col-md-6">
 							<label for="licensePhone" class="form-label fw-medium">
-								電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+								電話番号 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="tel" class="form-control" id="licensePhone"
 								th:field="*{licensePhone}" th:errorclass="is-invalid"
-								placeholder="例）03-1234-5678">
+								placeholder="例）03-1234-5678" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licensePhone')}"
 								th:errors="*{licensePhone}"></div>
@@ -318,14 +346,16 @@
 
 						<div class="col-md-6">
 							<label for="businessType" class="form-label fw-medium">
-								営業種別 <span class="badge bg-danger text-white ms-1">必須</span>
+								営業種別 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <select class="form-select" id="businessType"
-								th:field="*{businessType}" th:errorclass="is-invalid">
+								th:field="*{businessType}" th:errorclass="is-invalid"
+								th:disabled="${isView}">
 								<option value="">選択してください</option>
 								<option value="1">ホテル</option>
 								<option value="2">旅館</option>
 								<option value="3">簡易宿所</option>
-								<option value="4">民泊/option>
+								<option value="4">民泊</option>
 							</select>
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('businessType')}"
@@ -334,9 +364,11 @@
 
 						<div class="col-md-6">
 							<label for="licenseNumber" class="form-label fw-medium">
-								許可番号 <span class="badge bg-danger text-white ms-1">必須</span>
+								許可番号 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="licenseNumber"
-								th:field="*{licenseNumber}" th:errorclass="is-invalid">
+								th:field="*{licenseNumber}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseNumber')}"
 								th:errors="*{licenseNumber}"></div>
@@ -358,9 +390,11 @@
 
 						<div class="col-md-4">
 							<label for="ownerAddressNo" class="form-label fw-medium">
-								住所(郵便番号) <span class="badge bg-danger text-white ms-1">必須</span>
+								住所(郵便番号) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="ownerAddressNo"
-								th:field="*{ownerAddressNo}" th:errorclass="is-invalid">
+								th:field="*{ownerAddressNo}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('ownerAddressNo')}"
 								th:errors="*{ownerAddressNo}"></div>
@@ -368,9 +402,11 @@
 
 						<div class="col-md-8">
 							<label for="ownerAddress" class="form-label fw-medium">
-								住所 <span class="badge bg-danger text-white ms-1">必須</span>
+								住所 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="ownerAddress"
-								th:field="*{ownerAddress}" th:errorclass="is-invalid">
+								th:field="*{ownerAddress}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('ownerAddress')}"
 								th:errors="*{ownerAddress}"></div>
@@ -378,10 +414,11 @@
 
 						<div class="col-md-6">
 							<label for="ownerNameKana" class="form-label fw-medium">
-								氏名(ふりがな) <span class="badge bg-danger text-white ms-1">必須</span>
+								氏名(ふりがな) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="ownerNameKana"
 								th:field="*{ownerNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入力">
+								placeholder="ひらがなで入力" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('ownerNameKana')}"
 								th:errors="*{ownerNameKana}"></div>
@@ -389,9 +426,10 @@
 
 						<div class="col-md-6">
 							<label for="ownerName" class="form-label fw-medium"> 氏名 <span
-								class="badge bg-danger text-white ms-1">必須</span>
+								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="ownerName"
-								th:field="*{ownerName}" th:errorclass="is-invalid">
+								th:field="*{ownerName}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('ownerName')}"
 								th:errors="*{ownerName}"></div>
@@ -399,10 +437,11 @@
 
 						<div class="col-md-6">
 							<label for="ownerPhone" class="form-label fw-medium">
-								電話番号 <span class="badge bg-danger text-white ms-1">必須</span>
+								電話番号 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="tel" class="form-control" id="ownerPhone"
 								th:field="*{ownerPhone}" th:errorclass="is-invalid"
-								placeholder="例）03-1234-5678">
+								placeholder="例）03-1234-5678" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('ownerPhone')}"
 								th:errors="*{ownerPhone}"></div>
@@ -424,9 +463,11 @@
 
 						<div class="col-md-4">
 							<label for="mailAddressNo" class="form-label fw-medium">
-								住所(郵便番号) <span class="badge bg-danger text-white ms-1">必須</span>
+								住所(郵便番号) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="mailAddressNo"
-								th:field="*{mailAddressNo}" th:errorclass="is-invalid">
+								th:field="*{mailAddressNo}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailAddressNo')}"
 								th:errors="*{mailAddressNo}"></div>
@@ -434,9 +475,10 @@
 
 						<div class="col-md-8">
 							<label for="mailAddress" class="form-label fw-medium"> 住所
-								<span class="badge bg-danger text-white ms-1">必須</span>
+								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="mailAddress"
-								th:field="*{mailAddress}" th:errorclass="is-invalid">
+								th:field="*{mailAddress}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailAddress')}"
 								th:errors="*{mailAddress}"></div>
@@ -444,10 +486,11 @@
 
 						<div class="col-md-6">
 							<label for="mailNameKana" class="form-label fw-medium">
-								氏名(ふりがな) <span class="badge bg-danger text-white ms-1">必須</span>
+								氏名(ふりがな) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="mailNameKana"
 								th:field="*{mailNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入力">
+								placeholder="ひらがなで入力" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailNameKana')}"
 								th:errors="*{mailNameKana}"></div>
@@ -455,19 +498,20 @@
 
 						<div class="col-md-6">
 							<label for="mailName" class="form-label fw-medium"> 氏名 <span
-								class="badge bg-danger text-white ms-1">必須</span>
+								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="text" class="form-control" id="mailName"
-								th:field="*{mailName}" th:errorclass="is-invalid">
+								th:field="*{mailName}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailName')}" th:errors="*{mailName}"></div>
 						</div>
 
 						<div class="col-md-6">
 							<label for="mailPhone" class="form-label fw-medium"> 電話番号
-								<span class="badge bg-danger text-white ms-1">必須</span>
+								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input type="tel" class="form-control" id="mailPhone"
 								th:field="*{mailPhone}" th:errorclass="is-invalid"
-								placeholder="例）03-1234-5678">
+								placeholder="例）03-1234-5678" th:readonly="${isView}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailPhone')}"
 								th:errors="*{mailPhone}"></div>
@@ -492,15 +536,17 @@
 							<div class="mt-2">
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio"
-										th:field="*{eltaxApplication}" id="eltaxYes" value="1">
-									<label class="form-check-label" for="eltaxYes">有</label>
+										th:field="*{eltaxApplication}" id="eltaxYes" value="1"
+										th:disabled="${isView}"> <label
+										class="form-check-label" for="eltaxYes">有</label>
 								</div>
 							</div>
 						</div>
 
 						<div class="col-md-6">
 							<label for="taxCycle" class="form-label fw-medium">納税周期</label> <select
-								class="form-select" id="taxCycle" th:field="*{taxCycle}">
+								class="form-select" id="taxCycle" th:field="*{taxCycle}"
+								th:disabled="${isView}">
 								<option value="">選択してください</option>
 								<option th:each="opt : ${taxCycleOptions}" th:value="${opt.seq}"
 									th:text="${opt.label}"></option>
@@ -510,7 +556,8 @@
 						<div class="col-md-12">
 							<label for="remarks" class="form-label fw-medium">備考</label>
 							<textarea class="form-control" id="remarks" rows="3"
-								th:field="*{remarks}" placeholder="特記事項があれば入力してください"></textarea>
+								th:field="*{remarks}" placeholder="特記事項があれば入力してください"
+								th:readonly="${isView}"></textarea>
 						</div>
 
 					</div>
@@ -533,19 +580,20 @@
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio"
 										th:field="*{declarationCategory}" id="catSuspension"
-										value="休止"> <label class="form-check-label"
-										for="catSuspension">休止</label>
+										value="休止" th:disabled="${isView}"> <label
+										class="form-check-label" for="catSuspension">休止</label>
 								</div>
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio"
 										th:field="*{declarationCategory}" id="catResumption"
-										value="再開"> <label class="form-check-label"
-										for="catResumption">再開</label>
+										value="再開" th:disabled="${isView}"> <label
+										class="form-check-label" for="catResumption">再開</label>
 								</div>
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catAbolition" value="廃止">
-									<label class="form-check-label" for="catAbolition">廃止</label>
+										th:field="*{declarationCategory}" id="catAbolition" value="廃止"
+										th:disabled="${isView}"> <label
+										class="form-check-label" for="catAbolition">廃止</label>
 								</div>
 							</div>
 						</div>
@@ -553,20 +601,21 @@
 						<div class="col-md-4">
 							<label for="suspensionStartDate" class="form-label fw-medium">休止期間（開始日）</label>
 							<input type="date" class="form-control" id="suspensionStartDate"
-								th:field="*{suspensionStartDate}">
+								th:field="*{suspensionStartDate}" th:readonly="${isView}">
 						</div>
 
 						<div class="col-md-4">
 							<label for="suspensionEndDate" class="form-label fw-medium">休止期間（終了日）</label>
 							<input type="date" class="form-control" id="suspensionEndDate"
-								th:field="*{suspensionEndDate}">
+								th:field="*{suspensionEndDate}" th:readonly="${isView}">
 						</div>
 
 						<div class="col-md-4 d-flex align-items-end">
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox"
 									id="suspensionEndDateUndecided"
-									th:field="*{suspensionEndDateUndecided}"> <label
+									th:field="*{suspensionEndDateUndecided}"
+									th:disabled="${isView}"> <label
 									class="form-check-label" for="suspensionEndDateUndecided">未定</label>
 							</div>
 						</div>
@@ -575,7 +624,7 @@
 							<label for="resumptionOrAbolitionDate"
 								class="form-label fw-medium">再開または廃止日</label> <input type="date"
 								class="form-control" id="resumptionOrAbolitionDate"
-								th:field="*{resumptionOrAbolitionDate}">
+								th:field="*{resumptionOrAbolitionDate}" th:readonly="${isView}">
 						</div>
 
 						<div class="col-md-6">
@@ -583,7 +632,8 @@
 								class="form-label fw-medium">休止または廃止理由</label> <input
 								type="text" class="form-control"
 								id="suspensionOrAbolitionReason"
-								th:field="*{suspensionOrAbolitionReason}">
+								th:field="*{suspensionOrAbolitionReason}"
+								th:readonly="${isView}">
 						</div>
 
 					</div>
