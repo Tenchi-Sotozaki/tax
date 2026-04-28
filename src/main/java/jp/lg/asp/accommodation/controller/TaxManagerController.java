@@ -23,30 +23,23 @@ import lombok.extern.slf4j.Slf4j;
 public class TaxManagerController {
 
 	private final TokugimuService collectorService;
+	private static final String FORM_VIEW = "collector/tax-manager-registration";
 
-	/**
-	 * GET /tax-manager/edit/{id}
-	 * 特別徴収義務者IDを受け取り、義務者名・施設名をフォームにセットして画面表示。
-	 */
 	@GetMapping("/edit/{id}")
 	public String showForm(@PathVariable Long id, Model model) {
-		// 特別徴収義務者情報をServiceから取得（現在はダミー）
 		var collectorForm = collectorService.getTokugimuById(id);
 
 		TaxManagerForm form = new TaxManagerForm();
 		form.setCollectorId(id);
 		form.setObligorName(collectorForm.getName());
-		// TODO: DB実装後は施設名を正しく取得する
 		form.setFacilityName("グランドホテル東京本館（ID:" + id + "）");
 
 		model.addAttribute("taxManagerForm", form);
-		return "collector/tax-manager-registration";
+		model.addAttribute("isEdit", true);   // ★追加: 編集モード
+		model.addAttribute("isView", false);  // ★追加: 照会モードではない
+		return FORM_VIEW;
 	}
 
-	/**
-	 * POST /tax-manager/edit/{id}
-	 * 納税管理人情報を登録・更新する。
-	 */
 	@PostMapping("/edit/{id}")
 	public String save(
 			@PathVariable Long id,
@@ -56,12 +49,13 @@ public class TaxManagerController {
 			RedirectAttributes redirectAttributes) {
 
 		if (bindingResult.hasErrors()) {
-			return "collector/tax-manager-registration";
+			model.addAttribute("isEdit", true);   // ★追加: エラーで戻る時用
+			model.addAttribute("isView", false);  // ★追加: エラーで戻る時用
+			return FORM_VIEW;
 		}
 
-		// TODO: DB登録処理
 		log.info("納税管理人登録: collectorId={}, manager={}", id, form.getManagerName());
 		redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を登録しました。");
-		return "redirect:/collector/list";
+		return "redirect:/collector/list"; // 保存後は一覧に戻る
 	}
 }

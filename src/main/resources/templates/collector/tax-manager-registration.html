@@ -9,129 +9,115 @@
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
 
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h2 class="h2">
 				<i class="bi bi-person-lines-fill me-2 text-primary" th:if="${isView ?: false}"></i>
 				<i class="bi bi-person-gear me-2 text-primary" th:unless="${isView ?: false}"></i>
-
 				<span th:text="${(isView ?: false) ? '納税管理人照会' : ((isEdit ?: false) ? '納税管理人編集' : '納税管理人登録')}"></span>
 			</h2>
 			<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
-				<i
-					th:class="${(isView ?: false) ? 'bi bi-eye me-1' : ((isEdit ?: false) ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
+				<i th:class="${(isView ?: false) ? 'bi bi-eye me-1' : ((isEdit ?: false) ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
 				<span th:text="${(isView ?: false) ? '照会' : ((isEdit ?: false) ? '編集' : '新規登録')}"></span>
 			</span>
 		</div>
 
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-			<i class="bi bi-check-circle-fill me-2"></i>
-			<span th:text="${successMessage}"></span>
+			<i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-			<i class="bi bi-exclamation-triangle-fill me-2"></i>
-			<span th:text="${errorMessage}"></span>
+			<i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<form id="taxManagerForm" th:action="@{/collector/edit/{id}(id=${taxManagerForm.collectorId})}"
-		      th:object="${taxManagerForm}" method="post">
-		    
-		    <input type="hidden" th:field="*{collectorId}" />
-			<input type="hidden" th:field="*{edit}" />
+		<form id="taxManagerForm" th:action="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
+				      th:object="${taxManagerForm}" method="post">
+				    
+				    <input type="hidden" th:field="*{collectorId}" />
+					<input type="hidden" th:field="*{edit}" />
 
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i>
-				入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
-			</div>
+					<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+						<i class="bi bi-exclamation-triangle-fill me-2"></i>
+						入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
+					</div>
 
-			<div class="card mb-4 shadow-sm">
-				<div class="card-header bg-primary text-white py-3">
-					<h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管理人情報</h5>
-				</div>
-				<div class="card-body bg-light-subtle">
-					<div class="row g-3">
-						<div class="col-md-4">
-							<label for="registrationDate" class="form-label fw-medium">
-								登録日 <span class="badge bg-danger text-white ms-1" th:if="${!isView}">必須</span>
-							</label>
-							<input type="date" class="form-control" th:field="*{registrationDate}"
-								th:readonly="${isView}">
+					<div class="card mb-4 shadow-sm">
+						<div class="card-header bg-primary text-white py-3">
+							<h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管理人情報</h5>
 						</div>
+						<div class="card-body bg-light-subtle">
+							<div class="row g-3">
+								<div class="col-md-4 d-flex align-items-end" th:if="${!(isView ?: false)}">
+									<label for="registrationDate" class="form-label fw-medium">
+										登録日 <span class="badge bg-danger text-white ms-1" th:if="${!(isView ?: false)}">必須</span>
+									</label>
+									<input type="date" class="form-control" th:field="*{registrationDate}" th:readonly="${isView ?: false}">
+								</div>
 
-						<div class="col-md-4 d-flex align-items-end" th:if="${!isView}">
-							<button type="button" class="btn btn-outline-info" data-bs-toggle="modal"
-								data-bs-target="#addressSearchModal">
-								<i class="bi bi-search me-1"></i>宛名検索
-							</button>
-						</div>
+								<div class="col-md-4 d-flex align-items-end" th:if="${!(isView ?: false)}">
+									<button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addressSearchModal">
+										<i class="bi bi-search me-1"></i>宛名検索
+									</button>
+								</div>
 
-						<div class="col-md-6">
-							<label class="form-label fw-medium">特別徴収義務者</label>
-							<input type="text" class="form-control" th:field="*{obligorName}" readonly>
-						</div>
+								<div class="col-md-6">
+									<label class="form-label fw-medium">特別徴収義務者</label>
+									<input type="text" class="form-control" th:field="*{obligorName}" readonly>
+								</div>
 
-						<div class="col-md-6">
-							<label class="form-label fw-medium">施設名称</label>
-							<input type="text" class="form-control" th:field="*{facilityName}" readonly>
-						</div>
+								<div class="col-md-6">
+									<label class="form-label fw-medium">施設名称</label>
+									<input type="text" class="form-control" th:field="*{facilityName}" readonly>
+								</div>
 
-						<div class="col-md-12">
-							<label class="form-label fw-medium">住所（所在地）</label>
-							<input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}"
-								th:readonly="${isView}">
-						</div>
+								<div class="col-md-12">
+									<label class="form-label fw-medium">住所（所在地）</label>
+									<input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}" th:readonly="${isView ?: false}">
+								</div>
 
-						<div class="col-md-6">
-							<label class="form-label fw-medium">氏名</label>
-							<input type="text" class="form-control" id="managerName" th:field="*{managerName}"
-								th:readonly="${isView}">
-						</div>
+								<div class="col-md-6">
+									<label class="form-label fw-medium">氏名</label>
+									<input type="text" class="form-control" id="managerName" th:field="*{managerName}" th:readonly="${isView ?: false}">
+								</div>
 
-						<div class="col-md-6">
-							<label class="form-label fw-medium">ふりがな</label>
-							<input type="text" class="form-control" id="managerNameKana" th:field="*{managerNameKana}"
-								th:readonly="${isView}">
-						</div>
+								<div class="col-md-6">
+									<label class="form-label fw-medium">ふりがな</label>
+									<input type="text" class="form-control" id="managerNameKana" th:field="*{managerNameKana}" th:readonly="${isView ?: false}">
+								</div>
 
-						<div class="col-md-6">
-							<label class="form-label fw-medium">電話番号</label>
-							<input type="tel" class="form-control" id="managerPhone" th:field="*{managerPhone}"
-								th:readonly="${isView}">
-						</div>
+								<div class="col-md-6">
+									<label class="form-label fw-medium">電話番号</label>
+									<input type="tel" class="form-control" id="managerPhone" th:field="*{managerPhone}" th:readonly="${isView ?: false}">
+								</div>
 
-						<div class="col-md-6 d-flex align-items-end">
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" th:field="*{exemptionFlag}"
-									id="exemptionFlag" th:disabled="${isView}">
-								<label class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
+								<div class="col-md-6 d-flex align-items-end">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" th:field="*{exemptionFlag}" id="exemptionFlag" th:disabled="${isView ?: false}">
+										<label class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
+									</div>
+								</div>
+
+								<div class="col-md-12" id="exemptionReasonArea" style="display: none;">
+									<label for="exemptionReason" class="form-label fw-medium">選任免除理由</label>
+									<textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}" th:readonly="${isView ?: false}"></textarea>
+								</div>
 							</div>
 						</div>
-
-						<div class="col-md-12" id="exemptionReasonArea" style="display: none;">
-							<label for="exemptionReason" class="form-label fw-medium">選任免除理由</label>
-							<textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}"
-								th:readonly="${isView}"></textarea>
-						</div>
 					</div>
-				</div>
-			</div>
 
-			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<button type="submit" class="btn btn-primary btn-lg px-5" th:if="${!isView}">
-					<i class="bi bi-save me-2"></i>
-					<span th:text="${isEdit ? '更新する' : '登録する'}"></span>
-				</button>
-				<a th:href="@{/collector/edit/{id}(id=${taxManagerForm.tokugimuId})}"
-					class="btn btn-primary btn-lg px-5" th:if="${isView}">
-					<i class="bi bi-pencil-square me-2"></i>編集する
-				</a>
-				<a th:href="@{/controller/list}" class="btn btn-outline-secondary btn-lg px-4">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
-			</div>
-		</form>
+					<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+						<button type="submit" class="btn btn-primary btn-lg px-5" th:if="${!(isView ?: false)}">
+							<i class="bi bi-save me-2"></i>
+							<span th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
+						</button>
+						<a th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}" class="btn btn-primary btn-lg px-5" th:if="${isView ?: false}">
+							<i class="bi bi-pencil-square me-2"></i>編集する
+						</a>
+						<a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
+							<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+						</a>
+					</div>
+				</form>
 
 		<div class="modal fade" id="addressSearchModal" tabindex="-1" aria-hidden="true">
 			<div class="modal-dialog modal-xl">
