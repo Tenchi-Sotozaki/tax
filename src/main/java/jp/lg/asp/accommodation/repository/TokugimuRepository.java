@@ -20,12 +20,12 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			SELECT t FROM Tokugimu t
 			LEFT JOIN Atena a ON t.jichitaiCd = a.jichitaiCd AND t.atenaNo = a.atenaNo
 			WHERE t.newFlg = '1' AND t.delFlg = '0'
-			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR t.shiteiNo LIKE %:shiteiNo%)
+			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR t.shiteiNo = :shiteiNo)
 			AND (:name IS NULL OR :name = '' OR a.name LIKE %:name%)
 			AND (:shisetsuName IS NULL OR :shisetsuName = '' OR t.shisetsuName LIKE %:shisetsuName%)
 			AND (:kyokaShu IS NULL OR :kyokaShu = '' OR :kyokaShu = '999' OR t.kyokaShu = :kyokaShu)
-			AND (:kojinNo IS NULL OR :kojinNo = '' OR a.kojinNo LIKE %:kojinNo%)
-			AND (:hojinNo IS NULL OR :hojinNo = '' OR a.hojinNo LIKE %:hojinNo%)
+			AND (:kojinNo IS NULL OR :kojinNo = '' OR a.kojinNo = :kojinNo)
+			AND (:hojinNo IS NULL OR :hojinNo = '' OR a.hojinNo = :hojinNo)
 			ORDER BY t.shiteiNo
 			""")
 	List<Tokugimu> findBySearchConditions(
