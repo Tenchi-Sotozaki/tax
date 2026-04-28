@@ -30,10 +30,10 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<form id="taxManagerForm" th:action="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
-				      th:object="${taxManagerForm}" method="post">
+		<form id="taxManagerForm" th:action="@{/tax-manager/save/{id}(id=${taxManagerForm.collectorId})}"
+		      th:object="${taxManagerForm}" method="post">
 				    
-				    <input type="hidden" th:field="*{collectorId}" />
+					<input type="hidden" th:field="*{collectorId}" />
 					<input type="hidden" th:field="*{edit}" />
 
 					<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
@@ -71,23 +71,28 @@
 								</div>
 
 								<div class="col-md-12">
-									<label class="form-label fw-medium">住所（所在地）</label>
-									<input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}" th:readonly="${isView ?: false}">
+								    <label class="form-label fw-medium">住所（所在地）</label>
+								    <input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}" th:readonly="${isView ?: false}"
+								           th:classappend="${#fields.hasErrors('managerAddress')} ? 'is-invalid'">
+								    <div class="invalid-feedback" th:if="${#fields.hasErrors('managerAddress')}" th:errors="*{managerAddress}"></div>
 								</div>
 
 								<div class="col-md-6">
 									<label class="form-label fw-medium">氏名</label>
 									<input type="text" class="form-control" id="managerName" th:field="*{managerName}" th:readonly="${isView ?: false}">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('managerName')}" th:errors="*{managerName}"></div>
 								</div>
 
 								<div class="col-md-6">
 									<label class="form-label fw-medium">ふりがな</label>
 									<input type="text" class="form-control" id="managerNameKana" th:field="*{managerNameKana}" th:readonly="${isView ?: false}">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('managerNameKana')}" th:errors="*{managerNameKana}"></div>
 								</div>
 
 								<div class="col-md-6">
 									<label class="form-label fw-medium">電話番号</label>
 									<input type="tel" class="form-control" id="managerPhone" th:field="*{managerPhone}" th:readonly="${isView ?: false}">
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('managerPhone')}" th:errors="*{managerPhone}"></div>
 								</div>
 
 								<div class="col-md-6 d-flex align-items-end">
@@ -100,6 +105,7 @@
 								<div class="col-md-12" id="exemptionReasonArea" style="display: none;">
 									<label for="exemptionReason" class="form-label fw-medium">選任免除理由</label>
 									<textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}" th:readonly="${isView ?: false}"></textarea>
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('exemptionReason')}" th:errors="*{exemptionReason}"></div>
 								</div>
 							</div>
 						</div>
