@@ -40,18 +40,9 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			SELECT t FROM Tokugimu t
 			WHERE t.jichitaiCd = :jichitaiCd AND t.atenaNo = :atenaNo
 			AND t.newFlg = '1' AND t.delFlg = '0'
+			ORDER BY t.rno DESC
 			""")
-	Optional<Tokugimu> findByJichitaiCdAndAtenaNo(
-			@Param("jichitaiCd") String jichitaiCd,
-			@Param("atenaNo") BigDecimal atenaNo);
-
-	@Modifying
-	@Query("""
-			UPDATE Tokugimu t
-			SET t.delFlg = '1', t.updDt = CURRENT_TIMESTAMP
-			WHERE t.jichitaiCd = :jichitaiCd AND t.atenaNo = :atenaNo
-			""")
-	void deleteByJichitaiCdAndAtenaNo(
+	List<Tokugimu> findByJichitaiCdAndAtenaNo(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("atenaNo") BigDecimal atenaNo);
 
@@ -64,4 +55,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 	Optional<Tokugimu> findByJichitaiCdAndShiteiNo(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
+
+	@Query(value = "SELECT MAX(CAST(shitei_no AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$'", nativeQuery = true)
+	Optional<Integer> findMaxShiteiNoByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 }

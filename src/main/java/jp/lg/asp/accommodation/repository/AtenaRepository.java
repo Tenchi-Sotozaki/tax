@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.lang.Nullable;
 
 @Repository
 public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
@@ -25,6 +26,23 @@ public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
     Optional<Atena> findByJichitaiCdAndAtenaNo(
         @Param("jichitaiCd") String jichitaiCd,
         @Param("atenaNo") BigDecimal atenaNo
+    );
+
+    @Query("SELECT a FROM Atena a WHERE a.jichitaiCd = :jichitaiCd AND ("
+        + "(:addressNumber IS NOT NULL AND a.atenaNo = :addressNumber) OR "
+        + "(:name        IS NOT NULL AND a.name     = :name)           OR "
+        + "(:address     IS NOT NULL AND a.jusho    = :address)        OR "
+        + "(:phone       IS NOT NULL AND a.tel1     = :phone)          OR "
+        + "(:kojinNo     IS NOT NULL AND a.kojinNo  = :kojinNo)        OR "
+        + "(:hojinNo     IS NOT NULL AND a.hojinNo  = :hojinNo))")
+    List<Atena> searchByAnyField(
+        @Param("jichitaiCd")   String jichitaiCd,
+        @Param("addressNumber") @Nullable BigDecimal addressNumber,
+        @Param("name")          @Nullable String name,
+        @Param("address")       @Nullable String address,
+        @Param("phone")         @Nullable String phone,
+        @Param("kojinNo")       @Nullable String kojinNo,
+        @Param("hojinNo")       @Nullable String hojinNo
     );
 
     @Modifying

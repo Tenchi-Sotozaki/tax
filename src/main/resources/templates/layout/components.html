@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <body>
 
-<!--
+	<!--
   確認モーダル フラグメント
   引数:
     modalId  - モーダルのHTML id属性値
@@ -18,97 +18,116 @@
   使用例（削除確認）:
     <div th:replace="~{layout/components :: confirmModal('deleteModal','削除確認','削除します。よろしいですか？','deleteForm-1','btn-danger','削除する')}"></div>
 -->
-<div th:fragment="confirmModal(modalId, title, message, formId, btnClass, btnLabel)"
-     class="modal fade"
-     th:id="${modalId}"
-     tabindex="-1"
-     th:aria-labelledby="${modalId + 'Label'}"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow">
-            <div class="modal-header"
-                 th:classappend="${btnClass == 'btn-danger'} ? 'bg-danger text-white' : 'bg-primary text-white'">
-                <h5 class="modal-title" th:id="${modalId + 'Label'}">
-                    <i th:class="${btnClass == 'btn-danger'} ? 'bi bi-exclamation-triangle me-2' : 'bi bi-check2-square me-2'"></i>
-                    <span th:text="${title}">確認</span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="閉じる"></button>
-            </div>
-            <div class="modal-body">
-                <p class="mb-0" th:text="${message}">よろしいですか？</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg me-1"></i>キャンセル
-                </button>
-                <button type="button" class="btn"
-                        th:classappend="${btnClass}"
-                        th:data-form-id="${formId}"
-                        onclick="document.getElementById(this.dataset.formId).submit()">
-                    <i th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>
-                    <span th:text="${btnLabel}">実行</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+	<div
+		th:fragment="confirmModal(modalId, title, message, formId, btnClass, btnLabel)"
+		class="modal fade" th:id="${modalId}" tabindex="-1"
+		th:aria-labelledby="${modalId + 'Label'}" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content shadow">
+				<div class="modal-header"
+					th:classappend="${btnClass == 'btn-danger'} ? 'bg-danger text-white' : 'bg-primary text-white'">
+					<h5 class="modal-title" th:id="${modalId + 'Label'}">
+						<i
+							th:class="${btnClass == 'btn-danger'} ? 'bi bi-exclamation-triangle me-2' : 'bi bi-check2-square me-2'"></i>
+						<span th:text="${title}">確認</span>
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="閉じる"></button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-0" th:text="${message}">よろしいですか？</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>キャンセル
+					</button>
+					<button type="button" class="btn" th:classappend="${btnClass}"
+						th:data-form-id="${formId}"
+						onclick="document.getElementById(this.dataset.formId).submit()">
+						<i
+							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>
+						<span th:text="${btnLabel}">実行</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
-<!--
+	<!--
   宛名検索モーダル フラグメント
   使用例:
     <div th:replace="~{layout/components :: addressSearchModal}"></div>
 -->
-<div th:fragment="addressSearchModal"
-     id="addressSearchModal"
-     class="modal fade"
-     tabindex="-1"
-     data-bs-backdrop="static"
-     data-bs-keyboard="false"
-     aria-labelledby="addressSearchModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content shadow">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="addressSearchModalLabel">
-                    <i class="bi bi-search me-2"></i>宛名検索
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="閉じる"></button>
-            </div>
-            <div class="modal-body">
-                <!-- 検索条件 -->
-                <div class="row g-2 mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label form-label-sm fw-medium">宛名番号</label>
-                        <input type="text" id="addrSearchNo" class="form-control form-control-sm" placeholder="宛名番号">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label form-label-sm fw-medium">氏名</label>
-                        <input type="text" id="addrSearchName" class="form-control form-control-sm" placeholder="氏名">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label form-label-sm fw-medium">住所</label>
-                        <input type="text" id="addrSearchAddress" class="form-control form-control-sm" placeholder="住所">
-                    </div>
-                </div>
-                <div class="d-flex justify-content-end mb-3">
-                    <button type="button" id="addrSearchBtn" class="btn btn-primary btn-sm px-4">
-                        <i class="bi bi-search me-1"></i>検索
-                    </button>
-                </div>
-                <!-- 検索結果 -->
-                <div id="addrSearchResult">
-                    <p class="text-muted text-center small">検索条件を入力して検索してください。</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg me-1"></i>閉じる
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+	<div th:fragment="addressSearchModal" id="addressSearchModal"
+		class="modal fade" tabindex="-1" data-bs-backdrop="static"
+		data-bs-keyboard="false" aria-labelledby="addressSearchModalLabel"
+		aria-hidden="true">
+		<div
+			class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content shadow">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title" id="addressSearchModalLabel">
+						<i class="bi bi-search me-2"></i>宛名検索
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="閉じる"></button>
+				</div>
+				<div class="modal-body">
+					<!-- 検索条件 -->
+					<div class="row g-2 mb-3">
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium">宛名番号</label> <input
+								type="text" id="addrSearchNo"
+								class="form-control form-control-sm" placeholder="宛名番号">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium">氏名</label> <input
+								type="text" id="addrSearchName"
+								class="form-control form-control-sm" placeholder="氏名">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium">住所</label> <input
+								type="text" id="addrSearchAddress"
+								class="form-control form-control-sm" placeholder="住所">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium">電話番号</label> <input
+								type="tel" id="addrSearchPhone"
+								class="form-control form-control-sm" placeholder="電話番号">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium">個人番号</label> <input
+								type="text" id="addrSearchKojinNo"
+								class="form-control form-control-sm" placeholder="個人番号">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label form-lable-sm fw-medium">法人番号</label> <input
+								type="text" id="addrSearchHojinNo"
+								class="form-control form-control-sm" placeholder="法人番号">
+						</div>
+					</div>
+					<div class="d-flex justify-content-end mb-3">
+						<button type="button" id="addrSearchBtn"
+							class="btn btn-primary btn-sm px-4">
+							<i class="bi bi-search me-1"></i>検索
+						</button>
+					</div>
+					<!-- 検索結果 -->
+					<div id="addrSearchResult">
+						<p class="text-muted text-center small">検索条件を入力して検索してください。</p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>閉じる
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>
