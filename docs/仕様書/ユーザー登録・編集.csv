@@ -1,0 +1,17 @@
+﻿,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,,作成者,亀井
+画面項目一覧表,,画面物理名,user_config,,作成日,2026/4/20
+,,画面論理名,ユーザー登録/編集,,更新日,2026/4/22
+,,,,,,
+No.,DBテーブル名,カラム名,画面項目名,更新条件,備考,
+1,m_user,jichitai_cd,ー,ー,編集不可,
+2,m_user,id,ID,ー,,
+3,m_user,password,パスワード,現在の登録パスワードが一致する場合のみ更新が可能,hash値で保存,
+4,m_user,name,氏名,ー,,
+5,m_user,name_kana,ふりがな,ー,,
+6,m_user,busho,部署,ー,,
+7,m_user,role_id,権限,ー,権限管理マスタの権限ロールID,
+8,m_user,add_dt,登録日,ー,編集不可,
+9,m_user,add_user,ー,ー,ユーザ管理マスタのid、編集不可,
+10,m_user,upd_dt,ー,ー,,
+11,m_user,upd_user,ー,ー,ユーザ管理マスタのid,
+12,m_user,version,ー,ー,,
