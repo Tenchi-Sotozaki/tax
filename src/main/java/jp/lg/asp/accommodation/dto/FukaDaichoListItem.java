@@ -2,23 +2,23 @@ package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDate;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class FukaDaichoListItem {
-    private String nendo;
-    private Integer kibetsu;
+    // 表示用項目
+    private String displayNengetsu; // カラム2: 年月 (例: "4月")[cite: 1]
+    private Long amount;            // カラム3: 金額[cite: 1]
+    private String status;          // カラム4: ステータス (済/未)[cite: 1]
+    private String displayNoki;     // 納期 (例: "5月末")[cite: 1]
+
+    // 内部処理・遷移用
+    private String nendo;           // 年度
+    private Integer kibetsu;        // 期別
+    private LocalDate targetYearMonth; // 登録画面等への遷移パラメータ用
+    private LocalDate shinkokuYmd;  // 申告日（判定用）
+    private boolean shinkokuZumi;   // 済・未の判定フラグ
     
-    // HTML側が求めている全ての名前を網羅する
-    private String displayNengetsu;    
-    private LocalDate targetYearMonth; 
-    private Long amount;               // ${record.amount} 用
-    private Long totalZeigaku;         // line 91: ${item.totalZeigaku} 用
-    private String status;             
-    
-    private boolean isShinkokuZumi;
-    private LocalDate shinkokuYmd;
-    private String displayNoki;
+    // 合計金額計算用（Serviceで使用）
+    private Long totalZeigaku;
 }

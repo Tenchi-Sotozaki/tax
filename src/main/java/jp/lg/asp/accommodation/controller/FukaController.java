@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/declaration") // 仕様書に合わせて申告関連のパスに
+@RequestMapping("/declaration") 
 public class FukaController {
 
     private final FukaService fukaService;
@@ -28,21 +28,22 @@ public class FukaController {
     /**
      * 納入金額管理台帳 表示・検索処理
      */
+    /**
+     * 納入金額管理台帳 表示・検索処理
+     */
     @GetMapping("/payment-ledger/{shiteiNo}")
     public String showDaicho(
             @PathVariable String shiteiNo,
-            @RequestParam(required = false) String nendo,
+            @RequestParam(name = "nendo", required = false) String nendo, // パラメータ名を明示
             @RequestParam(required = false) String status,
             Model model) {
 
-        // 初回アクセス時は現在の年度をデフォルトとする簡易ロジック
-    	if (nendo == null) {
-    	    LocalDate now = LocalDate.now();
-    	    int nendoInt = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-    	    // 数値を文字列に変換して代入
-    	    nendo = String.valueOf(nendoInt);
-    	}
-
+        // 1. 年度がない場合のデフォルト設定（ここだけ残す）
+        if (nendo == null || nendo.isEmpty()) {
+            LocalDate now = LocalDate.now();
+            int nendoInt = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+            nendo = String.valueOf(nendoInt);
+        }
         // Serviceを呼び出して画面用データを生成
         FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo, status);
 
