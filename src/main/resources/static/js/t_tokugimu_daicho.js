@@ -1,9 +1,8 @@
-document.addEventListener('DOMContentLoaded', function () {
-
-    function requireSelected(msg) {
+function requireSelected(msg) {
         const cb = document.querySelector('.row-select:checked');
         if (!cb) { alert(msg || 'レコードを選択してください。'); return null; }
-        return cb.dataset.id;
+        
+        return cb.dataset.atenaId; 
     }
 
     // 行クリックでチェックボックスをトグル＋ハイライト
@@ -84,4 +83,5 @@ document.addEventListener('DOMContentLoaded', function () {
         const id = requireSelected('特別徴収義務者を選択してください。');
         if (id) alert('帳票発行画面は未実装です。');
     });
-});
+
+
