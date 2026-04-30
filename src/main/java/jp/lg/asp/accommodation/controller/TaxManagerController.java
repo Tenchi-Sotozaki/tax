@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
-import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.service.TaxManagerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,32 +22,42 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/tax-manager")
 public class TaxManagerController {
 
-	private final TokugimuService collectorService;
+	private final TaxManagerService taxManagerService;
+
+	/** HTMLテンプレートのパス（ロウワーキャメルケース） */
+	private static final String FORM_VIEW = "collector/tTaxManagerConfig";
 
 	/**
-	 * GET /tax-manager/edit/{id}
-	 * 特別徴収義務者IDを受け取り、義務者名・施設名をフォームにセットして画面表示。
+	 * 【新規登録・編集】画面表示
+	 * ※Service側の getById でデータがなければ新規用のFormが返る設計
 	 */
 	@GetMapping("/edit/{id}")
 	public String showForm(@PathVariable Long id, Model model) {
-		// 特別徴収義務者情報をServiceから取得（現在はダミー）
-		var collectorForm = collectorService.getTokugimuById(id);
-
-		TaxManagerForm form = new TaxManagerForm();
-		form.setCollectorId(id);
-		form.setObligorName(collectorForm.getName());
-		// TODO: DB実装後は施設名を正しく取得する
-		form.setFacilityName("グランドホテル東京本館（ID:" + id + "）");
+		TaxManagerForm form = taxManagerService.getById(id);
 
 		model.addAttribute("taxManagerForm", form);
-		return "collector/tax-manager-registration";
+		model.addAttribute("isEdit", form.isEdit()); // DBにデータがあればtrue
+		model.addAttribute("isView", false);         // 編集可能モード
+		return FORM_VIEW;
 	}
 
 	/**
-	 * POST /tax-manager/edit/{id}
-	 * 納税管理人情報を登録・更新する。
+	 * 【照会】画面表示
 	 */
-	@PostMapping("/edit/{id}")
+	@GetMapping("/view/{id}")
+	public String showView(@PathVariable Long id, Model model) {
+		TaxManagerForm form = taxManagerService.getById(id);
+
+		model.addAttribute("taxManagerForm", form);
+		model.addAttribute("isEdit", false);
+		model.addAttribute("isView", true);          // 参照専用モード
+		return FORM_VIEW;
+	}
+
+	/**
+	 * 【保存】実行（登録・更新共通）
+	 */
+	@PostMapping("/save/{id}")
 	public String save(
 			@PathVariable Long id,
 			@Validated @ModelAttribute("taxManagerForm") TaxManagerForm form,
@@ -55,13 +65,19 @@ public class TaxManagerController {
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
+		// カスタムバリデーション（TaxManagerValidator）の結果判定
 		if (bindingResult.hasErrors()) {
-			return "collector/tax-manager-registration";
+			model.addAttribute("isEdit", form.isEdit());
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
 		}
 
-		// TODO: DB登録処理
-		log.info("納税管理人登録: collectorId={}, manager={}", id, form.getManagerName());
-		redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を登録しました。");
+		// Serviceによる永続化（規約に沿った定数処理含む）
+		taxManagerService.save(id, form);
+
+		log.info("納税管理人情報を保存しました。collectorId: {}", id);
+		redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");
+		
 		return "redirect:/collector/list";
 	}
 }

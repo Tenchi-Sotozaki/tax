@@ -40,10 +40,10 @@ public class TokugimuController {
 	}
 
 	// ========== 新規登録 ==========
-
+    
 	@GetMapping("/registration")
 	public String showRegistrationForm(Model model) {
-		model.addAttribute("TokugimuForm", new TokugimuForm());
+		model.addAttribute("TokugimuForm", new TokugimuForm()); 
 		model.addAttribute("isEdit", false);
 		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 		return FORM_VIEW;
@@ -61,7 +61,15 @@ public class TokugimuController {
 			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 			return FORM_VIEW;
 		}
-		tokugimuService.register(form);
+		try {
+			tokugimuService.register(form);
+		} catch (Exception e) {
+			log.error("登録処理エラー", e);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+			model.addAttribute("errorMessage", e.getMessage());
+			return FORM_VIEW;
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
 		return "redirect:/tokugimu/list";
 	}
@@ -104,11 +112,36 @@ public class TokugimuController {
 			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 			return FORM_VIEW;
 		}
-		tokugimuService.update(id, form);
+		try {
+			tokugimuService.update(id, form);
+		} catch (Exception e) {
+			log.error("更新処理エラー", e);
+			model.addAttribute("isEdit", true);
+			model.addAttribute("editId", id);
+			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+			model.addAttribute("errorMessage", e.getMessage());
+			return FORM_VIEW;
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
 		return "redirect:/tokugimu/list";
 	}
 
+	/**
+	 * 【照会】画面表示
+	 */
+	@GetMapping("/view/{id}")
+	public String showView(@PathVariable Long id, Model model) {
+	    // 既存の getTokugimuById を利用してデータを取得
+	    model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
+	    
+	    model.addAttribute("isEdit", false);
+	    model.addAttribute("isView", true);  // ★照会フラグを立てる
+	    model.addAttribute("editId", id);
+	    model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+	    
+	    return FORM_VIEW;
+	}
+	
 	// ========== 削除 ==========
 
 	@PostMapping("/delete/{id}")

@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS t_tokugimu (
   kyushi_ed_ymd date,
   kyuhaishi_riyu varchar(400),
   eltax_umu char(1),
-  nokigen char(2),
+  nokigen numeric(3),
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,

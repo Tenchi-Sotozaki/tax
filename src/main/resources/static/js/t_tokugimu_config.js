@@ -50,17 +50,23 @@ function initAddressSearchModal() {
     if (!searchBtn) return;
 
     searchBtn.addEventListener('click', async () => {
-        const no      = document.getElementById('addrSearchNo').value.trim();
-        const name    = document.getElementById('addrSearchName').value.trim();
+        const no = document.getElementById('addrSearchNo').value.trim();
+        const name = document.getElementById('addrSearchName').value.trim();
         const address = document.getElementById('addrSearchAddress').value.trim();
+        const phone = document.getElementById('addrSearchPhone').value.trim();
+        const kojinNo = document.getElementById('addrSearchKojinNo').value.trim();
+        const hojinNo = document.getElementById('addrSearchHojinNo').value.trim();
 
         const params = new URLSearchParams();
-        if (no)      params.set('addressNumber', no);
-        if (name)    params.set('name', name);
+        if (no) params.set('addressNumber', no);
+        if (name) params.set('name', name);
         if (address) params.set('address', address);
+        if (phone) params.set('phone', phone);
+        if (kojinNo) params.set('kojinNo', kojinNo);
+        if (hojinNo) params.set('hojinNo', hojinNo);
 
         try {
-            const res  = await fetch(`${ADDR_API}?${params}`);
+            const res = await fetch(`${ADDR_API}?${params}`);
             const data = await res.json();
             renderAddressResults(data);
         } catch (err) {
@@ -77,19 +83,22 @@ function initAddressSearchModal() {
     });
 }
 
+let _addrSearchResults = [];
+
 function renderAddressResults(data) {
     const container = document.getElementById('addrSearchResult');
     if (!data.length) {
         container.innerHTML = '<p class="text-muted text-center small">該当する宛名が見つかりませんでした。</p>';
         return;
     }
-    const rows = data.map(d => `
-        <tr style="cursor:pointer" onclick="selectAddress(${JSON.stringify(d)})">
-            <td>${d.addressNumber}</td>
-            <td>${d.name}</td>
-            <td>${d.nameKana}</td>
-            <td>${d.address}</td>
-            <td>${d.phone}</td>
+    _addrSearchResults = data;
+    const rows = data.map((d, i) => `
+        <tr style="cursor:pointer" data-idx="${i}">
+            <td>${d.addressNumber ?? ''}</td>
+            <td>${d.name ?? ''}</td>
+            <td>${d.nameKana ?? ''}</td>
+            <td>${d.address ?? ''}</td>
+            <td>${d.phone ?? ''}</td>
         </tr>`).join('');
     container.innerHTML = `
         <p class="small text-muted mb-1">行をクリックすると自動入力されます。</p>
@@ -103,14 +112,20 @@ function renderAddressResults(data) {
                 <tbody>${rows}</tbody>
             </table>
         </div>`;
+    container.querySelectorAll('tbody tr').forEach(tr => {
+        tr.addEventListener('click', () => selectAddress(_addrSearchResults[+tr.dataset.idx]));
+    });
 }
 
 function selectAddress(d) {
     // 特別徴収義務者情報エリアに自動入力
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+    set('atenaNo', d.addressNumber);
     set('tokugimuAddress', d.address);
-    set('name',            d.name);
-    set('tokugimuPhone',   d.phone);
+    set('name', d.name);
+    set('tokugimuPhone', d.phone);
+	set('personalNumber', d.kojinNo);
+	set('corporateNumber', d.hojinNo);
 
     // モーダルを閉じる
     bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
@@ -121,10 +136,10 @@ function selectAddress(d) {
 // -----------------------------------------------------------------------
 function onDeclarationTypeChange(e) {
     const value = e.target.value;
-    const suspendStart  = document.getElementById('suspensionStartDate');
-    const suspendEnd    = document.getElementById('suspensionEndDate');
-    const undecided     = document.getElementById('suspensionEndDateUndecided');
-    const resumeClose   = document.getElementById('resumptionOrAbolitionDate');
+    const suspendStart = document.getElementById('suspensionStartDate');
+    const suspendEnd = document.getElementById('suspensionEndDate');
+    const undecided = document.getElementById('suspensionEndDateUndecided');
+    const resumeClose = document.getElementById('resumptionOrAbolitionDate');
 
     [suspendStart, suspendEnd, undecided, resumeClose].forEach(el => {
         if (el) el.disabled = true;

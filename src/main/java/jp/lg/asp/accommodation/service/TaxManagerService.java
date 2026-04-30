@@ -22,26 +22,40 @@ public class TaxManagerService {
 
 	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
-	private final TokugimuService collectorService;
+	private final TokugimuService tokugimuService;
 
 	// application.yml (app.jichitai.code) から自治体コードを注入
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
+	// ========== 規約に基づく定数定義 ==========
+	/** 履歴番号（デフォルト） */
+	private static final int DEFAULT_RNO = 1;
+	
+	/** フラグON / 有効 */
+	private static final String FLG_ON = "1";
+	
+	/** フラグOFF / 無効 */
+	private static final String FLG_OFF = "0";
+	
+	/** システム更新ユーザー名 */
+	private static final String SYSTEM_USER = "system";
+	
+	/** 初期バージョン番号 */
+	private static final int INITIAL_VERSION = 1;
+	// ==========================================
+
 	/**
 	 * IDからデータを取得し、画面表示用のFormを作成する
 	 */
-	@Transactional(readOnly = true) // ★必ず readOnly を付ける
+	@Transactional(readOnly = true)
 	public TaxManagerForm getById(Long id) {
 		TaxManagerForm form = new TaxManagerForm();
 		form.setCollectorId(id);
 		form.setRegistrationDate(LocalDate.now());
 
-		// 指定番号が取れない場合や、リポジトリでエラーが出た場合に備えて
-		// メソッド全体ではなく、個別の処理を try-catch で保護し、
-		// 失敗しても「空のフォーム」を返すようにします。
 		try {
-			String shiteiNo = collectorService.getShiteiNoById(id);
+			String shiteiNo = tokugimuService.getShiteiNoById(id);
 
 			// 1. 特別徴収義務者の取得
 			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
@@ -50,33 +64,21 @@ public class TaxManagerService {
 						form.setFacilityName(tokugimu.getShisetsuName());
 					});
 
-			// 2. 納税管理人の取得
-			TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+			// 2. 納税管理人の取得 (定数 DEFAULT_RNO を使用)
+			TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, DEFAULT_RNO);
 			taxManagerRepository.findById(nokanId).ifPresent(nokan -> {
 				form.setEdit(true);
-
-				// --- 以下を修正 ---
-				// getRegistrationDate() -> getTorokuYmd()
 				form.setRegistrationDate(nokan.getTorokuYmd());
-
 				form.setManagerName(nokan.getName());
 				form.setManagerNameKana(nokan.getNameKana());
-
-				// getAddress() -> getJusho()
 				form.setManagerAddress(nokan.getJusho());
-
-				// getPhone() -> getTel()
 				form.setManagerPhone(nokan.getTel());
 
-				// getExemptionKbn() -> getMenjoKbn()
-				form.setExemptionFlag("1".equals(nokan.getMenjoKbn()));
-
-				// getExemptionReason() -> getMenjoRiyu()
+				// 定数 FLG_ON を使用
+				form.setExemptionFlag(FLG_ON.equals(nokan.getMenjoKbn()));
 				form.setExemptionReason(nokan.getMenjoRiyu());
-				// ------------------
 			});
 		} catch (Exception e) {
-			// エラーをログに出すが、例外は投げない（画面を表示させるため）
 			log.warn("データの取得中にエラーが発生しました。新規登録として処理します: {}", e.getMessage());
 		}
 
@@ -88,22 +90,21 @@ public class TaxManagerService {
 	 */
 	@Transactional
 	public void save(Long id, TaxManagerForm form) {
-		String shiteiNo = collectorService.getShiteiNoById(id);
+		String shiteiNo = tokugimuService.getShiteiNoById(id);
 		LocalDateTime now = LocalDateTime.now();
 
-		// 1. 既存データを取得（なければ新規作成）
-		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, 1);
+		// 1. 既存データを取得
+		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, DEFAULT_RNO);
 		TaxManager entity = taxManagerRepository.findById(nokanId)
 				.orElse(new TaxManager());
 
-		// 2. 定義書に基づき値をマッピング
+		// 2.値をマッピング
 		entity.setJichitaiCd(jichitaiCd);
 		entity.setShiteiNo(shiteiNo);
-		entity.setRno(1);
-		entity.setMenjoKbn(form.isExemptionFlag() ? "1" : "0");
+		entity.setRno(DEFAULT_RNO); 
+		
+		entity.setMenjoKbn(form.isExemptionFlag() ? FLG_ON : FLG_OFF);
 		entity.setTorokuYmd(form.getRegistrationDate());
-
-		// ★必須項目：申告年月日（画面の登録日をセット）
 		entity.setShinkokuYmd(form.getRegistrationDate());
 
 		entity.setName(form.getManagerName());
@@ -112,17 +113,18 @@ public class TaxManagerService {
 		entity.setTel(form.getManagerPhone());
 		entity.setMenjoRiyu(form.getExemptionReason());
 
-		entity.setNewFlg("1");
-		entity.setDelFlg("0");
 
-		// 3. 共通項目の手動セット（本来は共通処理で行うのが望ましいですが、一旦ここで）
+		entity.setNewFlg(FLG_ON);
+		entity.setDelFlg(FLG_OFF);
+
+		// 3. 共通項目の手動セット
 		if (entity.getAddDt() == null) {
 			entity.setAddDt(now);
-			entity.setAddUser("system");
+			entity.setAddUser(SYSTEM_USER);
 		}
 		entity.setUpdDt(now);
-		entity.setUpdUser("system");
-		entity.setVersion(1); // 簡易的に1をセット
+		entity.setUpdUser(SYSTEM_USER);
+		entity.setVersion(INITIAL_VERSION);
 
 		taxManagerRepository.save(entity);
 	}

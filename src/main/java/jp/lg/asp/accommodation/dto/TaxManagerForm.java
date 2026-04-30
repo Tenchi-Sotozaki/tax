@@ -2,41 +2,32 @@ package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDate;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-
 import org.springframework.format.annotation.DateTimeFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@TaxManagerValid 
 public class TaxManagerForm {
 
-	private Long collectorId;
+    private Long collectorId;
+    private String obligorName;
+    private String facilityName;
 
-	private String obligorName;
-	private String facilityName;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate registrationDate;
 
-	@NotNull(message = "登録日は必須です")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate registrationDate;
+    // 動的にチェックするため、個別の @NotBlank は削除、または
+    // 常に必須な項目（登録日など）にだけ残します。
+    private String managerAddress;
+    private String managerName;
+    private String managerNameKana;
+    private String managerPhone;
 
-	@NotBlank(message = "住所（所在地）は必須です")
-	private String managerAddress;
-
-	@NotBlank(message = "氏名は必須です")
-	private String managerName;
-
-	@NotBlank(message = "ふりがなは必須です")
-	private String managerNameKana;
-
-	@Pattern(regexp = "^[0-9-]{10,15}$", message = "有効な電話番号を入力してください（例：03-1234-5678）")
-	@NotBlank(message = "電話番号は必須です")
-	private String managerPhone;
-
-	private boolean exemptionFlag;
-	private String exemptionReason;
-
-	private boolean edit;
+    private boolean exemptionFlag;
+    private String exemptionReason;
+    
+    private boolean edit;
 }
