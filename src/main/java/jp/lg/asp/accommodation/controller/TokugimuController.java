@@ -40,10 +40,10 @@ public class TokugimuController {
 	}
 
 	// ========== 新規登録 ==========
-
+    
 	@GetMapping("/registration")
 	public String showRegistrationForm(Model model) {
-		model.addAttribute("TokugimuForm", new TokugimuForm());
+		model.addAttribute("TokugimuForm", new TokugimuForm()); 
 		model.addAttribute("isEdit", false);
 		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 		return FORM_VIEW;
@@ -126,6 +126,22 @@ public class TokugimuController {
 		return "redirect:/tokugimu/list";
 	}
 
+	/**
+	 * 【照会】画面表示
+	 */
+	@GetMapping("/view/{id}")
+	public String showView(@PathVariable Long id, Model model) {
+	    // 既存の getTokugimuById を利用してデータを取得
+	    model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
+	    
+	    model.addAttribute("isEdit", false);
+	    model.addAttribute("isView", true);  // ★照会フラグを立てる
+	    model.addAttribute("editId", id);
+	    model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+	    
+	    return FORM_VIEW;
+	}
+	
 	// ========== 削除 ==========
 
 	@PostMapping("/delete/{id}")
