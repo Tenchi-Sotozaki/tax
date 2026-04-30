@@ -61,7 +61,15 @@ public class TokugimuController {
 			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 			return FORM_VIEW;
 		}
-		tokugimuService.register(form);
+		try {
+			tokugimuService.register(form);
+		} catch (Exception e) {
+			log.error("登録処理エラー", e);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+			model.addAttribute("errorMessage", e.getMessage());
+			return FORM_VIEW;
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
 		return "redirect:/tokugimu/list";
 	}
@@ -104,7 +112,16 @@ public class TokugimuController {
 			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 			return FORM_VIEW;
 		}
-		tokugimuService.update(id, form);
+		try {
+			tokugimuService.update(id, form);
+		} catch (Exception e) {
+			log.error("更新処理エラー", e);
+			model.addAttribute("isEdit", true);
+			model.addAttribute("editId", id);
+			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+			model.addAttribute("errorMessage", e.getMessage());
+			return FORM_VIEW;
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
 		return "redirect:/tokugimu/list";
 	}
