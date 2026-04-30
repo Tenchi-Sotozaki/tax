@@ -75,79 +75,62 @@ public class TokugimuController {
 	}
 
 	// ========== 照会 ==========
+		@GetMapping("/view/{id}")
+		public String showView(@PathVariable("id") String id, Model model) {
+			// Service側も getTokugimuByShiteiNo(id) に差し替える
+			model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
+			model.addAttribute("isView", true);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("editId", id); // JS側で id として扱うならこのままでもOK
+			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+			return FORM_VIEW;
+		}
 
-	@GetMapping("/view/{id}")
-	public String showViewForm(@PathVariable Long id, Model model) {
-		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
-		model.addAttribute("isView", true);
-		model.addAttribute("isEdit", false);
-		model.addAttribute("editId", id);
-		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
-		return FORM_VIEW;
-	}
+		// ========== 編集 ==========
 
-	// ========== 編集 ==========
-
-	@GetMapping("/edit/{id}")
-	public String showEditForm(@PathVariable Long id, Model model) {
-		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
-		model.addAttribute("isView", false);
-		model.addAttribute("isEdit", true);
-		model.addAttribute("editId", id);
-		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
-		return FORM_VIEW;
-	}
-
-	@PostMapping("/edit/{id}")
-	public String update(
-			@PathVariable Long id,
-			@Validated @ModelAttribute("TokugimuForm") TokugimuForm form,
-			BindingResult bindingResult,
-			Model model,
-			RedirectAttributes redirectAttributes) {
-
-		if (bindingResult.hasErrors()) {
+		@GetMapping("/edit/{id}")
+		public String showEditForm(@PathVariable("id") String id, Model model) {
+			model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
+			model.addAttribute("isView", false);
 			model.addAttribute("isEdit", true);
 			model.addAttribute("editId", id);
 			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
 			return FORM_VIEW;
 		}
-		try {
-			tokugimuService.update(id, form);
-		} catch (Exception e) {
-			log.error("更新処理エラー", e);
-			model.addAttribute("isEdit", true);
-			model.addAttribute("editId", id);
-			model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
-			model.addAttribute("errorMessage", e.getMessage());
-			return FORM_VIEW;
+
+		// ========== 編集（更新） ==========
+		@PostMapping("/edit/{id}")
+		public String update(
+				@PathVariable("id") String id, // ← ★ Long から String に変更！
+				@Validated @ModelAttribute("TokugimuForm") TokugimuForm form,
+				BindingResult bindingResult,
+				Model model,
+				RedirectAttributes redirectAttributes) {
+
+			if (bindingResult.hasErrors()) {
+				model.addAttribute("isEdit", true);
+				model.addAttribute("editId", id);
+				model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
+				return FORM_VIEW;
+			}
+			try {
+				// ★ 古い update(id, form) から変更！
+				tokugimuService.updateByShiteiNo(id, form); 
+			} catch (Exception e) {
+				log.error("更新処理エラー", e);
+				// ... 省略 ...
+				return FORM_VIEW;
+			}
+			redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
+			return "redirect:/tokugimu/list";
 		}
-		redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
-		return "redirect:/tokugimu/list";
-	}
 
-	/**
-	 * 【照会】画面表示
-	 */
-	@GetMapping("/view/{id}")
-	public String showView(@PathVariable Long id, Model model) {
-	    // 既存の getTokugimuById を利用してデータを取得
-	    model.addAttribute("TokugimuForm", tokugimuService.getTokugimuById(id));
-	    
-	    model.addAttribute("isEdit", false);
-	    model.addAttribute("isView", true);  // ★照会フラグを立てる
-	    model.addAttribute("editId", id);
-	    model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
-	    
-	    return FORM_VIEW;
-	}
-	
-	// ========== 削除 ==========
-
-	@PostMapping("/delete/{id}")
-	public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-		tokugimuService.delete(id);
-		redirectAttributes.addFlashAttribute("successMessage", "ID:" + id + " のデータを削除しました。");
-		return "redirect:/tokugimu/list";
-	}
+		// ========== 削除 ==========
+		@PostMapping("/delete/{id}")
+		public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) { // ← ★ Long から String に変更！
+			// ★ 古い delete(id) から変更！
+			tokugimuService.deleteByShiteiNo(id); 
+			redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " のデータを削除しました。");
+			return "redirect:/tokugimu/list";
+		}
 }

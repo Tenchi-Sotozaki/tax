@@ -111,89 +111,28 @@ public class TokugimuServiceImpl implements TokugimuService {
 		};
 	}
 
+	/**
+	 * 指定番号（shiteiNo）で1件取得してフォームに変換する
+	 */
 	@Override
 	@Transactional(readOnly = true)
-	public TokugimuForm getTokugimuById(Long id) {
-		BigDecimal atenaNo = BigDecimal.valueOf(id);
-		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
-				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
-		Tokugimu t = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
+	public TokugimuForm getTokugimuByShiteiNo(String shiteiNo) {
+		// 1. 指定番号から Tokugimu（施設情報）を取得
+		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
 				.stream().findFirst()
-				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
+				.orElseThrow(() -> new RuntimeException("宿泊施設が見つかりません: " + shiteiNo));
+
+		// 2. 宛名番号から Atena（事業者情報）を取得
+		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
+				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + t.getAtenaNo()));
 
 		TokugimuForm form = new TokugimuForm();
-		form.setId(id);
-		form.setAtenaNo(id);
+		form.setAtenaNo(t.getAtenaNo().longValue());
+		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(t.getTorokuYmd());
 
-		// 特別徴収義務者情報 (Atena)
-		form.setName(atena.getName());
-		form.setTokugimuAddress(atena.getJusho());
-		form.setTokugimuPhone(atena.getTel1());
-		form.setPersonalNumber(atena.getKojinNo());
-		form.setCorporateNumber(atena.getHojinNo());
-
-		// 宿泊施設情報 (Tokugimu)
-		form.setFacilityAddressNo(t.getShisetsuYubinNo());
-		form.setFacilityAddress(t.getShisetsuJusho());
-		form.setFacilityName(t.getShisetsuName());
-		form.setFacilityNameKana(t.getShisetsuNameKana());
-		form.setFacilityPhone(t.getShisetsuTel());
-		form.setFloorArea(t.getYukaMenseki());
-		form.setAboveGroundFloor(t.getChijoKai() != null ? t.getChijoKai().toPlainString() : null);
-		form.setBasementFloor(t.getChikaKai() != null ? t.getChikaKai().toPlainString() : null);
-		form.setRoomCount(t.getKyakushitsuSu() != null ? t.getKyakushitsuSu().intValue() : null);
-		form.setCapacity(t.getShuyoSu() != null ? t.getShuyoSu().intValue() : null);
-		form.setBusinessStartDate(t.getEigyoStYmd());
-
-		// 営業許可等情報 (Tokugimu)
-		form.setLicenseAddressNo(t.getKyokaYubinNo());
-		form.setLicenseAddress(t.getKyokaJusho());
-		form.setLicenseName(t.getKyokaName());
-		form.setLicenseNameKana(t.getKyokaNameKana());
-		form.setLicensePhone(t.getKyokaTel());
-		form.setBusinessType(t.getKyokaShu());
-		form.setLicenseNumber(t.getKyokaNo());
-
-		// 書類送付先情報 (Tokugimu)
-		form.setMailAddressNo(t.getSoufusakiYubinNo());
-		form.setMailAddress(t.getSoufusakiJusho());
-		form.setMailName(t.getSoufusakiName());
-		form.setMailNameKana(t.getSoufusakiNameKana());
-		form.setMailPhone(t.getSoufusakiTel());
-
-		// その他 (Tokugimu)
-		form.setEltaxApplication(t.getEltaxUmu());
-		form.setTaxCycle(t.getNokigen());
-		form.setRemarks(t.getBiko());
-
-		// 施設所有者情報 (Shoyusha)
-		shoyushaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo())
-				.stream().findFirst().ifPresent(s -> {
-					form.setOwnerName(s.getShoyushaName());
-					form.setOwnerNameKana(s.getShoyushaNameKana());
-					form.setOwnerAddressNo(s.getShoyushaYubinNo());
-					form.setOwnerAddress(s.getShoyushaJusho());
-					form.setOwnerPhone(s.getShoyushaTel());
-				});
-
-		// 休止/廃止情報 (Tokugimu)
-		form.setSuspensionStartDate(t.getKyushiStYmd());
-		form.setSuspensionEndDate(t.getKyushiEdYmd());
-		form.setResumptionOrAbolitionDate(t.getEigyoEdYmd());
-		form.setSuspensionOrAbolitionReason(t.getKyuhaishiRiyu());
-
-		// 申告区分を日付情報から判定
-		if (t.getEigyoEdYmd() != null) {
-			form.setDeclarationCategory("廃止");
-		} else if (t.getKyushiStYmd() != null) {
-			LocalDate today = LocalDate.now();
-			if (t.getKyushiEdYmd() != null && today.isAfter(t.getKyushiEdYmd())) {
-				form.setDeclarationCategory("再開");
-			} else {
-				form.setDeclarationCategory("休止");
-			}
-		}
+		// EntityからFormへのマッピングロジック
+		mapEntityToForm(form, t, atena);
 
 		return form;
 	}
@@ -210,11 +149,15 @@ public class TokugimuServiceImpl implements TokugimuService {
 		}
 	}
 
+	/**
+	 * 納税管理人フォームの初期値を生成（指定番号ベース）
+	 */
 	@Override
-	public TaxManagerForm buildTaxManagerForm(Long collectorId) {
-		TokugimuForm tokugimu = getTokugimuById(collectorId);
+	@Transactional(readOnly = true)
+	public TaxManagerForm buildTaxManagerFormByShiteiNo(String shiteiNo) {
+		TokugimuForm tokugimu = getTokugimuByShiteiNo(shiteiNo);
 		TaxManagerForm form = new TaxManagerForm();
-		form.setCollectorId(collectorId);
+		// 指定番号ベースで初期値をセット
 		form.setObligorName(tokugimu.getName());
 		return form;
 	}
@@ -231,7 +174,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		String systemUser = getCurrentUser();
 
 		if (form.getAtenaNo() == null) {
-			throw new IllegalArgumentException("宛名番号が指定されていません。宛名検索から選択してください。");
+			throw new IllegalArgumentException("宛名番号が指定されていません。");
 		}
 		BigDecimal atenaNo = BigDecimal.valueOf(form.getAtenaNo());
 		atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
@@ -257,35 +200,28 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setVersion(BigDecimal.ONE);
 		tokugimuRepository.save(t);
 
-		Shoyusha s = new Shoyusha();
-		s.setJichitaiCd(jichitaiCd);
-		s.setShiteiNo(shiteiNo);
-		s.setRno(BigDecimal.ONE);
-		s.setIdx(BigDecimal.ONE);
-		s.setShoyushaName(form.getOwnerName());
-		s.setShoyushaNameKana(form.getOwnerNameKana());
-		s.setShoyushaYubinNo(form.getOwnerAddressNo());
-		s.setShoyushaJusho(form.getOwnerAddress());
-		s.setShoyushaTel(form.getOwnerPhone());
-		s.setAddDt(now);
-		s.setAssUser(systemUser);
-		s.setUpdDt(now);
-		s.setUpdUser(systemUser);
-		s.setVersion(BigDecimal.ONE);
-		shoyushaRepository.save(s);
+		saveShoyusha(shiteiNo, BigDecimal.ONE, form, now, systemUser);
 
-		log.info("特別徴収義務者登録完了: atenaNo={}, shiteiNo={}", atenaNo, shiteiNo);
+		log.info("特別徴収義務者登録完了: shiteiNo={}", shiteiNo);
 	}
 
+	/**
+	 * 指定番号（shiteiNo）をキーに更新処理を行う
+	 */
 	@Override
 	@Transactional
-	public void update(Long id, TokugimuForm form) {
-		BigDecimal atenaNo = BigDecimal.valueOf(id);
+	public void updateByShiteiNo(String shiteiNo, TokugimuForm form) {
 		LocalDateTime now = LocalDateTime.now();
 		String systemUser = getCurrentUser();
 
-		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
-				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
+		// 1. Tokugimuを取得
+		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream().findFirst()
+				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + shiteiNo));
+
+		// 2. Atena（事業者情報）を更新
+		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
+				.orElseThrow(() -> new RuntimeException("宛名情報が見つかりません"));
 		atena.setName(form.getName());
 		atena.setJusho(form.getTokugimuAddress());
 		atena.setTel1(form.getTokugimuPhone());
@@ -293,34 +229,102 @@ public class TokugimuServiceImpl implements TokugimuService {
 		atena.setUpdUser(systemUser);
 		atenaRepository.save(atena);
 
-		Tokugimu t = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
-				.stream().findFirst()
-				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + id));
+		// 3. Tokugimu（宿泊施設情報）を更新
 		t.setHenkoYmd(form.getRegistrationDate());
 		applyFormToTokugimu(t, form);
 		t.setUpdDt(now);
 		t.setUpdUser(systemUser);
 		tokugimuRepository.save(t);
 
-		shoyushaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo());
-		Shoyusha s = new Shoyusha();
-		s.setJichitaiCd(jichitaiCd);
-		s.setShiteiNo(t.getShiteiNo());
-		s.setRno(t.getRno());
-		s.setIdx(BigDecimal.ONE);
-		s.setShoyushaName(form.getOwnerName());
-		s.setShoyushaNameKana(form.getOwnerNameKana());
-		s.setShoyushaYubinNo(form.getOwnerAddressNo());
-		s.setShoyushaJusho(form.getOwnerAddress());
-		s.setShoyushaTel(form.getOwnerPhone());
-		s.setAddDt(now);
-		s.setAssUser(systemUser);
-		s.setUpdDt(now);
-		s.setUpdUser(systemUser);
-		s.setVersion(BigDecimal.ONE);
-		shoyushaRepository.save(s);
+		// 4. 所有者情報の更新
+		shoyushaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		saveShoyusha(shiteiNo, t.getRno(), form, now, systemUser);
 
-		log.info("特別徴収義務者更新完了: id={}, name={}", id, form.getName());
+		log.info("特別徴収義務者更新完了: shiteiNo={}, name={}", shiteiNo, form.getName());
+	}
+
+	/**
+	 * 指定番号（shiteiNo）をキーに論理削除を行う
+	 */
+	@Override
+	@Transactional
+	public void deleteByShiteiNo(String shiteiNo) {
+		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream().findFirst()
+				.orElseThrow(() -> new RuntimeException("削除対象が見つかりません: " + shiteiNo));
+
+		t.setDelFlg("1");
+		t.setUpdDt(LocalDateTime.now());
+		t.setUpdUser(getCurrentUser());
+		tokugimuRepository.save(t);
+		log.info("特別徴収義務者論理削除完了: shiteiNo={}", shiteiNo);
+	}
+
+	/**
+	 * 納税管理人の保存（指定番号ベース）
+	 */
+	@Override
+	@Transactional
+	public void saveTaxManagerByShiteiNo(String shiteiNo, TaxManagerForm form) {
+		// 指定番号から宛名IDを特定し、会社単位で管理人を保存するロジック（後ほど実装）
+		log.info("納税管理人保存（未実装）: shiteiNo={}, manager={}", shiteiNo, form.getManagerName());
+	}
+
+	// ========== ヘルパーメソッド ==========
+
+	private void mapEntityToForm(TokugimuForm form, Tokugimu t, Atena atena) {
+		// 事業者情報
+		form.setName(atena.getName());
+		form.setTokugimuAddress(atena.getJusho());
+		form.setTokugimuPhone(atena.getTel1());
+		form.setPersonalNumber(atena.getKojinNo());
+		form.setCorporateNumber(atena.getHojinNo());
+
+		// 施設情報
+		form.setFacilityAddressNo(t.getShisetsuYubinNo());
+		form.setFacilityAddress(t.getShisetsuJusho());
+		form.setFacilityName(t.getShisetsuName());
+		form.setFacilityNameKana(t.getShisetsuNameKana());
+		form.setFacilityPhone(t.getShisetsuTel());
+		form.setFloorArea(t.getYukaMenseki());
+		form.setAboveGroundFloor(t.getChijoKai() != null ? t.getChijoKai().toPlainString() : null);
+		form.setBasementFloor(t.getChikaKai() != null ? t.getChikaKai().toPlainString() : null);
+		form.setRoomCount(t.getKyakushitsuSu() != null ? t.getKyakushitsuSu().intValue() : null);
+		form.setCapacity(t.getShuyoSu() != null ? t.getShuyoSu().intValue() : null);
+		form.setBusinessStartDate(t.getEigyoStYmd());
+
+		// 営業許可・送付先・その他
+		form.setLicenseAddressNo(t.getKyokaYubinNo());
+		form.setLicenseAddress(t.getKyokaJusho());
+		form.setLicenseName(t.getKyokaName());
+		form.setLicenseNameKana(t.getKyokaNameKana());
+		form.setLicensePhone(t.getKyokaTel());
+		form.setBusinessType(t.getKyokaShu());
+		form.setLicenseNumber(t.getKyokaNo());
+		form.setMailAddressNo(t.getSoufusakiYubinNo());
+		form.setMailAddress(t.getSoufusakiJusho());
+		form.setMailName(t.getSoufusakiName());
+		form.setMailNameKana(t.getSoufusakiNameKana());
+		form.setMailPhone(t.getSoufusakiTel());
+		form.setEltaxApplication(t.getEltaxUmu());
+		form.setTaxCycle(t.getNokigen());
+		form.setRemarks(t.getBiko());
+
+		// 所有者情報
+		shoyushaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo())
+				.stream().findFirst().ifPresent(s -> {
+					form.setOwnerName(s.getShoyushaName());
+					form.setOwnerNameKana(s.getShoyushaNameKana());
+					form.setOwnerAddressNo(s.getShoyushaYubinNo());
+					form.setOwnerAddress(s.getShoyushaJusho());
+					form.setOwnerPhone(s.getShoyushaTel());
+				});
+
+		// 状態判定
+		form.setSuspensionStartDate(t.getKyushiStYmd());
+		form.setSuspensionEndDate(t.getKyushiEdYmd());
+		form.setResumptionOrAbolitionDate(t.getEigyoEdYmd());
+		form.setSuspensionOrAbolitionReason(t.getKyuhaishiRiyu());
 	}
 
 	private void applyFormToTokugimu(Tokugimu t, TokugimuForm form) {
@@ -331,11 +335,9 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setShisetsuTel(form.getFacilityPhone());
 		t.setYukaMenseki(form.getFloorArea());
 		t.setChijoKai(form.getAboveGroundFloor() != null && !form.getAboveGroundFloor().isBlank()
-				? new BigDecimal(form.getAboveGroundFloor())
-				: null);
+				? new BigDecimal(form.getAboveGroundFloor()) : null);
 		t.setChikaKai(form.getBasementFloor() != null && !form.getBasementFloor().isBlank()
-				? new BigDecimal(form.getBasementFloor())
-				: null);
+				? new BigDecimal(form.getBasementFloor()) : null);
 		t.setKyakushitsuSu(form.getRoomCount() != null ? BigDecimal.valueOf(form.getRoomCount()) : null);
 		t.setShuyoSu(form.getCapacity() != null ? BigDecimal.valueOf(form.getCapacity()) : null);
 		t.setEigyoStYmd(form.getBusinessStartDate());
@@ -360,32 +362,25 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setKyuhaishiRiyu(form.getSuspensionOrAbolitionReason());
 	}
 
-	@Override
-	@Transactional
-	public void delete(Long id) {
-		BigDecimal atenaNo = BigDecimal.valueOf(id);
-
-		Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
-				.stream().findFirst()
-				.orElseThrow(() -> new RuntimeException("削除対象の特別徴収義務者が見つかりません: " + id));
-
-		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo).orElse(null);
-		String obligorName = atena != null ? atena.getName() : tokugimu.getKyokaName();
-
-		log.info("特別徴収義務者論理削除: id={}, 指定番号={}, 名称={}", id, tokugimu.getShiteiNo(), obligorName);
-		tokugimu.setDelFlg("1");
-		tokugimu.setUpdDt(LocalDateTime.now());
-		tokugimu.setUpdUser(getCurrentUser());
-		tokugimuRepository.save(tokugimu);
-		log.info("特別徴収義務者論理削除完了: id={}", id);
+	private void saveShoyusha(String shiteiNo, BigDecimal rno, TokugimuForm form, LocalDateTime now, String user) {
+		Shoyusha s = new Shoyusha();
+		s.setJichitaiCd(jichitaiCd);
+		s.setShiteiNo(shiteiNo);
+		s.setRno(rno);
+		s.setIdx(BigDecimal.ONE);
+		s.setShoyushaName(form.getOwnerName());
+		s.setShoyushaNameKana(form.getOwnerNameKana());
+		s.setShoyushaYubinNo(form.getOwnerAddressNo());
+		s.setShoyushaJusho(form.getOwnerAddress());
+		s.setShoyushaTel(form.getOwnerPhone());
+		s.setAddDt(now);
+		s.setAssUser(user);
+		s.setUpdDt(now);
+		s.setUpdUser(user);
+		s.setVersion(BigDecimal.ONE);
+		shoyushaRepository.save(s);
 	}
-
-	@Override
-	@Transactional
-	public void saveTaxManager(Long collectorId, TaxManagerForm form) {
-		log.info("納税管理人登録: collectorId={}, manager={}", collectorId, form.getManagerName());
-	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public String getShiteiNoById(Long id) {

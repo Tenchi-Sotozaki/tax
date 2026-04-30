@@ -2,7 +2,7 @@ function requireSelected(msg) {
         const cb = document.querySelector('.row-select:checked');
         if (!cb) { alert(msg || 'レコードを選択してください。'); return null; }
         
-        return cb.dataset.atenaId; 
+        return cb.dataset.shiteiNo;
     }
 
     // 行クリックでチェックボックスをトグル＋ハイライト
@@ -49,11 +49,11 @@ function requireSelected(msg) {
     });
 
     // ナビゲーションヘルパー
-    const nav = (btnId, msg, url) =>
-        document.getElementById(btnId)?.addEventListener('click', () => {
-            const id = requireSelected(msg);
-            if (id) location.href = url.replace('{id}', id);
-        });
+	const nav = (btnId, msg, url) =>
+	    document.getElementById(btnId)?.addEventListener('click', () => {
+	        const id = requireSelected(msg);
+	        if (id) location.href = url.replace('{id}', id);
+	    });
 
     nav('btnView',            '照会する特別徴収義務者を選択してください。',
                               '/accommodation-tax/tokugimu/view/{id}');

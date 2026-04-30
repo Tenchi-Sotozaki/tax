@@ -165,11 +165,9 @@ public class Tokugimu {
 
 	@Column(name = "version", nullable = false, precision = 5)
 	private BigDecimal version;
+	
 
-	/**
-	 * ステータスを判定する
-	 * 1：営業中 / 2：休止 / 3：廃止
-	 */
+	@jakarta.persistence.Transient 
 	public String getStatus() {
 		LocalDate now = LocalDate.now();
 
