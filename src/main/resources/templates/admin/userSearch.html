@@ -69,9 +69,16 @@
 
 		<!-- 操作ボタン＆件数 -->
 		<div class="d-flex justify-content-between align-items-center mb-2">
-			<a th:href="@{/admin/user-registration}" class="btn btn-success">
-				<i class="bi bi-person-plus me-1"></i>ユーザー登録
-			</a> <span class="text-muted small">検索結果：<span
+			<div class="d-flex gap-2">
+				<a th:href="@{/admin/user-registration}" class="btn btn-success">
+					<i class="bi bi-person-plus me-1"></i>ユーザー登録
+				</a>
+				<button type="button" id="editBtn" class="btn btn-primary" disabled
+					onclick="goToEdit()">
+					<i class="bi bi-pencil-square me-1"></i>ユーザー編集
+				</button>
+			</div>
+			<span class="text-muted small">検索結果：<span
 				th:text="${items.size()}">0</span> 件
 			</span>
 		</div>
@@ -94,7 +101,7 @@
 							<td colspan="5" class="text-center text-muted py-4">該当するユーザーが見つかりません</td>
 						</tr>
 						<tr th:each="user : ${items}">
-							<td><input type="checkbox" class="form-check-input"
+							<td><input type="checkbox" class="form-check-input user-checkbox"
 								th:value="${user.id}"></td>
 							<td th:text="${user.id}"></td>
 							<td th:text="${user.name}"></td>
@@ -107,5 +114,27 @@
 		</div>
 
 	</div>
+
+<th:block layout:fragment="scripts">
+<script th:inline="javascript">
+    const editBasePath = /*[[@{/admin/user-edit/}]]*/ '/admin/user-edit/';
+
+    document.querySelectorAll('.user-checkbox').forEach(cb => {
+        cb.addEventListener('change', function () {
+            document.querySelectorAll('.user-checkbox').forEach(other => {
+                if (other !== this) other.checked = false;
+            });
+            document.getElementById('editBtn').disabled =
+                !document.querySelector('.user-checkbox:checked');
+        });
+    });
+
+    function goToEdit() {
+        const checked = document.querySelector('.user-checkbox:checked');
+        if (!checked) return;
+        location.href = editBasePath + encodeURIComponent(checked.value);
+    }
+</script>
+</th:block>
 </body>
 </html>

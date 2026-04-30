@@ -98,8 +98,8 @@
                             パスワード（確認用）
                             <span th:if="!${isEdit}" class="badge bg-danger text-white ms-1">必須</span>
                         </label>
-                        <input type="password" class="form-control" id="passwordConfirm"
-                               th:field="*{passwordConfirm}" th:errorclass="is-invalid" autocomplete="new-password">
+                        <input type="text" class="form-control" id="passwordConfirm"
+                               name="passwordConfirm" th:errorclass="is-invalid" autocomplete="new-password">
                         <div class="invalid-feedback" th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"></div>
                     </div>
 

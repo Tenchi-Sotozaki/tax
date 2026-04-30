@@ -38,7 +38,7 @@ public class AdminUserController {
     private String jichitaiCd;
 
     private static final String LIST_VIEW = "admin/userSearch";
-    private static final String FORM_VIEW = "admin/userRegistration";
+    private static final String FORM_VIEW = "admin/userConfig";
 
     @GetMapping("/user-search")
     public String list(@ModelAttribute UserSearchForm searchForm, Model model) {
