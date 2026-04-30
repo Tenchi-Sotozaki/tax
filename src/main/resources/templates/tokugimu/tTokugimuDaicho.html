@@ -222,8 +222,9 @@ tbody tr.row-selected {
 						</thead>
 						<tbody>
 							<tr th:each="item : ${items}">
-								<td class="text-center"><input type="checkbox"
-									class="form-check-input row-select" th:data-id="${item.id}">
+								<td class="text-center">
+								    <input type="checkbox" class="form-check-input row-select" 
+									th:data-atena-id="${item.id}">
 								</td>
 								<td class="fw-bold text-primary"
 									th:text="${item.shiteiNo}"></td>

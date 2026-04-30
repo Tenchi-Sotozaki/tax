@@ -1,5 +1,4 @@
 package jp.lg.asp.accommodation.entity;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -11,11 +10,10 @@ import jakarta.persistence.Table;
 
 import lombok.Getter;
 import lombok.Setter;
-
 @Entity
 @Table(name = "t_fuka")
-@IdClass(FukaId.class)
-@Getter
+@IdClass(FukaId.class) 
+@Getter 
 @Setter
 public class Fuka {
 
@@ -23,7 +21,7 @@ public class Fuka {
     @Column(name = "jichitai_cd", length = 5)
     private String jichitaiCd;
 
-    @Id
+
     @Column(name = "shitei_no", length = 8)
     private String shiteiNo;
 
@@ -32,8 +30,8 @@ public class Fuka {
     private Integer rno;
 
     @Id
-    @Column(name = "nendo")
-    private Integer nendo;
+    @Column(name = "nendo", length = 4)
+    private String nendo; 
 
     @Id
     @Column(name = "kibetsu")
@@ -44,9 +42,6 @@ public class Fuka {
 
     @Column(name = "total_zeigaku")
     private Long totalZeigaku;
-
-    @Column(name = "biko", length = 1000)
-    private String biko;
 
     @Column(name = "new_flg", length = 1)
     private String newFlg;

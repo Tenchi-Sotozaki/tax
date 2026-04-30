@@ -31,20 +31,29 @@ public class FukaController {
     @GetMapping("/payment-ledger/{shiteiNo}")
     public String showDaicho(
             @PathVariable String shiteiNo,
-            @RequestParam(required = false) Integer nendo,
+            @RequestParam(required = false) String nendo,
             @RequestParam(required = false) String status,
             Model model) {
 
         // 初回アクセス時は現在の年度をデフォルトとする簡易ロジック
-        if (nendo == null) {
-            LocalDate now = LocalDate.now();
-            nendo = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-        }
+    	if (nendo == null) {
+    	    LocalDate now = LocalDate.now();
+    	    int nendoInt = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+    	    // 数値を文字列に変換して代入
+    	    nendo = String.valueOf(nendoInt);
+    	}
 
         // Serviceを呼び出して画面用データを生成
         FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo, status);
 
-        model.addAttribute("fukaDaichoForm", form);
+        model.addAttribute("fukaDaichoForm", form);       // HTML 23行目の ${fukaDaichoForm...} 用
+        model.addAttribute("searchForm", form);           // 検索フォーム th:object="${searchForm}" 用
+        model.addAttribute("items", form.getItems());       // 明細一覧用
+        model.addAttribute("totalAmount", form.getTotalAmount()); // 合計金額用
+        model.addAttribute("obligorId", shiteiNo);          // ボタンリンク用
+
         return DAICHO_VIEW;
     }
+    
+    
 }

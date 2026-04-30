@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class FukaService {
      * 納入金額管理台帳のデータを取得する
      */
     @Transactional(readOnly = true)
-    public FukaDaichoForm getDaichoData(String shiteiNo, Integer nendo, String status) {
+    public FukaDaichoForm getDaichoData(String shiteiNo, String nendo, String status) {
         FukaDaichoForm form = new FukaDaichoForm();
         form.setShiteiNo(shiteiNo);
         form.setNendo(nendo);
@@ -70,18 +71,35 @@ public class FukaService {
             int nokiMonth = displayMonth == 12 ? 1 : displayMonth + 1;
             item.setDisplayNoki(nokiMonth + "月末");
 
-            // DBにこの期のデータが存在するか？
+         // DBにこの期のデータが存在するか？s
             if (fukaMap.containsKey(i)) {
                 Fuka dbData = fukaMap.get(i);
-                item.setTotalZeigaku(dbData.getTotalZeigaku());
+                
+                // 両方の項目に同じ金額をセット
+                item.setAmount(dbData.getTotalZeigaku()); 
+                item.setTotalZeigaku(dbData.getTotalZeigaku()); // ★ここを追加
+                
+                item.setStatus("済");
+                item.setDisplayNengetsu(displayMonth + "月"); 
+                
+                int year = Integer.parseInt(nendo);
+                if (displayMonth < 4) year++;
+                item.setTargetYearMonth(LocalDate.of(year, displayMonth, 1));
+                
                 item.setShinkokuYmd(dbData.getShinkokuYmd());
-                item.setShinkokuZumi(dbData.getShinkokuYmd() != null);
+                item.setShinkokuZumi(true);
             } else {
-                // DBに無い場合は未申告
-                item.setTotalZeigaku(null);
+                item.setAmount(0L);
+                item.setTotalZeigaku(0L); 
+                item.setStatus("未");
+                item.setDisplayNengetsu(displayMonth + "月");
+                
+                int year = Integer.parseInt(nendo);
+                if (displayMonth < 4) year++;
+                item.setTargetYearMonth(LocalDate.of(year, displayMonth, 1));
+                
                 item.setShinkokuZumi(false);
             }
-
             // 4. 画面のステータス絞り込み（すべて/済/未）を適用
             if (STATUS_ZUMI.equals(form.getStatus()) && !item.isShinkokuZumi()) continue;
             if (STATUS_MI.equals(form.getStatus()) && item.isShinkokuZumi()) continue;
