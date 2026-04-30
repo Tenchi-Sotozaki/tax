@@ -57,7 +57,8 @@
 								class="badge bg-danger text-white ms-1">必須</span>
 							</label>
 							<input th:if="!${isView}" type="date" class="form-control" id="registrationDate"
-								th:field="*{registrationDate}" th:errorclass="is-invalid">
+								name="registrationDate" th:errorclass="is-invalid"
+								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
 							<input th:if="${isView}" type="text" class="form-control" readonly
 								th:value="*{registrationDate}">
 							<div class="invalid-feedback"
@@ -267,7 +268,8 @@
 								class="badge bg-danger text-white ms-1">必須</span>
 							</label>
 							<input th:if="!${isView}" type="date" class="form-control" id="businessStartDate"
-								th:field="*{businessStartDate}" th:errorclass="is-invalid">
+								name="businessStartDate" th:errorclass="is-invalid"
+								th:value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy-MM-dd') : ''}">
 							<input th:if="${isView}" type="text" class="form-control" readonly
 								th:value="*{businessStartDate}">
 							<div class="invalid-feedback"
@@ -552,7 +554,7 @@
 							<select class="form-select" id="taxCycle" th:field="*{taxCycle}"
 								th:style="${isView} ? 'pointer-events:none; background-color:#e9ecef;' : ''">
 								<option value="">選択してください</option>
-								<option th:each="opt : ${taxCycleOptions}" th:value="${opt.seq.toPlainString()}"
+								<option th:each="opt : ${taxCycleOptions}" th:value="${opt.seq.intValue()}"
 									th:text="${opt.label}"></option>
 							</select>
 						</div>
@@ -604,14 +606,20 @@
 
 						<div class="col-md-4">
 							<label for="suspensionStartDate" class="form-label fw-medium">休止期間（開始日）</label>
-							<input type="date" class="form-control" id="suspensionStartDate"
-								th:field="*{suspensionStartDate}" th:readonly="${isView}">
+							<input th:if="!${isView}" type="date" class="form-control" id="suspensionStartDate"
+								name="suspensionStartDate"
+								th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{suspensionStartDate}">
 						</div>
 
 						<div class="col-md-4">
 							<label for="suspensionEndDate" class="form-label fw-medium">休止期間（終了日）</label>
-							<input type="date" class="form-control" id="suspensionEndDate"
-								th:field="*{suspensionEndDate}" th:readonly="${isView}">
+							<input th:if="!${isView}" type="date" class="form-control" id="suspensionEndDate"
+								name="suspensionEndDate"
+								th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{suspensionEndDate}">
 						</div>
 
 						<div class="col-md-4 d-flex align-items-end">
@@ -626,9 +634,12 @@
 
 						<div class="col-md-6">
 							<label for="resumptionOrAbolitionDate"
-								class="form-label fw-medium">再開または廃止日</label> <input type="date"
-								class="form-control" id="resumptionOrAbolitionDate"
-								th:field="*{resumptionOrAbolitionDate}" th:readonly="${isView}">
+								class="form-label fw-medium">再開または廃止日</label>
+							<input th:if="!${isView}" type="date" class="form-control" id="resumptionOrAbolitionDate"
+								name="resumptionOrAbolitionDate"
+								th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{resumptionOrAbolitionDate}">
 						</div>
 
 						<div class="col-md-6">

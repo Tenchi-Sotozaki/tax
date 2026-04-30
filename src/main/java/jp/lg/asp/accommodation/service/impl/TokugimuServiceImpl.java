@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -80,7 +81,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 					}
 					if (form.getGasanTaisho() != null && !"999".equals(form.getGasanTaisho())) {
 						boolean shouldBeTarget = "2".equals(form.getGasanTaisho());
-						if (shouldBeTarget != isGassanTarget) return null;
+						if (shouldBeTarget != isGassanTarget)
+							return null;
 					}
 
 					return new TokugimuListItem(
@@ -180,6 +182,18 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setSuspensionEndDate(t.getKyushiEdYmd());
 		form.setResumptionOrAbolitionDate(t.getEigyoEdYmd());
 		form.setSuspensionOrAbolitionReason(t.getKyuhaishiRiyu());
+
+		// 申告区分を日付情報から判定
+		if (t.getEigyoEdYmd() != null) {
+			form.setDeclarationCategory("廃止");
+		} else if (t.getKyushiStYmd() != null) {
+			LocalDate today = LocalDate.now();
+			if (t.getKyushiEdYmd() != null && today.isAfter(t.getKyushiEdYmd())) {
+				form.setDeclarationCategory("再開");
+			} else {
+				form.setDeclarationCategory("休止");
+			}
+		}
 
 		return form;
 	}
@@ -317,9 +331,11 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setShisetsuTel(form.getFacilityPhone());
 		t.setYukaMenseki(form.getFloorArea());
 		t.setChijoKai(form.getAboveGroundFloor() != null && !form.getAboveGroundFloor().isBlank()
-				? new BigDecimal(form.getAboveGroundFloor()) : null);
+				? new BigDecimal(form.getAboveGroundFloor())
+				: null);
 		t.setChikaKai(form.getBasementFloor() != null && !form.getBasementFloor().isBlank()
-				? new BigDecimal(form.getBasementFloor()) : null);
+				? new BigDecimal(form.getBasementFloor())
+				: null);
 		t.setKyakushitsuSu(form.getRoomCount() != null ? BigDecimal.valueOf(form.getRoomCount()) : null);
 		t.setShuyoSu(form.getCapacity() != null ? BigDecimal.valueOf(form.getCapacity()) : null);
 		t.setEigyoStYmd(form.getBusinessStartDate());
