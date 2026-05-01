@@ -39,16 +39,6 @@ public class MainViewController {
 
 	// ========== システム管理 ==========
 
-	@GetMapping("/admin/user-search")
-	public String userSearch() {
-		return "admin/user-search";
-	}
-
-	@GetMapping("/admin/user-registration")
-	public String userRegistration() {
-		return "admin/user-registration";
-	}
-
 	@GetMapping("/admin/tax-system-inquiry")
 	public String taxSystemInquiry() {
 		return "admin/tax-system-inquiry";
