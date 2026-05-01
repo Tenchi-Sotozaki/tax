@@ -46,8 +46,8 @@
                             <ul class="nav flex-column ms-3">
                                 <li class="nav-item">
                                     <a class="nav-link text-white-50 py-1 sidebar-link"
-                                       th:href="@{/collector/list}"
-                                       th:classappend="${#strings.contains(currentUri, '/collector')} ? 'text-white fw-medium' : ''">
+                                       th:href="@{/tokugimu/list}"
+                                       th:classappend="${#strings.contains(currentUri, '/tokugimu')} ? 'text-white fw-medium' : ''">
                                         <i class="bi bi-people me-2"></i>特別徴収義務者管理台帳
                                     </a>
                                 </li>
@@ -147,17 +147,13 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-white-50 py-1 sidebar-link"
-                                       th:href="@{/admin/tax-system-inquiry}"
-                                       th:classappend="${#strings.contains(currentUri, '/admin/tax-system')} ? 'text-white fw-medium' : ''">
-                                        <i class="bi bi-sliders me-2"></i>税制照会
+                                    <a class="nav-link text-white-50 py-1 sidebar-link" th:href="@{#}">
+                                        <i class="bi bi-sliders me-2"></i>賦課方式
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-white-50 py-1 sidebar-link"
-                                       th:href="@{/admin/tax-cycle-inquiry}"
-                                       th:classappend="${#strings.contains(currentUri, '/admin/tax-cycle')} ? 'text-white fw-medium' : ''">
-                                        <i class="bi bi-calendar-check me-2"></i>納税周期一覧
+                                    <a class="nav-link text-white-50 py-1 sidebar-link" th:href="@{#}">
+                                        <i class="bi bi-calendar-check me-2"></i>納税周期
                                     </a>
                                 </li>
                             </ul>
@@ -189,19 +185,19 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-white-50 py-1 sidebar-link"
-                                       th:href="@{/admin/tax-system-registration}">
-                                        <i class="bi bi-sliders me-2"></i>税制設定
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-white-50 py-1 sidebar-link"
-                                       th:href="@{/admin/tax-cycle-registration}">
-                                        <i class="bi bi-calendar-check me-2"></i>納税周期
+                                    <a class="nav-link text-white-50 py-1 sidebar-link" th:href="@{#}">
+                                        <i class="bi bi-sliders me-2"></i>賦課方式設定
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link text-white-50 py-1 sidebar-link" th:href="@{#}">
+                                        <i class="bi bi-calendar-check me-2"></i>納税周期
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-white-50 py-1 sidebar-link"
+                                       th:href="@{/admin/role/management}"
+                                       th:classappend="${#strings.contains(currentUri, '/admin/role')} ? 'text-white fw-medium' : ''">
                                         <i class="bi bi-shield-lock me-2"></i>権限管理
                                     </a>
                                 </li>
