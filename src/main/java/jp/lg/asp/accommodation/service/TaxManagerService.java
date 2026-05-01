@@ -59,6 +59,8 @@ public class TaxManagerService {
 
 			// 1. 特別徴収義務者の取得
 			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+			        .stream()
+		            .findFirst()
 					.ifPresent(tokugimu -> {
 						form.setObligorName(tokugimu.getKyokaName());
 						form.setFacilityName(tokugimu.getShisetsuName());

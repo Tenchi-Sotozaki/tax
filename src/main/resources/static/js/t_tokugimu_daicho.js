@@ -36,11 +36,12 @@ function requireSelected(msg) {
     });
 
     // 行内削除ボタン
-    document.querySelectorAll('.delete-btn').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const id = this.dataset.id, name = this.dataset.name;
-            const modal = document.getElementById('deleteModal');
+	document.querySelectorAll('.delete-btn').forEach(function (btn) {
+	        btn.addEventListener('click', function (e) {
+	            e.stopPropagation();
+	            // HTML側が data-shitei-no の場合は dataset.shiteiNo に変更する
+	            const id = this.dataset.shiteiNo, name = this.dataset.name;
+	            const modal = document.getElementById('deleteModal');
             modal.querySelector('.modal-body p').textContent =
                 '「' + name + '」を削除します。この操作は取り消せません。よろしいですか？';
             modal.querySelector('[data-form-id]').dataset.formId = 'deleteForm-' + id;

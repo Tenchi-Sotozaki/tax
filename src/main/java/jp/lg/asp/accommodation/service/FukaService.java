@@ -44,6 +44,8 @@ public class FukaService {
 
         // 1. ヘッダー情報（特別徴収義務者名称）の取得
         tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .stream()        
+                .findFirst()
                 .ifPresent(tokugimu -> form.setObligorName(tokugimu.getKyokaName()));
 
         // 仮設定：今回は「毎月申告（全12期）」として処理（※後日マスタと連動）

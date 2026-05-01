@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -52,7 +51,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			AND t.newFlg = '1' AND t.delFlg = '0'
 			ORDER BY t.rno DESC
 			""")
-	Optional<List<Tokugimu> findByJichitaiCdAndShiteiNo(String jichitaiCd, String shiteiNo);
+	List<Tokugimu> findByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNo") String shiteiNo);
 
 	@Query(value = "SELECT MAX(CAST(shitei_no AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$'", nativeQuery = true)
 	Optional<Integer> findMaxShiteiNoByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
