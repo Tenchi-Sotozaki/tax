@@ -164,4 +164,6 @@ public class TokugimuForm {
 	private boolean suspensionEndDateUndecided;
 	private LocalDate resumptionOrAbolitionDate; // Tokugimu.eigyoEdYmd
 	private String suspensionOrAbolitionReason; // Tokugimu.kyuhaishiRiyu
+	
+	private String shiteiNo;
 }
