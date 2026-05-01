@@ -82,9 +82,8 @@ public class TaxManagerService {
 	 * 指定番号（shiteiNo）ベースでの保存処理
 	 */
 	@Transactional
-	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) { // ★ Long id から String shiteiNo に変更
+	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) {
 		LocalDateTime now = LocalDateTime.now();
-		// ★ 変換処理(getShiteiNoById)は削除。引数の shiteiNo を直接使う。
 
 		// 1. 既存データを取得
 		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, DEFAULT_RNO);
