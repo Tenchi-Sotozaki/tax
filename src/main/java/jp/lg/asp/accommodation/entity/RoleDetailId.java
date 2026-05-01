@@ -8,7 +8,8 @@ import lombok.AllArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleId implements Serializable {
+public class RoleDetailId implements Serializable {
     private String jichitaiCd;
     private Long roleId;
+    private String screenId;
 }
