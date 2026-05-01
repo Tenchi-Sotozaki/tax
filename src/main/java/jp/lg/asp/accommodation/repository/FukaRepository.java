@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -22,4 +23,6 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
     // 未申告絞り込み：shinkokuYmd が NULL である
     List<Fuka> findByJichitaiCdAndShiteiNoAndNendoAndShinkokuYmdIsNullOrderByKibetsuAsc(
             String jichitaiCd, String shiteiNo, String nendo);
+    
+    Optional<Fuka> findByJichitaiCdAndShiteiNoAndKibetsu(String jichitaiCd, String shiteiNo, Integer kibetsu);
 }

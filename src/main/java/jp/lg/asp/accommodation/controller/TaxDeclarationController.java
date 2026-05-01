@@ -1,10 +1,5 @@
 package jp.lg.asp.accommodation.controller;
 
-import jp.lg.asp.accommodation.dto.TaxDeclarationForm;
-import jp.lg.asp.accommodation.service.DeclarationService;
-import jp.lg.asp.accommodation.service.ReportService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jp.lg.asp.accommodation.dto.TaxDeclarationForm;
+import jp.lg.asp.accommodation.service.DeclarationService;
+import jp.lg.asp.accommodation.service.ReportService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
@@ -43,7 +44,7 @@ public class TaxDeclarationController {
     // GET: 登録画面表示
     // -------------------------------------------------------------------------
 
-    @GetMapping("/register/{obligorId}")
+    @GetMapping("/old-register/{obligorId}") 
     public String showForm(@PathVariable String obligorId, Model model) {
         model.addAttribute("taxDeclarationForm",
                 declarationService.buildInitialDeclarationForm(obligorId));

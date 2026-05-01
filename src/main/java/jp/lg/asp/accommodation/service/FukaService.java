@@ -9,109 +9,260 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDaichoListItem;
+import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
+import jp.lg.asp.accommodation.dto.MonthlyDeclarationDto;
 import jp.lg.asp.accommodation.entity.Fuka;
+import jp.lg.asp.accommodation.entity.FukaId;
+import jp.lg.asp.accommodation.entity.FukaMonthlyDeclaration;
+import jp.lg.asp.accommodation.repository.FukaMonthlyDeclarationRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 宿泊税納入（賦課）に関するビジネスロジックを担当するサービス
+ */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FukaService {
 
-    private final FukaRepository fukaRepository;
-    private final TokugimuRepository tokugimuRepository;
-    
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+	private final FukaRepository fukaRepository;
+	private final TokugimuRepository tokugimuRepository;
+	
+	private final FukaMonthlyDeclarationRepository repository;
+    private final FukaValidatorService validatorService;
 
-    // 規約に基づく定数
-    private static final String STATUS_ALL = "999";
-    private static final String STATUS_ZUMI = "1";
-    private static final String STATUS_MI = "2";
+	@Value("${app.jichitai.code}")
+	private String jichitaiCd;
 
-    /**
-     * 納入金額管理台帳のデータを取得する
+	// 規約に基づく定数
+	private static final String STATUS_ALL = "999";
+	private static final String STATUS_ZUMI = "1";
+	private static final String STATUS_MI = "2";
+
+	/**
+	 * 納入金額管理台帳のデータを取得する
+	 */
+	@Transactional(readOnly = true)
+	public FukaDaichoForm getDaichoData(String shiteiNo, String nendo, String status) {
+		FukaDaichoForm form = new FukaDaichoForm();
+		form.setShiteiNo(shiteiNo);
+		form.setNendo(nendo);
+		form.setStatus(status != null ? status : STATUS_ALL);
+
+		// 1. ヘッダー情報（特別徴収義務者名称）の取得
+		tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream()
+				.findFirst()
+				.ifPresent(tokugimu -> form.setObligorName(tokugimu.getKyokaName()));
+
+		// 仮設定：今回は「毎月申告（全12期）」として処理
+		int maxKibetsu = 12;
+
+		// 2. DBから実データを取得し、期別(kibetsu)をキーにしたMapに変換
+		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
+		Map<Integer, Fuka> fukaMap = fukaList.stream()
+				.collect(Collectors.toMap(Fuka::getKibetsu, f -> f));
+
+		// 3. 1期〜12期までのリストを生成
+		List<FukaDaichoListItem> items = new ArrayList<>();
+
+		for (int i = 1; i <= maxKibetsu; i++) {
+			FukaDaichoListItem item = new FukaDaichoListItem();
+			item.setNendo(nendo);
+			item.setKibetsu(i);
+
+			int displayMonth = (i + 3) > 12 ? (i + 3) - 12 : (i + 3);
+			item.setDisplayNengetsu(displayMonth + "月");
+
+			int nokiMonth = displayMonth == 12 ? 1 : displayMonth + 1;
+			item.setDisplayNoki(nokiMonth + "月末");
+
+			if (fukaMap.containsKey(i)) {
+				Fuka dbData = fukaMap.get(i);
+				item.setAmount(dbData.getTotalZeigaku());
+				item.setTotalZeigaku(dbData.getTotalZeigaku());
+				item.setStatus("済");
+
+				int year = Integer.parseInt(nendo);
+				if (displayMonth < 4) year++;
+				item.setTargetYearMonth(LocalDate.of(year, displayMonth, 1));
+
+				item.setShinkokuYmd(dbData.getShinkokuYmd());
+				item.setShinkokuZumi(true);
+			} else {
+				item.setAmount(0L);
+				item.setTotalZeigaku(0L);
+				item.setStatus("未");
+
+				int year = Integer.parseInt(nendo);
+				if (displayMonth < 4) year++;
+				item.setTargetYearMonth(LocalDate.of(year, displayMonth, 1));
+
+				item.setShinkokuZumi(false);
+			}
+
+			// 4. 画面のステータス絞り込みを適用
+			if (STATUS_ZUMI.equals(form.getStatus()) && !item.isShinkokuZumi()) continue;
+			if (STATUS_MI.equals(form.getStatus()) && item.isShinkokuZumi()) continue;
+
+			items.add(item);
+		}
+
+		form.setItems(items);
+		return form;
+	}
+
+	// ========== 宿泊税情報 登録/編集/照会用メソッド ==========
+
+	/**
+	 * 【新規登録用】初期表示データの取得
+	 */
+	@Transactional(readOnly = true)
+	public FukaDeclarationForm getDeclarationFormForRegister(String shiteiNo) {
+		FukaDeclarationForm form = new FukaDeclarationForm();
+		form.setShiteiNo(shiteiNo);
+		form.setRegistrationDate(LocalDate.now());
+
+		try {
+			// 特別徴収義務者情報の取得
+			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+					.stream()
+					.findFirst()
+					.ifPresent(tokugimu -> {
+						form.setObligorName(tokugimu.getKyokaName());
+						form.setFacilityName(tokugimu.getShisetsuName());
+					});
+		} catch (Exception e) {
+			log.error("新規登録用データの取得に失敗しました。指定番号: {}", shiteiNo, e);
+		}
+
+		return form;
+	}
+
+	// ========== 宿泊税情報 登録/編集/照会用メソッド ==========
+
+	/**
+	 * 【編集用】表示データの取得
+	 */
+	@Transactional(readOnly = true)
+	public FukaDeclarationForm getDeclarationFormForEdit(String shiteiNo, String nendo, Integer kibetsu) {
+	    FukaDeclarationForm form = new FukaDeclarationForm();
+	    form.setEdit(true);
+
+	    try {
+	        FukaId fukaId = new FukaId(jichitaiCd, shiteiNo, 1, nendo, kibetsu);
+
+	        fukaRepository.findById(fukaId).ifPresent(entity -> {
+	            
+	            // --- ① 親フォーム（FukaDeclarationForm）へのセット ---
+	            form.setShiteiNo(entity.getShiteiNo());
+	            // 登録日 (type="date") 用: "yyyy-MM-dd" 形式にする
+	            form.setRegistrationDate(entity.getShinkokuYmd()); 
+	            
+	            // 特別徴収義務者情報の取得（任意：表示用）
+	            tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+	                .stream()
+	                .findFirst()
+	                .ifPresent(tokugimu -> {
+	                    form.setObligorName(tokugimu.getKyokaName());
+	                    form.setFacilityName(tokugimu.getShisetsuName());
+	                });
+
+	            // --- ② 1ヶ月分のDTO（MonthlyDeclarationDto）の作成とセット ---
+	            MonthlyDeclarationDto monthDto = new MonthlyDeclarationDto();
+	            
+	            // 納入年月 (type="month") 用: "yyyy-MM" 形式にする
+	            String formattedMonth = String.format("%s-%02d", entity.getNendo(), entity.getKibetsu());
+	            monthDto.setPaymentYearMonth(formattedMonth);
+	            
+	            // （DBに保存されている合計値などをセットする）
+	            monthDto.setTotalStayCount(entity.getTotalHakusu());
+	            monthDto.setTotalPaymentAmount(entity.getTotalZeigaku());
+	            monthDto.setExemptStayCount(entity.getMenjoHakusu());
+
+	            // ※もし t_fuka テーブルに税区分1〜3の金額を保持していない場合、
+	            // 厳密には t_fuka_uchi (内訳テーブル) からデータを引っ張ってくる必要がある。
+	            // 今回はとりあえず合計値のみセットしておくぜ。
+
+	            // --- ③ 最後に、作成した1ヶ月分のDTOをフォームのリストに追加する ---
+	            form.getMonthlyDetails().add(monthDto);
+	        });
+	    } catch (Exception e) {
+	        log.error("編集用データの取得に失敗しました。指定番号: {}, 年度: {}, 期別: {}", shiteiNo, nendo, kibetsu, e);
+	    }
+
+	    return form;
+	}
+	/**
+	 * 【照会用】表示データの取得
+	 */
+	@Transactional(readOnly = true)
+	public FukaDeclarationForm getDeclarationFormForView(String shiteiNo, String nendo, Integer kibetsu) {
+	    FukaDeclarationForm form = getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
+	    form.setView(true); 
+	    return form;
+	}
+	
+	/**
+     * 宿泊税情報の保存処理（新規・更新）
      */
-    @Transactional(readOnly = true)
-    public FukaDaichoForm getDaichoData(String shiteiNo, String nendo, String status) {
-        FukaDaichoForm form = new FukaDaichoForm();
-        form.setShiteiNo(shiteiNo);
-        form.setNendo(nendo);
-        form.setStatus(status != null ? status : STATUS_ALL);
+    @Transactional // 途中でエラーが起きたらDBへの保存を取り消す（ロールバック）ためのアノテーション
+    public void saveDeclaration(FukaDeclarationForm form) {
 
-        // 1. ヘッダー情報（特別徴収義務者名称）の取得
-        tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-                .stream()        
-                .findFirst()
-                .ifPresent(tokugimu -> form.setObligorName(tokugimu.getKyokaName()));
+        // 1. 相関バリデーションの実行（エラーがあれば例外が飛ぶ）
+        validatorService.validateCorrelation(form);
 
-        // 仮設定：今回は「毎月申告（全12期）」として処理（※後日マスタと連動）
-        form.setShukiKbnName("毎月申告");
-        int maxKibetsu = 12; 
+        List<FukaMonthlyDeclaration> entitiesToSave = new ArrayList<>();
 
-        // 2. DBから実データ（t_fuka）を取得し、期別(kibetsu)をキーにしたMapに変換
-        List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
-        Map<Integer, Fuka> fukaMap = fukaList.stream()
-                .collect(Collectors.toMap(Fuka::getKibetsu, f -> f));
-
-        // 3. 1期〜12期までのリストを生成し、DBデータがあればセット、なければ「未」とする
-        List<FukaDaichoListItem> items = new ArrayList<>();
-        
-        for (int i = 1; i <= maxKibetsu; i++) {
-            FukaDaichoListItem item = new FukaDaichoListItem();
-            item.setNendo(nendo);
-            item.setKibetsu(i);
+        // 2. 画面の入力内容（3ヶ月分）をループで処理
+        for (MonthlyDeclarationDto dto : form.getMonthlyDetails()) {
             
-            // 例: 1期なら4月、2期なら5月... (※業務要件に合わせて調整)
-            int displayMonth = (i + 3) > 12 ? (i + 3) - 12 : (i + 3);
-            item.setDisplayNengetsu(displayMonth + "月");
-            
-            // 例: 翌月末を納期とする簡易計算
-            int nokiMonth = displayMonth == 12 ? 1 : displayMonth + 1;
-            item.setDisplayNoki(nokiMonth + "月末");
-
-         // DBにこの期のデータが存在するか？s
-            if (fukaMap.containsKey(i)) {
-                Fuka dbData = fukaMap.get(i);
-                
-                // 両方の項目に同じ金額をセット
-                item.setAmount(dbData.getTotalZeigaku()); 
-                item.setTotalZeigaku(dbData.getTotalZeigaku()); // ★ここを追加
-                
-                item.setStatus("済");
-                item.setDisplayNengetsu(displayMonth + "月"); 
-                
-                int year = Integer.parseInt(nendo);
-                if (displayMonth < 4) year++;
-                item.setTargetYearMonth(LocalDate.of(year, displayMonth, 1));
-                
-                item.setShinkokuYmd(dbData.getShinkokuYmd());
-                item.setShinkokuZumi(true);
-            } else {
-                item.setAmount(0L);
-                item.setTotalZeigaku(0L); 
-                item.setStatus("未");
-                item.setDisplayNengetsu(displayMonth + "月");
-                
-                int year = Integer.parseInt(nendo);
-                if (displayMonth < 4) year++;
-                item.setTargetYearMonth(LocalDate.of(year, displayMonth, 1));
-                
-                item.setShinkokuZumi(false);
+            // 納入年月が入力されている行のみを保存対象とする
+            if (StringUtils.hasText(dto.getPaymentYearMonth())) {
+                FukaMonthlyDeclaration entity = convertToEntity(form.getShiteiNo(), dto);
+                entitiesToSave.add(entity);
             }
-            // 4. 画面のステータス絞り込み（すべて/済/未）を適用
-            if (STATUS_ZUMI.equals(form.getStatus()) && !item.isShinkokuZumi()) continue;
-            if (STATUS_MI.equals(form.getStatus()) && item.isShinkokuZumi()) continue;
-
-            items.add(item);
         }
 
-        form.setItems(items);
-        return form;
+        // 3. DBへ一括保存
+        if (!entitiesToSave.isEmpty()) {
+            repository.saveAll(entitiesToSave);
+        }
     }
-    
-    
+
+    /**
+     * DTOからEntityへの詰め替えを行うプライベートメソッド
+     */
+    private FukaMonthlyDeclaration convertToEntity(String shiteiNo, MonthlyDeclarationDto dto) {
+        FukaMonthlyDeclaration entity = new FukaMonthlyDeclaration();
+        
+        // 誰の申告かをセット
+        entity.setShiteiNo(shiteiNo);
+        
+        // 月ごとのデータをセット
+        entity.setPaymentYearMonth(dto.getPaymentYearMonth());
+        
+        entity.setStayCount1(dto.getStayCount1());
+        entity.setTaxAmount1(dto.getTaxAmount1());
+        
+        entity.setStayCount2(dto.getStayCount2());
+        entity.setTaxAmount2(dto.getTaxAmount2());
+        
+        entity.setStayCount3(dto.getStayCount3());
+        entity.setTaxAmount3(dto.getTaxAmount3());
+        
+        entity.setExemptStayCount(dto.getExemptStayCount());
+        entity.setTotalStayCount(dto.getTotalStayCount());
+        entity.setTotalPaymentAmount(dto.getTotalPaymentAmount());
+        
+        return entity;
+    }
+
 }

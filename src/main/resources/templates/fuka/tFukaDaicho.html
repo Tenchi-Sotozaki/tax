@@ -15,6 +15,7 @@
 			</h2>
 		</div>
 
+		<!-- 抽出条件フォーム -->
 		<div class="card mb-3 shadow-sm">
 			<div class="card-header bg-light py-2">
 				<h6 class="mb-0"><i class="bi bi-funnel me-2"></i>抽出条件</h6>
@@ -23,11 +24,12 @@
 				<form th:action="@{/declaration/payment-ledger/{id}(id=${fukaDaichoForm.shiteiNo})}" th:object="${fukaDaichoForm}" method="get">
 					<div class="row g-3 align-items-end">
 						<div class="col-md-3">
-						    <label for="targetYear" class="form-label fw-medium">年度</label>
-						    <!-- type="number" にして、名前を nendo に統一する -->
-						    <input type="number" class="form-control" id="targetYear" 
-						           name="nendo" th:value="${searchForm.nendo}"
-						           min="2000" max="2100" step="1">
+						    <label for="nendo" class="form-label fw-medium">年度</label>
+						    <input type="text" 
+						           class="form-control" 
+						           th:field="*{nendo}" 
+						           maxlength="4" 
+						           placeholder="例: 2026">
 						</div>
 						<div class="col-md-3">
 							<label class="form-label fw-medium">ステータス</label>
@@ -47,12 +49,13 @@
 			</div>
 		</div>
 
+		<!-- 基本情報エリア -->
 		<div class="card mb-4 border-info">
 			<div class="card-body py-2 bg-info-subtle">
 				<div class="row text-center">
 					<div class="col-md-4 border-end border-info">
 						<small class="d-block text-muted">周期区分</small>
-						<span class="fw-bold" th:text="*{fukaDaichoForm.shukiKbnName}">-</span>
+						<span class="fw-bold" th:text="${fukaDaichoForm.shukiKbnName}">-</span>
 					</div>
 					<div class="col-md-4 border-end border-info">
 						<small class="d-block text-muted">期間</small>
@@ -66,6 +69,7 @@
 			</div>
 		</div>
 
+		<!-- 明細テーブル -->
 		<div class="card shadow-sm">
 			<div class="card-header bg-white py-3">
 				<h5 class="mb-0">
@@ -87,7 +91,11 @@
 						<tbody>
 							<tr th:each="item : ${fukaDaichoForm.items}" th:classappend="${item.shinkokuZumi} ? '' : 'table-light'">
 								<td class="text-center">
-									<input type="checkbox" class="form-check-input row-select" th:data-id="${item.kibetsu}">
+									<!-- チェックボックスに複合キー情報を付与 -->
+									<input type="checkbox" class="row-select" 
+									       th:data-shitei-no="${fukaDaichoForm.shiteiNo}" 
+									       th:data-nendo="${item.nendo}" 
+									       th:data-kibetsu="${item.kibetsu}">
 								</td>
 								<td class="text-center fw-bold" th:text="${item.displayNengetsu}">4月</td>
 								<td class="text-end px-4">
@@ -115,27 +123,25 @@
 			</div>
 		</div>
 
+		<!-- ボタンエリア -->
 		<div class="d-flex justify-content-center gap-3 py-4">
-			<button type="button" id="btnRegistration" class="btn btn-primary btn-lg px-5">
-				<i class="bi bi-plus-circle me-2"></i>新規登録
-			</button>
-			<button type="button" id="btnInquiry" class="btn btn-outline-primary btn-lg px-5">
+			<!-- 新規登録: ボタンの中に <a> を入れるのをやめ、<a> をボタンのデザインにする[cite: 2] -->
+			<a th:href="@{/declaration/register/{id}(id=${fukaDaichoForm.shiteiNo})}" 
+			   class="btn btn-primary btn-lg px-5">
+			    <i class="bi bi-plus-circle me-1"></i>新規登録
+			</a>
+			<button type="button" id="btnViewDeclaration" class="btn btn-outline-primary btn-lg px-5">
 				<i class="bi bi-eye me-2"></i>照会
 			</button>
-			<a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
-				一覧に戻る
+			<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-3">
+			    <i class="bi bi-arrow-left me-1"></i>一覧に戻る
 			</a>
 		</div>
 
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:inline="javascript">
-			/* 選択ロジックなどは、以前作成した共通の仕組みを応用すればOKだ */
-			document.getElementById('btnRegistration')?.addEventListener('click', () => {
-				alert('宿泊税情報登録画面へ遷移します（未実装）');
-			});
-		</script>
+		<script th:src="@{/js/fuka_daicho.js}"></script>
 	</th:block>
 </body>
 
