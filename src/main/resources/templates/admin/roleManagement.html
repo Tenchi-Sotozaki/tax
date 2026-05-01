@@ -6,7 +6,7 @@
 <title>権限管理台帳</title>
 </head>
 <body>
-	<div layout:fragment="content" class="container-fluid p-4">
+	<div layout:fragment="content" class="container-fluid p-4" th:data-ctx="@{/}">
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -125,132 +125,9 @@
 
 	</div>
 
-	<script layout:fragment="scripts">
-let currentMode = 'create';
-
-function toggleSelectAll() {
-    const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('.role-checkbox');
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    updateButtons();
-}
-
-function updateButtons() {
-    const checked = document.querySelectorAll('.role-checkbox:checked');
-    const editBtn = document.getElementById('editBtn');
-    const viewBtn = document.getElementById('viewBtn');
-    const usersBtn = document.getElementById('usersBtn');
-    
-    const hasSelection = checked.length > 0;
-    const singleSelection = checked.length === 1;
-    
-    editBtn.disabled = !singleSelection;
-    viewBtn.disabled = !singleSelection;
-    usersBtn.disabled = !singleSelection;
-}
-
-function openRoleModal(mode) {
-    currentMode = mode;
-    const modal = new bootstrap.Modal(document.getElementById('roleModal'));
-    const title = document.getElementById('roleModalTitle');
-    const saveBtn = document.getElementById('saveBtn');
-    
-    if (mode === 'create') {
-        title.textContent = '権限登録';
-        saveBtn.style.display = 'block';
-        document.getElementById('roleForm').reset();
-        document.getElementById('roleId').value = '';
-    } else {
-        const checked = document.querySelector('.role-checkbox:checked');
-        if (!checked) return;
-        
-        const roleId = checked.value;
-        
-        if (mode === 'edit') {
-            title.textContent = '権限編集';
-            saveBtn.style.display = 'block';
-        } else {
-            title.textContent = '権限照会';
-            saveBtn.style.display = 'none';
-        }
-        
-        loadRoleDetail(roleId, mode === 'view');
-    }
-    
-    modal.show();
-}
-
-function loadRoleDetail(roleId, readonly) {
-    fetch(`/admin/role/detail/${roleId}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('roleId').value = data.role.roleId;
-            document.getElementById('roleName').value = data.role.name;
-            document.getElementById('version').value = data.role.version;
-            
-            // 権限設定
-            if (data.permissions) {
-                Object.entries(data.permissions).forEach(([screenId, permission]) => {
-                    const radio = document.querySelector(`input[name="permission_${screenId}"][value="${permission}"]`);
-                    if (radio) radio.checked = true;
-                });
-            }
-            
-            // 読み取り専用設定
-            if (readonly) {
-                document.querySelectorAll('#roleForm input').forEach(input => input.disabled = true);
-            } else {
-                document.querySelectorAll('#roleForm input').forEach(input => input.disabled = false);
-            }
-        });
-}
-
-function saveRole() {
-    const form = document.getElementById('roleForm');
-    const formData = new FormData(form);
-    
-    const data = {
-        roleId: formData.get('roleId') || null,
-        name: formData.get('name'),
-        version: formData.get('version') || null,
-        screenPermissions: {}
-    };
-    
-    // 権限設定を収集
-    document.querySelectorAll('input[name^="permission_"]:checked').forEach(radio => {
-        const screenId = radio.name.replace('permission_', '');
-        const permission = parseInt(radio.value);
-        if (permission > 0) {
-            data.screenPermissions[screenId] = permission;
-        }
-    });
-    
-    fetch('/admin/role/save', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(result => {
-        if (result.success) {
-            location.reload();
-        } else {
-            alert('保存に失敗しました: ' + result.message);
-        }
-    });
-}
-
-function viewAssignedUsers() {
-    const checked = document.querySelector('.role-checkbox:checked');
-    if (!checked) return;
-    
-    const roleId = checked.value;
-    // 付与ユーザー一覧画面への遷移
-    window.location.href = `/admin/role/users/${roleId}`;
-}
-</script>
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/role_management.js}"></script>
+	</th:block>
 
 </body>
 </html>
