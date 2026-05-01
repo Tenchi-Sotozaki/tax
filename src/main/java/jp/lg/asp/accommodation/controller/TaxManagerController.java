@@ -25,19 +25,20 @@ public class TaxManagerController {
 	private final TaxManagerService taxManagerService;
 
 	/** HTMLテンプレートのパス（ロウワーキャメルケース） */
-	private static final String FORM_VIEW = "collector/tTaxManagerConfig";
+	private static final String FORM_VIEW = "tokugimu/tTaxManagerConfig";
 
 	/**
 	 * 【新規登録・編集】画面表示
 	 * ※Service側の getById でデータがなければ新規用のFormが返る設計
 	 */
 	@GetMapping("/edit/{id}")
-	public String showForm(@PathVariable Long id, Model model) {
-		TaxManagerForm form = taxManagerService.getById(id);
+	public String edit(@PathVariable("id") String id, Model model) {
+	    TaxManagerForm form = taxManagerService.getByShiteiNo(id);
+
 
 		model.addAttribute("taxManagerForm", form);
-		model.addAttribute("isEdit", form.isEdit()); // DBにデータがあればtrue
-		model.addAttribute("isView", false);         // 編集可能モード
+		model.addAttribute("isEdit", form.isEdit());
+		model.addAttribute("isView", false);
 		return FORM_VIEW;
 	}
 
@@ -45,8 +46,8 @@ public class TaxManagerController {
 	 * 【照会】画面表示
 	 */
 	@GetMapping("/view/{id}")
-	public String showView(@PathVariable Long id, Model model) {
-		TaxManagerForm form = taxManagerService.getById(id);
+	public String view(@PathVariable("id") String id, Model model) {
+	    TaxManagerForm form = taxManagerService.getByShiteiNo(id);
 
 		model.addAttribute("taxManagerForm", form);
 		model.addAttribute("isEdit", false);
@@ -58,9 +59,8 @@ public class TaxManagerController {
 	 * 【保存】実行（登録・更新共通）
 	 */
 	@PostMapping("/save/{id}")
-	public String save(
-			@PathVariable Long id,
-			@Validated @ModelAttribute("taxManagerForm") TaxManagerForm form,
+	public String save(@PathVariable("id") String id,
+	        @Validated @ModelAttribute("taxManagerForm") TaxManagerForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
@@ -73,7 +73,7 @@ public class TaxManagerController {
 		}
 
 		// Serviceによる永続化（規約に沿った定数処理含む）
-		taxManagerService.save(id, form);
+		taxManagerService.saveByShiteiNo(id, form);
 
 		log.info("納税管理人情報を保存しました。collectorId: {}", id);
 		redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");

@@ -114,7 +114,7 @@ public class TokugimuController {
 				return FORM_VIEW;
 			}
 			try {
-				// ★ 古い update(id, form) から変更！
+		
 				tokugimuService.updateByShiteiNo(id, form); 
 			} catch (Exception e) {
 				log.error("更新処理エラー", e);
