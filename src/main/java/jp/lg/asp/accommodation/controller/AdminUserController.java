@@ -127,7 +127,13 @@ public class AdminUserController {
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
 
+		// 新しいパスワードが入力された場合のみ現在のパスワードを検証
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {
+			if (form.getCurrentPassword() == null || form.getCurrentPassword().isBlank()) {
+				bindingResult.rejectValue("currentPassword", "error.currentPassword", "現在のパスワードを入力してください");
+			} else if (!passwordEncoder.matches(form.getCurrentPassword(), user.getPassword())) {
+				bindingResult.rejectValue("currentPassword", "error.currentPassword", "現在のパスワードが正しくありません");
+			}
 			if (!form.getPassword().equals(form.getPasswordConfirm())) {
 				bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
 			}

@@ -82,10 +82,20 @@
                         <div class="invalid-feedback" th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}"></div>
                     </div>
 
+                    <div class="col-md-4" th:if="${isEdit}">
+                        <label for="currentPassword" class="form-label fw-medium">
+                            現在のパスワード
+                            <span class="text-muted small ms-1">（パスワード変更時のみ必須）</span>
+                        </label>
+                        <input type="password" class="form-control" id="currentPassword"
+                               th:field="*{currentPassword}" th:errorclass="is-invalid" autocomplete="current-password">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
+                    </div>
+
                     <div class="col-md-4">
                         <label for="password" class="form-label fw-medium">
-                            パスワード
-                            <span th:if="!${isEdit}" class="badge bg-danger text-white ms-1">必須</span>
+                            <span th:if="${isEdit}">新しいパスワード</span>
+                            <span th:if="!${isEdit}">パスワード <span class="badge bg-danger text-white ms-1">必須</span></span>
                             <span th:if="${isEdit}" class="text-muted small ms-1">（変更する場合のみ入力）</span>
                         </label>
                         <input type="password" class="form-control" id="password"

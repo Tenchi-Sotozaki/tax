@@ -9,11 +9,13 @@ import lombok.Data;
 @Data
 public class UserForm {
 
-    private String originalId; // 編集時の元ID（ID変更検知用）
+    private String originalId;
 
     @NotBlank(message = "IDは必須です")
     @Size(max = 100)
     private String id;
+
+    private String currentPassword;
 
     @Size(max = 64, message = "パスワードは64文字以内で入力してください")
     private String password;
