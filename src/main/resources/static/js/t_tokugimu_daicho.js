@@ -1,9 +1,8 @@
-document.addEventListener('DOMContentLoaded', function () {
-
-    function requireSelected(msg) {
+function requireSelected(msg) {
         const cb = document.querySelector('.row-select:checked');
         if (!cb) { alert(msg || 'レコードを選択してください。'); return null; }
-        return cb.dataset.id;
+        
+        return cb.dataset.shiteiNo;
     }
 
     // 行クリックでチェックボックスをトグル＋ハイライト
@@ -37,11 +36,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 行内削除ボタン
-    document.querySelectorAll('.delete-btn').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const id = this.dataset.id, name = this.dataset.name;
-            const modal = document.getElementById('deleteModal');
+	document.querySelectorAll('.delete-btn').forEach(function (btn) {
+	        btn.addEventListener('click', function (e) {
+	            e.stopPropagation();
+	            // HTML側が data-shitei-no の場合は dataset.shiteiNo に変更する
+	            const id = this.dataset.shiteiNo, name = this.dataset.name;
+	            const modal = document.getElementById('deleteModal');
             modal.querySelector('.modal-body p').textContent =
                 '「' + name + '」を削除します。この操作は取り消せません。よろしいですか？';
             modal.querySelector('[data-form-id]').dataset.formId = 'deleteForm-' + id;
@@ -50,18 +50,18 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ナビゲーションヘルパー
-    const nav = (btnId, msg, url) =>
-        document.getElementById(btnId)?.addEventListener('click', () => {
-            const id = requireSelected(msg);
-            if (id) location.href = url.replace('{id}', id);
-        });
+	const nav = (btnId, msg, url) =>
+	    document.getElementById(btnId)?.addEventListener('click', () => {
+	        const id = requireSelected(msg);
+	        if (id) location.href = url.replace('{id}', id);
+	    });
 
     nav('btnView',            '照会する特別徴収義務者を選択してください。',
                               '/accommodation-tax/tokugimu/view/{id}');
     nav('btnTaxManager',      '特別徴収義務者を選択してください。',
                               '/accommodation-tax/tax-manager/edit/{id}');
-    nav('btnTaxManagerView',  '特別徴収義務者を選択してください。',
-                              '/accommodation-tax/tax-manager/edit/{id}');
+	nav('btnTaxManagerView',  '特別徴収義務者を選択してください。',
+							  '/accommodation-tax/tax-manager/view/{id}');
     nav('btnPaymentLedger',   '事業者を選択してください。',
                               '/accommodation-tax/declaration/payment-ledger/{id}');
     nav('btnConsolidated',    '特別徴収義務者を選択してください。',
@@ -84,4 +84,5 @@ document.addEventListener('DOMContentLoaded', function () {
         const id = requireSelected('特別徴収義務者を選択してください。');
         if (id) alert('帳票発行画面は未実装です。');
     });
-});
+
+
