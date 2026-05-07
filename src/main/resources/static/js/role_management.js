@@ -1,12 +1,5 @@
 let currentMode = 'create';
 
-function toggleSelectAll() {
-    const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('.role-checkbox');
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-    updateButtons();
-}
-
 function updateButtons() {
     const checked = document.querySelectorAll('.role-checkbox:checked');
     const editBtn = document.getElementById('editBtn');
@@ -31,11 +24,13 @@ function openRoleModal(mode) {
         saveBtn.style.display = 'block';
         document.getElementById('roleForm').reset();
         document.getElementById('roleId').value = '';
+        document.querySelectorAll('#roleForm input').forEach(input => input.disabled = false);
     } else {
         const checked = document.querySelector('.role-checkbox:checked');
         if (!checked) return;
 
         const roleId = checked.value;
+        document.getElementById('roleForm').reset();
 
         if (mode === 'edit') {
             title.textContent = '権限編集';
@@ -60,6 +55,8 @@ function loadRoleDetail(roleId, readonly) {
             document.getElementById('roleName').value = data.role.name;
             document.getElementById('version').value = data.role.version;
 
+            // パーミッションをリセットしてから設定
+            document.querySelectorAll('input[name^="permission_"][value="0"]').forEach(r => r.checked = true);
             if (data.permissions) {
                 Object.entries(data.permissions).forEach(([screenId, permission]) => {
                     const radio = document.querySelector(`input[name="permission_${screenId}"][value="${permission}"]`);
@@ -67,7 +64,8 @@ function loadRoleDetail(roleId, readonly) {
                 });
             }
 
-            document.querySelectorAll('#roleForm input').forEach(input => input.disabled = readonly);
+            document.getElementById('roleName').disabled = readonly;
+            document.querySelectorAll('#screenPermissions input').forEach(input => input.disabled = readonly);
         });
 }
 

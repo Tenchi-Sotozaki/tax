@@ -1,8 +1,11 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +39,7 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public Role findById(String jichitaiCd, Long roleId) {
-		return roleRepository.findById(new RoleId(jichitaiCd, roleId)).orElse(null);
+		return roleRepository.findByIdWithDetails(jichitaiCd, roleId).orElse(null);
 	}
 
 	@Override
@@ -44,45 +47,62 @@ public class RoleServiceImpl implements RoleService {
 	public void saveRole(RoleForm form, String jichitaiCd, String userId) {
 		Role role;
 		if (form.getRoleId() != null) {
-			role = roleRepository.findById(new RoleId(jichitaiCd, form.getRoleId())).orElseThrow();
-			role.setUpdDt(LocalDateTime.now());
-			role.setUpdUser(userId);
+			role = roleRepository.findByIdWithDetails(jichitaiCd, form.getRoleId()).orElseThrow();
+
+			// 既存のroleDetailsをscreenIdでMap化
+			Map<String, RoleDetail> existingMap = role.getRoleDetails() == null ? new HashMap<>()
+					: role.getRoleDetails().stream().collect(Collectors.toMap(RoleDetail::getScreenId, d -> d));
+
+			List<RoleDetail> updatedDetails = new ArrayList<>();
+			if (form.getScreenPermissions() != null) {
+				for (Map.Entry<String, Integer> entry : form.getScreenPermissions().entrySet()) {
+					if (entry.getValue() != null && entry.getValue() > 0) {
+						RoleDetail detail = existingMap.getOrDefault(entry.getKey(), new RoleDetail());
+						detail.setJichitaiCd(jichitaiCd);
+						detail.setRoleId(role.getRoleId());
+						detail.setScreenId(entry.getKey());
+						detail.setPermission(entry.getValue());
+						detail.setUpdDt(LocalDateTime.now());
+						detail.setUpdUser(userId);
+						if (!existingMap.containsKey(entry.getKey())) {
+							detail.setAddUser(userId);
+						}
+						updatedDetails.add(detail);
+					}
+				}
+			}
+			role.getRoleDetails().clear();
+			role.getRoleDetails().addAll(updatedDetails);
+			roleRepository.save(role);
 		} else {
 			role = new Role();
 			role.setJichitaiCd(jichitaiCd);
+			long nextId = roleRepository.findMaxRoleIdByJichitaiCd(jichitaiCd) + 1;
+			role.setRoleId(nextId);
+			role.setName(form.getName());
 			role.setAddUser(userId);
 			role.setUpdDt(LocalDateTime.now());
 			role.setUpdUser(userId);
-		}
+			role.setRoleDetails(new ArrayList<>());
+			roleRepository.saveAndFlush(role);
 
-		role.setName(form.getName());
-		role = roleRepository.save(role);
-
-		// 既存の権限詳細を削除
-		if (role.getRoleDetails() != null) {
-			role.getRoleDetails().clear();
-		} else {
-			role.setRoleDetails(new java.util.ArrayList<>());
-		}
-
-		// 新しい権限詳細を追加
-		if (form.getScreenPermissions() != null) {
-			for (Map.Entry<String, Integer> entry : form.getScreenPermissions().entrySet()) {
-				if (entry.getValue() != null && entry.getValue() > 0) {
-					RoleDetail detail = new RoleDetail();
-					detail.setJichitaiCd(jichitaiCd);
-					detail.setRoleId(role.getRoleId());
-					detail.setScreenId(entry.getKey());
-					detail.setPermission(entry.getValue());
-					detail.setAddUser(userId);
-					detail.setUpdDt(LocalDateTime.now());
-					detail.setUpdUser(userId);
-					role.getRoleDetails().add(detail);
+			if (form.getScreenPermissions() != null) {
+				for (Map.Entry<String, Integer> entry : form.getScreenPermissions().entrySet()) {
+					if (entry.getValue() != null && entry.getValue() > 0) {
+						RoleDetail detail = new RoleDetail();
+						detail.setJichitaiCd(jichitaiCd);
+						detail.setRoleId(role.getRoleId());
+						detail.setScreenId(entry.getKey());
+						detail.setPermission(entry.getValue());
+						detail.setAddUser(userId);
+						detail.setUpdDt(LocalDateTime.now());
+						detail.setUpdUser(userId);
+						role.getRoleDetails().add(detail);
+					}
 				}
 			}
+			roleRepository.save(role);
 		}
-
-		roleRepository.save(role);
 	}
 
 	@Override
