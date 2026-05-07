@@ -74,13 +74,17 @@ public class RoleController {
 	@ResponseBody
 	public Map<String, Object> getRoleDetail(@PathVariable Long roleId) {
 		Role role = roleService.findById(jichitaiCd, roleId);
-		List<Screen> screens = roleService.findAllScreens();
 
 		Map<String, Object> result = new HashMap<>();
-		result.put("role", role);
-		result.put("screens", screens);
+		if (role == null) return result;
 
-		if (role != null && role.getRoleDetails() != null) {
+		Map<String, Object> roleMap = new HashMap<>();
+		roleMap.put("roleId", role.getRoleId());
+		roleMap.put("name", role.getName());
+		roleMap.put("version", role.getVersion());
+		result.put("role", roleMap);
+
+		if (role.getRoleDetails() != null) {
 			Map<String, Integer> permissions = role.getRoleDetails().stream()
 					.collect(Collectors.toMap(
 							rd -> rd.getScreenId(),

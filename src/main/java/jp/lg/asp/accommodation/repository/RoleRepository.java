@@ -15,4 +15,9 @@ public interface RoleRepository extends JpaRepository<Role, RoleId> {
     
     @Query("SELECT r FROM Role r LEFT JOIN FETCH r.roleDetails rd LEFT JOIN FETCH rd.screen WHERE r.jichitaiCd = :jichitaiCd")
     List<Role> findByJichitaiCdWithDetails(@Param("jichitaiCd") String jichitaiCd);
+    @Query("SELECT r FROM Role r LEFT JOIN FETCH r.roleDetails WHERE r.jichitaiCd = :jichitaiCd AND r.roleId = :roleId")
+    java.util.Optional<Role> findByIdWithDetails(@Param("jichitaiCd") String jichitaiCd, @Param("roleId") Long roleId);
+
+    @Query("SELECT COALESCE(MAX(r.roleId), 0) FROM Role r WHERE r.jichitaiCd = :jichitaiCd")
+    Long findMaxRoleIdByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 }
