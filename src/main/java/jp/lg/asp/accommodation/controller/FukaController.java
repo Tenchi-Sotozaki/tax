@@ -73,23 +73,16 @@ public class FukaController {
 	 * 宿泊税情報 新規登録画面表示処理
 	 */
 	@GetMapping("/register/{shiteiNo}")
-	public String showRegister(@PathVariable("shiteiNo") String shiteiNo, Model model) {
-		FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo);
+    public String showRegister(@PathVariable("shiteiNo") String shiteiNo, Model model) {
+        FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo);
 
-		// 【登録モード】両方 false にする（booleanの初期値はfalseなので明示しなくてもOKだが、書くと親切）
-		form.setView(false);
-		form.setEdit(false);
+        if (form.getMonthlyDetail() == null) {
+            form.setMonthlyDetail(new MonthlyDeclarationDto());
+        }
 
-		// 3ヶ月分の枠作成（先ほど追加した処理）
-		if (form.getMonthlyDetails() == null || form.getMonthlyDetails().isEmpty()) {
-			for (int i = 0; i < 3; i++) {
-				form.getMonthlyDetails().add(new MonthlyDeclarationDto());
-			}
-		}
-
-		model.addAttribute("fukaDeclarationForm", form);
-		return CONFIG_VIEW;
-	}
+        model.addAttribute("fukaDeclarationForm", form);
+        return CONFIG_VIEW;
+    }
 
 	/**
 	 * 宿泊税情報 照会画面表示処理

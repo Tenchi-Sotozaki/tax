@@ -1,8 +1,6 @@
 package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -47,8 +45,8 @@ public class FukaDeclarationForm {
 	// 宿泊施設名称 (リードオンリー)
 	private String facilityName;
 
-	@Valid // ← リストの中身をバリデーションする場合はこれを付ける
-    private List<MonthlyDeclarationDto> monthlyDetails = new ArrayList<>();
+	@Valid
+	private MonthlyDeclarationDto monthlyDetail;
 
 	// ========== 加算金額入力エリア ==========
 	// 加算金額の区分 (過少申告加算金/不申告加算金/重加算金)

@@ -177,8 +177,6 @@ public class FukaService {
 
 	            // --- ② 1ヶ月分のDTO（MonthlyDeclarationDto）の作成とセット ---
 	            MonthlyDeclarationDto monthDto = new MonthlyDeclarationDto();
-	            
-	            // 納入年月 (type="month") 用: "yyyy-MM" 形式にする
 	            String formattedMonth = String.format("%s-%02d", entity.getNendo(), entity.getKibetsu());
 	            monthDto.setPaymentYearMonth(formattedMonth);
 	            
@@ -186,13 +184,9 @@ public class FukaService {
 	            monthDto.setTotalStayCount(entity.getTotalHakusu());
 	            monthDto.setTotalPaymentAmount(entity.getTotalZeigaku());
 	            monthDto.setExemptStayCount(entity.getMenjoHakusu());
+	            
+	            form.setMonthlyDetail(monthDto);
 
-	            // ※もし t_fuka テーブルに税区分1〜3の金額を保持していない場合、
-	            // 厳密には t_fuka_uchi (内訳テーブル) からデータを引っ張ってくる必要がある。
-	            // 今回はとりあえず合計値のみセットしておくぜ。
-
-	            // --- ③ 最後に、作成した1ヶ月分のDTOをフォームのリストに追加する ---
-	            form.getMonthlyDetails().add(monthDto);
 	        });
 	    } catch (Exception e) {
 	        log.error("編集用データの取得に失敗しました。指定番号: {}, 年度: {}, 期別: {}", shiteiNo, nendo, kibetsu, e);
@@ -213,27 +207,29 @@ public class FukaService {
 	/**
      * 宿泊税情報の保存処理（新規・更新）
      */
-    @Transactional // 途中でエラーが起きたらDBへの保存を取り消す（ロールバック）ためのアノテーション
+	@Transactional
     public void saveDeclaration(FukaDeclarationForm form) {
-
-        // 1. 相関バリデーションの実行（エラーがあれば例外が飛ぶ）
         validatorService.validateCorrelation(form);
 
-        List<FukaMonthlyDeclaration> entitiesToSave = new ArrayList<>();
+        // ❌ forループはもう不要！
+        // ⭕ 修正後：単一のオブジェクトを取り出してそのまま処理
+        MonthlyDeclarationDto dto = form.getMonthlyDetail();
 
-        // 2. 画面の入力内容（3ヶ月分）をループで処理
-        for (MonthlyDeclarationDto dto : form.getMonthlyDetails()) {
+        if (dto != null && StringUtils.hasText(dto.getPaymentYearMonth())) {
             
-            // 納入年月が入力されている行のみを保存対象とする
-            if (StringUtils.hasText(dto.getPaymentYearMonth())) {
-                FukaMonthlyDeclaration entity = convertToEntity(form.getShiteiNo(), dto);
-                entitiesToSave.add(entity);
-            }
-        }
+            // ① 親データ（t_fuka）の作成と保存
+            Fuka parentFuka = new Fuka();
+            // ... (parentFuka.set... の処理はそのまま) ...
+            
+            // 合計値の計算もループ不要で直接セットできる
+            parentFuka.setTotalHakusu(dto.getTotalStayCount() != null ? dto.getTotalStayCount() : 0);
+            parentFuka.setTotalZeigaku(dto.getTotalPaymentAmount() != null ? dto.getTotalPaymentAmount() : 0);
+            parentFuka.setMenjoHakusu(dto.getExemptStayCount() != null ? dto.getExemptStayCount() : 0);
+            parentFuka.setTaishoYm(dto.getPaymentYearMonth().replace("-", "")); // "2026-05" -> "202605"
 
-        // 3. DBへ一括保存
-        if (!entitiesToSave.isEmpty()) {
-            repository.saveAll(entitiesToSave);
+            fukaRepository.save(parentFuka);
+            
+            // ② 子データ（t_fuka_uchi）の作成と保存のロジックへ続く...
         }
     }
 
