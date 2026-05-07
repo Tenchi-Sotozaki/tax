@@ -114,9 +114,49 @@ function saveRole() {
     .catch(err => alert('通信エラー: ' + err.message));
 }
 
+let currentUsersRoleId = null;
+
 function viewAssignedUsers() {
     const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
     const checked = document.querySelector('.role-checkbox:checked');
     if (!checked) return;
-    window.location.href = `${ctx}/admin/role/users/${checked.value}`;
+    currentUsersRoleId = checked.value;
+
+    fetch(`${ctx}/admin/role/users/${currentUsersRoleId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('usersModalRoleName').textContent = data.roleName;
+            const tbody = document.getElementById('usersModalBody');
+            tbody.innerHTML = '';
+            data.users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="checkbox" class="user-assign-checkbox" value="${user.id}" ${user.assigned ? 'checked' : ''}></td>
+                    <td>${user.name}</td>`;
+                tbody.appendChild(tr);
+            });
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('usersModal')).show();
+        });
+}
+
+function updateAssignedUsers() {
+    const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
+    const userIds = Array.from(document.querySelectorAll('.user-assign-checkbox:checked')).map(cb => cb.value);
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    fetch(`${ctx}/admin/role/users/${currentUsersRoleId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+        body: JSON.stringify({ userIds })
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('usersModal')).hide();
+        } else {
+            alert('更新に失敗しました: ' + result.message);
+        }
+    })
+    .catch(err => alert('通信エラー: ' + err.message));
 }

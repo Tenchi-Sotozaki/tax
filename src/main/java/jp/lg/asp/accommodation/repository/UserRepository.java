@@ -13,6 +13,10 @@ import jp.lg.asp.accommodation.entity.UserId;
 @Repository
 public interface UserRepository extends JpaRepository<User, UserId> {
 
+	List<User> findByJichitaiCdOrderById(String jichitaiCd);
+
+	List<User> findByJichitaiCdAndRoleId(String jichitaiCd, java.math.BigDecimal roleId);
+
 	@Query("SELECT u FROM User u WHERE u.jichitaiCd = :jichitaiCd" +
 			" AND (:id IS NULL OR u.id LIKE %:id%)" +
 			" AND (:name IS NULL OR u.name LIKE %:name%)" +

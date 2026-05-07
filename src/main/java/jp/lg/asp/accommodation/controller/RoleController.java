@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.Screen;
+import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.service.RoleService;
 import lombok.RequiredArgsConstructor;
 
@@ -92,6 +93,38 @@ public class RoleController {
 			result.put("permissions", permissions);
 		}
 
+		return result;
+	}
+
+	@GetMapping("/users/{roleId}")
+	@ResponseBody
+	public Map<String, Object> getAssignedUsers(@PathVariable Long roleId) {
+		Role role = roleService.findById(jichitaiCd, roleId);
+		List<User> allUsers = roleService.findAllUsers(jichitaiCd);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("roleName", role != null ? role.getName() : "");
+		result.put("users", allUsers.stream().map(u -> {
+			Map<String, Object> m = new HashMap<>();
+			m.put("id", u.getId());
+			m.put("name", u.getName());
+			m.put("assigned", u.getRoleId() != null && u.getRoleId().longValue() == roleId);
+			return m;
+		}).collect(Collectors.toList()));
+		return result;
+	}
+
+	@PostMapping("/users/{roleId}")
+	@ResponseBody
+	public Map<String, Object> updateAssignedUsers(@PathVariable Long roleId, @RequestBody Map<String, List<String>> body) {
+		Map<String, Object> result = new HashMap<>();
+		try {
+			roleService.updateUserRole(jichitaiCd, roleId, body.get("userIds"), "admin");
+			result.put("success", true);
+		} catch (Exception e) {
+			result.put("success", false);
+			result.put("message", e.getMessage());
+		}
 		return result;
 	}
 

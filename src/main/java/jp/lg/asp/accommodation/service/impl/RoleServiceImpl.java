@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +16,11 @@ import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.RoleDetail;
 import jp.lg.asp.accommodation.entity.RoleId;
 import jp.lg.asp.accommodation.entity.Screen;
+import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.ScreenRepository;
+import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.RoleService;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +30,7 @@ public class RoleServiceImpl implements RoleService {
 
 	private final RoleRepository roleRepository;
 	private final ScreenRepository screenRepository;
+	private final UserRepository userRepository;
 
 	@Override
 	public List<Role> findAllRoles(String jichitaiCd) {
@@ -102,6 +107,36 @@ public class RoleServiceImpl implements RoleService {
 				}
 			}
 			roleRepository.save(role);
+		}
+	}
+
+	@Override
+	public List<User> findAllUsers(String jichitaiCd) {
+		return userRepository.findByJichitaiCdOrderById(jichitaiCd);
+	}
+
+	@Override
+	@Transactional
+	public void updateUserRole(String jichitaiCd, Long roleId, List<String> userIds, String updUser) {
+		// 現在このrole_idが付与されているユーザーのrole_idを0にリセット
+		List<User> currentUsers = userRepository.findByJichitaiCdAndRoleId(jichitaiCd, BigDecimal.valueOf(roleId));
+		for (User u : currentUsers) {
+			u.setRoleId(BigDecimal.ZERO);
+			u.setUpdDt(LocalDateTime.now());
+			u.setUpdUser(updUser);
+		}
+		userRepository.saveAll(currentUsers);
+
+		if (userIds != null) {
+			for (String userId : userIds) {
+				User u = userRepository.findById(new UserId()).orElse(null);
+				if (u != null) {
+					u.setRoleId(BigDecimal.valueOf(roleId));
+					u.setUpdDt(LocalDateTime.now());
+					u.setUpdUser(updUser);
+					userRepository.save(u);
+				}
+			}
 		}
 	}
 
