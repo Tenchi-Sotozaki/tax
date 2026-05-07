@@ -46,7 +46,7 @@ public class FukaDeclarationForm {
 	private String facilityName;
 
 	@Valid
-	private MonthlyDeclarationDto monthlyDetail;
+	private FukaMonthlyDeclarationDto monthlyDetail = new FukaMonthlyDeclarationDto();
 
 	// ========== 加算金額入力エリア ==========
 	// 加算金額の区分 (過少申告加算金/不申告加算金/重加算金)
@@ -56,7 +56,7 @@ public class FukaDeclarationForm {
 	private String additionalRate;
 
 	// 加算金額
-	private Integer additionalAmount;
+	private Long additionalAmount;
 
 	// 加算金額の納期限
 	private LocalDate additionalDueDate;

@@ -25,7 +25,7 @@ public class Fuka {
     @Column(name = "jichitai_cd", length = 5)
     private String jichitaiCd;
 
-    @Id // 🔴 追加！これが無いとエラーになるぜ
+    @Id 
     @Column(name = "shitei_no", length = 8)
     private String shiteiNo;
 

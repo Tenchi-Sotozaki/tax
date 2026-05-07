@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
-import jp.lg.asp.accommodation.dto.MonthlyDeclarationDto;
+import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.repository.FukaMonthlyDeclarationRepository;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
@@ -77,7 +77,7 @@ public class FukaController {
         FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo);
 
         if (form.getMonthlyDetail() == null) {
-            form.setMonthlyDetail(new MonthlyDeclarationDto());
+            form.setMonthlyDetail(new FukaMonthlyDeclarationDto());
         }
 
         model.addAttribute("fukaDeclarationForm", form);
@@ -131,6 +131,10 @@ public class FukaController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		
+		log.info("【デバッグ】指定番号: {}, 納入年月: {}", 
+				form.getShiteiNo(), 
+				form.getMonthlyDetail() != null ? form.getMonthlyDetail().getPaymentYearMonth() : "MonthlyDetail自体がNULL!");
 
 		// バリデーションエラーがある場合は元の画面に戻す
 		if (bindingResult.hasErrors()) {
