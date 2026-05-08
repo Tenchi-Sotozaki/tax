@@ -43,54 +43,54 @@ CREATE TABLE IF NOT EXISTS t_tokugimu (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_tokugimu_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno)
 );
-COMMENT ON TABLE t_tokugimu IS '“Á•Ê’¥û‹`–±Òî•ñ';
-COMMENT ON COLUMN t_tokugimu.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_tokugimu.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_tokugimu.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_tokugimu.toroku_ymd IS '“o˜^”NŒ“ú';
-COMMENT ON COLUMN t_tokugimu.shinkoku_ymd IS '\”NŒ“ú';
-COMMENT ON COLUMN t_tokugimu.henko_ymd IS '•ÏX”NŒ“ú';
-COMMENT ON COLUMN t_tokugimu.atena_no IS 'ˆ¶–¼”Ô†';
-COMMENT ON COLUMN t_tokugimu.shisetsu_name IS '{İ–¼Ì';
-COMMENT ON COLUMN t_tokugimu.shisetsu_name_kana IS '{İ–¼Ì‚©‚È';
-COMMENT ON COLUMN t_tokugimu.shisetsu_yubin_no IS '{İ—X•Ö”Ô†';
-COMMENT ON COLUMN t_tokugimu.shisetsu_jusho IS '{İŠİ’n';
-COMMENT ON COLUMN t_tokugimu.shisetsu_tel IS '{İ“d˜b”Ô†';
-COMMENT ON COLUMN t_tokugimu.yuka_menseki IS '{İ°–ÊÏ';
-COMMENT ON COLUMN t_tokugimu.chijo_kai IS '{İ’nãŠK”';
-COMMENT ON COLUMN t_tokugimu.chika_kai IS '{İ’n‰ºŠK”';
-COMMENT ON COLUMN t_tokugimu.kyakushitsu_su IS '{İ‹qº”';
-COMMENT ON COLUMN t_tokugimu.shuyo_su IS '{İû—elˆõ”';
-COMMENT ON COLUMN t_tokugimu.kyoka_name IS '‰c‹Æ‹–‰Â–¼';
-COMMENT ON COLUMN t_tokugimu.kyoka_name_kana IS '‰c‹Æ‹–‰Â–¼‚©‚È';
-COMMENT ON COLUMN t_tokugimu.kyoka_yubin_no IS '‰c‹Æ‹–‰Â—X•Ö”Ô†';
-COMMENT ON COLUMN t_tokugimu.kyoka_jusho IS '‰c‹Æ‹–‰ÂZŠ';
-COMMENT ON COLUMN t_tokugimu.kyoka_tel IS '‰c‹Æ‹–‰Â“d˜b”Ô†';
-COMMENT ON COLUMN t_tokugimu.kyoka_shu IS '‰c‹Æ‹–‰Âí•Ê';
-COMMENT ON COLUMN t_tokugimu.kyoka_no IS '‰c‹Æ‹–‰Â“™”Ô†';
-COMMENT ON COLUMN t_tokugimu.soufusaki_name IS '‘—•tæ–¼';
-COMMENT ON COLUMN t_tokugimu.soufusaki_name_kana IS '‘—•tæ–¼‚©‚È';
-COMMENT ON COLUMN t_tokugimu.soufusaki_yubin_no IS '‘—•tæ—X•Ö”Ô†';
-COMMENT ON COLUMN t_tokugimu.soufusaki_jusho IS '‘—•tæZŠ';
-COMMENT ON COLUMN t_tokugimu.soufusaki_tel IS '‘—•tæ“d˜b”Ô†';
-COMMENT ON COLUMN t_tokugimu.biko IS '\¿”õl';
-COMMENT ON COLUMN t_tokugimu.eigyo_st_ymd IS '‰c‹ÆŠJn”NŒ“ú';
-COMMENT ON COLUMN t_tokugimu.eigyo_ed_ymd IS '‰c‹ÆI—¹”NŒ“ú';
-COMMENT ON COLUMN t_tokugimu.kyushi_st_ymd IS '‹x~ŠJn”NŒ“ú';
-COMMENT ON COLUMN t_tokugimu.kyushi_ed_ymd IS '‹x~I—¹”NŒ“ú';
-COMMENT ON COLUMN t_tokugimu.kyuhaishi_riyu IS '‹x”p~——R';
-COMMENT ON COLUMN t_tokugimu.eltax_umu IS 'eLTAX—˜—p—L–³';
-COMMENT ON COLUMN t_tokugimu.nokigen IS '”[ÅüŠú‘I‘ğ';
-COMMENT ON COLUMN t_tokugimu.new_flg IS 'ÅVƒtƒ‰ƒO';
-COMMENT ON COLUMN t_tokugimu.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN t_tokugimu.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_tokugimu.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_tokugimu.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_tokugimu.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_tokugimu.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_tokugimu IS 'ç‰¹åˆ¥å¾´åç¾©å‹™è€…æƒ…å ±';
+COMMENT ON COLUMN t_tokugimu.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_tokugimu.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_tokugimu.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.toroku_ymd IS 'ç™»éŒ²å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_tokugimu.shinkoku_ymd IS 'ç”³å‘Šå¹´æœˆæ—¥';
+COMMENT ON COLUMN t_tokugimu.henko_ymd IS 'å¤‰æ›´å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_tokugimu.atena_no IS 'å®›åç•ªå·';
+COMMENT ON COLUMN t_tokugimu.shisetsu_name IS 'æ–½è¨­åç§°';
+COMMENT ON COLUMN t_tokugimu.shisetsu_name_kana IS 'æ–½è¨­åç§°ã‹ãª';
+COMMENT ON COLUMN t_tokugimu.shisetsu_yubin_no IS 'æ–½è¨­éƒµä¾¿ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.shisetsu_jusho IS 'æ–½è¨­æ‰€åœ¨åœ°';
+COMMENT ON COLUMN t_tokugimu.shisetsu_tel IS 'æ–½è¨­é›»è©±ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.yuka_menseki IS 'æ–½è¨­åºŠé¢ç©';
+COMMENT ON COLUMN t_tokugimu.chijo_kai IS 'æ–½è¨­åœ°ä¸Šéšæ•°';
+COMMENT ON COLUMN t_tokugimu.chika_kai IS 'æ–½è¨­åœ°ä¸‹éšæ•°';
+COMMENT ON COLUMN t_tokugimu.kyakushitsu_su IS 'æ–½è¨­å®¢å®¤æ•°';
+COMMENT ON COLUMN t_tokugimu.shuyo_su IS 'æ–½è¨­åå®¹äººå“¡æ•°';
+COMMENT ON COLUMN t_tokugimu.kyoka_name IS 'å–¶æ¥­è¨±å¯æ°å';
+COMMENT ON COLUMN t_tokugimu.kyoka_name_kana IS 'å–¶æ¥­è¨±å¯æ°åã‹ãª';
+COMMENT ON COLUMN t_tokugimu.kyoka_yubin_no IS 'å–¶æ¥­è¨±å¯éƒµä¾¿ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.kyoka_jusho IS 'å–¶æ¥­è¨±å¯ä½æ‰€';
+COMMENT ON COLUMN t_tokugimu.kyoka_tel IS 'å–¶æ¥­è¨±å¯é›»è©±ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.kyoka_shu IS 'å–¶æ¥­è¨±å¯ç¨®åˆ¥';
+COMMENT ON COLUMN t_tokugimu.kyoka_no IS 'å–¶æ¥­è¨±å¯ç­‰ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.soufusaki_name IS 'é€ä»˜å…ˆæ°å';
+COMMENT ON COLUMN t_tokugimu.soufusaki_name_kana IS 'é€ä»˜å…ˆæ°åã‹ãª';
+COMMENT ON COLUMN t_tokugimu.soufusaki_yubin_no IS 'é€ä»˜å…ˆéƒµä¾¿ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.soufusaki_jusho IS 'é€ä»˜å…ˆä½æ‰€';
+COMMENT ON COLUMN t_tokugimu.soufusaki_tel IS 'é€ä»˜å…ˆé›»è©±ç•ªå·';
+COMMENT ON COLUMN t_tokugimu.biko IS 'ç”³è«‹å‚™è€ƒ';
+COMMENT ON COLUMN t_tokugimu.eigyo_st_ymd IS 'å–¶æ¥­é–‹å§‹å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_tokugimu.eigyo_ed_ymd IS 'å–¶æ¥­çµ‚äº†å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_tokugimu.kyushi_st_ymd IS 'ä¼‘æ­¢é–‹å§‹å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_tokugimu.kyushi_ed_ymd IS 'ä¼‘æ­¢çµ‚äº†å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_tokugimu.kyuhaishi_riyu IS 'ä¼‘å»ƒæ­¢ç†ç”±';
+COMMENT ON COLUMN t_tokugimu.eltax_umu IS 'eLTAXåˆ©ç”¨æœ‰ç„¡';
+COMMENT ON COLUMN t_tokugimu.nokigen IS 'ç´ç¨å‘¨æœŸé¸æŠ';
+COMMENT ON COLUMN t_tokugimu.new_flg IS 'æœ€æ–°ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_tokugimu.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_tokugimu.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_tokugimu.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_tokugimu.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_tokugimu.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_tokugimu.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_shoyusha (
@@ -107,24 +107,24 @@ CREATE TABLE IF NOT EXISTS t_shoyusha (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_shoyusha_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, idx)
 );
-COMMENT ON TABLE t_shoyusha IS 'h”‘{İŠ—LÒî•ñ';
-COMMENT ON COLUMN t_shoyusha.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_shoyusha.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_shoyusha.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_shoyusha.idx IS '“¯ˆê{İŠ—LÒ˜A”Ô';
-COMMENT ON COLUMN t_shoyusha.shoyusha_name IS '{İŠ—LÒ–¼Ì';
-COMMENT ON COLUMN t_shoyusha.shoyusha_name_kana IS '{İŠ—LÒ–¼Ì‚©‚È';
-COMMENT ON COLUMN t_shoyusha.shoyusha_yubin_no IS '{İŠ—LÒ—X•Ö”Ô†';
-COMMENT ON COLUMN t_shoyusha.shoyusha_jusho IS '{İŠ—LÒZŠ';
-COMMENT ON COLUMN t_shoyusha.shoyusha_tel IS '{İŠ—LÒ“d˜b”Ô†';
-COMMENT ON COLUMN t_shoyusha.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_shoyusha.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_shoyusha.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_shoyusha.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_shoyusha.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_shoyusha IS 'å®¿æ³Šæ–½è¨­æ‰€æœ‰è€…æƒ…å ±';
+COMMENT ON COLUMN t_shoyusha.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_shoyusha.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_shoyusha.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_shoyusha.idx IS 'åŒä¸€æ–½è¨­æ‰€æœ‰è€…é€£ç•ª';
+COMMENT ON COLUMN t_shoyusha.shoyusha_name IS 'æ–½è¨­æ‰€æœ‰è€…åç§°';
+COMMENT ON COLUMN t_shoyusha.shoyusha_name_kana IS 'æ–½è¨­æ‰€æœ‰è€…åç§°ã‹ãª';
+COMMENT ON COLUMN t_shoyusha.shoyusha_yubin_no IS 'æ–½è¨­æ‰€æœ‰è€…éƒµä¾¿ç•ªå·';
+COMMENT ON COLUMN t_shoyusha.shoyusha_jusho IS 'æ–½è¨­æ‰€æœ‰è€…ä½æ‰€';
+COMMENT ON COLUMN t_shoyusha.shoyusha_tel IS 'æ–½è¨­æ‰€æœ‰è€…é›»è©±ç•ªå·';
+COMMENT ON COLUMN t_shoyusha.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_shoyusha.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_shoyusha.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_shoyusha.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_shoyusha.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_nokan (
@@ -147,30 +147,30 @@ CREATE TABLE IF NOT EXISTS t_nokan (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_nokan_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno)
 );
-COMMENT ON TABLE t_nokan IS '”[ÅŠÇ—lî•ñ';
-COMMENT ON COLUMN t_nokan.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_nokan.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_nokan.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_nokan.menjo_kbn IS '‘I”C–Æœ‹æ•ª';
-COMMENT ON COLUMN t_nokan.toroku_ymd IS '“o˜^”NŒ“ú';
-COMMENT ON COLUMN t_nokan.shinkoku_ymd IS '\”NŒ“ú';
-COMMENT ON COLUMN t_nokan.atena_no IS '”[ÅŠÇ—lˆ¶–¼”Ô†';
-COMMENT ON COLUMN t_nokan.name IS '”[ÅŠÇ—l–¼Ì';
-COMMENT ON COLUMN t_nokan.name_kana IS '”[ÅŠÇ—l–¼Ì‚©‚È';
-COMMENT ON COLUMN t_nokan.yubin_no IS '”[ÅŠÇ—l—X•Ö”Ô†';
-COMMENT ON COLUMN t_nokan.jusho IS '”[ÅŠÇ—lZŠ';
-COMMENT ON COLUMN t_nokan.tel IS '”[ÅŠÇ—l“d˜b”Ô†';
-COMMENT ON COLUMN t_nokan.menjo_riyu IS 'ê”C–Æœ——R';
-COMMENT ON COLUMN t_nokan.new_flg IS 'ÅVƒtƒ‰ƒO';
-COMMENT ON COLUMN t_nokan.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN t_nokan.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_nokan.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_nokan.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_nokan.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_nokan.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_nokan IS 'ç´ç¨ç®¡ç†äººæƒ…å ±';
+COMMENT ON COLUMN t_nokan.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_nokan.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_nokan.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_nokan.menjo_kbn IS 'é¸ä»»å…é™¤åŒºåˆ†';
+COMMENT ON COLUMN t_nokan.toroku_ymd IS 'ç™»éŒ²å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_nokan.shinkoku_ymd IS 'ç”³å‘Šå¹´æœˆæ—¥';
+COMMENT ON COLUMN t_nokan.atena_no IS 'ç´ç¨ç®¡ç†äººå®›åç•ªå·';
+COMMENT ON COLUMN t_nokan.name IS 'ç´ç¨ç®¡ç†äººåç§°';
+COMMENT ON COLUMN t_nokan.name_kana IS 'ç´ç¨ç®¡ç†äººåç§°ã‹ãª';
+COMMENT ON COLUMN t_nokan.yubin_no IS 'ç´ç¨ç®¡ç†äººéƒµä¾¿ç•ªå·';
+COMMENT ON COLUMN t_nokan.jusho IS 'ç´ç¨ç®¡ç†äººä½æ‰€';
+COMMENT ON COLUMN t_nokan.tel IS 'ç´ç¨ç®¡ç†äººé›»è©±ç•ªå·';
+COMMENT ON COLUMN t_nokan.menjo_riyu IS 'å°‚ä»»å…é™¤ç†ç”±';
+COMMENT ON COLUMN t_nokan.new_flg IS 'æœ€æ–°ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_nokan.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_nokan.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_nokan.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_nokan.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_nokan.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_nokan.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_gassan (
@@ -188,25 +188,25 @@ CREATE TABLE IF NOT EXISTS t_gassan (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_gassan_pkey PRIMARY KEY (jichitai_cd, gassan_shitei_no, rno)
 );
-COMMENT ON TABLE t_gassan IS '‡Z\”[“üî•ñ';
-COMMENT ON COLUMN t_gassan.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_gassan.gassan_shitei_no IS '‡Zw’è”Ô†';
-COMMENT ON COLUMN t_gassan.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_gassan.toroku_ymd IS '“o˜^”NŒ“ú';
-COMMENT ON COLUMN t_gassan.shinkoku_ymd IS '\”NŒ“ú';
-COMMENT ON COLUMN t_gassan.atena_no IS 'ˆ¶–¼”Ô†';
-COMMENT ON COLUMN t_gassan.tekiyo_st_ymd IS '“K—pŠJn”NŒ“ú';
-COMMENT ON COLUMN t_gassan.tekiyo_ed_ymd IS '“K—pI—¹”NŒ“ú';
-COMMENT ON COLUMN t_gassan.new_flg IS 'ÅVƒtƒ‰ƒO';
-COMMENT ON COLUMN t_gassan.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN t_gassan.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_gassan.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_gassan.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_gassan.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_gassan.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_gassan IS 'åˆç®—ç”³å‘Šç´å…¥æƒ…å ±';
+COMMENT ON COLUMN t_gassan.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_gassan.gassan_shitei_no IS 'åˆç®—æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_gassan.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_gassan.toroku_ymd IS 'ç™»éŒ²å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_gassan.shinkoku_ymd IS 'ç”³å‘Šå¹´æœˆæ—¥';
+COMMENT ON COLUMN t_gassan.atena_no IS 'å®›åç•ªå·';
+COMMENT ON COLUMN t_gassan.tekiyo_st_ymd IS 'é©ç”¨é–‹å§‹å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_gassan.tekiyo_ed_ymd IS 'é©ç”¨çµ‚äº†å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_gassan.new_flg IS 'æœ€æ–°ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_gassan.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_gassan.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_gassan.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_gassan.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_gassan.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_gassan.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_gassan_uchi (
@@ -218,19 +218,19 @@ CREATE TABLE IF NOT EXISTS t_gassan_uchi (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_gassan_uchi_pkey PRIMARY KEY (jichitai_cd, gassan_shitei_no, rno, shitei_no)
 );
-COMMENT ON TABLE t_gassan_uchi IS '‡Z\”[“ü“à–óî•ñ';
-COMMENT ON COLUMN t_gassan_uchi.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_gassan_uchi.gassan_shitei_no IS '‡Zw’è”Ô†';
-COMMENT ON COLUMN t_gassan_uchi.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_gassan_uchi.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_gassan_uchi.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_gassan_uchi.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_gassan_uchi.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_gassan_uchi.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_gassan_uchi.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_gassan_uchi IS 'åˆç®—ç”³å‘Šç´å…¥å†…è¨³æƒ…å ±';
+COMMENT ON COLUMN t_gassan_uchi.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_gassan_uchi.gassan_shitei_no IS 'åˆç®—æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_gassan_uchi.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_gassan_uchi.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_gassan_uchi.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_gassan_uchi.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_gassan_uchi.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_gassan_uchi.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_gassan_uchi.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_fuka (
@@ -264,41 +264,41 @@ CREATE TABLE IF NOT EXISTS t_fuka (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_fuka_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, nendo, kibetsu)
 );
-COMMENT ON TABLE t_fuka IS '•Š‰Ûî•ñ';
-COMMENT ON COLUMN t_fuka.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_fuka.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_fuka.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_fuka.nendo IS '•Š‰Û”N“x';
-COMMENT ON COLUMN t_fuka.kibetsu IS 'Šú•Ê';
-COMMENT ON COLUMN t_fuka.toroku_ymd IS '“o˜^”NŒ“ú';
-COMMENT ON COLUMN t_fuka.shinkoku_ymd IS '\”NŒ“ú';
-COMMENT ON COLUMN t_fuka.taisho_ym IS '‘ÎÛ”NŒ';
-COMMENT ON COLUMN t_fuka.fuka_kbn IS '•Š‰Û•û®';
-COMMENT ON COLUMN t_fuka.henko_kbn IS '•ÏX‹æ•ª';
-COMMENT ON COLUMN t_fuka.henko_riyu IS '•ÏX——R';
-COMMENT ON COLUMN t_fuka.kazei_hakusu IS '‰ÛÅ‘ÎÛh”‘”';
-COMMENT ON COLUMN t_fuka.kazei_ryokin IS '‰ÛÅ‘ÎÛh”‘—¿‹à';
-COMMENT ON COLUMN t_fuka.zeigaku IS '‰ÛÅ‘ÎÛÅŠz';
-COMMENT ON COLUMN t_fuka.menjo_hakusu IS '‰ÛÅ–Æœh”‘”';
-COMMENT ON COLUMN t_fuka.menjo_ryokin IS '‰ÛÅ–Æœh”‘—¿‹à';
-COMMENT ON COLUMN t_fuka.total_hakusu IS '‡Œvh”‘”';
-COMMENT ON COLUMN t_fuka.total_zeigaku IS '‡ŒvÅŠz';
-COMMENT ON COLUMN t_fuka.city_zeigaku IS 's‹æ’¬‘ºÅŠz';
-COMMENT ON COLUMN t_fuka.ken_zeigaku IS '“s“¹•{Œ§ÅŠz';
-COMMENT ON COLUMN t_fuka.kasan_kbn IS '‰ÁZ‹àŠz‹æ•ª';
-COMMENT ON COLUMN t_fuka.kasan_ritsu IS '‰ÁZŠ„‡';
-COMMENT ON COLUMN t_fuka.kasan_gaku IS '‰ÁZ‹àŠz';
-COMMENT ON COLUMN t_fuka.nokigen IS '”[ŠúŒÀ';
-COMMENT ON COLUMN t_fuka.new_flg IS 'ÅVƒtƒ‰ƒO';
-COMMENT ON COLUMN t_fuka.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN t_fuka.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_fuka.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_fuka.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_fuka.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_fuka.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_fuka IS 'è³¦èª²æƒ…å ±';
+COMMENT ON COLUMN t_fuka.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_fuka.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_fuka.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_fuka.nendo IS 'è³¦èª²å¹´åº¦';
+COMMENT ON COLUMN t_fuka.kibetsu IS 'æœŸåˆ¥';
+COMMENT ON COLUMN t_fuka.toroku_ymd IS 'ç™»éŒ²å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_fuka.shinkoku_ymd IS 'ç”³å‘Šå¹´æœˆæ—¥';
+COMMENT ON COLUMN t_fuka.taisho_ym IS 'å¯¾è±¡å¹´æœˆ';
+COMMENT ON COLUMN t_fuka.fuka_kbn IS 'è³¦èª²æ–¹å¼';
+COMMENT ON COLUMN t_fuka.henko_kbn IS 'å¤‰æ›´åŒºåˆ†';
+COMMENT ON COLUMN t_fuka.henko_riyu IS 'å¤‰æ›´ç†ç”±';
+COMMENT ON COLUMN t_fuka.kazei_hakusu IS 'èª²ç¨å¯¾è±¡å®¿æ³Šæ•°';
+COMMENT ON COLUMN t_fuka.kazei_ryokin IS 'èª²ç¨å¯¾è±¡å®¿æ³Šæ–™é‡‘';
+COMMENT ON COLUMN t_fuka.zeigaku IS 'èª²ç¨å¯¾è±¡ç¨é¡';
+COMMENT ON COLUMN t_fuka.menjo_hakusu IS 'èª²ç¨å…é™¤å®¿æ³Šæ•°';
+COMMENT ON COLUMN t_fuka.menjo_ryokin IS 'èª²ç¨å…é™¤å®¿æ³Šæ–™é‡‘';
+COMMENT ON COLUMN t_fuka.total_hakusu IS 'åˆè¨ˆå®¿æ³Šæ•°';
+COMMENT ON COLUMN t_fuka.total_zeigaku IS 'åˆè¨ˆç¨é¡';
+COMMENT ON COLUMN t_fuka.city_zeigaku IS 'å¸‚åŒºç”ºæ‘ç¨é¡';
+COMMENT ON COLUMN t_fuka.ken_zeigaku IS 'éƒ½é“åºœçœŒç¨é¡';
+COMMENT ON COLUMN t_fuka.kasan_kbn IS 'åŠ ç®—é‡‘é¡åŒºåˆ†';
+COMMENT ON COLUMN t_fuka.kasan_ritsu IS 'åŠ ç®—å‰²åˆ';
+COMMENT ON COLUMN t_fuka.kasan_gaku IS 'åŠ ç®—é‡‘é¡';
+COMMENT ON COLUMN t_fuka.nokigen IS 'ç´æœŸé™';
+COMMENT ON COLUMN t_fuka.new_flg IS 'æœ€æ–°ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_fuka.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN t_fuka.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_fuka.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_fuka.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_fuka.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_fuka.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_fuka_uchi (
@@ -321,30 +321,30 @@ CREATE TABLE IF NOT EXISTS t_fuka_uchi (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_fuka_uchi_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, nendo, kibetsu, kazei_kbn)
 );
-COMMENT ON TABLE t_fuka_uchi IS '•Š‰Û“à–óî•ñ';
-COMMENT ON COLUMN t_fuka_uchi.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_fuka_uchi.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_fuka_uchi.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_fuka_uchi.nendo IS '•Š‰Û”N“x';
-COMMENT ON COLUMN t_fuka_uchi.kibetsu IS 'Šú•Ê';
-COMMENT ON COLUMN t_fuka_uchi.kazei_kbn IS '‰ÛÅ‹æ•ª';
-COMMENT ON COLUMN t_fuka_uchi.zeiritsu_seq IS 'Å—¦ŠÇ—”Ô†';
-COMMENT ON COLUMN t_fuka_uchi.fuka_kbn IS '•Š‰Û•û®';
-COMMENT ON COLUMN t_fuka_uchi.ryokin_sogaku IS 'h”‘—¿‹à‘Šz';
-COMMENT ON COLUMN t_fuka_uchi.hakusu IS 'h”‘”';
-COMMENT ON COLUMN t_fuka_uchi.ryokin IS 'h”‘—¿‹à';
-COMMENT ON COLUMN t_fuka_uchi.zei_ritsu IS 'Å—¦';
-COMMENT ON COLUMN t_fuka_uchi.zeigaku IS 'ÅŠz';
-COMMENT ON COLUMN t_fuka_uchi.city_zeigaku IS 's‹æ’¬‘ºÅŠz';
-COMMENT ON COLUMN t_fuka_uchi.ken_zeigaku IS '“s“¹•{Œ§ÅŠz';
-COMMENT ON COLUMN t_fuka_uchi.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_fuka_uchi.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_fuka_uchi.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_fuka_uchi.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_fuka_uchi.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_fuka_uchi IS 'è³¦èª²å†…è¨³æƒ…å ±';
+COMMENT ON COLUMN t_fuka_uchi.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_fuka_uchi.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_fuka_uchi.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_fuka_uchi.nendo IS 'è³¦èª²å¹´åº¦';
+COMMENT ON COLUMN t_fuka_uchi.kibetsu IS 'æœŸåˆ¥';
+COMMENT ON COLUMN t_fuka_uchi.kazei_kbn IS 'èª²ç¨åŒºåˆ†';
+COMMENT ON COLUMN t_fuka_uchi.zeiritsu_seq IS 'ç¨ç‡ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN t_fuka_uchi.fuka_kbn IS 'è³¦èª²æ–¹å¼';
+COMMENT ON COLUMN t_fuka_uchi.ryokin_sogaku IS 'å®¿æ³Šæ–™é‡‘ç·é¡';
+COMMENT ON COLUMN t_fuka_uchi.hakusu IS 'å®¿æ³Šæ•°';
+COMMENT ON COLUMN t_fuka_uchi.ryokin IS 'å®¿æ³Šæ–™é‡‘';
+COMMENT ON COLUMN t_fuka_uchi.zei_ritsu IS 'ç¨ç‡';
+COMMENT ON COLUMN t_fuka_uchi.zeigaku IS 'ç¨é¡';
+COMMENT ON COLUMN t_fuka_uchi.city_zeigaku IS 'å¸‚åŒºç”ºæ‘ç¨é¡';
+COMMENT ON COLUMN t_fuka_uchi.ken_zeigaku IS 'éƒ½é“åºœçœŒç¨é¡';
+COMMENT ON COLUMN t_fuka_uchi.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_fuka_uchi.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_fuka_uchi.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_fuka_uchi.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_fuka_uchi.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_choshu_genbo (
@@ -440,103 +440,103 @@ CREATE TABLE IF NOT EXISTS t_choshu_genbo (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_choshu_genbo_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, nendo, kibetsu)
 );
-COMMENT ON TABLE t_choshu_genbo IS '’¥ûŒ´•ë';
-COMMENT ON COLUMN t_choshu_genbo.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_choshu_genbo.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_choshu_genbo.rno IS '—š—ğ”Ô†';
-COMMENT ON COLUMN t_choshu_genbo.nendo IS '•Š‰Û”N“x';
-COMMENT ON COLUMN t_choshu_genbo.kibetsu IS 'Šú•Ê';
-COMMENT ON COLUMN t_choshu_genbo.sogaku1_sum IS '‡Œvh”‘—¿‹à‘Šz1';
-COMMENT ON COLUMN t_choshu_genbo.hakusu1_sum IS '‡Œvh”‘”1';
-COMMENT ON COLUMN t_choshu_genbo.ryokin1_sum IS '‡Œvh”‘—¿‹à1';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu1 IS 'Å—¦1';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku1_sum IS '‡ŒvÅŠz1';
-COMMENT ON COLUMN t_choshu_genbo.sogaku2_sum IS '‡Œvh”‘—¿‹à‘Šz2';
-COMMENT ON COLUMN t_choshu_genbo.hakusu2_sum IS '‡Œvh”‘”2';
-COMMENT ON COLUMN t_choshu_genbo.ryokin2_sum IS '‡Œvh”‘—¿‹à2';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu2 IS 'Å—¦2';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku2_sum IS '‡ŒvÅŠz2';
-COMMENT ON COLUMN t_choshu_genbo.sogaku3_sum IS '‡Œvh”‘—¿‹à‘Šz3';
-COMMENT ON COLUMN t_choshu_genbo.hakusu3_sum IS '‡Œvh”‘”3';
-COMMENT ON COLUMN t_choshu_genbo.ryokin3_sum IS '‡Œvh”‘—¿‹à3';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu3 IS 'Å—¦3';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku3_sum IS '‡ŒvÅŠz3';
-COMMENT ON COLUMN t_choshu_genbo.sogaku4_sum IS '‡Œvh”‘—¿‹à‘Šz4';
-COMMENT ON COLUMN t_choshu_genbo.hakusu4_sum IS '‡Œvh”‘”4';
-COMMENT ON COLUMN t_choshu_genbo.ryokin4_sum IS '‡Œvh”‘—¿‹à4';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu4 IS 'Å—¦4';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku4_sum IS '‡ŒvÅŠz4';
-COMMENT ON COLUMN t_choshu_genbo.sogaku5_sum IS '‡Œvh”‘—¿‹à‘Šz5';
-COMMENT ON COLUMN t_choshu_genbo.hakusu5_sum IS '‡Œvh”‘”5';
-COMMENT ON COLUMN t_choshu_genbo.ryokin5_sum IS '‡Œvh”‘—¿‹à5';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu5 IS 'Å—¦5';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku5_sum IS '‡ŒvÅŠz5';
-COMMENT ON COLUMN t_choshu_genbo.sogaku6_sum IS '‡Œvh”‘—¿‹à‘Šz6';
-COMMENT ON COLUMN t_choshu_genbo.hakusu6_sum IS '‡Œvh”‘”6';
-COMMENT ON COLUMN t_choshu_genbo.ryokin6_sum IS '‡Œvh”‘—¿‹à6';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu6 IS 'Å—¦6';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku6_sum IS '‡ŒvÅŠz6';
-COMMENT ON COLUMN t_choshu_genbo.sogaku7_sum IS '‡Œvh”‘—¿‹à‘Šz7';
-COMMENT ON COLUMN t_choshu_genbo.hakusu7_sum IS '‡Œvh”‘”7';
-COMMENT ON COLUMN t_choshu_genbo.ryokin7_sum IS '‡Œvh”‘—¿‹à7';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu7 IS 'Å—¦7';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku7_sum IS '‡ŒvÅŠz7';
-COMMENT ON COLUMN t_choshu_genbo.sogaku8_sum IS '‡Œvh”‘—¿‹à‘Šz8';
-COMMENT ON COLUMN t_choshu_genbo.hakusu8_sum IS '‡Œvh”‘”8';
-COMMENT ON COLUMN t_choshu_genbo.ryokin8_sum IS '‡Œvh”‘—¿‹à8';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu8 IS 'Å—¦8';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku8_sum IS '‡ŒvÅŠz8';
-COMMENT ON COLUMN t_choshu_genbo.sogaku9_sum IS '‡Œvh”‘—¿‹à‘Šz9';
-COMMENT ON COLUMN t_choshu_genbo.hakusu9_sum IS '‡Œvh”‘”9';
-COMMENT ON COLUMN t_choshu_genbo.ryokin9_sum IS '‡Œvh”‘—¿‹à9';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu9 IS 'Å—¦9';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku9_sum IS '‡ŒvÅŠz9';
-COMMENT ON COLUMN t_choshu_genbo.sogaku10_sum IS '‡Œvh”‘—¿‹à‘Šz10';
-COMMENT ON COLUMN t_choshu_genbo.hakusu10_sum IS '‡Œvh”‘”10';
-COMMENT ON COLUMN t_choshu_genbo.ryokin10_sum IS '‡Œvh”‘—¿‹à10';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu10 IS 'Å—¦10';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku10_sum IS '‡ŒvÅŠz10';
-COMMENT ON COLUMN t_choshu_genbo.menjo_hakusu_sum IS '‡Œv–Æœ”‘”';
-COMMENT ON COLUMN t_choshu_genbo.total_zeigaku_sum IS '‘‡ŒvÅŠz';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_1 IS '’¥ûŒ´•ë“à–ó¯•Êq1';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_2 IS '’¥ûŒ´•ë“à–ó¯•Êq2';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_3 IS '’¥ûŒ´•ë“à–ó¯•Êq3';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_4 IS '’¥ûŒ´•ë“à–ó¯•Êq4';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_5 IS '’¥ûŒ´•ë“à–ó¯•Êq5';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_6 IS '’¥ûŒ´•ë“à–ó¯•Êq6';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_7 IS '’¥ûŒ´•ë“à–ó¯•Êq7';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_8 IS '’¥ûŒ´•ë“à–ó¯•Êq8';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_9 IS '’¥ûŒ´•ë“à–ó¯•Êq9';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_10 IS '’¥ûŒ´•ë“à–ó¯•Êq10';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_11 IS '’¥ûŒ´•ë“à–ó¯•Êq11';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_12 IS '’¥ûŒ´•ë“à–ó¯•Êq12';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_13 IS '’¥ûŒ´•ë“à–ó¯•Êq13';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_14 IS '’¥ûŒ´•ë“à–ó¯•Êq14';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_15 IS '’¥ûŒ´•ë“à–ó¯•Êq15';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_16 IS '’¥ûŒ´•ë“à–ó¯•Êq16';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_17 IS '’¥ûŒ´•ë“à–ó¯•Êq17';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_18 IS '’¥ûŒ´•ë“à–ó¯•Êq18';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_19 IS '’¥ûŒ´•ë“à–ó¯•Êq19';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_20 IS '’¥ûŒ´•ë“à–ó¯•Êq20';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_21 IS '’¥ûŒ´•ë“à–ó¯•Êq21';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_22 IS '’¥ûŒ´•ë“à–ó¯•Êq22';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_23 IS '’¥ûŒ´•ë“à–ó¯•Êq23';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_24 IS '’¥ûŒ´•ë“à–ó¯•Êq24';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_25 IS '’¥ûŒ´•ë“à–ó¯•Êq25';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_26 IS '’¥ûŒ´•ë“à–ó¯•Êq26';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_27 IS '’¥ûŒ´•ë“à–ó¯•Êq27';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_28 IS '’¥ûŒ´•ë“à–ó¯•Êq28';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_29 IS '’¥ûŒ´•ë“à–ó¯•Êq29';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_30 IS '’¥ûŒ´•ë“à–ó¯•Êq30';
-COMMENT ON COLUMN t_choshu_genbo.uchi_idx_31 IS '’¥ûŒ´•ë“à–ó¯•Êq31';
-COMMENT ON COLUMN t_choshu_genbo.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_choshu_genbo.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_choshu_genbo.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_choshu_genbo.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_choshu_genbo.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_choshu_genbo IS 'å¾´ååŸç°¿';
+COMMENT ON COLUMN t_choshu_genbo.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_choshu_genbo.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_choshu_genbo.rno IS 'å±¥æ­´ç•ªå·';
+COMMENT ON COLUMN t_choshu_genbo.nendo IS 'è³¦èª²å¹´åº¦';
+COMMENT ON COLUMN t_choshu_genbo.kibetsu IS 'æœŸåˆ¥';
+COMMENT ON COLUMN t_choshu_genbo.sogaku1_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡1';
+COMMENT ON COLUMN t_choshu_genbo.hakusu1_sum IS 'åˆè¨ˆå®¿æ³Šæ•°1';
+COMMENT ON COLUMN t_choshu_genbo.ryokin1_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘1';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu1 IS 'ç¨ç‡1';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku1_sum IS 'åˆè¨ˆç¨é¡1';
+COMMENT ON COLUMN t_choshu_genbo.sogaku2_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡2';
+COMMENT ON COLUMN t_choshu_genbo.hakusu2_sum IS 'åˆè¨ˆå®¿æ³Šæ•°2';
+COMMENT ON COLUMN t_choshu_genbo.ryokin2_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘2';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu2 IS 'ç¨ç‡2';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku2_sum IS 'åˆè¨ˆç¨é¡2';
+COMMENT ON COLUMN t_choshu_genbo.sogaku3_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡3';
+COMMENT ON COLUMN t_choshu_genbo.hakusu3_sum IS 'åˆè¨ˆå®¿æ³Šæ•°3';
+COMMENT ON COLUMN t_choshu_genbo.ryokin3_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘3';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu3 IS 'ç¨ç‡3';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku3_sum IS 'åˆè¨ˆç¨é¡3';
+COMMENT ON COLUMN t_choshu_genbo.sogaku4_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡4';
+COMMENT ON COLUMN t_choshu_genbo.hakusu4_sum IS 'åˆè¨ˆå®¿æ³Šæ•°4';
+COMMENT ON COLUMN t_choshu_genbo.ryokin4_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘4';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu4 IS 'ç¨ç‡4';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku4_sum IS 'åˆè¨ˆç¨é¡4';
+COMMENT ON COLUMN t_choshu_genbo.sogaku5_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡5';
+COMMENT ON COLUMN t_choshu_genbo.hakusu5_sum IS 'åˆè¨ˆå®¿æ³Šæ•°5';
+COMMENT ON COLUMN t_choshu_genbo.ryokin5_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘5';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu5 IS 'ç¨ç‡5';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku5_sum IS 'åˆè¨ˆç¨é¡5';
+COMMENT ON COLUMN t_choshu_genbo.sogaku6_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡6';
+COMMENT ON COLUMN t_choshu_genbo.hakusu6_sum IS 'åˆè¨ˆå®¿æ³Šæ•°6';
+COMMENT ON COLUMN t_choshu_genbo.ryokin6_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘6';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu6 IS 'ç¨ç‡6';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku6_sum IS 'åˆè¨ˆç¨é¡6';
+COMMENT ON COLUMN t_choshu_genbo.sogaku7_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡7';
+COMMENT ON COLUMN t_choshu_genbo.hakusu7_sum IS 'åˆè¨ˆå®¿æ³Šæ•°7';
+COMMENT ON COLUMN t_choshu_genbo.ryokin7_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘7';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu7 IS 'ç¨ç‡7';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku7_sum IS 'åˆè¨ˆç¨é¡7';
+COMMENT ON COLUMN t_choshu_genbo.sogaku8_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡8';
+COMMENT ON COLUMN t_choshu_genbo.hakusu8_sum IS 'åˆè¨ˆå®¿æ³Šæ•°8';
+COMMENT ON COLUMN t_choshu_genbo.ryokin8_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘8';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu8 IS 'ç¨ç‡8';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku8_sum IS 'åˆè¨ˆç¨é¡8';
+COMMENT ON COLUMN t_choshu_genbo.sogaku9_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡9';
+COMMENT ON COLUMN t_choshu_genbo.hakusu9_sum IS 'åˆè¨ˆå®¿æ³Šæ•°9';
+COMMENT ON COLUMN t_choshu_genbo.ryokin9_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘9';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu9 IS 'ç¨ç‡9';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku9_sum IS 'åˆè¨ˆç¨é¡9';
+COMMENT ON COLUMN t_choshu_genbo.sogaku10_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘ç·é¡10';
+COMMENT ON COLUMN t_choshu_genbo.hakusu10_sum IS 'åˆè¨ˆå®¿æ³Šæ•°10';
+COMMENT ON COLUMN t_choshu_genbo.ryokin10_sum IS 'åˆè¨ˆå®¿æ³Šæ–™é‡‘10';
+COMMENT ON COLUMN t_choshu_genbo.zei_ritsu10 IS 'ç¨ç‡10';
+COMMENT ON COLUMN t_choshu_genbo.zeigaku10_sum IS 'åˆè¨ˆç¨é¡10';
+COMMENT ON COLUMN t_choshu_genbo.menjo_hakusu_sum IS 'åˆè¨ˆå…é™¤æ³Šæ•°';
+COMMENT ON COLUMN t_choshu_genbo.total_zeigaku_sum IS 'ç·åˆè¨ˆç¨é¡';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_1 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­1';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_2 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­2';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_3 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­3';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_4 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­4';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_5 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­5';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_6 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­6';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_7 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­7';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_8 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­8';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_9 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­9';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_10 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­10';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_11 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­11';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_12 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­12';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_13 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­13';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_14 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­14';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_15 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­15';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_16 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­16';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_17 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­17';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_18 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­18';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_19 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­19';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_20 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­20';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_21 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­21';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_22 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­22';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_23 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­23';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_24 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­24';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_25 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­25';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_26 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­26';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_27 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­27';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_28 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­28';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_29 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­29';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_30 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­30';
+COMMENT ON COLUMN t_choshu_genbo.uchi_idx_31 IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­31';
+COMMENT ON COLUMN t_choshu_genbo.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_choshu_genbo.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_choshu_genbo.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_choshu_genbo.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_choshu_genbo.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_choshu_genbo_uchi (
@@ -578,49 +578,49 @@ CREATE TABLE IF NOT EXISTS t_choshu_genbo_uchi (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_choshu_genbo_uchi_pkey PRIMARY KEY (jichitai_cd, uchi_idx)
 );
-COMMENT ON TABLE t_choshu_genbo_uchi IS '’¥ûŒ´•ë“à–ó';
-COMMENT ON COLUMN t_choshu_genbo_uchi.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_choshu_genbo_uchi.uchi_idx IS '’¥ûŒ´•ë“à–ó¯•Êq';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku1 IS 'h”‘—¿‹à‘Šz1';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu1 IS 'h”‘”1';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin1 IS 'h”‘—¿‹à1';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku2 IS 'h”‘—¿‹à‘Šz2';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu2 IS 'h”‘”2';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin2 IS 'h”‘—¿‹à2';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku3 IS 'h”‘—¿‹à‘Šz3';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu3 IS 'h”‘”3';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin3 IS 'h”‘—¿‹à3';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku4 IS 'h”‘—¿‹à‘Šz4';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu4 IS 'h”‘”4';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin4 IS 'h”‘—¿‹à4';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku5 IS 'h”‘—¿‹à‘Šz5';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu5 IS 'h”‘”5';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin5 IS 'h”‘—¿‹à5';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku6 IS 'h”‘—¿‹à‘Šz6';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu6 IS 'h”‘”6';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin6 IS 'h”‘—¿‹à6';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku7 IS 'h”‘—¿‹à‘Šz7';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu7 IS 'h”‘”7';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin7 IS 'h”‘—¿‹à7';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku8 IS 'h”‘—¿‹à‘Šz8';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu8 IS 'h”‘”8';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin8 IS 'h”‘—¿‹à8';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku9 IS 'h”‘—¿‹à‘Šz9';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu9 IS 'h”‘”9';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin9 IS 'h”‘—¿‹à9';
-COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku10 IS 'h”‘—¿‹à‘Šz10';
-COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu10 IS 'h”‘”10';
-COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin10 IS 'h”‘—¿‹à10';
-COMMENT ON COLUMN t_choshu_genbo_uchi.menjo_hakusu IS '–Æœ”‘”';
-COMMENT ON COLUMN t_choshu_genbo_uchi.zeigaku IS 'ÅŠz';
-COMMENT ON COLUMN t_choshu_genbo_uchi.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_choshu_genbo_uchi.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_choshu_genbo_uchi.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_choshu_genbo_uchi.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_choshu_genbo_uchi.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_choshu_genbo_uchi IS 'å¾´ååŸç°¿å†…è¨³';
+COMMENT ON COLUMN t_choshu_genbo_uchi.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_choshu_genbo_uchi.uchi_idx IS 'å¾´ååŸç°¿å†…è¨³è­˜åˆ¥å­';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku1 IS 'å®¿æ³Šæ–™é‡‘ç·é¡1';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu1 IS 'å®¿æ³Šæ•°1';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin1 IS 'å®¿æ³Šæ–™é‡‘1';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku2 IS 'å®¿æ³Šæ–™é‡‘ç·é¡2';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu2 IS 'å®¿æ³Šæ•°2';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin2 IS 'å®¿æ³Šæ–™é‡‘2';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku3 IS 'å®¿æ³Šæ–™é‡‘ç·é¡3';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu3 IS 'å®¿æ³Šæ•°3';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin3 IS 'å®¿æ³Šæ–™é‡‘3';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku4 IS 'å®¿æ³Šæ–™é‡‘ç·é¡4';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu4 IS 'å®¿æ³Šæ•°4';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin4 IS 'å®¿æ³Šæ–™é‡‘4';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku5 IS 'å®¿æ³Šæ–™é‡‘ç·é¡5';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu5 IS 'å®¿æ³Šæ•°5';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin5 IS 'å®¿æ³Šæ–™é‡‘5';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku6 IS 'å®¿æ³Šæ–™é‡‘ç·é¡6';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu6 IS 'å®¿æ³Šæ•°6';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin6 IS 'å®¿æ³Šæ–™é‡‘6';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku7 IS 'å®¿æ³Šæ–™é‡‘ç·é¡7';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu7 IS 'å®¿æ³Šæ•°7';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin7 IS 'å®¿æ³Šæ–™é‡‘7';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku8 IS 'å®¿æ³Šæ–™é‡‘ç·é¡8';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu8 IS 'å®¿æ³Šæ•°8';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin8 IS 'å®¿æ³Šæ–™é‡‘8';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku9 IS 'å®¿æ³Šæ–™é‡‘ç·é¡9';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu9 IS 'å®¿æ³Šæ•°9';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin9 IS 'å®¿æ³Šæ–™é‡‘9';
+COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku10 IS 'å®¿æ³Šæ–™é‡‘ç·é¡10';
+COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu10 IS 'å®¿æ³Šæ•°10';
+COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin10 IS 'å®¿æ³Šæ–™é‡‘10';
+COMMENT ON COLUMN t_choshu_genbo_uchi.menjo_hakusu IS 'å…é™¤æ³Šæ•°';
+COMMENT ON COLUMN t_choshu_genbo_uchi.zeigaku IS 'ç¨é¡';
+COMMENT ON COLUMN t_choshu_genbo_uchi.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_choshu_genbo_uchi.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_choshu_genbo_uchi.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_choshu_genbo_uchi.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_choshu_genbo_uchi.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_shoreikin (
@@ -635,22 +635,22 @@ CREATE TABLE IF NOT EXISTS t_shoreikin (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_shoreikin_pkey PRIMARY KEY (jichitai_cd, shitei_no, nendo)
 );
-COMMENT ON TABLE t_shoreikin IS '§—ã‹àŒğ•tî•ñ';
-COMMENT ON COLUMN t_shoreikin.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_shoreikin.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_shoreikin.nendo IS '§—ã‹à”N“x';
-COMMENT ON COLUMN t_shoreikin.kofu_zeigaku IS '”[“üÅŠz';
-COMMENT ON COLUMN t_shoreikin.kofu_ritsu IS 'Œğ•t—¦';
-COMMENT ON COLUMN t_shoreikin.kofu_gaku IS 'Œğ•tŠz';
-COMMENT ON COLUMN t_shoreikin.kofu_ymd IS 'Œğ•t”NŒ“ú';
-COMMENT ON COLUMN t_shoreikin.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_shoreikin.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_shoreikin.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_shoreikin.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_shoreikin.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_shoreikin IS 'å¥¨åŠ±é‡‘äº¤ä»˜æƒ…å ±';
+COMMENT ON COLUMN t_shoreikin.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_shoreikin.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_shoreikin.nendo IS 'å¥¨åŠ±é‡‘å¹´åº¦';
+COMMENT ON COLUMN t_shoreikin.kofu_zeigaku IS 'ç´å…¥ç¨é¡';
+COMMENT ON COLUMN t_shoreikin.kofu_ritsu IS 'äº¤ä»˜ç‡';
+COMMENT ON COLUMN t_shoreikin.kofu_gaku IS 'äº¤ä»˜é¡';
+COMMENT ON COLUMN t_shoreikin.kofu_ymd IS 'äº¤ä»˜å¹´æœˆæ—¥';
+COMMENT ON COLUMN t_shoreikin.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_shoreikin.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_shoreikin.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_shoreikin.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_shoreikin.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_furikomi_koza (
@@ -667,24 +667,24 @@ CREATE TABLE IF NOT EXISTS t_furikomi_koza (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_furikomi_koza_pkey PRIMARY KEY (jichitai_cd, shitei_no)
 );
-COMMENT ON TABLE t_furikomi_koza IS 'UŒûÀî•ñ';
-COMMENT ON COLUMN t_furikomi_koza.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_furikomi_koza.shitei_no IS 'w’è”Ô†';
-COMMENT ON COLUMN t_furikomi_koza.bank_cd IS '‹à—Z‹@ŠÖƒR[ƒh';
-COMMENT ON COLUMN t_furikomi_koza.bank_name IS '‹à—Z‹@ŠÖ–¼';
-COMMENT ON COLUMN t_furikomi_koza.branch_cd IS 'x“XƒR[ƒh';
-COMMENT ON COLUMN t_furikomi_koza.branch_name IS 'x“X–¼';
-COMMENT ON COLUMN t_furikomi_koza.shumoku IS '—a‹àí–Ú';
-COMMENT ON COLUMN t_furikomi_koza.koza_no IS 'ŒûÀ”Ô†';
-COMMENT ON COLUMN t_furikomi_koza.meigi IS 'ŒûÀ–¼‹`';
-COMMENT ON COLUMN t_furikomi_koza.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_furikomi_koza.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_furikomi_koza.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_furikomi_koza.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_furikomi_koza.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_furikomi_koza IS 'æŒ¯è¾¼å£åº§æƒ…å ±';
+COMMENT ON COLUMN t_furikomi_koza.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_furikomi_koza.shitei_no IS 'æŒ‡å®šç•ªå·';
+COMMENT ON COLUMN t_furikomi_koza.bank_cd IS 'é‡‘èæ©Ÿé–¢ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_furikomi_koza.bank_name IS 'é‡‘èæ©Ÿé–¢å';
+COMMENT ON COLUMN t_furikomi_koza.branch_cd IS 'æ”¯åº—ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_furikomi_koza.branch_name IS 'æ”¯åº—å';
+COMMENT ON COLUMN t_furikomi_koza.shumoku IS 'é é‡‘ç¨®ç›®';
+COMMENT ON COLUMN t_furikomi_koza.koza_no IS 'å£åº§ç•ªå·';
+COMMENT ON COLUMN t_furikomi_koza.meigi IS 'å£åº§åç¾©';
+COMMENT ON COLUMN t_furikomi_koza.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_furikomi_koza.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_furikomi_koza.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_furikomi_koza.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_furikomi_koza.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_eltax_renkei (
@@ -699,22 +699,22 @@ CREATE TABLE IF NOT EXISTS t_eltax_renkei (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT t_eltax_renkei_pkey PRIMARY KEY (jichitai_cd, seq)
 );
-COMMENT ON TABLE t_eltax_renkei IS 'eLTAX˜AŒgŠÇ—';
-COMMENT ON COLUMN t_eltax_renkei.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN t_eltax_renkei.seq IS 'ŠÇ—”Ô†';
-COMMENT ON COLUMN t_eltax_renkei.file_name IS 'ƒtƒ@ƒCƒ‹–¼';
-COMMENT ON COLUMN t_eltax_renkei.shubetsu IS 'ƒtƒ@ƒCƒ‹í•Ê';
-COMMENT ON COLUMN t_eltax_renkei.shori_dt IS 'ˆ—“ú';
-COMMENT ON COLUMN t_eltax_renkei.shori_kekka IS 'ˆ—Œ‹‰Ê';
-COMMENT ON COLUMN t_eltax_renkei.log IS 'ƒƒO';
-COMMENT ON COLUMN t_eltax_renkei.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN t_eltax_renkei.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN t_eltax_renkei.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN t_eltax_renkei.upd_user IS 'XVÒ';
-COMMENT ON COLUMN t_eltax_renkei.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE t_eltax_renkei IS 'eLTAXé€£æºç®¡ç†';
+COMMENT ON COLUMN t_eltax_renkei.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN t_eltax_renkei.seq IS 'ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN t_eltax_renkei.file_name IS 'ãƒ•ã‚¡ã‚¤ãƒ«å';
+COMMENT ON COLUMN t_eltax_renkei.shubetsu IS 'ãƒ•ã‚¡ã‚¤ãƒ«ç¨®åˆ¥';
+COMMENT ON COLUMN t_eltax_renkei.shori_dt IS 'å‡¦ç†æ—¥æ™‚';
+COMMENT ON COLUMN t_eltax_renkei.shori_kekka IS 'å‡¦ç†çµæœ';
+COMMENT ON COLUMN t_eltax_renkei.log IS 'ãƒ­ã‚°';
+COMMENT ON COLUMN t_eltax_renkei.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN t_eltax_renkei.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN t_eltax_renkei.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN t_eltax_renkei.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN t_eltax_renkei.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_nozei_shuki (
@@ -726,19 +726,19 @@ CREATE TABLE IF NOT EXISTS m_nozei_shuki (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, seq)
 );
-COMMENT ON TABLE m_nozei_shuki IS '”[ÅüŠúƒ}ƒXƒ^';
-COMMENT ON COLUMN m_nozei_shuki.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_nozei_shuki.seq IS 'ŠÇ—”Ô†';
-COMMENT ON COLUMN m_nozei_shuki.shuki IS '”[ÅüŠú';
-COMMENT ON COLUMN m_nozei_shuki.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN m_nozei_shuki.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN m_nozei_shuki.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_nozei_shuki.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_nozei_shuki.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_nozei_shuki.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_nozei_shuki IS 'ç´ç¨å‘¨æœŸãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_nozei_shuki.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_nozei_shuki.seq IS 'ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN m_nozei_shuki.shuki IS 'ç´ç¨å‘¨æœŸ';
+COMMENT ON COLUMN m_nozei_shuki.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN m_nozei_shuki.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_nozei_shuki.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_nozei_shuki.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_nozei_shuki.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_nozei_shuki.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_zeiritsu (
@@ -753,22 +753,22 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_zeiritsu_pkey PRIMARY KEY (jichitai_cd, seq)
 );
-COMMENT ON TABLE m_zeiritsu IS 'Å—¦ŠÇ—ƒ}ƒXƒ^';
-COMMENT ON COLUMN m_zeiritsu.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_zeiritsu.seq IS 'Å—¦ŠÇ—”Ô†';
-COMMENT ON COLUMN m_zeiritsu.taisho_kbn IS '‘ÎÛ‹æ•ª';
-COMMENT ON COLUMN m_zeiritsu.tekiyo_st_ym IS '“K—pŠJn”NŒ';
-COMMENT ON COLUMN m_zeiritsu.tekiyo_ed_ym IS '“K—pI—¹”NŒ';
-COMMENT ON COLUMN m_zeiritsu.fuka_kbn IS '•Š‰Û•û®';
-COMMENT ON COLUMN m_zeiritsu.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN m_zeiritsu.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN m_zeiritsu.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_zeiritsu.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_zeiritsu.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_zeiritsu.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_zeiritsu IS 'ç¨ç‡ç®¡ç†ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_zeiritsu.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_zeiritsu.seq IS 'ç¨ç‡ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN m_zeiritsu.taisho_kbn IS 'å¯¾è±¡åŒºåˆ†';
+COMMENT ON COLUMN m_zeiritsu.tekiyo_st_ym IS 'é©ç”¨é–‹å§‹å¹´æœˆ';
+COMMENT ON COLUMN m_zeiritsu.tekiyo_ed_ym IS 'é©ç”¨çµ‚äº†å¹´æœˆ';
+COMMENT ON COLUMN m_zeiritsu.fuka_kbn IS 'è³¦èª²æ–¹å¼';
+COMMENT ON COLUMN m_zeiritsu.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN m_zeiritsu.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_zeiritsu.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_zeiritsu.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_zeiritsu.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_zeiritsu.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_zeiritsu_teigaku (
@@ -783,22 +783,22 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu_teigaku (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_zeiritsu_teigaku_pkey PRIMARY KEY (jichitai_cd, seq, teigaku_seq)
 );
-COMMENT ON TABLE m_zeiritsu_teigaku IS 'Å—¦’èŠzÚ×ƒ}ƒXƒ^';
-COMMENT ON COLUMN m_zeiritsu_teigaku.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_zeiritsu_teigaku.seq IS 'Å—¦ŠÇ—”Ô†';
-COMMENT ON COLUMN m_zeiritsu_teigaku.teigaku_seq IS '’èŠzŠÇ—”Ô†';
-COMMENT ON COLUMN m_zeiritsu_teigaku.ryokin_st IS 'h”‘—¿‹à”ÍˆÍŠJn';
-COMMENT ON COLUMN m_zeiritsu_teigaku.ryokin_ed IS 'h”‘—¿‹à”ÍˆÍI—¹';
-COMMENT ON COLUMN m_zeiritsu_teigaku.zeigaku IS 'h”‘ÅŠz';
-COMMENT ON COLUMN m_zeiritsu_teigaku.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN m_zeiritsu_teigaku.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN m_zeiritsu_teigaku.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_zeiritsu_teigaku.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_zeiritsu_teigaku.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_zeiritsu_teigaku.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_zeiritsu_teigaku IS 'ç¨ç‡å®šé¡è©³ç´°ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_zeiritsu_teigaku.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_zeiritsu_teigaku.seq IS 'ç¨ç‡ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN m_zeiritsu_teigaku.teigaku_seq IS 'å®šé¡ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN m_zeiritsu_teigaku.ryokin_st IS 'å®¿æ³Šæ–™é‡‘ç¯„å›²é–‹å§‹';
+COMMENT ON COLUMN m_zeiritsu_teigaku.ryokin_ed IS 'å®¿æ³Šæ–™é‡‘ç¯„å›²çµ‚äº†';
+COMMENT ON COLUMN m_zeiritsu_teigaku.zeigaku IS 'å®¿æ³Šç¨é¡';
+COMMENT ON COLUMN m_zeiritsu_teigaku.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN m_zeiritsu_teigaku.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_zeiritsu_teigaku.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_zeiritsu_teigaku.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_zeiritsu_teigaku.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_zeiritsu_teigaku.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_zeiritsu_teiritsu (
@@ -811,20 +811,20 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu_teiritsu (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_zeiritsu_teiritsu_pkey PRIMARY KEY (jichitai_cd, seq, teiritsu_seq)
 );
-COMMENT ON TABLE m_zeiritsu_teiritsu IS 'Å—¦’è—¦Ú×ƒ}ƒXƒ^';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.seq IS 'Å—¦ŠÇ—”Ô†';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.teiritsu_seq IS '’è—¦ŠÇ—”Ô†';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.zei_ritsu IS 'h”‘Å—¦';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.del_flg IS 'íœƒtƒ‰ƒO';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_zeiritsu_teiritsu.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_zeiritsu_teiritsu IS 'ç¨ç‡å®šç‡è©³ç´°ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.seq IS 'ç¨ç‡ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.teiritsu_seq IS 'å®šç‡ç®¡ç†ç•ªå·';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.zei_ritsu IS 'å®¿æ³Šç¨ç‡';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.del_flg IS 'å‰Šé™¤ãƒ•ãƒ©ã‚°';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_user (
@@ -839,42 +839,44 @@ CREATE TABLE IF NOT EXISTS m_user (
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_user_pkey PRIMARY KEY (jichitai_cd, id)
 );
-COMMENT ON TABLE m_user IS 'ƒ†[ƒUŠÇ—ƒ}ƒXƒ^';
-COMMENT ON COLUMN m_user.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_user.id IS 'ƒ†[ƒU‚h‚c';
-COMMENT ON COLUMN m_user.password IS 'ƒpƒXƒ[ƒh';
-COMMENT ON COLUMN m_user.name IS '–¼';
-COMMENT ON COLUMN m_user.name_kana IS '–¼‚©‚È';
-COMMENT ON COLUMN m_user.busho IS '•”';
-COMMENT ON COLUMN m_user.role_id IS 'Œ ŒÀƒ[ƒ‹‚h‚c';
-COMMENT ON COLUMN m_user.add_dt IS 'ì¬“ú';
-COMMENT ON COLUMN m_user.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_user.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_user.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_user.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_user IS 'ãƒ¦ãƒ¼ã‚¶ç®¡ç†ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_user.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_user.id IS 'ãƒ¦ãƒ¼ã‚¶ï¼©ï¼¤';
+COMMENT ON COLUMN m_user.password IS 'ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_user.name IS 'æ°å';
+COMMENT ON COLUMN m_user.name_kana IS 'æ°åã‹ãª';
+COMMENT ON COLUMN m_user.busho IS 'éƒ¨ç½²';
+COMMENT ON COLUMN m_user.role_id IS 'æ¨©é™ãƒ­ãƒ¼ãƒ«ï¼©ï¼¤';
+COMMENT ON COLUMN m_user.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_user.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_user.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_user.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_user.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_role (
   jichitai_cd char(5) NOT NULL,
   role_id numeric(5) NOT NULL,
   name varchar(200) NOT NULL,
-  add_user varchar(200) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_role_pkey PRIMARY KEY (jichitai_cd, role_id)
 );
-COMMENT ON TABLE m_role IS 'Œ ŒÀŠÇ—ƒ}ƒXƒ^';
-COMMENT ON COLUMN m_role.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_role.role_id IS 'Œ ŒÀƒ[ƒ‹‚h‚c';
-COMMENT ON COLUMN m_role.name IS 'Œ ŒÀ–¼Ì';
-COMMENT ON COLUMN m_role.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_role.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_role.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_role.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_role IS 'æ¨©é™ç®¡ç†ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_role.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_role.role_id IS 'æ¨©é™ãƒ­ãƒ¼ãƒ«ï¼©ï¼¤';
+COMMENT ON COLUMN m_role.name IS 'æ¨©é™åç§°';
+COMMENT ON COLUMN m_role.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_role.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_role.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_role.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_role.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_role_dtl (
@@ -882,39 +884,81 @@ CREATE TABLE IF NOT EXISTS m_role_dtl (
   role_id numeric(5) NOT NULL,
   screen_id char(10) NOT NULL,
   permission char(1) NOT NULL,
-  add_user varchar(200) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_role_dtl_pkey PRIMARY KEY (jichitai_cd, role_id, screen_id)
 );
-COMMENT ON TABLE m_role_dtl IS 'Œ ŒÀÚ×ƒ}ƒXƒ^';
-COMMENT ON COLUMN m_role_dtl.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_role_dtl.role_id IS 'Œ ŒÀƒ[ƒ‹‚h‚c';
-COMMENT ON COLUMN m_role_dtl.screen_id IS '‰æ–Ê‚h‚c';
-COMMENT ON COLUMN m_role_dtl.permission IS 'Œ ŒÀ';
-COMMENT ON COLUMN m_role_dtl.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_role_dtl.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_role_dtl.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_role_dtl.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_role_dtl IS 'æ¨©é™è©³ç´°ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_role_dtl.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_role_dtl.role_id IS 'æ¨©é™ãƒ­ãƒ¼ãƒ«ï¼©ï¼¤';
+COMMENT ON COLUMN m_role_dtl.screen_id IS 'ç”»é¢ï¼©ï¼¤';
+COMMENT ON COLUMN m_role_dtl.permission IS 'æ¨©é™';
+COMMENT ON COLUMN m_role_dtl.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_role_dtl.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_role_dtl.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_role_dtl.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_role_dtl.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_screen (
   jichitai_cd char(5) NOT NULL,
   screen_id char(10) NOT NULL,
   screen_name varchar(100) NOT NULL,
-  add_user varchar(200) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user varchar(20) NOT NULL,
-  version numeric(5) NOT NULL,
+  version integer NOT NULL,
   CONSTRAINT m_screen_pkey PRIMARY KEY (jichitai_cd, screen_id)
 );
-COMMENT ON TABLE m_screen IS '‰æ–ÊŠÇ—ƒ}ƒXƒ^';
-COMMENT ON COLUMN m_screen.jichitai_cd IS '©¡‘ÌƒR[ƒh';
-COMMENT ON COLUMN m_screen.screen_id IS '‰æ–Ê‚h‚c';
-COMMENT ON COLUMN m_screen.screen_name IS '‰æ–Ê–¼Ì';
-COMMENT ON COLUMN m_screen.add_user IS 'ì¬Ò';
-COMMENT ON COLUMN m_screen.upd_dt IS 'XV“ú';
-COMMENT ON COLUMN m_screen.upd_user IS 'XVÒ';
-COMMENT ON COLUMN m_screen.version IS 'ƒo[ƒWƒ‡ƒ“';
+COMMENT ON TABLE m_screen IS 'ç”»é¢ç®¡ç†ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_screen.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_screen.screen_id IS 'ç”»é¢ï¼©ï¼¤';
+COMMENT ON COLUMN m_screen.screen_name IS 'ç”»é¢åç§°';
+COMMENT ON COLUMN m_screen.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_screen.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_screen.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_screen.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_screen.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_atena (
+  jichitai_cd char(5) NOT NULL,
+  atena_no numeric(15) NOT NULL,
+  kbn char(1) NOT NULL,
+  kojin_no char(64),
+  hojin_no char(13),
+  name varchar(200) NOT NULL,
+  name_kana varchar(200),
+  yubin_no varchar(10),
+  jusho varchar(200),
+  tel1 varchar(20),
+  tel2 varchar(20),
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_atena_pkey PRIMARY KEY (jichitai_cd, atena_no)
+);
+COMMENT ON TABLE m_atena IS 'å®›åç®¡ç†ãƒã‚¹ã‚¿';
+COMMENT ON COLUMN m_atena.jichitai_cd IS 'è‡ªæ²»ä½“ã‚³ãƒ¼ãƒ‰';
+COMMENT ON COLUMN m_atena.atena_no IS 'å®›åç•ªå·';
+COMMENT ON COLUMN m_atena.kbn IS 'åŒºåˆ†';
+COMMENT ON COLUMN m_atena.kojin_no IS 'å€‹äººç•ªå·';
+COMMENT ON COLUMN m_atena.hojin_no IS 'æ³•äººç•ªå·';
+COMMENT ON COLUMN m_atena.name IS 'åç§°';
+COMMENT ON COLUMN m_atena.name_kana IS 'åç§°ã‹ãª';
+COMMENT ON COLUMN m_atena.yubin_no IS 'éƒµä¾¿ç•ªå·';
+COMMENT ON COLUMN m_atena.jusho IS 'ä½æ‰€';
+COMMENT ON COLUMN m_atena.tel1 IS 'é›»è©±ç•ªå·1';
+COMMENT ON COLUMN m_atena.tel2 IS 'é›»è©±ç•ªå·2';
+COMMENT ON COLUMN m_atena.add_dt IS 'ä½œæˆæ—¥æ™‚';
+COMMENT ON COLUMN m_atena.add_user IS 'ä½œæˆè€…';
+COMMENT ON COLUMN m_atena.upd_dt IS 'æ›´æ–°æ—¥æ™‚';
+COMMENT ON COLUMN m_atena.upd_user IS 'æ›´æ–°è€…';
+COMMENT ON COLUMN m_atena.version IS 'ãƒãƒ¼ã‚¸ãƒ§ãƒ³';
 
