@@ -1,13 +1,20 @@
 package jp.lg.asp.accommodation.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "m_screen")
-@Data
+@Getter 
+@Setter
 @IdClass(ScreenId.class)
-public class Screen {
+public class Screen extends BaseEntity {
     
     @Id
     @Column(name = "jichitai_cd")
@@ -20,15 +27,4 @@ public class Screen {
     @Column(name = "screen_name", nullable = false)
     private String screenName;
     
-    @Column(name = "add_user")
-    private String addUser;
-    
-    @Column(name = "upd_dt")
-    private java.time.LocalDateTime updDt;
-    
-    @Column(name = "upd_user")
-    private String updUser;
-    
-    @Column(name = "version")
-    private Long version;
 }

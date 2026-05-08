@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.entity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,13 +8,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "t_nokan")
-@Data
+@Getter 
+@Setter
 @IdClass(TaxManagerId.class)
-public class TaxManager {
+public class TaxManager extends BaseEntity {
 
     @Id
     @Column(name = "jichitai_cd", length = 5, nullable = false)
@@ -65,19 +66,5 @@ public class TaxManager {
     @Column(name = "del_flg", length = 1, nullable = false)
     private String delFlg;
 
-    // --- 以下、共通カラム（定義書に基づく） ---
-    @Column(name = "add_dt", nullable = false)
-    private LocalDateTime addDt;
 
-    @Column(name = "add_user", length = 20, nullable = false)
-    private String addUser;
-
-    @Column(name = "upd_dt", nullable = false)
-    private LocalDateTime updDt;
-
-    @Column(name = "upd_user", length = 20, nullable = false)
-    private String updUser;
-
-    @Column(name = "version", nullable = false)
-    private Integer version;
 }

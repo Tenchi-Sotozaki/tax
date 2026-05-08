@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.entity;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +14,7 @@ import lombok.Setter;
 @IdClass(FukaId.class) 
 @Getter 
 @Setter
-public class Fuka {
+public class Fuka extends BaseEntity {
 
     @Id
     @Column(name = "jichitai_cd", length = 5)
@@ -49,18 +48,5 @@ public class Fuka {
     @Column(name = "del_flg", length = 1)
     private String delFlg;
 
-    @Column(name = "add_dt")
-    private LocalDateTime addDt;
 
-    @Column(name = "add_user", length = 20)
-    private String addUser;
-
-    @Column(name = "upd_dt")
-    private LocalDateTime updDt;
-
-    @Column(name = "upd_user", length = 20)
-    private String updUser;
-
-    @Column(name = "version")
-    private Integer version;
 }

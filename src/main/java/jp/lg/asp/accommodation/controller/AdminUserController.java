@@ -1,10 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -75,9 +71,6 @@ public class AdminUserController {
 			return FORM_VIEW;
 		}
 
-		LocalDateTime now = LocalDateTime.now();
-		String currentUser = getCurrentUser();
-
 		User user = new User();
 		user.setJichitaiCd(jichitaiCd);
 		user.setId(form.getId());
@@ -86,11 +79,6 @@ public class AdminUserController {
 		user.setNameKana(form.getNameKana());
 		user.setBusho(form.getBusho());
 		user.setRoleId(form.getRoleId());
-		user.setAddDt(now);
-		user.setAddUser(currentUser);
-		user.setUpdDt(now);
-		user.setUpdUser(currentUser);
-		user.setVersion(BigDecimal.ONE);
 		userRepository.save(user);
 
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを登録しました。");
@@ -151,8 +139,6 @@ public class AdminUserController {
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {
 			user.setPassword(passwordEncoder.encode(form.getPassword()));
 		}
-		user.setUpdDt(LocalDateTime.now());
-		user.setUpdUser(getCurrentUser());
 		userRepository.save(user);
 
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザー情報を更新しました。");
@@ -164,11 +150,6 @@ public class AdminUserController {
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
 		return "redirect:/admin/user-search";
-	}
-
-	private String getCurrentUser() {
-		var auth = SecurityContextHolder.getContext().getAuthentication();
-		return (auth != null && auth.isAuthenticated()) ? auth.getName() : "system";
 	}
 
 	private UserId buildUserId(String id) {

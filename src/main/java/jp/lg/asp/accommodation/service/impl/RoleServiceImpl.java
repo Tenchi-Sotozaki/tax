@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,11 +66,6 @@ public class RoleServiceImpl implements RoleService {
 						detail.setRoleId(role.getRoleId());
 						detail.setScreenId(entry.getKey());
 						detail.setPermission(entry.getValue());
-						detail.setUpdDt(LocalDateTime.now());
-						detail.setUpdUser(userId);
-						if (!existingMap.containsKey(entry.getKey())) {
-							detail.setAddUser(userId);
-						}
 						updatedDetails.add(detail);
 					}
 				}
@@ -85,9 +79,6 @@ public class RoleServiceImpl implements RoleService {
 			long nextId = roleRepository.findMaxRoleIdByJichitaiCd(jichitaiCd) + 1;
 			role.setRoleId(nextId);
 			role.setName(form.getName());
-			role.setAddUser(userId);
-			role.setUpdDt(LocalDateTime.now());
-			role.setUpdUser(userId);
 			role.setRoleDetails(new ArrayList<>());
 			roleRepository.saveAndFlush(role);
 
@@ -99,9 +90,6 @@ public class RoleServiceImpl implements RoleService {
 						detail.setRoleId(role.getRoleId());
 						detail.setScreenId(entry.getKey());
 						detail.setPermission(entry.getValue());
-						detail.setAddUser(userId);
-						detail.setUpdDt(LocalDateTime.now());
-						detail.setUpdUser(userId);
 						role.getRoleDetails().add(detail);
 					}
 				}
@@ -122,8 +110,6 @@ public class RoleServiceImpl implements RoleService {
 		List<User> currentUsers = userRepository.findByJichitaiCdAndRoleId(jichitaiCd, BigDecimal.valueOf(roleId));
 		for (User u : currentUsers) {
 			u.setRoleId(BigDecimal.ZERO);
-			u.setUpdDt(LocalDateTime.now());
-			u.setUpdUser(updUser);
 		}
 		userRepository.saveAll(currentUsers);
 
@@ -132,8 +118,6 @@ public class RoleServiceImpl implements RoleService {
 				User u = userRepository.findById(new UserId()).orElse(null);
 				if (u != null) {
 					u.setRoleId(BigDecimal.valueOf(roleId));
-					u.setUpdDt(LocalDateTime.now());
-					u.setUpdUser(updUser);
 					userRepository.save(u);
 				}
 			}
