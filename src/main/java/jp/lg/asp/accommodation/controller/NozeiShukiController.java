@@ -84,6 +84,14 @@ public class NozeiShukiController {
     @PostMapping("/save")
     public String save(NozeiShuki nozeiShuki, RedirectAttributes redirectAttributes) {
         try {
+            if (nozeiShuki.getSeq() == null && nozeiShukiService.existsByShuki(nozeiShuki.getShuki())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "この周期は既に登録されています。");
+                return "redirect:/admin/nozei-shuki/register";
+            }
+            if (nozeiShuki.getSeq() != null && nozeiShukiService.existsByShukiExcludeSeq(nozeiShuki.getShuki(), nozeiShuki.getSeq())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "この周期は既に登録されています。");
+                return "redirect:/admin/nozei-shuki/edit/" + nozeiShuki.getSeq();
+            }
             nozeiShukiService.save(nozeiShuki);
             String message = nozeiShuki.getSeq() == null ? "納税周期を登録しました。" : "納税周期を更新しました。";
             redirectAttributes.addFlashAttribute("successMessage", message);

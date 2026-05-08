@@ -53,6 +53,18 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public boolean existsByShuki(BigDecimal shuki) {
+		return nozeiShukiRepository.countActiveByJichitaiCdAndShuki(jichitaiCd, shuki) > 0;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean existsByShukiExcludeSeq(BigDecimal shuki, BigDecimal seq) {
+		return nozeiShukiRepository.countActiveByJichitaiCdAndShukiExcludeSeq(jichitaiCd, shuki, seq) > 0;
+	}
+
+	@Override
 	@Transactional
 	public NozeiShuki save(NozeiShuki nozeiShuki) {
 		LocalDateTime now = LocalDateTime.now();
