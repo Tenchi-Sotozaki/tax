@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -193,11 +192,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		applyFormToTokugimu(t, form);
 		t.setNewFlg("1");
 		t.setDelFlg("0");
-		t.setAddDt(now);
-		t.setAddUser(systemUser);
-		t.setUpdDt(now);
-		t.setUpdUser(systemUser);
-		t.setVersion(BigDecimal.ONE);
 		tokugimuRepository.save(t);
 
 		saveShoyusha(shiteiNo, BigDecimal.ONE, form, now, systemUser);
@@ -225,15 +219,11 @@ public class TokugimuServiceImpl implements TokugimuService {
 		atena.setName(form.getName());
 		atena.setJusho(form.getTokugimuAddress());
 		atena.setTel1(form.getTokugimuPhone());
-		atena.setUpdDt(now);
-		atena.setUpdUser(systemUser);
 		atenaRepository.save(atena);
 
 		// 3. Tokugimu（宿泊施設情報）を更新
 		t.setHenkoYmd(form.getRegistrationDate());
 		applyFormToTokugimu(t, form);
-		t.setUpdDt(now);
-		t.setUpdUser(systemUser);
 		tokugimuRepository.save(t);
 
 		// 4. 所有者情報の更新
@@ -254,8 +244,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.orElseThrow(() -> new RuntimeException("削除対象が見つかりません: " + shiteiNo));
 
 		t.setDelFlg("1");
-		t.setUpdDt(LocalDateTime.now());
-		t.setUpdUser(getCurrentUser());
 		tokugimuRepository.save(t);
 		log.info("特別徴収義務者論理削除完了: shiteiNo={}", shiteiNo);
 	}
@@ -373,11 +361,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		s.setShoyushaYubinNo(form.getOwnerAddressNo());
 		s.setShoyushaJusho(form.getOwnerAddress());
 		s.setShoyushaTel(form.getOwnerPhone());
-		s.setAddDt(now);
-		s.setAssUser(user);
-		s.setUpdDt(now);
-		s.setUpdUser(user);
-		s.setVersion(BigDecimal.ONE);
 		shoyushaRepository.save(s);
 	}
 	

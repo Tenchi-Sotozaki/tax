@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,6 @@ public class TaxManagerService {
 	private static final int DEFAULT_RNO = 1;
 	private static final String FLG_ON = "1";
 	private static final String FLG_OFF = "0";
-	private static final String SYSTEM_USER = "system";
-	private static final int INITIAL_VERSION = 1;
 	// ==========================================
 
 	/**
@@ -83,7 +80,6 @@ public class TaxManagerService {
 	 */
 	@Transactional
 	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) {
-		LocalDateTime now = LocalDateTime.now();
 
 		// 1. 既存データを取得
 		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, DEFAULT_RNO);
@@ -107,15 +103,6 @@ public class TaxManagerService {
 
 		entity.setNewFlg(FLG_ON);
 		entity.setDelFlg(FLG_OFF);
-
-		// 3. 共通項目の手動セット
-		if (entity.getAddDt() == null) {
-			entity.setAddDt(now);
-			entity.setAddUser(SYSTEM_USER);
-		}
-		entity.setUpdDt(now);
-		entity.setUpdUser(SYSTEM_USER);
-		entity.setVersion(INITIAL_VERSION);
 
 		taxManagerRepository.save(entity);
 	}

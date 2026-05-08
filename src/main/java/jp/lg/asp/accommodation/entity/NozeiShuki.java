@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class NozeiShuki {
+public class NozeiShuki extends BaseEntity {
 	@Id
 	@Column(name = "jichitai_cd", length = 5)
 	private String jichitaiCd;
@@ -33,19 +32,6 @@ public class NozeiShuki {
 	@Column(name = "del_flg", length = 1, nullable = false)
 	private String delFlg;
 
-	@Column(name = "add_dt", nullable = false)
-	private LocalDateTime addDt;
 
-	@Column(name = "add_user", length = 20, nullable = false)
-	private String addUser;
-
-	@Column(name = "upd_dt", nullable = false)
-	private LocalDateTime updDt;
-
-	@Column(name = "upd_user", length = 20, nullable = false)
-	private String updUser;
-
-	@Column(name = "version", precision = 5, nullable = false)
-	private BigDecimal version;
 
 }
