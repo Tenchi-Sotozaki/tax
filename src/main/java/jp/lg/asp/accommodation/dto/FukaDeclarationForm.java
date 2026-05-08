@@ -44,6 +44,7 @@ public class FukaDeclarationForm {
 
 	// 宿泊施設名称 (リードオンリー)
 	private String facilityName;
+	
 
 	@Valid
 	private FukaMonthlyDeclarationDto monthlyDetail = new FukaMonthlyDeclarationDto();

@@ -3,8 +3,9 @@ package jp.lg.asp.accommodation.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
 
+import lombok.Data;
 /**
  * 月ごとの申告情報を保持するDTO
  */
@@ -12,6 +13,7 @@ import lombok.Data;
 public class FukaMonthlyDeclarationDto {
 
     // 納入年月（yyyy-MM形式）
+	@NotBlank(message = "納入年月を選択してください。")
     private String paymentYearMonth;
 
     // 税区分の数だけ動的に行が増えるリスト

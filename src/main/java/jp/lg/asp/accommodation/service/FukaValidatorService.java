@@ -7,12 +7,14 @@ import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
 /**
  * 宿泊税申告のバリデーションを行うサービス
  */
+@Slf4j
 @Service // 規約 4.2
 @RequiredArgsConstructor // 規約 4.3（コンストラクタインジェクション用）
+
 public class FukaValidatorService {
 
     // 💡 1ヶ月仕様になったため、3ヶ月制限のマージックナンバーは不要になり削除！
@@ -30,26 +32,32 @@ public class FukaValidatorService {
         }
     }
 
-    private void checkStayCount(FukaMonthlyDeclarationDto detail) {
-        boolean hasInput = false;
-        
-        // 1. リスト化された税区分の宿泊数をチェック
-        if (detail.getTaxDetails() != null) {
-            for (FukaTaxDetailDto taxDetail : detail.getTaxDetails()) {
-                if (taxDetail.getStayCount() != null) {
-                    hasInput = true;
-                    break; // 1つでも入力があればOK
-                }
-            }
-        }
-        
-        // 2. 課税対象外の宿泊数もチェック
-        if (detail.getExemptStayCount() != null) {
-            hasInput = true;
-        }
-        
-        if (!hasInput) {
-            throw new IllegalArgumentException("納入年月入力行の宿泊数は必須です。");
-        }
-    }
+	/**
+	 * 宿泊数と合計値の整合性チェック
+	 */
+	private void checkStayCount(FukaMonthlyDeclarationDto detail) {
+	    long sumOfDetails = 0;
+	    
+	    // 1. 各税区分の宿泊数を加算
+	    if (detail.getTaxDetails() != null) {
+	        for (FukaTaxDetailDto taxDetail : detail.getTaxDetails()) {
+	            if (taxDetail.getStayCount() != null) {
+	                sumOfDetails += taxDetail.getStayCount();
+	            }
+	        }
+	    }
+	    
+	    // 2. 課税対象外の宿泊数を加算
+	    if (detail.getExemptStayCount() != null) {
+	        sumOfDetails += detail.getExemptStayCount();
+	    }
+	    
+	    // 3. 画面から送られてきた「合計値」と比較
+	    // 💡 プログラムが正しくても、届いたデータがズレていればここで弾く
+	    if (detail.getTotalStayCount() == null || detail.getTotalStayCount() != sumOfDetails) {
+	        log.error("整合性エラー: 画面合計={}, 明細積み上げ={}", detail.getTotalStayCount(), sumOfDetails);
+	        throw new IllegalArgumentException("宿泊数の合計値が明細と一致しません。再計算してください。");
+	    }
+	}
+    
 }
