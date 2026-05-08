@@ -99,21 +99,6 @@
 					</div>
 				</div>
 
-				<!-- 帳票発行 -->
-				<div class="accordion accordion-flush" id="mainReportAccordion">
-					<div class="accordion-item bg-transparent border-0">
-						<h2 class="accordion-header">
-							<button
-								class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
-								type="button" data-bs-toggle="collapse"
-								data-bs-target="#mainReport">
-								<i class="bi bi-printer me-2 text-info"></i>帳票発行
-							</button>
-						</h2>
-						
-					</div>
-				</div>
-
 				<!-- ===== システム管理（ADMIN のみ表示） ===== -->
 				<div sec:authorize="hasRole('ADMIN')">
 					<div
