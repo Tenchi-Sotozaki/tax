@@ -71,9 +71,13 @@ public class AdminUserController {
 			return FORM_VIEW;
 		}
 
-		User user = new User();
-		user.setJichitaiCd(jichitaiCd);
-		user.setId(form.getId());
+		User user = userRepository.findById(buildUserId(form.getId()))
+				.orElse(new User());
+		boolean isNew = user.getId() == null;
+		if (isNew) {
+			user.setJichitaiCd(jichitaiCd);
+			user.setId(form.getId());
+		}
 		user.setPassword(passwordEncoder.encode(form.getPassword()));
 		user.setName(form.getName());
 		user.setNameKana(form.getNameKana());
@@ -81,7 +85,7 @@ public class AdminUserController {
 		user.setRoleId(form.getRoleId());
 		userRepository.save(user);
 
-		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを登録しました。");
+		redirectAttributes.addFlashAttribute("successMessage", isNew ? "ユーザーを登録しました。" : "ユーザー情報を更新しました。");
 		return "redirect:/admin/user-search";
 	}
 

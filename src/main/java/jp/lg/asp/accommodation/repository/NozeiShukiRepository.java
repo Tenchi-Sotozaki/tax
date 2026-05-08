@@ -20,6 +20,12 @@ public interface NozeiShukiRepository extends JpaRepository<NozeiShuki, NozeiShu
     @Query("SELECT n FROM NozeiShuki n WHERE n.jichitaiCd = :jichitaiCd AND n.shuki = :shuki AND n.delFlg = '0' ORDER BY n.seq")
     List<NozeiShuki> findActiveByJichitaiCdAndShuki(@Param("jichitaiCd") String jichitaiCd, @Param("shuki") BigDecimal shuki);
     
+    @Query("SELECT COUNT(n) FROM NozeiShuki n WHERE n.jichitaiCd = :jichitaiCd AND n.shuki = :shuki AND n.delFlg = '0'")
+    long countActiveByJichitaiCdAndShuki(@Param("jichitaiCd") String jichitaiCd, @Param("shuki") BigDecimal shuki);
+
+    @Query("SELECT COUNT(n) FROM NozeiShuki n WHERE n.jichitaiCd = :jichitaiCd AND n.shuki = :shuki AND n.seq <> :seq AND n.delFlg = '0'")
+    long countActiveByJichitaiCdAndShukiExcludeSeq(@Param("jichitaiCd") String jichitaiCd, @Param("shuki") BigDecimal shuki, @Param("seq") BigDecimal seq);
+
     @Query("SELECT COALESCE(MAX(n.seq), 0) + 1 FROM NozeiShuki n WHERE n.jichitaiCd = :jichitaiCd")
     BigDecimal findNextSeq(@Param("jichitaiCd") String jichitaiCd);
 }

@@ -5,12 +5,15 @@ function updateButtons() {
     const editBtn = document.getElementById('editBtn');
     const viewBtn = document.getElementById('viewBtn');
     const usersBtn = document.getElementById('usersBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
 
     const singleSelection = checked.length === 1;
+    const anySelection = checked.length >= 1;
 
     editBtn.disabled = !singleSelection;
     viewBtn.disabled = !singleSelection;
     usersBtn.disabled = !singleSelection;
+    deleteBtn.disabled = !anySelection;
 }
 
 function openRoleModal(mode) {
@@ -159,4 +162,32 @@ function updateAssignedUsers() {
         }
     })
     .catch(err => alert('通信エラー: ' + err.message));
+}
+
+function deleteRoles() {
+    const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
+    const checked = document.querySelectorAll('.role-checkbox:checked');
+    if (checked.length === 0) return;
+
+    if (!confirm(`チェックした${checked.length}件の権限を削除します。\n対象権限のユーザーはデフォルト権限に変更されます。\nよろしいですか？`)) return;
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    const requests = Array.from(checked).map(cb =>
+        fetch(`${ctx}/admin/role/delete/${cb.value}`, {
+            method: 'POST',
+            headers: { [csrfHeader]: csrfToken }
+        }).then(r => r.json())
+    );
+
+    Promise.all(requests)
+        .then(results => {
+            const failed = results.filter(r => !r.success);
+            if (failed.length > 0) {
+                alert('削除に失敗した項目があります: ' + failed.map(r => r.message).join(', '));
+            }
+            location.reload();
+        })
+        .catch(err => alert('通信エラー: ' + err.message));
 }

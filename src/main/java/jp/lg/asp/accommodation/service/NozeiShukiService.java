@@ -17,6 +17,12 @@ public interface NozeiShukiService {
     /** SEQで詳細取得 */
     NozeiShuki findBySeq(BigDecimal seq);
     
+    /** 周期の重複チェック（新規登録時） */
+    boolean existsByShuki(BigDecimal shuki);
+
+    /** 周期の重複チェック（更新時） */
+    boolean existsByShukiExcludeSeq(BigDecimal shuki, BigDecimal seq);
+
     /** 納税周期保存 */
     NozeiShuki save(NozeiShuki nozeiShuki);
     

@@ -127,6 +127,11 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	@Transactional
 	public void deleteRole(String jichitaiCd, Long roleId) {
+		List<User> users = userRepository.findByJichitaiCdAndRoleId(jichitaiCd, BigDecimal.valueOf(roleId));
+		for (User u : users) {
+			u.setRoleId(BigDecimal.ONE);
+		}
+		userRepository.saveAll(users);
 		roleRepository.deleteById(new RoleId(jichitaiCd, roleId));
 	}
 }
