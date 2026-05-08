@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>納税周期照会</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4" th:data-ctx="@{/}">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h2 class="h2">
+				<i class="bi bi-calendar-check me-2 text-primary"></i> 納税周期照会
+			</h2>
+		</div>
+
+		<!-- メッセージ表示 -->
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- 検索フォーム -->
+		<div class="card shadow-sm mb-3">
+			<div class="card-body">
+				<form id="searchForm" class="row g-3">
+					<div class="col-md-4">
+						<label for="shuki" class="form-label">周期</label>
+						<select class="form-select" id="shuki" name="shuki">
+							<option value="">全て</option>
+							<option value="1">毎月</option>
+							<option value="2">2ヶ月</option>
+							<option value="3">3ヶ月</option>
+							<option value="4">4ヶ月</option>
+							<option value="6">6ヶ月</option>
+							<option value="12">年1回</option>
+						</select>
+					</div>
+					<div class="col-md-8 d-flex align-items-end">
+						<button type="button" class="btn btn-primary me-2" onclick="searchNozeiShuki()">
+							<i class="bi bi-search me-1"></i>検索する
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- アクションボタン -->
+		<div class="mb-3">
+			<a th:href="@{/admin/nozei-shuki/register}" class="btn btn-primary me-2">
+				<i class="bi bi-plus-circle me-1"></i>新規登録
+			</a>
+			<button type="button" class="btn btn-success me-2" onclick="editNozeiShuki()" id="editBtn" disabled>
+				<i class="bi bi-pencil-square me-1"></i>編集
+			</button>
+		</div>
+
+		<!-- 納税周期一覧テーブル -->
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<table class="table table-hover" id="nozeiShukiTable">
+					<thead class="table-light">
+						<tr>
+							<th></th>
+							<th>周期</th>
+							<th>納期限</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(nozeiShukiList)}">
+							<td colspan="3" class="text-center">登録された周期がありません</td>
+						</tr>
+						<tr th:each="item : ${nozeiShukiList}">
+							<td>
+								<input type="checkbox" class="nozei-shuki-checkbox" 
+									   th:value="${item.seq}" onchange="updateButtons()">
+							</td>
+							<td th:text="${item.label}"></td>
+							<td th:text="${item.shuki != null ? (item.shuki.intValue() == 1 ? '翌月末日' : 
+								(item.shuki.intValue() == 2 ? '6月,8月,10月,12月,翌年2月,翌年4月末日' : 
+								(item.shuki.intValue() == 3 ? '7月,10月,翌年1月,翌年4月末日' : 
+								(item.shuki.intValue() == 4 ? '8月,12月,翌年4月末日' : 
+								(item.shuki.intValue() == 6 ? '10月,翌年4月末日' : 
+								(item.shuki.intValue() == 12 ? '翌年5月末日' : '設定により決定'))))))  : ''}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/nozei_shuki_daicho.js}"></script>
+	</th:block>
+
+</body>
+</html>
