@@ -1,19 +1,71 @@
 package jp.lg.asp.accommodation.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jp.lg.asp.accommodation.exception.AccessDeniedException;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.entity.UserId;
+import jp.lg.asp.accommodation.exception.AccessDeniedException;
+import jp.lg.asp.accommodation.repository.RoleRepository;
+import jp.lg.asp.accommodation.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalModelAdvice {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+
+    @Value("${app.jichitai.code}")
+    private String jichitaiCd;
 
     @ModelAttribute("currentUri")
     public String currentUri(HttpServletRequest request) {
         return request.getRequestURI();
+    }
+
+    /**
+     * ログインユーザーがアクセス可能な screen_id のセットをモデルに追加する。
+     * サイドバーの表示制御に使用する。
+     * DBにユーザーが存在しない場合（モックユーザー等）は全画面を許可する。
+     */
+    @ModelAttribute("accessibleScreens")
+    public Set<String> accessibleScreens() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return Collections.emptySet();
+        }
+
+        UserId pk = new UserId();
+        pk.setJichitaiCd(jichitaiCd);
+        pk.setId(auth.getName());
+
+        User user = userRepository.findById(pk).orElse(null);
+
+        // DBにユーザーが存在しない場合（モックユーザー）は全画面許可
+        if (user == null || user.getRoleId() == null) {
+            return Set.of("*");
+        }
+
+        return roleRepository.findByIdWithDetails(jichitaiCd, user.getRoleId().longValue())
+                .map(role -> role.getRoleDetails() == null ? Collections.<String>emptySet()
+                        : role.getRoleDetails().stream()
+                                .filter(rd -> rd.getPermission() != null && rd.getPermission() >= 1)
+                                .map(rd -> rd.getScreenId().strip())
+                                .collect(Collectors.toSet()))
+                .orElse(Collections.emptySet());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
