@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenId;
 import jp.lg.asp.accommodation.dto.UserForm;
 import jp.lg.asp.accommodation.dto.UserSearchForm;
 import jp.lg.asp.accommodation.entity.User;
@@ -29,15 +31,18 @@ public class AdminUserController {
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final ScreenAccessChecker accessChecker;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
+	private static final String SCREEN_ID = ScreenId.USER_MANAGEMENT;
 	private static final String LIST_VIEW = "admin/userSearch";
 	private static final String FORM_VIEW = "admin/userConfig";
 
 	@GetMapping("/user-search")
 	public String list(@ModelAttribute UserSearchForm searchForm, Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("items", userRepository.search(
 				jichitaiCd,
 				emptyToNull(searchForm.getId()),
@@ -49,6 +54,7 @@ public class AdminUserController {
 
 	@GetMapping("/user-registration")
 	public String showRegistrationForm(Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("userForm", new UserForm());
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", false);
@@ -61,6 +67,7 @@ public class AdminUserController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
 
 		if (!form.getPassword().equals(form.getPasswordConfirm())) {
 			bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
@@ -91,6 +98,7 @@ public class AdminUserController {
 
 	@GetMapping("/user-edit/{id}")
 	public String showEditForm(@PathVariable String id, Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
 
@@ -115,11 +123,11 @@ public class AdminUserController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
 
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
 
-		// 新しいパスワードが入力された場合のみ現在のパスワードを検証
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {
 			if (form.getCurrentPassword() == null || form.getCurrentPassword().isBlank()) {
 				bindingResult.rejectValue("currentPassword", "error.currentPassword", "現在のパスワードを入力してください");
@@ -151,6 +159,7 @@ public class AdminUserController {
 
 	@PostMapping("/user-delete/{id}")
 	public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
 		return "redirect:/admin/user-search";

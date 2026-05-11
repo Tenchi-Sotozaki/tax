@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenId;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.service.FukaService;
 import lombok.RequiredArgsConstructor;
@@ -17,44 +19,37 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/declaration") 
+@RequestMapping("/declaration")
 public class FukaController {
 
-    private final FukaService fukaService;
-    
-    // HTMLファイル名（規約のロウワーキャメルケース）
-    private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
+	private final FukaService fukaService;
+	private final ScreenAccessChecker accessChecker;
 
-    /**
-     * 納入金額管理台帳 表示・検索処理
-     */
-    /**
-     * 納入金額管理台帳 表示・検索処理
-     */
-    @GetMapping("/payment-ledger/{shiteiNo}")
-    public String showDaicho(
-            @PathVariable String shiteiNo,
-            @RequestParam(name = "nendo", required = false) String nendo, // パラメータ名を明示
-            @RequestParam(required = false) String status,
-            Model model) {
+	private static final String SCREEN_ID = ScreenId.FUKADAICHO;
+	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
 
-        // 1. 年度がない場合のデフォルト設定（ここだけ残す）
-        if (nendo == null || nendo.isEmpty()) {
-            LocalDate now = LocalDate.now();
-            int nendoInt = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-            nendo = String.valueOf(nendoInt);
-        }
-        // Serviceを呼び出して画面用データを生成
-        FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo, status);
+	@GetMapping("/payment-ledger/{shiteiNo}")
+	public String showDaicho(
+			@PathVariable String shiteiNo,
+			@RequestParam(name = "nendo", required = false) String nendo,
+			@RequestParam(required = false) String status,
+			Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
 
-        model.addAttribute("fukaDaichoForm", form);       // HTML 23行目の ${fukaDaichoForm...} 用
-        model.addAttribute("searchForm", form);           // 検索フォーム th:object="${searchForm}" 用
-        model.addAttribute("items", form.getItems());       // 明細一覧用
-        model.addAttribute("totalAmount", form.getTotalAmount()); // 合計金額用
-        model.addAttribute("obligorId", shiteiNo);          // ボタンリンク用
+		if (nendo == null || nendo.isEmpty()) {
+			LocalDate now = LocalDate.now();
+			int nendoInt = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+			nendo = String.valueOf(nendoInt);
+		}
 
-        return DAICHO_VIEW;
-    }
-    
-    
+		FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo, status);
+
+		model.addAttribute("fukaDaichoForm", form);
+		model.addAttribute("searchForm", form);
+		model.addAttribute("items", form.getItems());
+		model.addAttribute("totalAmount", form.getTotalAmount());
+		model.addAttribute("obligorId", shiteiNo);
+
+		return DAICHO_VIEW;
+	}
 }
