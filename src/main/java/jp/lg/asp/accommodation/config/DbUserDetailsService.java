@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.config;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
