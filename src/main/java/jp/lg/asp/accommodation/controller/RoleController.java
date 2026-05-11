@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.config.ScreenId;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.Screen;
@@ -35,7 +35,7 @@ public class RoleController {
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
-	private static final String SCREEN_ID = ScreenId.ROLE_MANAGEMENT;
+	private static final String SCREEN_ID = ScreenManagement.ROLE_MANAGEMENT;
 
 	@GetMapping("/management")
 	public String roleManagement(Model model) {

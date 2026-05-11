@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.config.ScreenId;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
@@ -30,7 +30,7 @@ public class TokugimuController {
 	private final NozeiShukiService nozeiShukiService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenId.TOKUGIMU_DAICHO;
+	private static final String SCREEN_ID = ScreenManagement.TOKUGIMU_DAICHO;
 	private static final String LIST_VIEW = "tokugimu/tTokugimuDaicho";
 	private static final String FORM_VIEW = "tokugimu/tTokugimuConfig";
 
