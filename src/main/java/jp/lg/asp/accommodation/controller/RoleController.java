@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenId;
 import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.Screen;
@@ -28,27 +30,24 @@ import lombok.RequiredArgsConstructor;
 public class RoleController {
 
 	private final RoleService roleService;
+	private final ScreenAccessChecker accessChecker;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
+	private static final String SCREEN_ID = ScreenId.ROLE_MANAGEMENT;
+
 	@GetMapping("/management")
 	public String roleManagement(Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
 		try {
 			List<Role> roles = roleService.findAllRoles(jichitaiCd);
 			List<Screen> screens = roleService.findAllScreens();
-
 			model.addAttribute("roles", roles);
 			model.addAttribute("screens", screens);
-			
-			// デバッグ用ログ
-			System.out.println("Roles count: " + (roles != null ? roles.size() : 0));
-			System.out.println("Screens count: " + (screens != null ? screens.size() : 0));
-			
 			return "admin/roleManagement";
 		} catch (Exception e) {
 			e.printStackTrace();
-			// エラーが発生した場合は空のリストを設定
 			model.addAttribute("roles", java.util.Collections.emptyList());
 			model.addAttribute("screens", java.util.Collections.emptyList());
 			return "admin/roleManagement";
@@ -58,11 +57,10 @@ public class RoleController {
 	@PostMapping("/save")
 	@ResponseBody
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
+		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		try {
-			String userId = "admin"; // セッションから取得
-
-			roleService.saveRole(form, jichitaiCd, userId);
+			roleService.saveRole(form, jichitaiCd, "admin");
 			result.put("success", true);
 		} catch (Exception e) {
 			result.put("success", false);
@@ -74,10 +72,12 @@ public class RoleController {
 	@GetMapping("/detail/{roleId}")
 	@ResponseBody
 	public Map<String, Object> getRoleDetail(@PathVariable Long roleId) {
+		accessChecker.checkAccess(SCREEN_ID);
 		Role role = roleService.findById(jichitaiCd, roleId);
 
 		Map<String, Object> result = new HashMap<>();
-		if (role == null) return result;
+		if (role == null)
+			return result;
 
 		Map<String, Object> roleMap = new HashMap<>();
 		roleMap.put("roleId", role.getRoleId());
@@ -99,6 +99,7 @@ public class RoleController {
 	@GetMapping("/users/{roleId}")
 	@ResponseBody
 	public Map<String, Object> getAssignedUsers(@PathVariable Long roleId) {
+		accessChecker.checkAccess(SCREEN_ID);
 		Role role = roleService.findById(jichitaiCd, roleId);
 		List<User> allUsers = roleService.findAllUsers(jichitaiCd);
 
@@ -116,7 +117,9 @@ public class RoleController {
 
 	@PostMapping("/users/{roleId}")
 	@ResponseBody
-	public Map<String, Object> updateAssignedUsers(@PathVariable Long roleId, @RequestBody Map<String, List<String>> body) {
+	public Map<String, Object> updateAssignedUsers(@PathVariable Long roleId,
+			@RequestBody Map<String, List<String>> body) {
+		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		try {
 			roleService.updateUserRole(jichitaiCd, roleId, body.get("userIds"), "admin");
@@ -131,6 +134,7 @@ public class RoleController {
 	@PostMapping("/delete/{roleId}")
 	@ResponseBody
 	public Map<String, Object> deleteRole(@PathVariable Long roleId) {
+		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		try {
 			roleService.deleteRole(jichitaiCd, roleId);
