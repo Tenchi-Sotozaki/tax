@@ -20,4 +20,7 @@ public interface RoleRepository extends JpaRepository<Role, RoleId> {
 
     @Query("SELECT COALESCE(MAX(r.roleId), 0) FROM Role r WHERE r.jichitaiCd = :jichitaiCd")
     Long findMaxRoleIdByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+
+    @Query("SELECT COUNT(rd) FROM RoleDetail rd WHERE rd.jichitaiCd = :jichitaiCd AND rd.roleId = :roleId AND rd.screenId = :screenId AND rd.permission >= 1")
+    long countAccessibleScreen(@Param("jichitaiCd") String jichitaiCd, @Param("roleId") Long roleId, @Param("screenId") String screenId);
 }
