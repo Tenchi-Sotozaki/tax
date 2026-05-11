@@ -1,0 +1,74 @@
+package jp.lg.asp.accommodation.controller;
+
+import jakarta.servlet.http.HttpSession;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto;
+import jp.lg.asp.accommodation.service.EltaxRenkeiKakuninService;
+import lombok.RequiredArgsConstructor;
+
+@Controller
+@RequestMapping("/eltax-renkei/kakunin")
+@RequiredArgsConstructor
+public class EltaxRenkeiKakuninController {
+
+    private static final String SESSION_KEY_FILE = "eltaxUploadedFile";
+
+    private final EltaxRenkeiKakuninService eltaxRenkeiKakuninService;
+
+    /**
+     * ファイルを受け取り、確認画面を表示する（DB未登録）
+     */
+    @PostMapping("/preview")
+    public String preview(
+            @RequestParam("file") MultipartFile file,
+            HttpSession session,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        if (file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "ファイルを選択してください。");
+            return "redirect:/eltax-renkei";
+        }
+        try {
+            EltaxRenkeiKakuninDto dto = eltaxRenkeiKakuninService.preview(file);
+            session.setAttribute(SESSION_KEY_FILE, file);
+            model.addAttribute("kakuninDto", dto);
+            return "eltaxRenkei/eltaxRenkeiKakunin";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/eltax-renkei";
+        }
+    }
+
+    /**
+     * 確認後、セッションのファイルをDBへ登録する
+     */
+    @PostMapping("/commit")
+    public String commit(
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        MultipartFile uploadedFile = (MultipartFile) session.getAttribute(SESSION_KEY_FILE);
+        if (uploadedFile == null || uploadedFile.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "セッションが切れました。再度ファイルを選択してください。");
+            return "redirect:/eltax-renkei";
+        }
+        try {
+            eltaxRenkeiKakuninService.commit(uploadedFile);
+            redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } finally {
+            session.removeAttribute(SESSION_KEY_FILE);
+        }
+        return "redirect:/eltax-renkei";
+    }
+}
