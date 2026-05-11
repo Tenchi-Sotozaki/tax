@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.config.ScreenId;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
 import jp.lg.asp.accommodation.service.TaxManagerService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class TaxManagerController {
 	private final TaxManagerService taxManagerService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenId.TAX_MANAGER;
+	private static final String SCREEN_ID = ScreenManagement.TAX_MANAGER;
 	private static final String FORM_VIEW = "tokugimu/tTaxManagerConfig";
 
 	@GetMapping("/edit/{id}")

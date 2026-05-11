@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.config.ScreenId;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.UserForm;
 import jp.lg.asp.accommodation.dto.UserSearchForm;
 import jp.lg.asp.accommodation.entity.User;
@@ -36,7 +36,7 @@ public class AdminUserController {
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
-	private static final String SCREEN_ID = ScreenId.USER_MANAGEMENT;
+	private static final String SCREEN_ID = ScreenManagement.USER_MANAGEMENT;
 	private static final String LIST_VIEW = "admin/userSearch";
 	private static final String FORM_VIEW = "admin/userConfig";
 

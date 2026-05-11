@@ -33,8 +33,8 @@ public class DbUserDetailsService implements UserDetailsService {
 
 	// layout.html の sec:authorize="hasRole('ADMIN')" と対応する管理系画面ID
 	private static final Set<String> ADMIN_SCREENS = Set.of(
-			ScreenId.USER_MANAGEMENT.strip(), ScreenId.ROLE_MANAGEMENT.strip(),
-			ScreenId.NOZEI_SHUKI.strip());
+			ScreenManagement.USER_MANAGEMENT.strip(), ScreenManagement.ROLE_MANAGEMENT.strip(),
+			ScreenManagement.NOZEI_SHUKI.strip());
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

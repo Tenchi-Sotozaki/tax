@@ -7,9 +7,9 @@ package jp.lg.asp.accommodation.config;
  * screen_idを変更する場合はここだけ修正する
  *
  */
-public final class ScreenId {
+public final class ScreenManagement {
 
-	private ScreenId() {
+	private ScreenManagement() {
 	}
 
 	//特別徴収義務者管理台帳
