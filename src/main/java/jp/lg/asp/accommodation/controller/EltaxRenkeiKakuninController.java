@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenId;
 import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto;
 import jp.lg.asp.accommodation.service.EltaxRenkeiKakuninService;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +21,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EltaxRenkeiKakuninController {
 
-    private static final String SESSION_KEY_FILE = "eltaxUploadedFile";
-
     private final EltaxRenkeiKakuninService eltaxRenkeiKakuninService;
+    private final ScreenAccessChecker accessChecker;
+
+    private static final String SCREEN_ID = ScreenId.ELTAX_RENKEI;
+    private static final String SESSION_KEY_FILE = "eltaxUploadedFile";
 
     /**
      * ファイルを受け取り、確認画面を表示する（DB未登録）
@@ -33,6 +37,7 @@ public class EltaxRenkeiKakuninController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
+        accessChecker.checkAccess(SCREEN_ID);
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "ファイルを選択してください。");
             return "redirect:/eltax-renkei";
@@ -56,6 +61,7 @@ public class EltaxRenkeiKakuninController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        accessChecker.checkAccess(SCREEN_ID);
         MultipartFile uploadedFile = (MultipartFile) session.getAttribute(SESSION_KEY_FILE);
         if (uploadedFile == null || uploadedFile.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "セッションが切れました。再度ファイルを選択してください。");
