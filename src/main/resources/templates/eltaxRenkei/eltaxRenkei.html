@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>電子申告情報取込</title>
+</head>
+<body>
+    <div layout:fragment="content" class="container-fluid p-4" th:data-ctx="@{/}">
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h2 class="h2">
+                <i class="bi bi-upload me-2 text-primary"></i> 電子申告情報取込
+            </h2>
+        </div>
+
+        <!-- メッセージ表示 -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- ファイル選択エリア -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-bold">ファイル選択</div>
+            <div class="card-body">
+                <form th:action="@{/eltax-renkei/import}" method="post" enctype="multipart/form-data" class="row g-3">
+                    <div class="col-md-8">
+                        <label for="file" class="form-label">取込ファイル</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-1"></i>取込内容確認
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 取込済みファイル一覧エリア -->
+        <div class="card shadow-sm">
+            <div class="card-header fw-bold">取込済みファイル一覧</div>
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ファイル名</th>
+                            <th>様式</th>
+                            <th>処理日時</th>
+                            <th>処理結果</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(eltaxRenkeiList)}">
+                            <td colspan="5" class="text-center">取込済みのファイルがありません</td>
+                        </tr>
+                        <tr th:each="item : ${eltaxRenkeiList}">
+                            <td th:text="${item.fileName}"></td>
+                            <td th:text="${item.shubetsu}"></td>
+                            <td th:text="${item.shoriDt != null ? #temporals.format(item.shoriDt, 'yyyy/MM/dd HH:mm:ss') : ''}"></td>
+                            <td>
+                                <span th:if="${item.shoriKekka == '1'}" class="badge bg-success">正常</span>
+                                <span th:if="${item.shoriKekka == '9'}" class="badge bg-danger">エラー</span>
+                                <span th:if="${item.shoriKekka != '1' and item.shoriKekka != '9'}" class="badge bg-secondary" th:text="${item.shoriKekka}"></span>
+                            </td>
+                            <td>
+                                <a th:href="@{/eltax-renkei/download/{seq}(seq=${item.seq})}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-download me-1"></i>ダウンロード
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
