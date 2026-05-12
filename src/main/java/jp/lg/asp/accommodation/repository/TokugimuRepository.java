@@ -56,4 +56,12 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 	@Query(value = "SELECT MAX(CAST(shitei_no AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$'", nativeQuery = true)
 	Optional<Integer> findMaxShiteiNoByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 	
+	/**
+     * 💡 画面表示用のハイドレーションで使用：
+     * 自治体コード、指定番号、最新フラグ、削除フラグを指定して特別徴収義務者を1件取得する
+     */
+
+   Optional<Tokugimu> findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
+           String jichitaiCd, String shiteiNo, String newFlg, String delFlg);
+	
 }

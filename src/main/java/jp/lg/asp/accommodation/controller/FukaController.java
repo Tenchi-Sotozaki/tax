@@ -138,42 +138,43 @@ public class FukaController {
 	}
 
 	/**
-	 * 宿泊税情報 保存（新規登録・更新）処理
-	 */
-	@PostMapping("/save")
-	public String save(
-			@Validated @ModelAttribute("fukaDeclarationForm") FukaDeclarationForm form,
-			BindingResult bindingResult,
-			Model model,
-			RedirectAttributes redirectAttributes) {
-		
-		log.info("【デバッグ】指定番号: {}, 納入年月: {}", 
-				form.getShiteiNo(), 
-				form.getMonthlyDetail() != null ? form.getMonthlyDetail().getPaymentYearMonth() : "MonthlyDetail自体がNULL!");
+     * 宿泊税情報の保存（登録・更新）
+     */
+    @PostMapping("/save")
+    public String save(@Validated @ModelAttribute("fukaDeclarationForm") FukaDeclarationForm form, 
+                       BindingResult result, 
+                       Model model,
+                       RedirectAttributes redirectAttributes) {
 
-		// バリデーションエラーがある場合は元の画面に戻す
-		if (bindingResult.hasErrors()) {
-			// 🔴 ここを追加！エラーの正体をコンソールに暴き出すぜ！
-			bindingResult.getFieldErrors().forEach(e -> {
-				log.error("❌ エラー発生項目: {} | 理由: {} | 送信された値: {}", 
-						e.getField(), e.getDefaultMessage(), e.getRejectedValue());
-			});
-			
-			return CONFIG_VIEW;
-		}
+        // 1. 基本的なバリデーションエラー（相関チェックなど）がある場合
+        if (result.hasErrors()) {
+            // エラーがある場合は、画面に必要なメタデータ（施設名など）を再セットして戻すぜ
+            fukaService.hydrateFormMetadata(form);
+            return "fuka/tFukaConfig";
+        }
 
-		try {
-			// 保存処理を実行
-			fukaService.saveDeclaration(form);
-		} catch (Exception e) {
-			log.error("宿泊税情報の保存処理でエラーが発生しました", e);
-			model.addAttribute("errorMessage", "保存処理中にエラーが発生しました。");
-			return CONFIG_VIEW;
-		}
+        try {
+            // 2. サービスの保存処理を実行
+            // ここで「更生理由未入力」などの RuntimeException が投げられる可能性があるぜ
+            fukaService.saveDeclaration(form);
 
-		redirectAttributes.addFlashAttribute("successMessage", "宿泊税情報を保存しました。");
+            // 成功した場合は一覧画面へリダイレクト
+            redirectAttributes.addFlashAttribute("successMessage", "保存が完了しました。");
+            return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
 
-		// 保存成功後は、その特別徴収義務者の納入金額管理台帳へリダイレクトして戻る
-		return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
-	}
+        } catch (RuntimeException e) {
+            // 💡 3. サービス層からの例外をキャッチして、画面にエラーメッセージを渡す
+            // HTML側の th:if="${errorMessage}" にこのメッセージが表示される仕組みだぜ
+            model.addAttribute("errorMessage", e.getMessage());
+
+            // 入力内容を保持したまま編集・登録画面に戻す
+            // 施設名などの、フォームに含まれない表示専用データを再取得する
+            fukaService.hydrateFormMetadata(form);
+            
+            // ログにもエラーを残しておくと、後で調査しやすいぜ
+            log.error("保存処理でエラーが発生しました: {}", e.getMessage());
+
+            return "fuka/tFukaConfig";
+        }
+    }
 }

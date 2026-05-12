@@ -65,10 +65,7 @@ public class FukaDeclarationForm {
 	// ========== 更生/修正エリア ==========
 	// 変更の区分 (更生/修正)
 	private String modificationCategory;
-
-	// 変更対象年月
-	private String modificationYearMonth;
-
+	
 	// 変更理由
 	private String modificationReason;
 	

@@ -39,4 +39,7 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
      */
     Optional<Fuka> findFirstByJichitaiCdAndShiteiNoAndNendoAndKibetsuOrderByRnoDesc(
             String jichitaiCd, String shiteiNo, String nendo, Integer kibetsu);
+    
+    
+    
 }

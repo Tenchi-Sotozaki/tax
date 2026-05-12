@@ -19,6 +19,7 @@ import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto.DailyItem;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
+import jp.lg.asp.accommodation.entity.AtenaId;
 import jp.lg.asp.accommodation.entity.ChoshuGenbo;
 import jp.lg.asp.accommodation.entity.ChoshuGenboId;
 import jp.lg.asp.accommodation.entity.ChoshuGenboUchi;
@@ -26,6 +27,7 @@ import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaId;
 import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.FukaZeiritsuTeigaku;
+import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.ChoshuGenboRepository;
 import jp.lg.asp.accommodation.repository.ChoshuGenboUchiRepository;
 import jp.lg.asp.accommodation.repository.FukaMonthlyDeclarationRepository;
@@ -53,6 +55,7 @@ public class FukaService {
     private final FukaUchiRepository fukaUchiRepository;
     private final ChoshuGenboRepository choshuGenboRepository;
     private final ChoshuGenboUchiRepository choshuGenboUchiRepository;
+    private final AtenaRepository atenaRepository;
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
@@ -234,7 +237,6 @@ public class FukaService {
                         jichitaiCd, shiteiNo, targetYm).ifPresent(latestFuka -> {
                     
                     form.setModificationCategory("修正"); 
-                    form.setModificationYearMonth(paymentMonth);
                     
                     monthlyDetail.setExemptStayCount(latestFuka.getMenjoHakusu());
                     monthlyDetail.setTotalStayCount(latestFuka.getTotalHakusu());
@@ -357,52 +359,76 @@ public class FukaService {
 	/**
      * 宿泊税情報の保存処理（修正・更生対応版）
      */
-    @Transactional(rollbackFor = Exception.class)
-    public void saveDeclaration(FukaDeclarationForm form) {
-        
-        String currentJichitaiCd = getCurrentJichitaiCd();
-        FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
+	@Transactional
+	public void saveDeclaration(FukaDeclarationForm form) {
+	    String currentJichitaiCd = getCurrentJichitaiCd();
+	    
+	    // 💡 1. 履歴番号 (RNO: Revision Number) の採番
+	    // 既存の最新RNOを確認し、新しい番号を決定するぜ
+	    Integer targetRno = determineNextRno(currentJichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu());
 
-        // 💡 1. Validation (更生時の理由入力チェック)
-        // 更生（行政側による決定）の場合は、理由の記録が Mandatory（必須）だぜ。
-        if ("更生".equals(form.getModificationCategory()) && !StringUtils.hasText(form.getModificationReason())) {
-            throw new RuntimeException("更生の場合は、変更理由を入力してください。");
-        }
+	    // 💡 2. 親データ (Fuka) の生成と準備
+	    // 画面の入力値を Entity に Mapping（マッピング：データの詰め替え）する
+	    FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
+	    Fuka parentFuka = createParentFuka(form, dto, currentJichitaiCd);
+	    parentFuka.setRno(targetRno); 
+	    
+	    // ⚠️ 重要：保存（save）を呼ぶ前に、必ず監査項目をセットするぜ
+	    // これで add_dt が NULL で怒られることはなくなる
+	    setAuditFields(parentFuka);
 
-        // 💡 2. RNO Determination Strategy（RNO決定戦略）
-        int targetRno;
-        if ("更生".equals(form.getModificationCategory())) {
-            // 【更生の場合】最新のリビジョンを取得し、インクリメント（+1）して新規登録する
-            Integer maxRno = fukaRepository.findFirstByJichitaiCdAndShiteiNoAndNendoAndKibetsuOrderByRnoDesc(
-                    currentJichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
-                    .map(Fuka::getRno).orElse(0);
-            targetRno = maxRno + 1;
-        } else {
-            // 【修正・新規の場合】現在のRNO（既存レコード）を対象にする
-            targetRno = (form.getRno() != null) ? form.getRno() : 1;
-            
-            // 修正時はデータの整合性を保つため、古い内訳（t_fuka_uchi）を一度削除するぜ
-            deleteExistingDetailsByRno(form, currentJichitaiCd, targetRno);
-        }
+	    // 💡 3. 内訳データ (FukaUchi) の生成と準備
+	    // 親のキー情報を引き継いだ内訳リストを作成するぜ
+	    List<FukaUchi> uchiList = createFukaUchiList(form, parentFuka, currentJichitaiCd);
+	    
+	    if (!uchiList.isEmpty()) {
+	        // 各レコードに対して Batch Audit Injection（監査項目の一括注入）を行うぜ
+	        uchiList.forEach(this::setAuditFields);
+	    }
 
-        // 💡 3. 親テーブル (t_fuka) の保存
-        // 新しい targetRno をセットして保存（save は主キーが重複すれば UPDATE、なければ INSERT になる）
-        Fuka parentFuka = createParentFuka(form, dto, currentJichitaiCd);
-        parentFuka.setRno(targetRno); 
-        fukaRepository.save(parentFuka);
+	    // 💡 4. データベースへの永続化 (Persistence)
+	    // ここで初めて save を呼ぶ。これがプロの Single Save Point（単一保存地点）だ
+	    fukaRepository.save(parentFuka);
+	    if (!uchiList.isEmpty()) {
+	        fukaUchiRepository.saveAll(uchiList);
+	    }
 
-        // 💡 4. 内訳テーブル (t_fuka_uchi) の保存
-        List<FukaUchi> uchiList = createFukaUchiList(form, parentFuka, currentJichitaiCd);
-        if (!uchiList.isEmpty()) {
-            fukaUchiRepository.saveAll(uchiList);
-        }
+	    // 💡 5. 徴収原簿 (ChoshuGenbo) の更新
+	    if (form.getMonthlyTally() != null) {
+	        // 原簿側の保存処理の中でも、内部で setAuditFields が呼ばれているか確認してくれよな
+	        saveChoshuGenboDataWithRno(form, parentFuka, currentJichitaiCd, targetRno);
+	    }
+	}
 
-        // 💡 5. 徴収原簿 (t_choshu_genbo) の保存・更新
-        if (form.getMonthlyTally() != null) {
-            saveChoshuGenboDataWithRno(form, parentFuka, currentJichitaiCd, targetRno);
-        }
+    /**
+     * 💡 画面の入力内容から内訳テーブル (t_fuka_uchi) のエンティティリストを作成する (Mapping Logic)
+     * @param form 画面入力データ
+     * @param parent 親テーブルのエンティティ（キー情報をコピーするため）
+     * @return 内訳エンティティのリスト
+     */
+    private List<FukaUchi> createUchiDetails(FukaDeclarationForm form, Fuka parent) {
+        // 💡 画面の税区分リストをループして Entity に変換する (Iteration)
+        return form.getMonthlyDetail().getTaxDetails().stream()
+            .map(dto -> {
+                FukaUchi uchi = new FukaUchi();
+                
+                // 1. 親テーブルからキー情報をコピー (Key Propagation)
+                uchi.setJichitaiCd(parent.getJichitaiCd());
+                uchi.setShiteiNo(parent.getShiteiNo());
+                uchi.setNendo(parent.getNendo());
+                uchi.setKibetsu(parent.getKibetsu());
+                uchi.setRno(parent.getRno()); // 💡 親と同じ最新のRNOをセット
+                
+                // 2. DTOから入力値をセット (Value Assignment)
+                uchi.setZeiritsuSeq(dto.getZeiritsuSeq());
+                uchi.setHakusu(dto.getStayCount());
+                uchi.setZeigaku(dto.getTaxAmount());
+
+                // 💡 共通項目（登録日時など）はこの後 saveDeclaration 内で一括セットするぜ
+                return uchi;
+            })
+            .collect(Collectors.toList());
     }
-
     /**
      * 指定された RNO に紐づく古い内訳データを削除する
      */
@@ -660,7 +686,7 @@ public class FukaService {
         parentFuka.setShinkokuYmd(java.time.LocalDate.now());
         // 💡 変更区分を画面入力からセットする（空なら "1"：新規とする）
         parentFuka.setFukaKbn(org.springframework.util.StringUtils.hasText(form.getModificationCategory()) ? form.getModificationCategory() : "1");
-        parentFuka.setHenkoKbn(form.getModificationCategory());
+        parentFuka.setHenkoKbn(mapModificationCategory(form.getModificationCategory()));
         parentFuka.setHenkoRiyu(form.getModificationReason());
         
         parentFuka.setNewFlg("1");
@@ -725,5 +751,63 @@ public class FukaService {
         setAuditFields(genbo);
         choshuGenboRepository.save(genbo);
     }
+    
+    /**
+     * 画面表示に必要なメタデータをフォームに再セット（ハイドレーション）する
+     */
+    public void hydrateFormMetadata(FukaDeclarationForm form) {
+        if (form.getShiteiNo() == null) {
+            return;
+        }
+
+        // 💡 指定番号をキーに、特別徴収義務者（施設情報）を取得する
+        String jichitaiCd = getCurrentJichitaiCd();
+        
+        // 既存の取得ロジック（tokugimuRepository等）を流用して、名称をセットするぜ
+        tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
+                jichitaiCd, form.getShiteiNo(), "1", "0")
+            .ifPresent(tokugimu -> {
+                // 施設名のセット
+                form.setFacilityName(tokugimu.getShisetsuName());
+                
+                // 義務者名の取得（Atenaテーブル等との紐付けがある場合はここで解決する）
+                // ここでは簡略化して、既存の取得済み情報をセットするイメージだ
+                if (tokugimu.getAtenaNo() != null) {
+                    atenaRepository.findById(new AtenaId(jichitaiCd, tokugimu.getAtenaNo()))
+                        .ifPresent(atena -> form.setObligorName(atena.getName()));
+                }
+            });
+            
+        // 💡 宿泊税率マスタなどのリストも必要であれば、ここで再セットする
+        // (例) form.setTaxRateList(mZeiritsuRepository.findAll());
+    }
+    
+    
+    /**
+     * 💡 画面の「更生/修正」文字列を DB 用の 1 文字コードに変換する
+     */
+    private String mapModificationCategory(String category) {
+        if (!org.springframework.util.StringUtils.hasText(category)) {
+            return "0"; // デフォルト（新規申告）
+        }
+        return switch (category) {
+            case "更生" -> "1";
+            case "修正" -> "2";
+            default -> "0";
+        };
+    }
+    
+    /**
+     * 💡 次に使用すべき履歴番号 (RNO) を決定するぜ
+     */
+    private Integer determineNextRno(String jichitaiCd, String shiteiNo, String nendo, Integer kibetsu) {
+        // 💡 「最新の1件」を取得し、存在すればその RNO に +1、なければ 1 を返す
+        return fukaRepository.findFirstByJichitaiCdAndShiteiNoAndNendoAndKibetsuOrderByRnoDesc(
+                    jichitaiCd, shiteiNo, nendo, kibetsu)
+                .map(Fuka::getRno)   // Entity から RNO だけを抽出 (Mapping)
+                .map(rno -> rno + 1) // 既存があればプラス1
+                .orElse(1);          // 存在しなければ 1 (Default Value)
+    }
+
 
 }
