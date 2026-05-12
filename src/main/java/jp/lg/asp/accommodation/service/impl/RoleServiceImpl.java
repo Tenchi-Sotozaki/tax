@@ -115,7 +115,10 @@ public class RoleServiceImpl implements RoleService {
 
 		if (userIds != null) {
 			for (String userId : userIds) {
-				User u = userRepository.findById(new UserId()).orElse(null);
+				UserId pk = new UserId();
+				pk.setJichitaiCd(jichitaiCd);
+				pk.setId(userId);
+				User u = userRepository.findById(pk).orElse(null);
 				if (u != null) {
 					u.setRoleId(BigDecimal.valueOf(roleId));
 					userRepository.save(u);

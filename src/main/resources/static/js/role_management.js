@@ -157,6 +157,8 @@ function updateAssignedUsers() {
     .then(result => {
         if (result.success) {
             bootstrap.Modal.getInstance(document.getElementById('usersModal')).hide();
+            sessionStorage.setItem('flashMessage', '付与ユーザーを更新しました。');
+            location.reload();
         } else {
             alert('更新に失敗しました: ' + result.message);
         }

@@ -16,6 +16,11 @@
 			</h2>
 		</div>
 
+		<div id="flashMessage" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+			<span id="flashMessageText"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
 		<!-- アクションボタン -->
 		<div class="mb-3">
 			<button type="button" class="btn btn-primary me-2"
@@ -165,6 +170,14 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/role_management.js}"></script>
+		<script>
+			const msg = sessionStorage.getItem('flashMessage');
+			if (msg) {
+				document.getElementById('flashMessageText').textContent = msg;
+				document.getElementById('flashMessage').classList.remove('d-none');
+				sessionStorage.removeItem('flashMessage');
+			}
+		</script>
 	</th:block>
 
 </body>
