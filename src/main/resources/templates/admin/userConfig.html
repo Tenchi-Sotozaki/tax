@@ -16,8 +16,7 @@
 			</h2>
 		</div>
 
-		<form th:action="@{/admin/user-registration}"
-			th:attr="action=${isEdit} ? @{/admin/user-edit/{id}(id=${userForm.originalId})} : @{/admin/user-registration}"
+		<form th:action="${isEdit} ? @{/admin/user-edit/{id}(id=${userForm.originalId})} : @{/admin/user-registration}"
 			th:object="${userForm}" method="post">
 
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"

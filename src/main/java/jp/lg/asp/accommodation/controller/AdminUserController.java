@@ -63,7 +63,7 @@ public class AdminUserController {
 
 	@PostMapping("/user-registration")
 	public String register(
-			@Validated @ModelAttribute("userForm") UserForm form,
+			@Validated(UserForm.OnCreate.class) @ModelAttribute("userForm") UserForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
@@ -119,7 +119,7 @@ public class AdminUserController {
 	@PostMapping("/user-edit/{id}")
 	public String update(
 			@PathVariable String id,
-			@Validated @ModelAttribute("userForm") UserForm form,
+			@Validated(UserForm.OnUpdate.class) @ModelAttribute("userForm") UserForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
