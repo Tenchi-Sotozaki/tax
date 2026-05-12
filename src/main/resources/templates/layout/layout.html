@@ -50,12 +50,14 @@
 						<div id="mainQuery" class="accordion-collapse collapse">
 							<div class="accordion-body py-1 px-0">
 								<ul class="nav flex-column ms-3">
-									<li class="nav-item"><a
-										class="nav-link text-white-50 py-1 sidebar-link"
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('TOKUGIMU')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/tokugimu/list}"
 										th:classappend="${#strings.contains(currentUri, '/tokugimu')} ? 'text-white fw-medium' : ''">
 											<i class="bi bi-people me-2"></i>特別徴収義務者管理台帳
-									</a></li>
+									</a>
+									</li>
 									<li class="nav-item"><a
 										class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{#}"> <i class="bi bi-person-lines-fill me-2"></i>宛名情報
@@ -119,12 +121,14 @@
 							<div id="adminQuery" class="accordion-collapse collapse">
 								<div class="accordion-body py-1 px-0">
 									<ul class="nav flex-column ms-3">
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
+										<li class="nav-item"
+											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('USER_MGMT')}">
+											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/user-search}"
 											th:classappend="${#strings.contains(currentUri, '/admin/user')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-person-search me-2"></i>ユーザー検索
-										</a></li>
+										</a>
+										</li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{#}"> <i class="bi bi-journal-text me-2"></i>システムログ
@@ -133,12 +137,14 @@
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{#}"> <i class="bi bi-sliders me-2"></i>賦課方式
 										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
+										<li class="nav-item"
+											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
+											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki}"
 											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar-check me-2"></i>納税周期
-										</a></li>
+										</a>
+										</li>
 									</ul>
 								</div>
 							</div>
@@ -171,18 +177,22 @@
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{#}"> <i class="bi bi-sliders me-2"></i>賦課方式設定
 										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
+										<li class="nav-item"
+											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
+											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki/register}"
 											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/register')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar-check me-2"></i>納税周期
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
+										</a>
+										</li>
+										<li class="nav-item"
+											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ROLE_MGMT')}">
+											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/role/management}"
 											th:classappend="${#strings.contains(currentUri, '/admin/role')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-shield-lock me-2"></i>権限管理
-										</a></li>
+										</a>
+										</li>
 									</ul>
 								</div>
 							</div>

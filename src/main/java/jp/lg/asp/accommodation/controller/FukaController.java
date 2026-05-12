@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.config.ScreenId;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.service.FukaService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class FukaController {
 	private final FukaService fukaService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenId.FUKADAICHO;
+	private static final String SCREEN_ID = ScreenManagement.FUKADAICHO;
 	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
 
 	@GetMapping("/payment-ledger/{shiteiNo}")
