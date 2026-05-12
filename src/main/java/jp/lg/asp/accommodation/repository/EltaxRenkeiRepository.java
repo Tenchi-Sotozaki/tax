@@ -14,9 +14,9 @@ import jp.lg.asp.accommodation.entity.EltaxRenkeiId;
 @Repository
 public interface EltaxRenkeiRepository extends JpaRepository<EltaxRenkei, EltaxRenkeiId> {
 
-    @Query("SELECT e FROM EltaxRenkei e WHERE e.jichitaiCd = :jichitaiCd ORDER BY e.seq DESC")
-    List<EltaxRenkei> findByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+	@Query("SELECT e FROM EltaxRenkei e WHERE e.jichitaiCd = :jichitaiCd ORDER BY e.seq DESC")
+	List<EltaxRenkei> findByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 
-    @Query("SELECT COALESCE(MAX(e.seq), 0) + 1 FROM EltaxRenkei e WHERE e.jichitaiCd = :jichitaiCd")
-    BigDecimal findNextSeq(@Param("jichitaiCd") String jichitaiCd);
+	@Query("SELECT COALESCE(MAX(e.seq), 0) + 1 FROM EltaxRenkei e WHERE e.jichitaiCd = :jichitaiCd")
+	BigDecimal findNextSeq(@Param("jichitaiCd") String jichitaiCd);
 }

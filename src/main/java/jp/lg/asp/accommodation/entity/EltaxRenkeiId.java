@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EltaxRenkeiId implements Serializable {
-    private String jichitaiCd;
-    private BigDecimal seq;
+	private String jichitaiCd;
+	private BigDecimal seq;
 }

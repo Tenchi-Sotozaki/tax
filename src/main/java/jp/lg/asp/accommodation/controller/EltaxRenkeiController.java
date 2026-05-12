@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.config.ScreenId;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.entity.EltaxRenkei;
 import jp.lg.asp.accommodation.service.EltaxRenkeiService;
 import lombok.RequiredArgsConstructor;
@@ -27,45 +27,45 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EltaxRenkeiController {
 
-    private final EltaxRenkeiService eltaxRenkeiService;
-    private final ScreenAccessChecker accessChecker;
+	private final EltaxRenkeiService eltaxRenkeiService;
+	private final ScreenAccessChecker accessChecker;
 
-    private static final String SCREEN_ID = ScreenId.ELTAX_RENKEI;
+	private static final String SCREEN_ID = ScreenManagement.ELTAX_RENKEI;
 
-    @GetMapping
-    public String index(Model model) {
-        accessChecker.checkAccess(SCREEN_ID);
-        model.addAttribute("eltaxRenkeiList", eltaxRenkeiService.findAll());
-        return "eltaxRenkei/eltaxRenkei";
-    }
+	@GetMapping
+	public String index(Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
+		model.addAttribute("eltaxRenkeiList", eltaxRenkeiService.findAll());
+		return "eltaxRenkei/eltaxRenkei";
+	}
 
-    @PostMapping("/import")
-    public String importFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-        accessChecker.checkAccess(SCREEN_ID);
-        if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "ファイルを選択してください。");
-            return "redirect:/eltax-renkei";
-        }
-        try {
-            eltaxRenkeiService.importFile(file);
-            redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        }
-        return "redirect:/eltax-renkei";
-    }
+	@PostMapping("/import")
+	public String importFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
+		if (file.isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "ファイルを選択してください。");
+			return "redirect:/eltax-renkei";
+		}
+		try {
+			eltaxRenkeiService.importFile(file);
+			redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		}
+		return "redirect:/eltax-renkei";
+	}
 
-    @GetMapping("/download/{seq}")
-    public ResponseEntity<byte[]> download(@PathVariable BigDecimal seq) {
-        accessChecker.checkAccess(SCREEN_ID);
+	@GetMapping("/download/{seq}")
+	public ResponseEntity<byte[]> download(@PathVariable BigDecimal seq) {
+		accessChecker.checkAccess(SCREEN_ID);
 
-        EltaxRenkei entity = eltaxRenkeiService.findBySeq(seq);
-        if (entity == null || entity.getLog() == null) {
-            return ResponseEntity.notFound().build();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentDisposition(ContentDisposition.attachment().filename(entity.getFileName()).build());
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return ResponseEntity.ok().headers(headers).body(entity.getLog());
-    }
+		EltaxRenkei entity = eltaxRenkeiService.findBySeq(seq);
+		if (entity == null || entity.getLog() == null) {
+			return ResponseEntity.notFound().build();
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentDisposition(ContentDisposition.attachment().filename(entity.getFileName()).build());
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		return ResponseEntity.ok().headers(headers).body(entity.getLog());
+	}
 }

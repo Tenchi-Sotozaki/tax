@@ -20,44 +20,45 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EltaxRenkeiServiceImpl implements EltaxRenkeiService {
 
-    private final EltaxRenkeiRepository eltaxRenkeiRepository;
+	private final EltaxRenkeiRepository eltaxRenkeiRepository;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+	@Value("${app.jichitai.code}")
+	private String jichitaiCd;
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<EltaxRenkeiDto> findAll() {
-        return eltaxRenkeiRepository.findByJichitaiCd(jichitaiCd)
-                .stream()
-                .map(e -> new EltaxRenkeiDto(e.getSeq(), e.getFileName(), e.getShubetsu(), e.getShoriDt(), e.getShoriKekka()))
-                .toList();
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public List<EltaxRenkeiDto> findAll() {
+		return eltaxRenkeiRepository.findByJichitaiCd(jichitaiCd)
+				.stream()
+				.map(e -> new EltaxRenkeiDto(e.getSeq(), e.getFileName(), e.getShubetsu(), e.getShoriDt(),
+						e.getShoriKekka()))
+				.toList();
+	}
 
-    @Override
-    @Transactional
-    public void importFile(MultipartFile file) {
-        try {
-            BigDecimal nextSeq = eltaxRenkeiRepository.findNextSeq(jichitaiCd);
-            LocalDateTime now = LocalDateTime.now();
+	@Override
+	@Transactional
+	public void importFile(MultipartFile file) {
+		try {
+			BigDecimal nextSeq = eltaxRenkeiRepository.findNextSeq(jichitaiCd);
+			LocalDateTime now = LocalDateTime.now();
 
-            EltaxRenkei entity = new EltaxRenkei();
-            entity.setJichitaiCd(jichitaiCd);
-            entity.setSeq(nextSeq);
-            entity.setFileName(file.getOriginalFilename());
-            entity.setShoriDt(now);
-            entity.setShoriKekka("1");
-            entity.setLog(file.getBytes());
+			EltaxRenkei entity = new EltaxRenkei();
+			entity.setJichitaiCd(jichitaiCd);
+			entity.setSeq(nextSeq);
+			entity.setFileName(file.getOriginalFilename());
+			entity.setShoriDt(now);
+			entity.setShoriKekka("1");
+			entity.setLog(file.getBytes());
 
-            eltaxRenkeiRepository.save(entity);
-        } catch (Exception e) {
-            throw new RuntimeException("ファイルの取込に失敗しました: " + e.getMessage(), e);
-        }
-    }
+			eltaxRenkeiRepository.save(entity);
+		} catch (Exception e) {
+			throw new RuntimeException("ファイルの取込に失敗しました: " + e.getMessage(), e);
+		}
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public EltaxRenkei findBySeq(BigDecimal seq) {
-        return eltaxRenkeiRepository.findById(new EltaxRenkeiId(jichitaiCd, seq)).orElse(null);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public EltaxRenkei findBySeq(BigDecimal seq) {
+		return eltaxRenkeiRepository.findById(new EltaxRenkeiId(jichitaiCd, seq)).orElse(null);
+	}
 }

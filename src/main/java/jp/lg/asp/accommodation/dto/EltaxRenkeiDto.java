@@ -10,9 +10,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class EltaxRenkeiDto {
 
-    private BigDecimal seq;
-    private String fileName;
-    private String shubetsu;
-    private LocalDateTime shoriDt;
-    private String shoriKekka;
+	private BigDecimal seq;
+	private String fileName;
+	private String shubetsu;
+	private LocalDateTime shoriDt;
+	private String shoriKekka;
 }

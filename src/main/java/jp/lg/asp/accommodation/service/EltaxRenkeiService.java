@@ -10,12 +10,12 @@ import jp.lg.asp.accommodation.entity.EltaxRenkei;
 
 public interface EltaxRenkeiService {
 
-    /** 取込済みファイル一覧を取得する */
-    List<EltaxRenkeiDto> findAll();
+	/** 取込済みファイル一覧を取得する */
+	List<EltaxRenkeiDto> findAll();
 
-    /** ファイルを取り込み、t_eltax_renkeiに登録する */
-    void importFile(MultipartFile file);
+	/** ファイルを取り込み、t_eltax_renkeiに登録する */
+	void importFile(MultipartFile file);
 
-    /** SEQを指定してログをダウンロード用に取得する */
-    EltaxRenkei findBySeq(BigDecimal seq);
+	/** SEQを指定してログをダウンロード用に取得する */
+	EltaxRenkei findBySeq(BigDecimal seq);
 }
