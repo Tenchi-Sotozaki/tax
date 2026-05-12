@@ -48,16 +48,16 @@ function updateTable(data) {
                     noki = '翌月末日';
                     break;
 				case 2:
-					noki = '6月,8月,10月,12月,翌年2月,翌年4月末日';
+					noki = '6月,8月,10月,12月,翌年2月,翌年4月の各末日';
 					break;
                 case 3:
-                    noki = '7月,10月,翌年1月,翌年4月末日';
+                    noki = '7月,10月,翌年1月,翌年4月の各末日';
                     break;
                 case 4:
-                    noki = '8月,12月,翌年4月末日';
+                    noki = '8月,12月,翌年4月の各末日';
                     break;
                 case 6:
-                    noki = '10月,翌年4月末日';
+                    noki = '10月,翌年4月の各末日';
                     break;
                 case 12:
                     noki = '翌年5月末日';
