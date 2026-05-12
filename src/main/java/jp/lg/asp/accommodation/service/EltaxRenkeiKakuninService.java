@@ -15,5 +15,5 @@ public interface EltaxRenkeiKakuninService {
 	/**
 	 * 確認済みファイルをDBに登録する（t_eltax_renkei への保存と関連テーブル更新）。
 	 */
-	void commit(MultipartFile file);
+	void commit(byte[] fileBytes, String fileName);
 }

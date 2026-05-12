@@ -62,7 +62,7 @@
                         </tr>
                         <tr th:each="item : ${eltaxRenkeiList}">
                             <td th:text="${item.fileName}"></td>
-                            <td th:text="${item.shubetsu}"></td>
+                            <td th:text="${shubetsuNameMap.getOrDefault(item.shubetsu, item.shubetsu)}"></td>
                             <td th:text="${item.shoriDt != null ? #temporals.format(item.shoriDt, 'yyyy/MM/dd HH:mm:ss') : ''}"></td>
                             <td>
                                 <span th:if="${item.shoriKekka == '1'}" class="badge bg-success">正常</span>

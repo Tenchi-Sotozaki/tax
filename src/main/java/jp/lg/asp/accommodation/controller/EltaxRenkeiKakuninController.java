@@ -26,6 +26,7 @@ public class EltaxRenkeiKakuninController {
 
 	private static final String SCREEN_ID = ScreenManagement.ELTAX_RENKEI;
 	private static final String SESSION_KEY_FILE = "eltaxUploadedFile";
+	private static final String SESSION_KEY_FILE_NAME = "eltaxUploadedFileName";
 
 	/**
 	 * ファイルを受け取り、確認画面を表示する（DB未登録）
@@ -44,7 +45,8 @@ public class EltaxRenkeiKakuninController {
 		}
 		try {
 			EltaxRenkeiKakuninDto dto = eltaxRenkeiKakuninService.preview(file);
-			session.setAttribute(SESSION_KEY_FILE, file);
+			session.setAttribute(SESSION_KEY_FILE, file.getBytes());
+			session.setAttribute(SESSION_KEY_FILE_NAME, file.getOriginalFilename());
 			model.addAttribute("kakuninDto", dto);
 			return "eltaxRenkei/eltaxRenkeiKakunin";
 		} catch (Exception e) {
@@ -62,18 +64,20 @@ public class EltaxRenkeiKakuninController {
 			RedirectAttributes redirectAttributes) {
 
 		accessChecker.checkAccess(SCREEN_ID);
-		MultipartFile uploadedFile = (MultipartFile) session.getAttribute(SESSION_KEY_FILE);
-		if (uploadedFile == null || uploadedFile.isEmpty()) {
+		byte[] fileBytes = (byte[]) session.getAttribute(SESSION_KEY_FILE);
+		String fileName = (String) session.getAttribute(SESSION_KEY_FILE_NAME);
+		if (fileBytes == null || fileBytes.length == 0) {
 			redirectAttributes.addFlashAttribute("errorMessage", "セッションが切れました。再度ファイルを選択してください。");
 			return "redirect:/eltax-renkei";
 		}
 		try {
-			eltaxRenkeiKakuninService.commit(uploadedFile);
+			eltaxRenkeiKakuninService.commit(fileBytes, fileName);
 			redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		} finally {
 			session.removeAttribute(SESSION_KEY_FILE);
+			session.removeAttribute(SESSION_KEY_FILE_NAME);
 		}
 		return "redirect:/eltax-renkei";
 	}

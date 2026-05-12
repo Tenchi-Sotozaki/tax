@@ -10,14 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.EltaxTetsuzukiConstants;
 import jp.lg.asp.accommodation.entity.EltaxRenkei;
 import jp.lg.asp.accommodation.service.EltaxRenkeiService;
 import lombok.RequiredArgsConstructor;
@@ -36,23 +33,8 @@ public class EltaxRenkeiController {
 	public String index(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("eltaxRenkeiList", eltaxRenkeiService.findAll());
+		model.addAttribute("shubetsuNameMap", EltaxTetsuzukiConstants.SHUBETSU_NAME_MAP);
 		return "eltaxRenkei/eltaxRenkei";
-	}
-
-	@PostMapping("/import")
-	public String importFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
-		if (file.isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", "ファイルを選択してください。");
-			return "redirect:/eltax-renkei";
-		}
-		try {
-			eltaxRenkeiService.importFile(file);
-			redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-		}
-		return "redirect:/eltax-renkei";
 	}
 
 	@GetMapping("/download/{seq}")

@@ -18,6 +18,7 @@ public class EltaxRenkeiKakuninDto {
 	private String atenaJusho;
 	private String fileName;
 	private String shubetsu;
+	private String shubetsuName;
 
 	private List<DiffRow> diffRows;
 
