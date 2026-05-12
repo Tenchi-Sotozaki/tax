@@ -86,7 +86,7 @@ public class RoleController {
 		result.put("role", roleMap);
 
 		if (role.getRoleDetails() != null) {
-			Map<String, Integer> permissions = role.getRoleDetails().stream()
+			Map<String, String> permissions = role.getRoleDetails().stream()
 					.collect(Collectors.toMap(
 							rd -> rd.getScreenId(),
 							rd -> rd.getPermission()));

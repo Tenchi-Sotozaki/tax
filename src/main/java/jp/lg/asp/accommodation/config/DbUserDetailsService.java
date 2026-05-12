@@ -52,7 +52,7 @@ public class DbUserDetailsService implements UserDetailsService {
 		boolean isAdmin = user.getRoleId() != null && roleRepository
 				.findByIdWithDetails(jichitaiCd, user.getRoleId().longValue())
 				.map(role -> role.getRoleDetails() != null && role.getRoleDetails().stream()
-						.anyMatch(rd -> rd.getPermission() != null && rd.getPermission() >= 1
+						.anyMatch(rd -> rd.getPermission() != null && rd.getPermission().compareTo("1") >= 0
 								&& ADMIN_SCREENS.contains(rd.getScreenId().strip())))
 				.orElse(false);
 
