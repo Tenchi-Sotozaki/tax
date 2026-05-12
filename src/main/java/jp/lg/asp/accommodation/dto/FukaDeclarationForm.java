@@ -79,5 +79,10 @@ public class FukaDeclarationForm {
     private Integer kibetsu; 
     
 
+    // 徴収原簿用の日別データ（モーダルの入力値）
+    private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
+
+    private Integer rno;
+    
 
 }

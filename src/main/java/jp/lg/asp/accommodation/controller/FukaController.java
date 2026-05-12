@@ -16,13 +16,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
-import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.repository.FukaMonthlyDeclarationRepository;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -68,20 +66,27 @@ public class FukaController {
 	// =======================================================
 	// 宿泊税情報 登録/編集/照会
 	// =======================================================
-
 	/**
-	 * 宿泊税情報 新規登録画面表示処理
-	 */
-	@GetMapping("/register/{shiteiNo}")
-    public String showRegister(@PathVariable("shiteiNo") String shiteiNo, Model model) {
-        FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo);
-
-        if (form.getMonthlyDetail() == null) {
-            form.setMonthlyDetail(new FukaMonthlyDeclarationDto());
+     * 宿泊税情報 登録画面表示
+     */
+    @GetMapping("/register/{shiteiNo}")
+    public String register(
+            @PathVariable("shiteiNo") String shiteiNo,
+            @RequestParam(name = "month", required = false) String month,
+            RedirectAttributes redirectAttributes, // 🔴 追加：リダイレクト先にメッセージを渡すための部品
+            Model model) {
+        
+        // 💡 サーバーサイドでのアクセスガード（済なら新規登録させない）
+        if (month != null && !month.isEmpty()) {
+            if (fukaService.isAlreadyRegistered(shiteiNo, month)) {
+                redirectAttributes.addFlashAttribute("errorMessage", "申告済みのデータです。「照会」ボタンから確認してください。");
+                return "redirect:/declaration/payment-ledger/" + shiteiNo; // 台帳画面へ強制送還
+            }
         }
 
+        FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo, month);
         model.addAttribute("fukaDeclarationForm", form);
-        return CONFIG_VIEW;
+        return CONFIG_VIEW; 
     }
 
 	/**
@@ -92,13 +97,18 @@ public class FukaController {
 			@PathVariable("shiteiNo") String shiteiNo,
 			@PathVariable("nendo") String nendo,
 			@PathVariable("kibetsu") Integer kibetsu,
+			RedirectAttributes redirectAttributes, // 🔴 追加
 			Model model) {
-		FukaDeclarationForm form = fukaService.getDeclarationFormForView(shiteiNo, nendo, kibetsu);
+		
+        // 💡 サーバーサイドでのアクセスガード（未なら照会させない）
+        if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "未申告のデータです。「新規登録」ボタンから登録してください。");
+            return "redirect:/declaration/payment-ledger/" + shiteiNo;
+        }
 
-		// 【照会モード】isView だけ true にする
+		FukaDeclarationForm form = fukaService.getDeclarationFormForView(shiteiNo, nendo, kibetsu);
 		form.setView(true);
 		form.setEdit(false);
-
 		model.addAttribute("fukaDeclarationForm", form);
 		return CONFIG_VIEW;
 	}
@@ -111,13 +121,18 @@ public class FukaController {
 			@PathVariable("shiteiNo") String shiteiNo,
 			@PathVariable("nendo") String nendo,
 			@PathVariable("kibetsu") Integer kibetsu,
+			RedirectAttributes redirectAttributes, // 🔴 追加
 			Model model) {
-		FukaDeclarationForm form = fukaService.getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
 
-		// 【編集モード】isEdit だけ true にする
+        // 💡 編集画面も同様に未申告データをガードする
+        if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "未申告のデータです。「新規登録」ボタンから登録してください。");
+            return "redirect:/declaration/payment-ledger/" + shiteiNo;
+        }
+
+		FukaDeclarationForm form = fukaService.getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
 		form.setView(false);
 		form.setEdit(true);
-
 		model.addAttribute("fukaDeclarationForm", form);
 		return CONFIG_VIEW;
 	}
