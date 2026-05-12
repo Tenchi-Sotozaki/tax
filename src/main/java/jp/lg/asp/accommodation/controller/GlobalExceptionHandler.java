@@ -14,9 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
-@RestControllerAdvice(assignableTypes = {
-        AccommodationTaxDeclarationController.class
-})
+@RestControllerAdvice(annotations = org.springframework.web.bind.annotation.RestController.class)
 public class GlobalExceptionHandler {
 
     /**

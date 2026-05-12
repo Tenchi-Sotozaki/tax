@@ -65,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
 						detail.setJichitaiCd(jichitaiCd);
 						detail.setRoleId(role.getRoleId());
 						detail.setScreenId(entry.getKey());
-						detail.setPermission(entry.getValue());
+						detail.setPermission(String.valueOf(entry.getValue()));
 						updatedDetails.add(detail);
 					}
 				}
@@ -89,7 +89,7 @@ public class RoleServiceImpl implements RoleService {
 						detail.setJichitaiCd(jichitaiCd);
 						detail.setRoleId(role.getRoleId());
 						detail.setScreenId(entry.getKey());
-						detail.setPermission(entry.getValue());
+						detail.setPermission(String.valueOf(entry.getValue()));
 						role.getRoleDetails().add(detail);
 					}
 				}

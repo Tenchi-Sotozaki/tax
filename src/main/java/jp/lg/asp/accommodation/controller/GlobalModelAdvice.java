@@ -43,29 +43,34 @@ public class GlobalModelAdvice {
      */
     @ModelAttribute("accessibleScreens")
     public Set<String> accessibleScreens() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+                return Collections.emptySet();
+            }
+
+            UserId pk = new UserId();
+            pk.setJichitaiCd(jichitaiCd);
+            pk.setId(auth.getName());
+
+            User user = userRepository.findById(pk).orElse(null);
+
+            // DBにユーザーが存在しない場合（モックユーザー）は全画面許可
+            if (user == null || user.getRoleId() == null) {
+                return Set.of("*");
+            }
+
+            return roleRepository.findByIdWithDetails(jichitaiCd, user.getRoleId().longValue())
+                    .map(role -> role.getRoleDetails() == null ? Collections.<String>emptySet()
+                            : role.getRoleDetails().stream()
+                                    .filter(rd -> rd.getPermission() != null && rd.getPermission().compareTo("1") >= 0)
+                                    .map(rd -> rd.getScreenId().strip())
+                                    .collect(Collectors.toSet()))
+                    .orElse(Collections.emptySet());
+        } catch (Exception e) {
+            log.warn("accessibleScreens取得エラー: {}", e.getMessage());
             return Collections.emptySet();
         }
-
-        UserId pk = new UserId();
-        pk.setJichitaiCd(jichitaiCd);
-        pk.setId(auth.getName());
-
-        User user = userRepository.findById(pk).orElse(null);
-
-        // DBにユーザーが存在しない場合（モックユーザー）は全画面許可
-        if (user == null || user.getRoleId() == null) {
-            return Set.of("*");
-        }
-
-        return roleRepository.findByIdWithDetails(jichitaiCd, user.getRoleId().longValue())
-                .map(role -> role.getRoleDetails() == null ? Collections.<String>emptySet()
-                        : role.getRoleDetails().stream()
-                                .filter(rd -> rd.getPermission() != null && rd.getPermission() >= 1)
-                                .map(rd -> rd.getScreenId().strip())
-                                .collect(Collectors.toSet()))
-                .orElse(Collections.emptySet());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

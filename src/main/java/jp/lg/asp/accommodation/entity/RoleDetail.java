@@ -33,7 +33,7 @@ public class RoleDetail extends BaseEntity {
     private String screenId;
 
     @Column(name = "permission", nullable = false)
-    private Integer permission; // 1:参照, 2:更新
+    private String permission; // 1:参照, 2:更新
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({

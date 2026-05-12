@@ -51,7 +51,7 @@ public class ScreenAccessChecker {
         }
 
         long count = roleRepository.countAccessibleScreen(
-                jichitaiCd, user.getRoleId().longValue(), screenId);
+                jichitaiCd, user.getRoleId().longValue(), screenId.strip());
 
         if (count == 0) {
             throw new AccessDeniedException(screenId, userId);
