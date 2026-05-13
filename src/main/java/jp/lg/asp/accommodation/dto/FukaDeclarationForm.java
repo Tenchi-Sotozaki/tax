@@ -60,7 +60,8 @@ public class FukaDeclarationForm {
 	private Long additionalAmount;
 
 	// 加算金額の納期限
-	private LocalDate additionalDueDate;
+	@org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd")
+	private java.time.LocalDate additionalDueDate;
 
 	// ========== 更生/修正エリア ==========
 	// 変更の区分 (更生/修正)
@@ -81,5 +82,6 @@ public class FukaDeclarationForm {
 
     private Integer rno;
     
+
 
 }

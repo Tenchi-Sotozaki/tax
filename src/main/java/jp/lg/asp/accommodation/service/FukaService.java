@@ -19,7 +19,6 @@ import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto.DailyItem;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
-import jp.lg.asp.accommodation.entity.AtenaId;
 import jp.lg.asp.accommodation.entity.ChoshuGenbo;
 import jp.lg.asp.accommodation.entity.ChoshuGenboId;
 import jp.lg.asp.accommodation.entity.ChoshuGenboUchi;
@@ -107,9 +106,13 @@ public class FukaService {
 
 		// 2. DBから実データを取得し、期別(kibetsu)をキーにしたMapに変換
 		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
+		// 💡 重複キーを安全に解決するマージ処理を追加したぜ！
 		Map<Integer, Fuka> fukaMap = fukaList.stream()
-				.collect(Collectors.toMap(Fuka::getKibetsu, f -> f));
-
+		        .collect(Collectors.toMap(
+		                Fuka::getKibetsu, 
+		                f -> f, 
+		                (existing, replacement) -> existing.getRno() > replacement.getRno() ? existing : replacement
+		        ));
 		// 3. 1期〜12期までのリストを生成
 		List<FukaDaichoListItem> items = new ArrayList<>();
 
@@ -283,77 +286,54 @@ public class FukaService {
         }
     }
 	// ========== 宿泊税情報 登録/編集/照会用メソッド ==========
-
     /**
-     * 【編集・照会用】DBから全ての関連データを取得し、DTOを構築する
+     * 【編集・照会共通】表示データの取得ロジック
+     * 高い High-level Abstraction（抽象化：細かい実装を隠して処理の流れを見せること）を実現しているぜ。
      */
     @Transactional(readOnly = true)
     public FukaDeclarationForm getDeclarationFormForEdit(String shiteiNo, String nendo, Integer kibetsu) {
         FukaDeclarationForm form = new FukaDeclarationForm();
         form.setShiteiNo(shiteiNo);
+        
+        // 1. 基本情報のセット（施設名など）
+        hydrateFormMetadata(form);
 
-        try {
-            // 1. 親データ (t_fuka) の取得
-            FukaId fukaId = new FukaId(jichitaiCd, shiteiNo, 1, nendo, kibetsu);
-            Optional<Fuka> fukaOpt = fukaRepository.findById(fukaId);
+        String jichitaiCd = getCurrentJichitaiCd();
 
-            if (fukaOpt.isPresent()) {
-                Fuka entity = fukaOpt.get();
-                
-                // 基本情報のセット
+        // 2. 最新履歴(RNO)の申告データを取得
+        fukaRepository.findFirstByJichitaiCdAndShiteiNoAndNendoAndKibetsuOrderByRnoDesc(
+                jichitaiCd, shiteiNo, nendo, kibetsu)
+            .ifPresent(entity -> {
+                // 基本項目のセット（登録日、年度、期別、変更理由など）
                 form.setRegistrationDate(entity.getShinkokuYmd());
                 form.setNendo(entity.getNendo());
                 form.setKibetsu(entity.getKibetsu());
-                // 特別徴収義務者情報の取得
-                tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-                    .stream().findFirst().ifPresent(t -> {
-                        form.setObligorName(t.getKyokaName());
-                        form.setFacilityName(t.getShisetsuName());
-                    });
+                form.setModificationCategory(entity.getHenkoKbn()); 
+                form.setModificationReason(entity.getHenkoRiyu());
+                
+                // 3. 🔴 加算金項目の復元（ハイドレーション）
+                hydrateAdditionalFields(entity, form);
 
-                // 2. 1ヶ月分の明細枠 (MonthlyDetail) の生成とマスタ情報のセット
-                FukaMonthlyDeclarationDto monthDto = new FukaMonthlyDeclarationDto();
-                monthDto.setPaymentYearMonth(String.format("%s-%02d", entity.getNendo(), entity.getKibetsu()));
-                monthDto.setExemptStayCount(entity.getMenjoHakusu());
-                monthDto.setTotalStayCount(entity.getTotalHakusu());
-                monthDto.setTotalPaymentAmount(entity.getTotalZeigaku());
+                // 4. 🔴 月次明細サマリの復元（未定義エラーの解消箇所だぜ！）
+                hydrateMonthlyDetail(entity, form, jichitaiCd);
 
-                // 💡 マスタからラベル等の情報を取得して枠を作る（共通化のため別メソッドにしてもいいが、ここでは直書きするぜ）
-                List<FukaZeiritsuTeigaku> masterRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
-                for (FukaZeiritsuTeigaku m : masterRates) {
-                    FukaTaxDetailDto d = new FukaTaxDetailDto();
-                    d.setZeiritsuSeq(m.getSeq());
-                    d.setTeigakuSeq(m.getTeigakuSeq());
-                    d.setTaxRate(m.getZeigaku());
-                    d.setLabel(m.getRyokinEd() != null ? 
-                        String.format("%,d円 ～ %,d円未満", m.getRyokinSt(), m.getRyokinEd() + 1) : 
-                        String.format("%,d円以上", m.getRyokinSt()));
-                    monthDto.getTaxDetails().add(d);
-                }
-                form.setMonthlyDetail(monthDto);
-
-                // 3. 💡 明細データ (t_fuka_uchi) を取得して DTO に同期
-                List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-                        jichitaiCd, shiteiNo, 1, nendo, kibetsu);
-                syncUchiDataToForm(uchiList, monthDto);
-
-                // 4. 💡 徴収原簿 (月計表モーダル用データ) を取得して復元
+                // 5. 月計表（モーダル）データの復元
                 hydrateMonthlyTally(form, jichitaiCd, entity);
-            }
-        } catch (Exception e) {
-            log.error("データ取得エラー: {}", e.getMessage());
-        }
+            });
+
         return form;
     }
 	/**
 	 * 【照会用】表示データの取得
 	 */
 	@Transactional(readOnly = true)
-	public FukaDeclarationForm getDeclarationFormForView(String shiteiNo, String nendo, Integer kibetsu) {
-	    FukaDeclarationForm form = getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
-	    form.setView(true); 
-	    return form;
-	}
+    public FukaDeclarationForm getDeclarationFormForView(String shiteiNo, String nendo, Integer kibetsu) {
+        // getDeclarationFormForEdit を再利用しているため、
+        // 上記のメソッドが修正されていれば自動的に照会も直るぜ！
+        FukaDeclarationForm form = getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
+        form.setView(true); 
+        return form;
+    }
 	
 
 	/**
@@ -376,6 +356,7 @@ public class FukaService {
 	    // ⚠️ 重要：保存（save）を呼ぶ前に、必ず監査項目をセットするぜ
 	    // これで add_dt が NULL で怒られることはなくなる
 	    setAuditFields(parentFuka);
+	    fukaRepository.save(parentFuka);
 
 	    // 💡 3. 内訳データ (FukaUchi) の生成と準備
 	    // 親のキー情報を引き継いだ内訳リストを作成するぜ
@@ -400,35 +381,7 @@ public class FukaService {
 	    }
 	}
 
-    /**
-     * 💡 画面の入力内容から内訳テーブル (t_fuka_uchi) のエンティティリストを作成する (Mapping Logic)
-     * @param form 画面入力データ
-     * @param parent 親テーブルのエンティティ（キー情報をコピーするため）
-     * @return 内訳エンティティのリスト
-     */
-    private List<FukaUchi> createUchiDetails(FukaDeclarationForm form, Fuka parent) {
-        // 💡 画面の税区分リストをループして Entity に変換する (Iteration)
-        return form.getMonthlyDetail().getTaxDetails().stream()
-            .map(dto -> {
-                FukaUchi uchi = new FukaUchi();
-                
-                // 1. 親テーブルからキー情報をコピー (Key Propagation)
-                uchi.setJichitaiCd(parent.getJichitaiCd());
-                uchi.setShiteiNo(parent.getShiteiNo());
-                uchi.setNendo(parent.getNendo());
-                uchi.setKibetsu(parent.getKibetsu());
-                uchi.setRno(parent.getRno()); // 💡 親と同じ最新のRNOをセット
-                
-                // 2. DTOから入力値をセット (Value Assignment)
-                uchi.setZeiritsuSeq(dto.getZeiritsuSeq());
-                uchi.setHakusu(dto.getStayCount());
-                uchi.setZeigaku(dto.getTaxAmount());
 
-                // 💡 共通項目（登録日時など）はこの後 saveDeclaration 内で一括セットするぜ
-                return uchi;
-            })
-            .collect(Collectors.toList());
-    }
     /**
      * 指定された RNO に紐づく古い内訳データを削除する
      */
@@ -444,14 +397,21 @@ public class FukaService {
         Long[] uchiIndices = new Long[31];
         List<DailyItem> dailyItems = form.getMonthlyTally().getDailyItems();
 
+        // 💡 修正箇所1: ループに入る前に「現在の最大値」を1回だけ取得する
+        Long currentMaxIdx = choshuGenboUchiRepository.getMaxUchiIdx();
+
         for (int i = 0; i < dailyItems.size() && i < 31; i++) {
             DailyItem item = dailyItems.get(i);
             if (isDailyDataPresent(item)) {
-                Long nextIdx = choshuGenboUchiRepository.getNextUchiIdx();
+                
+                // 💡 修正箇所2: DBにないシーケンスを呼ぶのをやめ、手動でインクリメントする
+                currentMaxIdx++;
+                Long nextIdx = currentMaxIdx;
+                
                 uchiIndices[i] = nextIdx;
 
                 ChoshuGenboUchi uchi = new ChoshuGenboUchi();
-                uchi.setUchiIdx(nextIdx);
+                uchi.setUchiIdx(nextIdx); // 手動で採番したIDをセット
                 
                 // 💡 DTOのリストから値を取り出し、Entityの各項目にセットする
                 List<Integer> counts = item.getTaxCategoryCounts();
@@ -698,6 +658,8 @@ public class FukaService {
         parentFuka.setMenjoHakusu(dto.getExemptStayCount());
         parentFuka.setCityZeigaku(parentFuka.getTotalZeigaku());
         parentFuka.setKenZeigaku(0L);
+        
+        mapAdditionalFields(form, parentFuka);
 
         return parentFuka;
     }
@@ -721,14 +683,24 @@ public class FukaService {
 
         java.util.List<jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto.DailyItem> dailyItems = form.getMonthlyTally().getDailyItems();
 
+        // 💡 修正箇所1: ループに入る前に「現在の最大値」を1回だけ取得する
+        // ※Repositoryに getMaxUchiIdx() メソッドを追加しておく必要があるぜ！
+        Long currentMaxIdx = choshuGenboUchiRepository.getMaxUchiIdx();
+
         for (int i = 0; i < dailyItems.size() && i < 31; i++) {
             jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto.DailyItem item = dailyItems.get(i);
             if (isDailyDataPresent(item)) {
-                Long targetIdx = (uchiIndices[i] != null) ? uchiIndices[i] : choshuGenboUchiRepository.getNextUchiIdx();
+                
+                // 💡 修正箇所2: 自動採番（getNextUchiIdx）をやめ、手動で MAX値 をカウントアップする
+                Long targetIdx = uchiIndices[i];
+                if (targetIdx == null) {
+                    currentMaxIdx++;          // 最大値をインクリメント
+                    targetIdx = currentMaxIdx; // 新しいIDとして採用
+                }
                 uchiIndices[i] = targetIdx;
 
                 jp.lg.asp.accommodation.entity.ChoshuGenboUchi uchi = new jp.lg.asp.accommodation.entity.ChoshuGenboUchi();
-                uchi.setUchiIdx(targetIdx);
+                uchi.setUchiIdx(targetIdx); // 手動で振ったIDをセット
                 
                 java.util.List<Integer> counts = item.getTaxCategoryCounts();
                 if (counts.size() >= 1) uchi.setHakusu1(counts.get(0));
@@ -755,31 +727,26 @@ public class FukaService {
     /**
      * 画面表示に必要なメタデータをフォームに再セット（ハイドレーション）する
      */
+    /**
+     * 画面表示に必要なメタデータをフォームに再セット（ハイドレーション）する
+     */
     public void hydrateFormMetadata(FukaDeclarationForm form) {
         if (form.getShiteiNo() == null) {
             return;
         }
 
-        // 💡 指定番号をキーに、特別徴収義務者（施設情報）を取得する
         String jichitaiCd = getCurrentJichitaiCd();
         
-        // 既存の取得ロジック（tokugimuRepository等）を流用して、名称をセットするぜ
-        tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
-                jichitaiCd, form.getShiteiNo(), "1", "0")
+        // 💡 修正ポイント：登録画面（Register）と完全に同じ取得ロジックに統一するぜ！
+        tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, form.getShiteiNo())
+            .stream()
+            .findFirst()
             .ifPresent(tokugimu -> {
                 // 施設名のセット
                 form.setFacilityName(tokugimu.getShisetsuName());
-                
-                // 義務者名の取得（Atenaテーブル等との紐付けがある場合はここで解決する）
-                // ここでは簡略化して、既存の取得済み情報をセットするイメージだ
-                if (tokugimu.getAtenaNo() != null) {
-                    atenaRepository.findById(new AtenaId(jichitaiCd, tokugimu.getAtenaNo()))
-                        .ifPresent(atena -> form.setObligorName(atena.getName()));
-                }
+                // 特別徴収義務者名のセット（宛名テーブル検索をやめ、直接 kyoka_name を使う）
+                form.setObligorName(tokugimu.getKyokaName());
             });
-            
-        // 💡 宿泊税率マスタなどのリストも必要であれば、ここで再セットする
-        // (例) form.setTaxRateList(mZeiritsuRepository.findAll());
     }
     
     
@@ -809,5 +776,95 @@ public class FukaService {
                 .orElse(1);          // 存在しなければ 1 (Default Value)
     }
 
+    /**
+     * フォームからエンティティへ加算項目をマッピングする。
+     * BigDecimal 型への変換を行い、Data Integrity（データの一貫性）を保証するぜ。
+     */
+    private void mapAdditionalFields(FukaDeclarationForm form, Fuka entity) {
+        // 加算区分
+        entity.setKasanKbn(form.getAdditionalCategory());
+        
+        // 加算割合 (String -> BigDecimal)
+        if (org.springframework.util.StringUtils.hasText(form.getAdditionalRate())) {
+            try {
+                entity.setKasanRitsu(new java.math.BigDecimal(form.getAdditionalRate()));
+            } catch (NumberFormatException e) {
+                log.warn("加算割合の数値変換に失敗しました: {}", form.getAdditionalRate());
+                entity.setKasanRitsu(null);
+            }
+        } else {
+            entity.setKasanRitsu(null);
+        }
+        
+        // 加算金額
+        entity.setKasanGaku(form.getAdditionalAmount());
+        
+        // 納期限 (nokigen)
+        entity.setNokigen(form.getAdditionalDueDate());
+    }
 
+    // ---------------------------------------------------------------------
+
+
+    // 💡 既存の updateParentFuka メソッドも同様に修正だ
+    private void updateParentFuka(Fuka existing, FukaDeclarationForm form) {
+        // ... 既存のセット処理 ...
+        existing.setTotalZeigaku(form.getMonthlyDetail().getTotalPaymentAmount());
+        
+        // 💡 修正箇所：加算項目をマッピング
+        mapAdditionalFields(form, existing);
+        
+        setAuditFields(existing);
+        fukaRepository.save(existing);
+    }
+    
+    /**
+     * 💡 修正箇所：月次明細サマリ（総泊数、免除、税額合計）を Form に復元する。
+     * 専門的な値を DTO へ Mapping（マッピング：値を詰め替えること）するぜ。
+     */
+    private void hydrateMonthlyDetail(Fuka entity, FukaDeclarationForm form, String jichitaiCd) {
+        FukaMonthlyDeclarationDto monthDto = new FukaMonthlyDeclarationDto();
+        
+        // 納入年月 (YYYY-MM) の動的算出
+        int calendarMonth = (entity.getKibetsu() <= 9) ? entity.getKibetsu() + 3 : entity.getKibetsu() - 9;
+        int calendarYear = Integer.parseInt(entity.getNendo());
+        if (calendarMonth < 4) calendarYear++; 
+        monthDto.setPaymentYearMonth(String.format("%s-%02d", calendarYear, calendarMonth));
+        
+        monthDto.setExemptStayCount(entity.getMenjoHakusu());
+        monthDto.setTotalStayCount(entity.getTotalHakusu());
+        monthDto.setTotalPaymentAmount(entity.getTotalZeigaku());
+
+        // 税率マスタ情報の紐付け
+        List<FukaZeiritsuTeigaku> masterRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+        for (FukaZeiritsuTeigaku m : masterRates) {
+            FukaTaxDetailDto d = new FukaTaxDetailDto();
+            d.setZeiritsuSeq(m.getSeq());
+            d.setTeigakuSeq(m.getTeigakuSeq());
+            d.setTaxRate(m.getZeigaku());
+            d.setLabel(m.getRyokinEd() != null ? 
+                String.format("%,d円 ～ %,d円未満", m.getRyokinSt(), m.getRyokinEd() + 1) : 
+                String.format("%,d円以上", m.getRyokinSt()));
+            monthDto.getTaxDetails().add(d);
+        }
+        form.setMonthlyDetail(monthDto);
+
+        // 内訳データ(FukaUchi)の同期
+        List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+                jichitaiCd, form.getShiteiNo(), entity.getRno(), entity.getNendo(), entity.getKibetsu());
+        syncUchiDataToForm(uchiList, monthDto);
+    }
+
+    /**
+     * 💡 加算金項目の復元処理。
+     * Null-Safe（ヌルセーフ：値が Null でも落ちないように安全に考慮すること）に実装しているぜ。
+     */
+    private void hydrateAdditionalFields(Fuka entity, FukaDeclarationForm form) {
+        form.setAdditionalCategory(entity.getKasanKbn());
+        if (entity.getKasanRitsu() != null) {
+            form.setAdditionalRate(entity.getKasanRitsu().toString());
+        }
+        form.setAdditionalAmount(entity.getKasanGaku());
+        form.setAdditionalDueDate(entity.getNokigen());
+    }
 }
