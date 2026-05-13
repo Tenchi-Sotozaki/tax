@@ -30,7 +30,8 @@ public class TokugimuController {
 	private final NozeiShukiService nozeiShukiService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenManagement.TOKUGIMU_DAICHO;
+	private static final String TOKUGIMU_DAICHO = ScreenManagement.TOKUGIMU_DAICHO;
+	private static final String TOKUGIMU_CONFIG = ScreenManagement.TOKUGIMU_CONFIG;
 	private static final String LIST_VIEW = "tokugimu/tTokugimuDaicho";
 	private static final String FORM_VIEW = "tokugimu/tTokugimuConfig";
 
@@ -38,7 +39,7 @@ public class TokugimuController {
 
 	@GetMapping("/list")
 	public String list(@ModelAttribute TokugimuSearchForm searchForm, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(TOKUGIMU_DAICHO);
 		model.addAttribute("items", tokugimuService.search(searchForm));
 		model.addAttribute("searchForm", searchForm);
 		return LIST_VIEW;
@@ -48,7 +49,7 @@ public class TokugimuController {
 
 	@GetMapping("/registration")
 	public String showRegistrationForm(Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", new TokugimuForm());
 		model.addAttribute("isEdit", false);
 		model.addAttribute("taxCycleOptions", nozeiShukiService.findAll());
@@ -61,7 +62,7 @@ public class TokugimuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", false);
@@ -85,7 +86,7 @@ public class TokugimuController {
 
 	@GetMapping("/view/{id}")
 	public String showView(@PathVariable("id") String id, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
 		model.addAttribute("isView", true);
 		model.addAttribute("isEdit", false);
@@ -98,7 +99,7 @@ public class TokugimuController {
 
 	@GetMapping("/edit/{id}")
 	public String showEditForm(@PathVariable("id") String id, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
 		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", true);
@@ -116,7 +117,7 @@ public class TokugimuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", true);
@@ -138,7 +139,7 @@ public class TokugimuController {
 
 	@PostMapping("/delete/{id}")
 	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		tokugimuService.deleteByShiteiNo(id);
 		redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " のデータを削除しました。");
 		return "redirect:/tokugimu/list";

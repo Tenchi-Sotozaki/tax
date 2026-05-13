@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>宛名管理台帳</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h2 class="h2">
+				<i class="bi bi-person-lines-fill me-2 text-primary"></i>宛名管理台帳
+			</h2>
+			<a th:href="@{/atena/import}" class="btn btn-outline-secondary btn-sm">
+				<i class="bi bi-upload me-1"></i>宛名取込
+			</a>
+		</div>
+
+		<!-- 検索条件エリア -->
+		<div class="card mb-4 shadow-sm">
+			<div class="card-header bg-primary text-white py-3">
+				<h5 class="mb-0"><i class="bi bi-funnel me-2"></i>検索条件</h5>
+			</div>
+			<div class="card-body bg-light-subtle">
+				<form th:action="@{/atena/list}" th:object="${searchForm}" method="get">
+					<div class="row g-3 align-items-end">
+						<div class="col-md-2">
+							<label class="form-label fw-medium">宛名番号</label>
+							<input type="text" class="form-control" th:field="*{atenaNo}" placeholder="宛名番号">
+						</div>
+						<div class="col-md-3">
+							<label class="form-label fw-medium">氏名/名称</label>
+							<input type="text" class="form-control" th:field="*{name}" placeholder="氏名または名称">
+						</div>
+						<div class="col-md-3">
+							<label class="form-label fw-medium">ふりがな</label>
+							<input type="text" class="form-control" th:field="*{nameKana}" placeholder="ふりがな">
+						</div>
+						<div class="col-md-2">
+							<label class="form-label fw-medium">郵便番号</label>
+							<input type="text" class="form-control" th:field="*{yubinNo}" placeholder="郵便番号">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label fw-medium">住所</label>
+							<input type="text" class="form-control" th:field="*{jusho}" placeholder="住所">
+						</div>
+						<div class="col-md-2">
+							<label class="form-label fw-medium">電話番号</label>
+							<input type="text" class="form-control" th:field="*{tel}" placeholder="電話番号">
+						</div>
+						<div class="col-md-2">
+							<label class="form-label fw-medium">個人番号</label>
+							<input type="text" class="form-control" th:field="*{kojinNo}" placeholder="個人番号">
+						</div>
+						<div class="col-md-2">
+							<label class="form-label fw-medium">法人番号</label>
+							<input type="text" class="form-control" th:field="*{hojinNo}" placeholder="法人番号">
+						</div>
+						<div class="col-12 d-flex gap-2">
+							<button type="submit" class="btn btn-primary">
+								<i class="bi bi-search me-1"></i>検索する
+							</button>
+							<a th:href="@{/atena/list}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
+							</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- 件数 -->
+		<div class="d-flex justify-content-end mb-2">
+			<span class="text-muted small">検索結果：<span th:text="${items.size()}">0</span> 件</span>
+		</div>
+
+		<!-- 一覧テーブル -->
+		<div class="card shadow-sm mb-5">
+			<div class="table-responsive">
+				<table class="table table-striped table-hover align-middle mb-0">
+					<thead class="table-primary">
+						<tr>
+							<th>宛名番号</th>
+							<th>氏名/名称</th>
+							<th>ふりがな</th>
+							<th>法人番号</th>
+							<th>郵便番号・住所</th>
+							<th>電話番号</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${items.isEmpty()}">
+							<td colspan="6" class="text-center text-muted py-4">該当する宛名が見つかりません</td>
+						</tr>
+						<tr th:each="item : ${items}">
+							<td th:text="${item.atenaNo}"></td>
+							<td th:text="${item.name}"></td>
+							<td class="text-muted" th:text="${item.nameKana}"></td>
+							<td th:text="${item.hojinNo}"></td>
+							<td>
+								<span th:text="${item.yubinNo != null ? '〒' + item.yubinNo : ''}"></span>
+								<span th:text="${item.jusho}"></span>
+							</td>
+							<td>
+								<div th:text="${item.tel1}"></div>
+								<div th:if="${item.tel2}" th:text="${item.tel2}" class="text-muted small"></div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

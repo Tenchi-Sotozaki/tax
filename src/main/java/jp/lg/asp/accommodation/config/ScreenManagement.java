@@ -12,8 +12,14 @@ public final class ScreenManagement {
 	private ScreenManagement() {
 	}
 
-	//特別徴収義務者管理台帳
+	// 特別徴収義務者管理台帳
 	public static final String TOKUGIMU_DAICHO = "TOKUGIMU";
+
+	// 宛名管理台帳
+	public static final String ATENA_DAICHO = "ATENA";
+
+	// 宛名取込
+	public static final String ATENA_INSERT = "ATENAINS";
 
 	//特別徴収義務者登録/編集/照会
 	public static final String TOKUGIMU_CONFIG = "TOKUCONFIG";
