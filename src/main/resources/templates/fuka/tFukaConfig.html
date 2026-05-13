@@ -30,25 +30,31 @@
 		</div>
 
 		<form id="fukaDeclarationForm" th:action="@{/declaration/save}" th:object="${fukaDeclarationForm}"
-			method="post">
+					method="post">
 
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger py-2 mb-3">
-				<i class="bi bi-exclamation-octagon-fill me-2"></i>入力内容にエラーがあります。各項目の赤字を確認してください。
-			</div>
+					<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger py-2 mb-3">
+						<i class="bi bi-exclamation-octagon-fill me-2"></i>入力内容にエラーがあります。各項目の赤字を確認してください。
+					</div>
 
-			<input type="hidden" th:field="*{declarationId}" />
-			<input type="hidden" th:field="*{shiteiNo}" />
+					<input type="hidden" th:field="*{declarationId}" />
+					<input type="hidden" th:field="*{shiteiNo}" />
 
-			<div class="card shadow-sm mb-4">
-				<div class="card-header bg-primary bg-opacity-10 py-2">
-					<h6 class="mb-0 fw-bold text-primary"><i class="bi bi-calculator me-2"></i>納税額情報</h6>
-				</div>
+					<input type="hidden" th:field="*{nendo}" />
+					<input type="hidden" th:field="*{kibetsu}" />
+
+					<input type="hidden" name="isEdit" th:value="${fukaDeclarationForm.isEdit}" />
+					<input type="hidden" name="isView" th:value="${fukaDeclarationForm.isView}" />
+
+					<div class="card shadow-sm mb-4">
+						<div class="card-header bg-primary bg-opacity-10 py-2">
+							<h6 class="mb-0 fw-bold text-primary"><i class="bi bi-calculator me-2"></i>納税額情報</h6>
+						</div>
 				<div class="card-body">
 					<div class="row g-3 mb-3">
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium mb-1">登録日</label>
-							<input type="date" class="form-control form-control-sm" th:field="*{registrationDate}"
-								th:readonly="${fukaDeclarationForm.isView}">
+						    <label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">登録日</label>
+						    <input type="date" class="form-control form-control-sm" th:field="*{registrationDate}"
+						        th:readonly="${fukaDeclarationForm.isView}">
 						</div>
 						<div class="col-md-4">
 							<label class="form-label form-label-sm fw-medium mb-1">特別徴収義務者</label>
@@ -84,27 +90,28 @@
 							</div>
 						</div>
 
-						<th:block th:if="${fukaDeclarationForm.isEdit or (fukaDeclarationForm.isView and !#strings.isEmpty(fukaDeclarationForm.modificationCategory))}">
-						        
-						        <div class="col-md-2">
-						            <label class="form-label form-label-sm fw-medium mb-1">変更の区分</label>
-						            <select class="form-select form-select-sm" th:field="*{modificationCategory}"
-						                th:disabled="${fukaDeclarationForm.isView}">
-						                <option value="">選択してください</option>
-						                <option value="更生">更生</option>
-						                <option value="修正">修正</option>
-						            </select>
-						            <input type="hidden" th:if="${fukaDeclarationForm.isView}" th:field="*{modificationCategory}" />
-						        </div>
+						<th:block
+							th:if="${fukaDeclarationForm.isEdit or (fukaDeclarationForm.isView and !#strings.isEmpty(fukaDeclarationForm.modificationCategory))}">
 
-						        <div class="col-md-4">
-						            <label class="form-label form-label-sm fw-medium mb-1">変更理由</label>
-						            <textarea class="form-control form-control-sm" rows="1"
-						                th:field="*{modificationReason}"
-						                th:readonly="${fukaDeclarationForm.isView}" placeholder="更生/修正の場合は入力"></textarea>
-						        </div>
-						        
-						    </th:block>
+							<div class="col-md-2">
+								<label class="form-label form-label-sm fw-medium mb-1">変更の区分</label>
+								<select id="modificationCategory" class="form-select form-select-sm"
+									th:field="*{modificationCategory}" th:disabled="${fukaDeclarationForm.isView}">
+									<option value="">選択してください</option>
+									<option value="更生">更生</option>
+									<option value="修正">修正</option>
+								</select>
+								<input type="hidden" th:if="${fukaDeclarationForm.isView}"
+									th:field="*{modificationCategory}" />
+							</div>
+
+							<div class="col-md-4">
+								<label class="form-label form-label-sm fw-medium mb-1">変更理由</label>
+								<textarea class="form-control form-control-sm" rows="1" th:field="*{modificationReason}"
+									th:readonly="${fukaDeclarationForm.isView}" placeholder="更生/修正の場合は入力"></textarea>
+							</div>
+
+						</th:block>
 					</div>
 
 					<div class="col-12 mt-4">
@@ -313,57 +320,87 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script>
-			document.addEventListener('DOMContentLoaded', function () {
+			<script>
+				document.addEventListener('DOMContentLoaded', function () {
 
-				// 💡 1. 月計表モーダルの反映ボタン処理 (Event Listener) のみを残す
-				const btnApply = document.getElementById('btnApplyTally');
-				if (btnApply) {
-					btnApply.addEventListener('click', function () {
-						const detailRows = document.querySelectorAll('.tax-detail-row');
-						const categoryCount = detailRows.length;
+					// =========================================================
+					// 💡 1. 登録日/更生日/修正日の動的ラベリング機能
+					// =========================================================
+					const modCategorySelect = document.getElementById('modificationCategory');
+					const regDateLabel = document.getElementById('registrationDateLabel');
 
-						let categoryTotals = new Array(categoryCount).fill(0);
-						let totalExempt = 0;
+					if (modCategorySelect && regDateLabel) {
+						// 状態に応じてラベルのテキストを更新する関数
+						const updateDateLabel = () => {
+							const selectedVal = modCategorySelect.value;
+							if (selectedVal === '更生') {
+								regDateLabel.textContent = '更生年月日';
+							} else if (selectedVal === '修正') {
+								regDateLabel.textContent = '修正年月日';
+							} else {
+								// 新規または未選択の場合は元の名前に戻す
+								regDateLabel.textContent = '登録日';
+							}
+						};
 
-						// モーダル内の表から各区分の合計を算出
-						document.querySelectorAll('#monthlyTallyTable tbody tr').forEach(row => {
-							for (let i = 0; i < categoryCount; i++) {
-								const input = row.querySelector(`.seq${i + 1}`);
-								if (input) {
-									categoryTotals[i] += parseInt(input.value) || 0;
+						// 画面初期ロード時の実行 (Initial Load)
+						updateDateLabel();
+
+						// プルダウンの選択が変更された時の実行 (Change Event)
+						modCategorySelect.addEventListener('change', updateDateLabel);
+					}
+
+
+					// =========================================================
+					// 💡 2. 月計表モーダルの反映ボタン処理
+					// =========================================================
+					const btnApply = document.getElementById('btnApplyTally');
+					if (btnApply) {
+						btnApply.addEventListener('click', function () {
+							const detailRows = document.querySelectorAll('.tax-detail-row');
+							const categoryCount = detailRows.length;
+
+							let categoryTotals = new Array(categoryCount).fill(0);
+							let totalExempt = 0;
+
+							// モーダル内の表から各区分の合計を算出
+							document.querySelectorAll('#monthlyTallyTable tbody tr').forEach(row => {
+								for (let i = 0; i < categoryCount; i++) {
+									const input = row.querySelector(`.seq${i + 1}`);
+									if (input) {
+										categoryTotals[i] += parseInt(input.value) || 0;
+									}
 								}
-							}
-							// 課税免除の集計
-							const exemptInput = row.querySelector('.exempt');
-							if (exemptInput) {
-								totalExempt += parseInt(exemptInput.value) || 0;
-							}
-						});
-
-						// 親画面（Summary Table）の宿泊数入力欄へ値を反映 (DOM Manipulation)
-						categoryTotals.forEach((total, index) => {
-							if (detailRows[index]) {
-								const targetInput = detailRows[index].querySelector('.stay-count-input');
-								if (targetInput) {
-									targetInput.value = total;
+								// 課税免除の集計
+								const exemptInput = row.querySelector('.exempt');
+								if (exemptInput) {
+									totalExempt += parseInt(exemptInput.value) || 0;
 								}
+							});
+
+							// 親画面（Summary Table）の宿泊数入力欄へ値を反映
+							categoryTotals.forEach((total, index) => {
+								if (detailRows[index]) {
+									const targetInput = detailRows[index].querySelector('.stay-count-input');
+									if (targetInput) {
+										targetInput.value = total;
+									}
+								}
+							});
+
+							// 免除・対象外の合計欄へ反映
+							const exemptField = document.getElementById('exemptStayCount');
+							if (exemptField) {
+								exemptField.value = totalExempt;
 							}
+
+							// 🔴 自動計算の呼び出しは仕様通り「完全削除」
+							alert('月計表の宿泊数を反映しました。税額と合計値は手入力で算定してください。');
 						});
-
-						// 免除・対象外の合計欄へ反映
-						const exemptField = document.getElementById('exemptStayCount');
-						if (exemptField) {
-							exemptField.value = totalExempt;
-						}
-
-						// 🔴 自動計算(calculateTotal)の呼び出しは仕様通り「完全削除」したぜ！
-						alert('月計表の宿泊数を反映しました。税額と合計値は手入力で算定してください。');
-					});
-				}
-			});
-		</script>
-	</th:block>
+					}
+				});
+			</script>
+		</th:block>
 </body>
 
 </html>
