@@ -126,15 +126,12 @@
 							<tbody>
 								<tr th:each="detail, stat : *{monthlyDetail.taxDetails}" class="tax-detail-row">
 									<td class="text-center fw-medium bg-light">
-										<span th:text="${detail.label}">区分名</span>
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}">
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}">
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].label}">
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}">
+									    <span th:text="|${detail.label} (${#numbers.formatInteger(detail.taxRate, 1, 'COMMA')}円)|">区分名</span>
+									    
+									    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}">
+									    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}">
+									    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].label}">
+									    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}">
 									</td>
 									<td>
 										<input type="text" th:if="${fukaDeclarationForm.isView}"
