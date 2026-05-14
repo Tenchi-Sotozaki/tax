@@ -94,7 +94,8 @@
 									</a></li>
 									<li class="nav-item"><a
 										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{#}"> <i
+										th:href="@{/eltax-renkei}"
+										th:classappend="${#strings.contains(currentUri, '/eltax-renkei')} ? 'text-white fw-medium' : ''"> <i
 											class="bi bi-file-earmark-arrow-down me-2"></i>電子申告情報
 									</a></li>
 								</ul>

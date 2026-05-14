@@ -41,4 +41,10 @@ public final class ScreenManagement {
 
 	// 納税周期管理
 	public static final String NOZEI_SHUKI = "NOZEI_SHUK";
+
+	// 電子申告情報取込
+	public static final String ELTAX_RENKEI = "ELTAX_RENKEI";
+
+	// 電子申告情報取込確認
+	public static final String ELTAX_RENKEI_KAKUNIN = "ELTAX_RENKEI_KAKU";
 }
