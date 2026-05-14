@@ -15,68 +15,76 @@
 			</h2>
 		</div>
 
-		<!-- 検索条件エリア -->
-		<div class="card mb-4 shadow-sm">
-			<div class="card-header bg-primary text-white py-3">
-				<h5 class="mb-0">
-					<i class="bi bi-funnel me-2"></i>検索条件
-				</h5>
-			</div>
-			<div class="card-body bg-light-subtle">
-				<form th:action="@{/atena/list}" th:object="${searchForm}"
-					method="get">
-					<div class="row g-3 align-items-end">
-						<div class="col-md-2">
-							<label class="form-label fw-medium">宛名番号</label> <input
-								type="text" class="form-control" th:field="*{atenaNo}"
-								placeholder="宛名番号">
-						</div>
-						<div class="col-md-3">
-							<label class="form-label fw-medium">氏名/名称</label> <input
-								type="text" class="form-control" th:field="*{name}"
-								placeholder="氏名または名称">
-						</div>
-						<div class="col-md-3">
-							<label class="form-label fw-medium">ふりがな</label> <input
-								type="text" class="form-control" th:field="*{nameKana}"
-								placeholder="ふりがな">
-						</div>
-						<div class="col-md-2">
-							<label class="form-label fw-medium">郵便番号</label> <input
-								type="text" class="form-control" th:field="*{yubinNo}"
-								placeholder="郵便番号">
-						</div>
-						<div class="col-md-4">
-							<label class="form-label fw-medium">住所</label> <input type="text"
-								class="form-control" th:field="*{jusho}" placeholder="住所">
-						</div>
-						<div class="col-md-2">
-							<label class="form-label fw-medium">電話番号</label> <input
-								type="text" class="form-control" th:field="*{tel}"
-								placeholder="電話番号">
-						</div>
-						<div class="col-md-2">
-							<label class="form-label fw-medium">個人番号</label> <input
-								type="text" class="form-control" th:field="*{kojinNo}"
-								placeholder="個人番号">
-						</div>
-						<div class="col-md-2">
-							<label class="form-label fw-medium">法人番号</label> <input
-								type="text" class="form-control" th:field="*{hojinNo}"
-								placeholder="法人番号">
-						</div>
-						<div class="col-12 d-flex gap-2">
-							<button type="submit" class="btn btn-primary">
-								<i class="bi bi-search me-1"></i>検索する
-							</button>
-							<a th:href="@{/atena/list}" class="btn btn-outline-secondary">
-								<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
-							</a>
-						</div>
+		<!-- ======= 検索条件 (アコーディオン) ========= -->
+		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
+			<div class="accordion-item border">
+				<h2 class="accordion-header">
+					<button class="accordion-button py-2 fw-semibold" type="button"
+						data-bs-toggle="collapse" data-bs-target="#searchPanel">
+						<i class="bi bi-funnel me-2"></i>検索条件
+					</button>
+				</h2>
+				<div id="searchPanel" class="accordion-collapse collapse show">
+					<div class="accordion-body pt-3 pb-2 px-3">
+						<form th:action="@{/atena/list}" th:object="${searchForm}"
+							method="get">
+							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">宛名番号</label>
+									<input type="text" class="form-control form-contorl-sm"
+										th:field="*{atenaNo}" placeholder="宛名番号">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">氏名/名称</label>
+									<input type="text" class="form-control form-contorl-sm"
+										th:field="*{name}" placeholder="氏名または名称">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">ふりがな</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{nameKana}" placeholder="ふりがな">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">郵便番号</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{yubinNo}" placeholder="郵便番号">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">住所</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{jusho}" placeholder="住所">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">電話番号</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{tel}" placeholder="電話番号">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{kojinNo}" placeholder="個人番号">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{hojinNo}" placeholder="法人番号">
+								</div>
+							</div>
+							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+								<a th:href="@{/atena/list}"
+									class="btn btn-outline-secondary btn-sm"> <i
+									class="bi bi-arrow-counterclockwise me-1"></i>リセット
+								</a>
+								<button type="submit" class="btn btn-primary btn-sm px-4">
+									<i class="bi bi-search me-1"></i>検索する
+								</button>
+							</div>
+						</form>
 					</div>
-				</form>
+				</div>
 			</div>
 		</div>
+
 
 		<!-- 件数 -->
 		<div class="d-flex justify-content-end mb-2">
