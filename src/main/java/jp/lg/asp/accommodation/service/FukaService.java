@@ -339,49 +339,60 @@ public class FukaService {
 	/**
      * 宿泊税情報の保存処理（修正・更生対応版）
      */
-	@Transactional
-	public void saveDeclaration(FukaDeclarationForm form) {
-	    String currentJichitaiCd = getCurrentJichitaiCd();
-	    
-	    // 💡 1. 履歴番号 (RNO: Revision Number) の採番
-	    // 既存の最新RNOを確認し、新しい番号を決定するぜ
-	    Integer targetRno = determineNextRno(currentJichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu());
+    @Transactional
+    public void saveDeclaration(FukaDeclarationForm form) {
+        String currentJichitaiCd = getCurrentJichitaiCd();
+        String category = form.getModificationCategory(); // "1":更生, "2":修正
 
-	    // 💡 2. 親データ (Fuka) の生成と準備
-	    // 画面の入力値を Entity に Mapping（マッピング：データの詰め替え）する
-	    FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
-	    Fuka parentFuka = createParentFuka(form, dto, currentJichitaiCd);
-	    parentFuka.setRno(targetRno); 
-	    
-	    // ⚠️ 重要：保存（save）を呼ぶ前に、必ず監査項目をセットするぜ
-	    // これで add_dt が NULL で怒られることはなくなる
-	    setAuditFields(parentFuka);
-	    fukaRepository.save(parentFuka);
+        // 💡 修正ポイント1: RNO の採番ロジックを分岐
+        Integer targetRno;
+        if ("2".equals(category)) {
+            // 🔵 修正 (Update) の場合
+            // 現在の最新 RNO を取得して、それをそのまま使うぜ
+            targetRno = getCurrentMaxRno(currentJichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu());
+        } else {
+            // 🔴 更生 (Insert) または新規の場合
+            // 新しい履歴番号（現在の最大値 + 1）を採番するぜ
+            targetRno = determineNextRno(currentJichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu());
+        }
 
-	    // 💡 3. 内訳データ (FukaUchi) の生成と準備
-	    // 親のキー情報を引き継いだ内訳リストを作成するぜ
-	    List<FukaUchi> uchiList = createFukaUchiList(form, parentFuka, currentJichitaiCd);
-	    
-	    if (!uchiList.isEmpty()) {
-	        // 各レコードに対して Batch Audit Injection（監査項目の一括注入）を行うぜ
-	        uchiList.forEach(this::setAuditFields);
-	    }
+        // 親データ (Fuka) の生成
+        FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
+        Fuka parentFuka = createParentFuka(form, dto, currentJichitaiCd);
+        parentFuka.setRno(targetRno); 
+        
+        // 💡 修正ポイント2: 内訳リストの生成
+        List<FukaUchi> uchiList = createFukaUchiList(form, parentFuka, currentJichitaiCd);
+        
+        // 監査項目のセット（登録日・更新日など）
+        setAuditFields(parentFuka);
+        if (!uchiList.isEmpty()) {
+            uchiList.forEach(this::setAuditFields);
+        }
 
-	    // 💡 4. データベースへの永続化 (Persistence)
-	    // ここで初めて save を呼ぶ。これがプロの Single Save Point（単一保存地点）だ
-	    fukaRepository.save(parentFuka);
-	    if (!uchiList.isEmpty()) {
-	        fukaUchiRepository.saveAll(uchiList);
-	    }
+        // 💡 修正ポイント3: 永続化 (Persistence) はここだけで OK
+        // targetRno が既存なら UPDATE、新規なら INSERT が走るぜ
+        fukaRepository.save(parentFuka);
+        if (!uchiList.isEmpty()) {
+            // 内訳も古い RNO のデータがあれば自動で上書きされるぜ
+            fukaUchiRepository.saveAll(uchiList);
+        }
 
-	    // 💡 5. 徴収原簿 (ChoshuGenbo) の更新
-	    if (form.getMonthlyTally() != null) {
-	        // 原簿側の保存処理の中でも、内部で setAuditFields が呼ばれているか確認してくれよな
-	        saveChoshuGenboDataWithRno(form, parentFuka, currentJichitaiCd, targetRno);
-	    }
-	}
+        // 徴収原簿の更新
+        if (form.getMonthlyTally() != null) {
+            saveChoshuGenboDataWithRno(form, parentFuka, currentJichitaiCd, targetRno);
+        }
+    }
 
-
+    /**
+     * 現在の最新 RNO を取得する
+     */
+    private Integer getCurrentMaxRno(String jichitaiCd, String shiteiNo, String nendo, Integer kibetsu) {
+        return fukaRepository.findFirstByJichitaiCdAndShiteiNoAndNendoAndKibetsuOrderByRnoDesc(
+                jichitaiCd, shiteiNo, nendo, kibetsu)
+            .map(Fuka::getRno)
+            .orElse(1); // 万が一データがない場合は 1 とするぜ
+    }
     /**
      * 指定された RNO に紐づく古い内訳データを削除する
      */
@@ -867,4 +878,6 @@ public class FukaService {
         form.setAdditionalAmount(entity.getKasanGaku());
         form.setAdditionalDueDate(entity.getNokigen());
     }
+    
+
 }
