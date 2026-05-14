@@ -24,7 +24,7 @@ public class SecurityConfig {
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可
-						.requestMatchers("/tokugimu/**", "/declaration/**", "/tokugimu/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/tokugimu/**", "/declaration/**", "/atena/**").hasAnyRole("USER", "ADMIN")
 						// その他は認証済みであればアクセス可
 						.anyRequest().authenticated())
 				.formLogin(form -> form

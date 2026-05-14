@@ -51,4 +51,25 @@ public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
         @Param("jichitaiCd") String jichitaiCd,
         @Param("atenaNo") BigDecimal atenaNo
     );
+
+    @Query("SELECT a FROM Atena a WHERE a.jichitaiCd = :jichitaiCd"
+        + " AND (:atenaNo  IS NULL OR CAST(a.atenaNo AS string) LIKE CONCAT('%', :atenaNo, '%'))"
+        + " AND (:name     IS NULL OR a.name     LIKE CONCAT('%', :name, '%'))"
+        + " AND (:nameKana IS NULL OR a.nameKana LIKE CONCAT('%', :nameKana, '%'))"
+        + " AND (:yubinNo  IS NULL OR a.yubinNo  LIKE CONCAT('%', :yubinNo, '%'))"
+        + " AND (:jusho    IS NULL OR a.jusho    LIKE CONCAT('%', :jusho, '%'))"
+        + " AND (:tel      IS NULL OR a.tel1     LIKE CONCAT('%', :tel, '%') OR a.tel2 LIKE CONCAT('%', :tel, '%'))"
+        + " AND (:kojinNo  IS NULL OR a.kojinNo  LIKE CONCAT('%', :kojinNo, '%'))"
+        + " AND (:hojinNo  IS NULL OR a.hojinNo  LIKE CONCAT('%', :hojinNo, '%'))")
+    List<Atena> search(
+        @Param("jichitaiCd") String jichitaiCd,
+        @Param("atenaNo")    @Nullable String atenaNo,
+        @Param("name")       @Nullable String name,
+        @Param("nameKana")   @Nullable String nameKana,
+        @Param("yubinNo")    @Nullable String yubinNo,
+        @Param("jusho")      @Nullable String jusho,
+        @Param("tel")        @Nullable String tel,
+        @Param("kojinNo")    @Nullable String kojinNo,
+        @Param("hojinNo")    @Nullable String hojinNo
+    );
 }
