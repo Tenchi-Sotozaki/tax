@@ -82,6 +82,7 @@ public class FukaDeclarationForm {
 
     private Integer rno;
     
+    private boolean taxCheckBypassed = false;
 
 
 }

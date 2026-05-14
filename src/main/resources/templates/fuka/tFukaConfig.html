@@ -31,6 +31,8 @@
 
 		<form id="fukaDeclarationForm" th:action="@{/declaration/save}" th:object="${fukaDeclarationForm}"
 			method="post">
+			<input type="hidden" th:field="*{taxCheckBypassed}" id="taxCheckBypassed" />
+			<input type="hidden" id="modalTriggerFlag" th:value="${showTaxWarningModal != null ? showTaxWarningModal : false}" />
 
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger py-2 mb-3">
 				<i class="bi bi-exclamation-octagon-fill me-2"></i>入力内容にエラーがあります。各項目の赤字を確認してください。
@@ -126,79 +128,74 @@
 							</thead>
 							<tbody>
 								<tr th:each="detail, stat : *{monthlyDetail.taxDetails}" class="tax-detail-row">
-									<td class="text-center fw-medium bg-light">
-										<span
-											th:text="|${detail.label} (${#numbers.formatInteger(detail.taxRate, 1, 'COMMA')}円)|">区分名</span>
+								    <td class="text-center fw-medium bg-light">
+								        <span th:text="|${detail.label} (${#numbers.formatInteger(detail.taxRate, 1, 'COMMA')}円)|">区分名</span>
 
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}">
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}">
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].label}">
-										<input type="hidden"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}">
-									</td>
-									<td>
-										<input type="text" th:if="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end bg-light"
-											th:value="${detail.stayCount == null or detail.stayCount == 0 ? '' : detail.stayCount}"
-											readonly>
+								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}">
+								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}">
+								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].label}">
+								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}">
+								    </td>
+								    <td>
+								        <input type="text" th:if="${fukaDeclarationForm.isView}"
+								            class="form-control form-control-sm text-end bg-light"
+								            th:value="${detail.stayCount == null or detail.stayCount == 0 ? '' : detail.stayCount}"
+								            readonly>
 
-										<input type="number" th:unless="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end stay-count-input"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].stayCount}">
-									</td>
-									<td>
-										<input type="text" th:if="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end bg-light"
-											th:value="${detail.taxAmount == null or detail.taxAmount == 0 ? '' : detail.taxAmount}"
-											readonly>
+								        <input type="number" th:unless="${fukaDeclarationForm.isView}"
+								            class="form-control form-control-sm text-end stay-count-input"
+								            th:field="*{monthlyDetail.taxDetails[__${stat.index}__].stayCount}">
+								    </td>
+								    <td>
+								        <input type="text" th:if="${fukaDeclarationForm.isView}"
+								            class="form-control form-control-sm text-end bg-light"
+								            th:value="${detail.taxAmount == null or detail.taxAmount == 0 ? '' : detail.taxAmount}"
+								            readonly>
 
-										<input type="number" th:unless="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end"
-											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxAmount}">
-									</td>
+								        <input type="number" th:unless="${fukaDeclarationForm.isView}"
+								            class="form-control form-control-sm text-end"
+								            th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxAmount}">
+								    </td>
 								</tr>
 
 								<tr>
-									<td class="text-center fw-medium bg-light">課税対象外宿泊数</td>
-									<td>
-										<input type="text" th:if="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end bg-light"
-											th:value="${fukaDeclarationForm.monthlyDetail.exemptStayCount == null or fukaDeclarationForm.monthlyDetail.exemptStayCount == 0 ? '' : fukaDeclarationForm.monthlyDetail.exemptStayCount}"
-											readonly>
-										<input type="number" id="exemptStayCount"
-											th:unless="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end"
-											th:field="*{monthlyDetail.exemptStayCount}">
-									</td>
-									<td class="bg-light"></td>
-								</tr>
-							</tbody>
-							<tfoot class="table-primary fw-bold">
-								<tr>
-									<td class="text-center">合計</td>
-									<td>
-										<input type="text" th:if="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end bg-primary-subtle"
-											th:value="${fukaDeclarationForm.monthlyDetail.totalStayCount == null or fukaDeclarationForm.monthlyDetail.totalStayCount == 0 ? '' : fukaDeclarationForm.monthlyDetail.totalStayCount}"
-											readonly>
-										<input type="number" th:unless="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end"
-											th:field="*{monthlyDetail.totalStayCount}">
-									</td>
-									<td>
-										<input type="text" th:if="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end bg-primary-subtle"
-											th:value="${fukaDeclarationForm.monthlyDetail.totalPaymentAmount == null or fukaDeclarationForm.monthlyDetail.totalPaymentAmount == 0 ? '' : fukaDeclarationForm.monthlyDetail.totalPaymentAmount}"
-											readonly>
-										<input type="number" th:unless="${fukaDeclarationForm.isView}"
-											class="form-control form-control-sm text-end"
-											th:field="*{monthlyDetail.totalPaymentAmount}">
-									</td>
-								</tr>
-							</tfoot>
+																	<td class="text-center fw-medium bg-light">課税対象外宿泊数</td>
+																	<td>
+																		<input type="text" th:if="${fukaDeclarationForm.isView}"
+																			class="form-control form-control-sm text-end bg-light"
+																			th:value="${fukaDeclarationForm.monthlyDetail.exemptStayCount == null ? '0' : fukaDeclarationForm.monthlyDetail.exemptStayCount}"
+																			readonly>
+																		<input type="number" id="exemptStayCount"
+																			th:unless="${fukaDeclarationForm.isView}"
+																			class="form-control form-control-sm text-end"
+																			th:field="*{monthlyDetail.exemptStayCount}">
+																	</td>
+																	<td class="bg-light"></td>
+																</tr>
+															</tbody>
+															<tfoot class="table-primary fw-bold">
+																<tr>
+																	<td class="text-center">合計</td>
+																	<td>
+																		<input type="text" th:if="${fukaDeclarationForm.isView}"
+																			class="form-control form-control-sm text-end bg-primary-subtle"
+																			th:value="${fukaDeclarationForm.monthlyDetail.totalStayCount == null ? '0' : fukaDeclarationForm.monthlyDetail.totalStayCount}"
+																			readonly>
+																		<input type="number" th:unless="${fukaDeclarationForm.isView}"
+																			class="form-control form-control-sm text-end"
+																			th:field="*{monthlyDetail.totalStayCount}">
+																	</td>
+																	<td>
+																		<input type="text" th:if="${fukaDeclarationForm.isView}"
+																			class="form-control form-control-sm text-end bg-primary-subtle"
+																			th:value="${fukaDeclarationForm.monthlyDetail.totalPaymentAmount == null ? '0' : fukaDeclarationForm.monthlyDetail.totalPaymentAmount}"
+																			readonly>
+																		<input type="number" th:unless="${fukaDeclarationForm.isView}"
+																			class="form-control form-control-sm text-end"
+																			th:field="*{monthlyDetail.totalPaymentAmount}">
+																	</td>
+																</tr>
+															</tfoot>
 						</table>
 					</div>
 				</div>
@@ -320,10 +317,66 @@
 				</div>
 			</div>
 		</form>
+		<div class="modal fade" id="taxWarningModal" tabindex="-1" aria-labelledby="taxWarningModalLabel" aria-hidden="true">
+		    <div class="modal-dialog modal-dialog-centered">
+		        <div class="modal-content">
+		            <div class="modal-header bg-warning-subtle">
+		                <h5 class="modal-title text-dark" id="taxWarningModalLabel">
+		                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>金額の不整合確認
+		                </h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		            </div>
+		            <div class="modal-body text-dark">
+		                <p>入力された合計税額と、宿泊数から計算された値が一致しません。</p>
+		                <p class="mb-0">このまま保存してもよろしいですか？</p>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+		                <button type="button" class="btn btn-primary" id="btnForceSave">そのまま保存する</button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 	</div>
+	
+
 
 	<th:block layout:fragment="scripts">
 		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+			    // 💡 1. 隠し項目からフラグの値を読み取る（確実な State 取得）
+			    const flagElement = document.getElementById('modalTriggerFlag');
+			    
+			    // 💡 2. 値が 'true' ならモーダルを発火
+			    if (flagElement && flagElement.value === 'true') {
+			        const modalElement = document.getElementById('taxWarningModal');
+			        
+			        // Bootstrap の存在チェック（エラー回避）
+			        if (typeof bootstrap !== 'undefined') {
+			            const modal = new bootstrap.Modal(modalElement);
+			            modal.show();
+			        } else {
+			            console.error('Bootstrap JS が読み込まれていません！');
+			        }
+			    }
+
+			    // 💡 3. 「そのまま保存する」ボタンの処理
+			    const btnForceSave = document.getElementById('btnForceSave');
+			    if (btnForceSave) {
+			        btnForceSave.addEventListener('click', function() {
+			            // バイパスフラグをオンにする
+			            document.getElementById('taxCheckBypassed').value = 'true';
+			            
+			            // フォームを特定して送信（Action に save が含まれる form を探す）
+			            const form = document.querySelector('form[action*="/save"]');
+			            if (form) {
+			                form.submit();
+			            } else {
+			                console.error('保存用のフォームが見つかりません！');
+			            }
+			        });
+			    }
+			});
 			document.addEventListener('DOMContentLoaded', function () {
 
 				// =========================================================
@@ -396,7 +449,6 @@
 							exemptField.value = totalExempt;
 						}
 
-						// 🔴 自動計算の呼び出しは仕様通り「完全削除」
 						alert('月計表の宿泊数を反映しました。税額と合計値は手入力で算定してください。');
 					});
 				}
