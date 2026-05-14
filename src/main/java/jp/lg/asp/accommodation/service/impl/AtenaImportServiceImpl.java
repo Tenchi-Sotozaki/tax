@@ -28,6 +28,7 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 
 	private final AtenaRepository atenaRepository;
 	private final AtenaRenkeiRepository atenaRenkeiRepository;
+	private final HashUtil hashUtil;
 
 	@Override
 	@Transactional
@@ -77,7 +78,7 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 				atena.setJusho(jusho.isBlank() ? null : jusho);
 				atena.setTel1(tel1.isBlank() ? null : tel1);
 				atena.setTel2(tel2 == null || tel2.isBlank() ? null : tel2);
-				atena.setKojinNo(kojinNo == null || kojinNo.isBlank() ? null : HashUtil.sha256(kojinNo));
+				atena.setKojinNo(kojinNo == null || kojinNo.isBlank() ? null : hashUtil.sha256(kojinNo));
 				atena.setHojinNo(hojinNo == null || hojinNo.isBlank() ? null : hojinNo);
 				atenaRepository.save(atena);
 
