@@ -1,3 +1,5 @@
+document.addEventListener('DOMContentLoaded', () => searchNozeiShuki());
+
 function updateButtons() {
     const checked = document.querySelectorAll('.nozei-shuki-checkbox:checked');
     const editBtn = document.getElementById('editBtn');
