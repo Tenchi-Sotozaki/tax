@@ -52,15 +52,16 @@ public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
         @Param("atenaNo") BigDecimal atenaNo
     );
 
-    @Query("SELECT a FROM Atena a WHERE a.jichitaiCd = :jichitaiCd"
-        + " AND (:atenaNo  IS NULL OR CAST(a.atenaNo AS string) LIKE CONCAT('%', :atenaNo, '%'))"
-        + " AND (:name     IS NULL OR a.name     LIKE CONCAT('%', :name, '%'))"
-        + " AND (:nameKana IS NULL OR a.nameKana LIKE CONCAT('%', :nameKana, '%'))"
-        + " AND (:yubinNo  IS NULL OR a.yubinNo  LIKE CONCAT('%', :yubinNo, '%'))"
-        + " AND (:jusho    IS NULL OR a.jusho    LIKE CONCAT('%', :jusho, '%'))"
-        + " AND (:tel      IS NULL OR a.tel1     LIKE CONCAT('%', :tel, '%') OR a.tel2 LIKE CONCAT('%', :tel, '%'))"
-        + " AND (:kojinNo  IS NULL OR a.kojinNo  LIKE CONCAT('%', :kojinNo, '%'))"
-        + " AND (:hojinNo  IS NULL OR a.hojinNo  LIKE CONCAT('%', :hojinNo, '%'))")
+    @Query(value = "SELECT * FROM m_atena a WHERE a.jichitai_cd = :jichitaiCd"
+        + " AND (:atenaNo  IS NULL OR CAST(a.atena_no AS text) LIKE CONCAT('%', :atenaNo, '%'))"
+        + " AND (:name     IS NULL OR a.name      LIKE CONCAT('%', :name, '%'))"
+        + " AND (:nameKana IS NULL OR a.name_kana LIKE CONCAT('%', :nameKana, '%'))"
+        + " AND (:yubinNo  IS NULL OR a.yubin_no  LIKE CONCAT('%', :yubinNo, '%'))"
+        + " AND (:jusho    IS NULL OR a.jusho     LIKE CONCAT('%', :jusho, '%'))"
+        + " AND (:tel      IS NULL OR a.tel1      LIKE CONCAT('%', :tel, '%') OR a.tel2 LIKE CONCAT('%', :tel, '%'))"
+        + " AND (:kojinNo  IS NULL OR a.kojin_no  LIKE CONCAT('%', :kojinNo, '%'))"
+        + " AND (:hojinNo  IS NULL OR a.hojin_no  LIKE CONCAT('%', :hojinNo, '%'))",
+        nativeQuery = true)
     List<Atena> search(
         @Param("jichitaiCd") String jichitaiCd,
         @Param("atenaNo")    @Nullable String atenaNo,

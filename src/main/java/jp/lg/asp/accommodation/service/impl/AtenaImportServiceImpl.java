@@ -17,6 +17,7 @@ import jp.lg.asp.accommodation.entity.AtenaRenkei;
 import jp.lg.asp.accommodation.repository.AtenaRenkeiRepository;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.service.AtenaImportService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,7 +77,7 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 				atena.setJusho(jusho.isBlank() ? null : jusho);
 				atena.setTel1(tel1.isBlank() ? null : tel1);
 				atena.setTel2(tel2 == null || tel2.isBlank() ? null : tel2);
-				atena.setKojinNo(kojinNo == null || kojinNo.isBlank() ? null : kojinNo);
+				atena.setKojinNo(kojinNo == null || kojinNo.isBlank() ? null : HashUtil.sha256(kojinNo));
 				atena.setHojinNo(hojinNo == null || hojinNo.isBlank() ? null : hojinNo);
 				atenaRepository.save(atena);
 
@@ -105,4 +106,5 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 	public List<AtenaRenkei> findHistory(String jichitaiCd) {
 		return atenaRenkeiRepository.findByJichitaiCdOrderBySeqDesc(jichitaiCd);
 	}
+
 }
