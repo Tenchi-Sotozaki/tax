@@ -22,50 +22,56 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- 検索条件エリア -->
-		<div class="card mb-4 shadow-sm">
-			<div class="card-header bg-primary text-white py-3">
-				<h5 class="mb-0">
-					<i class="bi bi-funnel me-2"></i>検索条件
-				</h5>
+		<!-- ======== 検索条件アコーディオン ======== -->
+		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
+			<div class="accordion-item border">
+				<h2 class="accordion-header">
+					<button class="accordion-button py-2 fw-semibold" type="button"
+						data-bs-toggle="collapse" data-bs-target="#searchPanel">
+						<i class="bi bi-funnel me-2"></i>検索条件
+					</button>
+				</h2>
 			</div>
-			<div class="card-body bg-light-subtle">
-				<form th:action="@{/admin/user-search}"
-					th:object="${userSearchForm}" method="get">
-					<div class="row g-3 align-items-end">
-						<div class="col-md-3">
-							<label for="id" class="form-label fw-medium">ID</label> <input
-								type="text" class="form-control" id="id" th:field="*{id}"
-								placeholder="IDを入力">
+			<div id="searchPanel" class="accordion-collapse collapse show">
+				<div class="accordion-body pt-3 pb-2 px-3">
+					<form th:action="@{/admin/user-search}"
+						th:object="${userSearchForm}" method="get">
+						<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">ID</label>
+								<input type="text" class="form-control form-control-sm"
+									th:field="*{id}" placeholder="IDを入力">
+							</div>
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">氏名</label>
+								<input type="text" class="form-control form-control-sm"
+									th:field="*{name}" placeholder="氏名を入力">
+							</div>
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">ふりがな</label>
+								<input type="text" class="form-control form-control-sm"
+									th:field="*{nameKana}" placeholder="ふりがなを入力">
+							</div>
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">部署</label>
+								<input type="text" class="form-control form-control-sm"
+									th:field="*{busho}" placeholder="部署を入力">
+							</div>
 						</div>
-						<div class="col-md-3">
-							<label for="name" class="form-label fw-medium">氏名</label> <input
-								type="text" class="form-control" id="name" th:field="*{name}"
-								placeholder="氏名を入力">
-						</div>
-						<div class="col-md-3">
-							<label for="nameKana" class="form-label fw-medium">ふりがな</label> <input
-								type="text" class="form-control" id="nameKana"
-								th:field="*{nameKana}" placeholder="ふりがなを入力">
-						</div>
-						<div class="col-md-3">
-							<label for="busho" class="form-label fw-medium">部署</label> <input
-								type="text" class="form-control" id="busho" th:field="*{busho}"
-								placeholder="部署を入力">
-						</div>
-						<div class="col-md-12 d-flex gap-2">
-							<button type="submit" class="btn btn-primary">
-								<i class="bi bi-search me-1"></i>検索する
-							</button>
+						<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 							<a th:href="@{/admin/user-search}"
-								class="btn btn-outline-secondary"> <i
+								class="btn btn-outline-secondary btn-sm"> <i
 								class="bi bi-arrow-counterclockwise me-1"></i>クリア
 							</a>
+							<button type="submit" class="btn btn-primary btn-sm px-4">
+								<i class="bi bi-search me-1"></i>検索する
+							</button>
 						</div>
-					</div>
-				</form>
+					</form>
+				</div>
 			</div>
 		</div>
+
 
 		<!-- 操作ボタン＆件数 -->
 		<div class="d-flex justify-content-between align-items-center mb-2">
@@ -101,8 +107,8 @@
 							<td colspan="5" class="text-center text-muted py-4">該当するユーザーが見つかりません</td>
 						</tr>
 						<tr th:each="user : ${items}">
-							<td><input type="checkbox" class="form-check-input user-checkbox"
-								th:value="${user.id}"></td>
+							<td><input type="checkbox"
+								class="form-check-input user-checkbox" th:value="${user.id}"></td>
 							<td th:text="${user.id}"></td>
 							<td th:text="${user.name}"></td>
 							<td class="text-muted" th:text="${user.nameKana}"></td>
@@ -115,8 +121,8 @@
 
 	</div>
 
-<th:block layout:fragment="scripts">
-<script th:inline="javascript">
+	<th:block layout:fragment="scripts">
+		<script th:inline="javascript">
     const editBasePath = /*[[@{/admin/user-edit/}]]*/ '/admin/user-edit/';
 
     document.querySelectorAll('.user-checkbox').forEach(cb => {
@@ -135,6 +141,6 @@
         location.href = editBasePath + encodeURIComponent(checked.value);
     }
 </script>
-</th:block>
+	</th:block>
 </body>
 </html>
