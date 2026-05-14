@@ -31,6 +31,7 @@ public class AtenaController {
 	private final AtenaRepository atenaRepository;
 	private final AtenaImportService atenaImportService;
 	private final ScreenAccessChecker accessChecker;
+	private final HashUtil hashUtil;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
@@ -86,6 +87,6 @@ public class AtenaController {
 	}
 
 	private String hashIfPresent(String s) {
-		return (s == null || s.isBlank()) ? null : HashUtil.sha256(s);
+		return (s == null || s.isBlank()) ? null : hashUtil.sha256(s);
 	}
 }

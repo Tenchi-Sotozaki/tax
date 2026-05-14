@@ -4,14 +4,20 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
 
-public final class HashUtil {
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-    private HashUtil() {}
+@Component
+public class HashUtil {
 
-    public static String sha256(String value) {
+    @Value("${app.hash.salt}")
+    private String salt;
+
+    public String sha256(String value) {
         try {
+            String salted = salt + value;
             byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(value.getBytes(StandardCharsets.UTF_8));
+                    .digest(salted.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(digest);
         } catch (Exception e) {
             throw new RuntimeException("ハッシュ化に失敗しました", e);
