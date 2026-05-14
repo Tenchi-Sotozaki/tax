@@ -18,6 +18,7 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.AtenaSearchForm;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.service.AtenaImportService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +49,7 @@ public class AtenaController {
 				emptyToNull(searchForm.getYubinNo()),
 				emptyToNull(searchForm.getJusho()),
 				emptyToNull(searchForm.getTel()),
-				emptyToNull(searchForm.getKojinNo()),
+				hashIfPresent(searchForm.getKojinNo()),
 				emptyToNull(searchForm.getHojinNo())));
 		model.addAttribute("searchForm", searchForm);
 		return "atena/atenaDaicho";
@@ -82,5 +83,9 @@ public class AtenaController {
 
 	private String emptyToNull(String s) {
 		return (s == null || s.isBlank()) ? null : s;
+	}
+
+	private String hashIfPresent(String s) {
+		return (s == null || s.isBlank()) ? null : HashUtil.sha256(s);
 	}
 }
