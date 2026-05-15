@@ -3,9 +3,8 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title
-		th:text="${fukaDeclarationForm.isView ? '宿泊税納入情報照会' : (fukaDeclarationForm.isEdit ? '宿泊税納入情報編集' : '宿泊税納入情報登録')}">
-		宿泊税納入情報</title>
+	<title th:text="${fukaDeclarationForm.view ? '宿泊税納入情報照会' : (fukaDeclarationForm.edit ? '宿泊税納入情報編集' : '宿泊税納入情報登録')}">
+	    宿泊税納入情報</title>
 </head>
 
 <body>
@@ -13,9 +12,8 @@
 
 		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-file-earmark-text text-primary me-2"></i>
-				<span
-					th:text="${fukaDeclarationForm.isView ? '宿泊税納入情報照会' : (fukaDeclarationForm.isEdit ? '宿泊税納入情報編集' : '宿泊税納入情報登録')}"></span>
+			    <i class="bi bi-file-earmark-text text-primary me-2"></i>
+			    <span th:text="${fukaDeclarationForm.view ? '宿泊税納入情報照会' : (fukaDeclarationForm.edit ? '宿泊税納入情報編集' : '宿泊税納入情報登録')}"></span>
 			</h5>
 			<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
 				<i
@@ -44,8 +42,8 @@
 			<input type="hidden" th:field="*{nendo}" />
 			<input type="hidden" th:field="*{kibetsu}" />
 
-			<input type="hidden" name="isEdit" th:value="${fukaDeclarationForm.isEdit}" />
-			<input type="hidden" name="isView" th:value="${fukaDeclarationForm.isView}" />
+			<input type="hidden" th:field="*{edit}" />
+			<input type="hidden" th:field="*{view}" />
 
 			<div class="card shadow-sm mb-4">
 				<div class="card-header bg-primary bg-opacity-10 py-2">
@@ -97,15 +95,26 @@
 							th:if="${fukaDeclarationForm.isEdit or (fukaDeclarationForm.isView and !#strings.isEmpty(fukaDeclarationForm.modificationCategory))}">
 
 							<div class="col-md-2">
-								<label class="form-label form-label-sm fw-medium mb-1">変更の区分</label>
-								<select id="modificationCategory" class="form-select form-select-sm"
-									th:field="*{modificationCategory}" th:disabled="${fukaDeclarationForm.isView}">
-									<option value="">選択してください</option>
-									<option value="1">更生</option>
-									<option value="2">修正</option>
-								</select>
-								<input type="hidden" th:if="${fukaDeclarationForm.isView}"
-									th:field="*{modificationCategory}" />
+							    <label class="form-label form-label-sm fw-medium mb-1">
+							        変更の区分 <span class="badge bg-danger ms-1" th:if="${fukaDeclarationForm.edit}">必須</span>
+							    </label>
+							    
+							    <select id="modificationCategory" 
+							            class="form-select form-select-sm"
+							            th:field="*{modificationCategory}" 
+							            th:errorclass="is-invalid"
+							            th:disabled="${fukaDeclarationForm.view}">
+							        <option value="">選択してください</option>
+							        <option value="1">更生</option>
+							        <option value="2">修正</option>
+							    </select>
+							    
+							    <div class="invalid-feedback" 
+							         th:if="${#fields.hasErrors('modificationCategory')}" 
+							         th:errors="*{modificationCategory}">
+							    </div>
+
+							    <input type="hidden" th:if="${fukaDeclarationForm.view}" th:field="*{modificationCategory}" />
 							</div>
 
 							<div class="col-md-4">
@@ -128,74 +137,81 @@
 							</thead>
 							<tbody>
 								<tr th:each="detail, stat : *{monthlyDetail.taxDetails}" class="tax-detail-row">
+								    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}" />
+								    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}" />
+								    
 								    <td class="text-center fw-medium bg-light">
 								        <span th:text="|${detail.label} (${#numbers.formatInteger(detail.taxRate, 1, 'COMMA')}円)|">区分名</span>
-
-								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}">
-								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}">
-								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].label}">
-								        <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}">
 								    </td>
-								    <td>
-								        <input type="text" th:if="${fukaDeclarationForm.isView}"
-								            class="form-control form-control-sm text-end bg-light"
-								            th:value="${detail.stayCount == null or detail.stayCount == 0 ? '' : detail.stayCount}"
-								            readonly>
+														        <td>
+														            <input type="text" th:if="${fukaDeclarationForm.isView}"
+														                class="form-control form-control-sm text-end bg-light"
+														                th:value="${detail.stayCount == null or detail.stayCount == 0 ? '' : detail.stayCount}"
+														                readonly>
 
-								        <input type="number" th:unless="${fukaDeclarationForm.isView}"
-								            class="form-control form-control-sm text-end stay-count-input"
-								            th:field="*{monthlyDetail.taxDetails[__${stat.index}__].stayCount}">
-								    </td>
-								    <td>
-								        <input type="text" th:if="${fukaDeclarationForm.isView}"
-								            class="form-control form-control-sm text-end bg-light"
-								            th:value="${detail.taxAmount == null or detail.taxAmount == 0 ? '' : detail.taxAmount}"
-								            readonly>
+														            <input type="number" th:unless="${fukaDeclarationForm.isView}"
+														                class="form-control form-control-sm text-end stay-count-input"
+														                th:field="*{monthlyDetail.taxDetails[__${stat.index}__].stayCount}"
+														                th:errorclass="is-invalid">
+														            <div class="invalid-feedback" th:if="${#fields.hasErrors('monthlyDetail.taxDetails[__${stat.index}__].stayCount')}" 
+														                 th:errors="*{monthlyDetail.taxDetails[__${stat.index}__].stayCount}"></div>
+														        </td>
+														        <td>
+														            <input type="text" th:if="${fukaDeclarationForm.isView}"
+														                class="form-control form-control-sm text-end bg-light"
+														                th:value="${detail.taxAmount == null or detail.taxAmount == 0 ? '' : detail.taxAmount}"
+														                readonly>
 
-								        <input type="number" th:unless="${fukaDeclarationForm.isView}"
-								            class="form-control form-control-sm text-end"
-								            th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxAmount}">
-								    </td>
-								</tr>
+														            <input type="number" th:unless="${fukaDeclarationForm.isView}"
+														                class="form-control form-control-sm text-end"
+														                th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxAmount}"
+														                th:errorclass="is-invalid">
+														            <div class="invalid-feedback" th:if="${#fields.hasErrors('monthlyDetail.taxDetails[__${stat.index}__].taxAmount')}" 
+														                 th:errors="*{monthlyDetail.taxDetails[__${stat.index}__].taxAmount}"></div>
+														        </td>
+														    </tr>
 
-								<tr>
-																	<td class="text-center fw-medium bg-light">課税対象外宿泊数</td>
-																	<td>
-																		<input type="text" th:if="${fukaDeclarationForm.isView}"
-																			class="form-control form-control-sm text-end bg-light"
-																			th:value="${fukaDeclarationForm.monthlyDetail.exemptStayCount == null ? '0' : fukaDeclarationForm.monthlyDetail.exemptStayCount}"
-																			readonly>
-																		<input type="number" id="exemptStayCount"
-																			th:unless="${fukaDeclarationForm.isView}"
-																			class="form-control form-control-sm text-end"
-																			th:field="*{monthlyDetail.exemptStayCount}">
-																	</td>
-																	<td class="bg-light"></td>
-																</tr>
-															</tbody>
-															<tfoot class="table-primary fw-bold">
-																<tr>
-																	<td class="text-center">合計</td>
-																	<td>
-																		<input type="text" th:if="${fukaDeclarationForm.isView}"
-																			class="form-control form-control-sm text-end bg-primary-subtle"
-																			th:value="${fukaDeclarationForm.monthlyDetail.totalStayCount == null ? '0' : fukaDeclarationForm.monthlyDetail.totalStayCount}"
-																			readonly>
-																		<input type="number" th:unless="${fukaDeclarationForm.isView}"
-																			class="form-control form-control-sm text-end"
-																			th:field="*{monthlyDetail.totalStayCount}">
-																	</td>
-																	<td>
-																		<input type="text" th:if="${fukaDeclarationForm.isView}"
-																			class="form-control form-control-sm text-end bg-primary-subtle"
-																			th:value="${fukaDeclarationForm.monthlyDetail.totalPaymentAmount == null ? '0' : fukaDeclarationForm.monthlyDetail.totalPaymentAmount}"
-																			readonly>
-																		<input type="number" th:unless="${fukaDeclarationForm.isView}"
-																			class="form-control form-control-sm text-end"
-																			th:field="*{monthlyDetail.totalPaymentAmount}">
-																	</td>
-																</tr>
-															</tfoot>
+														    <tr>
+														        <td class="text-center fw-medium bg-light">課税対象外宿泊数</td>
+														        <td>
+														            <input type="text" th:if="${fukaDeclarationForm.isView}"
+														                class="form-control form-control-sm text-end bg-light"
+														                th:value="${fukaDeclarationForm.monthlyDetail.exemptStayCount == null ? '0' : fukaDeclarationForm.monthlyDetail.exemptStayCount}"
+														                readonly>
+														            <input type="number" id="exemptStayCount"
+														                th:unless="${fukaDeclarationForm.isView}"
+														                class="form-control form-control-sm text-end"
+														                th:field="*{monthlyDetail.exemptStayCount}">
+														        </td>
+														        <td class="bg-light"></td>
+														    </tr>
+														</tbody>
+														<tfoot class="table-primary fw-bold">
+														    <tr>
+														        <td class="text-center">合計</td>
+														        <td>
+														            <input type="number" 
+														                   class="form-control form-control-sm text-end"
+														                   th:field="*{monthlyDetail.totalStayCount}"
+														                   th:readonly="${fukaDeclarationForm.view}"
+														                   th:errorclass="is-invalid">
+														            
+														            <div class="invalid-feedback" th:if="${#fields.hasErrors('monthlyDetail.totalStayCount')}" 
+														                 th:errors="*{monthlyDetail.totalStayCount}"></div>
+														        </td>
+
+														        <td>
+														            <input type="number" 
+														                   class="form-control form-control-sm text-end"
+														                   th:field="*{monthlyDetail.totalPaymentAmount}"
+														                   th:readonly="${fukaDeclarationForm.view}"
+														                   th:errorclass="is-invalid">
+														            
+														            <div class="invalid-feedback" th:if="${#fields.hasErrors('monthlyDetail.totalPaymentAmount')}" 
+														                 th:errors="*{monthlyDetail.totalPaymentAmount}"></div>
+														        </td>
+														    </tr>
+														</tfoot>
 						</table>
 					</div>
 				</div>

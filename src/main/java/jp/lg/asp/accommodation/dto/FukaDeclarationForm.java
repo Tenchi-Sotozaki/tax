@@ -27,12 +27,6 @@ public class FukaDeclarationForm {
 	// 特別徴収義務者の指定番号
 	private String shiteiNo;
 
-	// 編集モード判定フラグ
-	private boolean isEdit;
-
-	// 照会モード判定フラグ（全項目リードオンリー制御用）
-	private boolean isView;
-
 	// ========== 納税額情報エリア ==========
 	// 登録日
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -83,6 +77,9 @@ public class FukaDeclarationForm {
     private Integer rno;
     
     private boolean taxCheckBypassed = false;
-
+    
+    private boolean edit;
+    
+    private boolean view;
 
 }

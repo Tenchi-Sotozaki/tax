@@ -215,6 +215,12 @@ public class FukaService {
         form.setShiteiNo(shiteiNo);
         form.setRegistrationDate(LocalDate.now());
 
+        // 💡 追記：年度と期別を算出してセット（これで hidden 項目に値が入る）
+        if (StringUtils.hasText(paymentMonth)) {
+            form.setNendo(calculateNendo(paymentMonth));
+            form.setKibetsu(calculateKibetsu(paymentMonth));
+        }
+
         try {
             setupObligorInfo(form, shiteiNo);
 
@@ -359,6 +365,16 @@ public class FukaService {
     @Transactional
     public void saveDeclaration(FukaDeclarationForm form) {
         String currentJichitaiCd = getCurrentJichitaiCd();
+        
+        // 💡 追記：年度・期別の Null ガード（DBエラー防止の要だぜ）
+        if (!StringUtils.hasText(form.getNendo()) || form.getKibetsu() == null) {
+            String ym = form.getMonthlyDetail().getPaymentYearMonth();
+            if (StringUtils.hasText(ym)) {
+                form.setNendo(calculateNendo(ym));
+                form.setKibetsu(calculateKibetsu(ym));
+            }
+        }
+        
         String category = form.getModificationCategory();
 
         Integer targetRno = "2".equals(category)
@@ -527,11 +543,14 @@ public class FukaService {
 
         for (int i = 0; i < dto.getTaxDetails().size(); i++) {
             FukaTaxDetailDto detail = dto.getTaxDetails().get(i);
+            
+            // 💡 宿泊数が未入力(null)または0の場合は、内訳レコードを作成しない（仕様通りのスキップ）
             if (detail.getStayCount() == null || detail.getStayCount() == 0) {
                 continue;
             }
 
             FukaUchi uchi = new FukaUchi();
+            
             uchi.setJichitaiCd(currentJichitaiCd);
             uchi.setShiteiNo(form.getShiteiNo());
             uchi.setNendo(parentFuka.getNendo());
@@ -539,12 +558,21 @@ public class FukaService {
             uchi.setRno(parentFuka.getRno());
             uchi.setKazeiKbn(i + 1);
             uchi.setFukaKbn(parentFuka.getFukaKbn());
+            
+            // 💡 正しい変数(detail)からの値のセット
             uchi.setZeiritsuSeq(detail.getZeiritsuSeq());
             uchi.setHakusu(detail.getStayCount());
-            uchi.setZeigaku(detail.getTaxAmount());
-            uchi.setCityZeigaku(detail.getTaxAmount());
+            
+            // 💡 修正：税額が null の場合は 0L を補完（Data Cleansing）
+            long amount = (detail.getTaxAmount() != null) ? detail.getTaxAmount() : 0L;
+            uchi.setZeigaku(amount);
+            uchi.setCityZeigaku(amount);
             uchi.setKenZeigaku(0L);
-            uchi.setZeiRitsu(java.math.BigDecimal.valueOf(detail.getTaxRate()));
+
+            // 💡 修正：taxRate の NPE 回避
+            // Long 型の getTaxRate() を直接渡さず、null チェック後に long 値として渡す
+            long rate = (detail.getTaxRate() != null) ? detail.getTaxRate() : 0L;
+            uchi.setZeiRitsu(java.math.BigDecimal.valueOf(rate));
 
             setAuditFields(uchi);
             uchiList.add(uchi);
@@ -704,11 +732,18 @@ public class FukaService {
     /**
      * フォームのメタデータを再セットする。
      */
+    /**
+     * 画面表示に必要なメタデータをフォームに再セットする。
+     * バリデーションエラーによる再表示時、消失したラベル情報を復元（Hydration）する。
+     */
     public void hydrateFormMetadata(FukaDeclarationForm form) {
         if (form.getShiteiNo() == null) {
             return;
         }
+
         String jichitaiCd = getCurrentJichitaiCd();
+
+        // 義務者情報の復元
         tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, form.getShiteiNo())
                 .stream()
                 .findFirst()
@@ -716,6 +751,24 @@ public class FukaService {
                     form.setFacilityName(tokugimu.getShisetsuName());
                     form.setObligorName(tokugimu.getKyokaName());
                 });
+
+        // 💡 追記：税区分ラベルと税率をマスタから再取得してセットし直す
+        // これで画面上の 「null (null円)」 表示を回避するぜ
+        List<FukaZeiritsuTeigaku> masterRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+        List<FukaTaxDetailDto> formDetails = form.getMonthlyDetail().getTaxDetails();
+
+        for (int i = 0; i < masterRates.size() && i < formDetails.size(); i++) {
+            FukaZeiritsuTeigaku master = masterRates.get(i);
+            FukaTaxDetailDto detail = formDetails.get(i);
+
+            // マスタから表示用ラベルを生成
+            String label = (master.getRyokinEd() != null)
+                    ? String.format("%,d円 ～ %,d円未満", master.getRyokinSt(), master.getRyokinEd() + 1)
+                    : String.format("%,d円以上", master.getRyokinSt());
+
+            detail.setLabel(label);
+            detail.setTaxRate(master.getZeigaku());
+        }
     }
 
     /**
@@ -833,5 +886,24 @@ public class FukaService {
         // 初期履歴番号(1)のデータが存在するかを確認する
         FukaId fukaId = new FukaId(jichitaiCd, shiteiNo, INITIAL_VERSION, nendo, kibetsu);
         return fukaRepository.findById(fukaId).isPresent();
+    }
+
+    /**
+     * 💡 納入年月(yyyy-MM)から年度を算出する。
+     */
+    private String calculateNendo(String paymentYearMonth) {
+        String[] ym = paymentYearMonth.split("-");
+        int year = Integer.parseInt(ym[0]);
+        int month = Integer.parseInt(ym[1]);
+        return String.valueOf(month >= FISCAL_START_MONTH ? year : year - 1);
+    }
+
+    /**
+     * 💡 納入年月(yyyy-MM)から期別を算出する。
+     */
+    private Integer calculateKibetsu(String paymentYearMonth) {
+        String[] ym = paymentYearMonth.split("-");
+        int month = Integer.parseInt(ym[1]);
+        return month >= FISCAL_START_MONTH ? month - 3 : month + 9;
     }
 }

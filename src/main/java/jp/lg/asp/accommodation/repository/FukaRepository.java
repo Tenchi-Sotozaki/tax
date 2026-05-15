@@ -41,5 +41,6 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
             String jichitaiCd, String shiteiNo, String nendo, Integer kibetsu);
     
     
-    
+    Optional<Fuka> findByJichitaiCdAndShiteiNoAndNendoAndKibetsu(
+            String jichitaiCd, String shiteiNo, String nendo, Integer kibetsu);
 }

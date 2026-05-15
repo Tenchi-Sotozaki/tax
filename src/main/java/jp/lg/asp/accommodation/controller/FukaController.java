@@ -176,6 +176,11 @@ public class FukaController {
             fukaService.hydrateFormMetadata(form);
             return CONFIG_VIEW;
         }
+        
+     // editフラグがtrue、かつ区分が未選択(empty)の場合にエラーを追加するぜ
+        if (form.isEdit() && !org.springframework.util.StringUtils.hasText(form.getModificationCategory())) {
+            result.rejectValue("modificationCategory", "error.modificationCategory", "編集時は変更の区分を選択してください。");
+        }
 
         // 税額の整合性チェックを行い、相違がある場合は警告を表示する
         if (!form.isTaxCheckBypassed() && fukaService.hasTaxAmountDiscrepancy(form)) {
