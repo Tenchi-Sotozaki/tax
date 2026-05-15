@@ -14,12 +14,14 @@ import lombok.Data;
 @IdClass(ChoshuGenboId.class) // 💡 複合主キーを指定
 @Data
 public class ChoshuGenbo {
-
-    @Id private String jichitaiCd;
+	@Id
+    @Column(name = "jichitai_cd")
+    private String jichitaiCd;
     @Id private String shiteiNo;
     @Id private Integer rno;
     @Id private String nendo;
     @Id private Integer kibetsu;
+    
 
  @Column(name = "uchi_idx_1") private Long uchiIdx1;
  @Column(name = "uchi_idx_2") private Long uchiIdx2;

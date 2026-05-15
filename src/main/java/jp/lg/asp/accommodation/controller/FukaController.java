@@ -190,16 +190,27 @@ public class FukaController {
             model.addAttribute("showTaxWarningModal", true);
             return CONFIG_VIEW;
         }
-
         try {
-            // 申告情報の保存を実行
+            // 4. 申告情報の保存を実行
             fukaService.saveDeclaration(form);
 
-            redirectAttributes.addFlashAttribute("successMessage", "保存が完了しました。");
+            // 5. 区分に応じて適切な成功メッセージを決定する
+            String message = "納入情報の保存が成功しました。";
+            if ("1".equals(form.getModificationCategory())) {
+                message = "更生処理が成功しました。";
+            } else if ("2".equals(form.getModificationCategory())) {
+                message = "修正処理が成功しました。";
+            }
+            
+            // フラッシュ属性にメッセージをセット（リダイレクト先の一覧画面で表示される）
+            redirectAttributes.addFlashAttribute("successMessage", message);
+
+            // 納入金額管理台帳（一覧画面）へリダイレクト
             return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
 
         } catch (RuntimeException e) {
-            model.addAttribute("errorMessage", e.getMessage());
+            log.error("保存処理中にエラーが発生しました", e);
+            model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());
             fukaService.hydrateFormMetadata(form);
             return CONFIG_VIEW;
         }

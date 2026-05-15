@@ -140,6 +140,7 @@
 								    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}" />
 								    <input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}" />
 								    
+									<input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
 								    <td class="text-center fw-medium bg-light">
 								        <span th:text="|${detail.label} (${#numbers.formatInteger(detail.taxRate, 1, 'COMMA')}円)|">区分名</span>
 								    </td>

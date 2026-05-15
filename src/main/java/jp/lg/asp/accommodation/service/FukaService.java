@@ -708,6 +708,7 @@ public class FukaService {
 
                 jp.lg.asp.accommodation.entity.ChoshuGenboUchi uchi = new jp.lg.asp.accommodation.entity.ChoshuGenboUchi();
                 uchi.setUchiIdx(targetIdx);
+                
                 List<Integer> counts = item.getTaxCategoryCounts();
                 if (counts.size() >= 1) uchi.setHakusu1(counts.get(0));
                 if (counts.size() >= 2) uchi.setHakusu2(counts.get(1));
@@ -863,19 +864,21 @@ public class FukaService {
      */
     public boolean hasTaxAmountDiscrepancy(FukaDeclarationForm form) {
         FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
-        if (detail == null || detail.getTaxDetails() == null) {
-            return false;
-        }
+        // ... (nullガード) ...
 
+        // 💡 ここで各行の「単価 × 宿泊数」を合計している
         long calculatedTotal = detail.getTaxDetails().stream()
                 .mapToLong(d -> {
-                    long rate = (d.getTaxRate() != null) ? d.getTaxRate() : 0L;
+                    long rate = (d.getTaxRate() != null) ? d.getTaxRate() : 0L; // ← ここが0になっていないか？
                     int count = (d.getStayCount() != null) ? d.getStayCount() : 0;
                     return rate * count;
                 })
                 .sum();
 
+        // 💡 画面の「合計」欄の値を取得
         long inputTotal = (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0L;
+
+        // A と B が違えば不整合！
         return calculatedTotal != inputTotal;
     }
     
