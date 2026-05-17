@@ -31,7 +31,7 @@ public interface ZeiritsuTeigakuRepository extends JpaRepository<ZeiritsuTeigaku
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("taishoKbn") String taishoKbn,
 			@Param("tekiyoYm") String tekiyoYm,
-			@Param("tekiyoYm") Long ryokin);
+			@Param("ryokin") Long ryokin);
 
 	// 自治体コードで検索し、料金開始額の昇順（安い順）で取得する
 	List<ZeiritsuTeigaku> findByJichitaiCdOrderByRyokinStAsc(String jichitaiCd);

@@ -122,18 +122,12 @@ public class FukaCommonServiceImpl implements FukaCommonService {
 			if (hakusuIdx < 0 || getDataValue(dataRow, hakusuIdx).isBlank())
 				continue;
 
-			// 都道府県税額算出（内訳）
+			// 税率管理番号、都道府県税額算出（内訳）
+			BigDecimal zeiritsuSeq = null;
 			Long uchiKenZeigaku = null;
 			Long uchiCityZeigaku = null;
-			if (isTeigaku) {
-				Long zeigaku = parseLong(getDataValue(dataRow, zeigakuIdx));
-				uchiKenZeigaku = calcKenZeigaku(parseLong(getDataValue(dataRow, ryokinIdx)), taishoYm);
-				uchiCityZeigaku = zeigaku - uchiKenZeigaku;
-				totalKenZeigaku += uchiCityZeigaku;
-			}
-
-			// 税率管理番号
-			BigDecimal zeiritsuSeq = null;
+			Long uchiZeigaku = parseLong(getDataValue(dataRow, uchiZeigakuIdx));
+			Long uchiHakuSu = parseLong(getDataValue(dataRow, hakusuIdx));
 			if (isTeigaku) {
 				List<ZeiritsuTeigaku> teigakuList = zeiritsuTeigakuRepository
 						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, ZeiritsuConstants.CITY.getValue(), taishoYm);
@@ -141,6 +135,9 @@ public class FukaCommonServiceImpl implements FukaCommonService {
 					throw new RuntimeException("申告区分" + kbn + "に該当する税率定額詳細マスタが存在しません。");
 				}
 				zeiritsuSeq = teigakuList.get(kbn - 1).getTeigakuSeq();
+				uchiKenZeigaku = teigakuList.get(kbn - 1).getZeigaku() * uchiHakuSu;
+				uchiCityZeigaku = uchiZeigaku - uchiKenZeigaku;
+				totalKenZeigaku += uchiCityZeigaku;
 			} else {
 				Optional<ZeiritsuTeiritsu> teiritsuOpt = zeiritsuTeiritsuRepository
 						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, ZeiritsuConstants.CITY.getValue(), taishoYm);
@@ -160,10 +157,10 @@ public class FukaCommonServiceImpl implements FukaCommonService {
 			uchi.setZeiritsuSeq(zeiritsuSeq);
 			uchi.setFukaKbn(fukaKbn.getValue());
 			uchi.setRyokinSogaku(parseLong(getDataValue(dataRow, ryokinSogakuIdx)));
-			uchi.setHakusu(parseLong(getDataValue(dataRow, hakusuIdx)));
+			uchi.setHakusu(uchiHakuSu);
 			uchi.setRyokin(parseLong(getDataValue(dataRow, ryokinIdx)));
 			uchi.setZeiRitsu(parseBigDecimal(getDataValue(dataRow, zeiRitsuIdx)));
-			uchi.setZeigaku(parseLong(getDataValue(dataRow, uchiZeigakuIdx)));
+			uchi.setZeigaku(uchiZeigaku);
 			uchi.setCityZeigaku(uchiCityZeigaku);
 			uchi.setKenZeigaku(uchiKenZeigaku);
 			fukaUchiRepository.save(uchi);
@@ -177,7 +174,7 @@ public class FukaCommonServiceImpl implements FukaCommonService {
 			long totalRyokin = fuka.getKazeiRyokin();
 			long totalShukuhakushaSu = fuka.getKazeiHakusu();
 			long ryokin = totalShukuhakushaSu > 0 ? totalRyokin / totalShukuhakushaSu : 0;
-			long kenZeigaku = calcKenZeigaku(ryokin, taishoYm);
+			long kenZeigaku = getKenZeigaku(ryokin, taishoYm) * totalShukuhakushaSu;
 			fuka.setKenZeigaku(kenZeigaku);
 			fuka.setCityZeigaku(fuka.getTotalZeigaku() - kenZeigaku);
 		}
@@ -185,8 +182,11 @@ public class FukaCommonServiceImpl implements FukaCommonService {
 	}
 
 	@Override
-	public Long calcKenZeigaku(Long shukuhakuRyokin, String taishoYM) {
-		return 0L;
+	public long getKenZeigaku(Long shukuhakuRyokin, String taishoYm) {
+		Optional<ZeiritsuTeigaku> teigakuOp = zeiritsuTeigakuRepository
+				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm,
+						shukuhakuRyokin);
+		return teigakuOp.map(ZeiritsuTeigaku::getZeigaku).orElse(0L);
 
 	}
 

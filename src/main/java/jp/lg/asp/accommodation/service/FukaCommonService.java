@@ -19,11 +19,11 @@ public interface FukaCommonService {
 			String taishoYmPrefix);
 
 	/**
-	 * 都道府県税額を算出する
+	 * 都道府県税額を取得する
 	 * 
 	 * @param shukuhakuRyokin 宿泊料金
-	 * @param taishoYM 対象年月
+	 * @param taishoYm 対象年月
 	 * @return 都道府県税額
 	 */
-	public Long calcKenZeigaku(Long shukuhakuRyokin, String taishoYM);
+	public long getKenZeigaku(Long shukuhakuRyokin, String taishoYm);
 }
