@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
-import jp.lg.asp.accommodation.constant.EltaxTetsuzukiConstants;
+import jp.lg.asp.accommodation.constant.EltaxConstants;
 import jp.lg.asp.accommodation.entity.EltaxRenkei;
 import jp.lg.asp.accommodation.service.EltaxRenkeiService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class EltaxRenkeiController {
 	public String index(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("eltaxRenkeiList", eltaxRenkeiService.findAll());
-		model.addAttribute("shubetsuNameMap", EltaxTetsuzukiConstants.SHUBETSU_NAME_MAP);
+		model.addAttribute("shubetsuNameMap", EltaxConstants.SHUBETSU_NAME_MAP);
 		return "eltaxRenkei/eltaxRenkei";
 	}
 

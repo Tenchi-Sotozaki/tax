@@ -45,14 +45,6 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 	Optional<Fuka> findByJichitaiCdAndShiteiNoAndNendoAndKibetsu(
 			String jichitaiCd, String shiteiNo, String nendo, Integer kibetsu);
 
-	@Query("SELECT f FROM Fuka f WHERE f.jichitaiCd = :jichitaiCd AND f.shiteiNo = :shiteiNo AND f.newFlg = '1' AND f.delFlg = '0' ORDER BY f.rno DESC")
-	List<Fuka> findLatestByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd,
-			@Param("shiteiNo") String shiteiNo);
-
-	@Query(value = "SELECT COALESCE(MAX(rno), 0) FROM t_fuka WHERE jichitai_cd = :jichitaiCd AND shitei_no = :shiteiNo", nativeQuery = true)
-	Optional<Integer> findMaxRnoByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd,
-			@Param("shiteiNo") String shiteiNo);
-
 	@Query("SELECT f FROM Fuka f WHERE f.jichitaiCd = :jichitaiCd AND f.shiteiNo = :shiteiNo AND f.nendo = :nendo AND f.kibetsu = :kibetsu AND f.newFlg = '1' AND f.delFlg = '0' ORDER BY f.rno DESC")
 	List<Fuka> findLatestByNendoAndKibetsu(@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo, @Param("nendo") String nendo, @Param("kibetsu") Integer kibetsu);
