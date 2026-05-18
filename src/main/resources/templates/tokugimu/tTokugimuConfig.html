@@ -55,12 +55,12 @@
 							<label for="registrationDate" class="form-label fw-medium">
 								登録日 <span th:if="!${isView}"
 								class="badge bg-danger text-white ms-1">必須</span>
-							</label>
-							<input th:if="!${isView}" type="date" class="form-control" id="registrationDate"
-								name="registrationDate" th:errorclass="is-invalid"
+							</label> <input th:if="!${isView}" type="date" class="form-control"
+								id="registrationDate" name="registrationDate"
+								th:errorclass="is-invalid"
 								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control" readonly
-								th:value="*{registrationDate}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{registrationDate}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('registrationDate')}"
 								th:errors="*{registrationDate}"></div>
@@ -266,12 +266,12 @@
 							<label for="businessStartDate" class="form-label fw-medium">
 								営業開始（予定）日 <span th:if="!${isView}"
 								class="badge bg-danger text-white ms-1">必須</span>
-							</label>
-							<input th:if="!${isView}" type="date" class="form-control" id="businessStartDate"
-								name="businessStartDate" th:errorclass="is-invalid"
+							</label> <input th:if="!${isView}" type="date" class="form-control"
+								id="businessStartDate" name="businessStartDate"
+								th:errorclass="is-invalid"
 								th:value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control" readonly
-								th:value="*{businessStartDate}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{businessStartDate}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('businessStartDate')}"
 								th:errors="*{businessStartDate}"></div>
@@ -419,6 +419,17 @@
 						</div>
 
 						<div class="col-md-6">
+							<label for="ownerName" class="form-label fw-medium"> 氏名 <span
+								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
+							</label> <input type="text" class="form-control" id="ownerName"
+								th:field="*{ownerName}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('ownerName')}"
+								th:errors="*{ownerName}"></div>
+						</div>
+
+						<div class="col-md-6">
 							<label for="ownerNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span th:if="!${isView}"
 								class="badge bg-danger text-white ms-1">必須</span>
@@ -428,17 +439,6 @@
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('ownerNameKana')}"
 								th:errors="*{ownerNameKana}"></div>
-						</div>
-
-						<div class="col-md-6">
-							<label for="ownerName" class="form-label fw-medium"> 氏名 <span
-								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
-							</label> <input type="text" class="form-control" id="ownerName"
-								th:field="*{ownerName}" th:errorclass="is-invalid"
-								th:readonly="${isView}">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('ownerName')}"
-								th:errors="*{ownerName}"></div>
 						</div>
 
 						<div class="col-md-6">
@@ -491,6 +491,16 @@
 						</div>
 
 						<div class="col-md-6">
+							<label for="mailName" class="form-label fw-medium"> 氏名 <span
+								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
+							</label> <input type="text" class="form-control" id="mailName"
+								th:field="*{mailName}" th:errorclass="is-invalid"
+								th:readonly="${isView}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('mailName')}" th:errors="*{mailName}"></div>
+						</div>
+
+						<div class="col-md-6">
 							<label for="mailNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span th:if="!${isView}"
 								class="badge bg-danger text-white ms-1">必須</span>
@@ -500,16 +510,6 @@
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailNameKana')}"
 								th:errors="*{mailNameKana}"></div>
-						</div>
-
-						<div class="col-md-6">
-							<label for="mailName" class="form-label fw-medium"> 氏名 <span
-								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
-							</label> <input type="text" class="form-control" id="mailName"
-								th:field="*{mailName}" th:errorclass="is-invalid"
-								th:readonly="${isView}">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('mailName')}" th:errors="*{mailName}"></div>
 						</div>
 
 						<div class="col-md-6">
@@ -550,12 +550,12 @@
 						</div>
 
 						<div class="col-md-6">
-							<label for="taxCycle" class="form-label fw-medium">納税周期</label>
-							<select class="form-select" id="taxCycle" th:field="*{taxCycle}"
+							<label for="taxCycle" class="form-label fw-medium">納税周期</label> <select
+								class="form-select" id="taxCycle" th:field="*{taxCycle}"
 								th:style="${isView} ? 'pointer-events:none; background-color:#e9ecef;' : ''">
 								<option value="">選択してください</option>
-								<option th:each="opt : ${taxCycleOptions}" th:value="${opt.seq.intValue()}"
-									th:text="${opt.label}"></option>
+								<option th:each="opt : ${taxCycleOptions}"
+									th:value="${opt.seq.intValue()}" th:text="${opt.label}"></option>
 							</select>
 						</div>
 
@@ -606,20 +606,20 @@
 
 						<div class="col-md-4">
 							<label for="suspensionStartDate" class="form-label fw-medium">休止期間（開始日）</label>
-							<input th:if="!${isView}" type="date" class="form-control" id="suspensionStartDate"
-								name="suspensionStartDate"
+							<input th:if="!${isView}" type="date" class="form-control"
+								id="suspensionStartDate" name="suspensionStartDate"
 								th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control" readonly
-								th:value="*{suspensionStartDate}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{suspensionStartDate}">
 						</div>
 
 						<div class="col-md-4">
 							<label for="suspensionEndDate" class="form-label fw-medium">休止期間（終了日）</label>
-							<input th:if="!${isView}" type="date" class="form-control" id="suspensionEndDate"
-								name="suspensionEndDate"
+							<input th:if="!${isView}" type="date" class="form-control"
+								id="suspensionEndDate" name="suspensionEndDate"
 								th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control" readonly
-								th:value="*{suspensionEndDate}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{suspensionEndDate}">
 						</div>
 
 						<div class="col-md-4 d-flex align-items-end">
@@ -634,12 +634,12 @@
 
 						<div class="col-md-6">
 							<label for="resumptionOrAbolitionDate"
-								class="form-label fw-medium">再開または廃止日</label>
-							<input th:if="!${isView}" type="date" class="form-control" id="resumptionOrAbolitionDate"
-								name="resumptionOrAbolitionDate"
+								class="form-label fw-medium">再開または廃止日</label> <input
+								th:if="!${isView}" type="date" class="form-control"
+								id="resumptionOrAbolitionDate" name="resumptionOrAbolitionDate"
 								th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control" readonly
-								th:value="*{resumptionOrAbolitionDate}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{resumptionOrAbolitionDate}">
 						</div>
 
 						<div class="col-md-6">
