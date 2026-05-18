@@ -69,6 +69,6 @@ public class TaxManagerController {
 		log.info("納税管理人情報を保存しました。collectorId: {}", id);
 		redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");
 
-		return "redirect:/collector/list";
+		return "redirect:/tokugimu/list";
 	}
 }
