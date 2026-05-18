@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>権限管理台帳</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4"
+		th:data-ctx="@{/}">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h2 class="h2">
+				<i class="bi bi-shield-lock me-2 text-primary"></i> 権限管理台帳
+			</h2>
+		</div>
+
+		<div id="flashMessage" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+			<span id="flashMessageText"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- アクションボタン -->
+		<div class="mb-3">
+			<button type="button" class="btn btn-primary me-2"
+				onclick="openRoleModal('create')">
+				<i class="bi bi-plus-circle me-1"></i>新規登録
+			</button>
+			<button type="button" class="btn btn-success me-2"
+				onclick="openRoleModal('edit')" id="editBtn" disabled>
+				<i class="bi bi-pencil-square me-1"></i>権限編集
+			</button>
+			<button type="button" class="btn btn-info me-2"
+				onclick="openRoleModal('view')" id="viewBtn" disabled>
+				<i class="bi bi-eye me-1"></i>権限照会
+			</button>
+			<button type="button" class="btn btn-danger ms-2"
+				onclick="deleteRoles()" id="deleteBtn" disabled>
+				<i class="bi bi-trash me-1"></i>削除
+			</button>
+			<button type="button" class="btn btn-outline-secondary"
+				onclick="viewAssignedUsers()" id="usersBtn" disabled>
+				<i class="bi bi-people me-1"></i>付与ユーザー照会
+			</button>
+
+		</div>
+
+		<!-- 権限一覧テーブル -->
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<table class="table table-hover">
+					<thead class="table-light">
+						<tr>
+							<th></th>
+							<th>権限ID</th>
+							<th>権限名</th>
+							<th>権限詳細</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="role : ${roles}">
+							<td><input type="checkbox" class="role-checkbox"
+								th:value="${role.roleId}" onchange="updateButtons()"></td>
+							<td th:text="${role.roleId}"></td>
+							<td th:text="${role.name}"></td>
+							<td><span th:each="detail, iterStat : ${role.roleDetails}"
+								th:text="${detail.screen.screenName + (detail.permission == 1 ? '(参照)' : '(更新)') + (!iterStat.last ? ', ' : '')}"></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- 付与ユーザー一覧モーダル -->
+		<div class="modal fade" id="usersModal" tabindex="-1"
+			aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">
+							権限付与ユーザー一覧 - <span id="usersModalRoleName"></span>
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<table class="table table-sm">
+							<thead class="table-light">
+								<tr>
+									<th>付与</th>
+									<th>ユーザー名</th>
+								</tr>
+							</thead>
+							<tbody id="usersModalBody"></tbody>
+						</table>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">閉じる</button>
+						<button type="button" class="btn btn-primary" id="updateUsersBtn"
+							onclick="updateAssignedUsers()">更新する</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 権限設定モーダル -->
+		<div class="modal fade" id="roleModal" tabindex="-1"
+			aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="roleModalTitle">権限登録</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<form id="roleForm">
+							<input type="hidden" id="roleId" name="roleId"> <input
+								type="hidden" id="version" name="version">
+
+							<div class="mb-3">
+								<label for="roleName" class="form-label">権限名 <span
+									class="text-danger">*</span></label> <input type="text"
+									class="form-control" id="roleName" name="name" required>
+							</div>
+
+							<div class="mb-3">
+								<label class="form-label">権限詳細</label>
+								<div class="table-responsive">
+									<table class="table table-sm">
+										<thead>
+											<tr>
+												<th>画面名</th>
+												<th>権限なし</th>
+												<th>参照</th>
+												<th>更新</th>
+											</tr>
+										</thead>
+										<tbody id="screenPermissions">
+											<tr th:each="screen : ${screens}">
+												<td th:text="${screen.screenName}"></td>
+												<td><input type="radio"
+													th:name="'permission_' + ${screen.screenId}" value="0"
+													checked></td>
+												<td><input type="radio"
+													th:name="'permission_' + ${screen.screenId}" value="1">
+												</td>
+												<td><input type="radio"
+													th:name="'permission_' + ${screen.screenId}" value="2">
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">キャンセル</button>
+						<button type="button" class="btn btn-primary" id="saveBtn"
+							onclick="saveRole()">保存</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/role_management.js}"></script>
+		<script>
+			const msg = sessionStorage.getItem('flashMessage');
+			if (msg) {
+				document.getElementById('flashMessageText').textContent = msg;
+				document.getElementById('flashMessage').classList.remove('d-none');
+				sessionStorage.removeItem('flashMessage');
+			}
+		</script>
+	</th:block>
+
+</body>
+</html>

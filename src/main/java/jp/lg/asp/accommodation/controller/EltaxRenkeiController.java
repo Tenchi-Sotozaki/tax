@@ -1,0 +1,53 @@
+package jp.lg.asp.accommodation.controller;
+
+import java.math.BigDecimal;
+
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.EltaxTetsuzukiConstants;
+import jp.lg.asp.accommodation.entity.EltaxRenkei;
+import jp.lg.asp.accommodation.service.EltaxRenkeiService;
+import lombok.RequiredArgsConstructor;
+
+@Controller
+@RequestMapping("/eltax-renkei")
+@RequiredArgsConstructor
+public class EltaxRenkeiController {
+
+	private final EltaxRenkeiService eltaxRenkeiService;
+	private final ScreenAccessChecker accessChecker;
+
+	private static final String SCREEN_ID = ScreenManagement.ELTAX_RENKEI;
+
+	@GetMapping
+	public String index(Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
+		model.addAttribute("eltaxRenkeiList", eltaxRenkeiService.findAll());
+		model.addAttribute("shubetsuNameMap", EltaxTetsuzukiConstants.SHUBETSU_NAME_MAP);
+		return "eltaxRenkei/eltaxRenkei";
+	}
+
+	@GetMapping("/download/{seq}")
+	public ResponseEntity<byte[]> download(@PathVariable BigDecimal seq) {
+		accessChecker.checkAccess(SCREEN_ID);
+
+		EltaxRenkei entity = eltaxRenkeiService.findBySeq(seq);
+		if (entity == null || entity.getLog() == null) {
+			return ResponseEntity.notFound().build();
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentDisposition(ContentDisposition.attachment().filename(entity.getFileName()).build());
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		return ResponseEntity.ok().headers(headers).body(entity.getLog());
+	}
+}

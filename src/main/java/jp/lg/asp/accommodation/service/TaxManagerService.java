@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,43 +21,34 @@ public class TaxManagerService {
 
 	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
-	private final TokugimuService tokugimuService;
+	// private final TokugimuService tokugimuService; // ← IDからの変換が不要になったので使わなければ削除推奨
 
-	// application.yml (app.jichitai.code) から自治体コードを注入
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
 	// ========== 規約に基づく定数定義 ==========
-	/** 履歴番号（デフォルト） */
 	private static final int DEFAULT_RNO = 1;
-	
-	/** フラグON / 有効 */
 	private static final String FLG_ON = "1";
-	
-	/** フラグOFF / 無効 */
 	private static final String FLG_OFF = "0";
-	
-	/** システム更新ユーザー名 */
-	private static final String SYSTEM_USER = "system";
-	
-	/** 初期バージョン番号 */
-	private static final int INITIAL_VERSION = 1;
 	// ==========================================
 
 	/**
-	 * IDからデータを取得し、画面表示用のFormを作成する
+	 * 指定番号（shiteiNo）からデータを取得し、画面表示用のFormを作成する
 	 */
 	@Transactional(readOnly = true)
-	public TaxManagerForm getById(Long id) {
+	public TaxManagerForm getByShiteiNo(String shiteiNo) { // ★ Long id から String shiteiNo に変更
 		TaxManagerForm form = new TaxManagerForm();
-		form.setCollectorId(id);
+		form.setCollectorId(null); // 古いIDは不要ならnull。formにshiteiNoフィールドを作ってセットするのがベスト。
+		form.setShiteiNo(shiteiNo); // ※TokugimuForm同様、TaxManagerFormにも shiteiNo を追加してくれ！
 		form.setRegistrationDate(LocalDate.now());
 
 		try {
-			String shiteiNo = tokugimuService.getShiteiNoById(id);
+			// ★ 変換処理(getShiteiNoById)は削除。引数の shiteiNo を直接使う。
 
 			// 1. 特別徴収義務者の取得
 			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+			        .stream()
+		            .findFirst()
 					.ifPresent(tokugimu -> {
 						form.setObligorName(tokugimu.getKyokaName());
 						form.setFacilityName(tokugimu.getShisetsuName());
@@ -86,12 +76,10 @@ public class TaxManagerService {
 	}
 
 	/**
-	 * 保存処理
+	 * 指定番号（shiteiNo）ベースでの保存処理
 	 */
 	@Transactional
-	public void save(Long id, TaxManagerForm form) {
-		String shiteiNo = tokugimuService.getShiteiNoById(id);
-		LocalDateTime now = LocalDateTime.now();
+	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) {
 
 		// 1. 既存データを取得
 		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, DEFAULT_RNO);
@@ -113,18 +101,8 @@ public class TaxManagerService {
 		entity.setTel(form.getManagerPhone());
 		entity.setMenjoRiyu(form.getExemptionReason());
 
-
 		entity.setNewFlg(FLG_ON);
 		entity.setDelFlg(FLG_OFF);
-
-		// 3. 共通項目の手動セット
-		if (entity.getAddDt() == null) {
-			entity.setAddDt(now);
-			entity.setAddUser(SYSTEM_USER);
-		}
-		entity.setUpdDt(now);
-		entity.setUpdUser(SYSTEM_USER);
-		entity.setVersion(INITIAL_VERSION);
 
 		taxManagerRepository.save(entity);
 	}

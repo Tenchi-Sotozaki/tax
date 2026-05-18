@@ -2,7 +2,6 @@ package jp.lg.asp.accommodation.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +21,7 @@ import lombok.Setter;
 @IdClass(TokugimuId.class)
 @Getter
 @Setter
-public class Tokugimu {
+public class Tokugimu extends BaseEntity {
 
 	@Id
 	@Column(name = "jichitai_cd", length = 5)
@@ -151,25 +150,10 @@ public class Tokugimu {
 	@Column(name = "del_flg", nullable = false, length = 1)
 	private String delFlg;
 
-	@Column(name = "add_dt", nullable = false)
-	private LocalDateTime addDt;
 
-	@Column(name = "add_user", nullable = false, length = 20)
-	private String addUser;
+	
 
-	@Column(name = "upd_dt", nullable = false)
-	private LocalDateTime updDt;
-
-	@Column(name = "upd_user", nullable = false, length = 20)
-	private String updUser;
-
-	@Column(name = "version", nullable = false, precision = 5)
-	private BigDecimal version;
-
-	/**
-	 * ステータスを判定する
-	 * 1：営業中 / 2：休止 / 3：廃止
-	 */
+	@jakarta.persistence.Transient 
 	public String getStatus() {
 		LocalDate now = LocalDate.now();
 

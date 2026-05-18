@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -52,10 +51,21 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			AND t.newFlg = '1' AND t.delFlg = '0'
 			ORDER BY t.rno DESC
 			""")
-	Optional<Tokugimu> findByJichitaiCdAndShiteiNo(
-			@Param("jichitaiCd") String jichitaiCd,
+	List<Tokugimu> findByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
 
 	@Query(value = "SELECT MAX(CAST(shitei_no AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$'", nativeQuery = true)
 	Optional<Integer> findMaxShiteiNoByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+
+	/**
+	 * ?? ��ʕ\���p�̃n�C�h���[�V�����Ŏg�p�F
+	 * �����̃R�[�h�A�w��ԍ��A�ŐV�t���O�A�폜�t���O���w�肵�ē��ʒ����`���҂�1���擾����
+	 */
+
+	Optional<Tokugimu> findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
+			String jichitaiCd, String shiteiNo, String newFlg, String delFlg);
+
+	@Query(value = "SELECT COALESCE(MAX(rno), 0) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no = :shiteiNo", nativeQuery = true)
+	Optional<Integer> findMaxRnoByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo);
 }

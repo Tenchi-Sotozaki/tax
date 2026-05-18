@@ -30,4 +30,6 @@ public class TaxManagerForm {
     private String exemptionReason;
     
     private boolean edit;
+    private String shiteiNo;
+
 }
