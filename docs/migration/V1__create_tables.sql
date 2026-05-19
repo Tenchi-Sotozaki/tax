@@ -315,8 +315,8 @@ CREATE TABLE IF NOT EXISTS t_fuka_uchi (
   ryokin numeric(13),
   zei_ritsu numeric(12, 2) NOT NULL,
   zeigaku numeric(13) NOT NULL,
-  city_zeigaku numeric(13) NOT NULL,
-  ken_zeigaku numeric(13) NOT NULL,
+  city_zeigaku numeric(13),
+  ken_zeigaku numeric(13),
   add_dt timestamp NOT NULL,
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
@@ -746,7 +746,7 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu (
   seq numeric(5) NOT NULL,
   taisho_kbn char(1) NOT NULL,
   tekiyo_st_ym char(6) NOT NULL,
-  tekiyo_ed_ym char(6) NOT NULL,
+  tekiyo_ed_ym char(6),
   fuka_kbn char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
@@ -805,6 +805,7 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu_teiritsu (
   jichitai_cd char(5) NOT NULL,
   seq numeric(5) NOT NULL,
   teiritsu_seq numeric(8) NOT NULL,
+  kbn_name char(20) NOT NULL,
   zei_ritsu numeric(3, 2) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
@@ -818,6 +819,7 @@ COMMENT ON TABLE m_zeiritsu_teiritsu IS '税率定率詳細マスタ';
 COMMENT ON COLUMN m_zeiritsu_teiritsu.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_zeiritsu_teiritsu.seq IS '税率管理番号';
 COMMENT ON COLUMN m_zeiritsu_teiritsu.teiritsu_seq IS '定率管理番号';
+COMMENT ON COLUMN m_zeiritsu_teiritsu.kbn_name IS '区分名';
 COMMENT ON COLUMN m_zeiritsu_teiritsu.zei_ritsu IS '宿泊税率';
 COMMENT ON COLUMN m_zeiritsu_teiritsu.del_flg IS '削除フラグ';
 COMMENT ON COLUMN m_zeiritsu_teiritsu.add_dt IS '作成日時';
@@ -961,4 +963,36 @@ COMMENT ON COLUMN m_atena.add_user IS '作成者';
 COMMENT ON COLUMN m_atena.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_atena.upd_user IS '更新者';
 COMMENT ON COLUMN m_atena.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_atena_renkei (
+  jichitai_cd char(5) NOT NULL,
+  seq numeric(8) NOT NULL,
+  file_name varchar(256) NOT NULL,
+  shubetsu char(2),
+  shori_dt timestamp NOT NULL,
+  shori_kensu numeric(10),
+  shinki_kensu numeric(10),
+  koshin_kensu numeric(10),
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_atena_renkei_pkey PRIMARY KEY (jichitai_cd, seq)
+);
+COMMENT ON TABLE t_atena_renkei IS '宛名連携管理';
+COMMENT ON COLUMN t_atena_renkei.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_atena_renkei.seq IS '管理番号';
+COMMENT ON COLUMN t_atena_renkei.file_name IS 'ファイル名';
+COMMENT ON COLUMN t_atena_renkei.shubetsu IS 'ファイル種別';
+COMMENT ON COLUMN t_atena_renkei.shori_dt IS '処理日時';
+COMMENT ON COLUMN t_atena_renkei.shori_kensu IS '処理件数';
+COMMENT ON COLUMN t_atena_renkei.shinki_kensu IS '新規件数';
+COMMENT ON COLUMN t_atena_renkei.koshin_kensu IS '更新件数';
+COMMENT ON COLUMN t_atena_renkei.add_dt IS '作成日時';
+COMMENT ON COLUMN t_atena_renkei.add_user IS '作成者';
+COMMENT ON COLUMN t_atena_renkei.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_atena_renkei.upd_user IS '更新者';
+COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
 

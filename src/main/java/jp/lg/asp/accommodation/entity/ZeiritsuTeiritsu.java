@@ -30,6 +30,9 @@ public class ZeiritsuTeiritsu extends BaseEntity {
 	@Column(name = "teiritsu_seq", precision = 8)
 	private BigDecimal teiritsuSeq;
 
+	@Column(name = "kbn_name", nullable = false, length = 20)
+	private String kbnName;
+
 	@Column(name = "zei_ritsu", nullable = false, precision = 3, scale = 2)
 	private BigDecimal zeiRitsu;
 
