@@ -379,14 +379,14 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			} else if (itemName.startsWith(taishoYmPrefix + "課税免除【宿泊数】")) {
 				return parseString(prevFukaList.get(idx).getMenjoHakusu());
 			} else if (itemName.startsWith(taishoYmPrefix + "合計【宿泊数】")) {
-				return parseString(prevFukaList.get(idx).getKazeiRyokin());
+				return parseString(prevFukaList.get(idx).getTotalHakusu());
 			} else if (itemName.startsWith(taishoYmPrefix + "合計【税額】")) {
 				return parseString(prevFukaList.get(idx).getTotalZeigaku());
 			}
 		} else {
 			if (itemName.startsWith(taishoYmPrefix + "課税対象宿泊合計【宿泊者数】")) {
 				return parseString(prevFukaList.get(idx).getKazeiHakusu());
-			} else if (itemName.startsWith(taishoYmPrefix + "【宿泊料金】")) {
+			} else if (itemName.startsWith(taishoYmPrefix + "課税対象宿泊合計【宿泊料金】")) {
 				return parseString(prevFukaList.get(idx).getKazeiRyokin());
 			} else if (itemName.startsWith(taishoYmPrefix + "課税対象宿泊合計【税額】")) {
 				return parseString(prevFukaList.get(idx).getZeigaku());
@@ -417,11 +417,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 				}
 			} else {
 				if (itemName.startsWith(taishoYmPrefix + "申告区分" + kbnStr + "【宿泊料金の総額】")) {
-					return parseString(prevUchi.getRyokin());
+					return parseString(prevUchi.getRyokinSogaku());
 				} else if (itemName.startsWith(taishoYmPrefix + "申告区分" + kbnStr + "【宿泊者数】")) {
 					return parseString(prevUchi.getHakusu());
 				} else if (itemName.startsWith(taishoYmPrefix + "申告区分" + kbnStr + "【宿泊料金】")) {
-					return parseString(prevUchi.getHakusu());
+					return parseString(prevUchi.getRyokin());
 				} else if (itemName.startsWith(taishoYmPrefix + "申告区分" + kbnStr + "【税率】")) {
 					return parseString(prevUchi.getZeiRitsu());
 				} else if (itemName.startsWith(taishoYmPrefix + "申告区分" + kbnStr + "【税額】")) {
@@ -826,11 +826,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 				uchiCityZeigaku = uchiZeigaku - uchiKenZeigaku;
 				totalKenZeigaku += uchiCityZeigaku;
 			} else {
-				Optional<ZeiritsuTeiritsu> teiritsuOpt = zeiritsuTeiritsuRepository
+				List<ZeiritsuTeiritsu> teiritsuList = zeiritsuTeiritsuRepository
 						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, ZeiritsuConstants.CITY.getValue(), taishoYm);
-				if (teiritsuOpt.isEmpty())
-					throw new RuntimeException("税率定率詳細マスタに該当データが存在しません。");
-				zeiritsuSeq = teiritsuOpt.get().getTeiritsuSeq();
+				if (teiritsuList.size() < kbn)
+					throw new RuntimeException("申告区分" + kbn + "に該当する税率定率詳細マスタが存在しません。");
+				zeiritsuSeq = teiritsuList.get(kbn - 1).getTeiritsuSeq();
 			}
 
 			FukaUchi uchi = new FukaUchi();
