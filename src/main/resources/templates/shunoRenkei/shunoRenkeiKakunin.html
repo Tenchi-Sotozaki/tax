@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}" lang="ja">
+<head>
+    <title>収納管理連携 - 照会</title>
+</head>
+<body>
+<div layout:fragment="content" class="container-fluid p-4">
+
+    <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2 class="h2"><i class="bi bi-eye me-2 text-primary"></i>照会</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>指定番号</th>
+                        <th>宛名番号</th>
+                        <th>氏名/名称</th>
+                        <th>対象年月</th>
+                        <th class="text-end">合計税額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${rows}">
+                        <td th:text="${r.shiteiNo}"></td>
+                        <td th:text="${r.atenaNo}"></td>
+                        <td th:text="${r.name}"></td>
+                        <td th:text="${r.taishoYm}"></td>
+                        <td class="text-end" th:text="${r.totalZeigaku}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

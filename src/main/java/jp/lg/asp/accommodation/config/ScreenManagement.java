@@ -47,4 +47,7 @@ public final class ScreenManagement {
 
 	// 電子申告情報取込確認
 	public static final String ELTAX_RENKEI_KAKUNIN = "ELTAX_RENKEI_KAKU";
+
+	// 収納管理情報連携
+	public static final String SHUNO_RENKEI = "SHUNO_RENKEI";
 }
