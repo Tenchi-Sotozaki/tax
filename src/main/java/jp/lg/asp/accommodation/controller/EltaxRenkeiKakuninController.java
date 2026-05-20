@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.math.BigDecimal;
+
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -60,6 +62,7 @@ public class EltaxRenkeiKakuninController {
 	 */
 	@PostMapping("/commit")
 	public String commit(
+			@RequestParam(required = false) String atenaNo,
 			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 
@@ -71,7 +74,11 @@ public class EltaxRenkeiKakuninController {
 			return "redirect:/eltax-renkei";
 		}
 		try {
-			eltaxRenkeiKakuninService.commit(fileBytes, fileName);
+			BigDecimal atenaNoDecimal = null;
+			if (atenaNo != null && !atenaNo.isBlank()) {
+				try { atenaNoDecimal = new BigDecimal(atenaNo); } catch (NumberFormatException ignored) {}
+			}
+			eltaxRenkeiKakuninService.commit(fileBytes, fileName, atenaNoDecimal);
 			redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
