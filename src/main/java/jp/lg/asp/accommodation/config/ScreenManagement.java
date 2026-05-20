@@ -47,4 +47,11 @@ public final class ScreenManagement {
 
 	// 電子申告情報取込確認
 	public static final String ELTAX_RENKEI_KAKUNIN = "ELTAX_RENKEI_KAKU";
+
+	// 合算申告管理台帳
+	public static final String GASSAN_DAICHO = "GASSAN";
+
+	// 合算申告登録/編集/照会
+	public static final String GASSAN_CONFIG = "GASSANCONF";
+	
 }

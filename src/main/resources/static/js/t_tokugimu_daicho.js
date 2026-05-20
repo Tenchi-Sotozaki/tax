@@ -64,10 +64,14 @@ function requireSelected(msg) {
 							  '/accommodation-tax/tax-manager/view/{id}');
     nav('btnPaymentLedger',   '事業者を選択してください。',
                               '/accommodation-tax/declaration/payment-ledger/{id}');
-    nav('btnConsolidated',    '特別徴収義務者を選択してください。',
-                              '/accommodation-tax/consolidated/register/{id}');
-    nav('btnConsolidatedView','特別徴収義務者を選択してください。',
-                              '/accommodation-tax/consolidated/register/{id}');
+    document.getElementById('btnConsolidated')?.addEventListener('click', () => {
+        const id = requireSelected('特別徴収義務者を選択してください。');
+        if (id) location.href = '/accommodation-tax/gassan/registration/' + id;
+    });
+    document.getElementById('btnConsolidatedView')?.addEventListener('click', () => {
+        const id = requireSelected('特別徴収義務者を選択してください。');
+        if (id) location.href = '/accommodation-tax/gassan/view-by-shitei/' + id;
+    });
 
     document.getElementById('btnDelete')?.addEventListener('click', () => {
         const id = requireSelected('削除するレコードを選択してください。');
