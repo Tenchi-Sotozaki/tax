@@ -1,4 +1,4 @@
-﻿package jp.lg.asp.accommodation.service.impl;
+package jp.lg.asp.accommodation.service.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,7 +26,6 @@ import jp.lg.asp.accommodation.constant.FukaConstants;
 import jp.lg.asp.accommodation.constant.ZeiritsuConstants;
 import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto;
 import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto.DiffRow;
-import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.EltaxRenkei;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
@@ -34,7 +33,6 @@ import jp.lg.asp.accommodation.entity.Shoyusha;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
-import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.EltaxRenkeiRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
@@ -53,7 +51,6 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	private final EltaxRenkeiRepository eltaxRenkeiRepository;
 	private final TokugimuRepository tokugimuRepository;
 	private final ShoyushaRepository shoyushaRepository;
-	private final AtenaRepository atenaRepository;
 	private final NozeiShukiRepository nozeiShukiRepository;
 	private final FukaRepository fukaRepository;
 	private final FukaUchiRepository fukaUchiRepository;
@@ -76,10 +73,24 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			Map<Integer, String> yoshikiMap = loadYoshikiMap(tetsuzukiId);
 
 			int shisetsuNoIdx = -1;
+			int shinseikubunIdx = -1;
+			String shinseikubun = "";
+			boolean isTokugimuNew = false;
+
 			switch (shubetsu) {
 			case EltaxConstants.SHUBETSU_TOKUGIMU:
 				// 特別徴収義務者
 				shisetsuNoIdx = findIndexByName(yoshikiMap, "施設情報【施設番号");
+				shinseikubunIdx = findIndexByName(yoshikiMap, "特別徴収義務者【申請区分");
+				shinseikubun = getDataValue(dataRow, shinseikubunIdx);
+				isTokugimuNew = shinseikubun.startsWith(EltaxConstants.SHINSEI_KBN_SHINKI);
+				if (!shinseikubun.startsWith(EltaxConstants.SHINSEI_KBN_SHINKI) &&
+						!shinseikubun.startsWith(EltaxConstants.SHINSEI_KBN_HENKO) &&
+						!shinseikubun.startsWith(EltaxConstants.SHINSEI_KBN_KYUSHI) &&
+						!shinseikubun.startsWith(EltaxConstants.SHINSEI_KBN_SAIKAI) &&
+						!shinseikubun.startsWith(EltaxConstants.SHINSEI_KBN_HAISHI)) {
+					throw new RuntimeException("システム対応外の申請区分です。");
+				}
 				break;
 			case EltaxConstants.SHUBETSU_TEIGAKU:
 			case EltaxConstants.SHUBETSU_TEIRITSU:
@@ -106,22 +117,41 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 					shisetsuName = t.getShisetsuName();
 					shisetsuJusho = t.getShisetsuJusho();
 				} else {
-					if (!EltaxConstants.SHUBETSU_TOKUGIMU.equals(shubetsu)) {
+					if (!isTokugimuNew) {
 						throw new RuntimeException("指定番号（" + shiteiNo + "）に該当する特別徴収義務者が登録されていません。");
 					}
-
 				}
 			} else {
-				if (!EltaxConstants.SHUBETSU_TOKUGIMU.equals(shubetsu)) {
+				if (!isTokugimuNew) {
 					throw new RuntimeException("施設番号が未設定です。");
 				}
 			}
 
 			List<DiffRow> diffRows = null;
+			boolean atenaSearchRequired = false;
+			String tokugimuName = "";
+			String tokugimuJusho = "";
+			String tokugimuTel = "";
+			String kojinNo = "";
+			String hojinNo = "";
 			switch (shubetsu) {
 			case EltaxConstants.SHUBETSU_TOKUGIMU:
 				// 特別徴収義務者
 				diffRows = buildDiffRowsTokugimu(dataRow, yoshikiMap, shiteiNo);
+				// 新規登録の場合は宛名検索が必要
+				if (isTokugimuNew) {
+					atenaSearchRequired = true;
+					int tokugimuNameIdx = findIndexByName(yoshikiMap, "特別徴収義務者【氏名又は名称】");
+					tokugimuName = getDataValue(dataRow, tokugimuNameIdx);
+					int tokugimuJushoIdx = findIndexByName(yoshikiMap, "特別徴収義務者【住所又は所在地】");
+					tokugimuJusho = getDataValue(dataRow, tokugimuJushoIdx);
+					int tokugimuTelIdx = findIndexByName(yoshikiMap, "特別徴収義務者【電話番号】");
+					tokugimuTel = getDataValue(dataRow, tokugimuTelIdx);
+					int kojinNoIdx = findIndexByName(yoshikiMap, "特別徴収義務者【個人番号】");
+					kojinNo = getDataValue(dataRow, kojinNoIdx);
+					int hojinNoIdx = findIndexByName(yoshikiMap, "特別徴収義務者【法人番号】");
+					hojinNo = getDataValue(dataRow, hojinNoIdx);
+				}
 				break;
 			case EltaxConstants.SHUBETSU_TEIGAKU:
 			case EltaxConstants.SHUBETSU_TEIRITSU:
@@ -131,11 +161,13 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 				diffRows = buildDiffRowsFuka(dataRow, yoshikiMap, shiteiNo, shubetsu);
 			}
 
-			return new EltaxRenkeiKakuninDto(
+			EltaxRenkeiKakuninDto dto = new EltaxRenkeiKakuninDto(
 					shiteiNo, shisetsuName, shisetsuJusho,
 					atenaName, atenaJusho,
 					file.getOriginalFilename(), shubetsu, shubetsuName,
+					atenaSearchRequired, tokugimuName, tokugimuJusho, tokugimuTel, kojinNo, hojinNo,
 					diffRows);
+			return dto;
 
 		} catch (Exception e) {
 			throw new RuntimeException("ファイルの解析に失敗しました: " + e.getMessage(), e);
@@ -144,14 +176,14 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 
 	@Override
 	@Transactional
-	public void commit(byte[] fileBytes, String fileName) {
+	public void commit(byte[] fileBytes, String fileName, BigDecimal atenaNoFromSession) {
 		try {
 			String tetsuzukiId = fileBytes.length > 0 ? extractTetsuzukiId(fileBytes) : "";
 			String shubetsu = EltaxConstants.TETSUZUKI_SHUBETSU_MAP.getOrDefault(tetsuzukiId, "");
 			switch (shubetsu) {
 			case EltaxConstants.SHUBETSU_TOKUGIMU:
 				// 特別徴収義務者
-				saveTokugimu(fileBytes);
+				saveTokugimu(fileBytes, atenaNoFromSession);
 				break;
 			case EltaxConstants.SHUBETSU_TEIGAKU:
 				// 納入申告（定額）
@@ -252,30 +284,57 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	private List<DiffRow> buildDiffRowsTokugimu(String[] dataRow, Map<Integer, String> yoshikiMap, String shiteiNo) {
 		List<DiffRow> diffRows = new ArrayList<>();
 
-		List<Tokugimu> existing = new ArrayList<>();
+		List<Tokugimu> existingTokugimu = new ArrayList<>();
 		if (shiteiNo != null && !shiteiNo.isBlank()) {
-			existing = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+			existingTokugimu = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 		}
-		Tokugimu prev = existing.isEmpty() ? null : existing.get(0);
+		Tokugimu prevTokugimu = existingTokugimu.isEmpty() ? null : existingTokugimu.get(0);
+
+		Shoyusha prevSyoyusha = shoyushaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
+				.filter(s -> prevTokugimu != null && s.getRno().compareTo(prevTokugimu.getRno()) == 0
+						&& s.getIdx().compareTo(BigDecimal.ONE) == 0)
+				.findFirst().orElse(null);
 
 		for (Map.Entry<Integer, String> entry : yoshikiMap.entrySet()) {
 			String itemName = entry.getValue();
 			String afterValue = getDataValue(dataRow, entry.getKey() - 1);
-			String beforeValue = resolveBeforeValueTokugimu(prev, itemName);
+			String beforeValue = resolveBeforeValueTokugimu(prevTokugimu, prevSyoyusha, itemName);
 			diffRows.add(new DiffRow(itemName, beforeValue, afterValue));
 		}
 		return diffRows;
 	}
 
-	private String resolveBeforeValueTokugimu(Tokugimu prev, String itemName) {
-		if (prev == null)
+	private String resolveBeforeValueTokugimu(Tokugimu prevTokugimu, Shoyusha prevShoyusha, String itemName) {
+		if (prevTokugimu == null)
 			return "";
 		return switch (itemName) {
-		case "施設情報【名称】" -> prev.getShisetsuName();
-		case "施設情報【所在地】" -> prev.getShisetsuJusho();
-		case "施設情報【電話番号】" -> prev.getShisetsuTel();
-		case "施設情報【客室数】" -> prev.getKyakushitsuSu() != null ? prev.getKyakushitsuSu().toPlainString() : "";
-		case "施設情報【宿泊定員】" -> prev.getShuyoSu() != null ? prev.getShuyoSu().toPlainString() : "";
+		case "施設情報【名称】" -> parseString(prevTokugimu.getShisetsuName());
+		case "施設情報【所在地】" -> parseString(prevTokugimu.getShisetsuJusho());
+		case "施設情報【電話番号】" -> parseString(prevTokugimu.getShisetsuTel());
+		case "施設情報【床面積】" -> parseString(prevTokugimu.getYukaMenseki());
+		case "施設情報【階数（地上）】" -> parseString(prevTokugimu.getChijoKai());
+		case "施設情報【階数（地下）】" -> parseString(prevTokugimu.getChikaKai());
+		case "施設情報【客室数】" -> parseString(prevTokugimu.getKyakushitsuSu());
+		case "施設情報【宿泊定員】" -> parseString(prevTokugimu.getShuyoSu());
+		case "施設情報【経営開始年月日】" -> parseString(prevTokugimu.getEigyoStYmd());
+		case "宿泊施設の営業許可等情報【氏名（名称及び代表者名）】" -> parseString(prevTokugimu.getKyokaName());
+		case "宿泊施設の営業許可等情報【郵便番号】" -> parseString(prevTokugimu.getKyokaYubinNo());
+		case "宿泊施設の営業許可等情報【住所又は所在地】" -> parseString(prevTokugimu.getKyokaJusho());
+		case "宿泊施設の営業許可等情報【許可番号（届出番号）】" -> parseString(prevTokugimu.getKyokaNo());
+		case "宿泊施設の営業許可等情報【営業種別】" -> parseString(prevTokugimu.getKyokaShu());
+		case "送付先情報【氏名（名称及び代表者名）】" -> parseString(prevTokugimu.getSoufusakiName());
+		case "送付先情報【郵便番号】" -> parseString(prevTokugimu.getSoufusakiYubinNo());
+		case "送付先情報【住所又は所在地】" -> parseString(prevTokugimu.getSoufusakiJusho());
+		case "送付先情報【電話番号】" -> parseString(prevTokugimu.getSoufusakiTel());
+		case "備考" -> parseString(prevTokugimu.getBiko());
+		case "届出理由（変更・休止・廃止・再開）" -> parseString(prevTokugimu.getKyuhaishiRiyu());
+		case "休止廃止再開情報【休止期間（自）】" -> parseString(prevTokugimu.getKyushiStYmd());
+		case "休止廃止再開情報【休止期間（至）】" -> parseString(prevTokugimu.getKyushiEdYmd());
+		case "休止廃止再開情報【廃止年月日】" -> parseString(prevTokugimu.getEigyoEdYmd());
+		case "施設の所有者情報【氏名（名称及び代表者名）】" -> prevShoyusha == null ? "" : parseString(prevShoyusha.getShoyushaName());
+		case "施設の所有者情報【郵便番号】" -> prevShoyusha == null ? "" : parseString(prevShoyusha.getShoyushaYubinNo());
+		case "施設の所有者情報【住所又は所在地】" -> prevShoyusha == null ? "" : parseString(prevShoyusha.getShoyushaJusho());
+		case "施設の所有者情報【電話番号】" -> prevShoyusha == null ? "" : parseString(prevShoyusha.getShoyushaTel());
 		default -> "";
 		};
 	}
@@ -350,7 +409,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 
 	private String resolveBeforeValueFuka(List<Fuka> prevFukaList, List<List<FukaUchi>> prevUchiList, String itemName,
 			boolean isToku, boolean isTeigaku) {
-		if (prevFukaList == null && prevFukaList.isEmpty() && prevUchiList == null && prevUchiList.isEmpty())
+		if (prevFukaList == null || prevFukaList.isEmpty() || prevUchiList == null || prevUchiList.isEmpty())
 			return "";
 
 		String taishoYmPrefix = null;
@@ -436,7 +495,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	/**
 	 * 特別徴収義務者登録申請書（種別01）のDB更新
 	 */
-	private void saveTokugimu(byte[] fileBytes) {
+	private void saveTokugimu(byte[] fileBytes, BigDecimal atenaNoFromSession) {
 		try {
 			String tetsuzukiId = extractTetsuzukiId(fileBytes);
 			Map<Integer, String> yoshikiMap = loadYoshikiMap(tetsuzukiId);
@@ -465,11 +524,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			int soufusakiJushoIdx = findIndexByName(yoshikiMap, "送付先情報【住所又は所在地");
 			int soufusakiTelIdx = findIndexByName(yoshikiMap, "送付先情報【電話番号");
 			int bikoIdx = findIndexByName(yoshikiMap, "備考");
+			int kyuhaishiRiyuIdx = findIndexByName(yoshikiMap, "届出理由（変更・休止・廃止・再開）");
 			int kyushiStYmdIdx = findIndexByName(yoshikiMap, "休止廃止再開情報【休止期間（自");
 			int kyushiEdYmdIdx = findIndexByName(yoshikiMap, "休止廃止再開情報【休止期間（至");
 			int eigyoEdYmdIdx = findIndexByName(yoshikiMap, "休止廃止再開情報【廃止年月日");
 			int saikaiYmdIdx = findIndexByName(yoshikiMap, "休止廃止再開情報【再開年月日");
-			int tokugimuNameIdx = findIndexByName(yoshikiMap, "特別徴収義務者【氏名又は名称");
 			int shoyushaNameIdx = findIndexByName(yoshikiMap, "施設の所有者情報【氏名");
 			int shoyushaYubinNoIdx = findIndexByName(yoshikiMap, "施設の所有者情報【郵便番号");
 			int shoyushaJushoIdx = findIndexByName(yoshikiMap, "施設の所有者情報【住所又は所在地");
@@ -477,13 +536,13 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 
 			String shinseikubun = getDataValue(dataRow, shinseikubunIdx);
 			String teishutsuYmd = getDataValue(dataRow, teishutsuYmdIdx);
-			boolean isNew = shinseikubun.startsWith("1");
+			boolean isNew = shinseikubun.startsWith(EltaxConstants.SHINSEI_KBN_SHINKI);
 
 			// 指定番号の決定
 			String shiteiNo;
 			if (isNew) {
-				int maxNo = tokugimuRepository.findMaxShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
-				shiteiNo = String.valueOf(maxNo + 1);
+				int max = tokugimuRepository.findMaxShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
+				shiteiNo = String.format("%08d", max + 1);
 			} else {
 				shiteiNo = getDataValue(dataRow, shisetsuNoIdx);
 			}
@@ -491,13 +550,16 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			// 前履歴取得
 			List<Tokugimu> prevList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 			Tokugimu prev = prevList.isEmpty() ? null : prevList.get(0);
+			if (!isNew && prev == null) {
+				throw new RuntimeException("指定番号（" + shiteiNo + "）に該当する特別徴収義務者が登録されていません。");
+			}
 
 			// 履歴番号
 			int maxRno = tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(0);
 			BigDecimal newRno = BigDecimal.valueOf(maxRno + 1);
 
 			// 登録年月日
-			LocalDate torokuYmd = isNew ? LocalDate.now() : (prev != null ? prev.getTorokuYmd() : LocalDate.now());
+			LocalDate torokuYmd = isNew ? LocalDate.now() : prev.getTorokuYmd();
 			LocalDate shinkokuYmd = parseDate(teishutsuYmd);
 			if (shinkokuYmd == null)
 				shinkokuYmd = LocalDate.now();
@@ -505,30 +567,75 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			// 宛名番号
 			BigDecimal atenaNo;
 			if (isNew) {
-				String tokugimuName = getDataValue(dataRow, tokugimuNameIdx);
-				List<Atena> atenaList = atenaRepository.searchByAnyField(
-						jichitaiCd, null, tokugimuName, null, null, null, null);
-				atenaNo = atenaList.isEmpty() ? BigDecimal.ZERO : atenaList.get(0).getAtenaNo();
+				if (atenaNoFromSession != null) {
+					atenaNo = atenaNoFromSession;
+				} else {
+					throw new RuntimeException("宛名番号が検索されていません。");
+				}
 			} else {
-				atenaNo = prev != null ? prev.getAtenaNo() : BigDecimal.ZERO;
+				atenaNo = prev.getAtenaNo();
 			}
 
 			// 納税周期
 			BigDecimal nokigen;
 			if (isNew) {
 				var nozeiList = nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd);
-				nokigen = nozeiList.isEmpty() ? null : nozeiList.get(0).getShuki();
+				nokigen = nozeiList.isEmpty() ? null : nozeiList.get(0).getSeq();
 			} else {
-				nokigen = prev != null ? prev.getNokigen() : null;
+				nokigen = prev.getNokigen();
 			}
 
-			// 営業開始年月日：再開年月日があればそちら、なければ経営開始年月日
-			String saikaiYmdStr = getDataValue(dataRow, saikaiYmdIdx);
-			LocalDate eigyoStYmd = (!saikaiYmdStr.isBlank())
-					? parseDate(saikaiYmdStr)
+			// 営業開始終了年月日、休止開始終了年月日
+			LocalDate eigyoStYmd = parseDate(getDataValue(dataRow, eigyoStYmdIdx)) == null
+					? (isNew ? LocalDate.now() : prev.getEigyoStYmd())
 					: parseDate(getDataValue(dataRow, eigyoStYmdIdx));
-			if (eigyoStYmd == null)
-				eigyoStYmd = LocalDate.now();
+			LocalDate eigyoEdYmd = null;
+			LocalDate kyushiStYmd = null;
+			LocalDate kyushiEdYmd = null;
+			String kyuhaishiRiyu = getDataValue(dataRow, kyuhaishiRiyuIdx).isEmpty()
+					? (isNew ? null : prev.getKyuhaishiRiyu())
+					: getDataValue(dataRow, kyuhaishiRiyuIdx);
+			switch (shinseikubun) {
+			case EltaxConstants.SHINSEI_KBN_KYUSHI:
+				eigyoEdYmd = prev.getEigyoEdYmd();
+				kyushiStYmd = parseDate(getDataValue(dataRow, kyushiStYmdIdx));
+				if (kyushiStYmd == null) {
+					throw new RuntimeException("休止年月日が入力されていません。");
+				}
+				kyushiEdYmd = parseDate(getDataValue(dataRow, kyushiEdYmdIdx));
+				kyuhaishiRiyu = getDataValue(dataRow, kyuhaishiRiyuIdx);
+				break;
+			case EltaxConstants.SHINSEI_KBN_SAIKAI:
+				eigyoEdYmd = prev.getEigyoEdYmd();
+				kyushiStYmd = prev.getKyushiStYmd();
+				kyushiEdYmd = parseDate(getDataValue(dataRow, saikaiYmdIdx));
+				if (kyushiEdYmd == null) {
+					throw new RuntimeException("再開年月日が入力されていません。");
+				}
+				kyushiEdYmd = kyushiEdYmd.minusDays(1);
+				kyuhaishiRiyu = getDataValue(dataRow, kyuhaishiRiyuIdx);
+				break;
+			case EltaxConstants.SHINSEI_KBN_HAISHI:
+				eigyoEdYmd = parseDate(getDataValue(dataRow, eigyoEdYmdIdx));
+				if (eigyoEdYmd == null) {
+					throw new RuntimeException("廃止年月日が入力されていません。");
+				}
+				kyushiStYmd = prev.getKyushiStYmd();
+				kyushiEdYmd = kyushiStYmd != null && prev.getKyushiEdYmd() == null
+						? parseDate(getDataValue(dataRow, eigyoEdYmdIdx))
+						: prev.getKyushiEdYmd();
+				kyuhaishiRiyu = getDataValue(dataRow, kyuhaishiRiyuIdx);
+				break;
+			default:
+				if (!isNew) {
+					eigyoEdYmd = prev.getEigyoEdYmd();
+					kyushiStYmd = prev.getKyushiStYmd();
+					kyushiEdYmd = prev.getKyushiEdYmd();
+					kyuhaishiRiyu = prev.getKyuhaishiRiyu();
+				}
+				break;
+
+			}
 
 			// 営業種別変換
 			String kyokaShu = convertKyokaShu(getDataValue(dataRow, kyokaShuIdx));
@@ -542,8 +649,8 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			entity.setHenkoYmd(shinkokuYmd);
 			entity.setAtenaNo(atenaNo);
 			entity.setShisetsuName(getDataValue(dataRow, shisetsuNameIdx));
-			entity.setShisetsuNameKana(prev != null ? prev.getShisetsuNameKana() : "");
-			entity.setShisetsuYubinNo(prev != null ? prev.getShisetsuYubinNo() : null);
+			entity.setShisetsuNameKana(!isNew ? prev.getShisetsuNameKana() : "");
+			entity.setShisetsuYubinNo(!isNew ? prev.getShisetsuYubinNo() : null);
 			entity.setShisetsuJusho(getDataValue(dataRow, shisetsuJushoIdx));
 			entity.setShisetsuTel(getDataValue(dataRow, shisetsuTelIdx));
 			entity.setYukaMenseki(parseBigDecimal(getDataValue(dataRow, yukaMensekiIdx)));
@@ -552,28 +659,33 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			entity.setKyakushitsuSu(parseBigDecimal(getDataValue(dataRow, kyakushitsuSuIdx)));
 			entity.setShuyoSu(parseBigDecimal(getDataValue(dataRow, shuyoSuIdx)));
 			entity.setKyokaName(getDataValue(dataRow, kyokaNameIdx));
-			entity.setKyokaNameKana(prev != null ? prev.getKyokaNameKana() : "");
+			entity.setKyokaNameKana(!isNew ? prev.getKyokaNameKana() : "");
 			entity.setKyokaYubinNo(getDataValue(dataRow, kyokaYubinNoIdx));
 			entity.setKyokaJusho(getDataValue(dataRow, kyokaJushoIdx));
-			entity.setKyokaTel(prev != null ? prev.getKyokaTel() : null);
+			entity.setKyokaTel(!isNew ? prev.getKyokaTel() : null);
 			entity.setKyokaShu(kyokaShu);
 			entity.setKyokaNo(getDataValue(dataRow, kyokaNoIdx));
 			entity.setSoufusakiName(getDataValue(dataRow, soufusakiNameIdx));
-			entity.setSoufusakiNameKana(prev != null ? prev.getSoufusakiNameKana() : "");
+			entity.setSoufusakiNameKana(!isNew ? prev.getSoufusakiNameKana() : "");
 			entity.setSoufusakiYubinNo(getDataValue(dataRow, soufusakiYubinNoIdx));
 			entity.setSoufusakiJusho(getDataValue(dataRow, soufusakiJushoIdx));
 			entity.setSoufusakiTel(getDataValue(dataRow, soufusakiTelIdx));
 			entity.setBiko(getDataValue(dataRow, bikoIdx));
 			entity.setEigyoStYmd(eigyoStYmd);
-			entity.setEigyoEdYmd(parseDate(getDataValue(dataRow, eigyoEdYmdIdx)));
-			entity.setKyushiStYmd(parseDate(getDataValue(dataRow, kyushiStYmdIdx)));
-			entity.setKyushiEdYmd(parseDate(getDataValue(dataRow, kyushiEdYmdIdx)));
-			entity.setKyuhaishiRiyu(prev != null ? prev.getKyuhaishiRiyu() : null);
+			entity.setEigyoEdYmd(eigyoEdYmd);
+			entity.setKyushiStYmd(kyushiStYmd);
+			entity.setKyushiEdYmd(kyushiEdYmd);
+			entity.setKyuhaishiRiyu(kyuhaishiRiyu);
 			entity.setEltaxUmu("1");
 			entity.setNokigen(nokigen);
 			entity.setNewFlg("1");
 			entity.setDelFlg("0");
 			tokugimuRepository.save(entity);
+			if (prev != null) {
+				// 履歴の最新フラグを"0"にする
+				prev.setNewFlg("0");
+				tokugimuRepository.save(prev);
+			}
 
 			// t_shoyusha
 			String shoyushaName = getDataValue(dataRow, shoyushaNameIdx);
@@ -790,6 +902,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		fuka.setNewFlg("1");
 		fuka.setDelFlg("0");
 		fuka = fukaRepository.save(fuka);
+		if (prev != null) {
+			// 履歴の最新フラグを"0"にする
+			prev.setNewFlg("0");
+			fukaRepository.save(prev);
+		}
 
 		long totalKenZeigaku = 0L;
 		for (int kbn = 1; kbn <= 10; kbn++) {
@@ -940,12 +1057,16 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		if (value == null)
 			return "";
 
-		if (value instanceof BigDecimal) {
+		if (value instanceof String) {
+			return (String) value;
+		} else if (value instanceof BigDecimal) {
 			return ((BigDecimal) value).toPlainString();
 		} else if (value instanceof Integer) {
 			return ((Integer) value).toString();
 		} else if (value instanceof Long) {
 			return ((Long) value).toString();
+		} else if (value instanceof LocalDate) {
+			return ((LocalDate) value).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 		}
 
 		return "";

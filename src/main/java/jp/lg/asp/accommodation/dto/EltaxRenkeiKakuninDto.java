@@ -19,6 +19,12 @@ public class EltaxRenkeiKakuninDto {
 	private String fileName;
 	private String shubetsu;
 	private String shubetsuName;
+	private boolean atenaSearchRequired;
+	private String tokugimuName;
+	private String tokugimuJusho;
+	private String tokugimuTel;
+	private String kojinNo;
+	private String hojinNo;
 
 	private List<DiffRow> diffRows;
 
