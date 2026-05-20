@@ -13,6 +13,16 @@ import java.util.List;
 @Repository
 public interface GassanUchiRepository extends JpaRepository<GassanUchi, GassanUchiId> {
 
+    @Query("SELECT g FROM GassanUchi g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo")
+    List<GassanUchi> findByJichitaiCdAndGassanShiteiNo(@Param("jichitaiCd") String jichitaiCd, @Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Query("SELECT g FROM GassanUchi g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo IN :gassanShiteiNos")
+    List<GassanUchi> findByJichitaiCdAndGassanShiteiNoIn(@Param("jichitaiCd") String jichitaiCd, @Param("gassanShiteiNos") List<String> gassanShiteiNos);
+
+    @Modifying
+    @Query("DELETE FROM GassanUchi g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo")
+    void deleteByJichitaiCdAndGassanShiteiNo(@Param("jichitaiCd") String jichitaiCd, @Param("gassanShiteiNo") String gassanShiteiNo);
+
     @Query("SELECT g FROM GassanUchi g WHERE g.jichitaiCd = :jichitaiCd AND g.shiteiNo = :shiteiNo")
     List<GassanUchi> findByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNo") String shiteiNo);
     
