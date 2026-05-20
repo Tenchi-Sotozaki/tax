@@ -31,39 +31,45 @@
 							method="get">
 							<!-- SP:1列 / タブレット:2列 / PC:4列 -->
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
-								<div class="col-md-3">
-									<label for="shinkokuFrom" class="form-label fw-medium">申告日（開始）</label>
-									<input type="date" class="form-control" id="shinkokuFrom"
-										name="shinkokuFrom">
+								<div class="col">
+									<label for="shinkokuFrom"
+										class="form-label form-label-sm fw-medium mb-1">申告日（開始）</label>
+									<input type="date" class="form-control form-control-sm"
+										id="shinkokuFrom" name="shinkokuFrom">
 								</div>
-								<div class="col-md-3">
-									<label for="shinkokuTo" class="form-label fw-medium">申告日（終了）</label>
-									<input type="date" class="form-control" id="shinkokuTo"
-										name="shinkokuTo">
+								<div class="col">
+									<label for="shinkokuTo"
+										class="form-label form-label-sm fw-medium mb-1">申告日（終了）</label>
+									<input type="date" class="form-control form-control-sm"
+										id="shinkokuTo" name="shinkokuTo">
 								</div>
-								<div class="col-md-2">
-									<label for="taishoMonth" class="form-label fw-medium">対象月</label>
-									<input type="month" class="form-control" id="taishoMonth"
-										name="taishoMonth">
+								<div class="col">
+									<label for="taishoMonth"
+										class="form-label form-label-sm fw-medium mb-1">対象月</label> <input
+										type="month" class="form-control form-control-sm"
+										id="taishoMonth" name="taishoMonth">
 								</div>
-								<div class="col-md-2">
-									<label for="shiteiNo" class="form-label fw-medium">指定番号</label>
-									<input type="text" class="form-control" id="shiteiNo"
+								<div class="col">
+									<label for="shiteiNo"
+										class="form-label form-label-sm fw-medium mb-1">指定番号</label> <input
+										type="text" class="form-control form-control-sm" id="shiteiNo"
 										name="shiteiNo">
 								</div>
-								<div class="col-md-2">
-									<label for="name" class="form-label fw-medium">氏名/名称</label> <input
-										type="text" class="form-control" id="name" name="name">
+								<div class="col">
+									<label for="name"
+										class="form-label form-label-sm fw-medium mb-1">氏名/名称</label>
+									<input type="text" class="form-control form-control-sm"
+										id="name" name="name">
 								</div>
-								<div class="col-12">
-									<button type="submit" class="btn btn-primary">
-										<i class="bi bi-search me-1"></i>検索
-									</button>
-									<button type="button" class="btn btn-outline-secondary ms-2"
-										id="clearBtn">
-										<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
-									</button>
-								</div>
+							</div>
+							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+								<a th:href="@{/shunoRenkei/list}"
+									class="btn btn-outline-secondary btn-sm"> <i
+									class="bi bi-arrow-counterclockwise me-1"></i>リセット
+								</a>
+								<button type="submit" class="btn btn-primary btn-sm px4">
+									<i class="bi bi-search me-1"></i>検索する
+								</button>
 							</div>
 						</form>
 					</div>
