@@ -9,7 +9,6 @@ import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 
 /**
  * 特別徴収義務者管理 Service インターフェース。
- * 指定番号（shiteiNo）を基準とした処理に変更。
  */
 public interface TokugimuService {
 

@@ -12,8 +12,11 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h2 class="h2">
-				<i class="bi bi-cloud-arrow-down me-2 text-primary"></i>収納管理連携
+				<i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i>収納管理連携
 			</h2>
+			<span class="text-muted small"> 検索結果: <strong
+				th:text="${#lists.size(items)}">0</strong> 件
+			</span>
 		</div>
 
 		<!-- ========== 検索条件（アコーディオン） ========== -->
@@ -75,56 +78,79 @@
 					</div>
 				</div>
 			</div>
+		</div>
 
-			<!-- ボタンエリア -->
-			<div class="d-flex justify-content-between align-items-center mb-3">
-				<div>
-					<button id="viewBtn" class="btn btn-secondary">
-						<i class="bi bi-eye me-1"></i>照会
-					</button>
-					<button id="csvBtn" class="btn btn-outline-primary ms-2">
-						<i class="bi bi-file-earmark-spreadsheet me-1"></i>csv出力
-					</button>
-				</div>
-				<div class="text-muted">
-					<small>検索結果: <span id="resultCount">0</span> 件
-					</small>
+		<!-- ボタンエリア -->
+		<div class="card shadow-sm mb-3">
+			<div class="card-body py-2 px-3">
+				<div class="d-flex flex-wrap align-items-center gap-1"
+					style="row-gap: 0.4rem;">
+					<div>
+						<button id="viewBtn" class="btn btn-outline-secondary btn-sm">
+							<i class="bi bi-eye me-1"></i>照会
+						</button>
+						<button id="csvBtn" class="btn btn-outline-primary btn-sm ms-2">
+							<i class="bi bi-file-earmark-spreadsheet me-1"></i>csv出力
+						</button>
+					</div>
 				</div>
 			</div>
+		</div>
 
-			<!-- 一覧エリア -->
-			<div class="table-container">
-				<table class="table table-striped table-hover mb-0" id="shunoTable">
-					<thead class="table-primary">
-						<tr>
-							<th style="width: 5%;"><input type="checkbox" id="selectAll"></th>
-							<th style="width: 10%;">指定番号</th>
-							<th style="width: 10%;">宛名番号</th>
-							<th style="width: 20%;">氏名/名称</th>
-							<th style="width: 10%;">対象年月</th>
-							<th style="width: 10%;" class="text-end">宿泊税額</th>
-							<th style="width: 15%;">登録年月日</th>
-							<th style="width: 15%;">申告年月日</th>
+		<!-- 一覧エリア -->
+		<div class="table-container">
+			<table
+				class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table"
+				id="shunoTable">
+				<thead class="table-primary">
+					<tr>
+						<th style="width: 20px;" class="text-center"><input
+							type="checkbox" id="selectAll"></th>
+						<th style="width: 100px;">指定番号</th>
+						<th style="width: 100px;">宛名番号</th>
+						<th style="width: 200px;">氏名/名称</th>
+						<th style="width: 100px;">対象年月</th>
+						<th style="width: 100px;">宿泊税額</th>
+						<th style="width: 150px;">登録年月日</th>
+						<th style="width: 150px;">申告年月日</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:if="${items != null}">
+						<tr th:each="item : ${items}">
+							<td class="text-center"><input type="checkbox"
+								name="selectedIds" th:value="${item.shiteiNo}"
+								th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo},data-kibetsu=${item.kibetsu}" />
+							</td>
+							<td th:text="${item.shiteiNo}">指定番号</td>
+							<td th:text="${item.atenaNo}">宛名番号</td>
+							<td th:text="${item.name}">氏名/名称</td>
+							<td th:text="${item.taishoYm}">対象年月</td>
+							<td class="text-center" th:text="${item.totalZeigaku}">宿泊税額</td>
+							<td
+								th:text="${item.torokuYmd != null ? #dates.format(item.torokuYmd, 'yyyy-MM-dd') : ''}">登録年月日</td>
+							<td
+								th:text="${item.shinkokuYmd != null ? #dates.format(item.shinkokuYmd, 'yyyy-MM-dd') : ''}">申告年月日</td>
 						</tr>
-					</thead>
-					<tbody>
-						<!-- JavaScriptで行を描画 -->
-					</tbody>
-				</table>
-			</div>
+					</th:block>
+					<th:block th:if="${items == null}">
+						<tr>
+							<td colspan="8" class="text-center">該当データがありません</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
 
-			<!-- ページネーション（ダミー） -->
-			<nav aria-label="ページネーション" class="mt-4">
-				<ul class="pagination justify-content-center">
-					<li class="page-item disabled"><a class="page-link" href="#"
-						tabindex="-1">前へ</a></li>
+		<!-- ページネーション -->
+		<div class="card-footer bg-white py-2 border-top">
+			<nav>
+				<ul class="pagination pagination-sm justify-content-center mb-0">
+					<li class="page-item disabled"><a class="page-link" href="#">前へ</a></li>
 					<li class="page-item active"><a class="page-link" href="#">1</a></li>
-					<li class="page-item"><a class="page-link" href="#">2</a></li>
-					<li class="page-item"><a class="page-link" href="#">3</a></li>
 					<li class="page-item"><a class="page-link" href="#">次へ</a></li>
 				</ul>
 			</nav>
-
 		</div>
 	</div>
 

@@ -35,9 +35,9 @@ tbody tr.row-selected {
 		<!-- ページヘッダー -->
 		<div
 			class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-			<h5 class="mb-0 fw-bold text-dark">
+			<h2 class="h2">
 				<i class="bi bi-building text-primary me-2"></i>特別徴収義務者管理台帳
-			</h5>
+			</h2>
 			<span class="text-muted small"> 検索結果: <strong
 				th:text="${#lists.size(items)}">0</strong> 件
 			</span>
@@ -139,13 +139,13 @@ tbody tr.row-selected {
 		</div>
 
 		<!-- ========== ツールバー（ボタンエリア） ========== -->
-		<div class="card shadow-sm mb-2">
+		<div class="card shadow-sm mb-3">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex flex-wrap align-items-center gap-1"
 					style="row-gap: 0.4rem;">
 					<!-- グループ1: 基本操作 -->
 					<div class="d-flex flex-wrap gap-1">
-					<a th:href="@{/tokugimu/registration}"
+						<a th:href="@{/tokugimu/registration}"
 							class="btn btn-primary btn-sm"> <i
 							class="bi bi-plus-circle me-1"></i>新規登録
 						</a>
@@ -222,12 +222,10 @@ tbody tr.row-selected {
 						</thead>
 						<tbody>
 							<tr th:each="item : ${items}">
-								<td class="text-center">
-									<input type="checkbox" class="form-check-input row-select" 
-										th:data-shitei-no="${item.shiteiNo}">
-								</td>
-								<td class="fw-bold text-primary"
-									th:text="${item.shiteiNo}"></td>
+								<td class="text-center"><input type="checkbox"
+									class="form-check-input row-select"
+									th:data-shitei-no="${item.shiteiNo}"></td>
+								<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
 								<td th:text="${item.Name}"></td>
 								<td th:text="${item.shisetsuName}"></td>
 								<td class="text-center"><span class="badge bg-success"
@@ -264,13 +262,14 @@ tbody tr.row-selected {
 		</div>
 
 		<!-- 削除フォーム（隠し） -->
-		<form th:each="item : ${items}" th:id="'deleteForm-' + ${item.shiteiNo}"
-			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}" method="post"
-			class="d-none">
+		<form th:each="item : ${items}"
+			th:id="'deleteForm-' + ${item.shiteiNo}"
+			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}"
+			method="post" class="d-none">
 
-		<!-- 削除確認モーダル -->
-		<div th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}"></div>
-
+			<!-- 削除確認モーダル -->
+			<div
+				th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">

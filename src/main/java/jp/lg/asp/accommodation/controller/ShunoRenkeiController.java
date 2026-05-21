@@ -1,6 +1,9 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -29,18 +32,40 @@ public class ShunoRenkeiController {
 	private final ScreenAccessChecker accessChecker;
 	private final ShunoRenkeiService shunoRenkeiService;
 
-	// 既存の画面IDを流用（既存コードは変更しないポリシーに合わせる）
 	private static final String SCREEN_ID = ScreenManagement.SHUNO_RENKEI;
 
 	@GetMapping("/list")
-	public String index(Model model) {
+	public String index(
+			@RequestParam(required = false) String shinkokuFrom,
+			@RequestParam(required = false) String shinkokuTo,
+			@RequestParam(required = false) String taishoMonth,
+			@RequestParam(required = false) String shiteiNo,
+			@RequestParam(required = false) String name,
+			Model model) {
+
 		accessChecker.checkAccess(SCREEN_ID);
+		LocalDate from = shinkokuFrom == null || shinkokuFrom.isEmpty() ? null
+				: LocalDate.parse(shinkokuFrom);
+		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
+				: LocalDate.parse(shinkokuTo);
+		String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
+		List<ShunoDto> items = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name);
+
+		model.addAttribute("items", items);
+		Map<String, Object> searchForm = new HashMap<>();
+		searchForm.put("shinkokuFrom", shinkokuFrom);
+		searchForm.put("shinkokuTo", shinkokuTo);
+		searchForm.put("taishoMonth", taishoMonth);
+		searchForm.put("shiteiNo", shiteiNo);
+		searchForm.put("name", name);
+		model.addAttribute("searchForm", searchForm);
+
 		return "renkei/shunoRenkei";
 	}
 
-	@GetMapping("/api/search")
+	@GetMapping("/search")
 	@ResponseBody
-	public List<ShunoDto> apiSearch(
+	public List<ShunoDto> search(
 			@RequestParam(required = false) String shinkokuFrom,
 			@RequestParam(required = false) String shinkokuTo,
 			@RequestParam(required = false) String taishoMonth,
@@ -48,31 +73,32 @@ public class ShunoRenkeiController {
 			@RequestParam(required = false) String name) {
 
 		accessChecker.checkAccess(SCREEN_ID);
-		java.time.LocalDate from = shinkokuFrom == null || shinkokuFrom.isEmpty() ? null
-				: java.time.LocalDate.parse(shinkokuFrom);
-		java.time.LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
-				: java.time.LocalDate.parse(shinkokuTo);
+		LocalDate from = shinkokuFrom == null || shinkokuFrom.isEmpty() ? null
+				: LocalDate.parse(shinkokuFrom);
+		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
+				: LocalDate.parse(shinkokuTo);
 		String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
 		return shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name);
 	}
 
-	@PostMapping("/download/csv")
+	@PostMapping("/download")
 	public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShunoDto.Key> keys) {
 		accessChecker.checkAccess(SCREEN_ID);
 		String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
 		List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 
-		String[] headers = { "宛名番号", "賦課年度", "期別", "登録年月日", "申告年月日", "対象年月", "合計税額", "市区町村税額", "都道府県税額", "加算金額区分",
+		String[] csvHeaders = { "宛名番号", "賦課年度", "期別", "登録年月日", "申告年月日", "対象年月", "合計税額", "市区町村税額", "都道府県税額", "加算金額区分",
 				"加算割合", "加算金額", "納期限" };
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < headers.length; i++) {
+		for (int i = 0; i < csvHeaders.length; i++) {
 			if (i > 0)
 				sb.append(',');
-			sb.append('"').append(headers[i].replace("\"", "\"\"")).append('"');
+			sb.append('"').append(csvHeaders[i].replace("\"", "\"\"")).append('"');
 		}
 		sb.append('\n');
 
 		for (ShunoDto r : rows) {
+			String kasanKbnName = convertKasanKbn(r.getKasanKbn());
 			String[] cols = new String[] {
 					r.getAtenaNo() != null ? r.getAtenaNo() : "",
 					r.getNendo() != null ? r.getNendo() : "",
@@ -83,7 +109,7 @@ public class ShunoRenkeiController {
 					r.getTotalZeigaku() != null ? String.valueOf(r.getTotalZeigaku()) : "",
 					r.getCityZeigaku() != null ? String.valueOf(r.getCityZeigaku()) : "",
 					r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "",
-					r.getKasanKbn() != null ? r.getKasanKbn() : "",
+					kasanKbnName,
 					r.getKasanRitsu() != null ? r.getKasanRitsu().toString() : "",
 					r.getKasanGaku() != null ? String.valueOf(r.getKasanGaku()) : "",
 					r.getNokigen() != null ? r.getNokigen().toString() : ""
@@ -97,10 +123,10 @@ public class ShunoRenkeiController {
 		}
 
 		byte[] body = sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
-		HttpHeaders headersResp = new HttpHeaders();
-		headersResp.setContentType(MediaType.parseMediaType("text/csv;charset=utf-8"));
-		headersResp.setContentDisposition(ContentDisposition.attachment().filename("shuno_renkei.csv").build());
-		return ResponseEntity.ok().headers(headersResp).body(body);
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setContentType(MediaType.parseMediaType("text/csv;charset=utf-8"));
+		httpHeaders.setContentDisposition(ContentDisposition.attachment().filename("shuno_renkei.csv").build());
+		return ResponseEntity.ok().headers(httpHeaders).body(body);
 	}
 
 	@PostMapping("/kakunin")
@@ -113,10 +139,26 @@ public class ShunoRenkeiController {
 			String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
 			List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 			model.addAttribute("rows", rows);
-			return "shunoRenkei/shunoRenkeiKakunin";
+			return "renkei/shunoRenkeiKakunin";
 		} catch (Exception e) {
 			model.addAttribute("rows", java.util.Collections.emptyList());
-			return "shunoRenkei/shunoRenkeiKakunin";
+			return "renkei/shunoRenkeiKakunin";
+		}
+	}
+
+	private String convertKasanKbn(String kasanKbn) {
+		if (kasanKbn == null) {
+			return "";
+		}
+		switch (kasanKbn) {
+			case "1":
+				return "過少申告加算金";
+			case "2":
+				return "不申告加算金";
+			case "3":
+				return "重加算金";
+			default:
+				return kasanKbn;
 		}
 	}
 }
