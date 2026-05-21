@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -46,7 +47,8 @@ public class EltaxRenkeiController {
 			return ResponseEntity.notFound().build();
 		}
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentDisposition(ContentDisposition.attachment().filename(entity.getFileName()).build());
+		headers.setContentDisposition(
+				ContentDisposition.attachment().filename(entity.getFileName(), StandardCharsets.UTF_8).build());
 		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 		return ResponseEntity.ok().headers(headers).body(entity.getLog());
 	}
