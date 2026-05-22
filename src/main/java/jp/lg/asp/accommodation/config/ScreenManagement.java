@@ -50,4 +50,7 @@ public final class ScreenManagement {
 
 	// 収納管理情報連携
 	public static final String SHUNO_RENKEI = "SHUNO_RENKEI";
+
+	// 交付金振込情報連携
+	public static final String KOFUKIN_FURIKOMI = "KOFUKIN_FURIKOMI";
 }
