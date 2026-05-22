@@ -1,4 +1,4 @@
-package jp.lg.asp.accommodation.service.dto;
+package jp.lg.asp.accommodation.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

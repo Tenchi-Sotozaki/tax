@@ -38,31 +38,31 @@
 									<label for="shinkokuFrom"
 										class="form-label form-label-sm fw-medium mb-1">申告日（開始）</label>
 									<input type="date" class="form-control form-control-sm"
-										id="shinkokuFrom" name="shinkokuFrom">
+										id="shinkokuFrom" name="shinkokuFrom" th:value="*{shinkokuFrom}">
 								</div>
 								<div class="col">
 									<label for="shinkokuTo"
 										class="form-label form-label-sm fw-medium mb-1">申告日（終了）</label>
 									<input type="date" class="form-control form-control-sm"
-										id="shinkokuTo" name="shinkokuTo">
+										id="shinkokuTo" name="shinkokuTo" th:value="*{shinkokuTo}">
 								</div>
 								<div class="col">
 									<label for="taishoMonth"
 										class="form-label form-label-sm fw-medium mb-1">対象月</label> <input
 										type="month" class="form-control form-control-sm"
-										id="taishoMonth" name="taishoMonth">
+										id="taishoMonth" name="taishoMonth" th:value="*{taishoMonth}">
 								</div>
 								<div class="col">
 									<label for="shiteiNo"
 										class="form-label form-label-sm fw-medium mb-1">指定番号</label> <input
 										type="text" class="form-control form-control-sm" id="shiteiNo"
-										name="shiteiNo">
+										name="shiteiNo" th:value="*{shiteiNo}">
 								</div>
 								<div class="col">
 									<label for="name"
 										class="form-label form-label-sm fw-medium mb-1">氏名/名称</label>
 									<input type="text" class="form-control form-control-sm"
-										id="name" name="name">
+										id="name" name="name" th:value="*{name}">
 								</div>
 							</div>
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
@@ -116,7 +116,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<th:block th:if="${items != null}">
+					<th:block th:if="${items != null and !items.empty}">
 						<tr th:each="item : ${items}">
 							<td class="text-center"><input type="checkbox"
 								name="selectedIds" th:value="${item.shiteiNo}"
@@ -133,9 +133,9 @@
 								th:text="${item.shinkokuYmd != null ? #dates.format(item.shinkokuYmd, 'yyyy-MM-dd') : ''}">申告年月日</td>
 						</tr>
 					</th:block>
-					<th:block th:if="${items == null}">
+					<th:block th:if="${items == null or items.empty}">
 						<tr>
-							<td colspan="8" class="text-center">該当データがありません</td>
+							<td colspan="8" class="text-center py-4 text-muted">該当データがありません</td>
 						</tr>
 					</th:block>
 				</tbody>

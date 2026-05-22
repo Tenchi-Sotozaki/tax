@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,8 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.ShunoDto;
 import jp.lg.asp.accommodation.service.ShunoRenkeiService;
-import jp.lg.asp.accommodation.service.dto.ShunoDto;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -31,6 +32,9 @@ public class ShunoRenkeiController {
 
 	private final ScreenAccessChecker accessChecker;
 	private final ShunoRenkeiService shunoRenkeiService;
+
+	@Value("${app.jichitai.code}")
+	private String jichitaiCd;
 
 	private static final String SCREEN_ID = ScreenManagement.SHUNO_RENKEI;
 
@@ -48,7 +52,6 @@ public class ShunoRenkeiController {
 				: LocalDate.parse(shinkokuFrom);
 		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
 				: LocalDate.parse(shinkokuTo);
-		String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
 		List<ShunoDto> items = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name);
 
 		model.addAttribute("items", items);
@@ -77,14 +80,12 @@ public class ShunoRenkeiController {
 				: LocalDate.parse(shinkokuFrom);
 		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
 				: LocalDate.parse(shinkokuTo);
-		String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
 		return shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name);
 	}
 
 	@PostMapping("/download")
 	public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShunoDto.Key> keys) {
 		accessChecker.checkAccess(SCREEN_ID);
-		String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
 		List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 
 		String[] csvHeaders = { "宛名番号", "賦課年度", "期別", "登録年月日", "申告年月日", "対象年月", "合計税額", "市区町村税額", "都道府県税額", "加算金額区分",
@@ -136,7 +137,6 @@ public class ShunoRenkeiController {
 			com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 			List<ShunoDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShunoDto.Key.class));
-			String jichitaiCd = System.getProperty("app.jichitai.code", "00000");
 			List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 			model.addAttribute("rows", rows);
 			return "renkei/shunoRenkeiKakunin";
@@ -151,14 +151,14 @@ public class ShunoRenkeiController {
 			return "";
 		}
 		switch (kasanKbn) {
-			case "1":
-				return "過少申告加算金";
-			case "2":
-				return "不申告加算金";
-			case "3":
-				return "重加算金";
-			default:
-				return kasanKbn;
+		case "1":
+			return "過少申告加算金";
+		case "2":
+			return "不申告加算金";
+		case "3":
+			return "重加算金";
+		default:
+			return kasanKbn;
 		}
 	}
 }

@@ -3,7 +3,7 @@ package jp.lg.asp.accommodation.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import jp.lg.asp.accommodation.service.dto.ShunoDto;
+import jp.lg.asp.accommodation.dto.ShunoDto;
 
 public interface ShunoRenkeiService {
 
