@@ -18,7 +18,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 	@Query("""
 			SELECT t FROM Tokugimu t
 			LEFT JOIN Atena a ON t.jichitaiCd = a.jichitaiCd AND t.atenaNo = a.atenaNo
-			WHERE t.newFlg = '1' AND t.delFlg = '0'
+			WHERE t.jichitaiCd = :jichitaiCd AND t.newFlg = '1' AND t.delFlg = '0'
 			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR t.shiteiNo = :shiteiNo)
 			AND (:name IS NULL OR :name = '' OR a.name LIKE %:name%)
 			AND (:shisetsuName IS NULL OR :shisetsuName = '' OR t.shisetsuName LIKE %:shisetsuName%)
@@ -28,6 +28,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			ORDER BY t.shiteiNo
 			""")
 	List<Tokugimu> findBySearchConditions(
+			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo,
 			@Param("name") String name,
 			@Param("shisetsuName") String shisetsuName,
@@ -61,18 +62,6 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 
 	Optional<Tokugimu> findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
 			String jichitaiCd, String shiteiNo, String newFlg, String delFlg);
-
-	@Query("""
-			SELECT t FROM Tokugimu t
-			WHERE t.jichitaiCd = :jichitaiCd
-			AND t.shiteiNo IN :shiteiNos
-			AND t.newFlg = :newFlg AND t.delFlg = :delFlg
-			""")
-	List<Tokugimu> findByJichitaiCdAndShiteiNoInAndNewFlgAndDelFlg(
-			@Param("jichitaiCd") String jichitaiCd,
-			@Param("shiteiNos") List<String> shiteiNos,
-			@Param("newFlg") String newFlg,
-			@Param("delFlg") String delFlg);
 
 	@Query(value = "SELECT COALESCE(MAX(rno), 0) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no = :shiteiNo", nativeQuery = true)
 	Optional<Integer> findMaxRnoByJichitaiCdAndShiteiNo(

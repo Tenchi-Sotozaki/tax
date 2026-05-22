@@ -59,8 +59,8 @@ public class ShoreikinDto {
 	/** No.13 指定番号（一覧表示用） */
 	private String listShiteiNo;
 
-	/** No.14 事業所名称（t_tokugimu.shisetsu_name） */
-	private String jigyoshoName;
+	/** No.14 施設名称（t_tokugimu.shisetsu_name） */
+	private String listShisetsuName;
 
 	/** No.15 氏名（m_atena.name） */
 	private String shimei;

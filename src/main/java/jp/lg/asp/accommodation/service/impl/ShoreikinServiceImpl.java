@@ -38,31 +38,24 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ShoreikinDto> search(ShoreikinDto form) {
-		List<Shoreikin> shoreikinList = shoreikinRepository.findBySearchConditions(
+
+		List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
 				jichitaiCd,
-				form.getNendo(),
 				form.getShiteiNo(),
-				form.getShisetsuName(),
 				form.getName(),
+				form.getShisetsuName(),
 				form.getKyokaShu(),
 				form.getKojinNo(),
 				form.getHojinNo());
 
-		if (shoreikinList.isEmpty()) {
+		if (tokugimuList.isEmpty()) {
 			return List.of();
 		}
 
-		List<String> shiteiNos = shoreikinList.stream().map(Shoreikin::getShiteiNo).distinct().toList();
-
-		// t_tokugimu（new_flg='1', del_flg='0'）を shitei_no をキーに取得
-		Map<String, Tokugimu> tokugimuMap = tokugimuRepository
-				.findByJichitaiCdAndShiteiNoInAndNewFlgAndDelFlg(jichitaiCd, shiteiNos, "1", "0")
-				.stream()
-				.collect(Collectors.toMap(Tokugimu::getShiteiNo, t -> t, (a, b) -> a));
+		List<BigDecimal> atenaNos = tokugimuList.stream().map(Tokugimu::getAtenaNo).distinct().toList();
+		List<String> shiteiNos = tokugimuList.stream().map(Tokugimu::getShiteiNo).toList();
 
 		// m_atena を atena_no をキーに取得
-		List<BigDecimal> atenaNos = tokugimuMap.values().stream()
-				.map(Tokugimu::getAtenaNo).distinct().toList();
 		Map<BigDecimal, Atena> atenaMap = atenaRepository
 				.findByJichitaiCdAndAtenaNoIn(jichitaiCd, atenaNos)
 				.stream()
@@ -74,11 +67,17 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 				.stream()
 				.collect(Collectors.toMap(GassanUchi::getShiteiNo, g -> true, (a, b) -> a));
 
-		return shoreikinList.stream()
-				.map(s -> {
-					Tokugimu t = tokugimuMap.get(s.getShiteiNo());
-					Atena atena = (t != null) ? atenaMap.get(t.getAtenaNo()) : null;
-					boolean isGassanTarget = gassanMap.containsKey(s.getShiteiNo());
+		// t_shoreikin を shitei_no、nendo をキーに取得
+		Map<String, Shoreikin> shoreikinMap = shoreikinRepository
+				.findByJichitaiCdAndShiteiNoInAndNendo(jichitaiCd, shiteiNos, form.getNendo())
+				.stream()
+				.collect(Collectors.toMap(Shoreikin::getShiteiNo, t -> t, (a, b) -> a));
+
+		List<ShoreikinDto> result = tokugimuList.stream()
+				.map(t -> {
+					Shoreikin s = shoreikinMap.get(t.getShiteiNo());
+					Atena atena = atenaMap.get(t.getAtenaNo());
+					boolean isGassanTarget = gassanMap.containsKey(t.getShiteiNo());
 
 					// 合算対象フィルタ
 					if (!"999".equals(form.getGassanTaisho())) {
@@ -89,7 +88,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 					}
 
 					// ステータスフィルタ
-					if (t != null && !"999".equals(form.getStatus())) {
+					if (!"999".equals(form.getStatus())) {
 						String currentStatus = t.getStatus();
 						if (!form.getStatus().equals(currentStatus)) {
 							return null;
@@ -98,7 +97,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 
 					// 交付金算出有無フィルタ（1=算出有: kofu_gaku > 0 / 2=算出無: kofu_gaku = 0）
 					if (!"999".equals(form.getKofuSanshutsuUmu())) {
-						boolean hasKofu = s.getKofuGaku() != null && s.getKofuGaku() > 0;
+						boolean hasKofu = s != null && s.getKofuGaku() != null && s.getKofuGaku() > 0;
 						if ("1".equals(form.getKofuSanshutsuUmu()) && !hasKofu) {
 							return null;
 						}
@@ -108,14 +107,17 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 					}
 
 					ShoreikinDto dto = new ShoreikinDto();
-					dto.setListShiteiNo(s.getShiteiNo());
-					dto.setJigyoshoName(t != null ? t.getShisetsuName() : null);
+					dto.setListShiteiNo(t.getShiteiNo());
+					dto.setListShisetsuName(t.getShisetsuName());
 					dto.setShimei(atena != null ? atena.getName() : null);
-					dto.setKofuGaku(s.getKofuGaku());
+					dto.setKofuGaku(s != null ? s.getKofuGaku() : null);
 					return dto;
 				})
 				.filter(dto -> dto != null)
 				.toList();
+
+		return result;
+
 	}
 
 	@Override
