@@ -53,5 +53,16 @@ public final class ScreenManagement {
 
 	// 合算申告登録/編集/照会
 	public static final String GASSAN_CONFIG = "GASSANCONF";
-	
+
+	// 特別徴収事務交付金
+	public static final String SHOREIKIN = "SHOREIKIN";
+
+	// 特別徴収事務交付金一括算出
+	public static final String SHOREIKIN_BULK = "SHOREIKIN_BULK";
+
+	// 特別徴収事務交付金照会/登録/編集
+	public static final String SHOREIKIN_CONFIG = "SHOREIKIN_CONFGI";
+
+	// 振込先口座照会/登録/編集
+	public static final String FURIKOMI_KOZA = "FURIKOMI_KOZA";
 }

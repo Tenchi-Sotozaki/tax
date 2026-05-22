@@ -49,4 +49,22 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 	List<Fuka> findLatestByNendoAndKibetsu(@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo, @Param("nendo") String nendo, @Param("kibetsu") Integer kibetsu);
 
+	/**
+	 * 指定年度の賦課情報を取得（一括算出用）
+	 */
+	@Query("""
+			SELECT f FROM Fuka f
+			WHERE f.jichitaiCd = :jichitaiCd
+			AND f.shiteiNo = :shiteiNo
+			AND f.nendo = :nendo
+			AND f.delFlg = :delFlg
+			AND f.newFlg = :newFlg
+			""")
+	List<Fuka> findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo,
+			@Param("nendo") String nendo,
+			@Param("delFlg") String delFlg,
+			@Param("newFlg") String newFlg);
+
 }

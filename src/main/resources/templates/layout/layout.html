@@ -63,10 +63,14 @@
 										th:href="@{/atena/list}"> <i
 											class="bi bi-person-lines-fill me-2"></i>宛名情報
 									</a></li>
-									<li class="nav-item"><a
-										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{#}"> <i class="bi bi-cash-coin me-2"></i>特別徴収義務者交付金
-									</a></li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('SHOREIKIN')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/shoreikin/list}"
+										th:classappend="${#strings.contains(currentUri, '/shoreikin')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-cash-coin me-2"></i>特別徴収義務者交付金
+										</a>
+									</li>
 								</ul>
 							</div>
 						</div>

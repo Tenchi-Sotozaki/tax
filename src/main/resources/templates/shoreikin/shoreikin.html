@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>特別徴収事務交付金</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid p-4">
+            <h2 class="mb-4">特別徴収事務交付金</h2>
+
+            <!-- 成功・エラーメッセージ -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- 抽出条件エリア -->
+            <form th:action="@{/shoreikin/search}" th:object="${searchForm}" method="post">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">抽出条件</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- 交付金年度 -->
+                            <div class="col-md-3">
+                                <label for="nendo" class="form-label">交付金年度</label>
+                                <input type="text" class="form-control" id="nendo" th:field="*{nendo}" maxlength="4">
+                            </div>
+
+                            <!-- 交付金算出有無 -->
+                            <div class="col-md-3">
+                                <label for="kofuSanshutsuUmu" class="form-label">交付金算出有無</label>
+                                <select class="form-select" id="kofuSanshutsuUmu" th:field="*{kofuSanshutsuUmu}">
+                                    <option value="999">すべて</option>
+                                    <option value="1">算出有</option>
+                                    <option value="2">算出無</option>
+                                </select>
+                            </div>
+
+                            <!-- 指定番号 -->
+                            <div class="col-md-3">
+                                <label for="shiteiNo" class="form-label">指定番号</label>
+                                <input type="text" class="form-control" id="shiteiNo" th:field="*{shiteiNo}" maxlength="8">
+                            </div>
+
+                            <!-- 氏名／名称 -->
+                            <div class="col-md-3">
+                                <label for="name" class="form-label">氏名／名称</label>
+                                <input type="text" class="form-control" id="name" th:field="*{name}" maxlength="200">
+                            </div>
+
+                            <!-- 施設名称 -->
+                            <div class="col-md-3">
+                                <label for="shisetsuName" class="form-label">施設名称</label>
+                                <input type="text" class="form-control" id="shisetsuName" th:field="*{shisetsuName}" maxlength="200">
+                            </div>
+
+                            <!-- 営業種別 -->
+                            <div class="col-md-3">
+                                <label for="kyokaShu" class="form-label">営業種別</label>
+                                <select class="form-select" id="kyokaShu" th:field="*{kyokaShu}">
+                                    <option value="999">すべて</option>
+                                    <option value="1">ホテル</option>
+                                    <option value="2">旅館</option>
+                                    <option value="3">簡易宿所</option>
+                                    <option value="4">民泊</option>
+                                </select>
+                            </div>
+
+                            <!-- 合算対象 -->
+                            <div class="col-md-3">
+                                <label for="gassanTaisho" class="form-label">合算対象</label>
+                                <select class="form-select" id="gassanTaisho" th:field="*{gassanTaisho}">
+                                    <option value="999">すべて</option>
+                                    <option value="1">非対象</option>
+                                    <option value="2">対象</option>
+                                </select>
+                            </div>
+
+                            <!-- ステータス -->
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">ステータス</label>
+                                <select class="form-select" id="status" th:field="*{status}">
+                                    <option value="999">すべて</option>
+                                    <option value="1">営業中</option>
+                                    <option value="2">休止</option>
+                                    <option value="3">廃止</option>
+                                </select>
+                            </div>
+
+                            <!-- 個人番号 -->
+                            <div class="col-md-3">
+                                <label for="kojinNo" class="form-label">個人番号</label>
+                                <input type="text" class="form-control" id="kojinNo" th:field="*{kojinNo}" maxlength="64">
+                            </div>
+
+                            <!-- 法人番号 -->
+                            <div class="col-md-3">
+                                <label for="hojinNo" class="form-label">法人番号</label>
+                                <input type="text" class="form-control" id="hojinNo" th:field="*{hojinNo}" maxlength="13">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search"></i> 検索
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- アクションボタン -->
+            <div class="mb-3">
+                <form th:action="@{/shoreikin/bulkCalculate}" th:object="${searchForm}" method="post" class="d-inline">
+                    <input type="hidden" th:field="*{nendo}">
+                    <button type="submit" class="btn btn-success me-2">
+                        <i class="bi bi-calculator"></i> 一括算出
+                    </button>
+                </form>
+
+                <button type="button" class="btn btn-info me-2" onclick="viewKofu()">
+                    <i class="bi bi-eye"></i> 交付金照会
+                </button>
+
+                <button type="button" class="btn btn-secondary" onclick="viewKoza()">
+                    <i class="bi bi-bank"></i> 口座照会
+                </button>
+            </div>
+
+            <!-- 情報一覧エリア -->
+            <form id="listForm">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">情報一覧</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 50px;">
+                                            <input type="checkbox" id="selectAll" onchange="toggleAll()">
+                                        </th>
+                                        <th>指定番号</th>
+                                        <th>事業所名称</th>
+                                        <th>氏名</th>
+                                        <th class="text-end">交付額</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(items)}">
+                                        <td colspan="5" class="text-center text-muted">データがありません</td>
+                                    </tr>
+                                    <tr th:each="item : ${items}">
+                                        <td>
+                                            <input type="checkbox" name="selectedItems" 
+                                                   th:value="${item.listShiteiNo}" class="item-checkbox">
+                                        </td>
+                                        <td th:text="${item.listShiteiNo}"></td>
+                                        <td th:text="${item.jigyoshoName}"></td>
+                                        <td th:text="${item.shimei}"></td>
+                                        <td class="text-end" th:text="${#numbers.formatDecimal(item.kofuGaku, 0, 'COMMA', 0, 'POINT')}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            function toggleAll() {
+                const selectAll = document.getElementById('selectAll');
+                const checkboxes = document.querySelectorAll('.item-checkbox');
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            }
+
+            function getSelectedItems() {
+                const checkboxes = document.querySelectorAll('.item-checkbox:checked');
+                return Array.from(checkboxes).map(cb => cb.value);
+            }
+
+            function viewKofu() {
+                const selected = getSelectedItems();
+                if (selected.length === 0) {
+                    alert('交付金照会する項目を選択してください。');
+                    return;
+                }
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = /*[[@{/shoreikin/viewKofu}]]*/ '/shoreikin/viewKofu';
+                
+                // CSRFトークンを追加
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_csrf';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+                }
+                
+                // 選択されたアイテムを追加
+                selected.forEach(item => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'selectedItems';
+                    input.value = item;
+                    form.appendChild(input);
+                });
+                
+                // 年度情報を追加
+                const nendoInput = document.getElementById('nendo');
+                if (nendoInput && nendoInput.value) {
+                    const nendoHidden = document.createElement('input');
+                    nendoHidden.type = 'hidden';
+                    nendoHidden.name = 'nendo';
+                    nendoHidden.value = nendoInput.value;
+                    form.appendChild(nendoHidden);
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            function viewKoza() {
+                const selected = getSelectedItems();
+                if (selected.length === 0) {
+                    alert('口座照会する項目を選択してください。');
+                    return;
+                }
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = /*[[@{/shoreikin/viewKoza}]]*/ '/shoreikin/viewKoza';
+                
+                // CSRFトークンを追加
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_csrf';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+                }
+                
+                selected.forEach(item => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'selectedItems';
+                    input.value = item;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        </script>
+    </div>
+</body>
+</html>
