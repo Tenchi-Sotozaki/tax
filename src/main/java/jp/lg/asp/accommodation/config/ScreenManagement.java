@@ -62,4 +62,16 @@ public final class ScreenManagement {
 
 	// 賦課方式設定（税率管理マスタ）
 	public static final String ZEIRITSU_CONFIG = "ZEIRITSU";
+
+	// 特別徴収事務交付金
+	public static final String SHOREIKIN = "SHOREIKIN";
+
+	// 特別徴収事務交付金一括算出
+	public static final String SHOREIKIN_BULK = "SHOREIKIN_BULK";
+
+	// 特別徴収事務交付金照会/登録/編集
+	public static final String SHOREIKIN_CONFIG = "SHOREIKIN_CONFGI";
+
+	// 振込先口座照会/登録/編集
+	public static final String FURIKOMI_KOZA = "FURIKOMI_KOZA";
 }

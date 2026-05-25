@@ -19,27 +19,27 @@ import lombok.Setter;
 @Setter
 public class Shoreikin extends BaseEntity {
 
-    @Id
-    @Column(name = "jichitai_cd", length = 5)
-    private String jichitaiCd;
+	@Id
+	@Column(name = "jichitai_cd", length = 5)
+	private String jichitaiCd;
 
-    @Id
-    @Column(name = "shitei_no", length = 8)
-    private String shiteiNo;
+	@Id
+	@Column(name = "shitei_no", length = 8)
+	private String shiteiNo;
 
-    @Id
-    @Column(name = "nendo", length = 4)
-    private String nendo;
+	@Id
+	@Column(name = "nendo", length = 4)
+	private String nendo;
 
-    @Column(name = "kofu_zeigaku")
-    private Long kofuZeigaku;
+	@Column(name = "kofu_zeigaku", nullable = false, precision = 14)
+	private Long kofuZeigaku;
 
-    @Column(name = "kofu_ritsu", precision = 5, scale = 2)
-    private BigDecimal kofuRitsu;
+	@Column(name = "kofu_ritsu", nullable = false, precision = 5, scale = 2)
+	private BigDecimal kofuRitsu;
 
-    @Column(name = "kofu_gaku")
-    private Long kofuGaku;
+	@Column(name = "kofu_gaku", nullable = false, precision = 13)
+	private Long kofuGaku;
 
-    @Column(name = "kofu_ymd")
-    private LocalDate kofuYmd;
+	@Column(name = "kofu_ymd")
+	private LocalDate kofuYmd;
 }

@@ -18,7 +18,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 	@Query("""
 			SELECT t FROM Tokugimu t
 			LEFT JOIN Atena a ON t.jichitaiCd = a.jichitaiCd AND t.atenaNo = a.atenaNo
-			WHERE t.newFlg = '1' AND t.delFlg = '0'
+			WHERE t.jichitaiCd = :jichitaiCd AND t.newFlg = '1' AND t.delFlg = '0'
 			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR t.shiteiNo = :shiteiNo)
 			AND (:name IS NULL OR :name = '' OR a.name LIKE %:name%)
 			AND (:shisetsuName IS NULL OR :shisetsuName = '' OR t.shisetsuName LIKE %:shisetsuName%)
@@ -28,6 +28,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			ORDER BY t.shiteiNo
 			""")
 	List<Tokugimu> findBySearchConditions(
+			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo,
 			@Param("name") String name,
 			@Param("shisetsuName") String shisetsuName,
@@ -51,21 +52,19 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			AND t.newFlg = '1' AND t.delFlg = '0'
 			ORDER BY t.rno DESC
 			""")
-	List<Tokugimu> findByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd,
+	List<Tokugimu> findByJichitaiCdAndShiteiNo(
+			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
 
 	@Query(value = "SELECT MAX(CAST(shitei_no AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$'", nativeQuery = true)
-	Optional<Integer> findMaxShiteiNoByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
-
-	/**
-	 * ?? ��ʕ\���p�̃n�C�h���[�V�����Ŏg�p�F
-	 * �����̃R�[�h�A�w��ԍ��A�ŐV�t���O�A�폜�t���O���w�肵�ē��ʒ����`���҂�1���擾����
-	 */
+	Optional<Integer> findMaxShiteiNoByJichitaiCd(
+			@Param("jichitaiCd") String jichitaiCd);
 
 	Optional<Tokugimu> findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
 			String jichitaiCd, String shiteiNo, String newFlg, String delFlg);
 
 	@Query(value = "SELECT COALESCE(MAX(rno), 0) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no = :shiteiNo", nativeQuery = true)
-	Optional<Integer> findMaxRnoByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd,
+	Optional<Integer> findMaxRnoByJichitaiCdAndShiteiNo(
+			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
 }

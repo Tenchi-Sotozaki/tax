@@ -14,8 +14,20 @@ import jp.lg.asp.accommodation.entity.ShoreikinId;
 @Repository
 public interface ShoreikinRepository extends JpaRepository<Shoreikin, ShoreikinId> {
 
-    @Query("SELECT s FROM Shoreikin s WHERE s.jichitaiCd = :jichitaiCd ORDER BY s.nendo DESC, s.shiteiNo ASC")
-    List<Shoreikin> findActiveByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+	Optional<Shoreikin> findByJichitaiCdAndShiteiNoAndNendo(
+			String jichitaiCd, String shiteiNo, String nendo);
 
-    Optional<Shoreikin> findByJichitaiCdAndShiteiNoAndNendo(String jichitaiCd, String shiteiNo, String nendo);
+	@Query("SELECT s FROM Shoreikin s WHERE s.jichitaiCd = :jichitaiCd ORDER BY s.nendo DESC, s.shiteiNo ASC")
+	List<Shoreikin> findActiveByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+
+	@Query("""
+			SELECT s FROM Shoreikin s
+			WHERE s.jichitaiCd = :jichitaiCd
+			AND s.shiteiNo IN :shiteiNoList
+			AND (:nendo IS NULL OR :nendo = "" OR s.nendo = :nendo)
+			""")
+	List<Shoreikin> findByJichitaiCdAndShiteiNoInAndNendo(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNoList") List<String> shiteiNoList,
+			@Param("nendo") String nendo);
 }

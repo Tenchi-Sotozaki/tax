@@ -11,5 +11,5 @@ import jp.lg.asp.accommodation.entity.FurikomiKozaId;
 @Repository
 public interface FurikomiKozaRepository extends JpaRepository<FurikomiKoza, FurikomiKozaId> {
 
-    Optional<FurikomiKoza> findByJichitaiCdAndShiteiNo(String jichitaiCd, String shiteiNo);
+	Optional<FurikomiKoza> findByJichitaiCdAndShiteiNo(String jichitaiCd, String shiteiNo);
 }

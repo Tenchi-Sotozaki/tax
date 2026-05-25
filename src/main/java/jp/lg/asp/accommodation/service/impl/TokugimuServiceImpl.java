@@ -49,6 +49,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Transactional(readOnly = true)
 	public List<TokugimuListItem> search(TokugimuSearchForm form) {
 		List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
+				jichitaiCd,
 				form.getShiteiNo(),
 				form.getName(),
 				form.getShisetsuName(),
@@ -323,9 +324,11 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setShisetsuTel(form.getFacilityPhone());
 		t.setYukaMenseki(form.getFloorArea());
 		t.setChijoKai(form.getAboveGroundFloor() != null && !form.getAboveGroundFloor().isBlank()
-				? new BigDecimal(form.getAboveGroundFloor()) : null);
+				? new BigDecimal(form.getAboveGroundFloor())
+				: null);
 		t.setChikaKai(form.getBasementFloor() != null && !form.getBasementFloor().isBlank()
-				? new BigDecimal(form.getBasementFloor()) : null);
+				? new BigDecimal(form.getBasementFloor())
+				: null);
 		t.setKyakushitsuSu(form.getRoomCount() != null ? BigDecimal.valueOf(form.getRoomCount()) : null);
 		t.setShuyoSu(form.getCapacity() != null ? BigDecimal.valueOf(form.getCapacity()) : null);
 		t.setEigyoStYmd(form.getBusinessStartDate());
@@ -363,7 +366,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		s.setShoyushaTel(form.getOwnerPhone());
 		shoyushaRepository.save(s);
 	}
-	
+
 	@Override
 	@Transactional(readOnly = true)
 	public String getShiteiNoById(Long id) {

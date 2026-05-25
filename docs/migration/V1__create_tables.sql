@@ -661,7 +661,7 @@ CREATE TABLE IF NOT EXISTS t_furikomi_koza (
   branch_cd char(3) NOT NULL,
   branch_name varchar(30) NOT NULL,
   shumoku char(1) NOT NULL,
-  koza_no char(8) NOT NULL,
+  koza_no char(7) NOT NULL,
   meigi varchar(30) NOT NULL,
   add_dt timestamp NOT NULL,
   add_user varchar(20) NOT NULL,
@@ -995,4 +995,3 @@ COMMENT ON COLUMN t_atena_renkei.add_user IS '作成者';
 COMMENT ON COLUMN t_atena_renkei.upd_dt IS '更新日時';
 COMMENT ON COLUMN t_atena_renkei.upd_user IS '更新者';
 COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
-
