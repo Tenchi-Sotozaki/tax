@@ -1,8 +1,5 @@
 package jp.lg.asp.accommodation.controller;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +16,10 @@ import jp.lg.asp.accommodation.service.ShoreikinConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 特別徴収事務交付金照会／登録／編集 Controller
+ * 仕様書：特別徴収事務交付金照会・登録・編集.csv に基づく実装
+ */
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -31,42 +32,47 @@ public class ShoreikinConfigController {
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN_CONFIG;
 	private static final String CONFIG_VIEW = "shoreikin/shoreikinConfig";
 
+	/**
+	 * 特別徴収事務交付金照会画面表示
+	 * @param shiteiNo 指定番号
+	 * @param nendo 交付金年度
+	 * @param model モデル
+	 * @return 画面パス
+	 */
 	@GetMapping("/config")
-	public String config(@RequestParam String shiteiNos,
+	public String config(@RequestParam String shiteiNo,
 			@RequestParam(required = false) String nendo,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
-		List<String> shiteiNoList = Arrays.asList(shiteiNos.split(","));
-
-		if (shiteiNoList.size() == 1) {
-			// 単一選択の場合は詳細画面
-			String shiteiNo = shiteiNoList.get(0);
-			ShoreikinConfigDto dto = shoreikinConfigService.getShoreikin(shiteiNo, nendo);
-			model.addAttribute("configForm", dto);
-			model.addAttribute("singleMode", true);
-		} else {
-			// 複数選択の場合は一覧画面
-			List<ShoreikinConfigDto> dtoList = shoreikinConfigService.getShoreikinList(shiteiNoList, nendo);
-			model.addAttribute("configList", dtoList);
-			model.addAttribute("singleMode", false);
-			model.addAttribute("nendo", nendo);
-		}
+		ShoreikinConfigDto dto = shoreikinConfigService.getShoreikin(shiteiNo, nendo);
+		model.addAttribute("configForm", dto);
 
 		return CONFIG_VIEW;
 	}
 
+	/**
+	 * 編集モード切り替え
+	 * @param configForm フォームデータ
+	 * @param model モデル
+	 * @return 画面パス
+	 */
 	@PostMapping("/config/edit")
 	public String editMode(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		configForm.setMode("edit");
 		model.addAttribute("configForm", configForm);
-		model.addAttribute("singleMode", true);
 
 		return CONFIG_VIEW;
 	}
 
+	/**
+	 * 交付金算出処理
+	 * @param configForm フォームデータ
+	 * @param model モデル
+	 * @return 画面パス
+	 */
 	@PostMapping("/config/calculate")
 	public String calculate(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -74,18 +80,21 @@ public class ShoreikinConfigController {
 		try {
 			ShoreikinConfigDto result = shoreikinConfigService.calculateShoreikin(configForm);
 			model.addAttribute("configForm", result);
-			model.addAttribute("singleMode", true);
-			model.addAttribute("successMessage", "交付金を算出しました。");
 		} catch (Exception e) {
-			log.error("交付金算出エラー", e);
+			log.error("交付金情報算出エラー", e);
 			model.addAttribute("configForm", configForm);
-			model.addAttribute("singleMode", true);
-			model.addAttribute("errorMessage", "交付金算出に失敗しました: " + e.getMessage());
+			model.addAttribute("errorMessage", "交付金情報算出に失敗しました: " + e.getMessage());
 		}
 
 		return CONFIG_VIEW;
 	}
 
+	/**
+	 * 交付金情報登録処理
+	 * @param configForm フォームデータ
+	 * @param redirectAttributes リダイレクト属性
+	 * @return リダイレクト先
+	 */
 	@PostMapping("/config/create")
 	public String create(@ModelAttribute ShoreikinConfigDto configForm,
 			RedirectAttributes redirectAttributes) {
@@ -96,12 +105,18 @@ public class ShoreikinConfigController {
 			redirectAttributes.addFlashAttribute("successMessage", "交付金情報を登録しました。");
 		} catch (Exception e) {
 			log.error("交付金登録エラー", e);
-			redirectAttributes.addFlashAttribute("errorMessage", "交付金登録に失敗しました: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("errorMessage", "交付金情報登録に失敗しました: " + e.getMessage());
 		}
 
 		return "redirect:/shoreikin/list";
 	}
 
+	/**
+	 * 交付金情報更新処理
+	 * @param configForm フォームデータ
+	 * @param redirectAttributes リダイレクト属性
+	 * @return リダイレクト先
+	 */
 	@PostMapping("/config/update")
 	public String update(@ModelAttribute ShoreikinConfigDto configForm,
 			RedirectAttributes redirectAttributes) {

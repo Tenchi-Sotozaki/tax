@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,7 +61,7 @@ public class ShoreikinBulkServiceImpl implements ShoreikinBulkService {
 
 					// 交付額を算出（交付税額 × 交付率）
 					Long kofuGaku = new BigDecimal(kofuZeigaku).multiply(dto.getKofuRitsu())
-							.divide(new BigDecimal("100")).longValue();
+							.divide(new BigDecimal("100"), RoundingMode.DOWN).longValue();
 
 					shoreikin.setJichitaiCd(jichitaiCd);
 					shoreikin.setShiteiNo(shiteiNo);

@@ -10,12 +10,9 @@
         <div class="container-fluid p-4">
             <h2 class="mb-4">
                 特別徴収事務交付金
-                <span th:if="${singleMode}">
-                    <span th:if="${configForm.viewMode}" class="text-muted">- 照会</span>
-                    <span th:if="${configForm.editMode}" class="text-muted">- 編集</span>
-                    <span th:if="${configForm.createMode}" class="text-muted">- 登録</span>
-                </span>
-                <span th:unless="${singleMode}" class="text-muted">- 一覧</span>
+                <span th:if="${configForm.viewMode}" class="text-muted">- 照会</span>
+                <span th:if="${configForm.editMode}" class="text-muted">- 編集</span>
+                <span th:if="${configForm.createMode}" class="text-muted">- 登録</span>
             </h2>
 
             <!-- 成功・エラーメッセージ -->
@@ -28,254 +25,173 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
-            <!-- 単一選択時の詳細画面 -->
-            <div th:if="${singleMode}">
-                <form th:action="@{/shoreikin/config/create}" th:if="${configForm.createMode}" 
-                      th:object="${configForm}" method="post">
-                    <input type="hidden" th:field="*{shiteiNo}">
-                    <input type="hidden" th:field="*{mode}">
-                    <input type="hidden" th:field="*{version}">
+            <!-- 統合メインフォーム -->
+            <form th:action="${configForm.createMode ? '/accommodation-tax/shoreikin/config/create' : ''}" 
+                  th:object="${configForm}" method="post">
+                <input type="hidden" th:field="*{shiteiNo}">
+                <input type="hidden" th:field="*{mode}">
+                <input type="hidden" th:field="*{version}">
 
-                    <!-- 特別徴収義務者エリア -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">特別徴収義務者情報</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <label class="form-label">指定番号</label>
-                                    <input type="text" class="form-control" th:value="${configForm.shiteiNo}" readonly>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">施設名称</label>
-                                    <input type="text" class="form-control" th:value="${configForm.shisetsuName}" readonly>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">氏名</label>
-                                    <input type="text" class="form-control" th:value="${configForm.shimei}" readonly>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 交付金情報エリア -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">交付金情報</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <label for="nendo" class="form-label">交付金年度 <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="nendo" th:field="*{nendo}" 
-                                           th:readonly="${configForm.viewMode}" maxlength="4" required>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="kofuZeigaku" class="form-label">納入税額</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control text-end" id="kofuZeigaku" 
-                                               th:field="*{kofuZeigaku}" th:readonly="${configForm.viewMode}" 
-                                               step="1" min="0">
-                                        <span class="input-group-text">円</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="kofuRitsu" class="form-label">交付率</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control text-end" id="kofuRitsu" 
-                                               th:field="*{kofuRitsu}" th:readonly="${configForm.viewMode}" 
-                                               step="0.01" min="0" max="100">
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="kofuGaku" class="form-label">交付額</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control text-end" id="kofuGaku" 
-                                               th:field="*{kofuGaku}" th:readonly="${configForm.viewMode}" 
-                                               step="1" min="0">
-                                        <span class="input-group-text">円</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 算出ボタン（編集・登録モードのみ） -->
-                            <div th:if="${configForm.editable}" class="row mt-3">
-                                <div class="col-12">
-                                    <button type="button" class="btn btn-info" onclick="calculateShoreikin()">
-                                        <i class="bi bi-calculator"></i> 算出
-                                    </button>
-                                    <small class="text-muted ms-2">
-                                        指定年度の賦課情報から納入税額、交付率、交付額を自動算出します
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- アクションボタン -->
-                    <div class="d-flex gap-2">
-                        <!-- 照会モード -->
-                        <div th:if="${configForm.viewMode}">
-                            <button type="button" class="btn btn-primary" onclick="editMode()">
-                                <i class="bi bi-pencil"></i> 編集する
-                            </button>
-                        </div>
-
-                        <!-- 登録モード -->
-                        <div th:if="${configForm.createMode}">
-                            <button type="submit" class="btn btn-success" 
-                                    onclick="return confirm('交付金情報を登録しますか？')">
-                                <i class="bi bi-check-circle"></i> 登録する
-                            </button>
-                        </div>
-
-                        <!-- 編集モード -->
-                        <div th:if="${configForm.editMode}">
-                            <button type="button" class="btn btn-success" onclick="updateShoreikin()"
-                                    onclick="return confirm('交付金情報を更新しますか？')">
-                                <i class="bi bi-arrow-repeat"></i> 更新する
-                            </button>
-                        </div>
-
-                        <a th:href="@{/shoreikin/list}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> 戻る
-                        </a>
-                    </div>
-                </form>
-
-                <!-- 更新用フォーム（編集モード） -->
-                <form th:action="@{/shoreikin/config/update}" th:if="${configForm.editMode}" 
-                      th:object="${configForm}" method="post" id="updateForm" style="display: none;">
-                    <input type="hidden" th:field="*{shiteiNo}">
-                    <input type="hidden" th:field="*{nendo}">
-                    <input type="hidden" th:field="*{kofuZeigaku}">
-                    <input type="hidden" th:field="*{kofuRitsu}">
-                    <input type="hidden" th:field="*{kofuGaku}">
-                    <input type="hidden" th:field="*{version}">
-                    <input type="hidden" th:field="*{mode}">
-                </form>
-
-                <!-- 編集モード切り替え用フォーム -->
-                <form th:action="@{/shoreikin/config/edit}" th:object="${configForm}" method="post" 
-                      id="editForm" style="display: none;">
-                    <input type="hidden" th:field="*{shiteiNo}">
-                    <input type="hidden" th:field="*{nendo}">
-                    <input type="hidden" th:field="*{kofuZeigaku}">
-                    <input type="hidden" th:field="*{kofuRitsu}">
-                    <input type="hidden" th:field="*{kofuGaku}">
-                    <input type="hidden" th:field="*{version}">
-                    <input type="hidden" th:field="*{shisetsuName}">
-                    <input type="hidden" th:field="*{shimei}">
-                </form>
-
-                <!-- 算出用フォーム -->
-                <form th:action="@{/shoreikin/config/calculate}" th:object="${configForm}" method="post" 
-                      id="calculateForm" style="display: none;">
-                    <input type="hidden" th:field="*{shiteiNo}">
-                    <input type="hidden" th:field="*{nendo}">
-                    <input type="hidden" th:field="*{kofuRitsu}">
-                    <input type="hidden" th:field="*{version}">
-                    <input type="hidden" th:field="*{mode}">
-                    <input type="hidden" th:field="*{shisetsuName}">
-                    <input type="hidden" th:field="*{shimei}">
-                </form>
-            </div>
-
-            <!-- 複数選択時の一覧画面 -->
-            <div th:unless="${singleMode}">
-                <div class="card">
+                <!-- 特別徴収義務者エリア -->
+                <div class="card mb-4">
                     <div class="card-header">
-                        <h5 class="mb-0">交付金情報一覧</h5>
-                        <small class="text-muted" th:if="${nendo}">対象年度: <span th:text="${nendo}"></span></small>
+                        <h5 class="mb-0">特別徴収義務者情報</h5>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover mb-0">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>指定番号</th>
-                                        <th>施設名称</th>
-                                        <th>氏名</th>
-                                        <th>年度</th>
-                                        <th class="text-end">納入税額</th>
-                                        <th class="text-end">交付率</th>
-                                        <th class="text-end">交付額</th>
-                                        <th>状態</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:if="${#lists.isEmpty(configList)}">
-                                        <td colspan="9" class="text-center text-muted">データがありません</td>
-                                    </tr>
-                                    <tr th:each="item : ${configList}">
-                                        <td th:text="${item.shiteiNo}"></td>
-                                        <td th:text="${item.shisetsuName}"></td>
-                                        <td th:text="${item.shimei}"></td>
-                                        <td th:text="${item.nendo}"></td>
-                                        <td class="text-end" th:text="${item.kofuZeigaku != null ? #numbers.formatDecimal(item.kofuZeigaku, 0, 'COMMA', 0, 'POINT') + '円' : '-'}"></td>
-                                        <td class="text-end" th:text="${item.kofuRitsu != null ? item.kofuRitsu + '%' : '-'}"></td>
-                                        <td class="text-end" th:text="${item.kofuGaku != null ? #numbers.formatDecimal(item.kofuGaku, 0, 'COMMA', 0, 'POINT') + '円' : '-'}"></td>
-                                        <td>
-                                            <span th:if="${item.exists}" class="badge bg-success">登録済み</span>
-                                            <span th:unless="${item.exists}" class="badge bg-warning">未登録</span>
-                                        </td>
-                                        <td>
-                                            <a th:href="@{/shoreikin/config(shiteiNos=${item.shiteiNo}, nendo=${item.nendo})}" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i> 詳細
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">指定番号</label>
+                                <input type="text" class="form-control" th:value="${configForm.shiteiNo}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">施設名称</label>
+                                <input type="text" class="form-control" th:value="${configForm.shisetsuName}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">氏名</label>
+                                <input type="text" class="form-control" th:value="${configForm.name}" readonly>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-3">
+                <!-- 交付金情報エリア -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">交付金情報</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="nendo" class="form-label">交付金年度</label>
+                                <input type="text" class="form-control" id="nendo" th:field="*{nendo}" 
+                                       th:readonly="${configForm.viewMode or configForm.editMode}" maxlength="4" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="kofuZeigaku" class="form-label">納入税額</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control text-end" id="kofuZeigaku" 
+                                           th:field="*{kofuZeigaku}" th:readonly="${configForm.viewMode}" 
+                                           step="1" min="0">
+                                    <span class="input-group-text">円</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="kofuRitsu" class="form-label">交付率</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control text-end" id="kofuRitsu" 
+                                           th:field="*{kofuRitsu}" th:readonly="${configForm.viewMode}" 
+                                           step="0.01" min="0" max="100">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="kofuGaku" class="form-label">交付額</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control text-end" id="kofuGaku" 
+                                           th:field="*{kofuGaku}" th:readonly="${configForm.viewMode}" 
+                                           step="1" min="0">
+                                    <span class="input-group-text">円</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-3">
+                                <label for="kofuYmd" class="form-label">交付年月日</label>
+                                <input type="date" class="form-control" id="kofuYmd" 
+                                       th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}" 
+                                       name="kofuYmd" th:readonly="${configForm.viewMode}">
+                            </div>
+                        </div>
+
+                        <!-- 算出ボタン（編集・登録モードのみ） -->
+                        <div th:if="${configForm.editable}" class="row mt-3">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-info" onclick="calculateShoreikin()">
+                                    <i class="bi bi-calculator"></i> 算出
+                                </button>
+                                <small class="text-muted ms-2">
+                                    指定年度の賦課情報から納入税額、交付額を自動算出します
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- アクションボタン -->
+                <div class="d-flex gap-2">
+                    <!-- 照会モード -->
+                    <div th:if="${configForm.viewMode}">
+                        <button type="button" class="btn btn-primary" onclick="editMode()">
+                            <i class="bi bi-pencil"></i> 編集する
+                        </button>
+                    </div>
+
+                    <!-- 登録モード -->
+                    <div th:if="${configForm.createMode}">
+                        <button type="submit" class="btn btn-success" 
+                                onclick="return confirm('交付金情報を登録しますか？')">
+                            <i class="bi bi-check-circle"></i> 登録する
+                        </button>
+                    </div>
+
+                    <!-- 編集モード -->
+                    <div th:if="${configForm.editMode}">
+                        <button type="button" class="btn btn-success" onclick="updateShoreikin()">
+                            <i class="bi bi-arrow-repeat"></i> 更新する
+                        </button>
+                    </div>
+
                     <a th:href="@{/shoreikin/list}" class="btn btn-secondary">
                         <i class="bi bi-arrow-left"></i> 戻る
                     </a>
                 </div>
-            </div>
+            </form>
+
+            <!-- 更新用フォーム（編集モード） -->
+            <form th:action="@{/shoreikin/config/update}" th:if="${configForm.editMode}" 
+                  th:object="${configForm}" method="post" id="updateForm" style="display: none;">
+                <input type="hidden" th:field="*{shiteiNo}">
+                <input type="hidden" th:field="*{nendo}">
+                <input type="hidden" th:field="*{kofuZeigaku}">
+                <input type="hidden" th:field="*{kofuRitsu}">
+                <input type="hidden" th:field="*{kofuGaku}">
+                <input type="hidden" th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}" name="kofuYmd">
+                <input type="hidden" th:field="*{version}">
+                <input type="hidden" th:field="*{mode}">
+            </form>
+
+            <!-- 編集モード切り替え用フォーム -->
+            <form th:action="@{/shoreikin/config/edit}" th:object="${configForm}" method="post" 
+                  id="editForm" style="display: none;">
+                <input type="hidden" th:field="*{shiteiNo}">
+                <input type="hidden" th:field="*{nendo}">
+                <input type="hidden" th:field="*{kofuZeigaku}">
+                <input type="hidden" th:field="*{kofuRitsu}">
+                <input type="hidden" th:field="*{kofuGaku}">
+                <input type="hidden" th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}" name="kofuYmd">
+                <input type="hidden" th:field="*{version}">
+                <input type="hidden" th:field="*{shisetsuName}">
+                <input type="hidden" th:field="*{name}">
+            </form>
+
+            <!-- 算出用フォーム -->
+            <form th:action="@{/shoreikin/config/calculate}" th:object="${configForm}" method="post" 
+                  id="calculateForm" style="display: none;">
+                <input type="hidden" th:field="*{shiteiNo}">
+                <input type="hidden" th:field="*{nendo}">
+                <input type="hidden" th:field="*{kofuRitsu}">
+                <input type="hidden" th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}" name="kofuYmd">
+                <input type="hidden" th:field="*{version}">
+                <input type="hidden" th:field="*{mode}">
+                <input type="hidden" th:field="*{shisetsuName}">
+                <input type="hidden" th:field="*{name}">
+            </form>
         </div>
 
-        <script>
-            function editMode() {
-                document.getElementById('editForm').submit();
-            }
-
-            function updateShoreikin() {
-                // 現在の入力値を更新フォームに反映
-                const form = document.getElementById('updateForm');
-                const kofuZeigaku = document.getElementById('kofuZeigaku').value;
-                const kofuRitsu = document.getElementById('kofuRitsu').value;
-                const kofuGaku = document.getElementById('kofuGaku').value;
-                
-                form.querySelector('input[name="kofuZeigaku"]').value = kofuZeigaku;
-                form.querySelector('input[name="kofuRitsu"]').value = kofuRitsu;
-                form.querySelector('input[name="kofuGaku"]').value = kofuGaku;
-                
-                if (confirm('交付金情報を更新しますか？')) {
-                    form.submit();
-                }
-            }
-
-            function calculateShoreikin() {
-                // 現在の入力値を算出フォームに反映
-                const form = document.getElementById('calculateForm');
-                const nendo = document.getElementById('nendo').value;
-                const kofuRitsu = document.getElementById('kofuRitsu').value;
-                
-                form.querySelector('input[name="nendo"]').value = nendo;
-                form.querySelector('input[name="kofuRitsu"]').value = kofuRitsu;
-                
-                form.submit();
-            }
-        </script>
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/shoreikin_config.js}"></script>
+    </th:block>
     </div>
 </body>
 </html>

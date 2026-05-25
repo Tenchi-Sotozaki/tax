@@ -12,7 +12,10 @@ function toggleAll() {
 
 function getSelectedItems() {
     const checkboxes = document.querySelectorAll('.item-checkbox:checked');
-    return Array.from(checkboxes).map(cb => cb.value);
+    return Array.from(checkboxes).map(cb => ({
+        shiteiNo: cb.value,
+        nendo: cb.getAttribute('data-nendo')
+    }));
 }
 
 function viewKofu() {
@@ -21,11 +24,18 @@ function viewKofu() {
         alert('交付金照会する項目を選択してください。');
         return;
     }
-    
+
+    if (selected.length > 1) {
+        alert('交付金照会は1件ずつ選択してください。');
+        return;
+    }
+
+    const selectedItem = selected[0];
+
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/accommodation-tax/shoreikin/viewKofu';
-    
+
     // CSRFトークンを追加
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
     if (csrfToken) {
@@ -35,26 +45,23 @@ function viewKofu() {
         csrfInput.value = csrfToken;
         form.appendChild(csrfInput);
     }
-    
-    // 選択されたアイテムを追加
-    selected.forEach(item => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'selectedItems';
-        input.value = item;
-        form.appendChild(input);
-    });
-    
-    // 年度情報を追加
-    const nendoInput = document.getElementById('nendo');
-    if (nendoInput && nendoInput.value) {
-        const nendoHidden = document.createElement('input');
-        nendoHidden.type = 'hidden';
-        nendoHidden.name = 'nendo';
-        nendoHidden.value = nendoInput.value;
-        form.appendChild(nendoHidden);
+
+    // 選択された指定番号を追加
+    const shiteiNoInput = document.createElement('input');
+    shiteiNoInput.type = 'hidden';
+    shiteiNoInput.name = 'selectedItems';
+    shiteiNoInput.value = selectedItem.shiteiNo;
+    form.appendChild(shiteiNoInput);
+
+    // 選択された行の年度情報を追加
+    if (selectedItem.nendo && selectedItem.nendo !== 'null') {
+        const nendoInput = document.createElement('input');
+        nendoInput.type = 'hidden';
+        nendoInput.name = 'nendo';
+        nendoInput.value = selectedItem.nendo;
+        form.appendChild(nendoInput);
     }
-    
+
     document.body.appendChild(form);
     form.submit();
 }
@@ -65,11 +72,18 @@ function viewKoza() {
         alert('口座照会する項目を選択してください。');
         return;
     }
-    
+
+    if (selected.length > 1) {
+        alert('口座照会は1件ずつ選択してください。');
+        return;
+    }
+
+    const selectedItem = selected[0];
+
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/accommodation-tax/shoreikin/viewKoza';
-    
+
     // CSRFトークンを追加
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
     if (csrfToken) {
@@ -79,15 +93,13 @@ function viewKoza() {
         csrfInput.value = csrfToken;
         form.appendChild(csrfInput);
     }
-    
-    selected.forEach(item => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'selectedItems';
-        input.value = item;
-        form.appendChild(input);
-    });
-    
+
+    const shiteiNoInput = document.createElement('input');
+    shiteiNoInput.type = 'hidden';
+    shiteiNoInput.name = 'selectedItems';
+    shiteiNoInput.value = selectedItem.shiteiNo;
+    form.appendChild(shiteiNoInput);
+
     document.body.appendChild(form);
     form.submit();
 }

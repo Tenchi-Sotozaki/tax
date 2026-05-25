@@ -185,7 +185,9 @@
                                     <tr th:each="item : ${items}">
                                         <td class="text-center">
                                             <input type="checkbox" name="selectedItems" 
-                                                   th:value="${item.listShiteiNo}" class="form-check-input item-checkbox">
+                                                   th:value="${item.listShiteiNo}" 
+                                                   th:attr="data-nendo=${item.kofuNendo}"
+                                                   class="form-check-input item-checkbox">
                                         </td>
                                         <td class="fw-bold text-primary" th:text="${item.listShiteiNo}"></td>
                                         <td th:text="${item.listShisetsuName}"></td>

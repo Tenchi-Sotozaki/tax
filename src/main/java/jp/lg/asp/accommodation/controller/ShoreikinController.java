@@ -57,7 +57,7 @@ public class ShoreikinController {
 
 	@PostMapping("/viewKofu")
 	public String viewKofu(@RequestParam List<String> selectedItems,
-			@ModelAttribute ShoreikinDto searchForm,
+			@RequestParam(required = false) String nendo,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 		if (selectedItems.isEmpty()) {
@@ -65,10 +65,18 @@ public class ShoreikinController {
 					"交付金照会する項目を選択してください。");
 			return "redirect:/shoreikin/list";
 		}
-		// 交付金照会画面への遷移
-		redirectAttributes.addAttribute("shiteiNos", String.join(",", selectedItems));
-		if (searchForm.getNendo() != null && !searchForm.getNendo().isEmpty()) {
-			redirectAttributes.addAttribute("nendo", searchForm.getNendo());
+
+		// 単一選択のみサポート
+		if (selectedItems.size() > 1) {
+			redirectAttributes.addFlashAttribute("errorMessage",
+					"交付金照会は1件ずつ選択してください。");
+			return "redirect:/shoreikin/list";
+		}
+
+		// 交付金照会画面への遷移（単一指定番号）
+		redirectAttributes.addAttribute("shiteiNo", selectedItems.get(0));
+		if (nendo != null && !nendo.isEmpty()) {
+			redirectAttributes.addAttribute("nendo", nendo);
 		}
 		return "redirect:/shoreikin/config";
 	}

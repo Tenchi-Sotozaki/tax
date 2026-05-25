@@ -6,16 +6,9 @@ import jp.lg.asp.accommodation.dto.ShoreikinConfigDto;
 
 /**
  * 特別徴収事務交付金照会／登録／編集 Service インターフェース
+ * 仕様書：特別徴収事務交付金照会・登録・編集.csv に基づく実装
  */
 public interface ShoreikinConfigService {
-
-	/**
-	 * 指定番号リストに基づいて交付金情報を取得
-	 * @param shiteiNos 指定番号のリスト
-	 * @param nendo 対象年度
-	 * @return 交付金情報のリスト
-	 */
-	List<ShoreikinConfigDto> getShoreikinList(List<String> shiteiNos, String nendo);
 
 	/**
 	 * 指定番号と年度で交付金情報を取得

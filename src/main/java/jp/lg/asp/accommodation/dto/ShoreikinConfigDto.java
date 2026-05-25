@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 特別徴収事務交付金照会／登録／編集 DTO
- * 交付金情報の照会・登録・編集用クラス
+ * 仕様書：特別徴収事務交付金照会・登録・編集.csv に基づく実装
  */
 @Data
 @NoArgsConstructor
@@ -25,7 +25,7 @@ public class ShoreikinConfigDto {
 	private String shisetsuName;
 
 	/** No.3 氏名 (m_atena.name) */
-	private String shimei;
+	private String name;
 
 	// ========== 交付金情報エリア ==========
 
@@ -54,11 +54,6 @@ public class ShoreikinConfigDto {
 
 	/** バージョン（楽観的排他制御用） */
 	private Integer version;
-
-	// ========== 算出用フィールド ==========
-
-	/** 算出対象年度の賦課情報合計税額 */
-	private BigDecimal totalFukaZeigaku;
 
 	/**
 	 * 編集可能かどうかを判定
