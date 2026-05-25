@@ -166,7 +166,8 @@
 										</a></li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{#}"> <i class="bi bi-sliders me-2"></i>賦課方式
+											th:href="@{/admin/zeiritsu/list}"
+											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu')} ? 'text-white fw-medium' : ''"> <i class="bi bi-sliders me-2"></i>賦課方式
 										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
@@ -202,7 +203,12 @@
 										</a></li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{#}"> <i class="bi bi-sliders me-2"></i>賦課方式
+											th:href="@{#}"> <i class="bi bi-filetype-csv me-2"></i>CSV取込設定
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/zeiritsu/register}"
+											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu')} ? 'text-white fw-medium' : ''"> <i class="bi bi-sliders me-2"></i>賦課方式設定
 										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
