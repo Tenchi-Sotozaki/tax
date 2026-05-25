@@ -2,9 +2,12 @@ package jp.lg.asp.accommodation.controller;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,8 +49,15 @@ public class ShoreikinBulkController {
 	}
 
 	@PostMapping("/bulk/execute")
-	public String executeIkkatsu(@ModelAttribute ShoreikinBulkDto bulkForm, Model model) {
+	public String executeBulk(@Valid @ModelAttribute ShoreikinBulkDto bulkForm,
+			BindingResult bindingResult,
+			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("bulkForm", bulkForm);
+			return BULK_VIEW;
+		}
 
 		try {
 			ShoreikinBulkDto result = shoreikinBulkService.executeBulkSanshutsu(bulkForm);

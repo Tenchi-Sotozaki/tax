@@ -1,7 +1,10 @@
 package jp.lg.asp.accommodation.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,13 +70,23 @@ public class FurikomiKozaController {
 	/**
 	 * 振込先口座情報登録処理
 	 * @param kozaForm フォームデータ
+	 * @param bindingResult バリデーション結果
+	 * @param model モデル
 	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先
+	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/create")
-	public String create(@ModelAttribute FurikomiKozaDto kozaForm,
+	public String create(@Valid @ModelAttribute FurikomiKozaDto kozaForm,
+			BindingResult bindingResult,
+			Model model,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+
+		if (bindingResult.hasErrors()) {
+			kozaForm.setMode("create");
+			model.addAttribute("kozaForm", kozaForm);
+			return KOZA_VIEW;
+		}
 
 		try {
 			furikomiKozaService.createFurikomiKoza(kozaForm);
@@ -89,13 +102,23 @@ public class FurikomiKozaController {
 	/**
 	 * 振込先口座情報更新処理
 	 * @param kozaForm フォームデータ
+	 * @param bindingResult バリデーション結果
+	 * @param model モデル
 	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先
+	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/update")
-	public String update(@ModelAttribute FurikomiKozaDto kozaForm,
+	public String update(@Valid @ModelAttribute FurikomiKozaDto kozaForm,
+			BindingResult bindingResult,
+			Model model,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+
+		if (bindingResult.hasErrors()) {
+			kozaForm.setMode("edit");
+			model.addAttribute("kozaForm", kozaForm);
+			return KOZA_VIEW;
+		}
 
 		try {
 			furikomiKozaService.updateFurikomiKoza(kozaForm);

@@ -3,6 +3,14 @@ package jp.lg.asp.accommodation.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,15 +38,26 @@ public class ShoreikinConfigDto {
 	// ========== 交付金情報エリア ==========
 
 	/** No.4 交付金年度 (t_shoreikin.nendo) */
+	@NotBlank(message = "交付金年度は必須入力です")
+	@Pattern(regexp = "^[0-9]{4}$", message = "交付金年度は4桁の数字で入力してください")
 	private String nendo;
 
 	/** No.5 納入税額 (t_shoreikin.kofu_zeigaku) */
+	@NotNull(message = "納入税額は必須入力です")
+	@Min(value = 0, message = "納入税額は0以上で入力してください")
+	@Max(value = 99999999999999L, message = "納入税額は14桁以内で入力してください")
 	private Long kofuZeigaku;
 
 	/** No.6 交付率 (t_shoreikin.kofu_ritsu) */
+	@NotNull(message = "交付率は必須入力です")
+	@DecimalMin(value = "0.00", message = "交付率は0.00以上で入力してください")
+	@Digits(integer = 5, fraction = 2, message = "交付率は整数部5桁、小数部2桁以内で入力してください")
 	private BigDecimal kofuRitsu;
 
 	/** No.7 交付額 (t_shoreikin.kofu_gaku) */
+	@NotNull(message = "交付額は必須入力です")
+	@Min(value = 0, message = "交付額は0以上で入力してください")
+	@Max(value = 9999999999999L, message = "交付額は13桁以内で入力してください")
 	private Long kofuGaku;
 
 	/** 交付年月日 (t_shoreikin.kofu_ymd) */

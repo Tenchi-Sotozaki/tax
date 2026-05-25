@@ -34,20 +34,28 @@
                         <div class="row g-3">
                             <!-- 交付金年度 -->
                             <div class="col-md-3">
-                                <label for="nendo" class="form-label">交付金年度</label>
+                                <label for="nendo" class="form-label">交付金年度 <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nendo" th:field="*{nendo}" 
-                                       maxlength="4" required placeholder="例：2026">
+                                       th:classappend="${#fields.hasErrors('nendo')} ? 'is-invalid' : ''"
+                                       maxlength="4" pattern="[0-9]{4}" title="4桁の数字で入力してください" 
+                                       required placeholder="例：2026">
+                                <div th:if="${#fields.hasErrors('nendo')}" class="invalid-feedback">
+                                    <span th:errors="*{nendo}"></span>
+                                </div>
                             </div>
 
                             <!-- 交付率 -->
                             <div class="col-md-3">
-                                <label for="kofuRitsu" class="form-label">交付率</label>
+                                <label for="kofuRitsu" class="form-label">交付率 <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="kofuRitsu" 
-                                           th:value="${bulkForm.kofuRitsu}" readonly>
+                                    <input type="number" class="form-control" id="kofuRitsu" th:field="*{kofuRitsu}"
+                                           th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
+                                           step="0.01" min="0" max="99999.99" required>
                                     <span class="input-group-text">%</span>
                                 </div>
-                                <input type="hidden" th:field="*{kofuRitsu}">
+                                <div th:if="${#fields.hasErrors('kofuRitsu')}" class="invalid-feedback">
+                                    <span th:errors="*{kofuRitsu}"></span>
+                                </div>
                             </div>
 
                             <!-- 算出済みを含む -->
@@ -152,5 +160,9 @@
             </div>
         </div>
     </div>
+
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/shoreikinBulk.js}"></script>
+    </th:block>
 </body>
 </html>

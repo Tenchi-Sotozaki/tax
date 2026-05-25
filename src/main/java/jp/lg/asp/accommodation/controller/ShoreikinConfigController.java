@@ -1,7 +1,10 @@
 package jp.lg.asp.accommodation.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,13 +95,23 @@ public class ShoreikinConfigController {
 	/**
 	 * 交付金情報登録処理
 	 * @param configForm フォームデータ
+	 * @param bindingResult バリデーション結果
+	 * @param model モデル
 	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先
+	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/config/create")
-	public String create(@ModelAttribute ShoreikinConfigDto configForm,
+	public String create(@Valid @ModelAttribute ShoreikinConfigDto configForm,
+			BindingResult bindingResult,
+			Model model,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+
+		if (bindingResult.hasErrors()) {
+			configForm.setMode("create");
+			model.addAttribute("configForm", configForm);
+			return CONFIG_VIEW;
+		}
 
 		try {
 			shoreikinConfigService.createShoreikin(configForm);
@@ -114,20 +127,30 @@ public class ShoreikinConfigController {
 	/**
 	 * 交付金情報更新処理
 	 * @param configForm フォームデータ
+	 * @param bindingResult バリデーション結果
+	 * @param model モデル
 	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先
+	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/config/update")
-	public String update(@ModelAttribute ShoreikinConfigDto configForm,
+	public String update(@Valid @ModelAttribute ShoreikinConfigDto configForm,
+			BindingResult bindingResult,
+			Model model,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+
+		if (bindingResult.hasErrors()) {
+			configForm.setMode("edit");
+			model.addAttribute("configForm", configForm);
+			return CONFIG_VIEW;
+		}
 
 		try {
 			shoreikinConfigService.updateShoreikin(configForm);
 			redirectAttributes.addFlashAttribute("successMessage", "交付金情報を更新しました。");
 		} catch (Exception e) {
 			log.error("交付金更新エラー", e);
-			redirectAttributes.addFlashAttribute("errorMessage", "交付金更新に失敗しました: " + e.getMessage());
+			redirectAttributes.addFlashAttribute("errorMessage", "交付金情報更新に失敗しました: " + e.getMessage());
 		}
 
 		return "redirect:/shoreikin/list";
