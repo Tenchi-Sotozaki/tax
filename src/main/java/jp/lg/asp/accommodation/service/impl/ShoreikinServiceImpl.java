@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,7 +13,6 @@ import jp.lg.asp.accommodation.dto.ShoreikinDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.GassanUchi;
 import jp.lg.asp.accommodation.entity.Shoreikin;
-import jp.lg.asp.accommodation.entity.ShoreikinId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
@@ -118,55 +116,5 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 
 		return result;
 
-	}
-
-	@Override
-	@Transactional
-	public int bulkCalculate(String nendo) {
-		if (nendo == null || nendo.isEmpty()) {
-			throw new IllegalArgumentException("年度が指定されていません");
-		}
-
-		// 対象となる特別徴収義務者を取得（del_flg='0', new_flg='1'）
-		List<Tokugimu> tokugimuList = tokugimuRepository
-				.findByJichitaiCdAndDelFlgAndNewFlg(jichitaiCd, "0", "1");
-
-		int count = 0;
-		for (Tokugimu tokugimu : tokugimuList) {
-			// 既存の交付金レコードをチェック
-			ShoreikinId id = new ShoreikinId(jichitaiCd, tokugimu.getShiteiNo(), nendo);
-
-			if (!shoreikinRepository.existsById(id)) {
-				// 交付金を算出（簡易実装：固定率3%）
-				Long kofuZeigaku = calculateKofuZeigaku(tokugimu.getShiteiNo(), nendo);
-				BigDecimal kofuRitsu = new BigDecimal("3.00");
-				Long kofuGaku = new BigDecimal(kofuZeigaku).multiply(kofuRitsu).divide(new BigDecimal("100"))
-						.longValue();
-
-				Shoreikin shoreikin = new Shoreikin();
-				shoreikin.setJichitaiCd(jichitaiCd);
-				shoreikin.setShiteiNo(tokugimu.getShiteiNo());
-				shoreikin.setNendo(nendo);
-				shoreikin.setKofuZeigaku(kofuZeigaku);
-				shoreikin.setKofuRitsu(kofuRitsu);
-				shoreikin.setKofuGaku(kofuGaku);
-				shoreikin.setAddDt(LocalDateTime.now());
-				shoreikin.setAddUser("SYSTEM");
-				shoreikin.setUpdDt(LocalDateTime.now());
-				shoreikin.setUpdUser("SYSTEM");
-				shoreikin.setVersion(1);
-
-				shoreikinRepository.save(shoreikin);
-				count++;
-			}
-		}
-
-		return count;
-	}
-
-	private Long calculateKofuZeigaku(String shiteiNo, String nendo) {
-		// 実際の実装では、t_fuka テーブルから該当年度の納入税額を集計
-		// ここでは簡易実装として固定値を返す
-		return 100000L;
 	}
 }

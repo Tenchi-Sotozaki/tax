@@ -34,7 +34,7 @@
                         <div class="row g-3">
                             <!-- 交付金年度 -->
                             <div class="col-md-3">
-                                <label for="nendo" class="form-label">交付金年度 <span class="text-danger">*</span></label>
+                                <label for="nendo" class="form-label">交付金年度</label>
                                 <input type="text" class="form-control" id="nendo" th:field="*{nendo}" 
                                        maxlength="4" required placeholder="例：2026">
                             </div>
@@ -50,13 +50,18 @@
                                 <input type="hidden" th:field="*{kofuRitsu}">
                             </div>
 
-                            <!-- 対象件数表示 -->
-                            <div class="col-md-3" th:if="${bulkForm.nendo != null and !bulkForm.nendo.isEmpty()}">
-                                <label class="form-label">対象件数</label>
-                                <div class="form-control-plaintext">
-                                    <span th:text="${bulkForm.targetCount}" class="fw-bold text-primary"></span> 件
+                            <!-- 算出済みを含む -->
+                            <div class="col-md-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="includeCalculated" 
+                                           th:field="*{includeCalculated}">
+                                    <label class="form-check-label" for="includeCalculated">
+                                        算出済みを含む
+                                    </label>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="row mt-3">
@@ -92,7 +97,15 @@
                         <div class="col-md-3">
                             <div class="card text-center bg-light">
                                 <div class="card-body">
-                                    <h6 class="card-title text-muted">処理成功</h6>
+                                    <h6 class="card-title text-muted">スキップ件数</h6>
+                                    <h4 class="card-text text-warning" th:text="${bulkForm.skipCount}">0</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">成功件数</h6>
                                     <h4 class="card-text text-success" th:text="${bulkForm.successCount}">0</h4>
                                 </div>
                             </div>
@@ -100,20 +113,8 @@
                         <div class="col-md-3">
                             <div class="card text-center bg-light">
                                 <div class="card-body">
-                                    <h6 class="card-title text-muted">処理失敗</h6>
+                                    <h6 class="card-title text-muted">失敗件数</h6>
                                     <h4 class="card-text text-danger" th:text="${bulkForm.failureCount}">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center bg-light">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">処理率</h6>
-                                    <h4 class="card-text text-primary">
-                                        <span th:if="${bulkForm.targetCount > 0}"
-                                              th:text="${#numbers.formatDecimal((bulkForm.successCount * 100.0) / bulkForm.targetCount, 1, 1)}">0</span>
-                                        <span th:if="${bulkForm.targetCount == 0}">0</span>%
-                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -144,8 +145,7 @@
                 <div class="card-body">
                     <ul class="mb-0 small text-muted">
                         <li>指定した年度の賦課情報を基に、特別徴収義務者ごとの交付金を算出します。</li>
-                        <li>既に交付金が算出済みの義務者は処理対象外となります。</li>
-                        <li>交付率は固定値（3%）が適用されます。</li>
+                        <li>既に交付金が算出済みの特別徴収義務者を対象にするには算出済みを含むにチェックを入れてください。</li>
                         <li>処理には時間がかかる場合があります。実行後はしばらくお待ちください。</li>
                     </ul>
                 </div>

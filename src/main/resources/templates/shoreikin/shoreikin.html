@@ -128,29 +128,36 @@
             </div>
 
             <!-- 情報一覧エリア -->
-            <form id="listForm">
-                <!-- ========== ツールバー（ボタンエリア） ========== -->
-                <div class="card shadow-sm mb-2">
-                    <div class="card-body py-2 px-3">
-                        <div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
-                            <!-- グループ1: 基本操作 -->
-                            <div class="d-flex flex-wrap gap-1">
-                                <form th:action="@{/shoreikin/bulkCalculate}" th:object="${searchForm}" method="post" class="d-inline">
-                                    <input type="hidden" th:field="*{nendo}">
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="bi bi-calculator me-1"></i>一括算出
-                                    </button>
-                                </form>
-                                <button type="button" class="btn btn-info btn-sm" onclick="viewKofu()">
-                                    <i class="bi bi-eye me-1"></i>交付金照会
+            <!-- ========== ツールバー（ボタンエリア） ========== -->
+            <div class="card shadow-sm mb-2">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
+                        <!-- グループ1: 基本操作 -->
+                        <div class="d-flex flex-wrap gap-1">
+                            <form th:action="@{/shoreikin/bulkCalculate}" th:object="${searchForm}" method="post" class="d-inline">
+                                <input type="hidden" th:field="*{nendo}">
+                                <input type="hidden" th:field="*{shisetsuName}">
+                                <input type="hidden" th:field="*{kyokaShu}">
+                                <input type="hidden" th:field="*{gassanTaisho}">
+                                <input type="hidden" th:field="*{status}">
+                                <input type="hidden" th:field="*{kojinNo}">
+                                <input type="hidden" th:field="*{hojinNo}">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="bi bi-calculator me-1"></i>一括算出
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="viewKoza()">
-                                    <i class="bi bi-bank me-1"></i>口座照会
-                                </button>
-                            </div>
+                            </form>
+                            <button type="button" class="btn btn-info btn-sm" onclick="viewKofu()">
+                                <i class="bi bi-eye me-1"></i>交付金照会
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="viewKoza()">
+                                <i class="bi bi-bank me-1"></i>口座照会
+                            </button>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <form id="listForm">
 
                 <!-- ========== 一覧テーブル ========== -->
                 <div class="card shadow-sm">

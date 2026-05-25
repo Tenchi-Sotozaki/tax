@@ -1,5 +1,8 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.math.BigDecimal;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,18 +30,16 @@ public class ShoreikinBulkController {
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN;
 	private static final String BULK_VIEW = "shoreikin/shoreikinBulk";
 
+	@Value("${app.kofukin.rate}")
+	private BigDecimal defaultKofuritsu;
+
 	@GetMapping("/bulk")
 	public String bulk(@RequestParam(required = false) String nendo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
 		dto.setNendo(nendo);
-
-		// 対象件数を取得
-		if (nendo != null && !nendo.isEmpty()) {
-			int targetCount = shoreikinBulkService.getTargetCount(nendo);
-			dto.setTargetCount(targetCount);
-		}
+		dto.setKofuRitsu(defaultKofuritsu);
 
 		model.addAttribute("bulkForm", dto);
 		return BULK_VIEW;

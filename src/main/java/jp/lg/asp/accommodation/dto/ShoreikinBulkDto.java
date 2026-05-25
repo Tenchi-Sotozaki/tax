@@ -23,6 +23,9 @@ public class ShoreikinBulkDto {
 	/** 交付率 */
 	private BigDecimal kofuRitsu;
 
+	/** 算出済みを含む */
+	private boolean includeCalculated;
+
 	// ========== 処理結果表示用 ==========
 
 	/** 処理対象件数 */
@@ -33,6 +36,9 @@ public class ShoreikinBulkDto {
 
 	/** 処理失敗件数 */
 	private int failureCount;
+
+	/** スキップ件数 */
+	private int skipCount;
 
 	/** 処理結果メッセージ */
 	private String resultMessage;

@@ -67,14 +67,4 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 	Optional<Integer> findMaxRnoByJichitaiCdAndShiteiNo(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
-
-	@Query("""
-			SELECT t FROM Tokugimu t
-			WHERE t.jichitaiCd = :jichitaiCd
-			AND t.delFlg = :delFlg AND t.newFlg = :newFlg
-			""")
-	List<Tokugimu> findByJichitaiCdAndDelFlgAndNewFlg(
-			@Param("jichitaiCd") String jichitaiCd,
-			@Param("delFlg") String delFlg,
-			@Param("newFlg") String newFlg);
 }
