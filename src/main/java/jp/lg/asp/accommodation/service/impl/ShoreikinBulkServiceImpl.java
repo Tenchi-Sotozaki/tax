@@ -51,9 +51,9 @@ public class ShoreikinBulkServiceImpl implements ShoreikinBulkService {
 			try {
 				// 既存の交付金レコードをチェック
 				ShoreikinId id = new ShoreikinId(jichitaiCd, shiteiNo, dto.getNendo());
-				Shoreikin shoreikin = shoreikinRepository.findById(id).orElse(null);
+				Shoreikin shoreikin = shoreikinRepository.findById(id).orElse(new Shoreikin());
 
-				if (dto.isIncludeCalculated() || shoreikin == null) {
+				if (dto.isIncludeCalculated() || shoreikin.getShiteiNo() == null) {
 					// 交付金税額を算出（指定年度の賦課情報から集計）
 					Long kofuZeigaku = calculateKofuZeigaku(shiteiNo, dto.getNendo());
 					kofuZeigaku = kofuZeigaku < 0L ? 0L : kofuZeigaku;

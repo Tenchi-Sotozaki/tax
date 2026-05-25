@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.dto;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -65,6 +67,12 @@ public class ShoreikinDto {
 	/** No.15 氏名（m_atena.name） */
 	private String shimei;
 
-	/** No.16 交付額 (t_shoreikin.kofu_gaku) */
+	/** No.16 交付年度 (t_shoreikin.nendo) */
+	private Integer kofuNendo;
+
+	/** No.17 交付額 (t_shoreikin.kofu_gaku) */
 	private Long kofuGaku;
+
+	/** No.18 交付年月日 (t_shoreikin.kofu_ymd) */
+	private LocalDate kofuYmd;
 }

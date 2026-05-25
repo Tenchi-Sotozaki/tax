@@ -1,9 +1,11 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -66,14 +68,19 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 				.collect(Collectors.toMap(GassanUchi::getShiteiNo, g -> true, (a, b) -> a));
 
 		// t_shoreikin を shitei_no、nendo をキーに取得
-		Map<String, Shoreikin> shoreikinMap = shoreikinRepository
+		Map<String, List<Shoreikin>> shoreikinMap = shoreikinRepository
 				.findByJichitaiCdAndShiteiNoInAndNendo(jichitaiCd, shiteiNos, form.getNendo())
 				.stream()
-				.collect(Collectors.toMap(Shoreikin::getShiteiNo, t -> t, (a, b) -> a));
+				.collect(Collectors.toMap(Shoreikin::getShiteiNo,
+						t -> new ArrayList<>(List.of(t)),
+						(a, b) -> {
+							a.addAll(b);
+							return a;
+						}));
 
 		List<ShoreikinDto> result = tokugimuList.stream()
-				.map(t -> {
-					Shoreikin s = shoreikinMap.get(t.getShiteiNo());
+				.<ShoreikinDto> flatMap(t -> {
+					List<Shoreikin> shoreikinList = shoreikinMap.get(t.getShiteiNo());
 					Atena atena = atenaMap.get(t.getAtenaNo());
 					boolean isGassanTarget = gassanMap.containsKey(t.getShiteiNo());
 
@@ -81,7 +88,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 					if (!"999".equals(form.getGassanTaisho())) {
 						boolean shouldBeTarget = "2".equals(form.getGassanTaisho());
 						if (shouldBeTarget != isGassanTarget) {
-							return null;
+							return Stream.empty();
 						}
 					}
 
@@ -89,29 +96,50 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 					if (!"999".equals(form.getStatus())) {
 						String currentStatus = t.getStatus();
 						if (!form.getStatus().equals(currentStatus)) {
-							return null;
+							return Stream.empty();
 						}
 					}
 
-					// 交付金算出有無フィルタ（1=算出有: kofu_gaku > 0 / 2=算出無: kofu_gaku = 0）
-					if (!"999".equals(form.getKofuSanshutsuUmu())) {
-						boolean hasKofu = s != null && s.getKofuGaku() != null && s.getKofuGaku() > 0;
-						if ("1".equals(form.getKofuSanshutsuUmu()) && !hasKofu) {
-							return null;
-						}
-						if ("2".equals(form.getKofuSanshutsuUmu()) && hasKofu) {
-							return null;
+					// shoreikinListがnullまたは空の場合の処理
+					if (shoreikinList == null || shoreikinList.isEmpty()) {
+						// 交付金算出有無フィルタ（算出無のみ表示する場合）
+						if ("1".equals(form.getKofuSanshutsuUmu())) {
+							// 算出有のみ表示する場合は除外
+							return Stream.empty();
+						} else {
+							// 算出無のみ、またはすべて表示する場合
+							ShoreikinDto dto = new ShoreikinDto();
+							dto.setListShiteiNo(t.getShiteiNo());
+							dto.setListShisetsuName(t.getShisetsuName());
+							dto.setShimei(atena != null ? atena.getName() : null);
+							dto.setKofuGaku(null);
+							dto.setKofuNendo(null);
+							dto.setKofuYmd(null);
+							return Stream.of(dto);
 						}
 					}
 
-					ShoreikinDto dto = new ShoreikinDto();
-					dto.setListShiteiNo(t.getShiteiNo());
-					dto.setListShisetsuName(t.getShisetsuName());
-					dto.setShimei(atena != null ? atena.getName() : null);
-					dto.setKofuGaku(s != null ? s.getKofuGaku() : null);
-					return dto;
+					// shoreikinListから複数のDTOを生成
+					return shoreikinList.stream()
+							.filter(s -> {
+								// 交付金算出有無フィルタ
+								if ("2".equals(form.getKofuSanshutsuUmu())) {
+									// 算出無のみ表示する場合は除外
+									return false;
+								}
+								return true;
+							})
+							.map(s -> {
+								ShoreikinDto dto = new ShoreikinDto();
+								dto.setListShiteiNo(t.getShiteiNo());
+								dto.setListShisetsuName(t.getShisetsuName());
+								dto.setShimei(atena != null ? atena.getName() : null);
+								dto.setKofuGaku(s.getKofuGaku());
+								dto.setKofuNendo(s.getNendo() != null ? Integer.valueOf(s.getNendo()) : null);
+								dto.setKofuYmd(s.getKofuYmd());
+								return dto;
+							});
 				})
-				.filter(dto -> dto != null)
 				.toList();
 
 		return result;

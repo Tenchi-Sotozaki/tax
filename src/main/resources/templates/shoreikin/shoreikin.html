@@ -170,12 +170,14 @@
                                         <th style="min-width: 100px">指定番号</th>
                                         <th style="min-width: 140px">施設名称</th>
                                         <th style="min-width: 140px">氏名</th>
+                                        <th style="min-width: 80px">交付年度</th>
                                         <th style="min-width: 120px">交付額</th>
+                                        <th style="min-width: 100px">交付年月日</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr th:if="${#lists.isEmpty(items)}">
-                                        <td colspan="5" class="text-center text-muted py-5">
+                                        <td colspan="7" class="text-center text-muted py-5">
                                             <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
                                             該当するデータが見つかりませんでした。
                                         </td>
@@ -188,11 +190,20 @@
                                         <td class="fw-bold text-primary" th:text="${item.listShiteiNo}"></td>
                                         <td th:text="${item.listShisetsuName}"></td>
                                         <td th:text="${item.shimei}"></td>
+                                        <td class="text-center">
+                                            <span th:if="${item.kofuNendo != null}" th:text="${item.kofuNendo}"></span>
+                                            <span th:if="${item.kofuNendo == null}" class="text-muted">-</span>
+                                        </td>
                                         <td class="text-end">
                                             <span th:if="${item.kofuGaku != null}" 
                                                   th:text="${#numbers.formatDecimal(item.kofuGaku, 0, 'COMMA', 0, 'POINT')} + '円'" 
                                                   class="fw-medium"></span>
                                             <span th:if="${item.kofuGaku == null}" class="text-muted">-</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span th:if="${item.kofuYmd != null}" 
+                                                  th:text="${#temporals.format(item.kofuYmd, 'yyyy/MM/dd')}"></span>
+                                            <span th:if="${item.kofuYmd == null}" class="text-muted">-</span>
                                         </td>
                                     </tr>
                                 </tbody>
