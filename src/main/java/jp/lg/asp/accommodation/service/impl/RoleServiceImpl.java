@@ -129,12 +129,17 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	@Transactional
-	public void deleteRole(String jichitaiCd, Long roleId) {
+	public void resetUsersToDefaultRole(String jichitaiCd, Long roleId, String updUser) {
 		List<User> users = userRepository.findByJichitaiCdAndRoleId(jichitaiCd, BigDecimal.valueOf(roleId));
 		for (User u : users) {
 			u.setRoleId(BigDecimal.ONE);
 		}
 		userRepository.saveAll(users);
+	}
+
+	@Override
+	@Transactional
+	public void deleteRole(String jichitaiCd, Long roleId) {
 		roleRepository.deleteById(new RoleId(jichitaiCd, roleId));
 	}
 }

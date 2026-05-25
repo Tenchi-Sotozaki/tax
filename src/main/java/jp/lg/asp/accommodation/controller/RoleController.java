@@ -136,7 +136,17 @@ public class RoleController {
 	public Map<String, Object> deleteRole(@PathVariable Long roleId) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
+		
+		if (roleId == 1L) {
+			result.put("success", false);
+			result.put("message", "デフォルト権限のため削除できません");
+			return result;
+		}
+		
 		try {
+			// 削除対象の権限が付与されているユーザーをデフォルト権限に変更
+			roleService.resetUsersToDefaultRole(jichitaiCd, roleId, "admin");
+			
 			roleService.deleteRole(jichitaiCd, roleId);
 			result.put("success", true);
 		} catch (Exception e) {

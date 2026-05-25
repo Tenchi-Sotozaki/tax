@@ -22,4 +22,6 @@ public interface RoleService {
     List<User> findAllUsers(String jichitaiCd);
 
     void updateUserRole(String jichitaiCd, Long roleId, List<String> userIds, String updUser);
+    
+    void resetUsersToDefaultRole(String jichitaiCd, Long roleId, String updUser);
 }
