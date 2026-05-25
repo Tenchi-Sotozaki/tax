@@ -1,10 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
-import jakarta.validation.Valid;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,105 +12,99 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FurikomiKozaDto;
-import jp.lg.asp.accommodation.exception.ResourceNotFoundException;
 import jp.lg.asp.accommodation.service.FurikomiKozaService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 振込先口座照会／登録／編集 Controller
+ * 仕様書：振込先口座照会・登録・編集.csv に基づく実装
+ */
+@Slf4j
 @Controller
-@RequestMapping("/shoreikin/furikomiKoza")
 @RequiredArgsConstructor
+@RequestMapping("/shoreikin/furikomiKoza")
 public class FurikomiKozaController {
 
 	private final FurikomiKozaService furikomiKozaService;
 	private final ScreenAccessChecker accessChecker;
 
 	private static final String SCREEN_ID = ScreenManagement.FURIKOMI_KOZA;
+	private static final String KOZA_VIEW = "shoreikin/furikomiKoza";
 
 	/**
 	 * 振込先口座照会画面表示
+	 * @param shiteiNo 指定番号
+	 * @param model モデル
+	 * @return 画面パス
 	 */
 	@GetMapping
 	public String view(@RequestParam String shiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		try {
-			FurikomiKozaDto dto = furikomiKozaService.getFurikomiKoza(shiteiNo);
-			model.addAttribute("furikomiKozaDto", dto);
-			return "shoreikin/furikomiKoza";
-		} catch (ResourceNotFoundException e) {
-			model.addAttribute("errorMessage", e.getMessage());
-			return "error";
-		}
+
+		FurikomiKozaDto dto = furikomiKozaService.getFurikomiKoza(shiteiNo);
+		model.addAttribute("kozaForm", dto);
+
+		return KOZA_VIEW;
 	}
 
 	/**
-	 * 編集画面表示
+	 * 編集モード切り替え
+	 * @param kozaForm フォームデータ
+	 * @param model モデル
+	 * @return 画面パス
 	 */
-	@GetMapping("/edit")
-	public String edit(@RequestParam String shiteiNo, Model model) {
+	@PostMapping("/edit")
+	public String editMode(@ModelAttribute FurikomiKozaDto kozaForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		try {
-			FurikomiKozaDto dto = furikomiKozaService.getFurikomiKoza(shiteiNo);
-			dto.setMode("edit");
-			model.addAttribute("furikomiKozaDto", dto);
-			return "shoreikin/furikomiKoza";
-		} catch (ResourceNotFoundException e) {
-			model.addAttribute("errorMessage", e.getMessage());
-			return "error";
-		}
+
+		kozaForm.setMode("edit");
+		model.addAttribute("kozaForm", kozaForm);
+
+		return KOZA_VIEW;
 	}
 
 	/**
-	 * 登録処理
+	 * 振込先口座情報登録処理
+	 * @param kozaForm フォームデータ
+	 * @param redirectAttributes リダイレクト属性
+	 * @return リダイレクト先
 	 */
-	@PostMapping("/register")
-	public String register(@Valid @ModelAttribute FurikomiKozaDto furikomiKozaDto,
-			BindingResult bindingResult,
-			Model model,
+	@PostMapping("/create")
+	public String create(@ModelAttribute FurikomiKozaDto kozaForm,
 			RedirectAttributes redirectAttributes) {
-
 		accessChecker.checkAccess(SCREEN_ID);
-		if (bindingResult.hasErrors()) {
-			furikomiKozaDto.setMode("register");
-			model.addAttribute("furikomiKozaDto", furikomiKozaDto);
-			return "shoreikin/furikomiKoza";
-		}
 
 		try {
-			furikomiKozaService.registerFurikomiKoza(furikomiKozaDto);
-			redirectAttributes.addFlashAttribute("successMessage", "振込先口座情報を登録しました");
-			return "redirect:/shoreikin";
+			furikomiKozaService.createFurikomiKoza(kozaForm);
+			redirectAttributes.addFlashAttribute("successMessage", "振込先口座情報を登録しました。");
 		} catch (Exception e) {
-			model.addAttribute("errorMessage", "登録に失敗しました: " + e.getMessage());
-			furikomiKozaDto.setMode("register");
-			model.addAttribute("furikomiKozaDto", furikomiKozaDto);
-			return "shoreikin/furikomiKoza";
+			log.error("振込先口座登録エラー", e);
+			redirectAttributes.addFlashAttribute("errorMessage", "振込先口座情報登録に失敗しました: " + e.getMessage());
 		}
+
+		return "redirect:/shoreikin/list";
 	}
 
 	/**
-	 * 更新処理
+	 * 振込先口座情報更新処理
+	 * @param kozaForm フォームデータ
+	 * @param redirectAttributes リダイレクト属性
+	 * @return リダイレクト先
 	 */
 	@PostMapping("/update")
-	public String update(@Valid @ModelAttribute FurikomiKozaDto furikomiKozaDto,
-			BindingResult bindingResult,
-			Model model,
+	public String update(@ModelAttribute FurikomiKozaDto kozaForm,
 			RedirectAttributes redirectAttributes) {
-
-		if (bindingResult.hasErrors()) {
-			furikomiKozaDto.setMode("edit");
-			model.addAttribute("furikomiKozaDto", furikomiKozaDto);
-			return "shoreikin/furikomiKoza";
-		}
+		accessChecker.checkAccess(SCREEN_ID);
 
 		try {
-			furikomiKozaService.updateFurikomiKoza(furikomiKozaDto);
-			redirectAttributes.addFlashAttribute("successMessage", "振込先口座情報を更新しました");
-			return "redirect:/shoreikin";
+			furikomiKozaService.updateFurikomiKoza(kozaForm);
+			redirectAttributes.addFlashAttribute("successMessage", "振込先口座情報を更新しました。");
 		} catch (Exception e) {
-			model.addAttribute("errorMessage", "更新に失敗しました: " + e.getMessage());
-			furikomiKozaDto.setMode("edit");
-			model.addAttribute("furikomiKozaDto", furikomiKozaDto);
-			return "shoreikin/furikomiKoza";
+			log.error("振込先口座更新エラー", e);
+			redirectAttributes.addFlashAttribute("errorMessage", "振込先口座更新に失敗しました: " + e.getMessage());
 		}
+
+		return "redirect:/shoreikin/list";
 	}
 }

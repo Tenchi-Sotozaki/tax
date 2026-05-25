@@ -90,8 +90,16 @@ public class ShoreikinController {
 					"口座照会する項目を選択してください。");
 			return "redirect:/shoreikin/list";
 		}
-		// 振込先口座照会画面への遷移（実装は別途）
-		redirectAttributes.addAttribute("shiteiNos", String.join(",", selectedItems));
-		return "redirect:/shoreikin/kozaDetail";
+
+		// 単一選択のみサポート
+		if (selectedItems.size() > 1) {
+			redirectAttributes.addFlashAttribute("errorMessage",
+					"口座照会は1件ずつ選択してください。");
+			return "redirect:/shoreikin/list";
+		}
+
+		// 振込先口座照会画面への遷移（単一指定番号）
+		redirectAttributes.addAttribute("shiteiNo", selectedItems.get(0));
+		return "redirect:/shoreikin/furikomiKoza";
 	}
 }
