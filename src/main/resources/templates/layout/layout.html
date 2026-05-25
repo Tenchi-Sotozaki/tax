@@ -81,7 +81,7 @@
 								class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
 								type="button" data-bs-toggle="collapse"
 								data-bs-target="#mainImport">
-								<i class="bi bi-upload me-2 text-info"></i>取り込み
+								<i class="bi bi-download me-2 text-info"></i>取り込み
 							</button>
 						</h2>
 						<div id="mainImport" class="accordion-collapse collapse">
@@ -95,8 +95,37 @@
 									<li class="nav-item"><a
 										class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/eltax-renkei}"
-										th:classappend="${#strings.contains(currentUri, '/eltax-renkei')} ? 'text-white fw-medium' : ''"> <i
-											class="bi bi-file-earmark-arrow-down me-2"></i>電子申告情報
+										th:classappend="${#strings.contains(currentUri, '/eltax-renkei')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-file-earmark-arrow-down me-2"></i>電子申告情報
+									</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- csv出力 -->
+				<div class="accordion accordion-flush" id="mainOutputAccordion">
+					<div class="accordion-item bg-transparent border-0">
+						<h2 class="accordion-header">
+							<button
+								class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
+								type="button" data-bs-toggle="collapse"
+								data-bs-target="#mainOutput">
+								<i class="bi bi-upload me-2 text-info"></i>csv出力
+							</button>
+						</h2>
+						<div id="mainOutput" class="accordion-collapse collapse">
+							<div class="accordion-body py-1 px-0">
+								<ul class="nav flex-column ms-3">
+									<li class="nav-item"><a
+										class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/shunoRenkei/list}"> <i
+											class="bi bi-piggy-bank me-2"></i>収納管理情報
+									</a></li>
+									<li class="nav-item"><a
+										class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/kofukinFurikomi/list}"> <i class="bi bi-bank me-2"></i>交付金振込情報
 									</a></li>
 								</ul>
 							</div>

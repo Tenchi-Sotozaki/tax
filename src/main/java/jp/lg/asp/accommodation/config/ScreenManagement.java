@@ -53,5 +53,10 @@ public final class ScreenManagement {
 
 	// 合算申告登録/編集/照会
 	public static final String GASSAN_CONFIG = "GASSANCONF";
-	
+
+	// 収納管理情報連携
+	public static final String SHUNO_RENKEI = "SHUNO_RENKEI";
+
+	// 交付金振込情報連携
+	public static final String KOFUKIN_FURIKOMI = "KOFUKIN_FURIKOMI";
 }

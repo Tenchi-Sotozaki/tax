@@ -1,0 +1,19 @@
+﻿,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,作成者,亀井
+画面項目一覧表,,画面物理名,shoreikinRenkei,作成日,2026/5/19
+,,画面論理名,交付金振込情報連携,更新日,
+,,,,,
+No.,DBテーブル名,カラム名,出力カラム名,備考,
+1,m_atena,atena_no,宛名番号,,
+2,t_shoreikin,nendo,奨励金年度,,
+3,t_shoreikin,kofu_zeigaku,納入税額,,
+4,t_shoreikin,kofu_ritsu,交付率,,
+5,t_shoreikin,kofu_gaku,交付額,,
+6,t_shoreikin,kofu_ymd,交付年月日,,
+7,t_furikomi_koza,bank_cd,金融機関コード,,
+8,t_furikomi_koza,bank_name,金融機関名,,
+9,t_furikomi_koza,branch_cd,支店コード,,
+10,t_furikomi_koza,branch_name,支店名,,
+11,t_furikomi_koza,shumoku,預金種目,"登録値によって以下のいずれかを出力する
+1:通常/2:当座",
+12,t_furikomi_koza,koza_no,口座番号,,
+13,t_furikomi_koza,meigi,口座名義,,
