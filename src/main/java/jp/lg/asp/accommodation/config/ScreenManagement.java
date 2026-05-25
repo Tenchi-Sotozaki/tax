@@ -59,4 +59,7 @@ public final class ScreenManagement {
 
 	// 交付金振込情報連携
 	public static final String KOFUKIN_FURIKOMI = "KOFUKIN_FURIKOMI";
+
+	// 賦課方式設定（税率管理マスタ）
+	public static final String ZEIRITSU_CONFIG = "ZEIRITSU";
 }
