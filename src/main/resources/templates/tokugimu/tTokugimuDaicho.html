@@ -4,30 +4,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
 <title>特別徴収義務者管理台帳</title>
-<style>
-tbody tr.row-selected {
-	background-color: #e8f0fe !important;
-}
-
-.sticky-table thead th {
-	position: sticky;
-	top: 0;
-	z-index: 1;
-}
-
-.table-scroll {
-	max-height: 55vh;
-	min-height: 200px;
-	overflow-y: auto;
-	overflow-x: auto;
-}
-
-@media ( max-width : 991.98px) {
-	.toolbar-divider {
-		display: none !important;
-	}
-}
-</style>
+<link rel="stylesheet" th:href="@{/css/tokugimuDaicho.css}">
 </head>
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">

@@ -103,18 +103,18 @@ function saveRole() {
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return response.json();
-    })
-    .then(result => {
-        if (result.success) {
-            location.reload();
-        } else {
-            alert('保存に失敗しました: ' + result.message);
-        }
-    })
-    .catch(err => alert('通信エラー: ' + err.message));
+        .then(response => {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        })
+        .then(result => {
+            if (result.success) {
+                location.reload();
+            } else {
+                alert('保存に失敗しました: ' + result.message);
+            }
+        })
+        .catch(err => alert('通信エラー: ' + err.message));
 }
 
 let currentUsersRoleId = null;
@@ -153,17 +153,17 @@ function updateAssignedUsers() {
         headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
         body: JSON.stringify({ userIds })
     })
-    .then(r => r.json())
-    .then(result => {
-        if (result.success) {
-            bootstrap.Modal.getInstance(document.getElementById('usersModal')).hide();
-            sessionStorage.setItem('flashMessage', '付与ユーザーを更新しました。');
-            location.reload();
-        } else {
-            alert('更新に失敗しました: ' + result.message);
-        }
-    })
-    .catch(err => alert('通信エラー: ' + err.message));
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('usersModal')).hide();
+                sessionStorage.setItem('flashMessage', '付与ユーザーを更新しました。');
+                location.reload();
+            } else {
+                alert('更新に失敗しました: ' + result.message);
+            }
+        })
+        .catch(err => alert('通信エラー: ' + err.message));
 }
 
 function deleteRoles() {
@@ -187,9 +187,16 @@ function deleteRoles() {
         .then(results => {
             const failed = results.filter(r => !r.success);
             if (failed.length > 0) {
-                alert('削除に失敗した項目があります: ' + failed.map(r => r.message).join(', '));
+                alert(failed.map(r => r.message).join(', '));
             }
             location.reload();
         })
         .catch(err => alert('通信エラー: ' + err.message));
+
+    const msg = sessionStorage.getItem('flashMessage');
+    if (msg) {
+        document.getElementById('flashMessageText').textContent = msg;
+        document.getElementById('flashMessage').classList.remove('d-none');
+        sessionStorage.removeItem('flashMessage');
+    }
 }
