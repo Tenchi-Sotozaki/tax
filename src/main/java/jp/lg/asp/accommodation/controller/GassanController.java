@@ -74,16 +74,23 @@ public class GassanController {
 	public String showViewByShiteiNo(
 			@PathVariable("shiteiNo") String shiteiNo,
 			@RequestParam(required = false) String gassanShiteiNo,
-			Model model) {
+			Model model,
+			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
-		GassanForm form = (gassanShiteiNo != null && !gassanShiteiNo.isBlank())
-				? gassanService.getViewFormByShiteiNo(shiteiNo, gassanShiteiNo)
-				: gassanService.getLatestByShiteiNo(shiteiNo);
-		model.addAttribute("GassanForm", form);
-		model.addAttribute("isView", true);
-		model.addAttribute("isEdit", false);
-		model.addAttribute("editId", form.getGassanShiteiNo());
-		return FORM_VIEW;
+		try {
+			GassanForm form = (gassanShiteiNo != null && !gassanShiteiNo.isBlank())
+					? gassanService.getViewFormByShiteiNo(shiteiNo, gassanShiteiNo)
+					: gassanService.getLatestByShiteiNo(shiteiNo);
+			model.addAttribute("GassanForm", form);
+			model.addAttribute("isView", true);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("editId", form.getGassanShiteiNo());
+			return FORM_VIEW;
+		} catch (RuntimeException e) {
+			// 特別徴収義務者管理台帳にエラーメッセージを表示してリダイレクト
+			redirectAttributes.addFlashAttribute("errorMessage", "合算申告情報が登録されていません");
+			return "redirect:/tokugimu/list";
+		}
 	}
 
 	// ========== 編集 ==========

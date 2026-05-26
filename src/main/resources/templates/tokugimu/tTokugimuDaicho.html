@@ -30,6 +30,15 @@
 				data-bs-dismiss="alert"></button>
 		</div>
 
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show py-2 mb-3"
+			role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> <span
+				th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close btn-sm"
+				data-bs-dismiss="alert"></button>
+		</div>
+
 		<!-- ========== 検索条件（アコーディオン） ========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
