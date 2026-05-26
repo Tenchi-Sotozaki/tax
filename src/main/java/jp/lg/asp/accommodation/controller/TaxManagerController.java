@@ -27,7 +27,7 @@ public class TaxManagerController {
 	private final TaxManagerService taxManagerService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenManagement.TAX_MANAGER;
+	private static final String SCREEN_ID = ScreenManagement.TAXMANAGER_CONFIG;
 	private static final String FORM_VIEW = "tokugimu/tTaxManagerConfig";
 
 	@GetMapping("/edit/{id}")
