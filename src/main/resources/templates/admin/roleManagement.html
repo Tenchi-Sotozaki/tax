@@ -54,17 +54,18 @@
 				<table class="table table-hover">
 					<thead class="table-light">
 						<tr>
-							<th></th>
-							<th>権限ID</th>
-							<th>権限名</th>
-							<th>権限詳細</th>
+							<th style="width: 40px"></th>
+							<th style="min-width: 70px">権限ID</th>
+							<th style="min-width: 100px">権限名</th>
+							<th style="min-width: 200px">権限詳細</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:each="role : ${roles}">
-							<td><input type="checkbox" class="role-checkbox"
-								th:value="${role.roleId}" onchange="updateButtons()"></td>
-							<td th:text="${role.roleId}"></td>
+							<td class="text-center"><input type="checkbox"
+								class="role-checkbox" th:value="${role.roleId}"
+								onchange="updateButtons()"></td>
+							<td th:text="${role.roleId}" class="text-center"></td>
 							<td th:text="${role.name}"></td>
 							<td><span th:each="detail, iterStat : ${role.roleDetails}"
 								th:text="${detail.screen.screenName + (detail.permission == 1 ? '(参照)' : '(更新)') + (!iterStat.last ? ', ' : '')}"></span>
