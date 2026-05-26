@@ -34,7 +34,7 @@ public class FukaController {
 	private final FukaService fukaService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenManagement.FUKADAICHO;
+	private static final String SCREEN_ID = ScreenManagement.FUKA_DAICHO;
 	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
 
 	private static final String CONFIG_VIEW = "fuka/tFukaConfig";

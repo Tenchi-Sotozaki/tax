@@ -25,13 +25,13 @@ public final class ScreenManagement {
 	public static final String TOKUGIMU_CONFIG = "TOKUCONFIG";
 
 	// 宿泊税申告登録
-	public static final String DECLARATION = "DECLARATIO";
+	public static final String FUKA_CONFIG = "DECLARATIO";
 
 	// 納入金額管理台帳
-	public static final String FUKADAICHO = "FUKA";
+	public static final String FUKA_DAICHO = "FUKA";
 
 	// 納税管理人登録・編集
-	public static final String TAX_MANAGER = "TAX_MANAGE";
+	public static final String TAXMANAGER_CONFIG = "TAX_MANAGE";
 
 	// ユーザー管理
 	public static final String USER_MANAGEMENT = "USER_MGMT";

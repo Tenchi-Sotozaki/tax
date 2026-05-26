@@ -26,7 +26,7 @@ public class EltaxRenkeiKakuninController {
 	private final EltaxRenkeiKakuninService eltaxRenkeiKakuninService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenManagement.ELTAX_RENKEI;
+	private static final String SCREEN_ID = ScreenManagement.ELTAX_RENKEI_KAKUNIN;
 	private static final String SESSION_KEY_FILE = "eltaxUploadedFile";
 	private static final String SESSION_KEY_FILE_NAME = "eltaxUploadedFileName";
 

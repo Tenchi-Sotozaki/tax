@@ -35,7 +35,7 @@ public class TaxDeclarationController {
 	private final ReportService reportService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenManagement.DECLARATION;
+	private static final String SCREEN_ID = ScreenManagement.FUKA_CONFIG;
 
 	private static final String VIEW = "declaration/tax-declaration-registration";
 
