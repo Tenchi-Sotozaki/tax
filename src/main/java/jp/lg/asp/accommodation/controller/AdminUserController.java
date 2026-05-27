@@ -37,7 +37,7 @@ public class AdminUserController {
 	private String jichitaiCd;
 
 	private static final String SCREEN_ID = ScreenManagement.USER_MANAGEMENT;
-	private static final String LIST_VIEW = "admin/userSearch";
+	private static final String LIST_VIEW = "admin/userDaicho";
 	private static final String FORM_VIEW = "admin/userConfig";
 
 	@GetMapping("/user-search")
