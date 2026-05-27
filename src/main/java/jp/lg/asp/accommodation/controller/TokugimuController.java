@@ -34,6 +34,7 @@ public class TokugimuController {
 	private static final String TOKUGIMU_CONFIG = ScreenManagement.TOKUGIMU_CONFIG;
 	private static final String LIST_VIEW = "tokugimu/tTokugimuDaicho";
 	private static final String FORM_VIEW = "tokugimu/tTokugimuConfig";
+	private static final String REPORT_VIEW = "tokugimu/tTokugimuReport";
 
 	// ========== 一覧・検索 ==========
 
@@ -133,6 +134,17 @@ public class TokugimuController {
 		}
 		redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
 		return "redirect:/tokugimu/list";
+	}
+
+	// ========== 帳票出力 ==========
+
+	@GetMapping("/report/{id}")
+	public String showReport(@PathVariable("id") String id, Model model) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
+		model.addAttribute("shiteiNo", id);
+		model.addAttribute("tokugimuName", form.getName());
+		return REPORT_VIEW;
 	}
 
 	// ========== 削除 ==========

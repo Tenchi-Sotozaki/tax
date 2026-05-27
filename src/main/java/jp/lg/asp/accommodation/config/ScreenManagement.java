@@ -71,4 +71,7 @@ public final class ScreenManagement {
 
 	// 振込先口座照会/登録/編集
 	public static final String FURIKOMI_KOZA = "FURIKOMI_KOZA";
+
+	// 帳票出力
+	public static final String TOKUGIMU_REPORT = "TOKU_REPORT";
 }

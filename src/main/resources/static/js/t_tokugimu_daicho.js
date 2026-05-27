@@ -86,7 +86,7 @@ function requireSelected(msg) {
     });
     document.getElementById('btnReport')?.addEventListener('click', () => {
         const id = requireSelected('特別徴収義務者を選択してください。');
-        if (id) alert('帳票発行画面は未実装です。');
+        if (id) location.href = '/accommodation-tax/tokugimu/report/' + id;
     });
 
 
