@@ -19,6 +19,7 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.service.FukaService;
+import jp.lg.asp.accommodation.service.FukaValidatorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +34,7 @@ public class FukaController {
 
 	private final FukaService fukaService;
 	private final ScreenAccessChecker accessChecker;
+	private final FukaValidatorService fukaValidatorService;
 
 	private static final String SCREEN_ID = ScreenManagement.FUKA_DAICHO;
 	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
@@ -175,48 +177,48 @@ public class FukaController {
 	 */
 	@PostMapping("/save")
 	public String save(@Validated @ModelAttribute("fukaDeclarationForm") FukaDeclarationForm form,
-			BindingResult result,
+			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 
-		// バリデーションエラーがある場合は入力画面へ差し戻す
-		if (result.hasErrors()) {
+		// 1. Springが自動判定したバリデーション結果を確認
+		if (bindingResult.hasErrors()) {
+			bindingResult.getAllErrors().forEach(error -> {
+				log.error("【バリデーションエラー】項目: {}, 内容: {}", error.getObjectName(), error.getDefaultMessage());
+			});
+			fukaService.hydrateFormMetadata(form); // 画面再表示用にメタ情報をセット
+			return CONFIG_VIEW;
+		}
+
+		// 2. 独自の相関チェック（定額・定率の分岐チェック）
+		try {
+			fukaValidatorService.validateCorrelation(form);
+		} catch (IllegalArgumentException e) {
+			model.addAttribute("errorMessage", e.getMessage());
 			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
 		}
 
-		// editフラグがtrue、かつ区分が未選択(empty)の場合にエラーを追加するぜ
+		// 3. 編集区分チェック（変数名を bindingResult に修正）
 		if (form.isEdit() && !org.springframework.util.StringUtils.hasText(form.getModificationCategory())) {
-			result.rejectValue("modificationCategory", "error.modificationCategory", "編集時は変更の区分を選択してください。");
+			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "編集時は変更の区分を選択してください。");
+			fukaService.hydrateFormMetadata(form);
+			return CONFIG_VIEW;
 		}
 
-		// 税額の整合性チェックを行い、相違がある場合は警告を表示する
+		// 4. 税額の不整合チェック
 		if (!form.isTaxCheckBypassed() && fukaService.hasTaxAmountDiscrepancy(form)) {
-			// 画面に必要なメタ情報を再セット
 			fukaService.hydrateFormMetadata(form);
-			// 警告モーダルの表示フラグを設定
 			model.addAttribute("showTaxWarningModal", true);
 			return CONFIG_VIEW;
 		}
+
+		// 5. 保存処理
 		try {
-			// 4. 申告情報の保存を実行
 			fukaService.saveDeclaration(form);
-
-			// 5. 区分に応じて適切な成功メッセージを決定する
-			String message = "納入情報の保存が成功しました。";
-			if ("1".equals(form.getModificationCategory())) {
-				message = "更生処理が成功しました。";
-			} else if ("2".equals(form.getModificationCategory())) {
-				message = "修正処理が成功しました。";
-			}
-
-			// フラッシュ属性にメッセージをセット（リダイレクト先の一覧画面で表示される）
-			redirectAttributes.addFlashAttribute("successMessage", message);
-
-			// 納入金額管理台帳（一覧画面）へリダイレクト
+			// ...成功時のリダイレクト処理...
 			return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
-
 		} catch (RuntimeException e) {
 			log.error("保存処理中にエラーが発生しました", e);
 			model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());

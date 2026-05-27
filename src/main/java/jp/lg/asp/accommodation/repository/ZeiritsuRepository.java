@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,9 @@ public interface ZeiritsuRepository extends JpaRepository<Zeiritsu, ZeiritsuId> 
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("taishoKbn") String taishoKbn,
 			@Param("tekiyoYm") String tekiyoYm);
+
+	List<Zeiritsu> findByJichitaiCdAndDelFlgOrderBySeqAsc(String jichitaiCd, String delFlg);
+
+	Optional<Zeiritsu> findFirstByJichitaiCdAndFukaKbnAndDelFlgOrderBySeqAsc(
+			String jichitaiCd, String fukaKbn, String delFlg);
 }
