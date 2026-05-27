@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/accommodation_tax_db
     username: postgres
-    password: desw321
+    password: GEpassword
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -19,7 +19,6 @@ spring:
       filter:
         enabled: true
 
-
 server:
   port: 8080
   servlet:
@@ -31,4 +30,4 @@ logging:
 
 app:
   jichitai:
-    code: '01202'
+    code: '01203'

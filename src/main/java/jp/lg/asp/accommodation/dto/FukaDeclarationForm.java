@@ -26,6 +26,9 @@ public class FukaDeclarationForm {
 
 	// 特別徴収義務者の指定番号
 	private String shiteiNo;
+	
+	// "1": 定額制, "2": 定率制 など、m_zeiritsu の fuka_kbn と連携する
+    private String fukaKbn;
 
 	// ========== 納税額情報エリア ==========
 	// 登録日
@@ -39,7 +42,6 @@ public class FukaDeclarationForm {
 	// 宿泊施設名称 (リードオンリー)
 	private String facilityName;
 	
-
 	@Valid
 	private FukaMonthlyDeclarationDto monthlyDetail = new FukaMonthlyDeclarationDto();
 
@@ -81,5 +83,18 @@ public class FukaDeclarationForm {
     private boolean edit;
     
     private boolean view;
+
+    // ========== 定率制（fukaKbn == '2'）入力エリア ==========
+    // 課税対象宿泊料金合計
+    private Long kazeiRyokin;
+
+    // 定率税額合計
+    private Long teiritsuZeigaku;
+
+    // 免税対象宿泊料金合計
+    private Long menjoRyokin;
+
+    // 課税対象宿泊数（定率制でも使用）
+    private Integer kazeiHakusu;
 
 }

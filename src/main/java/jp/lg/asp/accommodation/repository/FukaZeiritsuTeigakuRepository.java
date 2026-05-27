@@ -11,4 +11,8 @@ public interface FukaZeiritsuTeigakuRepository extends JpaRepository<FukaZeirits
     
     // 自治体コードで検索し、料金開始額の昇順（安い順）で取得する
     List<FukaZeiritsuTeigaku> findByJichitaiCdOrderByRyokinStAsc(String jichitaiCd);
+    
+ // FukaZeiritsuTeigakuRepository.java に追加
+ // taisho_kbn を使わず、自治体コードと seq で絞り込む
+    List<FukaZeiritsuTeigaku> findByJichitaiCdAndSeqOrderByRyokinStAsc(String jichitaiCd, Integer seq);
 }
