@@ -60,7 +60,7 @@ public class AtenaController {
 	public String showImport(Model model) {
 		accessChecker.checkAccess(ATENA_INSERT);
 		model.addAttribute("history", atenaImportService.findHistory(jichitaiCd));
-		return "atena/atenaInsert";
+		return "atena/atenaRenkei";
 	}
 
 	@PostMapping("/import")
