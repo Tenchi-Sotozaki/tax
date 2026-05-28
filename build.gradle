@@ -30,6 +30,7 @@ dependencies {
 
     // JasperReports
     implementation 'net.sf.jasperreports:jasperreports:7.0.6'
+    implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.6'
     implementation 'com.github.librepdf:openpdf:1.3.32'
     
     // JasperReportsの追加依存関係

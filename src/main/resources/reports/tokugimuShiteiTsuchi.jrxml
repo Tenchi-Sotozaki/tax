@@ -2,34 +2,16 @@
 <jasperReport name="tokugimuShiteiTsuchi" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f2d2bcb1-f3da-474d-a44a-59cbdbca2be1">
 	<property name="com.jaspersoft.studio.report.description" value="宿泊税特別徴収義務者指定通知書"/>
 	<query language="sql"><![CDATA[]]></query>
-	<field name="hakkoYmd" class="java.lang.String">
-		<description><![CDATA[発行日]]></description>
-	</field>
-	<field name="cityName" class="java.lang.String">
-		<description><![CDATA[市区町村名]]></description>
-	</field>
-	<field name="jorei" class="java.lang.String">
-		<description><![CDATA[条令]]></description>
-	</field>
-	<field name="tokuName" class="java.lang.String">
-		<description><![CDATA[特別徴収義務者名]]></description>
-	</field>
-	<field name="shiteiNo" class="java.lang.String">
-		<description><![CDATA[指定番号]]></description>
-	</field>
-	<field name="shisetsuJusho" class="java.lang.String">
-		<description><![CDATA[所在地]]></description>
-	</field>
-	<field name="shisetsuName" class="java.lang.String">
-		<description><![CDATA[名称]]></description>
-	</field>
+	<field name="hakkoYmd" class="java.lang.String"/>
+	<field name="cityName" class="java.lang.String"/>
+	<field name="jorei" class="java.lang.String"/>
+	<field name="tokuName" class="java.lang.String"/>
+	<field name="shiteiNo" class="java.lang.String"/>
+	<field name="shisetsuJusho" class="java.lang.String"/>
+	<field name="shisetsuName" class="java.lang.String"/>
 	<field name="tokuJusho" class="java.lang.String"/>
-	<field name="riyu" class="java.lang.String">
-		<description><![CDATA[理由]]></description>
-	</field>
-	<field name="city" class="java.lang.String">
-		<description><![CDATA[市区町村]]></description>
-	</field>
+	<field name="riyu" class="java.lang.String"/>
+	<field name="city" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<title height="79" splitType="Stretch">
 		<element kind="staticText" uuid="40292224-3b8e-46bb-b3dd-8dca7dd795df" x="20" y="9" width="500" height="60" fontName="ＭＳ Ｐ明朝" fontSize="16.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
