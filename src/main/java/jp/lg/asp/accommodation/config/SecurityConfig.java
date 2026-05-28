@@ -18,13 +18,16 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
+				.csrf(csrf -> csrf
+						.ignoringRequestMatchers("/reports/*/pdf", "/accommodation-tax/reports/*/pdf"))
 				.authorizeHttpRequests(auth -> auth
 						// 静的リソース・ログインは誰でもアクセス可
 						.requestMatchers("/css/**", "/js/**", "/login").permitAll()
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可
-						.requestMatchers("/tokugimu/**", "/declaration/**", "/atena/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/tokugimu/**", "/declaration/**", "/atena/**", "/reports/**")
+						.hasAnyRole("USER", "ADMIN")
 						// その他は認証済みであればアクセス可
 						.anyRequest().authenticated())
 				.formLogin(form -> form

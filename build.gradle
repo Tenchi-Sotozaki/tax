@@ -6,7 +6,10 @@ plugins {
 
 group = 'jp.lg.asp.accommodation'
 version = '1.0.0'
-sourceCompatibility = '21'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+}
 
 repositories {
     mavenCentral()
@@ -26,8 +29,16 @@ dependencies {
     implementation 'org.flywaydb:flyway-database-postgresql'
 
     // JasperReports
-    implementation 'net.sf.jasperreports:jasperreports:6.21.0'
+    implementation 'net.sf.jasperreports:jasperreports:7.0.6'
     implementation 'com.github.librepdf:openpdf:1.3.32'
+    
+    // JasperReportsの追加依存関係
+    implementation 'net.sf.jasperreports:jasperreports-fonts:7.0.6'
+    implementation 'org.apache.xmlgraphics:batik-bridge:1.17'
+    implementation 'org.apache.xmlgraphics:batik-svg-dom:1.17'
+    implementation 'org.apache.xmlgraphics:batik-svggen:1.17'
+    implementation 'commons-digester:commons-digester:2.1'
+    implementation 'commons-collections:commons-collections:3.2.2'
 
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'

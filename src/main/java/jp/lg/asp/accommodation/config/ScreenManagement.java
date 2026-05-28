@@ -74,4 +74,7 @@ public final class ScreenManagement {
 
 	// 帳票出力
 	public static final String TOKUGIMU_REPORT = "TOKU_REPORT";
+
+	// 特別徴収義務者指定通知書
+	public static final String TOKUGIMU_SHITEI_TSUCHI = "ms00000013";
 }

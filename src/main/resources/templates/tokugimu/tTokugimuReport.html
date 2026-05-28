@@ -25,7 +25,8 @@
 		<div class="card shadow-sm">
 			<div class="card-body">
 				<div class="d-grid gap-2" style="max-width: 500px;">
-					<button type="button" class="btn btn-outline-primary text-start" id="btnReportTorokuTsuchi">特別徴収義務者登録通知書</button>
+					<button type="button" class="btn btn-outline-primary text-start" id="btnReportTokugimuShiteiTsuchi">特別徴収義務者指定通知書</button>
+					<button type="button" class="btn btn-outline-primary text-start" id="btnReportTokugimuShinseiJuriTsuchi">特別徴収義務者申請受理通知書</button>
 					<button type="button" class="btn btn-outline-primary text-start" id="btnReportNozeiKanrinin">納税管理人承認(不承認)通知書</button>
 					<button type="button" class="btn btn-outline-primary text-start" id="btnReportNozeiMenjo">納税管理人選任免除承認(不承認)通知書</button>
 					<button type="button" class="btn btn-outline-primary text-start" id="btnReportTokureiShitei">納入申告書の提出期限等の特例適用者指定通知書</button>
@@ -41,5 +42,12 @@
 		</div>
 
 	</div>
+
+	<th:block layout:fragment="scripts">
+		<!-- 指定番号をJavaScriptで取得できるように隠し要素として配置 -->
+		<span id="shiteiNoData" style="display: none;" th:text="${shiteiNo}"></span>
+		<script th:src="@{/js/tTokugimuReport.js}"></script>
+	</th:block>
+
 </body>
 </html>
