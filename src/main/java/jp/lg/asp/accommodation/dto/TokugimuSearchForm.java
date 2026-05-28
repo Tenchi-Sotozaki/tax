@@ -22,9 +22,9 @@ public class TokugimuSearchForm {
 
 	/**
 	 * No.6 \u30b9\u30c6\u30fc\u30bf\u30b9 (t_tokugimu.eigyo_st_ymd, eigyo_ed_ymd, kyushi_st_ymd, kyushi_ed_ymd\u306e\u767b\u9332\u72b6\u6cc1\u304b\u3089\u5224\u5b9a)
-	 * 1=\u55b6\u696d\u4e2d/2=\u4f11\u6b62/3=\u5ec3\u6b62/4=\u3059\u3079\u3066
+	 * 1=\u55b6\u696d\u4e2d/2=\u4f11\u6b62/3=\u5ec3\u6b62/999=\u3059\u3079\u3066
 	 */
-	private String status = "4";
+	private String status = "999";
 
 	/** No.7 \u500b\u4eba\u756a\u53f7 (m_atena.kojin_no) */
 	private String kojinNo;
