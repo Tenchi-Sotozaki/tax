@@ -1,4 +1,4 @@
-package jp.lg.asp.accommodation.service;
+﻿package jp.lg.asp.accommodation.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -227,7 +227,7 @@ public class FukaService {
 
 			// 1. まず「定率制(taisho_kbn='2')」のマスタを検索
 			Optional<Zeiritsu> teiritsuMasterOpt = zeiritsuRepository
-					.findFirstByJichitaiCdAndFukaKbnAndDelFlgOrderBySeqAsc(jichitaiCd, "2", "0");
+					.findFirstByJichitaiCdAndFukaKbnAndTaishoKbnAndDelFlgOrderBySeqAsc(jichitaiCd, "2", "2", "0");
 
 			List<ZeiritsuTeigaku> masterRates = new ArrayList<>();
 
@@ -1041,7 +1041,7 @@ public class FukaService {
 			// =========================================================
 			// 💡 定額制（1）の場合のデータ復元ロジック（検索条件を "1" に修正）
 			// =========================================================
-			zeiritsuRepository.findFirstByJichitaiCdAndFukaKbnAndDelFlgOrderBySeqAsc(jichitaiCd, "1", "0")
+			zeiritsuRepository.findFirstByJichitaiCdAndFukaKbnAndTaishoKbnAndDelFlgOrderBySeqAsc(jichitaiCd, "1", "2", "0")
 					.ifPresent(z -> {
 						List<ZeiritsuTeigaku> masterRates = zeiritsuTeigakuRepository
 								.findActiveBySeq(jichitaiCd, z.getSeq());

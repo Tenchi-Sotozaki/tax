@@ -27,4 +27,7 @@ public interface ZeiritsuRepository extends JpaRepository<Zeiritsu, ZeiritsuId> 
 
 	Optional<Zeiritsu> findFirstByJichitaiCdAndFukaKbnAndDelFlgOrderBySeqAsc(
 			String jichitaiCd, String fukaKbn, String delFlg);
+
+	Optional<Zeiritsu> findFirstByJichitaiCdAndFukaKbnAndTaishoKbnAndDelFlgOrderBySeqAsc(
+			String jichitaiCd, String fukaKbn, String taishoKbn, String delFlg);
 }
