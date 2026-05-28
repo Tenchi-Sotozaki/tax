@@ -17,6 +17,13 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 
 	@Query("""
 			SELECT t FROM Tokugimu t
+			WHERE t.jichitaiCd = :jichitaiCd AND t.newFlg = '1' AND t.delFlg = '0'
+			ORDER BY t.shiteiNo
+			""")
+	List<Tokugimu> findAllByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+
+	@Query("""
+			SELECT t FROM Tokugimu t
 			LEFT JOIN Atena a ON t.jichitaiCd = a.jichitaiCd AND t.atenaNo = a.atenaNo
 			WHERE t.jichitaiCd = :jichitaiCd AND t.newFlg = '1' AND t.delFlg = '0'
 			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR t.shiteiNo = :shiteiNo)
