@@ -97,8 +97,21 @@ public class TokugimuShiteiTsuchiController {
 	 * 印刷
 	 */
 	@PostMapping("/print")
-	public String print(TokugimuShiteiTsuchiDto dto) {
+	public ResponseEntity<byte[]> print(TokugimuShiteiTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return "reports/tokugimuShiteiTsuchi";
+		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		// inline指定でブラウザ内表示
+		headers.add("Content-Disposition", "inline; filename=tokugimu_shitei_tsuchi_print.pdf");
+		// 印刷用のカスタムヘッダー
+		headers.add("X-Print-Action", "true");
+		// キャッシュ制御
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+
+		return ResponseEntity.ok().headers(headers).body(pdfData);
 	}
 }
