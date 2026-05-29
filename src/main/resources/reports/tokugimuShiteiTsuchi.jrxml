@@ -1,0 +1,128 @@
+<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport name="tokugimuShiteiTsuchi" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f2d2bcb1-f3da-474d-a44a-59cbdbca2be1">
+	<property name="com.jaspersoft.studio.report.description" value="宿泊税特別徴収義務者指定通知書"/>
+	<query language="sql"><![CDATA[]]></query>
+	<field name="hakkoYmd" class="java.lang.String"/>
+	<field name="cityName" class="java.lang.String"/>
+	<field name="jorei" class="java.lang.String"/>
+	<field name="tokuName" class="java.lang.String"/>
+	<field name="shiteiNo" class="java.lang.String"/>
+	<field name="shisetsuJusho" class="java.lang.String"/>
+	<field name="shisetsuName" class="java.lang.String"/>
+	<field name="tokuJusho" class="java.lang.String"/>
+	<field name="riyu" class="java.lang.String"/>
+	<field name="city" class="java.lang.String"/>
+	<background splitType="Stretch"/>
+	<title height="79" splitType="Stretch">
+		<element kind="staticText" uuid="40292224-3b8e-46bb-b3dd-8dca7dd795df" x="20" y="9" width="500" height="60" fontName="IPAex明朝" fontSize="16.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+			<text><![CDATA[宿泊税特別徴収義務者指定通知書]]></text>
+		</element>
+	</title>
+	<detail>
+		<band height="659" splitType="Stretch">
+			<element kind="textField" uuid="71c90364-c928-4a37-b3ac-8a66020f6021" x="390" y="10" width="150" height="20" fontName="IPAex明朝" hTextAlign="Right">
+				<expression><![CDATA[$F{hakkoYmd}]]></expression>
+			</element>
+			<element kind="textField" uuid="cbfcfd41-c88f-4a7b-8218-b24f1f663e1a" x="40" y="21" width="220" height="30" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
+				<expression><![CDATA[$F{tokuName}]]></expression>
+			</element>
+			<element kind="staticText" uuid="8e7f4228-6369-4511-9017-34e07a57453a" x="260" y="21" width="40" height="30" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[様]]></text>
+			</element>
+			<element kind="textField" uuid="727e8f86-0807-4f17-ad05-ff4fcec8ef1c" x="330" y="50" width="100" height="20" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
+				<expression><![CDATA[$F{cityName}+"長"]]></expression>
+			</element>
+			<element kind="textField" uuid="c347ac56-ef98-445c-983c-a94c6a51d561" x="40" y="100" width="480" height="40" fontName="IPAex明朝" fontSize="12.0">
+				<expression><![CDATA["　"+$F{cityName}+"宿泊税条令"+$F{jorei}+"の規定により、次のとおり宿泊税の特別徴収義務者に指定したので通知します。"]]></expression>
+			</element>
+			<element kind="rectangle" uuid="17b63ab0-46d4-44fd-9e89-9cdf2f3d2d9d" x="40" y="160" width="210" height="40">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="8c7696e5-bc0d-4e8d-83f6-78a09dabaeaa" x="250" y="160" width="270" height="40">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="c4497a84-7c41-40cf-9118-97702c1f7321" x="40" y="160" width="210" height="40" markup="none" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[指 定 番 号]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="textField" uuid="188b9901-f284-493d-bbab-5397a5cbaef6" x="250" y="160" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" vTextAlign="Middle">
+				<expression><![CDATA[$F{shiteiNo}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="cf10546d-9ebb-4f34-8c09-11c9df6fe8f7" x="40" y="200" width="210" height="80">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="bfda5b85-3a40-42ce-b517-2e30d791f85e" x="150" y="200" width="100" height="40">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="2fc22caa-0964-4cc3-a275-6be912ac1651" x="150" y="240" width="100" height="40"/>
+			<element kind="staticText" uuid="7499304b-389a-4947-98d9-7c48691a3b79" x="40" y="200" width="110" height="80" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[宿 泊 施 設]]></text>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="6e6fa574-86f1-40e1-9b2d-a5681d58865d" x="150" y="200" width="100" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[所 在 地]]></text>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="cfea5af0-e301-4682-890e-b10c0f7e398b" x="150" y="240" width="100" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[名 称]]></text>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="e8b11bd4-3962-42e7-88c2-cc0a37246f1a" x="250" y="200" width="270" height="40"/>
+			<element kind="textField" uuid="40a8069f-c73a-4768-8039-dd31fd9f57e8" x="250" y="200" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$F{shisetsuJusho}]]></expression>
+			</element>
+			<element kind="rectangle" uuid="d7913e4d-b6b9-4ea0-b722-0a71ae996407" x="250" y="240" width="270" height="40"/>
+			<element kind="textField" uuid="5ae84b04-270b-497b-a912-d5c89cb63e65" x="250" y="240" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$F{shisetsuName}]]></expression>
+			</element>
+			<element kind="rectangle" uuid="a82d3bd4-9b55-4153-a4e8-80b055da828d" x="40" y="280" width="210" height="80">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="d41df911-7e6c-4d55-b9ad-35112be7633b" x="150" y="280" width="100" height="40">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="f9a29f5c-2a0d-41d3-ac35-b53193fffaad" x="150" y="320" width="100" height="40">
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="8b8675e6-866a-4d30-917f-3ec003c23eeb" x="40" y="280" width="110" height="80" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[特別徴収義務者]]></text>
+			</element>
+			<element kind="staticText" uuid="0e53a887-957a-416b-9d65-20b6a15cee67" x="150" y="280" width="100" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[住 所
+（所 在 地）]]></text>
+			</element>
+			<element kind="staticText" uuid="da12104e-1536-4751-a6d0-65bcb70b8994" x="150" y="320" width="100" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[氏 名
+（名 称）]]></text>
+			</element>
+			<element kind="rectangle" uuid="a2ebfe34-3574-4174-84d0-2e9a23704537" x="250" y="280" width="270" height="40"/>
+			<element kind="rectangle" uuid="dd0957ae-94a9-4414-b315-aca96d15e96e" x="250" y="320" width="270" height="40"/>
+			<element kind="textField" uuid="71b283ec-5a8c-4684-a9c6-ffbb62390a9f" x="250" y="280" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$F{tokuJusho}]]></expression>
+			</element>
+			<element kind="textField" uuid="d3edaca6-e7b3-4e17-9c3d-8deb4f7606e4" x="250" y="320" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$F{tokuName}]]></expression>
+			</element>
+			<element kind="rectangle" uuid="9d729c07-a340-454e-a9d3-02d3c86f7adf" x="40" y="360" width="110" height="80">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="staticText" uuid="cf160901-61d8-466d-aa18-9f42f73d454e" x="40" y="360" width="110" height="80" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[指定の理由]]></text>
+			</element>
+			<element kind="rectangle" uuid="efc1988d-0246-4693-8861-dcef0e1abde3" x="150" y="360" width="370" height="80">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="textField" uuid="ed591281-2b96-4c1c-95e6-6f5b3d8ab719" x="150" y="360" width="370" height="80" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$F{riyu}]]></expression>
+			</element>
+			<element kind="textField" uuid="ea21e6d2-f202-494a-b2a8-e8c697bf32f1" x="40" y="469" width="480" height="190" fontName="IPAex明朝" fontSize="12.0">
+				<expression><![CDATA["※この通知書に記載された事項について不服がある場合には、この通知書により処分があったことを知った日の翌日から起算して3か月以内に、"+$F{city}+"長に対して審査請求することができます。\r\n　また、処分の取り消しを求める訴えは、前記の審査請求に対する採決があったことを知った翌日から起算して6か月以内に、"+$F{city}+"を被告として（"+$F{city}+"長が被告の代表となります）提起することができます。\r\n　処分の取消しの訴えは、前記の審査請求に対する裁決を経た後でなければ提起することができないこととされていますが、①審査請求があった日の翌日から3か月を経過しても裁決がないとき、②処分、 処分の執行又は手続きの続行により生ずる著しい損害を避けるための緊急の必要があるとき、③その他裁決を経ないことにつき正当な理由があるときのいずれかに該当するときは、裁決を経ないでも処分の取消しの訴えを提起することができます。\r\n　なお、前記の期間が経過する前に、この処分があった日の翌日から起算して1年を経過した場合は、 審査請求をすることができなくなり、また、審査請求に対する裁決のあった日の翌日から起算して1年を経過した場合は、処分の取消しの訴えを提起することができなくなります。"]]></expression>
+			</element>
+		</band>
+	</detail>
+</jasperReport>
