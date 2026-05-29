@@ -72,7 +72,7 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 		// 住所を郵便番号と住所で連結
 		String tokuJusho = "";
 		if (atena.getYubinNo() != null && !atena.getYubinNo().isEmpty()) {
-			tokuJusho = "〒" + atena.getYubinNo() + " ";
+			tokuJusho = "〒" + atena.getYubinNo() + "\r\n";
 		}
 		if (atena.getJusho() != null) {
 			tokuJusho += atena.getJusho();
@@ -84,7 +84,7 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 		// 施設所在地を郵便番号と住所で連結
 		String shisetsuJusho = "";
 		if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
-			shisetsuJusho = "〒" + tokugimu.getShisetsuYubinNo() + " ";
+			shisetsuJusho = "〒" + tokugimu.getShisetsuYubinNo() + "\r\n";
 		}
 		if (tokugimu.getShisetsuJusho() != null) {
 			shisetsuJusho += tokugimu.getShisetsuJusho();

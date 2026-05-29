@@ -63,7 +63,7 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 		// 基本情報
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
-		reportsDto.setTokuJusho(dto.getTokuName() != null ? dto.getTokuName() : "");
+		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
 		reportsDto.setShiteiNo(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
