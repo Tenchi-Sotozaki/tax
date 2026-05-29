@@ -39,8 +39,6 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 
 	@Override
 	public TokugimuShiteiTsuchiDto getTokugimuInfo(String shiteiNo) {
-		log.info("特別徴収義務者情報取得開始: shiteiNo={}", shiteiNo);
-
 		// 特別徴収義務者情報取得（最新・未削除）
 		Optional<Tokugimu> tokugimuOpt = tokugimuRepository
 				.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
@@ -96,7 +94,6 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 		dto.setCity(city);
 		dto.setJorei(jorei);
 
-		log.info("特別徴収義務者情報取得完了: shiteiNo={}", shiteiNo);
 		return dto;
 	}
 }

@@ -18,8 +18,6 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
-				.csrf(csrf -> csrf
-						.ignoringRequestMatchers("/reports/*/pdf", "/accommodation-tax/reports/*/pdf"))
 				.authorizeHttpRequests(auth -> auth
 						// 静的リソース・ログインは誰でもアクセス可
 						.requestMatchers("/css/**", "/js/**", "/login").permitAll()

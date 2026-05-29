@@ -22,6 +22,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  * 特別徴収義務者指定通知帳票 Service 実装
@@ -35,8 +36,6 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 
 	@Override
 	public byte[] generateTsuchiPdf(TokugimuShiteiTsuchiDto dto) {
-		log.info("特別徴収義務者指定通知PDF生成開始: shiteiNo={}", dto.getShiteiNo());
-
 		try {
 			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
@@ -47,7 +46,6 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 					jasperReport, parameters, dataSource);
 
 			byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
-			log.info("特別徴収義務者指定通知PDF生成完了: size={}bytes", pdf.length);
 			return pdf;
 
 		} catch (Exception e) {

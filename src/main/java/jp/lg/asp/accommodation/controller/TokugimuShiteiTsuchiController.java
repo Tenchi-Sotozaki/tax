@@ -40,8 +40,6 @@ public class TokugimuShiteiTsuchiController {
 	@GetMapping
 	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		log.info("特別徴収義務者指定通知画面表示: shiteiNo={}", shiteiNo);
-
 		TokugimuShiteiTsuchiDto dto = new TokugimuShiteiTsuchiDto();
 
 		if (shiteiNo != null && !shiteiNo.isEmpty()) {
@@ -66,23 +64,13 @@ public class TokugimuShiteiTsuchiController {
 	@PostMapping("/pdf")
 	public ResponseEntity<byte[]> generatePdf(TokugimuShiteiTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
-		log.info("特別徴収義務者指定通知PDF出力: shiteiNo={}", dto.getShiteiNo());
+		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
 
-		try {
-			byte[] pdfData = reportsService.generateTsuchiPdf(dto);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.setContentDispositionFormData("inline", "tokugimu_shitei_tsuchi.pdf");
 
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.setContentDispositionFormData("inline", "tokugimu_shitei_tsuchi.pdf");
-
-			return ResponseEntity.ok()
-					.headers(headers)
-					.body(pdfData);
-
-		} catch (Exception e) {
-			log.error("PDF出力エラー", e);
-			return ResponseEntity.internalServerError().build();
-		}
+		return ResponseEntity.ok().headers(headers).body(pdfData);
 	}
 
 	/**
@@ -91,15 +79,26 @@ public class TokugimuShiteiTsuchiController {
 	@PostMapping("/preview")
 	public ResponseEntity<byte[]> preview(TokugimuShiteiTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generatePdf(dto);
+		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		// inline指定でブラウザ内表示を促す
+		headers.add("Content-Disposition", "inline; filename=tokugimu_shitei_tsuchi_preview.pdf");
+		// キャッシュ制御
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+
+		return ResponseEntity.ok().headers(headers).body(pdfData);
 	}
 
 	/**
 	 * 印刷
 	 */
 	@PostMapping("/print")
-	public ResponseEntity<byte[]> print(TokugimuShiteiTsuchiDto dto) {
+	public String print(TokugimuShiteiTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generatePdf(dto);
+		return "reports/tokugimuShiteiTsuchi";
 	}
 }

@@ -25,9 +25,28 @@ function preview() {
     }
     
     const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/reports/tokugimuShiteiTsuchi/preview';
-    form.target = '_self';
-    form.submit();
+    const formData = new FormData(form);
+    
+    fetch('/accommodation-tax/reports/tokugimuShiteiTsuchi/preview', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('プレビューの生成に失敗しました');
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        // メモリリークを防ぐため、少し後にURLを解放
+        setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('プレビューの表示に失敗しました。');
+    });
 }
 
 /**

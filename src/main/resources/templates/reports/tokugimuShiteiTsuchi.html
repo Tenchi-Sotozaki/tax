@@ -15,6 +15,7 @@
                     </h2>
                     
                     <form id="tsuchiForm" th:object="${dto}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <!-- 特別徴収義務者情報エリア -->
                         <div class="card mb-4">
                             <div class="card-header">
