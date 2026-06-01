@@ -46,8 +46,10 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
 			<element kind="textField" uuid="188b9901-f284-493d-bbab-5397a5cbaef6" x="250" y="160" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" vTextAlign="Middle">
+				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{shiteiNo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 			</element>
 			<element kind="rectangle" uuid="cf10546d-9ebb-4f34-8c09-11c9df6fe8f7" x="40" y="200" width="210" height="80">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -71,11 +73,15 @@
 			</element>
 			<element kind="rectangle" uuid="e8b11bd4-3962-42e7-88c2-cc0a37246f1a" x="250" y="200" width="270" height="40"/>
 			<element kind="textField" uuid="40a8069f-c73a-4768-8039-dd31fd9f57e8" x="250" y="200" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{shisetsuJusho}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 			</element>
 			<element kind="rectangle" uuid="d7913e4d-b6b9-4ea0-b722-0a71ae996407" x="250" y="240" width="270" height="40"/>
 			<element kind="textField" uuid="5ae84b04-270b-497b-a912-d5c89cb63e65" x="250" y="240" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{shisetsuName}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 			</element>
 			<element kind="rectangle" uuid="a82d3bd4-9b55-4153-a4e8-80b055da828d" x="40" y="280" width="210" height="80">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -101,10 +107,14 @@
 			<element kind="rectangle" uuid="a2ebfe34-3574-4174-84d0-2e9a23704537" x="250" y="280" width="270" height="40"/>
 			<element kind="rectangle" uuid="dd0957ae-94a9-4414-b315-aca96d15e96e" x="250" y="320" width="270" height="40"/>
 			<element kind="textField" uuid="71b283ec-5a8c-4684-a9c6-ffbb62390a9f" x="250" y="280" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{tokuJusho}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 			</element>
 			<element kind="textField" uuid="d3edaca6-e7b3-4e17-9c3d-8deb4f7606e4" x="250" y="320" width="270" height="40" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{tokuName}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 			</element>
 			<element kind="rectangle" uuid="9d729c07-a340-454e-a9d3-02d3c86f7adf" x="40" y="360" width="110" height="80">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -118,7 +128,9 @@
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
 			<element kind="textField" uuid="ed591281-2b96-4c1c-95e6-6f5b3d8ab719" x="150" y="360" width="370" height="80" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{riyu}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 			</element>
 			<element kind="textField" uuid="ea21e6d2-f202-494a-b2a8-e8c697bf32f1" x="40" y="469" width="480" height="190" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA["※この通知書に記載された事項について不服がある場合には、この通知書により処分があったことを知った日の翌日から起算して3か月以内に、"+$F{city}+"長に対して審査請求することができます。\r\n　また、処分の取り消しを求める訴えは、前記の審査請求に対する採決があったことを知った翌日から起算して6か月以内に、"+$F{city}+"を被告として（"+$F{city}+"長が被告の代表となります）提起することができます。\r\n　処分の取消しの訴えは、前記の審査請求に対する裁決を経た後でなければ提起することができないこととされていますが、①審査請求があった日の翌日から3か月を経過しても裁決がないとき、②処分、 処分の執行又は手続きの続行により生ずる著しい損害を避けるための緊急の必要があるとき、③その他裁決を経ないことにつき正当な理由があるときのいずれかに該当するときは、裁決を経ないでも処分の取消しの訴えを提起することができます。\r\n　なお、前記の期間が経過する前に、この処分があった日の翌日から起算して1年を経過した場合は、 審査請求をすることができなくなり、また、審査請求に対する裁決のあった日の翌日から起算して1年を経過した場合は、処分の取消しの訴えを提起することができなくなります。"]]></expression>
