@@ -20,7 +20,7 @@
 	</title>
 	<detail>
 		<band height="659" splitType="Stretch">
-			<element kind="textField" uuid="71c90364-c928-4a37-b3ac-8a66020f6021" x="390" y="10" width="150" height="20" fontName="IPAex明朝" hTextAlign="Right">
+			<element kind="textField" uuid="71c90364-c928-4a37-b3ac-8a66020f6021" x="390" y="10" width="150" height="20" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
 				<expression><![CDATA[$F{hakkoYmd}]]></expression>
 			</element>
 			<element kind="textField" uuid="cbfcfd41-c88f-4a7b-8218-b24f1f663e1a" x="40" y="21" width="220" height="30" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
@@ -33,7 +33,9 @@
 				<expression><![CDATA[$F{cityName}+"長"]]></expression>
 			</element>
 			<element kind="textField" uuid="c347ac56-ef98-445c-983c-a94c6a51d561" x="40" y="100" width="480" height="40" fontName="IPAex明朝" fontSize="12.0">
-				<expression><![CDATA["　"+$F{cityName}+"宿泊税条令"+$F{jorei}+"の規定により、次のとおり宿泊税の特別徴収義務者に指定したので通知します。"]]></expression>
+				<paragraph firstLineIndent="15"/>
+				<expression><![CDATA[$F{cityName}+"宿泊税条令"+$F{jorei}+"の規定により、次のとおり宿泊税の特別徴収義務者に指定したので通知します。"]]></expression>
+				<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
 			</element>
 			<element kind="rectangle" uuid="17b63ab0-46d4-44fd-9e89-9cdf2f3d2d9d" x="40" y="160" width="210" height="40">
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
