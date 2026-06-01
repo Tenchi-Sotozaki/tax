@@ -3,10 +3,10 @@ package jp.lg.asp.accommodation.dto;
 import lombok.Data;
 
 /**
- * 特別徴収義務者指定通知帳票DTO
+ * 特別徴収義務者申請受理通知帳票DTO
  */
 @Data
-public class TokugimuShiteiTsuchiReportsDto {
+public class TokugimuJuriTsuchiReportsDto {
 
 	/** 指定番号 */
 	private String shiteiNo;
@@ -14,14 +14,14 @@ public class TokugimuShiteiTsuchiReportsDto {
 	/** 発行日 */
 	private String hakkoYmd;
 
-	/** 指定の理由 */
-	private String riyu;
-
 	/** 特別徴収義務者名 */
 	private String tokuName;
 
 	/** 特別徴収義務者住所 */
 	private String tokuJusho;
+
+	/** 特別徴収義務者住所（郵便番号なし） */
+	private String tokuJushoWithoutYubin;
 
 	/** 施設名称 */
 	private String shisetsuName;
@@ -35,6 +35,6 @@ public class TokugimuShiteiTsuchiReportsDto {
 	/** 条令 */
 	private String jorei;
 
-	/** 市区町村 */
-	private String city;
+	/** 備考 */
+	private String biko;
 }
