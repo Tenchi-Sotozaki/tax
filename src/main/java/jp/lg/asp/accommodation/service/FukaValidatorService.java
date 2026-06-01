@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
+import jp.lg.asp.accommodation.enums.FukaKbn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
  * 宿泊税申告のバリデーションを行うサービス
  */
 @Slf4j
-
 @Service
 @RequiredArgsConstructor
 public class FukaValidatorService {
@@ -26,13 +26,74 @@ public class FukaValidatorService {
 		if (detail == null)
 			return;
 
+		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+
 		if (StringUtils.hasText(detail.getPaymentYearMonth())) {
-			// 💡 賦課区分によってバリデーションロジックを切り替える
-			if ("2".equals(form.getFukaKbn())) {
+			if (kbn.isTeiritsu()) {
 				checkStayCountForTeiritsu(form);
 			} else {
 				checkStayCountForTeigaku(detail);
 			}
+		}
+
+		// 明細から算出した税額合計と、画面の合計値の整合性チェック
+		validateTaxTotal(form);
+	}
+
+	/**
+	 * 明細リストから税額の正解値を再計算し、画面の合計値と比較する。
+	 * 不一致の場合は IllegalArgumentException をスローする。
+	 */
+	private void validateTaxTotal(FukaDeclarationForm form) {
+		long expectedTotal = calculateExpectedTotal(form);
+		long inputTotal = getInputTotal(form);
+
+		if (expectedTotal != inputTotal) {
+			log.error("税額整合性エラー: 明細からの算出値={}, 画面入力値={}", expectedTotal, inputTotal);
+			throw new IllegalArgumentException(
+					String.format("税額の合計が明細と一致しません。明細からの算出値: %,d円 / 画面入力値: %,d円", expectedTotal, inputTotal));
+		}
+	}
+
+	/**
+	 * 明細リスト（taxDetails）から税額の正解値を算出する。
+	 * Enumの calculateTax メソッドに計算を委譲することで、定額/定率の分岐を排除する。
+	 */
+	public long calculateExpectedTotal(FukaDeclarationForm form) {
+		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
+		if (detail == null || detail.getTaxDetails() == null || detail.getTaxDetails().isEmpty()) {
+			return 0L;
+		}
+
+		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+
+		long total = 0L;
+		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
+			long rate = (d.getTaxRate() != null) ? d.getTaxRate() : 0L;
+			long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
+			total += kbn.calculateTax(rate, count);
+		}
+		return total;
+	}
+
+	/**
+	 * 画面から送信された合計税額を取得する。
+	 * 定率制の場合は taxDetails[0].taxAmount、定額制の場合は totalPaymentAmount を参照する。
+	 */
+	private long getInputTotal(FukaDeclarationForm form) {
+		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
+		if (detail == null) return 0L;
+
+		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+
+		if (kbn.isTeiritsu()) {
+			if (detail.getTaxDetails() != null && !detail.getTaxDetails().isEmpty()) {
+				Long amt = detail.getTaxDetails().get(0).getTaxAmount();
+				return (amt != null) ? amt : 0L;
+			}
+			return 0L;
+		} else {
+			return (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0L;
 		}
 	}
 
@@ -66,8 +127,6 @@ public class FukaValidatorService {
 	private void checkStayCountForTeiritsu(FukaDeclarationForm form) {
 		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
 
-		// 💡 定率制の合計チェックロジック
-		// 課税対象宿泊数 + 課税対象外宿泊数 = 総宿泊数
 		long kazeiHakusu = (form.getKazeiHakusu() != null) ? form.getKazeiHakusu() : 0;
 		long exemptHakusu = (detail.getExemptStayCount() != null) ? detail.getExemptStayCount() : 0;
 		long totalStayCount = (detail.getTotalStayCount() != null) ? detail.getTotalStayCount() : 0;

@@ -414,41 +414,83 @@
 
 							<div class="table-responsive">
 								<table class="table table-sm table-bordered align-middle text-center"
-									id="monthlyTallyTable">
+									id="monthlyTallyTable" style="min-width: 800px;">
+
 									<thead class="table-light">
-										<tr th:if="*{fukaKbn == '2'}">
-											<th style="width: 60px;">日付</th>
-											<th>合計宿泊料金 (円)</th>
+										<tr>
+											<th rowspan="2" class="align-middle" style="width: 60px;">日付</th>
+											<th th:colspan="*{monthlyDetail.taxDetails.size()}"
+												th:text="*{fukaKbn == '1'} ? '宿泊数 (人泊)' : '課税対象 宿泊料金 (円)'">
+												宿泊数/料金
+											</th>
+											<th rowspan="2" class="align-middle" style="width: 100px;">課税免除<br>(人泊)</th>
+											<th rowspan="2" class="align-middle" style="width: 80px;"
+												th:if="*{fukaKbn == '1'}">合計<br>(人泊)</th>
+										</tr>
+										<tr>
+											<th th:each="detail : *{monthlyDetail.taxDetails}" th:text="${detail.label}"
+												style="font-size: 0.85rem; font-weight: normal;">
+												区分名
+											</th>
 										</tr>
 									</thead>
 
-									<tbody th:if="*{fukaKbn == '2'}">
+									<tbody>
 										<th:block th:if="*{#lists.isEmpty(monthlyTally.dailyItems)}">
 											<tr th:each="day : ${#numbers.sequence(1, 31)}">
-												<td th:text="${day} + '日'" class="fw-bold"></td>
+												<td th:text="${day}" class="fw-bold bg-light"></td>
 												<input type="hidden" th:name="|monthlyTally.dailyItems[${day - 1}].day|"
 													th:value="${day}">
+
+												<td th:each="detail, stat : *{monthlyDetail.taxDetails}">
+													<input type="number" class="form-control form-control-sm text-end"
+														th:classappend="*{fukaKbn == '1'} ? 'seq' + (${stat.index} + 1) : 'teiritsu-day-ryokin'"
+														th:name="|monthlyTally.dailyItems[${day - 1}].taxCategoryCounts[${stat.index}]|"
+														value="0" min="0">
+												</td>
+
 												<td>
 													<input type="number"
-														class="form-control form-control-sm tally-input teiritsu-day-ryokin text-end"
-														th:name="|monthlyTally.dailyItems[${day - 1}].taxCategoryCounts[0]|"
+														class="form-control form-control-sm text-end exempt"
+														th:name="|monthlyTally.dailyItems[${day - 1}].exemptCount|"
 														value="0" min="0">
+												</td>
+
+												<td th:if="*{fukaKbn == '1'}">
+													<input type="number"
+														class="form-control form-control-sm text-end bg-light row-total"
+														readonly value="0" tabindex="-1">
 												</td>
 											</tr>
 										</th:block>
 
 										<th:block th:unless="*{#lists.isEmpty(monthlyTally.dailyItems)}">
 											<tr th:each="item, stat : *{monthlyTally.dailyItems}">
-												<td th:text="${item.day} + '日'" class="fw-bold"></td>
+												<td th:text="${item.day}" class="fw-bold bg-light"></td>
 												<input type="hidden"
 													th:name="|monthlyTally.dailyItems[${stat.index}].day|"
 													th:value="${item.day}">
+
+												<td th:each="detail, catStat : *{monthlyDetail.taxDetails}">
+													<input type="number" class="form-control form-control-sm text-end"
+														th:classappend="*{fukaKbn == '1'} ? 'seq' + (${catStat.index} + 1) : 'teiritsu-day-ryokin'"
+														th:name="|monthlyTally.dailyItems[${stat.index}].taxCategoryCounts[${catStat.index}]|"
+														th:value="${not #lists.isEmpty(item.taxCategoryCounts) and item.taxCategoryCounts.size() > catStat.index ? item.taxCategoryCounts[catStat.index] : '0'}"
+														min="0" th:readonly="${fukaDeclarationForm.isView}">
+												</td>
+
 												<td>
 													<input type="number"
-														class="form-control form-control-sm tally-input teiritsu-day-ryokin text-end"
-														th:name="|monthlyTally.dailyItems[${stat.index}].taxCategoryCounts[0]|"
-														th:value="${not #lists.isEmpty(item.taxCategoryCounts) ? item.taxCategoryCounts[0] : ''}"
-														placeholder="0" min="0">
+														class="form-control form-control-sm text-end exempt"
+														th:name="|monthlyTally.dailyItems[${stat.index}].exemptCount|"
+														th:value="${item.exemptCount != null ? item.exemptCount : '0'}"
+														min="0" th:readonly="${fukaDeclarationForm.isView}">
+												</td>
+
+												<td th:if="*{fukaKbn == '1'}">
+													<input type="number"
+														class="form-control form-control-sm text-end bg-light row-total"
+														readonly value="0" tabindex="-1">
 												</td>
 											</tr>
 										</th:block>
@@ -457,9 +499,9 @@
 							</div>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
 							<button type="button" class="btn btn-primary" id="btnApplyTally" data-bs-dismiss="modal">
-								<span th:text="*{fukaKbn == '2'} ? '計算結果を親画面に反映' : '合計を親画面に反映'">合計を親画面に反映</span>
+								<span>入力内容を保持して閉じる</span>
 							</button>
 						</div>
 					</div>
@@ -566,98 +608,11 @@
 
 
 				// =========================================================
-				// 💡 2. 月計表モーダルの反映ボタン処理（定額・定率完全分離版）
+				// 💡 2. 月計表モーダルの反映ボタン処理
 				// =========================================================
 				const btnApply = document.getElementById('btnApplyTally');
 				if (btnApply) {
 					btnApply.addEventListener('click', function () {
-
-						// 💡 画面の一意のIDから現在の「賦課区分」を取得（"1":定額, "2":定率）
-						const fukaKbnElement = document.getElementById('fukaKbnHidden');
-						const fukaKbn = fukaKbnElement ? fukaKbnElement.value : "1";
-
-						// -------------------------------------------------
-						// 💡 【定率制（fukaKbn == "2"）】日別料金からの完全自動計算・代入処理
-						// -------------------------------------------------
-						if (fukaKbn === "2") {
-							let totalTeiritsuRyokin = 0; // 1ヶ月の合計宿泊料金の集計カウンター
-
-							// 💡 DOM（ドム：HTMLの要素をツリー構造としてプログラムから操作できるようにする仕組み）から各行の料金入力を抽出
-							document.querySelectorAll('#monthlyTallyTable tbody tr').forEach(row => {
-								const ryokinInput = row.querySelector('.teiritsu-day-ryokin');
-								if (ryokinInput) {
-									totalTeiritsuRyokin += parseInt(ryokinInput.value) || 0;
-								}
-							});
-
-							// ① 親画面の「課税対象宿泊料金」に入力合計金額を代入
-							const kazeiRyokinField = document.querySelector('[name="monthlyDetail.kazeiRyokin"]');
-							if (kazeiRyokinField) {
-								kazeiRyokinField.value = totalTeiritsuRyokin;
-							}
-
-							// ② 親画面の「合計 (総計) の宿泊料金」にも同じく入力合計金額を代入
-							const totalRyokinField = document.querySelector('[name="monthlyDetail.totalRyokin"]');
-							if (totalRyokinField) {
-								totalRyokinField.value = totalTeiritsuRyokin;
-							}
-
-							// ③ 親画面の隠し項目（id="teiritsuTaxRate"）から、マスタ由来の適用税率（2%）を取得
-							const taxRateElement = document.getElementById('teiritsuTaxRate');
-							const taxRatePercent = taxRateElement ? parseFloat(taxRateElement.value) || 2.0 : 2.0;
-
-							// ④ 💡 仕様通りの計算式：合計宿泊料金 × 課税率(%) / 100 （端数切り捨て）
-							const calculatedZeigaku = Math.floor(totalTeiritsuRyokin * (taxRatePercent / 100));
-
-							// ⑤ 親画面の「納税金額」の入力欄（th:field="*{monthlyDetail.taxDetails[0].taxAmount}"）に代入
-							const teiritsuZeigakuField = document.querySelector('[name="monthlyDetail.taxDetails[0].taxAmount"]');
-							if (teiritsuZeigakuField) {
-								teiritsuZeigakuField.value = calculatedZeigaku;
-							}
-
-							alert('定率制の計算が完了しました。\n合計宿泊料金: ' + totalTeiritsuRyokin + '円\n適用税率: ' + taxRatePercent + '%\n納税金額: ' + calculatedZeigaku + '円\n親画面に自動反映しました（ここから手動修正も可能です）。');
-
-							// 💡 Early Return（早期リターン：条件を満たした時点で直ちにメソッドの処理を終了させる設計手法）で定額制ロジックの通過を完全ブロック
-							return;
-						}
-
-						// -------------------------------------------------
-						// 💡 【既存ロジック】定額制（fukaKbn == "1"）の場合の集計処理（既存維持）
-						// -------------------------------------------------
-						const detailRows = document.querySelectorAll('.tax-detail-row');
-						const categoryCount = detailRows.length;
-
-						let categoryTotals = new Array(categoryCount).fill(0);
-						let totalExempt = 0;
-
-						document.querySelectorAll('#monthlyTallyTable tbody tr').forEach(row => {
-							for (let i = 0; i < categoryCount; i++) {
-								const input = row.querySelector(`.seq${i + 1}`);
-								if (input) {
-									categoryTotals[i] += parseInt(input.value) || 0;
-								}
-							}
-							const exemptInput = row.querySelector('.exempt');
-							if (exemptInput) {
-								totalExempt += parseInt(exemptInput.value) || 0;
-							}
-						});
-
-						categoryTotals.forEach((total, index) => {
-							if (detailRows[index]) {
-								const targetInput = detailRows[index].querySelector('.stay-count-input');
-								if (targetInput) {
-									targetInput.value = total;
-								}
-							}
-						});
-
-						const exemptField = document.getElementById('exemptStayCount');
-						if (exemptField) {
-							exemptField.value = totalExempt;
-						}
-
-						alert('月計表の宿泊数を反映しました。税額と合計値は手入力で算定してください。');
 					});
 				}
 			});
