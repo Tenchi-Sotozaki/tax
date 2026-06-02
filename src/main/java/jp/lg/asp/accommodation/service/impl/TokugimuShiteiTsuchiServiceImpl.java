@@ -2,14 +2,19 @@ package jp.lg.asp.accommodation.service.impl;
 
 import java.util.Optional;
 
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.TokugimuShiteiTsuchiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,18 +29,22 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
+	private final ReportsCommonService reportsCommonService;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCode;
 
-	@Value("${app.jichitai.city}")
 	private String city;
-
-	@Value("${app.jichitai.city-name}")
 	private String jichitaiName;
-
-	@Value("${app.jichitai.jorei.tokugimu-shitei-tsuchi}")
 	private String jorei;
+
+	@PostConstruct
+	public void init() {
+		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
+		jichitaiName = jichitaiInfo.getName();
+		city = jichitaiInfo.getKbnName();
+		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_SHITEI_JOREI);
+	}
 
 	@Override
 	public TokugimuShiteiTsuchiDto getTokugimuInfo(String shiteiNo) {

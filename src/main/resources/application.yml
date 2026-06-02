@@ -32,11 +32,6 @@ logging:
 app:
   jichitai:
     code: '01202'
-    city: '町'
-    city-name: '占冠村'
-    jorei:
-      tokugimu-shitei-tsuchi: '第７条第２項'
-      tokugimu-juri-tsuchi: '第９条第２項'
   hash:
     salt: 'xQ7#mK2$vP9@nL4&wR6!jF8^hD3*bN5'
   kofukin:
