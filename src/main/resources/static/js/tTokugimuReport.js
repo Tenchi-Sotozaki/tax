@@ -52,4 +52,17 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('btnReportTokugimuJuriTsuchiボタンが見つかりません');
     }
+
+    // 納入申告書の提出期限等の特例適用者指定通知書ボタンのクリックイベント
+    btn = document.getElementById('btnReportTokureiShitei');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            if (shiteiNo) {
+                const url = '/accommodation-tax/reports/tokureiShitei?shiteiNo=' + encodeURIComponent(shiteiNo);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
 });
