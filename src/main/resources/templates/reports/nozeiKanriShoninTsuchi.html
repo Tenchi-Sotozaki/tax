@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>納税管理人承認(不承認)通知書</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
+
+		<!-- ページヘッダー -->
+		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+			<h2 class="h2">
+				<i class="bi bi-file-earmark-text text-primary me-2"></i>納税管理人承認(不承認)通知書
+			</h2>
+		</div>
+
+		<!-- フォーム -->
+		<form th:object="${dto}" method="post">
+			<input type="hidden" th:field="*{shiteiNo}">
+			<input type="hidden" th:field="*{cityName}">
+			<input type="hidden" th:field="*{jorei}">
+			<input type="hidden" th:field="*{tokuJusho}">
+			<input type="hidden" th:field="*{tokuName}">
+			<input type="hidden" th:field="*{shisetsuJusho}">
+			<input type="hidden" th:field="*{shisetsuName}">
+			<input type="hidden" th:field="*{nozeiKanriJusho}">
+			<input type="hidden" th:field="*{nozeiKanriName}">
+
+			<div class="card shadow-sm mb-4">
+				<div class="card-header bg-primary text-white">
+					<h5 class="mb-0">
+						<i class="bi bi-gear me-2"></i>通知書設定
+					</h5>
+				</div>
+				<div class="card-body">
+					<div class="row g-3">
+						<!-- 発行日 -->
+						<div class="col-md-6">
+							<label for="hakkoYmd" class="form-label fw-medium">発行日 <span class="badge bg-danger ms-1">必須</span></label>
+							<input type="date" class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}" required>
+						</div>
+
+						<!-- 不承認の場合の理由 -->
+						<div class="col-12">
+							<label for="riyu" class="form-label fw-medium">不承認の場合の理由</label>
+							<textarea class="form-control" id="riyu" th:field="*{riyu}" rows="4" 
+								placeholder="承認の場合は空欄、不承認の場合は理由を入力してください"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- プレビュー情報 -->
+			<div class="card shadow-sm mb-4">
+				<div class="card-header bg-info text-white">
+					<h5 class="mb-0">
+						<i class="bi bi-eye me-2"></i>通知書内容プレビュー
+					</h5>
+				</div>
+				<div class="card-body">
+					<div class="row g-3">
+						<div class="col-md-6">
+							<strong>特別徴収義務者:</strong><br>
+							<span th:text="${dto.tokuName}">-</span><br>
+							<small class="text-muted" th:text="${dto.tokuJusho}">-</small>
+						</div>
+						<div class="col-md-6">
+							<strong>施設:</strong><br>
+							<span th:text="${dto.shisetsuName}">-</span><br>
+							<small class="text-muted" th:text="${dto.shisetsuJusho}">-</small>
+						</div>
+						<div class="col-md-6" th:if="${dto.nozeiKanriName != null and !dto.nozeiKanriName.isEmpty()}">
+							<strong>納税管理人:</strong><br>
+							<span th:text="${dto.nozeiKanriName}">-</span><br>
+							<small class="text-muted" th:text="${dto.nozeiKanriJusho}">-</small>
+						</div>
+						<div class="col-md-6" th:if="${dto.nozeiKanriName == null or dto.nozeiKanriName.isEmpty()}">
+							<div class="alert alert-warning">
+								<i class="bi bi-exclamation-triangle me-2"></i>
+								納税管理人情報が登録されていません
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ボタンエリア -->
+			<div class="card shadow-sm">
+				<div class="card-body">
+					<div class="d-flex gap-2 justify-content-center">
+						<button type="submit" formaction="pdf" class="btn btn-danger">
+							<i class="bi bi-file-earmark-pdf me-1"></i>PDF出力
+						</button>
+						<button type="submit" formaction="preview" class="btn btn-info">
+							<i class="bi bi-eye me-1"></i>プレビュー
+						</button>
+						<button type="submit" formaction="print" class="btn btn-secondary">
+							<i class="bi bi-printer me-1"></i>印刷
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+
+	</div>
+</body>
+</html>
