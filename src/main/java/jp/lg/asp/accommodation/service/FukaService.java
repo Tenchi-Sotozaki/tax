@@ -163,6 +163,8 @@ public class FukaService {
 			if (STATUS_MI.equals(filterStatus) && item.isShinkokuZumi()) {
 				continue;
 			}
+			item.setNendo(nendo);       // 年度をセット
+	        item.setKibetsu(i);        // 期別（月）をセット
 			items.add(item);
 		}
 		return items;
@@ -349,9 +351,8 @@ public class FukaService {
 					// 💡 マスタの区分名（例：「一般宿泊」）をセット
 					teiritsuDetail.setLabel(rate.getKbnName());
 
-					// 💡 マスタの税率をセット。
-					// DBの numeric(3,2) を BigDecimal で受けている想定なので、longValue() でキャスト（型変換）する
-					teiritsuDetail.setTaxRate(rate.getZeiRitsu() != null ? rate.getZeiRitsu().longValue() : 0L);
+					// 💡 マスタの税率をそのまま（BigDecimal型で）セット。nullの場合は0として扱う。
+					teiritsuDetail.setTaxRate(rate.getZeiRitsu() != null ? rate.getZeiRitsu() : BigDecimal.ZERO);
 
 					// 初期表示時は数量・金額は null (または0)
 					teiritsuDetail.setStayCount(null);
@@ -372,7 +373,7 @@ public class FukaService {
 				FukaTaxDetailDto detail = new FukaTaxDetailDto();
 				detail.setZeiritsuSeq(rate.getSeq());
 				detail.setTeigakuSeq(rate.getTeigakuSeq());
-				detail.setTaxRate(rate.getZeigaku());
+				detail.setTaxRate(rate.getZeigaku() != null ? BigDecimal.valueOf(rate.getZeigaku()) : BigDecimal.ZERO);
 				detail.setLabel(rate.getRyokinSt() + "円以上");
 				detail.setStayCount(null);
 				detail.setTaxAmount(null);
@@ -503,6 +504,13 @@ public class FukaService {
 	 */
 	@Transactional
 	public void saveDeclaration(FukaDeclarationForm form) {
+		if (!Boolean.TRUE.equals(form.isTaxCheckBypassed())) {
+			if (hasTaxAmountDiscrepancy(form)) {
+				// 不整合があれば、保存処理を中断してフラグを立てる
+				form.setShowTaxWarningModal(true);
+				return; // ⚠️ ここで処理を終了し、画面に戻す（保存されない）
+			}
+		}
 		String currentJichitaiCd = getCurrentJichitaiCd();
 
 		// 💡 追記：年度・期別の Null ガード（DBエラー防止の要だぜ）
@@ -781,8 +789,7 @@ public class FukaService {
 			uchi.setKenZeigaku(0L);
 
 			// taxRate の NPE 回避
-			long rate = (detail.getTaxRate() != null) ? detail.getTaxRate() : 0L;
-			uchi.setZeiRitsu(java.math.BigDecimal.valueOf(rate));
+			uchi.setZeiRitsu(detail.getTaxRate() != null ? detail.getTaxRate() : BigDecimal.ZERO);
 
 			setAuditFields(uchi);
 			uchiList.add(uchi);
@@ -828,6 +835,7 @@ public class FukaService {
 	}
 
 	/**
+	 * 
 	 * エンティティから動的に宿泊数値をセットする。
 	 */
 	private void setHakusuByIndex(ChoshuGenboUchi uchi, int index, Integer value) {
@@ -989,23 +997,45 @@ public class FukaService {
 					form.setObligorName(tokugimu.getKyokaName());
 				});
 
-		// 💡 追記：税区分ラベルと税率をマスタから再取得してセットし直す
-		// これで画面上の 「null (null円)」 表示を回避するぜ
-		List<ZeiritsuTeigaku> masterRates = zeiritsuTeigakuRepository
-				.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
 		List<FukaTaxDetailDto> formDetails = form.getMonthlyDetail().getTaxDetails();
 
-		for (int i = 0; i < masterRates.size() && i < formDetails.size(); i++) {
-			ZeiritsuTeigaku master = masterRates.get(i);
-			FukaTaxDetailDto detail = formDetails.get(i);
-
-			// マスタから表示用ラベルを生成
-			String label = (master.getRyokinEd() != null)
-					? String.format("%,d円 ～ %,d円未満", master.getRyokinSt(), master.getRyokinEd() + 1)
-					: String.format("%,d円以上", master.getRyokinSt());
-
-			detail.setLabel(label);
-			detail.setTaxRate(master.getZeigaku());
+		// =========================================================
+		// 💡 修正箇所：定率制と定額制で復元（Hydration）のロジックを分ける
+		// =========================================================
+		if ("2".equals(form.getFukaKbn())) {
+			// --- 定率制のラベル＆税率復元 ---
+			String ym = form.getMonthlyDetail().getPaymentYearMonth();
+			int targetYmInt = parseYmToInt(ym);
+			
+			// 対象年月から適用される税率マスタを再特定
+			zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd).stream()
+				.filter(z -> "2".equals(z.getTaishoKbn()))
+				.filter(z -> {
+					int st = parseYmToInt(z.getTekiyoStYm());
+					int ed = parseYmToInt(z.getTekiyoEdYm());
+					return (st == 0 || st <= targetYmInt) && (ed == 0 || targetYmInt <= ed);
+				})
+				.findFirst()
+				.ifPresent(applied -> {
+					List<ZeiritsuTeiritsu> mList = zeiritsuTeiritsuRepository
+							.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, applied.getSeq(), "0");
+					for (int i = 0; i < mList.size() && i < formDetails.size(); i++) {
+						formDetails.get(i).setLabel(mList.get(i).getKbnName());
+						formDetails.get(i).setTaxRate(mList.get(i).getZeiRitsu() != null ? mList.get(i).getZeiRitsu() : BigDecimal.ZERO);
+					}
+				});
+		} else {
+			// --- 定額制のラベル＆税率復元（以前直したもの） ---
+			List<ZeiritsuTeigaku> masterRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+			for (int i = 0; i < masterRates.size() && i < formDetails.size(); i++) {
+				ZeiritsuTeigaku master = masterRates.get(i);
+				FukaTaxDetailDto detail = formDetails.get(i);
+				String label = (master.getRyokinEd() != null)
+						? String.format("%,d円 ～ %,d円未満", master.getRyokinSt(), master.getRyokinEd() + 1)
+						: String.format("%,d円以上", master.getRyokinSt());
+				detail.setLabel(label);
+				detail.setTaxRate(master.getZeigaku() != null ? BigDecimal.valueOf(master.getZeigaku()) : BigDecimal.ZERO);
+			}
 		}
 	}
 
@@ -1105,13 +1135,13 @@ public class FukaService {
 						.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, appliedZeiritsu.getSeq(), "0");
 
 				for (ZeiritsuTeiritsu m : masterRates) {
-					FukaTaxDetailDto d = new FukaTaxDetailDto();
-					d.setZeiritsuSeq(m.getSeq());
-					d.setLabel(m.getKbnName());
-					d.setTaxRate(m.getZeiRitsu() != null ? m.getZeiRitsu().longValue() : 0L);
-					d.setStayCount(null);
-					d.setTaxAmount(null);
-					monthDto.getTaxDetails().add(d);
+				    FukaTaxDetailDto d = new FukaTaxDetailDto();
+				    d.setZeiritsuSeq(m.getSeq());
+				    d.setLabel(m.getKbnName());
+				    d.setTaxRate(m.getZeiRitsu() != null ? m.getZeiRitsu() : BigDecimal.ZERO); // ←ココを直す！
+				    d.setStayCount(null);
+				    d.setTaxAmount(null);
+				    monthDto.getTaxDetails().add(d);
 				}
 			} else {
 				// --- 定額制の復元 ---
@@ -1121,7 +1151,7 @@ public class FukaService {
 					FukaTaxDetailDto d = new FukaTaxDetailDto();
 					d.setZeiritsuSeq(m.getSeq());
 					d.setTeigakuSeq(m.getTeigakuSeq());
-					d.setTaxRate(m.getZeigaku());
+					d.setTaxRate(m.getZeigaku() != null ? BigDecimal.valueOf(m.getZeigaku()) : BigDecimal.ZERO);
 					d.setLabel(m.getRyokinEd() != null
 							? String.format("%,d円 ～ %,d円未満", m.getRyokinSt(), m.getRyokinEd() + 1)
 							: String.format("%,d円以上", m.getRyokinSt()));
@@ -1199,9 +1229,10 @@ public class FukaService {
 		// A の計算: 税率 × 宿泊数 の合計
 		long calculatedTotal = detail.getTaxDetails().stream()
 				.mapToLong(d -> {
-					long rate = (d.getTaxRate() != null) ? d.getTaxRate() : 0L; // ← ここが0になっていないか？
+					BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
 					long count = (d.getStayCount() != null) ? d.getStayCount() : 0;
-					return rate * count;
+					// 単価 × 宿泊数 を計算し、最後に long 型（合計金額）に戻す
+					return rate.multiply(BigDecimal.valueOf(count)).longValue();
 				})
 				.sum();
 

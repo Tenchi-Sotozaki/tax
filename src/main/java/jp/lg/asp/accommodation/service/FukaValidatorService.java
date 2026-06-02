@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
+import java.math.BigDecimal;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -67,13 +69,23 @@ public class FukaValidatorService {
 
 		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
 
-		long total = 0L;
-		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
-			long rate = (d.getTaxRate() != null) ? d.getTaxRate() : 0L;
-			long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
-			total += kbn.calculateTax(rate, count);
+		if (kbn.isTeiritsu()) {
+			//定率制の計算ロジック：フォームの「課税対象宿泊料金」 × マスタの「税率」
+			BigDecimal rate = detail.getTaxDetails().get(0).getTaxRate();
+			if (rate == null) rate = BigDecimal.ZERO;
+			
+			long ryokin = (form.getKazeiRyokin() != null) ? form.getKazeiRyokin() : 0L;
+			return kbn.calculateTax(rate, ryokin);
+		} else {
+			//定額制の計算ロジック：各明細の「単価」 × 「宿泊数」の合計
+			long total = 0L;
+			for (FukaTaxDetailDto d : detail.getTaxDetails()) {
+				BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
+				long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
+				total += kbn.calculateTax(rate, count);
+			}
+			return total;
 		}
-		return total;
 	}
 
 	/**
