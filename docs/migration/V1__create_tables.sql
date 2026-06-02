@@ -995,3 +995,51 @@ COMMENT ON COLUMN t_atena_renkei.add_user IS '作成者';
 COMMENT ON COLUMN t_atena_renkei.upd_dt IS '更新日時';
 COMMENT ON COLUMN t_atena_renkei.upd_user IS '更新者';
 COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_jichitai (
+  jichitai_cd char(5) NOT NULL,
+  name varchar(20) NOT NULL,
+  kbn_name varchar(10) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_jichitai_pkey PRIMARY KEY (jichitai_cd)
+);
+COMMENT ON TABLE m_jichitai IS '自治体情報マスタ';
+COMMENT ON COLUMN m_jichitai.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_jichitai.name IS '自治体名称';
+COMMENT ON COLUMN m_jichitai.kbn_name IS '自治体種別名';
+COMMENT ON COLUMN m_jichitai.add_dt IS '作成日時';
+COMMENT ON COLUMN m_jichitai.add_user IS '作成者';
+COMMENT ON COLUMN m_jichitai.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_jichitai.upd_user IS '更新者';
+COMMENT ON COLUMN m_jichitai.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_reports_def (
+  jichitai_cd char(5) NOT NULL,
+  id char(10) NOT NULL,
+  kbn char(1) NOT NULL,
+  def_text varchar(1000),
+  def_data bytea,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_reports_def_pkey PRIMARY KEY (jichitai_cd, id)
+);
+COMMENT ON TABLE m_reports_def IS '帳票定義マスタ';
+COMMENT ON COLUMN m_reports_def.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_reports_def.id IS '定義ＩＤ';
+COMMENT ON COLUMN m_reports_def.kbn IS '種別';
+COMMENT ON COLUMN m_reports_def.def_text IS '定義文';
+COMMENT ON COLUMN m_reports_def.def_data IS '定義データ';
+COMMENT ON COLUMN m_reports_def.add_dt IS '作成日時';
+COMMENT ON COLUMN m_reports_def.add_user IS '作成者';
+COMMENT ON COLUMN m_reports_def.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_reports_def.upd_user IS '更新者';
+COMMENT ON COLUMN m_reports_def.version IS 'バージョン';
