@@ -29,9 +29,15 @@ dependencies {
     implementation 'org.flywaydb:flyway-database-postgresql'
 
     // JasperReports
-    implementation 'net.sf.jasperreports:jasperreports:7.0.6'
-    implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.6'
-    implementation 'net.sf.jasperreports:jasperreports-fonts:7.0.6'
+    implementation('net.sf.jasperreports:jasperreports:7.0.6') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation('net.sf.jasperreports:jasperreports-pdf:7.0.6') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation('net.sf.jasperreports:jasperreports-fonts:7.0.6') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
 
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'

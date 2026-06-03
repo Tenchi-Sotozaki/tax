@@ -39,28 +39,40 @@ public class NozeiKanriShoninTsuchiController {
 	 */
 	@GetMapping
 	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
-		NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
+		try {
+			accessChecker.checkAccess(SCREEN_ID);
+			NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			try {
-				NozeiKanriShoninTsuchiDto nozeiKanriInfo = nozeiKanriShoninTsuchiService.getNozeiKanriInfo(shiteiNo);
-				if (nozeiKanriInfo != null) {
-					dto = nozeiKanriInfo;
+			if (shiteiNo != null && !shiteiNo.isEmpty()) {
+				try {
+					log.info("納税管理人情報取得開始: shiteiNo={}", shiteiNo);
+					NozeiKanriShoninTsuchiDto nozeiKanriInfo = nozeiKanriShoninTsuchiService.getNozeiKanriInfo(shiteiNo);
+					if (nozeiKanriInfo != null) {
+						dto = nozeiKanriInfo;
+						log.info("納税管理人情報取得成功");
+					}
+				} catch (RuntimeException e) {
+					log.error("納税管理人情報取得エラー: {}", e.getMessage(), e);
+					// エラーの場合は空のDTOを使用して続行
+					model.addAttribute("errorMessage", "指定番号: " + shiteiNo + " の情報が見つかりません。");
 				}
-			} catch (Exception e) {
-				log.warn("納税管理人情報取得エラー: {}", e.getMessage());
-				// エラーの場合は空のDTOを使用
 			}
-		}
 
-		// 発行日のデフォルト値を今日に設定
-		if (dto.getHakkoYmd() == null) {
+			// 発行日のデフォルト値を今日に設定
+			if (dto.getHakkoYmd() == null) {
+				dto.setHakkoYmd(LocalDate.now());
+			}
+
+			model.addAttribute("dto", dto);
+			return "reports/nozeiKanrininShoninTsuchi";
+		} catch (Exception e) {
+			log.error("納税管理人承認通知書画面表示エラー", e);
+			model.addAttribute("errorMessage", "システムエラーが発生しました。");
+			NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
 			dto.setHakkoYmd(LocalDate.now());
+			model.addAttribute("dto", dto);
+			return "reports/nozeiKanrininShoninTsuchi";
 		}
-
-		model.addAttribute("dto", dto);
-		return "reports/nozeiKanrininShoninTsuchi";
 	}
 
 	/**
@@ -68,14 +80,27 @@ public class NozeiKanriShoninTsuchiController {
 	 */
 	@PostMapping("/pdf")
 	public ResponseEntity<byte[]> generatePdf(NozeiKanriShoninTsuchiDto dto) {
-		accessChecker.checkAccess(SCREEN_ID);
-		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
+		try {
+			accessChecker.checkAccess(SCREEN_ID);
+			
+			// 入力チェック
+			if (dto.getHakkoYmd() == null) {
+				log.error("PDF生成エラー: 発行日が未入力です");
+				return ResponseEntity.badRequest().build();
+			}
+			
+			log.info("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
+			byte[] pdfData = reportsService.generateTsuchiPdf(dto);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("inline", "nozei_kanri_shonin_tsuchi.pdf");
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_PDF);
+			headers.setContentDispositionFormData("inline", "nozei_kanri_shonin_tsuchi.pdf");
 
-		return ResponseEntity.ok().headers(headers).body(pdfData);
+			return ResponseEntity.ok().headers(headers).body(pdfData);
+		} catch (Exception e) {
+			log.error("PDF生成エラー", e);
+			return ResponseEntity.status(500).build();
+		}
 	}
 
 	/**
@@ -83,19 +108,32 @@ public class NozeiKanriShoninTsuchiController {
 	 */
 	@PostMapping("/preview")
 	public ResponseEntity<byte[]> preview(NozeiKanriShoninTsuchiDto dto) {
-		accessChecker.checkAccess(SCREEN_ID);
-		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
+		try {
+			accessChecker.checkAccess(SCREEN_ID);
+			
+			// 入力チェック
+			if (dto.getHakkoYmd() == null) {
+				log.error("プレビューエラー: 発行日が未入力です");
+				return ResponseEntity.badRequest().build();
+			}
+			
+			log.info("プレビュー開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
+			byte[] pdfData = reportsService.generateTsuchiPdf(dto);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		// inline指定でブラウザ内表示を促す
-		headers.add("Content-Disposition", "inline; filename=nozei_kanri_shonin_tsuchi_preview.pdf");
-		// キャッシュ制御
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_PDF);
+			// inline指定でブラウザ内表示を促す
+			headers.add("Content-Disposition", "inline; filename=nozei_kanri_shonin_tsuchi_preview.pdf");
+			// キャッシュ制御
+			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+			headers.add("Pragma", "no-cache");
+			headers.add("Expires", "0");
 
-		return ResponseEntity.ok().headers(headers).body(pdfData);
+			return ResponseEntity.ok().headers(headers).body(pdfData);
+		} catch (Exception e) {
+			log.error("プレビューエラー", e);
+			return ResponseEntity.status(500).build();
+		}
 	}
 
 	/**
@@ -103,20 +141,33 @@ public class NozeiKanriShoninTsuchiController {
 	 */
 	@PostMapping("/print")
 	public ResponseEntity<byte[]> print(NozeiKanriShoninTsuchiDto dto) {
-		accessChecker.checkAccess(SCREEN_ID);
-		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
+		try {
+			accessChecker.checkAccess(SCREEN_ID);
+			
+			// 入力チェック
+			if (dto.getHakkoYmd() == null) {
+				log.error("印刷エラー: 発行日が未入力です");
+				return ResponseEntity.badRequest().build();
+			}
+			
+			log.info("印刷開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
+			byte[] pdfData = reportsService.generateTsuchiPdf(dto);
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		// inline指定でブラウザ内表示
-		headers.add("Content-Disposition", "inline; filename=nozei_kanri_shonin_tsuchi_print.pdf");
-		// 印刷用のカスタムヘッダー
-		headers.add("X-Print-Action", "true");
-		// キャッシュ制御
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_PDF);
+			// inline指定でブラウザ内表示
+			headers.add("Content-Disposition", "inline; filename=nozei_kanri_shonin_tsuchi_print.pdf");
+			// 印刷用のカスタムヘッダー
+			headers.add("X-Print-Action", "true");
+			// キャッシュ制御
+			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+			headers.add("Pragma", "no-cache");
+			headers.add("Expires", "0");
 
-		return ResponseEntity.ok().headers(headers).body(pdfData);
+			return ResponseEntity.ok().headers(headers).body(pdfData);
+		} catch (Exception e) {
+			log.error("印刷エラー", e);
+			return ResponseEntity.status(500).build();
+		}
 	}
 }

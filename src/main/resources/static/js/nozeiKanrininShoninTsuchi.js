@@ -6,8 +6,11 @@
  * PDF生成
  */
 function generatePdf() {
+    if (!validateForm()) {
+        return false;
+    }
     const form = document.getElementById('tsuchiForm');
-    form.action = '/reports/nozeiKanrininShoninTsuchi/pdf';
+    form.action = '/accommodation-tax/reports/nozeiKanrininShoninTsuchi/pdf';
     form.target = '_blank';
     form.submit();
 }
@@ -16,8 +19,11 @@ function generatePdf() {
  * プレビュー
  */
 function preview() {
+    if (!validateForm()) {
+        return false;
+    }
     const form = document.getElementById('tsuchiForm');
-    form.action = '/reports/nozeiKanrininShoninTsuchi/preview';
+    form.action = '/accommodation-tax/reports/nozeiKanrininShoninTsuchi/preview';
     form.target = '_blank';
     form.submit();
 }
@@ -26,10 +32,30 @@ function preview() {
  * 印刷
  */
 function print() {
+    if (!validateForm()) {
+        return false;
+    }
     const form = document.getElementById('tsuchiForm');
-    form.action = '/reports/nozeiKanrininShoninTsuchi/print';
+    form.action = '/accommodation-tax/reports/nozeiKanrininShoninTsuchi/print';
     form.target = '_blank';
     form.submit();
+}
+
+/**
+ * フォームバリデーション
+ */
+function validateForm() {
+    const hakkoYmd = document.getElementById('hakkoYmd');
+    
+    if (!hakkoYmd || !hakkoYmd.value.trim()) {
+        alert('発行日を入力してください。');
+        if (hakkoYmd) {
+            hakkoYmd.focus();
+        }
+        return false;
+    }
+    
+    return true;
 }
 
 /**

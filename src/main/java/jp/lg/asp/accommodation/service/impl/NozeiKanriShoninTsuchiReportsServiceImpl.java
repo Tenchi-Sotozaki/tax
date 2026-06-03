@@ -40,6 +40,12 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
 
 			Map<String, Object> parameters = new HashMap<>();
+			// フォント設定を明示的に追加
+			parameters.put("net.sf.jasperreports.default.font.name", "IPAex明朝");
+			parameters.put("net.sf.jasperreports.default.pdf.font.name", "IPAex明朝");
+			parameters.put("net.sf.jasperreports.default.pdf.encoding", "Identity-H");
+			parameters.put("net.sf.jasperreports.default.pdf.embedded", "true");
+			
 			JRDataSource dataSource = buildParams(dto);
 			JasperPrint jasperPrint = JasperFillManager.fillReport(
 					jasperReport, parameters, dataSource);
