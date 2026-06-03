@@ -30,7 +30,7 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
     @Value("${app.jichitai.code}")
     private String jichitaiCd;
 
-    @Value("${app.city-name:#{null}}")
+    @Value("${app.city.name:#{null}}")
     private String cityName;
 
     @Value("${app.jorei:#{null}}")
