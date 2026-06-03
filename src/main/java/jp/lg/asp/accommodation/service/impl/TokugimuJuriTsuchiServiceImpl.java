@@ -39,9 +39,23 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 
 	@PostConstruct
 	public void init() {
-		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
-		jichitaiName = jichitaiInfo.getName();
-		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
+		try {
+			Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
+			if (jichitaiInfo != null) {
+				jichitaiName = jichitaiInfo.getName();
+			} else {
+				log.warn("自治体情報が見つかりません: jichitaiCode={}", jichitaiCode);
+				jichitaiName = "○○市"; // デフォルト値
+			}
+			jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
+			if (jorei == null || jorei.isEmpty()) {
+				jorei = "○○市宿泊税条例"; // デフォルト値
+			}
+		} catch (Exception e) {
+			log.error("初期化エラー", e);
+			jichitaiName = "○○市";
+			jorei = "○○市宿泊税条例";
+		}
 	}
 
 	@Override
