@@ -6,9 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Nokan;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiService;
@@ -26,20 +28,20 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
     private final TokugimuRepository tokugimuRepository;
     private final AtenaRepository atenaRepository;
     private final NokanRepository nokanRepository;
+    private final JichitaiRepository jichitaiRepository;
 
     @Value("${app.jichitai.code}")
     private String jichitaiCd;
-
-    @Value("${app.city.name:#{null}}")
-    private String cityName;
-
-    @Value("${app.jorei:#{null}}")
-    private String jorei;
 
     @Override
     @Transactional(readOnly = true)
     public NozeiKanriShoninTsuchiDto getNozeiKanriInfo(String shiteiNo) {
         log.debug("納税管理人承認通知書情報取得開始: shiteiNo={}", shiteiNo);
+
+        // 自治体情報をDBから取得
+        Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
+        String cityName = jichitai != null ? jichitai.getName() : "";
+        String jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
 
         NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
         dto.setShiteiNo(shiteiNo);
