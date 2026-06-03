@@ -1,0 +1,25 @@
+﻿,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,作成者,亀井,
+帳票項目一覧表,,帳票物理名,kanpuMenjoTsuchi,作成日,2026/5/29,
+,,帳票論理名,徴収不能額等の還付又は納入義務の免除決定通知書,更新日,,
+,,,,,,
+No.,項目名,フィールド名,DBテーブル,DBカラム,型,備考
+1,発行日,hakkoYmd,ー,ー,String,画面入力値を設定
+2,市区町村名,cityName,ー,ー,String,application.ymlから取得
+3,条令,jorei,ー,ー,String,application.ymlから取得
+4,特別徴収義務者住所,tokuJusho,m_atena,"yubin_no
+jusho",String,郵便番号と住所を連結して設定
+5,特別徴収義務者名,tokuName,m_atena,name,String,
+6,所在地,shisetsuJusho,t_tokugimu,"shisetsu_yubin_no
+shisetsu_jusho",String,郵便番号と住所を連結して設定
+7,名称,shisetsuName,t_tokugimu,shisetsu_name,String,
+8,申請受理日,juriYmd,ー,ー,String,画面入力値を設定
+9,申請の年月,shinseiYm,ー,ー,String,画面入力値を設定
+10,申請した税額,zeigaku,ー,ー,String,画面入力値を設定
+11,還付又は納入義務の免除を決定した額,kanpuMenjoGaku,ー,ー,String,画面入力値を設定
+12,一部承認または不承認と決定した理由,riyu,ー,ー,String,画面入力値を設定
+13,備考,biko,ー,ー,String,画面入力値を設定
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,

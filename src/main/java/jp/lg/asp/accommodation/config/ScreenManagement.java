@@ -80,4 +80,7 @@ public final class ScreenManagement {
 
 	// 特別徴収義務者申請受理通知書
 	public static final String TOKUGIMU_JURI_TSUCHI = "ms00000014";
+
+	// 納税管理人承認(不承認)通知書
+	public static final String NOZEI_KANRININ_SHONIN_TSUCHI = "ms00000015";
 }
