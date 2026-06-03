@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>徴収不能額の還付又は納入義務の免除決定通知書</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<h2 class="mb-4">
+						<i class="bi bi-file-earmark-text text-primary me-2"></i>徴収不能額の還付又は納入義務の免除決定通知書
+					</h2>
+
+					<form id="tsuchiForm" th:object="${dto}" method="post">
+						<input type="hidden" th:name="${_csrf.parameterName}"
+							th:value="${_csrf.token}" />
+
+						<!-- 特別徴収義務者情報エリア -->
+						<div class="card mb-4">
+							<div class="card-header">
+								<h5 class="mb-0">特別徴収義務者情報</h5>
+							</div>
+							<div class="card-body">
+								<div class="row g-3">
+									<div class="col-md-4">
+										<label class="form-label">指定番号</label> 
+										<input type="text" class="form-control" th:field="*{shiteiNo}" readonly>
+									</div>
+									<div class="col-md-4">
+										<label class="form-label">施設名称</label> 
+										<input type="text" class="form-control" th:field="*{shisetsuName}" readonly>
+									</div>
+									<div class="col-md-4">
+										<label class="form-label">特別徴収義務者名</label> 
+										<input type="text" class="form-control" th:field="*{tokuName}" readonly>
+									</div>
+								</div>
+								<div class="row g-3 mt-2">
+									<div class="col-md-6">
+										<label class="form-label">特別徴収義務者住所</label> 
+										<input type="text" class="form-control" th:field="*{tokuJusho}" readonly>
+									</div>
+									<div class="col-md-6">
+										<label class="form-label">施設住所</label> 
+										<input type="text" class="form-control" th:field="*{shisetsuJusho}" readonly>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- 通知書情報エリア -->
+						<div class="card mb-4">
+							<div class="card-header">
+								<h5 class="mb-0">通知書情報</h5>
+							</div>
+							<div class="card-body">
+								<div class="row g-3">
+									<div class="col-md-4">
+										<label for="hakkoYmd" class="form-label">発行日 <span class="text-danger">*</span></label> 
+										<input type="date" class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}" required>
+									</div>
+									<div class="col-md-4">
+										<label for="juriYmd" class="form-label">申請受理日 <span class="text-danger">*</span></label> 
+										<input type="date" class="form-control" id="juriYmd" th:field="*{juriYmd}" required>
+									</div>
+									<div class="col-md-4">
+										<label for="shinseiYm" class="form-label">申請の年月 <span class="text-danger">*</span></label> 
+										<input type="month" class="form-control" id="shinseiYm" th:field="*{shinseiYm}" 
+											   required>
+									</div>
+								</div>
+								<div class="row g-3 mt-2">
+									<div class="col-md-6">
+										<label for="zeigaku" class="form-label">申請した税額 <span class="text-danger">*</span></label> 
+										<div class="input-group">
+											<input type="number" class="form-control" id="zeigaku" th:field="*{zeigaku}" 
+												   min="0" step="1" placeholder="0" required>
+											<span class="input-group-text">円</span>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<label for="kanpuMenjoGaku" class="form-label">還付又は納入義務の免除を決定した額 <span class="text-danger">*</span></label> 
+										<div class="input-group">
+											<input type="number" class="form-control" id="kanpuMenjoGaku" th:field="*{kanpuMenjoGaku}" 
+												   min="0" step="1" placeholder="0" required>
+											<span class="input-group-text">円</span>
+										</div>
+									</div>
+								</div>
+								<div class="row g-3 mt-2">
+									<div class="col-12">
+										<label for="riyu" class="form-label">一部承認または不承認と決定した理由</label>
+										<textarea class="form-control" id="riyu" th:field="*{riyu}"
+											rows="3" placeholder="理由を入力してください"></textarea>
+									</div>
+								</div>
+								<div class="row g-3 mt-2">
+									<div class="col-12">
+										<label for="biko" class="form-label">備考</label>
+										<textarea class="form-control" id="biko" th:field="*{biko}"
+											rows="3" placeholder="備考を入力してください"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<input type="hidden" th:field="*{cityName}"> 
+						<input type="hidden" th:field="*{jorei}">
+
+						<!-- アクションボタン -->
+						<div class="d-flex gap-2">
+							<button type="button" class="btn btn-primary" onclick="generatePdf()">
+								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
+							</button>
+							<button type="button" class="btn btn-info" onclick="preview()">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
+							<button type="button" class="btn btn-secondary" onclick="print()">
+								<i class="bi bi-printer me-1"></i> 印刷
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/kanpuMenjoTsuchi.js}"></script>
+	</th:block>
+</body>
+</html>

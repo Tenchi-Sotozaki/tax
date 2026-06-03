@@ -83,6 +83,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 宿泊税還付・納入義務の免除決定通知書ボタンのクリックイベント
+    const btnKanpu = document.getElementById('btnReportKanpu');
+    if (btnKanpu) {
+        console.log('宿泊税還付・納入義務の免除決定通知書ボタンが見つかりました。');
+        btnKanpu.addEventListener('click', function() {
+            console.log('宿泊税還付・納入義務の免除決定通知書ボタンがクリックされました。指定番号:', shiteiNo);
+            if (shiteiNo) {
+                const url = '/accommodation-tax/kanpuMenjoTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                console.log('開くURL:', url);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
 });
 
 /**
