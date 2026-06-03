@@ -83,4 +83,7 @@ public final class ScreenManagement {
 
 	// 納税管理人承認(不承認)通知書
 	public static final String NOZEI_KANRININ_SHONIN_TSUCHI = "ms00000015";
+
+	// 納入申告書の提出期限等の特例適用者指定通知書
+	public static final String TOKUREI_SHITEI = "ms00000016";
 }

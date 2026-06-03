@@ -68,6 +68,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 納入申告書の提出期限等の特例適用者指定通知書ボタンのクリックイベント
+    const btnTokureiShitei = document.getElementById('btnReportTokureiShitei');
+    if (btnTokureiShitei) {
+        console.log('納入申告書の提出期限等の特例適用者指定通知書ボタンが見つかりました。');
+        btn.addEventListener('click', function() {
+            console.log('納入申告書の提出期限等の特例適用者指定通知書ボタンがクリックされました。指定番号:', shiteiNo);
+            if (shiteiNo) {
+                const url = '/accommodation-tax/reports/tokureiShitei?shiteiNo=' + encodeURIComponent(shiteiNo);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
 });
 
 /**
