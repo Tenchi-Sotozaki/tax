@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnTokugimuJuri = document.getElementById('btnReportTokugimuJuriTsuchi');
     if (btnTokugimuJuri) {
         console.log('特別徴収義務者申請受理通知書ボタンが見つかりました。');
-        btn.addEventListener('click', function() {
+        btnTokugimuJuri.addEventListener('click', function() {
             console.log('特別徴収義務者申請受理通知書ボタンがクリックされました。指定番号:', shiteiNo);
             if (shiteiNo) {
                 const url = '/accommodation-tax/reports/tokugimuJuriTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnTokureiShitei = document.getElementById('btnReportTokureiShitei');
     if (btnTokureiShitei) {
         console.log('納入申告書の提出期限等の特例適用者指定通知書ボタンが見つかりました。');
-        btn.addEventListener('click', function() {
+        btnTokureiShitei.addEventListener('click', function() {
             console.log('納入申告書の提出期限等の特例適用者指定通知書ボタンがクリックされました。指定番号:', shiteiNo);
             if (shiteiNo) {
                 const url = '/accommodation-tax/reports/tokureiShitei?shiteiNo=' + encodeURIComponent(shiteiNo);
