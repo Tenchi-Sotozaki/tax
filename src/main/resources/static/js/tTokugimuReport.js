@@ -99,6 +99,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 納入書ボタンのクリックイベント
+    const btnNonyusho = document.getElementById('btnReportNonyusho');
+    if (btnNonyusho) {
+        console.log('納入書ボタンが見つかりました。');
+        btnNonyusho.addEventListener('click', function() {
+            console.log('納入書ボタンがクリックされました。指定番号:', shiteiNo);
+            if (shiteiNo) {
+                const url = '/accommodation-tax/nonyusho?shiteiNo=' + encodeURIComponent(shiteiNo);
+                console.log('開くURL:', url);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
 });
 
 /**

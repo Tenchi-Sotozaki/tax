@@ -1,5 +1,6 @@
 <!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
-<jasperReport name="nonyusho" language="java" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b3e81a05-acaf-401e-a7d3-0cd1857cc3bb">
+<jasperReport name="nonyusho" language="java" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="b3e81a05-acaf-401e-a7d3-0cd1857cc3bb">
+	<property name="com.jaspersoft.studio.report.description" value="宿泊税納入書"/>
 	<query language="sql"><![CDATA[]]></query>
 	<field name="jichitaiKoin" class="java.io.InputStream"/>
 	<field name="cityName" class="java.lang.String"/>
@@ -20,146 +21,118 @@
 	<field name="shiteiKinyuName" class="java.lang.String"/>
 	<field name="torimatome" class="java.lang.String"/>
 	<background splitType="Stretch"/>
-	<title height="74" splitType="Stretch">
-		<element kind="textField" uuid="82a4fa28-8712-4afc-9a6b-aa00cab4bcb3" x="0" y="0" width="100" height="20" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
-			<expression><![CDATA[$F{cityName}]]></expression>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="staticText" uuid="511d75b1-dc4c-4cd4-ab1d-cc8e67c9632d" x="0" y="20" width="100" height="20" hTextAlign="Center" vTextAlign="Middle">
-			<text><![CDATA[市区町村コード]]></text>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="textField" uuid="9c90790a-3201-4385-aa90-50f9fb1645c8" x="0" y="40" width="100" height="20" hTextAlign="Center" vTextAlign="Middle">
-			<expression><![CDATA[$F{jichitaiCd}]]></expression>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="image" uuid="53c98ea8-78c3-4f8b-b09b-3369f85f5646" x="198" y="5" width="50" height="50">
-			<expression><![CDATA[$F{jichitaiKoin}]]></expression>
-		</element>
-		<element kind="staticText" uuid="63478c28-94ed-49f6-9bd8-92075cf8243c" x="110" y="0" width="140" height="60" fontSize="10.0" hTextAlign="Left" vTextAlign="Middle">
-			<text><![CDATA[　宿泊税納入書]]></text>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="textField" uuid="2989f34f-f7e3-4827-bae7-e98ae82442a7" x="270" y="0" width="100" height="20" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
-			<expression><![CDATA[$F{cityName}]]></expression>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="staticText" uuid="003318cd-dfd2-4c93-b04c-886babc7f7c6" x="270" y="20" width="100" height="20" hTextAlign="Center" vTextAlign="Middle">
-			<text><![CDATA[市区町村コード]]></text>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="textField" uuid="d419b41d-a72b-47a7-9af5-0c3108a1271a" x="270" y="40" width="100" height="20" hTextAlign="Center" vTextAlign="Middle">
-			<expression><![CDATA[$F{jichitaiCd}]]></expression>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="staticText" uuid="c2b6c9c1-4c02-4265-b15d-f89f6be0d299" x="380" y="0" width="140" height="60" fontSize="10.0" hTextAlign="Left" vTextAlign="Middle">
-			<text><![CDATA[　宿泊税納入済通知書]]></text>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="image" uuid="91d8aa42-8ac9-4e7a-83b0-dc26dcf1562b" x="467" y="5" width="50" height="50">
-			<expression><![CDATA[$F{jichitaiKoin}]]></expression>
-		</element>
-		<element kind="textField" uuid="6af7eb34-1abc-405b-b0f8-64d83762a9df" x="540" y="0" width="100" height="20" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
-			<expression><![CDATA[$F{cityName}]]></expression>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="staticText" uuid="9fc95595-b92b-43b2-8ec6-e7fab901d707" x="540" y="20" width="100" height="20" hTextAlign="Center" vTextAlign="Middle">
-			<text><![CDATA[市区町村コード]]></text>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="textField" uuid="39a65e9f-4a88-43af-a60c-f6e8eaeb0595" x="540" y="40" width="100" height="20" hTextAlign="Center" vTextAlign="Middle">
-			<expression><![CDATA[$F{jichitaiCd}]]></expression>
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="staticText" uuid="a50e612c-9f46-4e6b-b3fe-dc2fddccb56f" x="652" y="0" width="140" height="60" fontSize="10.0" hTextAlign="Left" vTextAlign="Middle">
-			<text><![CDATA[　宿泊税領収証書]]></text>
-			<property name="com.jaspersoft.studio.unit.width" value="px"/>
-			<box>
-				<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-			</box>
-		</element>
-		<element kind="image" uuid="c3665d60-fe9b-4419-9445-974c22a4e5fb" x="740" y="5" width="50" height="50">
-			<expression><![CDATA[$F{jichitaiKoin}]]></expression>
-		</element>
-	</title>
+	<title splitType="Stretch"/>
 	<detail>
-		<band height="517" splitType="Stretch">
-			<element kind="staticText" uuid="bca614de-5a95-4881-8261-7bf00a4d8b8a" x="0" y="0" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+		<band height="540" splitType="Stretch">
+			<element kind="textField" uuid="82a4fa28-8712-4afc-9a6b-aa00cab4bcb3" x="0" y="2" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{cityName}]]></expression>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="511d75b1-dc4c-4cd4-ab1d-cc8e67c9632d" x="0" y="22" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[市区町村コード]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="9c90790a-3201-4385-aa90-50f9fb1645c8" x="0" y="42" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{jichitaiCd}]]></expression>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="63478c28-94ed-49f6-9bd8-92075cf8243c" x="110" y="2" width="140" height="60" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[　宿泊税納入書]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="2989f34f-f7e3-4827-bae7-e98ae82442a7" x="270" y="2" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{cityName}]]></expression>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="003318cd-dfd2-4c93-b04c-886babc7f7c6" x="270" y="22" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[市区町村コード]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="d419b41d-a72b-47a7-9af5-0c3108a1271a" x="270" y="42" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{jichitaiCd}]]></expression>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="c2b6c9c1-4c02-4265-b15d-f89f6be0d299" x="380" y="2" width="140" height="60" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[　宿泊税納入済通知書]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="6af7eb34-1abc-405b-b0f8-64d83762a9df" x="540" y="2" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{cityName}]]></expression>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="9fc95595-b92b-43b2-8ec6-e7fab901d707" x="540" y="22" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[市区町村コード]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="39a65e9f-4a88-43af-a60c-f6e8eaeb0595" x="540" y="42" width="100" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{jichitaiCd}]]></expression>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="a50e612c-9f46-4e6b-b3fe-dc2fddccb56f" x="652" y="2" width="140" height="60" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[　宿泊税領収証書]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="bca614de-5a95-4881-8261-7bf00a4d8b8a" x="0" y="70" width="130" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[口座番号]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -170,7 +143,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="a21ccf23-43f5-4ff2-b943-fcc1672350fb" x="130" y="0" width="120" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="a21ccf23-43f5-4ff2-b943-fcc1672350fb" x="130" y="70" width="120" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[加入者名]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -181,7 +154,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="3b714da1-5ebf-4a37-b30e-3f4bbe736a27" x="0" y="20" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="3b714da1-5ebf-4a37-b30e-3f4bbe736a27" x="0" y="90" width="130" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{kozaNo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -192,7 +165,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="41fac168-5241-4d30-a07d-fe840c6eed69" x="130" y="20" width="120" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="41fac168-5241-4d30-a07d-fe840c6eed69" x="130" y="90" width="120" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{kozaName}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -203,7 +176,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="332712f5-369c-4479-b840-201598d4988b" x="0" y="40" width="45" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="332712f5-369c-4479-b840-201598d4988b" x="0" y="110" width="45" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[年度]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -214,7 +187,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="a68a1e13-0f89-4d3c-b44a-b3dfedbe1429" x="0" y="60" width="45" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="a68a1e13-0f89-4d3c-b44a-b3dfedbe1429" x="0" y="130" width="45" height="30" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{nendo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -224,7 +197,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="34b8587a-32b5-45af-bae5-30a0b9395970" x="45" y="40" width="65" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="34b8587a-32b5-45af-bae5-30a0b9395970" x="45" y="110" width="65" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申告年月]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -235,7 +208,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="bb5e031e-d045-40b0-9191-b0919070a209" x="45" y="60" width="65" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="bb5e031e-d045-40b0-9191-b0919070a209" x="45" y="130" width="65" height="30" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{shinkokuYm}+"分"]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -245,7 +218,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="df39e053-e8b2-488c-b37d-7bf52f559af5" x="110" y="40" width="70" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="df39e053-e8b2-488c-b37d-7bf52f559af5" x="110" y="110" width="70" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申告区分]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -256,7 +229,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="3423fed3-4ca8-4846-a406-83d820ff4982" x="180" y="40" width="70" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="3423fed3-4ca8-4846-a406-83d820ff4982" x="180" y="110" width="70" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[指定番号]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -267,7 +240,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="0fc6af18-c768-4105-835c-c83e6feba6d1" x="180" y="60" width="70" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="0fc6af18-c768-4105-835c-c83e6feba6d1" x="180" y="130" width="70" height="30" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{shiteiNo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -277,7 +250,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="93968609-0ad9-492d-be6a-e9dde235271e" x="110" y="60" width="70" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="93968609-0ad9-492d-be6a-e9dde235271e" x="110" y="130" width="70" height="30" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申　更　決
 告　生　定]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -288,7 +261,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="d65c1745-d867-4521-8aee-b8ceb497e783" x="0" y="90" width="25" height="100" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="d65c1745-d867-4521-8aee-b8ceb497e783" x="0" y="160" width="25" height="100" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[納
 
 入
@@ -305,7 +278,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="a0e85873-afb5-40c0-bd4e-13655a0a99a4" x="25" y="90" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="a0e85873-afb5-40c0-bd4e-13655a0a99a4" x="25" y="160" width="85" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[税　額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -316,7 +289,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="66fe8141-8474-4eac-8424-c24ba83346c1" x="25" y="115" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="66fe8141-8474-4eac-8424-c24ba83346c1" x="25" y="185" width="85" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[延滞金]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -327,7 +300,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="18ba7800-0fd3-46c2-9eb0-34a71ffbe948" x="25" y="140" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="18ba7800-0fd3-46c2-9eb0-34a71ffbe948" x="25" y="210" width="85" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[加算額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -338,7 +311,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="1a1a13b6-89c7-429c-8d67-fe50fd8cb891" x="25" y="165" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="1a1a13b6-89c7-429c-8d67-fe50fd8cb891" x="25" y="235" width="85" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[合計額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -349,8 +322,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="9411d1e5-6452-4795-912d-119d23a47190" x="110" y="115" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{entai}+" 円 "]]></expression>
+			<element kind="textField" uuid="9411d1e5-6452-4795-912d-119d23a47190" x="110" y="185" width="140" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{entai}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -360,8 +333,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="e6c1eb3b-3495-4ef0-8771-22c6c13114a0" x="110" y="90" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{zeigaku}+" 円 "]]></expression>
+			<element kind="textField" uuid="e6c1eb3b-3495-4ef0-8771-22c6c13114a0" x="110" y="160" width="140" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{zeigaku}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -371,8 +344,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="2b93c334-5c97-4535-86e2-c45fd7c9eb0c" x="110" y="140" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{kasan}+" 円 "]]></expression>
+			<element kind="textField" uuid="2b93c334-5c97-4535-86e2-c45fd7c9eb0c" x="110" y="210" width="140" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{kasan}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
@@ -382,8 +355,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="a596e928-6bd7-4339-b8cd-98843e61b194" x="110" y="165" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{gokei}+" 円 "]]></expression>
+			<element kind="textField" uuid="a596e928-6bd7-4339-b8cd-98843e61b194" x="110" y="235" width="140" height="25" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{gokei}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
@@ -393,10 +366,10 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="line" uuid="095605dd-a35d-4e2e-9d9a-59fdf4532654" x="259" y="-91" width="1" height="597">
+			<element kind="line" uuid="095605dd-a35d-4e2e-9d9a-59fdf4532654" x="259" y="0" width="1" height="540">
 				<pen lineStyle="Dotted"/>
 			</element>
-			<element kind="staticText" uuid="033e79dc-1e4a-41a8-a45d-ccf072bd8bc5" x="0" y="190" width="110" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="033e79dc-1e4a-41a8-a45d-ccf072bd8bc5" x="0" y="260" width="110" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[納期限]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -407,8 +380,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="a9176d37-2f0e-434f-8cee-862ea44634ea" x="110" y="190" width="140" height="20" hTextAlign="Right">
-				<expression><![CDATA[$F{nokigen}+" "]]></expression>
+			<element kind="textField" uuid="a9176d37-2f0e-434f-8cee-862ea44634ea" x="110" y="260" width="140" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{nokigen}+" "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -418,7 +391,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="81931eef-1630-4ff7-9c08-4623d4894462" x="0" y="210" width="250" height="20" fontSize="12.0" vTextAlign="Middle">
+			<element kind="staticText" uuid="81931eef-1630-4ff7-9c08-4623d4894462" x="0" y="280" width="250" height="20" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
 				<text><![CDATA[　特別徴収義務者]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -429,7 +402,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="8f21bbe3-89ad-46cd-9f72-4a83e712946b" x="0" y="230" width="250" height="15" vTextAlign="Middle">
+			<element kind="staticText" uuid="8f21bbe3-89ad-46cd-9f72-4a83e712946b" x="0" y="300" width="250" height="15" fontName="IPAex明朝" fontSize="10.0" vTextAlign="Middle">
 				<text><![CDATA[　　住所(所在地)]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -440,7 +413,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="fa76cff2-b4f1-463c-9789-c6308c82753d" x="0" y="245" width="250" height="20" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="textField" uuid="fa76cff2-b4f1-463c-9789-c6308c82753d" x="0" y="315" width="250" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{tokuJusho}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -451,7 +424,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="08c3a7c3-3127-446f-8713-953bdcc8da20" x="0" y="265" width="250" height="15" vTextAlign="Middle">
+			<element kind="staticText" uuid="08c3a7c3-3127-446f-8713-953bdcc8da20" x="0" y="335" width="250" height="15" fontName="IPAex明朝" fontSize="10.0" vTextAlign="Middle">
 				<text><![CDATA[　　氏名(名称)]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -462,7 +435,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="62058b1e-a0ff-41ab-bf78-33c4478aeee5" x="0" y="280" width="250" height="20" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="textField" uuid="62058b1e-a0ff-41ab-bf78-33c4478aeee5" x="0" y="350" width="250" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{tokuName}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -473,7 +446,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="35c211ad-e145-4155-bf96-c8ac171607c5" x="0" y="300" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="35c211ad-e145-4155-bf96-c8ac171607c5" x="0" y="370" width="130" height="20" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[上記のとおり納入します。]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -484,7 +457,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="139d2e5e-252d-4548-b723-9ae251d94968" x="0" y="320" width="130" height="15" hTextAlign="Left" vTextAlign="Middle">
+			<element kind="staticText" uuid="139d2e5e-252d-4548-b723-9ae251d94968" x="0" y="390" width="130" height="15" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Left" vTextAlign="Middle">
 				<text><![CDATA[ （納入場所）]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -495,7 +468,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="fbb27f58-8a7c-443d-a591-4314ad237786" x="0" y="335" width="131" height="100" hTextAlign="Left" vTextAlign="Middle">
+			<element kind="textField" uuid="fbb27f58-8a7c-443d-a591-4314ad237786" x="0" y="405" width="130" height="84" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{nonyuBasho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -506,7 +479,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="2ba503fc-d3d0-4820-a9c2-14fa11486d24" x="131" y="300" width="20" height="135" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="2ba503fc-d3d0-4820-a9c2-14fa11486d24" x="130" y="370" width="20" height="120" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[領
 
 収
@@ -525,10 +498,11 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="00d9e3cb-ef59-4aa5-b4e5-cfa901a6d4e2" x="151" y="300" width="100" height="135" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="00d9e3cb-ef59-4aa5-b4e5-cfa901a6d4e2" x="150" y="370" width="100" height="120" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -536,17 +510,17 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="89b49597-95c5-45e0-aa70-f1785d5d085c" x="0" y="435" width="250" height="20" fontSize="12.0" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="staticText" uuid="89b49597-95c5-45e0-aa70-f1785d5d085c" x="0" y="495" width="250" height="20" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right" vTextAlign="Middle">
 				<text><![CDATA[（金融機関又はゆうちょ銀行等保管）]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="staticText" uuid="acaa6228-1e4c-424a-8793-bcef76b3efba" x="0" y="455" width="250" height="15" fontSize="6.0" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="staticText" uuid="acaa6228-1e4c-424a-8793-bcef76b3efba" x="0" y="515" width="250" height="15" fontName="IPAex明朝" fontSize="6.0" hTextAlign="Right" vTextAlign="Middle">
 				<text><![CDATA[この納入書は３枚一組となっておりますので、切り離さずに提出してください。]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
-			<element kind="staticText" uuid="77864245-c848-4d0f-bc99-9f0dc68a3275" x="270" y="0" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="77864245-c848-4d0f-bc99-9f0dc68a3275" x="270" y="70" width="130" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[口座番号]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -557,7 +531,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="bf530b71-b1cf-44ca-be03-0faaea149afe" x="400" y="0" width="120" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="bf530b71-b1cf-44ca-be03-0faaea149afe" x="400" y="70" width="120" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[加入者名]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -568,7 +542,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="5b3bf882-2e15-499f-9fac-b0ca4c23ad9c" x="270" y="20" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="5b3bf882-2e15-499f-9fac-b0ca4c23ad9c" x="270" y="90" width="130" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{kozaNo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -579,7 +553,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="374f318e-b171-430e-8d50-d5ca59607f86" x="400" y="20" width="120" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="374f318e-b171-430e-8d50-d5ca59607f86" x="400" y="90" width="120" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{kozaName}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -590,7 +564,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="37e96d1c-1d34-4c1d-a107-bb195d2cd384" x="270" y="40" width="45" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="37e96d1c-1d34-4c1d-a107-bb195d2cd384" x="270" y="110" width="45" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[年度]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -601,7 +575,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="550960a8-d9da-44e0-b25f-2b2f1cdc8525" x="315" y="40" width="65" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="550960a8-d9da-44e0-b25f-2b2f1cdc8525" x="315" y="110" width="65" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申告年月]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -612,7 +586,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="707f5d58-e7c7-4acc-9769-362553e5fbc7" x="380" y="40" width="70" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="707f5d58-e7c7-4acc-9769-362553e5fbc7" x="380" y="110" width="70" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申告区分]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -623,7 +597,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="cb9de386-7008-4512-8b4f-27965911266a" x="450" y="40" width="70" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="cb9de386-7008-4512-8b4f-27965911266a" x="450" y="110" width="70" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[指定番号]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -634,7 +608,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="aee330a6-c36d-42d1-934f-81b462fd6f9f" x="270" y="60" width="45" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="aee330a6-c36d-42d1-934f-81b462fd6f9f" x="270" y="130" width="45" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{nendo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -644,7 +618,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="8c846dc5-d296-4ee3-8f1e-c2522f95e152" x="315" y="60" width="65" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="8c846dc5-d296-4ee3-8f1e-c2522f95e152" x="315" y="130" width="65" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{shinkokuYm}+"分"]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -654,7 +628,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="4f331053-e15d-4bb5-b53e-86095e0c08bf" x="380" y="60" width="70" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="4f331053-e15d-4bb5-b53e-86095e0c08bf" x="380" y="130" width="70" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申　更　決
 告　生　定]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -665,7 +639,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="95a9002a-1502-4bd3-8a77-e32135534dd1" x="450" y="60" width="70" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="95a9002a-1502-4bd3-8a77-e32135534dd1" x="450" y="130" width="70" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{shiteiNo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -675,7 +649,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="e97adfba-c014-44b5-886d-900704d52572" x="270" y="90" width="25" height="100" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="e97adfba-c014-44b5-886d-900704d52572" x="270" y="160" width="25" height="100" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[納
 
 入
@@ -692,7 +666,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="50d535ed-ef22-4c9b-b3a3-e72a99d77027" x="295" y="90" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="50d535ed-ef22-4c9b-b3a3-e72a99d77027" x="295" y="160" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[税　額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -703,7 +677,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="188d2142-0e0f-4d68-94b6-a1be0e75be40" x="295" y="115" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="188d2142-0e0f-4d68-94b6-a1be0e75be40" x="295" y="185" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[延滞金]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -714,7 +688,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="8b941b35-c913-4719-9404-234f0b7daeea" x="295" y="140" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="8b941b35-c913-4719-9404-234f0b7daeea" x="295" y="210" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[加算額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -725,7 +699,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="317dc34a-34d9-401d-a904-235b0ba3979d" x="295" y="165" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="317dc34a-34d9-401d-a904-235b0ba3979d" x="295" y="235" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[合計額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -736,8 +710,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="c085a158-1691-4135-ac40-661bb6f1e24b" x="380" y="90" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{zeigaku}+" 円 "]]></expression>
+			<element kind="textField" uuid="c085a158-1691-4135-ac40-661bb6f1e24b" x="380" y="160" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{zeigaku}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -747,8 +721,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="2d1e78fd-a2c1-4ddf-b7a5-687cd3d84f62" x="380" y="115" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{entai}+" 円 "]]></expression>
+			<element kind="textField" uuid="2d1e78fd-a2c1-4ddf-b7a5-687cd3d84f62" x="380" y="185" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{entai}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -758,8 +732,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="c0778df1-7dba-44de-aaa9-828aa7627b66" x="380" y="140" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{kasan}+" 円 "]]></expression>
+			<element kind="textField" uuid="c0778df1-7dba-44de-aaa9-828aa7627b66" x="380" y="210" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{kasan}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
@@ -769,8 +743,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="ccb38640-3ed4-4d25-86f1-06227e4e780f" x="380" y="165" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{gokei}+" 円 "]]></expression>
+			<element kind="textField" uuid="ccb38640-3ed4-4d25-86f1-06227e4e780f" x="380" y="235" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{gokei}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
@@ -780,7 +754,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="dde2a81b-a74a-45df-a4a9-3104937a278f" x="270" y="190" width="110" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="dde2a81b-a74a-45df-a4a9-3104937a278f" x="270" y="260" width="110" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[納期限]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -791,7 +765,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="a8549bf2-4199-4d98-942b-eee5f294d90b" x="380" y="190" width="140" height="20" hTextAlign="Right">
+			<element kind="textField" uuid="a8549bf2-4199-4d98-942b-eee5f294d90b" x="380" y="260" width="140" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{nokigen}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -802,7 +776,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="75638d53-890f-47c1-9384-97b3b736fc77" x="270" y="210" width="250" height="20" fontSize="12.0" vTextAlign="Middle">
+			<element kind="staticText" uuid="75638d53-890f-47c1-9384-97b3b736fc77" x="270" y="280" width="250" height="20" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
 				<text><![CDATA[　特別徴収義務者]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -813,7 +787,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="01016972-4a9f-49d5-87c8-1472565745d7" x="270" y="230" width="250" height="15" vTextAlign="Middle">
+			<element kind="staticText" uuid="01016972-4a9f-49d5-87c8-1472565745d7" x="270" y="300" width="250" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[　　住所(所在地)]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -824,7 +798,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="160ac4c4-2f98-4414-b5ed-d41ebaae4417" x="270" y="245" width="250" height="20" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="textField" uuid="160ac4c4-2f98-4414-b5ed-d41ebaae4417" x="270" y="315" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{tokuJusho}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -835,7 +809,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="4ea0791c-4d04-4b6c-a9f1-16e170e50df3" x="270" y="265" width="250" height="15" vTextAlign="Middle">
+			<element kind="staticText" uuid="4ea0791c-4d04-4b6c-a9f1-16e170e50df3" x="270" y="335" width="250" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[　　氏名(名称)]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -846,7 +820,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="55510743-2bb8-4dbb-bb15-10c78a91a4fb" x="270" y="280" width="250" height="20" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="textField" uuid="55510743-2bb8-4dbb-bb15-10c78a91a4fb" x="270" y="350" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{tokuName}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -857,7 +831,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="0974da61-596b-4a98-8343-a42e1b523a33" x="270" y="300" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="0974da61-596b-4a98-8343-a42e1b523a33" x="270" y="370" width="130" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[指定金融機関名]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -868,7 +842,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="2fabea1f-1342-40ef-affb-62da0363c082" x="270" y="351" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="2fabea1f-1342-40ef-affb-62da0363c082" x="270" y="410" width="130" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[取りまとめ店]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -879,9 +853,10 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="032bd3e4-1701-4363-b0dd-e6c938500e5e" x="270" y="320" width="130" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="032bd3e4-1701-4363-b0dd-e6c938500e5e" x="270" y="390" width="130" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{shiteiKinyuName}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -889,7 +864,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="ad1d0763-9d4a-4421-9334-396e42cc0e90" x="270" y="370" width="130" height="65" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="ad1d0763-9d4a-4421-9334-396e42cc0e90" x="270" y="430" width="130" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{torimatome}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -900,7 +875,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="362d43a6-5df7-465a-afd6-1c72b4e99197" x="400" y="300" width="20" height="135" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="362d43a6-5df7-465a-afd6-1c72b4e99197" x="400" y="370" width="20" height="120" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[領
 
 収
@@ -919,7 +894,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="b29f3fb4-715a-4f36-b4e8-6531f12cfdac" x="420" y="300" width="100" height="135" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="b29f3fb4-715a-4f36-b4e8-6531f12cfdac" x="420" y="370" width="100" height="120" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -930,20 +905,20 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="c1607a36-60f2-48d7-8e54-013597c41709" x="270" y="435" width="250" height="20" hTextAlign="Right">
+			<element kind="textField" uuid="c1607a36-60f2-48d7-8e54-013597c41709" x="270" y="495" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA["（"+$F{cityName}+"保管）"]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
-			<element kind="textField" uuid="37953a8d-2502-41e7-a75a-2b766f2da98c" x="270" y="455" width="250" height="15" fontSize="7.0" hTextAlign="Right">
+			<element kind="textField" uuid="37953a8d-2502-41e7-a75a-2b766f2da98c" x="270" y="515" width="250" height="15" fontName="IPAex明朝" fontSize="7.0" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA["上記のとおり通知します。（受付店ー"+$F{cityName}+"会計管理者）"]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
-			<element kind="line" uuid="65600620-005e-4edd-95bd-0db5c35ab889" x="529" y="-91" width="1" height="597">
+			<element kind="line" uuid="65600620-005e-4edd-95bd-0db5c35ab889" x="529" y="0" width="1" height="540">
 				<pen lineStyle="Dotted"/>
 			</element>
-			<element kind="staticText" uuid="e4eec604-e90a-414e-a28a-15b69b2081ea" x="540" y="0" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="e4eec604-e90a-414e-a28a-15b69b2081ea" x="540" y="70" width="130" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[口座番号]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -954,7 +929,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="7dd4c045-bd3e-49cf-a92f-c0b719cf0276" x="670" y="0" width="120" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="7dd4c045-bd3e-49cf-a92f-c0b719cf0276" x="670" y="70" width="120" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[加入者名]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -965,7 +940,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="774c6dfc-9a0d-4d30-b9ca-a87bfe6f3a9c" x="540" y="20" width="130" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="774c6dfc-9a0d-4d30-b9ca-a87bfe6f3a9c" x="540" y="90" width="130" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{kozaNo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -976,7 +951,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="98da6b22-dfee-44d9-a989-0b4395cfa229" x="670" y="20" width="120" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="98da6b22-dfee-44d9-a989-0b4395cfa229" x="670" y="90" width="120" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{kozaName}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -987,7 +962,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="7dd79360-1859-44ea-9d85-8891f31c7dcf" x="540" y="40" width="45" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="7dd79360-1859-44ea-9d85-8891f31c7dcf" x="540" y="110" width="45" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[年度]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -998,7 +973,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="ee93e76f-eeb0-453c-8d18-1d4a1702ff59" x="585" y="40" width="65" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="ee93e76f-eeb0-453c-8d18-1d4a1702ff59" x="585" y="110" width="65" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申告年月]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1009,7 +984,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="f6cb6c56-0981-48d6-8523-5e252c1f68d4" x="650" y="40" width="70" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="f6cb6c56-0981-48d6-8523-5e252c1f68d4" x="650" y="110" width="70" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申告区分]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1020,7 +995,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="910f7014-df02-4cc6-86fb-1ed01553a9f9" x="720" y="40" width="70" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="910f7014-df02-4cc6-86fb-1ed01553a9f9" x="720" y="110" width="70" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[指定番号]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1031,7 +1006,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="a5d9c7be-6f00-49bf-9204-4c614e487b01" x="540" y="60" width="45" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="a5d9c7be-6f00-49bf-9204-4c614e487b01" x="540" y="130" width="45" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{nendo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -1041,7 +1016,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="c069bad0-7b2d-42e1-a910-a3624fecbc8c" x="585" y="60" width="65" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="c069bad0-7b2d-42e1-a910-a3624fecbc8c" x="585" y="130" width="65" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{shinkokuYm}+"分"]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -1051,7 +1026,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="4199efdf-7531-4b93-afa9-4b6c1949a86c" x="650" y="60" width="70" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="4199efdf-7531-4b93-afa9-4b6c1949a86c" x="650" y="130" width="70" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[申　更　決
 告　生　定]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1062,7 +1037,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="9cb664cc-4741-4ba2-b7e3-b0069ae28cc6" x="720" y="60" width="70" height="30" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="9cb664cc-4741-4ba2-b7e3-b0069ae28cc6" x="720" y="130" width="70" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{shiteiNo}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -1072,7 +1047,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="a9252217-9f15-4cff-9e64-d9d6ff81966d" x="540" y="90" width="25" height="100" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="a9252217-9f15-4cff-9e64-d9d6ff81966d" x="540" y="160" width="25" height="100" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[納
 
 入
@@ -1089,7 +1064,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="6a868e22-0fb8-4692-888b-8d9969a386ca" x="565" y="90" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="6a868e22-0fb8-4692-888b-8d9969a386ca" x="565" y="160" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[税　額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1100,7 +1075,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="23d9372c-1fd8-4906-b19f-8e513dec4d87" x="565" y="115" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="23d9372c-1fd8-4906-b19f-8e513dec4d87" x="565" y="185" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[延滞金]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1111,7 +1086,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="38ac9bab-98fd-48e4-b5c5-b78666f9e3be" x="565" y="140" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="38ac9bab-98fd-48e4-b5c5-b78666f9e3be" x="565" y="210" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[加算額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1122,7 +1097,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="0abd67dd-9597-4d4d-af00-ed4bf050fac9" x="565" y="165" width="85" height="25" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="0abd67dd-9597-4d4d-af00-ed4bf050fac9" x="565" y="235" width="85" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[合計額]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1133,8 +1108,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="86d1c578-3795-4994-905c-46d34395985f" x="650" y="90" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{zeigaku}+" 円 "]]></expression>
+			<element kind="textField" uuid="86d1c578-3795-4994-905c-46d34395985f" x="650" y="160" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{zeigaku}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -1144,8 +1119,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="57ac5da1-6810-40d3-b658-7f2319c32937" x="650" y="115" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{entai}+" 円 "]]></expression>
+			<element kind="textField" uuid="57ac5da1-6810-40d3-b658-7f2319c32937" x="650" y="185" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{entai}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -1155,8 +1130,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="9a92a8fe-b16d-42a4-8cae-ed782a944080" x="650" y="140" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{kasan}+" 円 "]]></expression>
+			<element kind="textField" uuid="9a92a8fe-b16d-42a4-8cae-ed782a944080" x="650" y="210" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{kasan}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
@@ -1166,8 +1141,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="6f4e02b2-ba77-4669-b186-f0bf26bf4c18" x="650" y="165" width="140" height="25" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{gokei}+" 円 "]]></expression>
+			<element kind="textField" uuid="6f4e02b2-ba77-4669-b186-f0bf26bf4c18" x="650" y="235" width="140" height="25" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<expression><![CDATA[$F{gokei}+" 円 "+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
@@ -1177,7 +1152,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="9eab5e5b-f874-4e43-bd68-884dfbe98c79" x="650" y="190" width="140" height="20" hTextAlign="Right">
+			<element kind="textField" uuid="9eab5e5b-f874-4e43-bd68-884dfbe98c79" x="650" y="260" width="140" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{nokigen}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1188,7 +1163,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="8ad599de-b2b5-40e8-bfdd-d003a1ae14e3" x="540" y="190" width="110" height="20" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="8ad599de-b2b5-40e8-bfdd-d003a1ae14e3" x="540" y="260" width="110" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[納期限]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1199,7 +1174,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="1aaded94-99c6-4da5-b0bd-377cf2286de6" x="540" y="210" width="250" height="20" fontSize="12.0" vTextAlign="Middle">
+			<element kind="staticText" uuid="1aaded94-99c6-4da5-b0bd-377cf2286de6" x="540" y="280" width="250" height="20" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
 				<text><![CDATA[　特別徴収義務者]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1210,7 +1185,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="eb5b187f-847b-4a52-9ec6-bcbda1ba61f8" x="540" y="230" width="250" height="15" vTextAlign="Middle">
+			<element kind="staticText" uuid="eb5b187f-847b-4a52-9ec6-bcbda1ba61f8" x="540" y="300" width="250" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[　　住所(所在地)]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1221,7 +1196,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="9a653673-80ba-45a7-a7e8-e7cf4695bdbe" x="540" y="245" width="250" height="20" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="textField" uuid="9a653673-80ba-45a7-a7e8-e7cf4695bdbe" x="540" y="315" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{tokuJusho}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1232,7 +1207,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="b64b1a79-5445-44fc-95c6-9da567594225" x="540" y="265" width="250" height="15" vTextAlign="Middle">
+			<element kind="staticText" uuid="b64b1a79-5445-44fc-95c6-9da567594225" x="540" y="335" width="250" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[　　氏名(名称)]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1243,7 +1218,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="167ac8bd-7149-4c8d-87bb-a403b57f547f" x="540" y="280" width="250" height="20" hTextAlign="Right" vTextAlign="Middle">
+			<element kind="textField" uuid="167ac8bd-7149-4c8d-87bb-a403b57f547f" x="540" y="350" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<expression><![CDATA[$F{tokuName}+" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -1254,9 +1229,8 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="5fd851f3-d073-4361-b5ac-0bd32378f2e3" x="540" y="300" width="130" height="135" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="5fd851f3-d073-4361-b5ac-0bd32378f2e3" x="540" y="370" width="130" height="120" fontName="IPAex明朝" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[上記のとおり領収しました。]]></text>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1265,7 +1239,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="38a14ed0-8a60-4ff6-bf1c-8c6ebefc05ad" x="670" y="300" width="20" height="135" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="38a14ed0-8a60-4ff6-bf1c-8c6ebefc05ad" x="670" y="370" width="20" height="120" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[領
 
 収
@@ -1276,7 +1250,6 @@
 
 印]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1284,7 +1257,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="5f6b2a52-1b6b-4b27-a5e3-2e9d7c726422" x="690" y="300" width="100" height="135" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="5f6b2a52-1b6b-4b27-a5e3-2e9d7c726422" x="690" y="370" width="100" height="120" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -1295,15 +1268,24 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="395b18a1-0623-4dde-b2ea-8a105a061c5f" x="540" y="435" width="250" height="20" hTextAlign="Right">
+			<element kind="staticText" uuid="395b18a1-0623-4dde-b2ea-8a105a061c5f" x="540" y="495" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
 				<text><![CDATA[（納入者保管）]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
-			<element kind="staticText" uuid="0bacb843-b738-4258-80be-8904bb177abf" x="540" y="455" width="250" height="15">
+			<element kind="staticText" uuid="0bacb843-b738-4258-80be-8904bb177abf" x="540" y="515" width="250" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[この領収書は、５年間保存してください]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="image" uuid="81cb8974-94ef-44f9-ae31-b5b0943f6199" x="198" y="7" width="50" height="50">
+				<expression><![CDATA[$F{jichitaiKoin}]]></expression>
+			</element>
+			<element kind="image" uuid="0d0bfcf6-7004-4774-9093-c9d368d40ec3" x="465" y="7" width="50" height="50">
+				<expression><![CDATA[$F{jichitaiKoin}]]></expression>
+			</element>
+			<element kind="image" uuid="2c05c8b0-50c0-4ff2-ac77-01d3c5ff1cdc" x="740" y="7" width="50" height="50">
+				<expression><![CDATA[$F{jichitaiKoin}]]></expression>
 			</element>
 		</band>
 	</detail>
