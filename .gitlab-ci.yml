@@ -24,4 +24,5 @@ deploy_local_job:
     # 2. サービスを再起動（古いプロセスが自動で停止し、新しいjarで立ち上がります）
     - sudo systemctl restart acomo
   only:
+    - master
     - cicd_setting
