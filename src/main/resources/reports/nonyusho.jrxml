@@ -468,7 +468,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="fbb27f58-8a7c-443d-a591-4314ad237786" x="0" y="405" width="130" height="84" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="textField" uuid="fbb27f58-8a7c-443d-a591-4314ad237786" x="0" y="405" width="130" height="85" fontName="IPAex明朝" fontSize="10.0" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{nonyuBasho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
