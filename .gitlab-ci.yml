@@ -1,0 +1,32 @@
+stages:
+  - deploy-and-build
+
+build_job:
+  stage: deploy-and-build
+  image: alpine:latest  # 軽量なLinuxイメージ
+  before_script:
+    # 1. SSHクライアント、rsyncのインストール
+    - apk add --no-cache openssh-client rsync
+
+    # 2. ssh-agentの起動と秘密鍵の登録
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+    # 3. SSH接続設定
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+  script:
+    # 4. GitLabが自動チェックアウトしたソースコード一式を、rsyncでUbuntuサーバーへ転送
+    - rsync -atv --delete ./ cicd-user@your-server-ip:/home/cicd-user/app/
+
+    # 5. Ubuntuサーバー側でGradleビルドを実行
+    - |
+      ssh cicd-user@your-server-ip "
+        cd /home/cicd-user/app &&
+        chmod +x ./gradlew &&
+        ./gradlew clean build
+      "
+  only:
+    - cicd_setting
