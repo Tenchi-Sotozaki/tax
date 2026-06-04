@@ -14,7 +14,7 @@ import lombok.Data;
 @Data
 public class FukaMonthlyDeclarationDto {
 
-	@NotBlank(message = "納入年月を選択してください。")
+	@NotBlank(message = "※納入年月を選択してください")
 	private String paymentYearMonth;
 
 	// リストの中身まで検証を Cascade（連鎖：親の検証時に子も自動的に検証すること）させる

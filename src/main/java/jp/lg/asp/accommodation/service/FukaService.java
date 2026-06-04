@@ -1218,52 +1218,47 @@ public class FukaService {
 	 * @return true: 不整合あり / false: 不整合なし
 	 */
 	public boolean hasTaxAmountDiscrepancy(FukaDeclarationForm form) {
-
-		// =========================================================
-		// 💡 【追加】定率制（料金ベース）の相関バリデーション（早期リターン）
-		// =========================================================
-		if ("2".equals(form.getFukaKbn())) {
-			// Null-Safety対策として、nullの場合は0として扱う
-			long ryokin = (form.getKazeiRyokin() != null) ? form.getKazeiRyokin() : 0L;
-			long zeigaku = (form.getTeiritsuZeigaku() != null) ? form.getTeiritsuZeigaku() : 0L;
-
-			// パターン1: 課税対象宿泊料金が入力されている（1円以上）のに、税額が0円（未入力）の場合は不整合
-			if (ryokin > 0 && zeigaku == 0) {
-				return true;
-			}
-
-			// パターン2: 逆に、課税対象宿泊料金が0円なのに、税額が入力されている場合も不整合
-			if (ryokin == 0 && zeigaku > 0) {
-				return true;
-			}
-
-			// 上記の矛盾がなければ正常とする（※税率2%の厳密な計算チェックが必要な場合はここへ追加可能）
-			return false;
-		}
-
-		// =========================================================
-		// 💡 【既存ロジック】定額制（人数ベース）の相関バリデーション
-		// =========================================================
 		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
-		if (detail == null || detail.getTaxDetails() == null) {
+		if (detail == null || detail.getTaxDetails() == null || detail.getTaxDetails().isEmpty()) {
 			return false;
 		}
 
-		// A の計算: 税率 × 宿泊数 の合計
-		long calculatedTotal = detail.getTaxDetails().stream()
-				.mapToLong(d -> {
-					BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
-					long count = (d.getStayCount() != null) ? d.getStayCount() : 0;
-					// 単価 × 宿泊数 を計算し、最後に long 型（合計金額）に戻す
-					return rate.multiply(BigDecimal.valueOf(count)).longValue();
-				})
-				.sum();
+		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
 
-		// 💡 画面の「合計」欄の値を取得
+		// 明細に1件でも入力があるか確認（全未入力ならチェック不要）
+		boolean hasInput;
+		if (kbn.isTeiritsu()) {
+			hasInput = detail.getTaxDetails().stream()
+					.anyMatch(d -> d.getKazeiRyokin() != null && d.getKazeiRyokin() > 0);
+		} else {
+			hasInput = detail.getTaxDetails().stream()
+					.anyMatch(d -> d.getStayCount() != null && d.getStayCount() > 0);
+		}
+		if (!hasInput) {
+			return false;
+		}
+
+		// 期待される税額を全区分ループで計算
+		long calculatedTotal = 0L;
+		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
+			BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
+			if (kbn.isTeiritsu()) {
+				long ryokin = (d.getKazeiRyokin() != null) ? d.getKazeiRyokin().longValue() : 0L;
+				calculatedTotal += kbn.calculateTax(rate, ryokin);
+			} else {
+				long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
+				calculatedTotal += kbn.calculateTax(rate, count);
+			}
+		}
+
+		// 画面の合計税額を取得
 		long inputTotal = (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0L;
 
-		// A と B が違えば不整合！
-		return calculatedTotal != inputTotal;
+		if (calculatedTotal != inputTotal) {
+			log.warn("税額整合性エラー: 算出値={}, 画面入力値={}, fukaKbn={}", calculatedTotal, inputTotal, form.getFukaKbn());
+			return true;
+		}
+		return false;
 	}
 
 	/**

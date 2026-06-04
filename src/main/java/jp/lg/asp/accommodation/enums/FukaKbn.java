@@ -26,12 +26,12 @@ public enum FukaKbn {
     TEIRITSU("2", "定率制") {
         @Override
         public long calculateTax(BigDecimal rate, long count) {
-            // 定率制：宿泊料金 × 税率(小数)（端数切り捨て）
-            // DBには 0.02 のような小数値で格納されているため、/ 100 は不要
-            if (rate == null) return 0L;
+            // 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
+            // DBにはパーセント値（例: 2.00 = 2%）で格納されている
+            if (rate == null || rate.compareTo(BigDecimal.ZERO) == 0) return 0L;
             return BigDecimal.valueOf(count)
                     .multiply(rate)
-                    .setScale(0, RoundingMode.DOWN)
+                    .divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN)
                     .longValue();
         }
     };

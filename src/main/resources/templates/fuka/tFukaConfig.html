@@ -16,12 +16,6 @@
 				<span
 					th:text="${fukaDeclarationForm.view ? '宿泊税納入情報照会' : (fukaDeclarationForm.edit ? '宿泊税納入情報編集' : '宿泊税納入情報登録')}"></span>
 			</h5>
-			<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
-				<i
-					th:class="${fukaDeclarationForm.isView ? 'bi bi-eye me-1' : (fukaDeclarationForm.isEdit ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
-				<span
-					th:text="${fukaDeclarationForm.isView ? '照会' : (fukaDeclarationForm.isEdit ? '編集' : '新規登録')}"></span>
-			</span>
 		</div>
 
 		<div th:if="${errorMessage}" class="alert alert-danger py-2 mb-3" role="alert">
@@ -35,7 +29,10 @@
 				th:value="${showTaxWarningModal != null ? showTaxWarningModal : false}" />
 
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger py-2 mb-3">
-				<i class="bi bi-exclamation-octagon-fill me-2"></i>入力内容にエラーがあります。各項目の赤字を確認してください。
+				<i class="bi bi-exclamation-octagon-fill me-2"></i>入力内容にエラーがあります。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${#fields.allErrors()}" th:text="${err}" class="text-danger small"></li>
+				</ul>
 			</div>
 
 			<input type="hidden" th:field="*{declarationId}" />
@@ -53,8 +50,9 @@
 				<div class="card-body">
 					<div class="row g-3 mb-3">
 						<div class="col-md-4">
-							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">登録日</label>
-							<input type="date" class="form-control form-control-sm" th:field="*{registrationDate}" th:readonly="${fukaDeclarationForm.isView}">
+							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">登録日 <span class="badge bg-danger ms-1" th:if="${!fukaDeclarationForm.isView}">必須</span></label>
+							<input type="date" class="form-control form-control-sm" th:field="*{registrationDate}" th:readonly="${fukaDeclarationForm.isView}" th:errorclass="is-invalid">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}" th:errors="*{registrationDate}"></div>
 						</div>
 						<div class="col-md-4">
 							<label class="form-label form-label-sm fw-medium mb-1">特別徴収義務者</label>
@@ -74,7 +72,9 @@
 							<input type="month" class="form-control form-control-sm"
 								th:classappend="${!#strings.isEmpty(fukaDeclarationForm.monthlyDetail.paymentYearMonth)} ? 'bg-light' : ''"
 								th:field="*{monthlyDetail.paymentYearMonth}"
-								th:readonly="${!#strings.isEmpty(fukaDeclarationForm.monthlyDetail.paymentYearMonth) or fukaDeclarationForm.isView}">
+								th:readonly="${!#strings.isEmpty(fukaDeclarationForm.monthlyDetail.paymentYearMonth) or fukaDeclarationForm.isView}"
+								th:errorclass="is-invalid">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('monthlyDetail.paymentYearMonth')}" th:errors="*{monthlyDetail.paymentYearMonth}"></div>
 						</div>
 
 						<div class="col-md-3">
@@ -95,6 +95,7 @@
 									<option value="1">更生</option>
 									<option value="2">修正</option>
 								</select>
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('modificationCategory')}" th:errors="*{modificationCategory}"></div>
 								<input type="hidden" th:if="${fukaDeclarationForm.view}" th:field="*{modificationCategory}" />
 							</div>
 							<div class="col-md-4">
@@ -473,8 +474,11 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body text-dark">
-						<p>入力された合計税額と、宿泊数から計算された値が一致しません。</p>
-						<p class="mb-0">このまま保存してもよろしいですか？</p>
+						<p class="fw-bold">以下の不整合が検出されました：</p>
+						<ul class="text-danger small" th:if="${discrepancyMessages != null && !discrepancyMessages.isEmpty()}">
+							<li th:each="msg : ${discrepancyMessages}" th:text="${msg}"></li>
+						</ul>
+						<p class="mb-0 mt-2">このまま保存してもよろしいですか？</p>
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
