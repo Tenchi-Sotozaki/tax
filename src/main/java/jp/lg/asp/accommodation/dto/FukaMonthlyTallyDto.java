@@ -22,6 +22,8 @@ public class FukaMonthlyTallyDto {
 		private Integer day; // 日付 (1〜31)
 		// index 0 -> 区分①(hakusu1), 1 -> 区分②(hakusu2)...
 		private List<Long> taxCategoryCounts = new ArrayList<>();
+		// 区分ごとの課税対象宿泊料金（定率制で使用）
+		private List<Long> taxCategoryAmounts = new ArrayList<>();
 		private Integer exemptCount; // 免除・対象外の宿泊数
 	}
 
@@ -45,6 +47,7 @@ public class FukaMonthlyTallyDto {
 			item.setDay(i);
 			for (int j = 0; j < categoryCount; j++) {
 				item.getTaxCategoryCounts().add(0L);
+				item.getTaxCategoryAmounts().add(0L);
 			}
 			item.setExemptCount(0);
 			this.dailyItems.add(item);

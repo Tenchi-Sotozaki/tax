@@ -61,6 +61,5 @@ public class FukaMonthlyDeclaration {
 
 	// 納入金額合計
 	@Column(name = "total_payment_amount")
-	private Long totalPaymentAmount;
-
+	private Long totalPaymentAmount;          
 }

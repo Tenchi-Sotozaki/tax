@@ -29,6 +29,14 @@ public class ChoshuGenboUchi {
 	private Integer hakusu2; // 税区分② 宿泊数
 	@Column(name = "hakusu3")
 	private Integer hakusu3; // 税区分③ 宿泊数
+	@Column(name = "ryokin1")
+	private Long ryokin1; // 税区分① 宿泊料金（定率制用）
+	@Column(name = "ryokin2")
+	private Long ryokin2; // 税区分② 宿泊料金（定率制用）
+	@Column(name = "ryokin3")
+	private Long ryokin3; // 税区分③ 宿泊料金（定率制用）
+	@jakarta.persistence.Transient
+	private Long menjoRyokin; // 免除宿泊料金（定率制用・DBカラム未存在のためマッピング除外）
 	@Column(name = "menjo_hakusu")
 	private Integer menjoHakusu; // 免除宿泊数
 

@@ -995,3 +995,4 @@ COMMENT ON COLUMN t_atena_renkei.add_user IS '作成者';
 COMMENT ON COLUMN t_atena_renkei.upd_dt IS '更新日時';
 COMMENT ON COLUMN t_atena_renkei.upd_user IS '更新者';
 COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
+

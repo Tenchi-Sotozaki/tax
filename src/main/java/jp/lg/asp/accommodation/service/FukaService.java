@@ -39,6 +39,7 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
+import jp.lg.asp.accommodation.enums.FukaKbn;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -436,16 +437,19 @@ public class FukaService {
 			FukaTaxDetailDto formDetail = dto.getTaxDetails().get(i);
 			FukaUchi matched = uchiMap.get(i + 1);
 
-			if (matched != null) {
-				// 💡 定率制(2)の場合は ryokin カラム、定額制(1)の場合は hakusu カラムの値をセットする
+				if (matched != null) {
 				if ("2".equals(matched.getFukaKbn())) {
-					formDetail.setStayCount(matched.getRyokin());
+					// 定率制: hakusu=宿泊数, ryokin=課税対象宿泊料金
+					formDetail.setStayCount(matched.getHakusu());
+					formDetail.setKazeiRyokin(matched.getRyokin() != null ? matched.getRyokin().intValue() : null);
 				} else {
+					// 定額制: hakusu=宿泊数
 					formDetail.setStayCount(matched.getHakusu());
 				}
 				formDetail.setTaxAmount(matched.getZeigaku());
 			} else {
 				formDetail.setStayCount(null);
+				formDetail.setKazeiRyokin(null);
 				formDetail.setTaxAmount(null);
 			}
 		}
@@ -535,12 +539,23 @@ public class FukaService {
 		// DTOからparentFukaへの値マッピング（NOT NULL制約違反防止：nullの場合はデフォルト値0を代入）
 		if (dto != null) {
 			parentFuka.setTotalHakusu(dto.getTotalStayCount() != null ? dto.getTotalStayCount() : 0);
-			parentFuka.setKazeiRyokin(dto.getKazeiRyokin() != null ? dto.getKazeiRyokin() : 0L);
-			Long taxAmount = 0L;
-			if (dto.getTaxDetails() != null && !dto.getTaxDetails().isEmpty()) {
-				taxAmount = dto.getTaxDetails().get(0).getTaxAmount();
+			// kazeiRyokin: DTO直下にバインドがない場合、taxDetailsの各区分から合計を算出
+                        Long kazeiRyokinTotal = 0L;
+                        if (dto.getKazeiRyokin() != null && dto.getKazeiRyokin() > 0) {
+                                kazeiRyokinTotal = dto.getKazeiRyokin();
+                        } else if (dto.getTaxDetails() != null) {
+                                kazeiRyokinTotal = dto.getTaxDetails().stream()
+                                        .mapToLong(d -> d.getKazeiRyokin() != null ? d.getKazeiRyokin().longValue() : 0L)
+                                        .sum();
+                        }
+                        parentFuka.setKazeiRyokin(kazeiRyokinTotal);
+			// totalZeigaku: totalPaymentAmount > taxDetails[0].taxAmount > 0L
+                        Long taxAmount = null;
+			if (dto.getTotalPaymentAmount() != null && dto.getTotalPaymentAmount() > 0) {
+				taxAmount = dto.getTotalPaymentAmount();
 			}
 			parentFuka.setTotalZeigaku(taxAmount != null ? taxAmount : 0L);
+                        log.info("★★★ [saveDeclaration] totalZeigaku={}, taxAmount={}, nonyuKingaku={}, totalPaymentAmount={}, fukaKbn={}", parentFuka.getTotalZeigaku(), taxAmount, dto.getNonyuKingaku(), dto.getTotalPaymentAmount(), form.getFukaKbn());
 			parentFuka.setZeigaku(dto.getNonyuKingaku() != null ? dto.getNonyuKingaku() : 0L);
 		}
 
@@ -596,7 +611,18 @@ public class FukaService {
 					if (cVal != null && cVal > 0) {
 						setHakusuByIndex(uchi, k + 1, cVal.intValue());
 					}
-				} // replaced fixed hakusu logic
+				}
+
+				// 定率制用：日別の宿泊料金（taxCategoryAmounts）をEntityの料金フィールドにセット
+				List<Long> amounts = item.getTaxCategoryAmounts();
+				if (amounts != null) {
+					for (int k = 0; k < amounts.size(); k++) {
+						Long aVal = amounts.get(k);
+						if (aVal != null && aVal > 0) {
+							setRyokinByIndex(uchi, k + 1, aVal);
+						}
+					}
+				}
 
 				uchi.setMenjoHakusu(item.getExemptCount());
 				setAuditFields(uchi);
@@ -708,68 +734,17 @@ public class FukaService {
 		// 💡 【定率制（料金ベース）の早期リターン処理】
 		// 定率制（fukaKbn == "2"）の場合はループを回さず、1件だけ内訳を作成して即座に返却する
 		// =========================================================
-		if ("2".equals(form.getFukaKbn())) {
-			FukaUchi teiritsuUchi = new FukaUchi();
-
-			// 1. 共通キー項目のセット（親エンティティと揃える）
-			teiritsuUchi.setJichitaiCd(currentJichitaiCd);
-			teiritsuUchi.setShiteiNo(form.getShiteiNo());
-			teiritsuUchi.setNendo(parentFuka.getNendo());
-			teiritsuUchi.setKibetsu(parentFuka.getKibetsu());
-			teiritsuUchi.setRno(parentFuka.getRno());
-
-			// 定率制は1件のみなので kazeiKbn は 1 固定
-			teiritsuUchi.setKazeiKbn(1);
-			teiritsuUchi.setFukaKbn(parentFuka.getFukaKbn());
-
-			// 2. 定率制（料金ベース）専用項目のセット（Null-Safety 考慮）
-			// 定率制の場合、zeiritsuSeq はマスタ（m_zeiritsu_teiritsu）に合わせて '1' を固定セットする等の業務仕様に従う
-			teiritsuUchi.setZeiritsuSeq(new BigDecimal(1));
-
-			// 課税対象宿泊数（フォームに値があればセット、なければ0）
-			teiritsuUchi.setHakusu(form.getKazeiHakusu() != null ? form.getKazeiHakusu() : 0);
-
-			// 課税対象宿泊料金（ryokin カラムへセット）
-			teiritsuUchi.setRyokin(form.getKazeiRyokin() != null ? form.getKazeiRyokin() : 0L);
-
-			// 料金総額（必要に応じて kazeiRyokin + menjoRyokin 等をセット。ここでは課税料金と同値とする）
-			teiritsuUchi.setRyokinSogaku(form.getKazeiRyokin() != null ? form.getKazeiRyokin() : 0L);
-
-			// 定率税額
-			long teiritsuAmount = (form.getTeiritsuZeigaku() != null) ? form.getTeiritsuZeigaku() : 0L;
-			teiritsuUchi.setZeigaku(teiritsuAmount);
-			teiritsuUchi.setCityZeigaku(teiritsuAmount);
-			teiritsuUchi.setKenZeigaku(0L); // 県税は現状0固定
-
-			// 税率（定率制マスタが 2% の場合、0.02 などをセットするが、フォームから渡されていない場合は 0 とする）
-			// ※必要であれば、Form側に zeiRitsu プロパティを追加して受け取るようにしてください
-			teiritsuUchi.setZeiRitsu(java.math.BigDecimal.ZERO);
-
-			// 監査項目（作成日時、作成者など）のセット
-			setAuditFields(teiritsuUchi);
-
-			// リストに追加して、既存の定額制ループに入ることなく即座にリターン
-			uchiList.add(teiritsuUchi);
-
-			// TODO: 課税対象宿泊料金が入力されているのに税額が0円になっていないか等の相関バリデーションは、
-			// データフロー開通後に Controller のチェックメソッド（hasTaxAmountDiscrepancy等）で拡張する
-
-			return uchiList;
-		}
-
-		// =========================================================
-		// 💡 【既存ロジック】定額制（fukaKbn == "1" またはその他）のループ処理
-		// =========================================================
+		// 定額制・定率制統一ループ: taxDetailsの区分ごとに内訳レコードを作成
+		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
 		for (int i = 0; i < dto.getTaxDetails().size(); i++) {
 			FukaTaxDetailDto detail = dto.getTaxDetails().get(i);
 
-			// 宿泊数が未入力(null)または0の場合は、内訳レコードを作成しない（仕様通りのスキップ）
+			// 未入力(null or 0)の区分はスキップ
 			if (detail.getStayCount() == null || detail.getStayCount() == 0) {
 				continue;
 			}
 
 			FukaUchi uchi = new FukaUchi();
-
 			uchi.setJichitaiCd(currentJichitaiCd);
 			uchi.setShiteiNo(form.getShiteiNo());
 			uchi.setNendo(parentFuka.getNendo());
@@ -777,18 +752,21 @@ public class FukaService {
 			uchi.setRno(parentFuka.getRno());
 			uchi.setKazeiKbn(i + 1);
 			uchi.setFukaKbn(parentFuka.getFukaKbn());
-
-			// 正しい変数(detail)からの値のセット
 			uchi.setZeiritsuSeq(detail.getZeiritsuSeq());
-			uchi.setHakusu(detail.getStayCount());
 
-			// 税額が null の場合は 0L を補完（Data Cleansing）
+			// 定率制: stayCount=宿泊料金, taxAmount=税額 / 定額制: stayCount=宿泊数, taxAmount=税額
+			if (kbn.isTeiritsu()) {
+				uchi.setRyokin(detail.getKazeiRyokin() != null ? detail.getKazeiRyokin().longValue() : 0L);
+				uchi.setRyokinSogaku(detail.getKazeiRyokin() != null ? detail.getKazeiRyokin().longValue() : 0L);
+				uchi.setHakusu(detail.getStayCount() != null ? detail.getStayCount() : 0L);
+			} else {
+				uchi.setHakusu(detail.getStayCount() != null ? detail.getStayCount() : 0L);
+			}
+
 			long amount = (detail.getTaxAmount() != null) ? detail.getTaxAmount() : 0L;
 			uchi.setZeigaku(amount);
 			uchi.setCityZeigaku(amount);
 			uchi.setKenZeigaku(0L);
-
-			// taxRate の NPE 回避
 			uchi.setZeiRitsu(detail.getTaxRate() != null ? detail.getTaxRate() : BigDecimal.ZERO);
 
 			setAuditFields(uchi);
@@ -828,6 +806,9 @@ public class FukaService {
 				for (int j = 1; j <= categoryCount; j++) {
 					Integer value = getHakusuValue(uchi, j);
 					dDto.getTaxCategoryCounts().set(j - 1, value != null ? value.longValue() : 0L);
+					// 定率制用: 日別宿泊料金の復元
+					Long ryokinValue = getRyokinValue(uchi, j);
+					dDto.getTaxCategoryAmounts().set(j - 1, ryokinValue != null ? ryokinValue : 0L);
 				}
 				dDto.setExemptCount(uchi.getMenjoHakusu());
 			}
@@ -856,6 +837,31 @@ public class FukaService {
 			return (val != null) ? (Integer) val : 0;
 		} catch (Exception e) {
 			return 0;
+		}
+	}
+
+	/**
+	 * エンティティに動的に宿泊料金をセットする。（定率制用）
+	 */
+	private void setRyokinByIndex(ChoshuGenboUchi uchi, int index, Long value) {
+		try {
+			String methodName = "setRyokin" + index;
+			uchi.getClass().getMethod(methodName, Long.class).invoke(uchi, value);
+		} catch (Exception e) {
+			log.warn("setRyokin{} failed: {}", index, e.getMessage());
+		}
+	}
+
+	/**
+	 * エンティティから動的に宿泊料金を取得する。（定率制用）
+	 */
+	private Long getRyokinValue(ChoshuGenboUchi uchi, int index) {
+		try {
+			String methodName = "getRyokin" + index;
+			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
+			return (val != null) ? (Long) val : 0L;
+		} catch (Exception e) {
+			return 0L;
 		}
 	}
 
@@ -906,10 +912,15 @@ public class FukaService {
 
 		// 定率制（fukaKbn == '2'）の場合にフォームの定率制フィールドをエンティティにマッピングする
 		if ("2".equals(form.getFukaKbn())) {
-			parentFuka.setKazeiRyokin(form.getKazeiRyokin());
-			parentFuka.setZeigaku(form.getTeiritsuZeigaku());
-			parentFuka.setMenjoRyokin(form.getMenjoRyokin());
-			parentFuka.setKazeiHakusu(form.getKazeiHakusu());
+			// kazeiRyokin: form直下またはmonthlyDetailのどちらから取得（null安全）
+			Long kazeiRyokinValue = form.getKazeiRyokin();
+			if (kazeiRyokinValue == null) {
+				kazeiRyokinValue = dto.getKazeiRyokin();
+			}
+			parentFuka.setKazeiRyokin(kazeiRyokinValue != null ? kazeiRyokinValue : 0L);
+			parentFuka.setZeigaku(form.getTeiritsuZeigaku() != null ? form.getTeiritsuZeigaku() : 0L);
+			parentFuka.setMenjoRyokin(form.getMenjoRyokin() != null ? form.getMenjoRyokin() : 0L);
+			parentFuka.setKazeiHakusu(form.getKazeiHakusu() != null ? form.getKazeiHakusu() : 0L);
 		}
 
 		mapAdditionalFields(form, parentFuka);
@@ -955,7 +966,18 @@ public class FukaService {
 					if (cVal != null && cVal > 0) {
 						setHakusuByIndex(uchi, k + 1, cVal.intValue());
 					}
-				} // replaced fixed hakusu logic
+				}
+
+				// 定率制用：日別の宿泊料金（taxCategoryAmounts）をEntityの料金フィールドにセット
+				List<Long> amounts = item.getTaxCategoryAmounts();
+				if (amounts != null) {
+					for (int k = 0; k < amounts.size(); k++) {
+						Long aVal = amounts.get(k);
+						if (aVal != null && aVal > 0) {
+							setRyokinByIndex(uchi, k + 1, aVal);
+						}
+					}
+				}
 
 				uchi.setMenjoHakusu(item.getExemptCount());
 				setAuditFields(uchi);
@@ -1097,6 +1119,7 @@ public class FukaService {
 		monthDto.setExemptStayCount(entity.getMenjoHakusu());
 		monthDto.setTotalStayCount(entity.getTotalHakusu());
 		monthDto.setTotalPaymentAmount(entity.getTotalZeigaku());
+		monthDto.setKazeiRyokin(entity.getKazeiRyokin());
 
 		// 💡 必須：税明細リストの器を確実に初期化
 		monthDto.setTaxDetails(new ArrayList<>());

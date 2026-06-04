@@ -48,4 +48,5 @@ public class FukaMonthlyDeclarationDto {
 
 	// 納入金額（1ヶ月分の最終的な納付額）
 	private Long nonyuKingaku;
+	
 }

@@ -147,18 +147,18 @@ public class FukaController {
 	 */
 	@GetMapping("/view/{shiteiNo}/{nendo}/{kibetsu}")
 	public String showView(
-	        @PathVariable("shiteiNo") String shiteiNo,
-	        @PathVariable("nendo") String nendo,
-	        @PathVariable(name = "kibetsu", required = false) Integer kibetsu, // required=false に
-	        RedirectAttributes redirectAttributes,
-	        Model model) {
-	    
-	    // kibetsu が null の場合のガード
-	    if (kibetsu == null) {
-	        redirectAttributes.addFlashAttribute("errorMessage", "期別情報が不足しています。");
-	        return "redirect:/declaration/payment-ledger/" + shiteiNo;
-	    }
-	    Integer k = kibetsu;
+			@PathVariable("shiteiNo") String shiteiNo,
+			@PathVariable("nendo") String nendo,
+			@PathVariable("kibetsu") Integer kibetsu,
+			RedirectAttributes redirectAttributes,
+			Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
+
+		// 未申告データに対する照会アクセス制限
+		if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
+			redirectAttributes.addFlashAttribute("errorMessage", "未申告のデータです。「新規登録」ボタンから登録してください。");
+			return "redirect:/declaration/payment-ledger/" + shiteiNo;
+		}
 
 		FukaDeclarationForm form = fukaService.getDeclarationFormForView(shiteiNo, nendo, kibetsu);
 		form.setView(true);
@@ -170,7 +170,7 @@ public class FukaController {
 	/**
 	 * 宿泊税情報の保存（登録・更新）を行う。
 	 * @param form 申告情報フォーム
-	 * @param result バリデーション結果
+	 * @param bindingResult バリデーション結果
 	 * @param model モデルオブジェクト
 	 * @param redirectAttributes リダイレクト属性
 	 * @return 画面パス
@@ -180,9 +180,10 @@ public class FukaController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		
 		accessChecker.checkAccess(SCREEN_ID);
 
-		// 1. Springが自動判定したバリデーション結果を確認
+		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
 		if (bindingResult.hasErrors()) {
 			bindingResult.getAllErrors().forEach(error -> {
 				log.error("【バリデーションエラー】項目: {}, 内容: {}", error.getObjectName(), error.getDefaultMessage());
@@ -191,36 +192,30 @@ public class FukaController {
 			return CONFIG_VIEW;
 		}
 
-		// 2. 独自の相関チェック（定額・定率の分岐チェック）
-		try {
-			fukaValidatorService.validateCorrelation(form);
-		} catch (IllegalArgumentException e) {
-			model.addAttribute("errorMessage", e.getMessage());
-			fukaService.hydrateFormMetadata(form);
-			return CONFIG_VIEW;
-		}
-
-		// 3. 編集区分チェック（変数名を bindingResult に修正）
+		// 2. 編集時の必須項目チェック
 		if (form.isEdit() && !org.springframework.util.StringUtils.hasText(form.getModificationCategory())) {
 			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "編集時は変更の区分を選択してください。");
 			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
 		}
 
-		// 4. 税額の不整合チェック
-		if (!form.isTaxCheckBypassed() && fukaService.hasTaxAmountDiscrepancy(form)) {
+		// 3. 【統合完了】金額と宿泊数のソフトバリデーション（Soft Validation）
+		// 「そのまま保存する」が押されていない（Bypass == false） かつ ズレがある（hasDiscrepancy == true）場合
+		if (!form.isTaxCheckBypassed() && fukaValidatorService.hasDiscrepancy(form)) {
+			log.info("金額または宿泊数のズレを検知しました。確認モーダルを表示します。");
 			fukaService.hydrateFormMetadata(form);
-			model.addAttribute("showTaxWarningModal", true);
+			model.addAttribute("showTaxWarningModal", true); // モーダル起動フラグをONにして画面を返す
 			return CONFIG_VIEW;
 		}
 
-		// 5. 保存処理
+		// 4. 保存処理（Transaction：DBへの書き込み）
 		try {
+			// バリデーションをすべて通過、またはユーザーが警告を承認（バイパス）したため保存を実行
 			fukaService.saveDeclaration(form);
-			// ...成功時のリダイレクト処理...
 			return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
+			
 		} catch (RuntimeException e) {
-			log.error("保存処理中にエラーが発生しました", e);
+			log.error("保存処理中に予期せぬエラーが発生しました", e);
 			model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());
 			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
