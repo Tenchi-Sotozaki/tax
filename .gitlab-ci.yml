@@ -1,5 +1,6 @@
 stages:
   - build
+  - deploy
 
 variables:
   JAVA_HOME: "/usr/lib/jvm/java-21-openjdk-amd64"
@@ -7,14 +8,20 @@ variables:
 build_job:
   stage: build
   script:
-    # 1. Javaのバージョンが正しく認識されているか確認（ログ出力用）
-    - $JAVA_HOME/bin/java -version
-
-    # 2. Gradleラッパー（gradlew）に実行権限を付与
     - chmod +x ./gradlew
-
-    # 3. 指定したJava 21の環境を使ってGradleビルドを実行
     - ./gradlew clean build -Dorg.gradle.java.home=$JAVA_HOME
-  
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+
+deploy_local_job:
+  stage: deploy
+  script:
+    # 1. 生成されたjarファイルを配置フォルダへコピー（名前を app.jar に統一）
+    - cp build/libs/*.jar /opt/acomo/app.jar
+
+    # 2. サービスを再起動（古いプロセスが自動で停止し、新しいjarで立ち上がります）
+    - sudo systemctl restart acomo
   only:
     - cicd_setting
