@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.0'
-    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.springframework.boot' version '3.3.13'
+    id 'io.spring.dependency-management' version '1.1.6'
 }
 
 group = 'jp.lg.asp.accommodation'
@@ -13,8 +13,8 @@ java {
 
 repositories {
     mavenCentral()
-    maven { url 'https://jasperreports.sourceforge.net/maven2' }
-    maven { url 'https://jaspersoft.jfrog.io/artifactory/jr-ce-releases' }
+    maven { url = 'https://jasperreports.sourceforge.net/maven2' }
+    maven { url = 'https://jaspersoft.jfrog.io/artifactory/jr-ce-releases' }
 }
 
 dependencies {
@@ -43,6 +43,10 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+jar {
+    enabled = false
 }
 
 tasks.named('test') {
