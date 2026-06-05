@@ -1,54 +1,75 @@
 package jp.lg.asp.accommodation.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Entity
-@Table(name = "t_choshu_genbo_uchi")
 @Data
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@Table(name = "t_fuka_uchi")
 @IdClass(ChoshuGenboUchiId.class)
-public class ChoshuGenboUchi {
+public class ChoshuGenboUchi extends BaseEntity {
 
-	@Id
-	@Column(name = "uchi_idx")
-	private Long uchiIdx;
+    @Id
+    @Column(name = "jichitai_cd", length = 5, nullable = false)
+    private String jichitaiCd;
 
-	@Id
-	@Column(name = "jichitai_cd")
-	private String jichitaiCd;
+    @Id
+    @Column(name = "shitei_no", length = 8, nullable = false)
+    private String shiteiNo;
 
-	@Column(name = "hakusu1")
-	private Integer hakusu1; // 税区分① 宿泊数
-	@Column(name = "hakusu2")
-	private Integer hakusu2; // 税区分② 宿泊数
-	@Column(name = "hakusu3")
-	private Integer hakusu3; // 税区分③ 宿泊数
-	@Column(name = "ryokin1")
-	private Long ryokin1; // 税区分① 宿泊料金（定率制用）
-	@Column(name = "ryokin2")
-	private Long ryokin2; // 税区分② 宿泊料金（定率制用）
-	@Column(name = "ryokin3")
-	private Long ryokin3; // 税区分③ 宿泊料金（定率制用）
-	@jakarta.persistence.Transient
-	private Long menjoRyokin; // 免除宿泊料金（定率制用・DBカラム未存在のためマッピング除外）
-	@Column(name = "menjo_hakusu")
-	private Integer menjoHakusu; // 免除宿泊数
+    @Id
+    @Column(name = "rno", nullable = false)
+    private Integer rno;
 
-	// 共通項目
-	@Column(name = "add_dt")
-	private java.time.LocalDateTime addDt;
-	@Column(name = "add_user")
-	private String addUser;
-	@Column(name = "upd_dt")
-	private java.time.LocalDateTime updDt;
-	@Column(name = "upd_user")
-	private String updUser;
-	@Version
-	private Integer version;
+    @Id
+    @Column(name = "nendo", length = 4, nullable = false)
+    private String nendo;
+
+    @Id
+    @Column(name = "kibetsu", nullable = false)
+    private Integer kibetsu;
+
+    @Id
+    @Column(name = "kazei_kbn", nullable = false)
+    private Integer kazeiKbn;
+
+    // --- その他のカラム ---
+
+    @Column(name = "zeiritsu_seq", nullable = false)
+    private Long zeiritsuSeq;
+
+    @Column(name = "fuka_kbn", length = 1, nullable = false)
+    private String fukaKbn;
+
+    @Column(name = "ryokin_sogaku")
+    private Long ryokinSogaku;
+
+    @Column(name = "hakusu")
+    private Long hakusu;
+
+    @Column(name = "ryokin")
+    private Long ryokin;
+
+    @Column(name = "zei_ritsu", nullable = false, precision = 12, scale = 2)
+    private BigDecimal zeiRitsu;
+
+    @Column(name = "zeigaku", nullable = false)
+    private Long zeigaku;
+
+    @Column(name = "city_zeigaku")
+    private Long cityZeigaku;
+
+    @Column(name = "ken_zeigaku")
+    private Long kenZeigaku;
+
+    // バージョン等は BaseEntity に定義されているため、ここでは除外しました
 }
