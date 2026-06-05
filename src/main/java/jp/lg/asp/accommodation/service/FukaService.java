@@ -33,7 +33,7 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
-import jp.lg.asp.accommodation.enums.FukaKbn;
+import jp.lg.asp.accommodation.constant.FukaConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -596,7 +596,7 @@ public class FukaService {
 		// 定率制（fukaKbn == "2"）の場合はループを回さず、1件だけ内訳を作成して即座に返却する
 		// =========================================================
 		// 定額制・定率制統一ループ: taxDetailsの区分ごとに内訳レコードを作成
-		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 		for (int i = 0; i < dto.getTaxDetails().size(); i++) {
 			FukaTaxDetailDto detail = dto.getTaxDetails().get(i);
 
@@ -616,7 +616,7 @@ public class FukaService {
 			uchi.setZeiritsuSeq(detail.getZeiritsuSeq());
 
 			// 定率制: stayCount=宿泊料金, taxAmount=税額 / 定額制: stayCount=宿泊数, taxAmount=税額
-			if (kbn.isTeiritsu()) {
+			if (FukaConstants.TEIRITSU.equals(kbn)) {
 				uchi.setRyokin(detail.getKazeiRyokin() != null ? detail.getKazeiRyokin().longValue() : 0L);
 				uchi.setRyokinSogaku(detail.getKazeiRyokin() != null ? detail.getKazeiRyokin().longValue() : 0L);
 				uchi.setHakusu(detail.getStayCount() != null ? detail.getStayCount() : 0L);
@@ -966,11 +966,11 @@ public class FukaService {
 			return false;
 		}
 
-		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 
 		// 明細に1件でも入力があるか確認（全未入力ならチェック不要）
 		boolean hasInput;
-		if (kbn.isTeiritsu()) {
+		if (FukaConstants.TEIRITSU.equals(kbn)) {
 			hasInput = detail.getTaxDetails().stream()
 					.anyMatch(d -> d.getKazeiRyokin() != null && d.getKazeiRyokin() > 0);
 		} else {
@@ -985,12 +985,12 @@ public class FukaService {
 		long calculatedTotal = 0L;
 		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
 			BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
-			if (kbn.isTeiritsu()) {
+			if (FukaConstants.TEIRITSU.equals(kbn)) {
 				long ryokin = (d.getKazeiRyokin() != null) ? d.getKazeiRyokin().longValue() : 0L;
-				calculatedTotal += kbn.calculateTax(rate, ryokin);
+				calculatedTotal += kbn.calculateTax(ryokin, rate);
 			} else {
 				long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
-				calculatedTotal += kbn.calculateTax(rate, count);
+				calculatedTotal += kbn.calculateTax(count, rate);
 			}
 		}
 

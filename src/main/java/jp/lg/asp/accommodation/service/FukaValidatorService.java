@@ -15,7 +15,7 @@ import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
-import jp.lg.asp.accommodation.enums.FukaKbn;
+import jp.lg.asp.accommodation.constant.FukaConstants;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
@@ -55,11 +55,11 @@ public class FukaValidatorService {
 			return messages;
 		}
 
-		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 
 		// 1. 宿泊数の不整合チェック
 		if (StringUtils.hasText(detail.getPaymentYearMonth())) {
-			if (kbn.isTeiritsu()) {
+			if (FukaConstants.TEIRITSU.equals(kbn)) {
 				checkStayCountForTeiritsu(form, messages);
 			} else {
 				checkStayCountForTeigaku(detail, messages);
@@ -84,18 +84,18 @@ public class FukaValidatorService {
 			return 0L;
 		}
 
-		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 		long total = 0L;
 
 		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
 			BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
 
-			if (kbn.isTeiritsu()) {
+			if (FukaConstants.TEIRITSU.equals(kbn)) {
 				long ryokin = (d.getKazeiRyokin() != null) ? d.getKazeiRyokin().longValue() : 0L;
-				total += kbn.calculateTax(rate, ryokin);
+				total += kbn.calculateTax(ryokin, rate);
 			} else {
 				long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
-				total += kbn.calculateTax(rate, count);
+				total += kbn.calculateTax(count, rate);
 			}
 		}
 		return total;
@@ -109,10 +109,10 @@ public class FukaValidatorService {
 			return;
 		}
 
-		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 
 		boolean hasInput;
-		if (kbn.isTeiritsu()) {
+		if (FukaConstants.TEIRITSU.equals(kbn)) {
 			hasInput = detail.getTaxDetails().stream()
 					.anyMatch(d -> d.getKazeiRyokin() != null && d.getKazeiRyokin() > 0);
 		} else {
@@ -195,13 +195,13 @@ public class FukaValidatorService {
 			return;
 		}
 
-		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 		List<String> categoryNames = resolveCategoryNames(form.getFukaKbn(), categoryCount);
 
 		boolean hasCountData = dailyItems.stream()
 				.anyMatch(item -> item.getTaxCategoryCounts() != null &&
 						item.getTaxCategoryCounts().stream().anyMatch(v -> v != null && v > 0));
-		boolean hasAmountData = kbn.isTeiritsu() && dailyItems.stream()
+		boolean hasAmountData = FukaConstants.TEIRITSU.equals(kbn) && dailyItems.stream()
 				.anyMatch(item -> item.getTaxCategoryAmounts() != null &&
 						item.getTaxCategoryAmounts().stream().anyMatch(v -> v != null && v > 0));
 
@@ -232,7 +232,7 @@ public class FukaValidatorService {
 		}
 
 		// ② 宿泊料金: 月計表合計 vs 親画面kazeiRyokin（定率制のみ）
-		if (hasAmountData && kbn.isTeiritsu()) {
+		if (hasAmountData && FukaConstants.TEIRITSU.equals(kbn)) {
 			for (int cat = 0; cat < categoryCount; cat++) {
 				long tallyAmountSum = 0;
 				for (var item : dailyItems) {
@@ -275,7 +275,7 @@ public class FukaValidatorService {
 			return;
 		}
 
-		FukaKbn kbn = FukaKbn.fromCode(form.getFukaKbn());
+		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 		List<String> categoryNames = resolveCategoryNames(form.getFukaKbn(), categoryCount);
 		List<String> errors = new ArrayList<>();
 
@@ -300,7 +300,7 @@ public class FukaValidatorService {
 		}
 
 		// 2. 料金の比較（定率制のみ）
-		if (kbn.isTeiritsu()) {
+		if (FukaConstants.TEIRITSU.equals(kbn)) {
 			for (int cat = 0; cat < categoryCount; cat++) {
 				long tallyAmountSum = 0;
 				for (var item : dailyItems) {
