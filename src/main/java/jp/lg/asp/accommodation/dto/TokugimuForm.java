@@ -39,11 +39,9 @@ public class TokugimuForm {
 
 	// ===== 宿泊施設情報 (t_tokugimu) =====
 
-	@NotBlank(message = "所在地(郵便番号)は必須です")
 	@Size(max = 10)
 	private String facilityAddressNo; // Tokugimu.shisetsuYubinNo
 
-	@NotBlank(message = "所在地(住所)は必須です")
 	@Size(max = 200)
 	private String facilityAddress; // Tokugimu.shisetsuJusho
 
@@ -55,23 +53,17 @@ public class TokugimuForm {
 	@Size(max = 200)
 	private String facilityNameKana; // Tokugimu.shisetsuNameKana
 
-	@NotBlank(message = "施設の電話番号は必須です")
 	@Size(max = 20)
 	private String facilityPhone; // Tokugimu.shisetsuTel
 
-	@NotNull(message = "延床面積は必須です")
 	private BigDecimal floorArea; // Tokugimu.yukaMenseki
 
-	@NotBlank(message = "地上階は必須です")
 	private String aboveGroundFloor; // Tokugimu.chijoKai
 
-	@NotBlank(message = "地下階は必須です")
 	private String basementFloor; // Tokugimu.chikaKai
 
-	@NotNull(message = "客室数は必須です")
 	private Integer roomCount; // Tokugimu.kyakushitsuSu
 
-	@NotNull(message = "収容人数は必須です")
 	private Integer capacity; // Tokugimu.shuyoSu
 
 	@NotNull(message = "営業開始(予定)日は必須です")
@@ -79,11 +71,9 @@ public class TokugimuForm {
 
 	// ===== 営業許可等情報 (t_tokugimu) =====
 
-	@NotBlank(message = "営業許可の住所(郵便番号)は必須です")
 	@Size(max = 10)
 	private String licenseAddressNo; // Tokugimu.kyokaYubinNo
 
-	@NotBlank(message = "営業許可の住所は必須です")
 	@Size(max = 200)
 	private String licenseAddress; // Tokugimu.kyokaJusho
 
@@ -95,24 +85,19 @@ public class TokugimuForm {
 	@Size(max = 200)
 	private String licenseNameKana; // Tokugimu.kyokaNameKana
 
-	@NotBlank(message = "営業許可の電話番号は必須です")
 	@Size(max = 20)
 	private String licensePhone; // Tokugimu.kyokaTel
 
-	@NotBlank(message = "営業種別は必須です")
 	private String businessType; // Tokugimu.kyokaShu
 
-	@NotBlank(message = "許可番号は必須です")
 	@Size(max = 200)
 	private String licenseNumber; // Tokugimu.kyokaNo
 
 	// ===== 施設所有者情報 (t_shoyusha) =====
 
-	@NotBlank(message = "所有者の住所(郵便番号)は必須です")
 	@Size(max = 10)
 	private String ownerAddressNo;
 
-	@NotBlank(message = "所有者の住所は必須です")
 	@Size(max = 200)
 	private String ownerAddress;
 
@@ -124,17 +109,14 @@ public class TokugimuForm {
 	@Size(max = 200)
 	private String ownerName;
 
-	@NotBlank(message = "所有者の電話番号は必須です")
 	@Size(max = 20)
 	private String ownerPhone;
 
 	// ===== 書類送付先情報 (t_tokugimu) =====
 
-	@NotBlank(message = "書類送付先の住所(郵便番号)は必須です")
 	@Size(max = 10)
 	private String mailAddressNo; // Tokugimu.soufusakiYubinNo
 
-	@NotBlank(message = "書類送付先の住所は必須です")
 	@Size(max = 200)
 	private String mailAddress; // Tokugimu.soufusakiJusho
 
@@ -146,13 +128,12 @@ public class TokugimuForm {
 	@Size(max = 200)
 	private String mailName; // Tokugimu.soufusakiName
 
-	@NotBlank(message = "書類送付先の電話番号は必須です")
 	@Size(max = 20)
 	private String mailPhone; // Tokugimu.soufusakiTel
 
 	// ===== その他の情報 (t_tokugimu) =====
 
-	private String eltaxApplication; // Tokugimu.eltaxUmu
+	private String eltaxUmu; // Tokugimu.eltaxUmu
 	private BigDecimal taxCycle; // Tokugimu.nokigen（NozeiShuki.seq）
 	private String remarks; // Tokugimu.biko
 
