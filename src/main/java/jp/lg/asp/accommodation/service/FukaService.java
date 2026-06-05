@@ -252,10 +252,6 @@ public class FukaService {
 
 			// 対象年月に合致する「唯一の適用マスタ」を特定する
 			for (Zeiritsu z : allZeiritsu) {
-				// 対象区分(2) のみを評価対象とする（既存仕様の踏襲）
-				if (!"2".equals(z.getTaishoKbn())) {
-					continue;
-				}
 
 				int stYmInt = parseYmToInt(z.getTekiyoStYm());
 				int edYmInt = parseYmToInt(z.getTekiyoEdYm());
@@ -289,10 +285,23 @@ public class FukaService {
 					teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
 				}
 			} else {
-				// 【安全装置】 万が一、適用期間に合致するマスタが登録されていない場合のフォールバック
-				log.warn("対象年月 {} に適用される税率マスタが存在しません！安全のため定額制で初期化します", targetYm);
-				form.setFukaKbn("1");
-				teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+				// 【フォールバック】適用期間に合致するマスタがない場合、有効マスタの先頭のfukaKbnを採用する
+				if (!allZeiritsu.isEmpty()) {
+					Zeiritsu fallback = allZeiritsu.get(0);
+					String fallbackKbn = fallback.getFukaKbn();
+					log.warn("対象年月 {} に適用される税率マスタが見つかりません。有効マスタ(seq={}, fukaKbn={})を採用します", targetYm, fallback.getSeq(), fallbackKbn);
+					form.setFukaKbn(fallbackKbn);
+					if ("2".equals(fallbackKbn)) {
+						teiritsuRates = zeiritsuTeiritsuRepository
+								.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, fallback.getSeq(), "0");
+					} else {
+						teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+					}
+				} else {
+					log.error("有効な税率マスタが1件も存在しません。デフォルト定額制で初期化します");
+					form.setFukaKbn("1");
+					teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+				}
 			}
 
 			// 2. 読み込んだマスタを使って初期化

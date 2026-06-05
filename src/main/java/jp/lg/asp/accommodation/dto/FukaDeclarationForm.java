@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.dto;
 import java.time.LocalDate;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -59,4 +60,17 @@ public class FukaDeclarationForm {
 	private Long teiritsuZeigaku;
 	private Long menjoRyokin;
 	private Long kazeiHakusu;
+
+	// ========== 相関チェック ==========
+
+	/**
+	 * 加算金額区分が選択されている場合、加算金額の入力を必須とする。
+	 */
+	@AssertTrue(message = "※区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid() {
+		if (additionalCategory == null || additionalCategory.isEmpty()) {
+			return true;
+		}
+		return additionalAmount != null && additionalAmount > 0;
+	}
 }

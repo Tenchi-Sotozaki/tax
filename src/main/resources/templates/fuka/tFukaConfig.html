@@ -10,7 +10,7 @@
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
 
-		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+		<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-file-earmark-text text-primary me-2"></i>
 				<span
@@ -153,7 +153,7 @@
 					</th:block>
 
 					<th:block th:if="*{fukaKbn == '2'}">
-						<div class="col-12 mt-2">
+						<div class="col-12 mt-4">
 							<table class="table table-bordered table-sm align-middle mb-0">
 								<thead class="table-light text-center">
 									<tr>
@@ -234,42 +234,41 @@
 				</div>
 			</div>
 
-			<div class="row">
-				<div class="col-12 mb-4">
-					<div class="card shadow-sm h-100">
-						<div class="card-header bg-warning bg-opacity-10 py-2">
-							<h6 class="mb-0 fw-bold text-warning-emphasis"><i class="bi bi-plus-slash-minus me-2"></i>加算金額入力</h6>
+			<div class="card shadow-sm mb-4">
+				<div class="card-header bg-warning bg-opacity-10 py-2">
+					<h6 class="mb-0 fw-bold text-warning-emphasis"><i class="bi bi-plus-slash-minus me-2"></i>加算金額入力</h6>
+				</div>
+				<div class="card-body py-3">
+					<div class="row g-3 align-items-end">
+						<div class="col-md-3">
+							<label class="form-label form-label-sm fw-medium mb-1">区分</label>
+							<select class="form-select form-select-sm" th:field="*{additionalCategory}" th:disabled="${fukaDeclarationForm.isView}">
+								<option value="">区分を選択してください</option>
+								<option value="1">過少申告加算金</option>
+								<option value="2">不申告加算金</option>
+								<option value="3">重加算金</option>
+							</select>
 						</div>
-						<div class="card-body">
-							<div class="row g-3">
-								<div class="col-md-3">
-									<label class="form-label">区分</label>
-									<select class="form-select form-select-sm" th:field="*{additionalCategory}" th:disabled="${fukaDeclarationForm.isView}">
-										<option value="">区分を選択してください</option>
-										<option value="1">過少申告加算金</option>
-										<option value="2">不申告加算金</option>
-										<option value="3">重加算金</option>
-									</select>
-								</div>
-								<div class="col-md-3">
-									<label class="form-label">割合 (%)</label>
-									<input type="text" class="form-control form-control-sm text-end" th:field="*{additionalRate}" th:readonly="${fukaDeclarationForm.isView}">
-								</div>
-								<div class="col-md-3">
-									<label class="form-label">金額 (円)</label>
-									<input type="number" class="form-control form-control-sm text-end" th:field="*{additionalAmount}" th:readonly="${fukaDeclarationForm.isView}">
-								</div>
-								<div class="col-md-3">
-									<label class="form-label">納期限</label>
-									<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate}" th:readonly="${fukaDeclarationForm.isView}">
-								</div>
+						<div class="col-md-2">
+							<label class="form-label form-label-sm fw-medium mb-1">割合 (%)</label>
+							<input type="text" class="form-control form-control-sm text-end" th:field="*{additionalRate}" th:readonly="${fukaDeclarationForm.isView}" placeholder="0.0">
+						</div>
+						<div class="col-md-3">
+							<label class="form-label form-label-sm fw-medium mb-1">金額 (円)</label>
+							<div class="input-group input-group-sm">
+								<input type="number" class="form-control text-end" th:field="*{additionalAmount}" th:readonly="${fukaDeclarationForm.isView}" placeholder="0">
+								<span class="input-group-text">円</span>
 							</div>
+						</div>
+						<div class="col-md-3">
+							<label class="form-label form-label-sm fw-medium mb-1">納期限</label>
+							<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate}" th:readonly="${fukaDeclarationForm.isView}">
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="d-flex justify-content-center gap-3 mt-2 mb-5">
+			<div class="d-flex justify-content-center gap-3 mt-4 mb-5 pt-2">
 				<a th:if="${fukaDeclarationForm.isView}"
 					th:href="@{/declaration/edit/{shiteiNo}/{nendo}/{kibetsu}(shiteiNo=${fukaDeclarationForm.shiteiNo}, nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
 					class="btn btn-warning px-5 shadow-sm">
