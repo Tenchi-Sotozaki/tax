@@ -1,75 +1,112 @@
 package jp.lg.asp.accommodation.entity;
 
-import java.math.BigDecimal;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "t_fuka_uchi")
+@Table(name = "t_choshu_genbo_uchi")
+@Data
 @IdClass(ChoshuGenboUchiId.class)
-public class ChoshuGenboUchi extends BaseEntity {
+public class ChoshuGenboUchi {
 
-    @Id
-    @Column(name = "jichitai_cd", length = 5, nullable = false)
-    private String jichitaiCd;
+	@Id
+	@Column(name = "jichitai_cd", length = 5)
+	private String jichitaiCd;
 
-    @Id
-    @Column(name = "shitei_no", length = 8, nullable = false)
-    private String shiteiNo;
+	@Id
+	@Column(name = "uchi_idx")
+	private Long uchiIdx;
 
-    @Id
-    @Column(name = "rno", nullable = false)
-    private Integer rno;
+	@Column(name = "sogaku1")
+	private Long sogaku1;
+	@Column(name = "hakusu1")
+	private Integer hakusu1;
+	@Column(name = "ryokin1")
+	private Long ryokin1;
 
-    @Id
-    @Column(name = "nendo", length = 4, nullable = false)
-    private String nendo;
+	@Column(name = "sogaku2")
+	private Long sogaku2;
+	@Column(name = "hakusu2")
+	private Integer hakusu2;
+	@Column(name = "ryokin2")
+	private Long ryokin2;
 
-    @Id
-    @Column(name = "kibetsu", nullable = false)
-    private Integer kibetsu;
+	@Column(name = "sogaku3")
+	private Long sogaku3;
+	@Column(name = "hakusu3")
+	private Integer hakusu3;
+	@Column(name = "ryokin3")
+	private Long ryokin3;
 
-    @Id
-    @Column(name = "kazei_kbn", nullable = false)
-    private Integer kazeiKbn;
+	@Column(name = "sogaku4")
+	private Long sogaku4;
+	@Column(name = "hakusu4")
+	private Integer hakusu4;
+	@Column(name = "ryokin4")
+	private Long ryokin4;
 
-    // --- その他のカラム ---
+	@Column(name = "sogaku5")
+	private Long sogaku5;
+	@Column(name = "hakusu5")
+	private Integer hakusu5;
+	@Column(name = "ryokin5")
+	private Long ryokin5;
 
-    @Column(name = "zeiritsu_seq", nullable = false)
-    private Long zeiritsuSeq;
+	@Column(name = "sogaku6")
+	private Long sogaku6;
+	@Column(name = "hakusu6")
+	private Integer hakusu6;
+	@Column(name = "ryokin6")
+	private Long ryokin6;
 
-    @Column(name = "fuka_kbn", length = 1, nullable = false)
-    private String fukaKbn;
+	@Column(name = "sogaku7")
+	private Long sogaku7;
+	@Column(name = "hakusu7")
+	private Integer hakusu7;
+	@Column(name = "ryokin7")
+	private Long ryokin7;
 
-    @Column(name = "ryokin_sogaku")
-    private Long ryokinSogaku;
+	@Column(name = "sogaku8")
+	private Long sogaku8;
+	@Column(name = "hakusu8")
+	private Integer hakusu8;
+	@Column(name = "ryokin8")
+	private Long ryokin8;
 
-    @Column(name = "hakusu")
-    private Long hakusu;
+	@Column(name = "sogaku9")
+	private Long sogaku9;
+	@Column(name = "hakusu9")
+	private Integer hakusu9;
+	@Column(name = "ryokin9")
+	private Long ryokin9;
 
-    @Column(name = "ryokin")
-    private Long ryokin;
+	@Column(name = "sogaku10")
+	private Long sogaku10;
+	@Column(name = "hakusu10")
+	private Integer hakusu10;
+	@Column(name = "ryokin10")
+	private Long ryokin10;
 
-    @Column(name = "zei_ritsu", nullable = false, precision = 12, scale = 2)
-    private BigDecimal zeiRitsu;
+	@Column(name = "menjo_hakusu")
+	private Integer menjoHakusu;
 
-    @Column(name = "zeigaku", nullable = false)
-    private Long zeigaku;
+	@Column(name = "zeigaku")
+	private Long zeigaku;
 
-    @Column(name = "city_zeigaku")
-    private Long cityZeigaku;
-
-    @Column(name = "ken_zeigaku")
-    private Long kenZeigaku;
-
-    // バージョン等は BaseEntity に定義されているため、ここでは除外しました
+	@Column(name = "add_dt")
+	private java.time.LocalDateTime addDt;
+	@Column(name = "add_user")
+	private String addUser;
+	@Column(name = "upd_dt")
+	private java.time.LocalDateTime updDt;
+	@Column(name = "upd_user")
+	private String updUser;
+	@Version
+	private Integer version;
 }

@@ -11,9 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChoshuGenboUchiId implements Serializable {
     private String jichitaiCd;
-    private String shiteiNo;
-    private Integer rno;
-    private String nendo;
-    private Integer kibetsu;
-    private Integer kazeiKbn;
+    private Long uchiIdx;
 }
