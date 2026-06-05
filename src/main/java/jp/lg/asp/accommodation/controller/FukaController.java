@@ -1,9 +1,11 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -193,7 +195,7 @@ public class FukaController {
 		}
 
 		// 2. 編集時の必須項目チェック
-		if (form.isEdit() && !org.springframework.util.StringUtils.hasText(form.getModificationCategory())) {
+		if (form.isEdit() && !StringUtils.hasText(form.getModificationCategory())) {
 			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "※編集時は変更の区分を選択してください");
 			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
@@ -215,7 +217,7 @@ public class FukaController {
 
 		// 3. 金額と宿泊数のソフトバリデーション（Soft Validation）
 		if (!form.isTaxCheckBypassed()) {
-			java.util.List<String> discrepancyMessages = fukaValidatorService.getDiscrepancyMessages(form);
+			List<String> discrepancyMessages = fukaValidatorService.getDiscrepancyMessages(form);
 			if (!discrepancyMessages.isEmpty()) {
 				log.info("金額または宿泊数のズレを検知しました。確認モーダルを表示します。");
 				fukaService.hydrateFormMetadata(form);

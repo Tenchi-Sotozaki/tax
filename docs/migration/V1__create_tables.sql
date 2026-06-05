@@ -996,8 +996,6 @@ COMMENT ON COLUMN t_atena_renkei.upd_dt IS '更新日時';
 COMMENT ON COLUMN t_atena_renkei.upd_user IS '更新者';
 COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
 
-<<<<<<< HEAD
-=======
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_jichitai (
   jichitai_cd char(5) NOT NULL,
@@ -1045,4 +1043,3 @@ COMMENT ON COLUMN m_reports_def.add_user IS '作成者';
 COMMENT ON COLUMN m_reports_def.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_reports_def.upd_user IS '更新者';
 COMMENT ON COLUMN m_reports_def.version IS 'バージョン';
->>>>>>> refs/heads/master
