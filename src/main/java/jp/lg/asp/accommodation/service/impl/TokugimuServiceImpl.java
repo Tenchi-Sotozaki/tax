@@ -83,12 +83,14 @@ public class TokugimuServiceImpl implements TokugimuService {
 					String status = determineStatus(t);
 
 					// ステータスフィルタリング（初期遷移時はフィルタリングなし）
-					if (form.getStatus() != null && !form.getStatus().isEmpty() && !"999".equals(form.getStatus()) && !form.getStatus().equals(status)) {
+					if (form.getStatus() != null && !form.getStatus().isEmpty() && !"999".equals(form.getStatus())
+							&& !form.getStatus().equals(status)) {
 						return null;
 					}
-					
+
 					// 合算対象フィルタリング（初期遷移時はフィルタリングなし）
-					if (form.getGasanTaisho() != null && !form.getGasanTaisho().isEmpty() && !"999".equals(form.getGasanTaisho())) {
+					if (form.getGasanTaisho() != null && !form.getGasanTaisho().isEmpty()
+							&& !"999".equals(form.getGasanTaisho())) {
 						boolean shouldBeTarget = "2".equals(form.getGasanTaisho());
 						if (shouldBeTarget != isGassanTarget)
 							return null;
@@ -115,13 +117,15 @@ public class TokugimuServiceImpl implements TokugimuService {
 			return true;
 		}
 		return (form.getShiteiNo() == null || form.getShiteiNo().isEmpty()) &&
-			   (form.getName() == null || form.getName().isEmpty()) &&
-			   (form.getShisetsuName() == null || form.getShisetsuName().isEmpty()) &&
-			   (form.getKyokaShu() == null || form.getKyokaShu().isEmpty() || "999".equals(form.getKyokaShu())) &&
-			   (form.getGasanTaisho() == null || form.getGasanTaisho().isEmpty() || "999".equals(form.getGasanTaisho())) &&
-			   (form.getStatus() == null || form.getStatus().isEmpty() || "999".equals(form.getStatus())) &&
-			   (form.getKojinNo() == null || form.getKojinNo().isEmpty()) &&
-			   (form.getHojinNo() == null || form.getHojinNo().isEmpty());
+				(form.getName() == null || form.getName().isEmpty()) &&
+				(form.getShisetsuName() == null || form.getShisetsuName().isEmpty()) &&
+				(form.getKyokaShu() == null || form.getKyokaShu().isEmpty() || "999".equals(form.getKyokaShu())) &&
+				(form.getGasanTaisho() == null || form.getGasanTaisho().isEmpty()
+						|| "999".equals(form.getGasanTaisho()))
+				&&
+				(form.getStatus() == null || form.getStatus().isEmpty() || "999".equals(form.getStatus())) &&
+				(form.getKojinNo() == null || form.getKojinNo().isEmpty()) &&
+				(form.getHojinNo() == null || form.getHojinNo().isEmpty());
 	}
 
 	private String determineStatus(Tokugimu t) {
@@ -331,7 +335,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setMailName(t.getSoufusakiName());
 		form.setMailNameKana(t.getSoufusakiNameKana());
 		form.setMailPhone(t.getSoufusakiTel());
-		form.setEltaxApplication(t.getEltaxUmu());
+		form.setEltaxUmu(t.getEltaxUmu());
 		form.setTaxCycle(t.getNokigen());
 		form.setRemarks(t.getBiko());
 
@@ -380,7 +384,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setSoufusakiName(form.getMailName());
 		t.setSoufusakiNameKana(form.getMailNameKana());
 		t.setSoufusakiTel(form.getMailPhone());
-		t.setEltaxUmu(form.getEltaxApplication());
+		t.setEltaxUmu(form.getEltaxUmu());
 		t.setNokigen(form.getTaxCycle());
 		t.setBiko(form.getRemarks());
 		t.setKyushiStYmd(form.getSuspensionStartDate());
