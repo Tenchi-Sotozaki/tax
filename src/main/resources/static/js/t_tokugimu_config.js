@@ -97,6 +97,7 @@ function renderAddressResults(data) {
             <td>${d.addressNumber ?? ''}</td>
             <td>${d.name ?? ''}</td>
             <td>${d.nameKana ?? ''}</td>
+            <td>${d.yubinNo ?? ''}</td>
             <td>${d.address ?? ''}</td>
             <td>${d.phone ?? ''}</td>
         </tr>`).join('');
@@ -106,7 +107,7 @@ function renderAddressResults(data) {
             <table class="table table-sm table-hover table-bordered mb-0">
                 <thead class="table-primary">
                     <tr>
-                        <th>宛名番号</th><th>氏名</th><th>ふりがな</th><th>住所</th><th>電話番号</th>
+                        <th>宛名番号</th><th>氏名</th><th>ふりがな</th><th>郵便番号</th><th>住所</th><th>電話番号</th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>

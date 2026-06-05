@@ -1,6 +1,10 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -30,10 +35,52 @@ public class TaxManagerController {
 	private static final String SCREEN_ID = ScreenManagement.TAXMANAGER_CONFIG;
 	private static final String FORM_VIEW = "tokugimu/tTaxManagerConfig";
 
+	/**
+	 * 特別徴収義務者との同一人物チェックAPI
+	 */
+	@PostMapping("/check-atena-duplicate")
+	public ResponseEntity<Map<String, Object>> checkAtenaDuplicate(
+			@RequestParam String taxManagerAtenaNo,
+			@RequestParam String obligorAtenaNo) {
+		try {
+			String trimmedTaxManagerAtenaNo = taxManagerAtenaNo != null ? taxManagerAtenaNo.trim() : "";
+			String trimmedObligorAtenaNo = obligorAtenaNo != null ? obligorAtenaNo.trim() : "";
+			log.debug("API同一人物チェック: 納税管理人={}, 特徴={}", trimmedTaxManagerAtenaNo, trimmedObligorAtenaNo);
+			
+			boolean isDuplicate = taxManagerService.isSamePerson(trimmedTaxManagerAtenaNo, trimmedObligorAtenaNo);
+			log.debug("API同一人物チェック結果: {}", isDuplicate);
+			
+			return ResponseEntity.ok(Map.of(
+				"isDuplicate", isDuplicate,
+				"message", isDuplicate ? "特別徴収義務者と同一人物のため、納税管理人として登録できません。" : "登録可能です。"
+			));
+		} catch (Exception e) {
+			log.error("宛名番号同一人物チェックエラー", e);
+			return ResponseEntity.ok(Map.of(
+				"isDuplicate", false,
+				"message", "チェック中にエラーが発生しました。"
+			));
+		}
+	}
+
 	@GetMapping("/edit/{id}")
-	public String edit(@PathVariable("id") String id, Model model) {
+	public String edit(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TaxManagerForm form = taxManagerService.getByShiteiNo(id);
+		
+		// 既に納税管理人が登録されている場合の処理
+		if (form.isEdit()) {
+			// 納税管理人登録ボタンからの遷移の場合は照会画面にリダイレクト
+			if ("register".equals(from)) {
+				return "redirect:/tax-manager/view/" + id + "?from=register";
+			}
+			// 納税管理人照会ボタンからの遷移の場合は編集画面を表示
+			model.addAttribute("taxManagerForm", form);
+			model.addAttribute("isEdit", true);
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
+		}
+		
 		model.addAttribute("taxManagerForm", form);
 		model.addAttribute("isEdit", form.isEdit());
 		model.addAttribute("isView", false);
@@ -41,9 +88,15 @@ public class TaxManagerController {
 	}
 
 	@GetMapping("/view/{id}")
-	public String view(@PathVariable("id") String id, Model model) {
+	public String view(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TaxManagerForm form = taxManagerService.getByShiteiNo(id);
+		
+		// 納税管理人登録ボタンからの遷移の場合はメッセージを表示
+		if ("register".equals(from)) {
+			model.addAttribute("infoMessage", "この特別徴収義務者には既に納税管理人が登録されています。");
+		}
+		
 		model.addAttribute("taxManagerForm", form);
 		model.addAttribute("isEdit", false);
 		model.addAttribute("isView", true);
@@ -58,17 +111,27 @@ public class TaxManagerController {
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 
+		// デバッグ情報を出力
+		log.info("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, exemptionFlag={}", 
+				id, form.getAtenaNo(), form.getManagerName(), form.isExemptionFlag());
+
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", form.isEdit());
 			model.addAttribute("isView", false);
 			return FORM_VIEW;
 		}
 
-		taxManagerService.saveByShiteiNo(id, form);
-
-		log.info("納税管理人情報を保存しました。collectorId: {}", id);
-		redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");
-
-		return "redirect:/tokugimu/list";
+		try {
+			taxManagerService.saveByShiteiNo(id, form);
+			log.info("納税管理人情報を保存しました。collectorId: {}", id);
+			redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");
+			return "redirect:/tokugimu/list";
+		} catch (IllegalArgumentException e) {
+			log.warn("納税管理人登録エラー: {}", e.getMessage());
+			model.addAttribute("errorMessage", e.getMessage());
+			model.addAttribute("isEdit", form.isEdit());
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
+		}
 	}
 }
