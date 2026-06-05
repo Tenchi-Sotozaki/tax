@@ -19,11 +19,7 @@ import jp.lg.asp.accommodation.dto.FukaDaichoListItem;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto;
-import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto.DailyItem;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
-import jp.lg.asp.accommodation.entity.ChoshuGenbo;
-import jp.lg.asp.accommodation.entity.ChoshuGenboId;
-import jp.lg.asp.accommodation.entity.ChoshuGenboUchi;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaId;
 import jp.lg.asp.accommodation.entity.FukaUchi;
@@ -31,8 +27,6 @@ import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
-import jp.lg.asp.accommodation.repository.ChoshuGenboRepository;
-import jp.lg.asp.accommodation.repository.ChoshuGenboUchiRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -57,15 +51,12 @@ public class FukaService {
 	private final ZeiritsuTeigakuRepository zeiritsuTeigakuRepository;
 	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository;
 	private final FukaUchiRepository fukaUchiRepository;
-	private final ChoshuGenboRepository choshuGenboRepository;
-	private final ChoshuGenboUchiRepository choshuGenboUchiRepository;
 
 	// 定数定義（マジックナンバーの排除）
 	private static final String STATUS_ALL = "999";
 	private static final String STATUS_ZUMI = "1";
 	private static final String STATUS_MI = "2";
 	private static final int MAX_KIBETSU = 12;
-	private static final int MAX_DAYS = 31;
 	private static final int FISCAL_START_MONTH = 4;
 	private static final String DEFAULT_NEW_FLG = "1";
 	private static final String DEFAULT_DEL_FLG = "0";
@@ -76,45 +67,6 @@ public class FukaService {
 
 	@Value("${app.jichitai.code}")
 	private String configJichitaiCd;
-
-	/**
-	 * 徴収原簿エンティティから31日分の内訳IDをリストとして抽出する。
-	 */
-	private List<Long> collectUchiIndices(ChoshuGenbo genbo) {
-		List<Long> indices = new ArrayList<>();
-		indices.add(genbo.getUchiIdx1());
-		indices.add(genbo.getUchiIdx2());
-		indices.add(genbo.getUchiIdx3());
-		indices.add(genbo.getUchiIdx4());
-		indices.add(genbo.getUchiIdx5());
-		indices.add(genbo.getUchiIdx6());
-		indices.add(genbo.getUchiIdx7());
-		indices.add(genbo.getUchiIdx8());
-		indices.add(genbo.getUchiIdx9());
-		indices.add(genbo.getUchiIdx10());
-		indices.add(genbo.getUchiIdx11());
-		indices.add(genbo.getUchiIdx12());
-		indices.add(genbo.getUchiIdx13());
-		indices.add(genbo.getUchiIdx14());
-		indices.add(genbo.getUchiIdx15());
-		indices.add(genbo.getUchiIdx16());
-		indices.add(genbo.getUchiIdx17());
-		indices.add(genbo.getUchiIdx18());
-		indices.add(genbo.getUchiIdx19());
-		indices.add(genbo.getUchiIdx20());
-		indices.add(genbo.getUchiIdx21());
-		indices.add(genbo.getUchiIdx22());
-		indices.add(genbo.getUchiIdx23());
-		indices.add(genbo.getUchiIdx24());
-		indices.add(genbo.getUchiIdx25());
-		indices.add(genbo.getUchiIdx26());
-		indices.add(genbo.getUchiIdx27());
-		indices.add(genbo.getUchiIdx28());
-		indices.add(genbo.getUchiIdx29());
-		indices.add(genbo.getUchiIdx30());
-		indices.add(genbo.getUchiIdx31());
-		return indices;
-	}
 
 	/**
 	 * 納入金額管理台帳のデータを取得する。
@@ -426,7 +378,8 @@ public class FukaService {
 							latestFuka.getNendo(), latestFuka.getKibetsu());
 
 					syncUchiDataToForm(uchiList, monthlyDetail);
-					hydrateMonthlyTally(form, latestFuka.getJichitaiCd(), latestFuka);
+					// TODO: hydrateMonthlyTallyは現在のEntity構造に合わせて再設計が必要
+					// hydrateMonthlyTally(form, latestFuka.getJichitaiCd(), latestFuka);
 				});
 	}
 
@@ -500,7 +453,8 @@ public class FukaService {
 
 					hydrateAdditionalFields(entity, form);
 					hydrateMonthlyDetail(entity, form, currentJichitaiCd);
-					hydrateMonthlyTally(form, currentJichitaiCd, entity);
+					// TODO: hydrateMonthlyTallyは現在のEntity構造に合わせて再設計が必要
+					// hydrateMonthlyTally(form, currentJichitaiCd, entity);
 				});
 		return form;
 	}
@@ -584,7 +538,8 @@ public class FukaService {
 		}
 
 		if (form.getMonthlyTally() != null) {
-			saveChoshuGenboDataWithRno(form, parentFuka, currentJichitaiCd, targetRno);
+			// TODO: 月計表保存処理は現在のEntity構造に合わせて再設計が必要
+			// saveChoshuGenboDataWithRno(form, parentFuka, currentJichitaiCd, targetRno);
 		}
 	}
 
@@ -596,60 +551,6 @@ public class FukaService {
 				jichitaiCd, shiteiNo, nendo, kibetsu)
 				.map(Fuka::getRno)
 				.orElse(1);
-	}
-
-	/**
-	 * 徴収原簿データを保存する。
-	 */
-	private void saveChoshuGenboData(FukaDeclarationForm form, Fuka parentFuka, String jichitaiCd) {
-		Long[] uchiIndices = new Long[MAX_DAYS];
-		List<DailyItem> dailyItems = form.getMonthlyTally().getDailyItems();
-		Long currentMaxIdx = choshuGenboUchiRepository.getMaxUchiIdx();
-
-		for (int i = 0; i < dailyItems.size() && i < MAX_DAYS; i++) {
-			DailyItem item = dailyItems.get(i);
-			if (isDailyDataPresent(item)) {
-				currentMaxIdx++;
-				Long nextIdx = currentMaxIdx;
-				uchiIndices[i] = nextIdx;
-
-				ChoshuGenboUchi uchi = new ChoshuGenboUchi();
-				uchi.setJichitaiCd(jichitaiCd);
-				uchi.setUchiIdx(nextIdx);
-
-				List<Long> counts = item.getTaxCategoryCounts();
-				for (int k = 0; k < counts.size(); k++) {
-					Long cVal = counts.get(k);
-					if (cVal != null && cVal > 0) {
-						setHakusuByIndex(uchi, k + 1, cVal.intValue());
-					}
-				}
-
-				// 定率制用：日別の宿泊料金（taxCategoryAmounts）をEntityの料金フィールドにセット
-				List<Long> amounts = item.getTaxCategoryAmounts();
-				if (amounts != null) {
-					for (int k = 0; k < amounts.size(); k++) {
-						Long aVal = amounts.get(k);
-						if (aVal != null && aVal > 0) {
-							setRyokinByIndex(uchi, k + 1, aVal);
-						}
-					}
-				}
-
-				uchi.setMenjoHakusu(item.getExemptCount());
-				setAuditFields(uchi);
-				choshuGenboUchiRepository.save(uchi);
-			}
-		}
-
-		ChoshuGenbo genbo = new ChoshuGenbo();
-		genbo.setJichitaiCd(jichitaiCd);
-		genbo.setShiteiNo(parentFuka.getShiteiNo());
-		genbo.setNendo(parentFuka.getNendo());
-		genbo.setKibetsu(parentFuka.getKibetsu());
-		genbo.setRno(parentFuka.getRno());
-		setUchiIndicesToGenbo(genbo, uchiIndices);
-		choshuGenboRepository.save(genbo);
 	}
 
 	/**
@@ -681,58 +582,6 @@ public class FukaService {
 		} catch (Exception e) {
 			log.error("メソッド実行エラー: {}", methodName, e);
 		}
-	}
-
-	/**
-	 * 日別データに入力があるか判定する。
-	 */
-	private boolean isDailyDataPresent(DailyItem item) {
-		if (item == null) {
-			return false;
-		}
-		long taxSum = item.getTaxCategoryCounts().stream()
-				.filter(java.util.Objects::nonNull)
-				.mapToLong(Long::longValue)
-				.sum();
-		int exempt = (item.getExemptCount() != null) ? item.getExemptCount() : 0;
-		return (taxSum + exempt) > 0;
-	}
-
-	/**
-	 * 内訳IDを徴収原簿のカラムにマッピングする。
-	 */
-	private void setUchiIndicesToGenbo(ChoshuGenbo genbo, Long[] indices) {
-		genbo.setUchiIdx1(indices[0]);
-		genbo.setUchiIdx2(indices[1]);
-		genbo.setUchiIdx3(indices[2]);
-		genbo.setUchiIdx4(indices[3]);
-		genbo.setUchiIdx5(indices[4]);
-		genbo.setUchiIdx6(indices[5]);
-		genbo.setUchiIdx7(indices[6]);
-		genbo.setUchiIdx8(indices[7]);
-		genbo.setUchiIdx9(indices[8]);
-		genbo.setUchiIdx10(indices[9]);
-		genbo.setUchiIdx11(indices[10]);
-		genbo.setUchiIdx12(indices[11]);
-		genbo.setUchiIdx13(indices[12]);
-		genbo.setUchiIdx14(indices[13]);
-		genbo.setUchiIdx15(indices[14]);
-		genbo.setUchiIdx16(indices[15]);
-		genbo.setUchiIdx17(indices[16]);
-		genbo.setUchiIdx18(indices[17]);
-		genbo.setUchiIdx19(indices[18]);
-		genbo.setUchiIdx20(indices[19]);
-		genbo.setUchiIdx21(indices[20]);
-		genbo.setUchiIdx22(indices[21]);
-		genbo.setUchiIdx23(indices[22]);
-		genbo.setUchiIdx24(indices[23]);
-		genbo.setUchiIdx25(indices[24]);
-		genbo.setUchiIdx26(indices[25]);
-		genbo.setUchiIdx27(indices[26]);
-		genbo.setUchiIdx28(indices[27]);
-		genbo.setUchiIdx29(indices[28]);
-		genbo.setUchiIdx30(indices[29]);
-		genbo.setUchiIdx31(indices[30]);
 	}
 
 	/**
@@ -785,96 +634,6 @@ public class FukaService {
 			uchiList.add(uchi);
 		}
 		return uchiList;
-	}
-
-	/**
-	 * 徴収原簿から月計表データを復元する。
-	 */
-	private void hydrateMonthlyTally(FukaDeclarationForm form, String jichitaiCd, Fuka parentFuka) {
-		ChoshuGenboId genboId = new ChoshuGenboId(jichitaiCd, parentFuka.getShiteiNo(), parentFuka.getRno(),
-				parentFuka.getNendo(), parentFuka.getKibetsu());
-
-		Optional<ChoshuGenbo> genboOpt = choshuGenboRepository.findById(genboId);
-		if (genboOpt.isEmpty()) {
-			return;
-		}
-
-		ChoshuGenbo genbo = genboOpt.get();
-		List<Long> uchiIndices = collectUchiIndices(genbo);
-
-		List<ChoshuGenboUchi> uchiList = choshuGenboUchiRepository.findByUchiIdxIn(uchiIndices);
-
-		Map<Long, ChoshuGenboUchi> uchiMap = uchiList.stream()
-				.collect(Collectors.toMap(ChoshuGenboUchi::getUchiIdx, u -> u));
-
-		int categoryCount = form.getMonthlyDetail().getTaxDetails().size();
-		form.getMonthlyTally().initialize(categoryCount);
-
-		for (int i = 0; i < MAX_DAYS; i++) {
-			Long idx = uchiIndices.get(i);
-			if (idx != null && uchiMap.containsKey(idx)) {
-				ChoshuGenboUchi uchi = uchiMap.get(idx);
-				DailyItem dDto = form.getMonthlyTally().getDailyItems().get(i);
-				for (int j = 1; j <= categoryCount; j++) {
-					Integer value = getHakusuValue(uchi, j);
-					dDto.getTaxCategoryCounts().set(j - 1, value != null ? value.longValue() : 0L);
-					// 定率制用: 日別宿泊料金の復元
-					Long ryokinValue = getRyokinValue(uchi, j);
-					dDto.getTaxCategoryAmounts().set(j - 1, ryokinValue != null ? ryokinValue : 0L);
-				}
-				dDto.setExemptCount(uchi.getMenjoHakusu());
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * エンティティから動的に宿泊数値をセットする。
-	 */
-	private void setHakusuByIndex(ChoshuGenboUchi uchi, int index, Integer value) {
-		try {
-			// 💡 "setHakusu" と文字列として正しく定義
-			String methodName = "setHakusu" + index;
-			uchi.getClass().getMethod(methodName, Integer.class).invoke(uchi, value);
-		} catch (Exception e) {
-			// 💡 ダブルクォーテーションでメッセージ全体を囲む
-			log.warn("setHakusu{} failed: {}", index, e.getMessage());
-		}
-	}
-
-	private Integer getHakusuValue(ChoshuGenboUchi uchi, int index) {
-		try {
-			String methodName = "getHakusu" + index;
-			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
-			return (val != null) ? (Integer) val : 0;
-		} catch (Exception e) {
-			return 0;
-		}
-	}
-
-	/**
-	 * エンティティに動的に宿泊料金をセットする。（定率制用）
-	 */
-	private void setRyokinByIndex(ChoshuGenboUchi uchi, int index, Long value) {
-		try {
-			String methodName = "setRyokin" + index;
-			uchi.getClass().getMethod(methodName, Long.class).invoke(uchi, value);
-		} catch (Exception e) {
-			log.warn("setRyokin{} failed: {}", index, e.getMessage());
-		}
-	}
-
-	/**
-	 * エンティティから動的に宿泊料金を取得する。（定率制用）
-	 */
-	private Long getRyokinValue(ChoshuGenboUchi uchi, int index) {
-		try {
-			String methodName = "getRyokin" + index;
-			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
-			return (val != null) ? (Long) val : 0L;
-		} catch (Exception e) {
-			return 0L;
-		}
 	}
 
 	/**
@@ -940,75 +699,6 @@ public class FukaService {
 	}
 
 	/**
-	 * 月計表データを特定のRNOで保存する。
-	 */
-	private void saveChoshuGenboDataWithRno(FukaDeclarationForm form, Fuka parentFuka, String jichitaiCd,
-			int targetRno) {
-		ChoshuGenboId genboId = new ChoshuGenboId(
-				jichitaiCd, parentFuka.getShiteiNo(), targetRno, parentFuka.getNendo(), parentFuka.getKibetsu());
-
-		Optional<ChoshuGenbo> existingGenboOpt = choshuGenboRepository.findById(genboId);
-		Long[] uchiIndices = new Long[MAX_DAYS];
-		if (existingGenboOpt.isPresent()) {
-			List<Long> currentIndices = collectUchiIndices(existingGenboOpt.get());
-			for (int i = 0; i < MAX_DAYS; i++)
-				uchiIndices[i] = currentIndices.get(i);
-		}
-
-		List<DailyItem> dailyItems = form.getMonthlyTally().getDailyItems();
-		Long currentMaxIdx = choshuGenboUchiRepository.getMaxUchiIdx();
-
-		for (int i = 0; i < dailyItems.size() && i < MAX_DAYS; i++) {
-			DailyItem item = dailyItems.get(i);
-			if (isDailyDataPresent(item)) {
-				Long targetIdx = uchiIndices[i];
-				if (targetIdx == null) {
-					currentMaxIdx++;
-					targetIdx = currentMaxIdx;
-				}
-				uchiIndices[i] = targetIdx;
-
-				ChoshuGenboUchi uchi = new ChoshuGenboUchi();
-				uchi.setJichitaiCd(jichitaiCd);
-				uchi.setUchiIdx(targetIdx);
-
-				List<Long> counts = item.getTaxCategoryCounts();
-				for (int k = 0; k < counts.size(); k++) {
-					Long cVal = counts.get(k);
-					if (cVal != null && cVal > 0) {
-						setHakusuByIndex(uchi, k + 1, cVal.intValue());
-					}
-				}
-
-				// 定率制用：日別の宿泊料金（taxCategoryAmounts）をEntityの料金フィールドにセット
-				List<Long> amounts = item.getTaxCategoryAmounts();
-				if (amounts != null) {
-					for (int k = 0; k < amounts.size(); k++) {
-						Long aVal = amounts.get(k);
-						if (aVal != null && aVal > 0) {
-							setRyokinByIndex(uchi, k + 1, aVal);
-						}
-					}
-				}
-
-				uchi.setMenjoHakusu(item.getExemptCount());
-				setAuditFields(uchi);
-				choshuGenboUchiRepository.save(uchi);
-			}
-		}
-
-		ChoshuGenbo genbo = existingGenboOpt.orElse(new ChoshuGenbo());
-		genbo.setJichitaiCd(jichitaiCd);
-		genbo.setShiteiNo(parentFuka.getShiteiNo());
-		genbo.setNendo(parentFuka.getNendo());
-		genbo.setKibetsu(parentFuka.getKibetsu());
-		genbo.setRno(targetRno);
-		setUchiIndicesToGenbo(genbo, uchiIndices);
-		setAuditFields(genbo);
-		choshuGenboRepository.save(genbo);
-	}
-
-	/**
 	 * フォームのメタデータを再セットする。
 	 */
 	/**
@@ -1043,7 +733,7 @@ public class FukaService {
 			
 			// 対象年月から適用される税率マスタを再特定
 			zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd).stream()
-				.filter(z -> "2".equals(z.getTaishoKbn()))
+				.filter(z -> "2".equals(z.getFukaKbn()))
 				.filter(z -> {
 					int st = parseYmToInt(z.getTekiyoStYm());
 					int ed = parseYmToInt(z.getTekiyoEdYm());
