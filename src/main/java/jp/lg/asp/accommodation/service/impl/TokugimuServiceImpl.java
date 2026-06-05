@@ -48,14 +48,20 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<TokugimuListItem> search(TokugimuSearchForm form) {
-		List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
-				jichitaiCd,
-				form.getShiteiNo(),
-				form.getName(),
-				form.getShisetsuName(),
-				form.getKyokaShu(),
-				form.getKojinNo(),
-				form.getHojinNo());
+		// 初期遷移時（検索条件がすべて空）は全件取得
+		List<Tokugimu> tokugimuList;
+		if (isEmptySearchForm(form)) {
+			tokugimuList = tokugimuRepository.findAllByJichitaiCd(jichitaiCd);
+		} else {
+			tokugimuList = tokugimuRepository.findBySearchConditions(
+					jichitaiCd,
+					form.getShiteiNo(),
+					form.getName(),
+					form.getShisetsuName(),
+					form.getKyokaShu(),
+					form.getKojinNo(),
+					form.getHojinNo());
+		}
 
 		if (tokugimuList.isEmpty()) {
 			return List.of();
@@ -74,12 +80,15 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.map(t -> {
 					Atena atena = atenaMap.get(t.getAtenaNo());
 					boolean isGassanTarget = gassanMap.containsKey(t.getShiteiNo());
-					String status = t.getStatus();
+					String status = determineStatus(t);
 
-					if (form.getStatus() != null && !"4".equals(form.getStatus()) && !form.getStatus().equals(status)) {
+					// ステータスフィルタリング（初期遷移時はフィルタリングなし）
+					if (form.getStatus() != null && !form.getStatus().isEmpty() && !"999".equals(form.getStatus()) && !form.getStatus().equals(status)) {
 						return null;
 					}
-					if (form.getGasanTaisho() != null && !"999".equals(form.getGasanTaisho())) {
+					
+					// 合算対象フィルタリング（初期遷移時はフィルタリングなし）
+					if (form.getGasanTaisho() != null && !form.getGasanTaisho().isEmpty() && !"999".equals(form.getGasanTaisho())) {
 						boolean shouldBeTarget = "2".equals(form.getGasanTaisho());
 						if (shouldBeTarget != isGassanTarget)
 							return null;
@@ -99,6 +108,33 @@ public class TokugimuServiceImpl implements TokugimuService {
 				})
 				.filter(item -> item != null)
 				.toList();
+	}
+
+	private boolean isEmptySearchForm(TokugimuSearchForm form) {
+		if (form == null) {
+			return true;
+		}
+		return (form.getShiteiNo() == null || form.getShiteiNo().isEmpty()) &&
+			   (form.getName() == null || form.getName().isEmpty()) &&
+			   (form.getShisetsuName() == null || form.getShisetsuName().isEmpty()) &&
+			   (form.getKyokaShu() == null || form.getKyokaShu().isEmpty() || "999".equals(form.getKyokaShu())) &&
+			   (form.getGasanTaisho() == null || form.getGasanTaisho().isEmpty() || "999".equals(form.getGasanTaisho())) &&
+			   (form.getStatus() == null || form.getStatus().isEmpty() || "999".equals(form.getStatus())) &&
+			   (form.getKojinNo() == null || form.getKojinNo().isEmpty()) &&
+			   (form.getHojinNo() == null || form.getHojinNo().isEmpty());
+	}
+
+	private String determineStatus(Tokugimu t) {
+		// 廃止日が設定されている場合は廃止
+		if (t.getEigyoEdYmd() != null) {
+			return "3"; // 廃止
+		}
+		// 休止期間が設定されている場合は休止
+		if (t.getKyushiStYmd() != null && t.getKyushiEdYmd() != null) {
+			return "2"; // 休止
+		}
+		// それ以外は営業中
+		return "1"; // 営業中
 	}
 
 	private String getBusinessTypeLabel(String kyokaShu) {

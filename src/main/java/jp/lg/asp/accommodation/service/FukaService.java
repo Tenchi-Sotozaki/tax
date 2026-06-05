@@ -1,4 +1,4 @@
-package jp.lg.asp.accommodation.service;
+﻿package jp.lg.asp.accommodation.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -433,10 +433,12 @@ public class FukaService {
 				.filter(u -> u.getKazeiKbn() != null)
 				.collect(Collectors.toMap(FukaUchi::getKazeiKbn, u -> u, (existing, replacement) -> existing));
 
+		log.info("[syncUchiDataToForm] uchiMap keys={}, dto.taxDetails size={}", uchiMap.keySet(), dto.getTaxDetails().size());
 		for (int i = 0; i < dto.getTaxDetails().size(); i++) {
 			FukaTaxDetailDto formDetail = dto.getTaxDetails().get(i);
 			FukaUchi matched = uchiMap.get(i + 1);
 
+			log.info("[syncUchiDataToForm] i={}, matched={}, fukaKbn={}, hakusu={}, ryokin={}, zeigaku={}", i, (matched != null), (matched != null ? matched.getFukaKbn() : null), (matched != null ? matched.getHakusu() : null), (matched != null ? matched.getRyokin() : null), (matched != null ? matched.getZeigaku() : null));
 				if (matched != null) {
 				if ("2".equals(matched.getFukaKbn())) {
 					// 定率制: hakusu=宿泊数, ryokin=課税対象宿泊料金
@@ -472,6 +474,7 @@ public class FukaService {
 				.findFirstByJichitaiCdAndShiteiNoAndNendoAndKibetsuOrderByRnoDesc(currentJichitaiCd, shiteiNo, nendo,
 						kibetsu)
 				.ifPresent(entity -> {
+					log.info("[getDeclarationFormForEdit] entity found: rno={}, fukaKbn={}, taishoYm={}, totalHakusu={}, totalZeigaku={}, kazeiRyokin={}", entity.getRno(), entity.getFukaKbn(), entity.getTaishoYm(), entity.getTotalHakusu(), entity.getTotalZeigaku(), entity.getKazeiRyokin());
 					form.setRegistrationDate(entity.getShinkokuYmd());
 					form.setNendo(entity.getNendo());
 					form.setKibetsu(entity.getKibetsu());
@@ -1134,8 +1137,13 @@ public class FukaService {
 		Zeiritsu appliedZeiritsu = null;
 		int targetYmInt = parseYmToInt(targetYm);
 
+		log.info("[hydrateMonthlyDetail] targetYm={}, fukaKbn={}, masterCount={}", targetYm, entity.getFukaKbn(), allZeiritsu.size());
+
 		for (Zeiritsu z : allZeiritsu) {
 			if (!"2".equals(z.getTaishoKbn())) {
+				continue;
+			}
+			if (!entity.getFukaKbn().equals(z.getFukaKbn())) {
 				continue;
 			}
 			int stYmInt = parseYmToInt(z.getTekiyoStYm());
@@ -1147,6 +1155,25 @@ public class FukaService {
 			if (isAfterStart && isBeforeEnd) {
 				appliedZeiritsu = z;
 				break;
+			}
+		}
+
+		// appliedZeiritsu==null: fukaKbn"1"(teigaku) may have taishoKbn!="2", retry without taishoKbn filter
+		if (appliedZeiritsu == null) {
+			log.warn("[hydrateMonthlyDetail] taishoKbn=2 filter found no match. Retrying without taishoKbn filter. fukaKbn={}", entity.getFukaKbn());
+			for (Zeiritsu z : allZeiritsu) {
+				if (!entity.getFukaKbn().equals(z.getFukaKbn())) {
+					continue;
+				}
+				int stYmInt2 = parseYmToInt(z.getTekiyoStYm());
+				int edYmInt2 = parseYmToInt(z.getTekiyoEdYm());
+				boolean isAfterStart2 = (stYmInt2 == 0 || stYmInt2 <= targetYmInt);
+				boolean isBeforeEnd2 = (edYmInt2 == 0 || targetYmInt <= edYmInt2);
+				if (isAfterStart2 && isBeforeEnd2) {
+					appliedZeiritsu = z;
+					log.info("[hydrateMonthlyDetail] Retry matched: seq={}, fukaKbn={}, taishoKbn={}", z.getSeq(), z.getFukaKbn(), z.getTaishoKbn());
+					break;
+				}
 			}
 		}
 
@@ -1183,12 +1210,29 @@ public class FukaService {
 			}
 		}
 
+		// 【フォールバック】appliedZeiritsu==null かつ定額制: m_zeiritsu_teigakuから直接構築
+		if (monthDto.getTaxDetails().isEmpty() && "1".equals(entity.getFukaKbn())) {
+			log.warn("[hydrateMonthlyDetail] appliedZeiritsu is null for teigaku. Using direct teigaku master query.");
+			List<ZeiritsuTeigaku> fallbackRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+			for (ZeiritsuTeigaku m : fallbackRates) {
+				FukaTaxDetailDto d = new FukaTaxDetailDto();
+				d.setZeiritsuSeq(m.getSeq());
+				d.setTeigakuSeq(m.getTeigakuSeq());
+				d.setTaxRate(m.getZeigaku() != null ? BigDecimal.valueOf(m.getZeigaku()) : BigDecimal.ZERO);
+				d.setLabel(m.getRyokinEd() != null
+						? String.format("%,d円 ～ %,d円未満", m.getRyokinSt(), m.getRyokinEd() + 1)
+						: String.format("%,d円以上", m.getRyokinSt()));
+				monthDto.getTaxDetails().add(d);
+			}
+		}
+
 		form.setMonthlyDetail(monthDto);
 
 		// 💡 内訳テーブル（t_fuka_uchi）から上書き同期を行う
 		List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
 				jichitaiCd, form.getShiteiNo(), entity.getRno(), entity.getNendo(), entity.getKibetsu());
 
+		log.info("[hydrateMonthlyDetail] uchiList size={}, taxDetails size={}, rno={}, nendo={}, kibetsu={}", uchiList.size(), monthDto.getTaxDetails().size(), entity.getRno(), entity.getNendo(), entity.getKibetsu());
 		syncUchiDataToForm(uchiList, monthDto);
 	}
 

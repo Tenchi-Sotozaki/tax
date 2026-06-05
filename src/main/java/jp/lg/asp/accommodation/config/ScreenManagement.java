@@ -74,4 +74,16 @@ public final class ScreenManagement {
 
 	// 帳票出力
 	public static final String TOKUGIMU_REPORT = "TOKU_REPORT";
+
+	// 特別徴収義務者指定通知書
+	public static final String TOKUGIMU_SHITEI_TSUCHI = "ms00000013";
+
+	// 特別徴収義務者申請受理通知書
+	public static final String TOKUGIMU_JURI_TSUCHI = "ms00000014";
+
+	// 納税管理人承認(不承認)通知書
+	public static final String NOZEI_KANRININ_SHONIN_TSUCHI = "ms00000015";
+
+	// 納入申告書の提出期限等の特例適用者指定通知書
+	public static final String TOKUREI_SHITEI = "ms00000016";
 }
