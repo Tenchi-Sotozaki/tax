@@ -144,6 +144,9 @@ public class TokugimuController {
 		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
 		model.addAttribute("shiteiNo", id);
 		model.addAttribute("tokugimuName", form.getName());
+		model.addAttribute("shisetsuName", form.getFacilityName());
+		// 合算指定番号がある場合は追加
+		// model.addAttribute("gassanShiteiNo", form.getGassanShiteiNo()); // 合算関連フィールドが存在する場合
 		return REPORT_VIEW;
 	}
 

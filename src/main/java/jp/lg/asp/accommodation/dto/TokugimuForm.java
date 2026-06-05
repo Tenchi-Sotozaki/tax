@@ -23,19 +23,17 @@ public class TokugimuForm {
 	@NotNull(message = "登録日は必須です")
 	private LocalDate registrationDate;
 
-	@Size(max = 200)
+	@NotBlank(message = "住所は必須です")
 	private String tokugimuAddress; // Atena.jusho（読取専用・宛名検索で自動入力）
 
 	@NotBlank(message = "氏名または名称は必須です")
-	@Size(max = 200)
-	private String name; // Atena.name
+	private String name; // Atena.name（読取専用・宛名検索で自動入力）
 
-	private String personalNumber; // Atena.kojinNo（読取専用）
-	private String corporateNumber; // Atena.hojinNo（読取専用）
+	private String personalNumber; // Atena.kojinNo（読取専用・宛名検索で自動入力）
+	private String corporateNumber; // Atena.hojinNo（読取専用・宛名検索で自動入力）
 
 	@NotBlank(message = "電話番号は必須です")
-	@Size(max = 20)
-	private String tokugimuPhone; // Atena.tel1
+	private String tokugimuPhone; // Atena.tel1（読取専用・宛名検索で自動入力）
 
 	// ===== 宿泊施設情報 (t_tokugimu) =====
 
@@ -145,6 +143,6 @@ public class TokugimuForm {
 	private boolean suspensionEndDateUndecided;
 	private LocalDate resumptionOrAbolitionDate; // Tokugimu.eigyoEdYmd
 	private String suspensionOrAbolitionReason; // Tokugimu.kyuhaishiRiyu
-	
+
 	private String shiteiNo;
 }
