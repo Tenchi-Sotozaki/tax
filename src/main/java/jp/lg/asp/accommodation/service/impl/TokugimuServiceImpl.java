@@ -11,7 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jp.lg.asp.accommodation.dto.TaxManagerForm;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
@@ -189,19 +188,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		}
 	}
 
-	/**
-	 * 納税管理人フォームの初期値を生成（指定番号ベース）
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public TaxManagerForm buildTaxManagerFormByShiteiNo(String shiteiNo) {
-		TokugimuForm tokugimu = getTokugimuByShiteiNo(shiteiNo);
-		TaxManagerForm form = new TaxManagerForm();
-		// 指定番号ベースで初期値をセット
-		form.setObligorName(tokugimu.getName());
-		return form;
-	}
-
 	private String generateShiteiNo() {
 		int max = tokugimuRepository.findMaxShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
 		return String.format("%08d", max + 1);
@@ -258,6 +244,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
 				.orElseThrow(() -> new RuntimeException("宛名情報が見つかりません"));
 		atena.setName(form.getName());
+		atena.setNameKana(form.getNameKana());
+		atena.setYubinNo(form.getTokugimuAddressNo());
 		atena.setJusho(form.getTokugimuAddress());
 		atena.setTel1(form.getTokugimuPhone());
 		atenaRepository.save(atena);
@@ -289,22 +277,14 @@ public class TokugimuServiceImpl implements TokugimuService {
 		log.info("特別徴収義務者論理削除完了: shiteiNo={}", shiteiNo);
 	}
 
-	/**
-	 * 納税管理人の保存（指定番号ベース）
-	 */
-	@Override
-	@Transactional
-	public void saveTaxManagerByShiteiNo(String shiteiNo, TaxManagerForm form) {
-		// 指定番号から宛名IDを特定し、会社単位で管理人を保存するロジック（後ほど実装）
-		log.info("納税管理人保存（未実装）: shiteiNo={}, manager={}", shiteiNo, form.getManagerName());
-	}
-
 	// ========== ヘルパーメソッド ==========
 
 	private void mapEntityToForm(TokugimuForm form, Tokugimu t, Atena atena) {
 		// 事業者情報
-		form.setName(atena.getName());
+		form.setTokugimuAddressNo(atena.getYubinNo());
 		form.setTokugimuAddress(atena.getJusho());
+		form.setName(atena.getName());
+		form.setNameKana(atena.getNameKana());
 		form.setTokugimuPhone(atena.getTel1());
 		form.setPersonalNumber(atena.getKojinNo());
 		form.setCorporateNumber(atena.getHojinNo());
