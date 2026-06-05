@@ -89,4 +89,7 @@ public final class ScreenManagement {
 
 	// 納入申告書の提出期限等の特例適用者指定通知書
 	public static final String TOKUREI_SHITEI = "ms00000016";
+
+	// 納入申告書の提出期限等の特例適用者指定取消通知書
+	public static final String TOKUREI_SHITEI_CANCEL = "ms00000017";
 }
