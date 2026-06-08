@@ -204,27 +204,10 @@ public class FukaService {
 			// 💡 【仕様書準拠】適用時期ベースの税体系判定ロジック
 			// =========================================================
 
-			// 【第1段階】 賦課区分（定額/定率）を問わず、現在の自治体の有効な税率マスタをすべて取得する
-			// ※ZeiritsuRepository に定義済みの findActiveByJichitaiCd を利用
-			List<Zeiritsu> allZeiritsu = zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd);
 
-			Zeiritsu appliedZeiritsu = null;
-			int targetYmInt = parseYmToInt(targetYm);
-
-			// 対象年月に合致する「唯一の適用マスタ」を特定する
-			for (Zeiritsu z : allZeiritsu) {
-
-				int stYmInt = parseYmToInt(z.getTekiyoStYm());
-				int edYmInt = parseYmToInt(z.getTekiyoEdYm());
-
-				boolean isAfterStart = (stYmInt == 0 || stYmInt <= targetYmInt);
-				boolean isBeforeEnd = (edYmInt == 0 || targetYmInt <= edYmInt);
-
-				if (isAfterStart && isBeforeEnd) {
-					appliedZeiritsu = z; // 期間が一致したマスタを「当月のルール」として確定！
-					break;
-				}
-			}
+			// 対象年月に合致する親マスタをDBから直接取得
+			Optional<Zeiritsu> appliedOpt = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
+			Zeiritsu appliedZeiritsu = appliedOpt.orElse(null);
 
 			List<ZeiritsuTeiritsu> teiritsuRates = new ArrayList<>();
 			List<ZeiritsuTeigaku> teigakuRates = new ArrayList<>();
