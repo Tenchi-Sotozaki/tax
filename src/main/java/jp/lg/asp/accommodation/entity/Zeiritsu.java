@@ -32,7 +32,7 @@ public class Zeiritsu extends BaseEntity {
 	@Column(name = "tekiyo_st_ym", nullable = false, length = 6)
 	private String tekiyoStYm;
 
-	@Column(name = "tekiyo_ed_ym", nullable = false, length = 6)
+	@Column(name = "tekiyo_ed_ym", nullable = true, length = 6)
 	private String tekiyoEdYm;
 
 	@Column(name = "fuka_kbn", nullable = false, length = 1)

@@ -107,6 +107,11 @@ public class ZeiritsuController {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		validateDetails(form, bindingResult);
+		
+		String jichitaiCd = authentication.getName();
+		BigDecimal seqDec = BigDecimal.valueOf(seq);
+		// 期間重複チェック（編集対象は除外）
+		validatePeriodOverlap(form, bindingResult, jichitaiCd, seqDec);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isView", false);
@@ -116,13 +121,20 @@ public class ZeiritsuController {
 			return FORM_VIEW;
 		}
 
-		String jichitaiCd = authentication.getName();
 		String tekiyoStYm = form.getTekiyoStYm().replace("-", "");
-		BigDecimal seqDec = BigDecimal.valueOf(seq);
+		
+		// 既存データの自動更新処理（編集対象は除外）
+		autoUpdateExistingPeriod(form, jichitaiCd, seqDec);
 
 		Zeiritsu entity = findOrThrow(jichitaiCd, seqDec);
 		entity.setFukaKbn(form.getFukaKbn());
 		entity.setTekiyoStYm(tekiyoStYm);
+		String tekiyoEdYm = form.getTekiyoEdYm();
+		if (tekiyoEdYm != null && !tekiyoEdYm.isBlank()) {
+			entity.setTekiyoEdYm(tekiyoEdYm.replace("-", ""));
+		} else {
+			entity.setTekiyoEdYm(null);
+		}
 		entity.setTaishoKbn(form.getTaishoKbn());
 		zeiritsuRepository.save(entity);
 
@@ -170,6 +182,37 @@ public class ZeiritsuController {
 		return "redirect:/admin/zeiritsu/view/" + seq;
 	}
 
+	// ========== 削除処理 ==========
+
+	@PostMapping("/delete/{seq}")
+	public String delete(@PathVariable("seq") Long seq,
+			Authentication authentication,
+			RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
+
+		String jichitaiCd = authentication.getName();
+		BigDecimal seqDec = BigDecimal.valueOf(seq);
+
+		// メインレコードの論理削除
+		Zeiritsu entity = findOrThrow(jichitaiCd, seqDec);
+		entity.setDelFlg("1");
+		zeiritsuRepository.save(entity);
+
+		// 関連する詳細レコードも論理削除
+		boolean isTeigaku = FukaConstants.TEIGAKU.getValue().equals(entity.getFukaKbn());
+		if (isTeigaku) {
+			zeiritsuTeigakuRepository.findActiveBySeq(jichitaiCd, seqDec)
+					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeigakuRepository.save(d); });
+		} else {
+			zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, seqDec)
+					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeiritsuRepository.save(d); });
+		}
+
+		log.info("税率管理マスタを削除しました。jichitaiCd: {}, seq: {}", jichitaiCd, seq);
+		redirectAttributes.addFlashAttribute("successMessage", "税率管理マスタを削除しました。");
+		return "redirect:/admin/zeiritsu/list";
+	}
+
 	// ========== 新規登録画面 ==========
 
 	@GetMapping("/register")
@@ -193,6 +236,10 @@ public class ZeiritsuController {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		validateDetails(form, bindingResult);
+		
+		String jichitaiCd = authentication.getName();
+		// 期間重複チェックを先に実行
+		validatePeriodOverlap(form, bindingResult, jichitaiCd, null);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isView", false);
@@ -201,11 +248,14 @@ public class ZeiritsuController {
 			return FORM_VIEW;
 		}
 
-		String jichitaiCd = authentication.getName();
 		String tekiyoStYm = form.getTekiyoStYm().replace("-", "");
+		
+		// 既存データの自動更新処理
+		autoUpdateExistingPeriod(form, jichitaiCd, null);
 
-		List<Zeiritsu> existing = zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd);
-		BigDecimal nextSeq = existing.stream()
+		// 物理テーブルから全レコードを取得して最大seqを取得
+		BigDecimal nextSeq = zeiritsuRepository.findAll().stream()
+				.filter(z -> z.getJichitaiCd().equals(jichitaiCd))
 				.map(Zeiritsu::getSeq)
 				.max(BigDecimal::compareTo)
 				.map(s -> s.add(BigDecimal.ONE))
@@ -216,7 +266,12 @@ public class ZeiritsuController {
 		entity.setSeq(nextSeq);
 		entity.setFukaKbn(form.getFukaKbn());
 		entity.setTekiyoStYm(tekiyoStYm);
-		entity.setTekiyoEdYm("999912");
+		String tekiyoEdYm = form.getTekiyoEdYm();
+		if (tekiyoEdYm != null && !tekiyoEdYm.isBlank()) {
+			entity.setTekiyoEdYm(tekiyoEdYm.replace("-", ""));
+		} else {
+			entity.setTekiyoEdYm(null);
+		}
 		entity.setTaishoKbn(form.getTaishoKbn());
 		entity.setDelFlg("0");
 		zeiritsuRepository.save(entity);
@@ -286,6 +341,103 @@ public class ZeiritsuController {
 		}
 	}
 
+	private void validatePeriodOverlap(ZeiritsuForm form, BindingResult bindingResult, String jichitaiCd, BigDecimal excludeSeq) {
+		String taishoKbn = form.getTaishoKbn();
+		String tekiyoStYm = form.getTekiyoStYm().replace("-", "");
+		String tekiyoEdYm = form.getTekiyoEdYm();
+		if (tekiyoEdYm != null && !tekiyoEdYm.isBlank()) {
+			tekiyoEdYm = tekiyoEdYm.replace("-", "");
+		}
+
+		// 同じ対象区分の既存データを取得（賦課方式は区別しない、削除フラグが1のものは除外）
+		List<Zeiritsu> existingList = zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd)
+				.stream()
+				.filter(z -> z.getTaishoKbn().equals(taishoKbn))
+				.filter(z -> !"1".equals(z.getDelFlg()))
+				.filter(z -> excludeSeq == null || !z.getSeq().equals(excludeSeq))
+				.collect(Collectors.toList());
+
+		for (Zeiritsu existing : existingList) {
+			String existingStYm = existing.getTekiyoStYm();
+			String existingEdYm = existing.getTekiyoEdYm();
+
+			// 期間重複チェック
+			boolean isOverlap = false;
+
+			if (existingEdYm == null || existingEdYm.isBlank()) {
+				// 既存が無期限の場合
+				if (tekiyoStYm.compareTo(existingStYm) >= 0) {
+					isOverlap = true;
+				}
+			} else {
+				// 既存が期限ありの場合
+				if (tekiyoEdYm == null || tekiyoEdYm.isBlank()) {
+					// 新規が無期限
+					if (tekiyoStYm.compareTo(existingEdYm) <= 0) {
+						isOverlap = true;
+					}
+				} else {
+					// 両方期限あり
+					if (!(tekiyoEdYm.compareTo(existingStYm) < 0 || tekiyoStYm.compareTo(existingEdYm) > 0)) {
+						isOverlap = true;
+					}
+				}
+			}
+
+			if (isOverlap) {
+				String fukaKbnName = FukaConstants.TEIGAKU.getValue().equals(existing.getFukaKbn()) 
+						? FukaConstants.TEIGAKU.getName() : FukaConstants.TEIRITSU.getName();
+				bindingResult.rejectValue("tekiyoStYm", "PeriodOverlap",
+						"既存の賦課方式設定と期間が重複しています。（既存：" + fukaKbnName + " " + formatYm(existingStYm) + "～" +
+								(existingEdYm != null ? formatYm(existingEdYm) : "無期限") + "）");
+				return;
+			}
+		}
+	}
+
+	private void autoUpdateExistingPeriod(ZeiritsuForm form, String jichitaiCd, BigDecimal excludeSeq) {
+		String taishoKbn = form.getTaishoKbn();
+		String tekiyoStYm = form.getTekiyoStYm().replace("-", "");
+
+		// 同じ対象区分で無期限の既存データを取得（賦課方式は区別しない、削除フラグが1のものは除外）
+		List<Zeiritsu> existingList = zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd)
+				.stream()
+				.filter(z -> z.getTaishoKbn().equals(taishoKbn))
+				.filter(z -> !"1".equals(z.getDelFlg()))
+				.filter(z -> z.getTekiyoEdYm() == null || z.getTekiyoEdYm().isBlank())
+				.filter(z -> excludeSeq == null || !z.getSeq().equals(excludeSeq))
+				.filter(z -> z.getTekiyoStYm().compareTo(tekiyoStYm) < 0)
+				.collect(Collectors.toList());
+
+		for (Zeiritsu existing : existingList) {
+			// 新規の適用開始時期の前月を適用終了時期に設定
+			String newEdYm = getPreviousMonth(tekiyoStYm);
+			existing.setTekiyoEdYm(newEdYm);
+			zeiritsuRepository.save(existing);
+			String fukaKbnName = FukaConstants.TEIGAKU.getValue().equals(existing.getFukaKbn()) 
+					? FukaConstants.TEIGAKU.getName() : FukaConstants.TEIRITSU.getName();
+			log.info("既存の賦課方式設定の適用終了時期を自動更新しました。seq: {}, 賦課方式: {}, 新終了時期: {}", 
+					existing.getSeq(), fukaKbnName, newEdYm);
+		}
+	}
+
+	private String getPreviousMonth(String ym) {
+		int year = Integer.parseInt(ym.substring(0, 4));
+		int month = Integer.parseInt(ym.substring(4, 6));
+		if (month == 1) {
+			year--;
+			month = 12;
+		} else {
+			month--;
+		}
+		return String.format("%04d%02d", year, month);
+	}
+
+	private String formatYm(String ym) {
+		if (ym == null || ym.length() != 6) return ym;
+		return ym.substring(0, 4) + "年" + ym.substring(4, 6) + "月";
+	}
+
 	private List<ZeiritsuListItem> search(String jichitaiCd, ZeiritsuSearchForm form) {
 		return zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd).stream()
 				.filter(z -> {
@@ -320,6 +472,7 @@ public class ZeiritsuController {
 		ZeiritsuForm form = new ZeiritsuForm();
 		form.setFukaKbn(z.getFukaKbn());
 		form.setTekiyoStYm(z.getTekiyoStYm());
+		form.setTekiyoEdYm(z.getTekiyoEdYm());
 		form.setTaishoKbn(z.getTaishoKbn());
 
 		boolean isTeigaku = FukaConstants.TEIGAKU.getValue().equals(z.getFukaKbn());

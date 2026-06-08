@@ -1,103 +1,139 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title th:text="${isView} ? '賦課方式設定照会' : (${isEdit} ? '賦課方式設定編集' : '賦課方式設定登録')">賦課方式設定</title>
+<title
+	th:text="${isView} ? '賦課方式設定照会' : (${isEdit} ? '賦課方式設定編集' : '賦課方式設定登録')">賦課方式設定</title>
 </head>
 
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
 
 		<!-- ページヘッダー -->
-		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h2 class="h2">
-				<i class="bi bi-sliders me-2 text-primary"></i>
-				<span th:text="${isView} ? '賦課方式設定照会' : (${isEdit} ? '賦課方式設定編集' : '賦課方式設定登録')"></span>
+				<i class="bi bi-sliders me-2 text-primary"></i> <span
+					th:text="${isView} ? '賦課方式設定照会' : (${isEdit} ? '賦課方式設定編集' : '賦課方式設定登録')"></span>
 			</h2>
-			<span class="badge px-3 py-2 fs-6"
-				th:classappend="${isView} ? 'bg-info-subtle text-info border border-info-subtle' : (${isEdit} ? 'bg-warning-subtle text-warning border border-warning-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle')">
-				<i th:class="${isView} ? 'bi bi-eye me-1' : (${isEdit} ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')"></i>
-				<span th:text="${isView} ? '照会' : (${isEdit} ? '編集' : '新規登録')"></span>
-			</span>
 		</div>
 
-		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-			<i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+		<div th:if="${successMessage}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i><span
+				th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-			<i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i><span
+				th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<form th:action="${isEdit} ? @{/admin/zeiritsu/edit/{seq}(seq=${seq})} : @{/admin/zeiritsu/register}"
+		<form
+			th:action="${isEdit} ? @{/admin/zeiritsu/edit/{seq}(seq=${seq})} : @{/admin/zeiritsu/register}"
 			th:object="${zeiritsuForm}" method="post">
 
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i>
-				入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
+			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
+				role="alert">
+				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
+					th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
+				<ul class="mb-0 mt-2" th:if="${#fields.hasGlobalErrors()}">
+					<li th:each="error : ${#fields.globalErrors()}" th:text="${error}"></li>
+				</ul>
 			</div>
 
 			<!-- 基本情報 -->
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header bg-primary text-white py-3">
-					<h5 class="mb-0"><i class="bi bi-sliders me-2"></i>税率管理情報</h5>
+					<h5 class="mb-0">
+						<i class="bi bi-sliders me-2"></i>税率管理情報
+					</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3" style="max-width: 480px;">
 
 						<div class="col-12">
-							<label class="form-label fw-medium">賦課方式
-								<span class="badge bg-danger text-white ms-1" th:unless="${isView}">必須</span>
+							<label class="form-label fw-medium">賦課方式 <span
+								class="badge bg-danger text-white ms-1" th:unless="${isView}">必須</span>
 							</label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="fukaTeigaku"
 										th:field="*{fukaKbn}" th:value="${fukaTeigaku.value}"
-										th:disabled="${isView}">
-									<label class="form-check-label" for="fukaTeigaku" th:text="${fukaTeigaku.name}"></label>
+										th:disabled="${isView}"> <label
+										class="form-check-label" for="fukaTeigaku"
+										th:text="${fukaTeigaku.name}"></label>
 								</div>
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="fukaTeiritsu"
 										th:field="*{fukaKbn}" th:value="${fukaTeiritsu.value}"
-										th:disabled="${isView}">
-									<label class="form-check-label" for="fukaTeiritsu" th:text="${fukaTeiritsu.name}"></label>
+										th:disabled="${isView}"> <label
+										class="form-check-label" for="fukaTeiritsu"
+										th:text="${fukaTeiritsu.name}"></label>
 								</div>
 							</div>
-							<div class="text-danger small mt-1" th:if="${#fields.hasErrors('fukaKbn')}" th:errors="*{fukaKbn}"></div>
+							<div class="text-danger small mt-1"
+								th:if="${#fields.hasErrors('fukaKbn')}" th:errors="*{fukaKbn}"></div>
 						</div>
 
 						<div class="col-12">
-							<label for="tekiyoStYm" class="form-label fw-medium">適用時期
-								<span class="badge bg-danger text-white ms-1" th:unless="${isView}">必須</span>
-							</label>
-							<input type="month" id="tekiyoStYm" name="tekiyoStYmDisplay" class="form-control"
+							<label for="tekiyoStYm" class="form-label fw-medium">適用開始時期
+								<span class="badge bg-danger text-white ms-1"
+								th:unless="${isView}">必須</span>
+							</label> <input type="month" id="tekiyoStYm" name="tekiyoStYmDisplay"
+								class="form-control"
 								th:classappend="${#fields.hasErrors('tekiyoStYm')} ? 'is-invalid'"
-								th:readonly="${isView}">
-							<input type="hidden" th:field="*{tekiyoStYm}" id="tekiyoStYmHidden">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('tekiyoStYm')}" th:errors="*{tekiyoStYm}"></div>
+								th:readonly="${isView}"> <input type="hidden"
+								th:field="*{tekiyoStYm}" id="tekiyoStYmHidden">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('tekiyoStYm')}">
+								<div th:each="error : ${#fields.errors('tekiyoStYm')}"
+									th:text="${error}"></div>
+							</div>
 						</div>
 
 						<div class="col-12">
-							<label class="form-label fw-medium">区分
-								<span class="badge bg-danger text-white ms-1" th:unless="${isView}">必須</span>
+							<label for="tekiyoEdYm" class="form-label fw-medium">適用終了時期
+								<small class="text-muted">(省略可)</small>
+							</label> <input type="month" id="tekiyoEdYm" name="tekiyoEdYmDisplay"
+								class="form-control"
+								th:classappend="${#fields.hasErrors('tekiyoEdYm')} ? 'is-invalid'"
+								th:readonly="${isView}"> <input type="hidden"
+								th:field="*{tekiyoEdYm}" id="tekiyoEdYmHidden">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('tekiyoEdYm')}">
+								<div th:each="error : ${#fields.errors('tekiyoEdYm')}"
+									th:text="${error}"></div>
+							</div>
+						</div>
+
+						<div class="col-12">
+							<label class="form-label fw-medium">区分 <span
+								class="badge bg-danger text-white ms-1" th:unless="${isView}">必須</span>
 							</label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="taishoCity"
 										th:field="*{taishoKbn}" th:value="${taishoCity.value}"
-										th:disabled="${isView}">
-									<label class="form-check-label" for="taishoCity" th:text="${taishoCity.name}"></label>
+										th:disabled="${isView}"> <label
+										class="form-check-label" for="taishoCity"
+										th:text="${taishoCity.name}"></label>
 								</div>
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="taishoKen"
 										th:field="*{taishoKbn}" th:value="${taishoKen.value}"
-										th:disabled="${isView}">
-									<label class="form-check-label" for="taishoKen" th:text="${taishoKen.name}"></label>
+										th:disabled="${isView}"> <label
+										class="form-check-label" for="taishoKen"
+										th:text="${taishoKen.name}"></label>
 								</div>
 							</div>
-							<div class="text-danger small mt-1" th:if="${#fields.hasErrors('taishoKbn')}" th:errors="*{taishoKbn}"></div>
+							<div class="text-danger small mt-1"
+								th:if="${#fields.hasErrors('taishoKbn')}"
+								th:errors="*{taishoKbn}"></div>
 						</div>
 
 					</div>
@@ -107,17 +143,18 @@
 			<!-- 税額(税率)明細 -->
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header bg-secondary text-white py-3">
-					<h5 class="mb-0"><i class="bi bi-table me-2"></i>税額(税率)明細</h5>
+					<h5 class="mb-0">
+						<i class="bi bi-table me-2"></i>税額(税率)明細
+					</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="table-responsive">
 						<table class="table table-bordered align-middle">
 							<thead class="table-light">
 								<tr>
-									<th style="width:4rem"></th>
-									<th>
-										<span id="zeiValueLabel">税額(税率)</span>
-										<small id="zeiValueHint" class="text-muted d-none">（0.01～9.99）</small>
+									<th style="width: 4rem"></th>
+									<th><span id="zeiValueLabel">税額(税率)</span> <small
+										id="zeiValueHint" class="text-muted d-none">（0.01～9.99）</small>
 									</th>
 									<th><span id="conditionLabel">条件</span></th>
 								</tr>
@@ -125,111 +162,156 @@
 							<tbody>
 								<!-- ① 必須 -->
 								<tr>
-									<td class="text-center fw-medium">①
-										<span class="badge bg-danger" th:unless="${isView}">必須</span>
+									<td class="text-center fw-medium">① <span
+										class="badge bg-danger" th:unless="${isView}">必須</span>
 									</td>
-									<td>
-										<input type="text" class="form-control" th:field="*{details[0].zeiValue}" th:readonly="${isView}">
-										<div class="text-danger small" th:if="${#fields.hasErrors('details[0].zeiValue')}" th:errors="*{details[0].zeiValue}"></div>
-									</td>
+									<td><input type="text" class="form-control"
+										th:field="*{details[0].zeiValue}" th:readonly="${isView}">
+										<div class="text-danger small"
+											th:if="${#fields.hasErrors('details[0].zeiValue')}"
+											th:errors="*{details[0].zeiValue}"></div></td>
 									<td class="condition-cell">
 										<div class="teigaku-condition">
 											<div class="input-group mb-1">
-												<input type="text" class="form-control" th:field="*{details[0].ryokinSt}" placeholder="以上" th:readonly="${isView}">
-												<span class="input-group-text">円以上</span>
+												<input type="text" class="form-control"
+													th:field="*{details[0].ryokinSt}" placeholder="以上"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円以上</span>
 											</div>
 											<div class="input-group">
-												<input type="text" class="form-control" th:field="*{details[0].ryokinEd}" placeholder="未満" th:readonly="${isView}">
-												<span class="input-group-text">円未満</span>
+												<input type="text" class="form-control"
+													th:field="*{details[0].ryokinEd}" placeholder="未満"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円未満</span>
 											</div>
-											<div class="text-danger small" th:if="${#fields.hasErrors('details[0].ryokinSt')}" th:errors="*{details[0].ryokinSt}"></div>
+											<div class="text-danger small"
+												th:if="${#fields.hasErrors('details[0].ryokinSt')}"
+												th:errors="*{details[0].ryokinSt}"></div>
 										</div>
-										<div class="teiritsu-condition" style="display:none;">
-											<input type="text" class="form-control" th:field="*{details[0].kbnName}" placeholder="区分名" th:readonly="${isView}">
+										<div class="teiritsu-condition" style="display: none;">
+											<input type="text" class="form-control"
+												th:field="*{details[0].kbnName}" placeholder="区分名"
+												th:readonly="${isView}">
 										</div>
 									</td>
 								</tr>
 								<!-- ② -->
 								<tr>
 									<td class="text-center fw-medium">②</td>
-									<td><input type="text" class="form-control" th:field="*{details[1].zeiValue}" th:readonly="${isView}"></td>
+									<td><input type="text" class="form-control"
+										th:field="*{details[1].zeiValue}" th:readonly="${isView}"></td>
 									<td class="condition-cell">
 										<div class="teigaku-condition">
 											<div class="input-group mb-1">
-												<input type="text" class="form-control" th:field="*{details[1].ryokinSt}" placeholder="以上" th:readonly="${isView}">
-												<span class="input-group-text">円以上</span>
+												<input type="text" class="form-control"
+													th:field="*{details[1].ryokinSt}" placeholder="以上"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円以上</span>
 											</div>
 											<div class="input-group">
-												<input type="text" class="form-control" th:field="*{details[1].ryokinEd}" placeholder="未満" th:readonly="${isView}">
-												<span class="input-group-text">円未満</span>
+												<input type="text" class="form-control"
+													th:field="*{details[1].ryokinEd}" placeholder="未満"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円未満</span>
 											</div>
-											<div class="text-danger small" th:if="${#fields.hasErrors('details[1].ryokinSt')}" th:errors="*{details[1].ryokinSt}"></div>
+											<div class="text-danger small"
+												th:if="${#fields.hasErrors('details[1].ryokinSt')}"
+												th:errors="*{details[1].ryokinSt}"></div>
 										</div>
-										<div class="teiritsu-condition" style="display:none;">
-											<input type="text" class="form-control" th:field="*{details[1].kbnName}" placeholder="区分名" th:readonly="${isView}">
+										<div class="teiritsu-condition" style="display: none;">
+											<input type="text" class="form-control"
+												th:field="*{details[1].kbnName}" placeholder="区分名"
+												th:readonly="${isView}">
 										</div>
 									</td>
 								</tr>
 								<!-- ③ -->
 								<tr>
 									<td class="text-center fw-medium">③</td>
-									<td><input type="text" class="form-control" th:field="*{details[2].zeiValue}" th:readonly="${isView}"></td>
+									<td><input type="text" class="form-control"
+										th:field="*{details[2].zeiValue}" th:readonly="${isView}"></td>
 									<td class="condition-cell">
 										<div class="teigaku-condition">
 											<div class="input-group mb-1">
-												<input type="text" class="form-control" th:field="*{details[2].ryokinSt}" placeholder="以上" th:readonly="${isView}">
-												<span class="input-group-text">円以上</span>
+												<input type="text" class="form-control"
+													th:field="*{details[2].ryokinSt}" placeholder="以上"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円以上</span>
 											</div>
 											<div class="input-group">
-												<input type="text" class="form-control" th:field="*{details[2].ryokinEd}" placeholder="未満" th:readonly="${isView}">
-												<span class="input-group-text">円未満</span>
+												<input type="text" class="form-control"
+													th:field="*{details[2].ryokinEd}" placeholder="未満"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円未満</span>
 											</div>
-											<div class="text-danger small" th:if="${#fields.hasErrors('details[2].ryokinSt')}" th:errors="*{details[2].ryokinSt}"></div>
+											<div class="text-danger small"
+												th:if="${#fields.hasErrors('details[2].ryokinSt')}"
+												th:errors="*{details[2].ryokinSt}"></div>
 										</div>
-										<div class="teiritsu-condition" style="display:none;">
-											<input type="text" class="form-control" th:field="*{details[2].kbnName}" placeholder="区分名" th:readonly="${isView}">
+										<div class="teiritsu-condition" style="display: none;">
+											<input type="text" class="form-control"
+												th:field="*{details[2].kbnName}" placeholder="区分名"
+												th:readonly="${isView}">
 										</div>
 									</td>
 								</tr>
 								<!-- ④ -->
 								<tr>
 									<td class="text-center fw-medium">④</td>
-									<td><input type="text" class="form-control" th:field="*{details[3].zeiValue}" th:readonly="${isView}"></td>
+									<td><input type="text" class="form-control"
+										th:field="*{details[3].zeiValue}" th:readonly="${isView}"></td>
 									<td class="condition-cell">
 										<div class="teigaku-condition">
 											<div class="input-group mb-1">
-												<input type="text" class="form-control" th:field="*{details[3].ryokinSt}" placeholder="以上" th:readonly="${isView}">
-												<span class="input-group-text">円以上</span>
+												<input type="text" class="form-control"
+													th:field="*{details[3].ryokinSt}" placeholder="以上"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円以上</span>
 											</div>
 											<div class="input-group">
-												<input type="text" class="form-control" th:field="*{details[3].ryokinEd}" placeholder="未満" th:readonly="${isView}">
-												<span class="input-group-text">円未満</span>
+												<input type="text" class="form-control"
+													th:field="*{details[3].ryokinEd}" placeholder="未満"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円未満</span>
 											</div>
-											<div class="text-danger small" th:if="${#fields.hasErrors('details[3].ryokinSt')}" th:errors="*{details[3].ryokinSt}"></div>
+											<div class="text-danger small"
+												th:if="${#fields.hasErrors('details[3].ryokinSt')}"
+												th:errors="*{details[3].ryokinSt}"></div>
 										</div>
-										<div class="teiritsu-condition" style="display:none;">
-											<input type="text" class="form-control" th:field="*{details[3].kbnName}" placeholder="区分名" th:readonly="${isView}">
+										<div class="teiritsu-condition" style="display: none;">
+											<input type="text" class="form-control"
+												th:field="*{details[3].kbnName}" placeholder="区分名"
+												th:readonly="${isView}">
 										</div>
 									</td>
 								</tr>
 								<!-- ⑤ -->
 								<tr>
 									<td class="text-center fw-medium">⑤</td>
-									<td><input type="text" class="form-control" th:field="*{details[4].zeiValue}" th:readonly="${isView}"></td>
+									<td><input type="text" class="form-control"
+										th:field="*{details[4].zeiValue}" th:readonly="${isView}"></td>
 									<td class="condition-cell">
 										<div class="teigaku-condition">
 											<div class="input-group mb-1">
-												<input type="text" class="form-control" th:field="*{details[4].ryokinSt}" placeholder="以上" th:readonly="${isView}">
-												<span class="input-group-text">円以上</span>
+												<input type="text" class="form-control"
+													th:field="*{details[4].ryokinSt}" placeholder="以上"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円以上</span>
 											</div>
 											<div class="input-group">
-												<input type="text" class="form-control" th:field="*{details[4].ryokinEd}" placeholder="未満" th:readonly="${isView}">
-												<span class="input-group-text">円未満</span>
+												<input type="text" class="form-control"
+													th:field="*{details[4].ryokinEd}" placeholder="未満"
+													th:readonly="${isView}"> <span
+													class="input-group-text">円未満</span>
 											</div>
-											<div class="text-danger small" th:if="${#fields.hasErrors('details[4].ryokinSt')}" th:errors="*{details[4].ryokinSt}"></div>
+											<div class="text-danger small"
+												th:if="${#fields.hasErrors('details[4].ryokinSt')}"
+												th:errors="*{details[4].ryokinSt}"></div>
 										</div>
-										<div class="teiritsu-condition" style="display:none;">
-											<input type="text" class="form-control" th:field="*{details[4].kbnName}" placeholder="区分名" th:readonly="${isView}">
+										<div class="teiritsu-condition" style="display: none;">
+											<input type="text" class="form-control"
+												th:field="*{details[4].kbnName}" placeholder="区分名"
+												th:readonly="${isView}">
 										</div>
 									</td>
 								</tr>
@@ -242,29 +324,65 @@
 			<!-- ボタンエリア -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 				<!-- 照会モード -->
-				<a th:if="${isView}" th:href="@{/admin/zeiritsu/edit/{seq}(seq=${seq})}"
-					class="btn btn-warning btn-lg px-5">
-					<i class="bi bi-pencil-square me-2"></i>編集する
+				<a th:if="${isView}"
+					th:href="@{/admin/zeiritsu/edit/{seq}(seq=${seq})}"
+					class="btn btn-warning btn-lg px-5"> <i
+					class="bi bi-pencil-square me-2"></i>編集する
 				</a>
 				<!-- 編集モード -->
-				<button th:if="${isEdit}" type="submit" class="btn btn-warning btn-lg px-5">
+				<button th:if="${isEdit}" type="submit"
+					class="btn btn-warning btn-lg px-5">
 					<i class="bi bi-save me-2"></i>更新する
 				</button>
+				<!-- 削除ボタン（編集モードのみ） -->
+				<button th:if="${isEdit}" type="button" class="btn btn-danger btn-lg px-4" 
+						data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
 				<!-- 新規登録モード -->
-				<button th:unless="${isView or isEdit}" type="submit" class="btn btn-primary btn-lg px-5">
+				<button th:unless="${isView or isEdit}" type="submit"
+					class="btn btn-primary btn-lg px-5">
 					<i class="bi bi-save me-2"></i>登録する
 				</button>
 				<!-- 一覧に戻る（照会・編集） / 一覧に戻る（新規） -->
 				<a th:if="${isView or isEdit}" th:href="@{/admin/zeiritsu/list}"
-					class="btn btn-outline-secondary btn-lg px-4">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
-				<a th:unless="${isView or isEdit}" th:href="@{/admin/zeiritsu/list}"
-					class="btn btn-outline-secondary btn-lg px-4">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+					class="btn btn-outline-secondary btn-lg px-4"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a> <a th:unless="${isView or isEdit}"
+					th:href="@{/admin/zeiritsu/list}"
+					class="btn btn-outline-secondary btn-lg px-4"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>
 		</form>
+
+		<!-- 削除確認モーダル -->
+		<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header bg-danger text-white">
+						<h5 class="modal-title" id="deleteConfirmModalLabel">
+							<i class="bi bi-exclamation-triangle me-2"></i>削除確認
+						</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body text-center">
+						<p class="fs-5 mb-3">この賦課方式設定を削除しますか？</p>
+						<p class="text-muted mb-0">削除したデータは復旧できません。</p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x me-2"></i>キャンセル
+						</button>
+						<form th:if="${isEdit}" th:action="@{/admin/zeiritsu/delete/{seq}(seq=${seq})}" method="post" style="display: inline;">
+							<button type="submit" class="btn btn-danger">
+								<i class="bi bi-trash me-2"></i>削除する
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<th:block layout:fragment="scripts">
@@ -273,17 +391,27 @@
 			const isView = /*[[${isView}]]*/ false;
 
 			document.addEventListener('DOMContentLoaded', function () {
-				const display = document.querySelector('input[name="tekiyoStYmDisplay"]');
-				const hidden = document.getElementById('tekiyoStYmHidden');
+				const displaySt = document.querySelector('input[name="tekiyoStYmDisplay"]');
+				const hiddenSt = document.getElementById('tekiyoStYmHidden');
+				const displayEd = document.querySelector('input[name="tekiyoEdYmDisplay"]');
+				const hiddenEd = document.getElementById('tekiyoEdYmHidden');
 
 				// 既存値の復元（yyyyMM → yyyy-MM）
-				if (hidden && hidden.value && hidden.value.length === 6) {
-					display.value = hidden.value.substring(0, 4) + '-' + hidden.value.substring(4, 6);
+				if (hiddenSt && hiddenSt.value && hiddenSt.value.length === 6) {
+					displaySt.value = hiddenSt.value.substring(0, 4) + '-' + hiddenSt.value.substring(4, 6);
+				}
+				if (hiddenEd && hiddenEd.value && hiddenEd.value.length === 6) {
+					displayEd.value = hiddenEd.value.substring(0, 4) + '-' + hiddenEd.value.substring(4, 6);
 				}
 				// 入力変更時にhiddenへ反映（照会モードは不要）
-				if (display && !isView) {
-					display.addEventListener('change', function () {
-						hidden.value = display.value ? display.value.replace('-', '') : '';
+				if (displaySt && !isView) {
+					displaySt.addEventListener('change', function () {
+						hiddenSt.value = displaySt.value ? displaySt.value.replace('-', '') : '';
+					});
+				}
+				if (displayEd && !isView) {
+					displayEd.addEventListener('change', function () {
+						hiddenEd.value = displayEd.value ? displayEd.value.replace('-', '') : '';
 					});
 				}
 

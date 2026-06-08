@@ -114,7 +114,7 @@
 										th:text="${item.fukaKbnName}"></span>
 								</td>
 								<td th:text="${#strings.substring(item.tekiyoStYm,0,4) + '/' + #strings.substring(item.tekiyoStYm,4,6)}"></td>
-								<td th:text="${item.tekiyoEdYm == '999912'} ? '-' : ${#strings.substring(item.tekiyoEdYm,0,4) + '/' + #strings.substring(item.tekiyoEdYm,4,6)}"></td>
+								<td th:text="${item.tekiyoEdYm == null or item.tekiyoEdYm == ''} ? '-' : ${#strings.substring(item.tekiyoEdYm,0,4) + '/' + #strings.substring(item.tekiyoEdYm,4,6)}"></td>
 								<td th:text="${item.taishoKbnName}"></td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(items)}">

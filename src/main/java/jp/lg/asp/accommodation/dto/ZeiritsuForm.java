@@ -17,8 +17,11 @@ public class ZeiritsuForm {
 	private String fukaKbn;
 
 	@NotBlank
-	@Pattern(regexp = "\\d{6}", message = "適用時期はyyyyMM形式で入力してください")
+	@Pattern(regexp = "\\d{6}", message = "適用開始時期はyyyyMM形式で入力してください")
 	private String tekiyoStYm;
+
+	@Pattern(regexp = "^$|^\\d{6}$", message = "適用終了時期はyyyyMM形式で入力してください")
+	private String tekiyoEdYm;
 
 	@NotBlank
 	private String taishoKbn;
