@@ -234,7 +234,7 @@ public class FukaService {
 				String currentFukaKbn = appliedZeiritsu.getFukaKbn();
 				form.setFukaKbn(currentFukaKbn);
 
-				if ("2".equals(currentFukaKbn)) {
+				if (FukaConstants.TEIRITSU.getValue().equals(currentFukaKbn)) {
 					// --- 当月は「定率制」が適用される ---
 					log.info("対象年月 {} は【定率制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
 					teiritsuRates = zeiritsuTeiritsuRepository
@@ -243,7 +243,8 @@ public class FukaService {
 				} else {
 					// --- 当月は「定額制」が適用される ---
 					log.info("対象年月 {} は【定額制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
-					teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+					teigakuRates = zeiritsuTeigakuRepository
+							.findByJichitaiCdAndSeqAndDelFlgOrderByRyokinStAsc(jichitaiCd, appliedZeiritsu.getSeq(), "0");
 				}
 			} else {
 				log.error("対象年月 {} に適用される税率マスタが存在しません。(自治体コード: {})", targetYm, jichitaiCd);
