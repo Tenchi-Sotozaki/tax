@@ -23,11 +23,19 @@ public class TokugimuForm {
 	@NotNull(message = "登録日は必須です")
 	private LocalDate registrationDate;
 
+	@Size(max = 10)
+	@NotBlank(message = "郵便番号は必須です")
+	private String tokugimuAddressNo; // Atena.yubinNo（読取専用・宛名検索で自動入力）
+
 	@NotBlank(message = "住所は必須です")
 	private String tokugimuAddress; // Atena.jusho（読取専用・宛名検索で自動入力）
 
 	@NotBlank(message = "氏名または名称は必須です")
 	private String name; // Atena.name（読取専用・宛名検索で自動入力）
+
+	@NotBlank(message = "ふりがなは必須です")
+	@Size(max = 200)
+	private String nameKana; // Atena.nameKana（読取専用・宛名検索で自動入力）
 
 	private String personalNumber; // Atena.kojinNo（読取専用・宛名検索で自動入力）
 	private String corporateNumber; // Atena.hojinNo（読取専用・宛名検索で自動入力）

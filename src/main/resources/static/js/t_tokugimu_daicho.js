@@ -59,7 +59,7 @@ function requireSelected(msg) {
     nav('btnView',            '照会する特別徴収義務者を選択してください。',
                               '/accommodation-tax/tokugimu/view/{id}');
     nav('btnTaxManager',      '特別徴収義務者を選択してください。',
-                              '/accommodation-tax/tax-manager/edit/{id}');
+                              '/accommodation-tax/tax-manager/edit/{id}?from=register');
 	nav('btnTaxManagerView',  '特別徴収義務者を選択してください。',
 							  '/accommodation-tax/tax-manager/view/{id}');
     nav('btnPaymentLedger',   '事業者を選択してください。',

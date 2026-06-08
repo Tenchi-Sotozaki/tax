@@ -87,7 +87,19 @@
 						</div>
 						<div class="col-md-4"></div>
 
-						<div class="col-md-6">
+						<div class="col-md-4">
+							<label for="tokugimuAddressNo" class="form-label fw-medium">
+								郵便番号<span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
+							</label> <input type="text" class="form-control" id="tokugimuAddressNo"
+								th:field="*{tokugimuAddressNo}" th:errorclass="is-invalid"
+								placeholder="自動入力されます" readonly>
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('tokugimuAddressNo')}"
+								th:errors="*{tokugimuAddressNo}"></div>
+						</div>
+
+						<div class="col-md-8">
 							<label for="tokugimuAddress" class="form-label fw-medium">
 								住所 <span th:if="!${isView}"
 								class="badge bg-danger text-white ms-1">必須</span>
@@ -107,6 +119,17 @@
 								placeholder="自動入力されます" readonly>
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+						</div>
+
+						<div class="col-md-6">
+							<label for="nameKana" class="form-label fw-medium">
+								氏名(ふりがな) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
+							</label> <input type="text" class="form-control" id="nameKana"
+								th:field="*{nameKana}" th:errorclass="is-invalid"
+								placeholder="自動入力されます" readonly>
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('nameKana')}" th:errors="*{nameKana}"></div>
 						</div>
 
 						<div class="col-md-6">
@@ -141,9 +164,17 @@
 			<div id="facility-info" class="card mb-4 shadow-sm"
 				style="scroll-margin-top: 120px;">
 				<div class="card-header bg-primary text-white py-3">
-					<h5 class="mb-0">
-						<i class="bi bi-building me-2"></i>宿泊施設情報
-					</h5>
+					<div class="d-flex justify-content-between align-items-center">
+						<h5 class="mb-0">
+							<i class="bi bi-building me-2"></i>宿泊施設情報
+						</h5>
+						<div class="form-check" th:if="!${isView}">
+							<input class="form-check-input" type="checkbox"
+								id="copyToFacility"> <label
+								class="form-check-label text-white" for="copyToFacility">
+								徴収義務者情報と同じ </label>
+						</div>
+					</div>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
@@ -210,19 +241,25 @@
 
 						<div class="col-md-4">
 							<label for="aboveGroundFloor" class="form-label fw-medium">
-								階層（地上） </label> <input type="text" class="form-control" id="floors"
-								th:field="*{aboveGroundFloor}" th:errorclass="is-invalid"
-								placeholder="施設の地上階数を入力する" th:readonly="${isView}">
+								階層（地上） </label>
+							<div class="input-group">
+								<input type="number" class="form-control" id="floors"
+									th:field="*{aboveGroundFloor}" th:errorclass="is-invalid"
+									placeholder="施設の地上階数を入力する" th:readonly="${isView}"><span
+									class="input-group-text">階</span>
+							</div>
 
 						</div>
 
 						<div class="col-md-4">
 							<label for="basementFloor" class="form-label fw-medium">
-								階層（地下） </label> <input type="text" class="form-control"
-								id="basementFloor" th:field="*{basementFloor}"
-								th:errorclass="is-invalid" placeholder="施設の地下階数を入力する"
-								th:readonly="${isView}">
-
+								階層（地下） </label>
+							<div class="input-group">
+								<input type="text" class="form-control" id="basementFloor"
+									th:field="*{basementFloor}" th:errorclass="is-invalid"
+									placeholder="施設の地下階数を入力する" th:readonly="${isView}"><span
+									class="input-group-text">階</span>
+							</div>
 						</div>
 
 						<div class="col-md-4">
@@ -272,9 +309,17 @@
 			<div id="license-info" class="card mb-4 shadow-sm"
 				style="scroll-margin-top: 120px;">
 				<div class="card-header bg-primary text-white py-3">
-					<h5 class="mb-0">
-						<i class="bi bi-file-earmark-check me-2"></i>営業許可等情報
-					</h5>
+					<div class="d-flex justify-content-between align-items-center">
+						<h5 class="mb-0">
+							<i class="bi bi-file-earmark-check me-2"></i>営業許可等情報
+						</h5>
+						<div class="form-check" th:if="!${isView}">
+							<input class="form-check-input" type="checkbox"
+								id="copyToLicense"> <label
+								class="form-check-label text-white" for="copyToLicense">
+								徴収義務者情報と同じ </label>
+						</div>
+					</div>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
@@ -356,9 +401,16 @@
 			<div id="owner-info" class="card mb-4 shadow-sm"
 				style="scroll-margin-top: 120px;">
 				<div class="card-header bg-primary text-white py-3">
-					<h5 class="mb-0">
-						<i class="bi bi-person-check me-2"></i>施設所有者情報
-					</h5>
+					<div class="d-flex justify-content-between align-items-center">
+						<h5 class="mb-0">
+							<i class="bi bi-person-check me-2"></i>施設所有者情報
+						</h5>
+						<div class="form-check" th:if="!${isView}">
+							<input class="form-check-input" type="checkbox" id="copyToOwner">
+							<label class="form-check-label text-white" for="copyToOwner">
+								徴収義務者情報と同じ </label>
+						</div>
+					</div>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
@@ -418,9 +470,16 @@
 			<div id="mail-info" class="card mb-4 shadow-sm"
 				style="scroll-margin-top: 120px;">
 				<div class="card-header bg-primary text-white py-3">
-					<h5 class="mb-0">
-						<i class="bi bi-envelope me-2"></i>書類送付先情報
-					</h5>
+					<div class="d-flex justify-content-between align-items-center">
+						<h5 class="mb-0">
+							<i class="bi bi-envelope me-2"></i>書類送付先情報
+						</h5>
+						<div class="form-check" th:if="!${isView}">
+							<input class="form-check-input" type="checkbox" id="copyToMail">
+							<label class="form-check-label text-white" for="copyToMail">
+								徴収義務者情報と同じ </label>
+						</div>
+					</div>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
