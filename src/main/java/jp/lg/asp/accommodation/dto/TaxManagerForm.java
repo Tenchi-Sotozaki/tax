@@ -30,6 +30,10 @@ public class TaxManagerForm {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate registrationDate;
 
+	@NotNull(message = "申告日は必須です")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate declarationDate;
+
 	private String atenaNo;
 	private String managerYubinNo;
 	private String managerAddress;

@@ -28,7 +28,6 @@ public class TaxManagerService {
 	private String jichitaiCd;
 
 	// ========== 規約に基づく定数定義 ==========
-	private static final int DEFAULT_RNO = 1;
 	private static final String FLG_ON = "1";
 	private static final String FLG_OFF = "0";
 	// ==========================================
@@ -60,6 +59,7 @@ public class TaxManagerService {
 		form.setCollectorId(null);
 		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(LocalDate.now());
+		form.setDeclarationDate(LocalDate.now()); // 申告日のデフォルト値
 
 		try {
 			// 1. 特別徴収義務者の取得
@@ -72,11 +72,11 @@ public class TaxManagerService {
 						form.setObligorAtenaNo(tokugimu.getAtenaNo().toString()); // 特徴の宛名番号を設定
 					});
 
-			// 2. 納税管理人の取得 (定数 DEFAULT_RNO を使用)
-			TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, DEFAULT_RNO);
-			taxManagerRepository.findById(nokanId).ifPresent(nokan -> {
+			// 2. 最新の納税管理人情報を取得（newFlg = '1'）
+			taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).ifPresent(nokan -> {
 				form.setEdit(true);
 				form.setRegistrationDate(nokan.getTorokuYmd());
+				form.setDeclarationDate(nokan.getShinkokuYmd());
 				form.setAtenaNo(nokan.getAtenaNo());
 				form.setManagerName(nokan.getName());
 				form.setManagerNameKana(nokan.getNameKana());
@@ -96,7 +96,7 @@ public class TaxManagerService {
 	}
 
 	/**
-	 * 指定番号（shiteiNo）ベースでの保存処理
+	 * 指定番号（shiteiNo）ベースでの保存処理（履歴管理方式）
 	 */
 	@Transactional
 	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) {
@@ -114,31 +114,66 @@ public class TaxManagerService {
 			throw new IllegalArgumentException("宛名番号は必須です。");
 		}
 
-		// 1. 既存データを取得
-		TaxManagerId nokanId = new TaxManagerId(jichitaiCd, shiteiNo, DEFAULT_RNO);
-		TaxManager entity = taxManagerRepository.findById(nokanId)
-				.orElse(new TaxManager());
-
-		// 2.値をマッピング
-		entity.setJichitaiCd(jichitaiCd);
-		entity.setShiteiNo(shiteiNo);
-		entity.setRno(DEFAULT_RNO); 
+		// 1. 新しい履歴番号を算出
+		Integer maxRno = taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		Integer newRno = maxRno + 1;
 		
-		entity.setMenjoKbn(form.isExemptionFlag() ? FLG_ON : FLG_OFF);
-		entity.setTorokuYmd(form.getRegistrationDate());
-		entity.setShinkokuYmd(form.getRegistrationDate());
+		// 2. 既存の最新フラグを0に更新（更新時のみ）
+		if (maxRno > 0) {
+			taxManagerRepository.updateNewFlgToZero(jichitaiCd, shiteiNo);
+			log.info("既存レコードの最新フラグを0に更新: shiteiNo={}", shiteiNo);
+		}
 
-		entity.setAtenaNo(form.getAtenaNo());
-		entity.setName(form.getManagerName());
-		entity.setNameKana(form.getManagerNameKana());
-		entity.setYubinNo(form.getManagerYubinNo());
-		entity.setJusho(form.getManagerAddress());
-		entity.setTel(form.getManagerPhone());
-		entity.setMenjoRiyu(form.getExemptionReason());
+		// 3. 新しいレコードを作成（必ずインサート）
+		TaxManager newEntity = new TaxManager();
+		newEntity.setJichitaiCd(jichitaiCd);
+		newEntity.setShiteiNo(shiteiNo);
+		newEntity.setRno(newRno);
+		
+		newEntity.setMenjoKbn(form.isExemptionFlag() ? FLG_ON : FLG_OFF);
+		newEntity.setTorokuYmd(form.getRegistrationDate());
+		newEntity.setShinkokuYmd(form.getDeclarationDate()); // フォームからの申告日を使用
 
-		entity.setNewFlg(FLG_ON);
-		entity.setDelFlg(FLG_OFF);
+		newEntity.setAtenaNo(form.getAtenaNo());
+		newEntity.setName(form.getManagerName());
+		newEntity.setNameKana(form.getManagerNameKana());
+		newEntity.setYubinNo(form.getManagerYubinNo());
+		newEntity.setJusho(form.getManagerAddress());
+		newEntity.setTel(form.getManagerPhone());
+		newEntity.setMenjoRiyu(form.getExemptionReason());
 
-		taxManagerRepository.save(entity);
+		newEntity.setNewFlg(FLG_ON); // 新しいレコードは必ず最新
+		newEntity.setDelFlg(FLG_OFF);
+
+		taxManagerRepository.save(newEntity);
+		log.info("納税管理人履歴保存完了: shiteiNo={}, rno={}, 種別={}", 
+				shiteiNo, newRno, maxRno > 0 ? "更新" : "新規登録");
+	}
+
+	/**
+	 * 納税管理人の削除処理（履歴管理方式）
+	 */
+	@Transactional
+	public void deleteByShiteiNo(String shiteiNo) {
+		log.info("納税管理人削除処理開始: shiteiNo={}", shiteiNo);
+		
+		// 1. 最新の納税管理人情報を取得
+		TaxManager currentRecord = taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.orElseThrow(() -> new IllegalArgumentException("削除対象の納税管理人が見つかりません: " + shiteiNo));
+		
+		Integer currentRno = currentRecord.getRno();
+		
+		// 2. 現在のレコードの削除フラグを1に更新
+		taxManagerRepository.updateDelFlgToOne(jichitaiCd, shiteiNo, currentRno);
+		log.info("現在レコードの削除フラグを更新: shiteiNo={}, rno={}", shiteiNo, currentRno);
+		
+		// 3. 履歴番号-1のレコードが存在する場合、最新フラグを1に変更
+		if (currentRno > 1) {
+			Integer previousRno = currentRno - 1;
+			taxManagerRepository.updateNewFlgToOneByRno(jichitaiCd, shiteiNo, previousRno);
+			log.info("前履歴レコードの最新フラグを更新: shiteiNo={}, rno={}", shiteiNo, previousRno);
+		}
+		
+		log.info("納税管理人削除完了: shiteiNo={}", shiteiNo);
 	}
 }

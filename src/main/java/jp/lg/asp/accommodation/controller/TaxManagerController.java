@@ -134,4 +134,22 @@ public class TaxManagerController {
 			return FORM_VIEW;
 		}
 	}
+
+	@PostMapping("/delete/{id}")
+	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
+
+		log.info("納税管理人削除処理: shiteiNo={}", id);
+
+		try {
+			taxManagerService.deleteByShiteiNo(id);
+			log.info("納税管理人を削除しました。shiteiNo: {}", id);
+			redirectAttributes.addFlashAttribute("successMessage", "納税管理人を削除しました。");
+			return "redirect:/tokugimu/list";
+		} catch (IllegalArgumentException e) {
+			log.warn("納税管理人削除エラー: {}", e.getMessage());
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+			return "redirect:/tax-manager/edit/" + id;
+		}
+	}
 }
