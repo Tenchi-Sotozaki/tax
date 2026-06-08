@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import jp.lg.asp.accommodation.constant.FukaConstants;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDaichoListItem;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
@@ -39,7 +40,6 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
-import jp.lg.asp.accommodation.constant.FukaConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -256,7 +256,7 @@ public class FukaService {
 
 			FukaMonthlyTallyDto tallyDto = new FukaMonthlyTallyDto();
 			// 💡 カラム数を動的に確保（定額・定率で取得できた方のサイズを使う）
-			int categorySize = "2".equals(form.getFukaKbn()) ? teiritsuRates.size() : teigakuRates.size();
+			int categorySize = FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn()) ? teiritsuRates.size() : teigakuRates.size();
 			tallyDto.initialize(categorySize);
 			form.setMonthlyTally(tallyDto);
 
@@ -356,7 +356,7 @@ public class FukaService {
 					// =========================================================
 					// 💡 【追加】定率制（料金ベース）専用項目の復元（順マッピング）
 					// =========================================================
-					if ("2".equals(latestFuka.getFukaKbn())) {
+					if (FukaConstants.TEIRITSU.getValue().equals(latestFuka.getFukaKbn())) {
 						// 念のためフォーム側にも fukaKbn を明示的にセットして状態を安定させる
 						form.setFukaKbn(latestFuka.getFukaKbn());
 						form.setKazeiRyokin(latestFuka.getKazeiRyokin());
@@ -396,7 +396,7 @@ public class FukaService {
 
 			log.info("[syncUchiDataToForm] i={}, matched={}, fukaKbn={}, hakusu={}, ryokin={}, zeigaku={}", i, (matched != null), (matched != null ? matched.getFukaKbn() : null), (matched != null ? matched.getHakusu() : null), (matched != null ? matched.getRyokin() : null), (matched != null ? matched.getZeigaku() : null));
 				if (matched != null) {
-				if ("2".equals(matched.getFukaKbn())) {
+				if (FukaConstants.TEIRITSU.getValue().equals(matched.getFukaKbn())) {
 					// 定率制: hakusu=宿泊数, ryokin=課税対象宿泊料金
 					formDetail.setStayCount(matched.getHakusu());
 					formDetail.setKazeiRyokin(matched.getRyokin() != null ? matched.getRyokin().intValue() : null);
@@ -438,7 +438,7 @@ public class FukaService {
 					form.setModificationCategory(entity.getHenkoKbn());
 					form.setModificationReason(entity.getHenkoRiyu());
 
-					if ("2".equals(entity.getFukaKbn())) {
+					if (FukaConstants.TEIRITSU.getValue().equals(entity.getFukaKbn())) {
 						form.setKazeiRyokin(entity.getKazeiRyokin());
 						form.setTeiritsuZeigaku(entity.getZeigaku());
 						form.setMenjoRyokin(entity.getMenjoRyokin());
@@ -635,25 +635,26 @@ public class FukaService {
 			if (FukaConstants.TEIGAKU.equals(kbn)) {
 				// 定額制: 都道府県税額をマスタから取得し、市区町村税額を差引きで算出
 				long hakusu = detail.getStayCount() != null ? detail.getStayCount() : 0L;
-				long kenZeigaku = 0L;
+			    long kenZeigaku = 0L;
 
 				// 都道府県用マスタ(taishoKbn="1")から税額単価を取得
-				Long ryokinForLookup = (detail.getKazeiRyokin() != null) ? detail.getKazeiRyokin().longValue() : 0L;
-				Optional<ZeiritsuTeigaku> kenMasterOpt = zeiritsuTeigakuRepository
-						.findActiveByTaishoKbnAndTekiyoYmAndRyokin(
-								currentJichitaiCd, "1", parentFuka.getTaishoYm(), ryokinForLookup);
+			    Long ryokinForLookup = detail.getKazeiRyokin() != null ? detail.getKazeiRyokin().longValue() : 0L;
+			    
+			    Optional<ZeiritsuTeigaku> kenMasterOpt = zeiritsuTeigakuRepository
+			            .findActiveByTaishoKbnAndTekiyoYmAndRyokin(
+			                    currentJichitaiCd, "1", parentFuka.getTaishoYm(), ryokinForLookup);
 
-				if (kenMasterOpt.isPresent()) {
-					long kenTanka = kenMasterOpt.get().getZeigaku() != null ? kenMasterOpt.get().getZeigaku() : 0L;
-					kenZeigaku = kenTanka * hakusu;
-				}
+			    if (kenMasterOpt.isPresent()) {
+			        long kenTanka = kenMasterOpt.get().getZeigaku() != null ? kenMasterOpt.get().getZeigaku() : 0L;
+			        kenZeigaku = kenTanka * hakusu;
+			    }
 
-				long cityZeigaku = totalAmount - kenZeigaku;
-				uchi.setZeigaku(totalAmount);
-				uchi.setKenZeigaku(kenZeigaku);
-				uchi.setCityZeigaku(cityZeigaku >= 0 ? cityZeigaku : 0L);
+			    long cityZeigaku = totalAmount - kenZeigaku;          // 差引き
+			    uchi.setZeigaku(totalAmount);
+			    uchi.setKenZeigaku(kenZeigaku);
+			    uchi.setCityZeigaku(cityZeigaku >= 0 ? cityZeigaku : 0L);
 			} else {
-				// 定率制: 全額市区町村税額（現行仕様）
+				// 定率制: 全額市区町村税額
 				uchi.setZeigaku(totalAmount);
 				uchi.setCityZeigaku(totalAmount);
 				uchi.setKenZeigaku(0L);
@@ -697,7 +698,7 @@ public class FukaService {
 		parentFuka.setKibetsu(kibetsu);
 		parentFuka.setTorokuYmd(form.getRegistrationDate() != null ? form.getRegistrationDate() : LocalDate.now());
 		parentFuka.setShinkokuYmd(LocalDate.now());
-		parentFuka.setFukaKbn(StringUtils.hasText(form.getFukaKbn()) ? form.getFukaKbn() : "1");
+		parentFuka.setFukaKbn(StringUtils.hasText(form.getFukaKbn()) ? form.getFukaKbn() : FukaConstants.TEIGAKU.getValue());
 		parentFuka.setHenkoKbn(mapModificationCategory(form.getModificationCategory()));
 		parentFuka.setHenkoRiyu(form.getModificationReason());
 		parentFuka.setNewFlg(DEFAULT_NEW_FLG);
@@ -711,7 +712,7 @@ public class FukaService {
 		parentFuka.setKenZeigaku(0L);
 
 		// 定率制（fukaKbn == '2'）の場合にフォームの定率制フィールドをエンティティにマッピングする
-		if ("2".equals(form.getFukaKbn())) {
+		if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 			// kazeiRyokin: form直下またはmonthlyDetailのどちらから取得（null安全）
 			Long kazeiRyokinValue = form.getKazeiRyokin();
 			if (kazeiRyokinValue == null) {
@@ -755,14 +756,14 @@ public class FukaService {
 		// =========================================================
 		// 💡 修正箇所：定率制と定額制で復元（Hydration）のロジックを分ける
 		// =========================================================
-		if ("2".equals(form.getFukaKbn())) {
+		if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 			// --- 定率制のラベル＆税率復元 ---
 			String ym = form.getMonthlyDetail().getPaymentYearMonth();
 			int targetYmInt = parseYmToInt(ym);
 			
 			// 対象年月から適用される税率マスタを再特定
 			zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd).stream()
-				.filter(z -> "2".equals(z.getFukaKbn()))
+				.filter(z -> FukaConstants.TEIRITSU.getValue().equals(z.getFukaKbn()))
 				.filter(z -> {
 					int st = parseYmToInt(z.getTekiyoStYm());
 					int ed = parseYmToInt(z.getTekiyoEdYm());
@@ -907,7 +908,7 @@ public class FukaService {
 
 		// 【第2段階】 子マスタを取得して画面DTOに展開
 		if (appliedZeiritsu != null) {
-			if ("2".equals(appliedZeiritsu.getFukaKbn())) {
+			if (FukaConstants.TEIRITSU.getValue().equals(appliedZeiritsu.getFukaKbn())) {
 				// --- 定率制の復元 ---
 				List<ZeiritsuTeiritsu> masterRates = zeiritsuTeiritsuRepository
 						.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, appliedZeiritsu.getSeq(), "0");
@@ -939,7 +940,7 @@ public class FukaService {
 		}
 
 		// 【フォールバック】appliedZeiritsu==null かつ定額制: m_zeiritsu_teigakuから直接構築
-		if (monthDto.getTaxDetails().isEmpty() && "1".equals(entity.getFukaKbn())) {
+		if (monthDto.getTaxDetails().isEmpty() && FukaConstants.TEIGAKU.getValue().equals(entity.getFukaKbn())) {
 			log.warn("[hydrateMonthlyDetail] appliedZeiritsu is null for teigaku. Using direct teigaku master query.");
 			List<ZeiritsuTeigaku> fallbackRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
 			for (ZeiritsuTeigaku m : fallbackRates) {
@@ -975,8 +976,7 @@ public class FukaService {
 		form.setAdditionalAmount(entity.getKasanGaku());
 		form.setAdditionalDueDate(entity.getNokigen());
 
-		// 定率制（fukaKbn == '2'）の場合にエンティティからフォームへ復元（DB → フォーム）
-		if ("2".equals(entity.getFukaKbn())) {
+		if (FukaConstants.TEIRITSU.getValue().equals(entity.getFukaKbn())) {
 			form.setKazeiRyokin(entity.getKazeiRyokin());
 			form.setTeiritsuZeigaku(entity.getZeigaku());
 			form.setMenjoRyokin(entity.getMenjoRyokin());
