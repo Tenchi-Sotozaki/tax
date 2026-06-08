@@ -38,6 +38,10 @@ dependencies {
     implementation('net.sf.jasperreports:jasperreports-fonts:7.0.6') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
+    implementation('net.sf.jasperreports:jasperreports-jdt:7.0.6') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    implementation 'org.eclipse.jdt:ecj:3.38.0'
 
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'
