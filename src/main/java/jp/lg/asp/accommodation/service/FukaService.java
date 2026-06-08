@@ -246,23 +246,9 @@ public class FukaService {
 					teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
 				}
 			} else {
-				// 【フォールバック】適用期間に合致するマスタがない場合、有効マスタの先頭のfukaKbnを採用する
-				if (!allZeiritsu.isEmpty()) {
-					Zeiritsu fallback = allZeiritsu.get(0);
-					String fallbackKbn = fallback.getFukaKbn();
-					log.warn("対象年月 {} に適用される税率マスタが見つかりません。有効マスタ(seq={}, fukaKbn={})を採用します", targetYm, fallback.getSeq(), fallbackKbn);
-					form.setFukaKbn(fallbackKbn);
-					if ("2".equals(fallbackKbn)) {
-						teiritsuRates = zeiritsuTeiritsuRepository
-								.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, fallback.getSeq(), "0");
-					} else {
-						teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
-					}
-				} else {
-					log.error("有効な税率マスタが1件も存在しません。デフォルト定額制で初期化します");
-					form.setFukaKbn("1");
-					teigakuRates = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
-				}
+				log.error("対象年月 {} に適用される税率マスタが存在しません。(自治体コード: {})", targetYm, jichitaiCd);
+				throw new jp.lg.asp.accommodation.exception.BusinessException("ERR_ZEIRITSU_NOT_FOUND",
+						"対象年月（" + targetYm + "）に適用される税率マスタが登録されていません。システム管理者にお問い合わせください。");
 			}
 
 			// 2. 読み込んだマスタを使って初期化
@@ -534,6 +520,19 @@ public class FukaService {
 
 		List<FukaUchi> uchiList = createFukaUchiList(form, parentFuka, currentJichitaiCd);
 
+		// 子リストの税額合計を親エンティティにセット
+		if (!uchiList.isEmpty()) {
+			long cityZeigakuSum = uchiList.stream()
+					.mapToLong(u -> u.getCityZeigaku() != null ? u.getCityZeigaku() : 0L)
+					.sum();
+			long kenZeigakuSum = uchiList.stream()
+					.mapToLong(u -> u.getKenZeigaku() != null ? u.getKenZeigaku() : 0L)
+					.sum();
+			parentFuka.setCityZeigaku(cityZeigakuSum);
+			parentFuka.setKenZeigaku(kenZeigakuSum);
+			parentFuka.setTotalZeigaku(cityZeigakuSum + kenZeigakuSum);
+		}
+
 		setAuditFields(parentFuka);
 		if (!uchiList.isEmpty()) {
 			uchiList.forEach(this::setAuditFields);
@@ -630,11 +629,35 @@ public class FukaService {
 				uchi.setHakusu(detail.getStayCount() != null ? detail.getStayCount() : 0L);
 			}
 
-			long amount = (detail.getTaxAmount() != null) ? detail.getTaxAmount() : 0L;
-			uchi.setZeigaku(amount);
-			uchi.setCityZeigaku(amount);
-			uchi.setKenZeigaku(0L);
+			long totalAmount = (detail.getTaxAmount() != null) ? detail.getTaxAmount() : 0L;
 			uchi.setZeiRitsu(detail.getTaxRate() != null ? detail.getTaxRate() : BigDecimal.ZERO);
+
+			if (FukaConstants.TEIGAKU.equals(kbn)) {
+				// 定額制: 都道府県税額をマスタから取得し、市区町村税額を差引きで算出
+				long hakusu = detail.getStayCount() != null ? detail.getStayCount() : 0L;
+				long kenZeigaku = 0L;
+
+				// 都道府県用マスタ(taishoKbn="1")から税額単価を取得
+				Long ryokinForLookup = (detail.getKazeiRyokin() != null) ? detail.getKazeiRyokin().longValue() : 0L;
+				Optional<ZeiritsuTeigaku> kenMasterOpt = zeiritsuTeigakuRepository
+						.findActiveByTaishoKbnAndTekiyoYmAndRyokin(
+								currentJichitaiCd, "1", parentFuka.getTaishoYm(), ryokinForLookup);
+
+				if (kenMasterOpt.isPresent()) {
+					long kenTanka = kenMasterOpt.get().getZeigaku() != null ? kenMasterOpt.get().getZeigaku() : 0L;
+					kenZeigaku = kenTanka * hakusu;
+				}
+
+				long cityZeigaku = totalAmount - kenZeigaku;
+				uchi.setZeigaku(totalAmount);
+				uchi.setKenZeigaku(kenZeigaku);
+				uchi.setCityZeigaku(cityZeigaku >= 0 ? cityZeigaku : 0L);
+			} else {
+				// 定率制: 全額市区町村税額（現行仕様）
+				uchi.setZeigaku(totalAmount);
+				uchi.setCityZeigaku(totalAmount);
+				uchi.setKenZeigaku(0L);
+			}
 
 			setAuditFields(uchi);
 			uchiList.add(uchi);
