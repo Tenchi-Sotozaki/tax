@@ -84,6 +84,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 納入申告書の提出期限等の特例適用者指定取消通知書ボタンのクリックイベント
+    const btnTokureiTorikeshi = document.getElementById('btnReportTokureiTorikeshi');
+    if (btnTokureiTorikeshi) {
+        btnTokureiTorikeshi.addEventListener('click', function() {
+            if (shiteiNo) {
+                const url = '/accommodation-tax/reports/tokureiShiteiCancel?shiteiNo=' + encodeURIComponent(shiteiNo);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
+
     // 宿泊税還付・納入義務の免除決定通知書ボタンのクリックイベント
     const btnKanpu = document.getElementById('btnReportKanpu');
     if (btnKanpu) {

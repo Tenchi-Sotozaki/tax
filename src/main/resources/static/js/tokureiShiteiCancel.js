@@ -1,5 +1,5 @@
 /**
- * 納入申告書の提出期限等の特例適用者指定通知書 JavaScript
+ * 納入申告書の提出期限等の特例適用者指定取消通知書 JavaScript
  */
 
 /**
@@ -11,7 +11,7 @@ function generatePdf() {
     }
 
     const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/reports/tokureiShitei/pdf';
+    form.action = '/accommodation-tax/reports/tokureiShiteiCancel/pdf';
     form.target = '_self';
     form.submit();
 }
@@ -27,7 +27,7 @@ function preview() {
     const form = document.getElementById('tsuchiForm');
     const formData = new URLSearchParams(new FormData(form));
 
-    fetch('/accommodation-tax/reports/tokureiShitei/preview', {
+    fetch('/accommodation-tax/reports/tokureiShiteiCancel/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData
@@ -60,7 +60,7 @@ function print() {
     const form = document.getElementById('tsuchiForm');
     const formData = new URLSearchParams(new FormData(form));
 
-    fetch('/accommodation-tax/reports/tokureiShitei/print', {
+    fetch('/accommodation-tax/reports/tokureiShiteiCancel/print', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData
@@ -97,7 +97,6 @@ function print() {
 function validateForm() {
     const hakkoYmd = document.getElementById('hakkoYmd').value;
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
-    const shonin = document.querySelector('input[name="shonin"]:checked');
     const riyu = document.getElementById('riyu').value;
 
     if (!hakkoYmd) {
@@ -112,13 +111,8 @@ function validateForm() {
         return false;
     }
 
-    if (!shonin) {
-        alert('承認を選択してください。');
-        return false;
-    }
-
     if (!riyu.trim()) {
-        alert('不承認理由を入力してください。');
+        alert('取消理由を入力してください。');
         document.getElementById('riyu').focus();
         return false;
     }

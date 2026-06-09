@@ -51,6 +51,7 @@ public class GassanController {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
 		if (bindingResult.hasErrors()) {
+			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
 			return FORM_VIEW;
@@ -59,6 +60,7 @@ public class GassanController {
 			gassanService.register(form);
 		} catch (Exception e) {
 			log.error("合算申告登録エラー", e);
+			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
 			model.addAttribute("errorMessage", e.getMessage());
@@ -115,6 +117,7 @@ public class GassanController {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
 		if (bindingResult.hasErrors()) {
+			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("editId", id);
@@ -124,6 +127,7 @@ public class GassanController {
 			gassanService.updateByGassanShiteiNo(id, form);
 		} catch (Exception e) {
 			log.error("合算申告更新エラー", e);
+			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("editId", id);

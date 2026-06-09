@@ -58,6 +58,7 @@ public class AddressSearchApiController {
                 a.getAtenaNo().toPlainString(),
                 a.getName(),
                 a.getNameKana(),
+                a.getYubinNo(),
                 a.getJusho(),
                 a.getTel1(),
                 a.getKojinNo(),

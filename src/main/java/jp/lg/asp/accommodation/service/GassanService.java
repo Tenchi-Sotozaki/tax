@@ -6,6 +6,9 @@ import jp.lg.asp.accommodation.dto.GassanForm;
 
 public interface GassanService {
 
+    /** フォームに施設一覧を再セットする */
+    void reloadFacilityList(GassanForm form);
+
     /** 合算指定番号で1件取得してフォームに変換する */
     GassanForm getByGassanShiteiNo(String gassanShiteiNo);
 
