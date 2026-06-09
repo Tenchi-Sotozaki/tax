@@ -177,7 +177,9 @@ public class ZeiritsuController {
 				d.setJichitaiCd(jichitaiCd);
 				d.setSeq(seqDec);
 				d.setTeiritsuSeq(BigDecimal.valueOf(detailSeq));
-				d.setZeiRitsu(new BigDecimal(detail.getZeiValue()));
+				// パーセント表記をそのまま使用（200 → 200.0）
+				BigDecimal zeiRitsu = new BigDecimal(detail.getZeiValue());
+				d.setZeiRitsu(zeiRitsu);
 				d.setKbnName(detail.getKbnName());
 				d.setDelFlg("0");
 				zeiritsuTeiritsuRepository.save(d);
@@ -306,7 +308,9 @@ public class ZeiritsuController {
 				d.setJichitaiCd(jichitaiCd);
 				d.setSeq(nextSeq);
 				d.setTeiritsuSeq(BigDecimal.valueOf(detailSeq));
-				d.setZeiRitsu(new BigDecimal(detail.getZeiValue()));
+				// パーセント表記をそのまま使用（200 → 200.0）
+				BigDecimal zeiRitsu = new BigDecimal(detail.getZeiValue());
+				d.setZeiRitsu(zeiRitsu);
 				d.setKbnName(detail.getKbnName());
 				d.setDelFlg("0");
 				zeiritsuTeiritsuRepository.save(d);
@@ -343,6 +347,17 @@ public class ZeiritsuController {
 				}
 			}
 			if (hasZei && !isTeigaku) {
+				// 定率の場合の税率範囲チェック
+				try {
+					BigDecimal zeiValue = new BigDecimal(d.getZeiValue());
+					if (zeiValue.compareTo(new BigDecimal("0.00")) < 0 || zeiValue.compareTo(new BigDecimal("999.99")) > 0) {
+						bindingResult.rejectValue("details[" + i + "].zeiValue", "Range",
+								"税率は0.00%～999.99%の範囲で入力してください");
+					}
+				} catch (NumberFormatException e) {
+					bindingResult.rejectValue("details[" + i + "].zeiValue", "Invalid",
+							"税率は数値で入力してください");
+				}
 				boolean kbnBlank = d.getKbnName() == null || d.getKbnName().isBlank();
 				if (kbnBlank) {
 					bindingResult.rejectValue("details[" + i + "].kbnName", "NotBlank",
@@ -511,6 +526,7 @@ public class ZeiritsuController {
 			for (int i = 0; i < details.size() && i < 5; i++) {
 				ZeiritsuTeiritsu d = details.get(i);
 				ZeiritsuDetailForm df = form.getDetails().get(i);
+				// データベース値をそのまま表示（200.0 → 200.0）
 				df.setZeiValue(d.getZeiRitsu() != null ? d.getZeiRitsu().toPlainString() : null);
 				df.setKbnName(d.getKbnName());
 			}
