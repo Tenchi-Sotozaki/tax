@@ -59,7 +59,7 @@ public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
         + " AND (:yubinNo  IS NULL OR a.yubin_no  LIKE CONCAT('%', :yubinNo, '%'))"
         + " AND (:jusho    IS NULL OR a.jusho     LIKE CONCAT('%', :jusho, '%'))"
         + " AND (:tel      IS NULL OR a.tel1      LIKE CONCAT('%', :tel, '%') OR a.tel2 LIKE CONCAT('%', :tel, '%'))"
-        + " AND (:kojinNo  IS NULL OR a.kojin_no  LIKE CONCAT('%', :kojinNo, '%'))"
+        + " AND (:kojinNo  IS NULL OR a.kojin_no  = :kojinNo)"
         + " AND (:hojinNo  IS NULL OR a.hojin_no  LIKE CONCAT('%', :hojinNo, '%'))",
         nativeQuery = true)
     List<Atena> search(
