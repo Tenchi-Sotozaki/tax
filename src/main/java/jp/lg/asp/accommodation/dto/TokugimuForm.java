@@ -153,4 +153,11 @@ public class TokugimuForm {
 	private String suspensionOrAbolitionReason; // Tokugimu.kyuhaishiRiyu
 
 	private String shiteiNo;
+
+	// 納入書用の特別徴収義務者郵便番号を取得
+	public String getTokugimuYubinNo() {
+		// 送付先郵便番号が優先、なければ特別徴収義務者郵便番号
+		return mailAddressNo != null && !mailAddressNo.isBlank() 
+			? mailAddressNo : tokugimuAddressNo;
+	}
 }

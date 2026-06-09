@@ -75,6 +75,8 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
         String tokuJusho = dto.getTokuJusho() != null ? dto.getTokuJusho().trim() : "";
         String tokuYubinNo = dto.getTokuYubinNo() != null ? dto.getTokuYubinNo().trim() : "";
         
+        log.info("郵便番号連結前: 郵便番号=[{}], 住所=[{}]", tokuYubinNo, tokuJusho);
+        
         // 郵便番号がある場合は住所の先頭に付加
         if (!tokuYubinNo.isEmpty()) {
             // 郵便番号のフォーマットを確認し、必要に応じてハイフンを追加
@@ -83,6 +85,9 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
             }
             // 郵便番号を先頭に追加（住所が空でも郵便番号は表示）
             tokuJusho = "〒" + tokuYubinNo + (tokuJusho.isEmpty() ? "" : " " + tokuJusho);
+            log.info("郵便番号連結後: [{}]", tokuJusho);
+        } else {
+            log.info("郵便番号が空のため連結処理をスキップしました");
         }
         reportsDto.setTokuJusho(tokuJusho);
         

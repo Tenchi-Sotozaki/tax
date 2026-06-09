@@ -262,6 +262,7 @@ function collectFormData() {
         nokigen: '2024-12-31', // サンプル値
         tokuName: document.getElementById('tokuName')?.value || '',
         tokuJusho: document.getElementById('tokuJusho')?.value || '',
+        tokuYubinNo: document.getElementById('tokuYubinNo')?.value || '',
         // サンプルデータ
         cityName: "占冠村",
         jichitaiCd: "01461",
