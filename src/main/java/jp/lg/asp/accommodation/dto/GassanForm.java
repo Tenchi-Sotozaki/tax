@@ -36,7 +36,7 @@ public class GassanForm {
     private List<GassanListItem> gassanList = new ArrayList<>();
 
     /** チェックされた指定番号リスト（登録対象） */
-    @Size(min = 1, message = "合算対象施設を1件以上選択してください")
+    @Size(min = 2, message = "合算対象施設を2件以上選択してください")
     private List<String> shiteiNoList;
 
     @Data

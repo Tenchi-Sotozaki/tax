@@ -39,6 +39,16 @@ public class GassanServiceImpl implements GassanService {
 
     @Override
     @Transactional(readOnly = true)
+    public void reloadFacilityList(GassanForm form) {
+        List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, form.getAtenaNo());
+        Set<String> checkedSet = form.getShiteiNoList() != null ? Set.copyOf(form.getShiteiNoList()) : Set.of();
+        form.setFacilityList(tokugimuList.stream()
+                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), checkedSet.contains(t.getShiteiNo())))
+                .toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public GassanForm getByGassanShiteiNo(String gassanShiteiNo) {
         Gassan gassan = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
                 .stream().findFirst()
@@ -165,7 +175,7 @@ public class GassanServiceImpl implements GassanService {
 
     private String generateGassanShiteiNo() {
         int max = gassanRepository.findMaxGassanShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
-        return String.format("%08d", max + 1);
+        return String.format("%08d", Math.max(max, 90000000) + 1);
     }
 
     private void saveGassanUchi(String gassanShiteiNo, BigDecimal rno, List<String> shiteiNoList) {
