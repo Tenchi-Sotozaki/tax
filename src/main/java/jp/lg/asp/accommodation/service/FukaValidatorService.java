@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FukaValidatorService {
 
+	private final FukaService fukaService;
 	private final ZeiritsuRepository zeiritsuRepository;
 	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository;
 	private final ZeiritsuTeigakuRepository zeiritsuTeigakuRepository;
@@ -92,10 +93,10 @@ public class FukaValidatorService {
 
 			if (FukaConstants.TEIRITSU.equals(kbn)) {
 				long ryokin = (d.getKazeiRyokin() != null) ? d.getKazeiRyokin().longValue() : 0L;
-				total += kbn.calculateTax(ryokin, rate);
+				total += fukaService.calculateTax(form.getFukaKbn(), ryokin, rate);
 			} else {
 				long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
-				total += kbn.calculateTax(count, rate);
+				total += fukaService.calculateTax(form.getFukaKbn(), count, rate);
 			}
 		}
 		return total;
@@ -384,4 +385,5 @@ public class FukaValidatorService {
 
 		return names;
 	}
+
 }

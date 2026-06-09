@@ -1000,10 +1000,10 @@ public class FukaService {
 			BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
 			if (FukaConstants.TEIRITSU.equals(kbn)) {
 				long ryokin = (d.getKazeiRyokin() != null) ? d.getKazeiRyokin().longValue() : 0L;
-				calculatedTotal += kbn.calculateTax(ryokin, rate);
+				calculatedTotal += calculateTax(form.getFukaKbn(), ryokin, rate);
 			} else {
 				long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
-				calculatedTotal += kbn.calculateTax(count, rate);
+				calculatedTotal += calculateTax(form.getFukaKbn(), count, rate);
 			}
 		}
 
@@ -1285,6 +1285,30 @@ public class FukaService {
 				}
 				dDto.setExemptCount(uchi.getMenjoHakusu());
 			}
+		}
+	}
+
+	/**
+	 * 賦課区分に応じた税額計算を行う。
+	 * @param fukaKbn 賦課区分コード（"1"=定額, "2"=定率）
+	 * @param baseValue 基準値（定額なら宿泊数、定率なら課税対象料金）
+	 * @param rate 税率（定額なら単価、定率ならパーセント値）
+	 * @return 計算後の税額
+	 */
+	public long calculateTax(String fukaKbn, long baseValue, BigDecimal rate) {
+		if (rate == null || rate.compareTo(BigDecimal.ZERO) == 0) return 0L;
+
+		if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
+			// 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
+			return BigDecimal.valueOf(baseValue)
+					.multiply(rate)
+					.divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.DOWN)
+					.longValue();
+		} else {
+			// 定額制：宿泊数 × 単価
+			return BigDecimal.valueOf(baseValue)
+					.multiply(rate)
+					.longValue();
 		}
 	}
 }
