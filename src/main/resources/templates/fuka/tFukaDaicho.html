@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
@@ -100,12 +100,11 @@
 		                    <tbody>
 		                        <tr th:each="item : ${fukaDaichoForm.items}" th:classappend="${item.shinkokuZumi} ? '' : 'table-light'">
 									<td class="text-center">
-									    <input type="radio" name="month" class="row-select"
-									           th:value="${#temporals.format(item.targetYearMonth, 'yyyy-MM')}" 
-									           th:data-status="${item.shinkokuZumi}"
-									           th:data-nendo="${item.nendo}"
-									           th:data-kibetsu="${item.kibetsu}"
-									           required> 
+										<input type="radio" name="month" class="row-select"
+										       th:value="${#temporals.format(item.targetYearMonth, 'yyyy-MM')}" 
+										       th:data-status="${item.shinkokuZumi}"
+										       th:data-nendo="${item.nendo}"
+										       th:data-kibetsu="${item.kibetsu}" required>
 									</td>
 		                            <td class="text-center fw-bold" th:text="${item.displayNengetsu}">4月</td>
 		                            <td class="text-end px-4">
@@ -147,63 +146,21 @@
 		    </div>
 
 		</form>
-
 		<th:block layout:fragment="scripts">
 		    <script th:inline="javascript">
-		        document.addEventListener('DOMContentLoaded', function() {
+		        /*<![CDATA[*/
+		        function generateViewUrl(nendo, kibetsu) {
+
+		            var baseUrl = /*[[@{/declaration/view/}]]*/ '/declaration/view/';
 		            
-		            // 💡 1. 新規登録ボタンの制御 (フォームのsubmitイベントをフックする)
-		            const form = document.querySelector('form[action*="/declaration/register"]');
-		            if (form) {
-		                form.addEventListener('submit', function(e) {
-		                    const selected = document.querySelector('input[name="month"]:checked');
-		                    
-		                    if (!selected) {
-		                        alert("登録対象の年月を選択してください。");
-		                        e.preventDefault(); // 処理をストップ
-		                        return;
-		                    }
-
-		                    // 🔴 ガード：ステータスが「済 (true)」なら新規登録させない
-		                    if (selected.getAttribute('data-status') === 'true') {
-		                        alert("既に申告済みのデータです。「照会」ボタンを使用してください。");
-		                        e.preventDefault(); // Submit (送信) をキャンセル
-		                        return;
-		                    }
-		                    
-		                    // 「未」の場合はそのままSubmitされ、FukaControllerに?month=yyyy-MMが飛ぶぜ
-		                });
-		            }
-
-		            // 💡 2. 照会ボタンの制御
-		            const btnView = document.getElementById('btnViewDeclaration');
-		            if (btnView) {
-		                btnView.addEventListener('click', function() {
-		                    const selected = document.querySelector('input[name="month"]:checked');
-		                    
-		                    if (!selected) {
-		                        alert("照会対象の年月を選択してください。");
-		                        return;
-		                    }
-
-		                    // 🔴 ガード：ステータスが「未 (false)」なら照会させない
-		                    if (selected.getAttribute('data-status') === 'false') {
-		                        alert("未申告のデータです。「新規登録」ボタンを使用してください。");
-		                        return;
-		                    }
-
-		                    // 「済」の場合：URLを組み立てて遷移する (Dynamic Routing)
-		                    const nendo = selected.getAttribute('data-nendo');
-		                    const kibetsu = selected.getAttribute('data-kibetsu');
-		                    // Thymeleafから指定番号を取得
-		                    const shiteiNo = /*[[${fukaDaichoForm.shiteiNo}]]*/ ''; 
-		                    
-		                    // 照会画面へ画面遷移
-		                    window.location.href = `/accommodation-tax/declaration/view/${shiteiNo}/${nendo}/${kibetsu}`;
-		                });
-		            }
-		        });
+		            var shiteiNo = /*[[${fukaDaichoForm.shiteiNo}]]*/ '';
+		            
+		            return baseUrl + shiteiNo + '/' + nendo + '/' + kibetsu;
+		        }
+		        /*]]>*/
 		    </script>
+		    
+		    <script th:src="@{/js/tFukaDaicho.js}"></script>
 		</th:block>
 </body>
 

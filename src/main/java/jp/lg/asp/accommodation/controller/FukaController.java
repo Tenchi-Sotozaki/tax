@@ -1,9 +1,11 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -170,7 +172,7 @@ public class FukaController {
 	/**
 	 * 宿泊税情報の保存（登録・更新）を行う。
 	 * @param form 申告情報フォーム
-	 * @param result バリデーション結果
+	 * @param bindingResult バリデーション結果
 	 * @param model モデルオブジェクト
 	 * @param redirectAttributes リダイレクト属性
 	 * @return 画面パス
@@ -180,9 +182,10 @@ public class FukaController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		
 		accessChecker.checkAccess(SCREEN_ID);
 
-		// 1. Springが自動判定したバリデーション結果を確認
+		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
 		if (bindingResult.hasErrors()) {
 			bindingResult.getAllErrors().forEach(error -> {
 				log.error("【バリデーションエラー】項目: {}, 内容: {}", error.getObjectName(), error.getDefaultMessage());
@@ -191,39 +194,73 @@ public class FukaController {
 			return CONFIG_VIEW;
 		}
 
-		// 2. 独自の相関チェック（定額・定率の分岐チェック）
+		// 2. 編集時の必須項目チェック
+		if (form.isEdit() && !StringUtils.hasText(form.getModificationCategory())) {
+			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "※編集時は変更の区分を選択してください");
+			fukaService.hydrateFormMetadata(form);
+			return CONFIG_VIEW;
+		}
+
+		// 2.5. 月計表未登録チェック（全区分の宿泊数が0の場合）
+		if (isTallyEmpty(form)) {
+			bindingResult.reject("error.global.tallyRequired", "※月計表の登録をしてください");
+			fukaService.hydrateFormMetadata(form);
+			return CONFIG_VIEW;
+		}
+
+		// 2.6. 月計表と親画面の突合チェック
+		fukaValidatorService.validateTallyVsParent(form, bindingResult);
+		if (bindingResult.hasErrors()) {
+			fukaService.hydrateFormMetadata(form);
+			return CONFIG_VIEW;
+		}
+
+		// 3. 金額と宿泊数のソフトバリデーション（Soft Validation）
+		if (!form.isTaxCheckBypassed()) {
+			List<String> discrepancyMessages = fukaValidatorService.getDiscrepancyMessages(form);
+			if (!discrepancyMessages.isEmpty()) {
+				log.info("金額または宿泊数のズレを検知しました。確認モーダルを表示します。");
+				fukaService.hydrateFormMetadata(form);
+				model.addAttribute("showTaxWarningModal", true);
+				model.addAttribute("discrepancyMessages", discrepancyMessages);
+				return CONFIG_VIEW;
+			}
+		}
+
+		// 4. 保存処理（Transaction：DBへの書き込み）
 		try {
-			fukaValidatorService.validateCorrelation(form);
-		} catch (IllegalArgumentException e) {
-			model.addAttribute("errorMessage", e.getMessage());
-			fukaService.hydrateFormMetadata(form);
-			return CONFIG_VIEW;
-		}
-
-		// 3. 編集区分チェック（変数名を bindingResult に修正）
-		if (form.isEdit() && !org.springframework.util.StringUtils.hasText(form.getModificationCategory())) {
-			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "編集時は変更の区分を選択してください。");
-			fukaService.hydrateFormMetadata(form);
-			return CONFIG_VIEW;
-		}
-
-		// 4. 税額の不整合チェック
-		if (!form.isTaxCheckBypassed() && fukaService.hasTaxAmountDiscrepancy(form)) {
-			fukaService.hydrateFormMetadata(form);
-			model.addAttribute("showTaxWarningModal", true);
-			return CONFIG_VIEW;
-		}
-
-		// 5. 保存処理
-		try {
+			// バリデーションをすべて通過、またはユーザーが警告を承認（バイパス）したため保存を実行
 			fukaService.saveDeclaration(form);
-			// ...成功時のリダイレクト処理...
 			return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
+			
 		} catch (RuntimeException e) {
-			log.error("保存処理中にエラーが発生しました", e);
+			log.error("保存処理中に予期せぬエラーが発生しました", e);
 			model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());
 			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
 		}
+	}
+
+	/**
+	 * 月計表が未入力かどうかを判定する。
+	 * dailyItemsの全日の宿泊数・料金がすべて0の場合は未登録とみなす。
+	 */
+	private boolean isTallyEmpty(FukaDeclarationForm form) {
+		var tally = form.getMonthlyTally();
+		if (tally == null || tally.getDailyItems() == null || tally.getDailyItems().isEmpty()) {
+			return true;
+		}
+
+		return tally.getDailyItems().stream().noneMatch(item -> {
+			// 宿泊数に1件でも入力があるか
+			boolean hasCount = item.getTaxCategoryCounts() != null
+					&& item.getTaxCategoryCounts().stream().anyMatch(v -> v != null && v > 0);
+			// 料金に1件でも入力があるか（定率制用）
+			boolean hasAmount = item.getTaxCategoryAmounts() != null
+					&& item.getTaxCategoryAmounts().stream().anyMatch(v -> v != null && v > 0);
+			// 免除に入力があるか
+			boolean hasExempt = item.getExemptCount() != null && item.getExemptCount() > 0;
+			return hasCount || hasAmount || hasExempt;
+		});
 	}
 }
