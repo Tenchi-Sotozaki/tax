@@ -181,7 +181,7 @@
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/nozei-shuki}"
+											th:href="@{/admin/nozei-shuki/list}"
 											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar-check me-2"></i>納税周期
 										</a>

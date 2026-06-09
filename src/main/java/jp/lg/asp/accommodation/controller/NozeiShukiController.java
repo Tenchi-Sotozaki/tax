@@ -33,7 +33,7 @@ public class NozeiShukiController {
 	private static final String SCREEN_ID = ScreenManagement.NOZEI_SHUKI;
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.NOZEI_SHUKI_CONFIG;
 
-	@GetMapping
+	@GetMapping("/list")
 	public String index(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<NozeiShukiDto> nozeiShukiList = nozeiShukiService.findAll();
