@@ -61,7 +61,8 @@
 									</li>
 									<li class="nav-item"><a
 										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/atena/list}"> <i
+										th:href="@{/atena/list}"
+										th:classappend="${#strings.contains(currentUri, '/atena/list')} ? 'text-white fw-medium' : ''"> <i
 											class="bi bi-person-lines-fill me-2"></i>宛名情報
 									</a></li>
 									<li class="nav-item"
@@ -94,7 +95,8 @@
 								<ul class="nav flex-column ms-3">
 									<li class="nav-item"><a
 										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/atena/import}"> <i
+										th:href="@{/atena/import}"
+										th:classappend="${#strings.contains(currentUri, '/atena/import')} ? 'text-white fw-medium' : ''"> <i
 											class="bi bi-person-lines-fill me-2"></i>宛名情報
 									</a></li>
 									<li class="nav-item"><a
@@ -125,12 +127,14 @@
 								<ul class="nav flex-column ms-3">
 									<li class="nav-item"><a
 										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/shunoRenkei/list}"> <i
+										th:href="@{/shunoRenkei/list}"
+										th:classappend="${#strings.contains(currentUri, '/shunoRenkei')} ? 'text-white fw-medium' : ''"> <i
 											class="bi bi-piggy-bank me-2"></i>収納管理情報
 									</a></li>
 									<li class="nav-item"><a
 										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/kofukinFurikomi/list}"> <i class="bi bi-bank me-2"></i>交付金振込情報
+										th:href="@{/kofukinFurikomi/list}"
+										th:classappend="${#strings.contains(currentUri, '/kofukinFurikomi')} ? 'text-white fw-medium' : ''"> <i class="bi bi-bank me-2"></i>交付金振込情報
 									</a></li>
 								</ul>
 							</div>
@@ -172,13 +176,13 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/zeiritsu/list}"
-											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu')} ? 'text-white fw-medium' : ''"> <i class="bi bi-sliders me-2"></i>賦課方式
+											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/list')} ? 'text-white fw-medium' : ''"> <i class="bi bi-sliders me-2"></i>賦課方式
 										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki')} ? 'text-white fw-medium' : ''">
+											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar-check me-2"></i>納税周期
 										</a>
 										</li>
@@ -209,7 +213,7 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/zeiritsu/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu')} ? 'text-white fw-medium' : ''"> <i class="bi bi-sliders me-2"></i>賦課方式
+											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/register')} ? 'text-white fw-medium' : ''"> <i class="bi bi-sliders me-2"></i>賦課方式
 										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
