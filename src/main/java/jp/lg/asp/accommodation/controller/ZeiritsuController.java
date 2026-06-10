@@ -131,8 +131,7 @@ public class ZeiritsuController {
 			zeiritsuTeigakuRepository.findActiveBySeq(jichitaiCd, seqDec)
 					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeigakuRepository.save(d); });
 		} else {
-			zeiritsuTeiritsuRepository.findActiveByTaishoKbnAndTekiyoYm(entity.getTaishoKbn(),
-					entity.getTekiyoStYm(), entity.getTekiyoEdYm())
+			zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, seqDec)
 					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeiritsuRepository.save(d); });
 		}
 
@@ -334,8 +333,7 @@ public class ZeiritsuController {
 				df.setRyokinEd(d.getRyokinEd() != null ? d.getRyokinEd().toString() : null);
 			}
 		} else {
-			List<ZeiritsuTeiritsu> details = zeiritsuTeiritsuRepository.findActiveByTaishoKbnAndTekiyoYm(z.getTaishoKbn(),
-					z.getTekiyoStYm(), z.getTekiyoEdYm());
+			List<ZeiritsuTeiritsu> details = zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, z.getSeq());
 			for (int i = 0; i < details.size() && i < 5; i++) {
 				ZeiritsuTeiritsu d = details.get(i);
 				ZeiritsuDetailForm df = form.getDetails().get(i);
