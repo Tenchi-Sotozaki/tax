@@ -131,8 +131,8 @@ public class ZeiritsuController {
 			zeiritsuTeigakuRepository.findActiveBySeq(jichitaiCd, seqDec)
 					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeigakuRepository.save(d); });
 		} else {
-			// 💡 新しいメソッド名に変更し、第3引数に削除フラグ "0" を追加
-			zeiritsuTeiritsuRepository.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, seqDec, "0")
+			zeiritsuTeiritsuRepository.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, entity.getTaishoKbn(),
+					entity.getTekiyoStYm(), entity.getTekiyoEdYm())
 					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeiritsuRepository.save(d); });
 		}
 
@@ -334,7 +334,8 @@ public class ZeiritsuController {
 				df.setRyokinEd(d.getRyokinEd() != null ? d.getRyokinEd().toString() : null);
 			}
 		} else {
-			List<ZeiritsuTeiritsu> details = zeiritsuTeiritsuRepository.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, z.getSeq(), "0");
+			List<ZeiritsuTeiritsu> details = zeiritsuTeiritsuRepository.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, z.getTaishoKbn(),
+					z.getTekiyoStYm(), z.getTekiyoEdYm());
 			for (int i = 0; i < details.size() && i < 5; i++) {
 				ZeiritsuTeiritsu d = details.get(i);
 				ZeiritsuDetailForm df = form.getDetails().get(i);

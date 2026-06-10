@@ -20,8 +20,8 @@ public interface ZeiritsuRepository extends JpaRepository<Zeiritsu, ZeiritsuId> 
 	@Query("SELECT z FROM Zeiritsu z WHERE z.jichitaiCd = :jichitaiCd AND z.delFlg = '0'"
 			+ " AND (z.tekiyoStYm <= :targetYm OR z.tekiyoStYm IS NULL)"
 			+ " AND (:targetYm <= z.tekiyoEdYm OR z.tekiyoEdYm IS NULL)"
-			+ " ORDER BY z.tekiyoStYm DESC")
-	Optional<Zeiritsu> findActiveByJichitaiCdAndTargetYm(
+			+ " ORDER BY z.taishoKbn DESC, z.tekiyoStYm DESC")
+	List<Zeiritsu> findActiveByJichitaiCdAndTargetYm(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("targetYm") String targetYm);
 

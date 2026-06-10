@@ -944,7 +944,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 				totalKenZeigaku += uchiCityZeigaku;
 			} else {
 				List<ZeiritsuTeiritsu> teiritsuList = zeiritsuTeiritsuRepository
-						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, ZeiritsuConstants.CITY.getValue(), taishoYm);
+						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, ZeiritsuConstants.CITY.getValue(), taishoYm, null);
 				if (teiritsuList.size() < kbn)
 					throw new RuntimeException("申告区分" + kbn + "に該当する税率定率詳細マスタが存在しません。");
 				zeiritsuSeq = teiritsuList.get(kbn - 1).getTeiritsuSeq();

@@ -206,9 +206,9 @@ public class FukaServiceImpl implements FukaService {
 			// =========================================================
 
 
-			// 対象年月に合致する親マスタをDBから直接取得
-			Optional<Zeiritsu> appliedOpt = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
-			Zeiritsu appliedZeiritsu = appliedOpt.orElse(null);
+			// 対象年月に合致する親マスタをDBから取得（市区町村用を優先）
+			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
+			Zeiritsu appliedZeiritsu = appliedList.isEmpty() ? null : appliedList.get(0);
 
 			List<ZeiritsuTeiritsu> teiritsuRates = new ArrayList<>();
 			List<ZeiritsuTeigaku> teigakuRates = new ArrayList<>();
@@ -222,8 +222,8 @@ public class FukaServiceImpl implements FukaService {
 					// --- 当月は「定率制」が適用される ---
 					log.info("対象年月 {} は【定率制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
 					teiritsuRates = zeiritsuTeiritsuRepository
-							.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, appliedZeiritsu.getSeq(),
-									"0");
+							.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, appliedZeiritsu.getTaishoKbn(),
+									appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
 				} else {
 					// --- 当月は「定額制」が適用される ---
 					log.info("対象年月 {} は【定額制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
@@ -757,7 +757,8 @@ public class FukaServiceImpl implements FukaService {
 				.findFirst()
 				.ifPresent(applied -> {
 					List<ZeiritsuTeiritsu> mList = zeiritsuTeiritsuRepository
-							.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, applied.getSeq(), "0");
+							.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, applied.getTaishoKbn(),
+									applied.getTekiyoStYm(), applied.getTekiyoEdYm());
 					for (int i = 0; i < mList.size() && i < formDetails.size(); i++) {
 						formDetails.get(i).setLabel(mList.get(i).getKbnName());
 						formDetails.get(i).setTaxRate(mList.get(i).getZeiRitsu() != null ? mList.get(i).getZeiRitsu() : BigDecimal.ZERO);
@@ -896,7 +897,8 @@ public class FukaServiceImpl implements FukaService {
 			if (FukaConstants.TEIRITSU.getValue().equals(appliedZeiritsu.getFukaKbn())) {
 				// --- 定率制の復元 ---
 				List<ZeiritsuTeiritsu> masterRates = zeiritsuTeiritsuRepository
-						.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, appliedZeiritsu.getSeq(), "0");
+						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, appliedZeiritsu.getTaishoKbn(),
+								appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
 
 				for (ZeiritsuTeiritsu m : masterRates) {
 				    FukaTaxDetailDto d = new FukaTaxDetailDto();
