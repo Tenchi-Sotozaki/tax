@@ -206,9 +206,12 @@ public class FukaServiceImpl implements FukaService {
 			// =========================================================
 
 
-			// 対象年月に合致する親マスタをDBから取得（市区町村用を優先）
+			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="2")を抽出
 			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
-			Zeiritsu appliedZeiritsu = appliedList.isEmpty() ? null : appliedList.get(0);
+			Zeiritsu appliedZeiritsu = appliedList.stream()
+					.filter(z -> "2".equals(z.getTaishoKbn()))
+					.findFirst()
+					.orElse(null);
 
 			List<ZeiritsuTeiritsu> teiritsuRates = new ArrayList<>();
 			List<ZeiritsuTeigaku> teigakuRates = new ArrayList<>();
@@ -870,25 +873,6 @@ public class FukaServiceImpl implements FukaService {
 			if (isAfterStart && isBeforeEnd) {
 				appliedZeiritsu = z;
 				break;
-			}
-		}
-
-		// appliedZeiritsu==null: fukaKbn"1"(teigaku) may have taishoKbn!="2", retry without taishoKbn filter
-		if (appliedZeiritsu == null) {
-			log.warn("[hydrateMonthlyDetail] taishoKbn=2 filter found no match. Retrying without taishoKbn filter. fukaKbn={}", entity.getFukaKbn());
-			for (Zeiritsu z : allZeiritsu) {
-				if (!entity.getFukaKbn().equals(z.getFukaKbn())) {
-					continue;
-				}
-				int stYmInt2 = parseYmToInt(z.getTekiyoStYm());
-				int edYmInt2 = parseYmToInt(z.getTekiyoEdYm());
-				boolean isAfterStart2 = (stYmInt2 == 0 || stYmInt2 <= targetYmInt);
-				boolean isBeforeEnd2 = (edYmInt2 == 0 || targetYmInt <= edYmInt2);
-				if (isAfterStart2 && isBeforeEnd2) {
-					appliedZeiritsu = z;
-					log.info("[hydrateMonthlyDetail] Retry matched: seq={}, fukaKbn={}, taishoKbn={}", z.getSeq(), z.getFukaKbn(), z.getTaishoKbn());
-					break;
-				}
 			}
 		}
 
