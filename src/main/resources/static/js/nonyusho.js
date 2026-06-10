@@ -109,14 +109,14 @@ function loadTokugimuInfo(shiteiNo) {
 /**
  * PDF生成処理
  */
-function generatePdf() {
+async function generatePdf() {
     console.log('PDF生成開始');
     
     if (!validateForm()) {
         return;
     }
     
-    const formData = collectFormData();
+    const formData = await collectFormData();
     const csrfToken = document.querySelector('input[name="_csrf"]').value;
     
     fetch('/accommodation-tax/nonyusho/pdf', {
@@ -151,14 +151,14 @@ function generatePdf() {
 /**
  * プレビュー表示処理
  */
-function previewReport() {
+async function previewReport() {
     console.log('プレビュー開始');
     
     if (!validateForm()) {
         return;
     }
     
-    const formData = collectFormData();
+    const formData = await collectFormData();
     const csrfToken = document.querySelector('input[name="_csrf"]').value;
     
     fetch('/accommodation-tax/nonyusho/pdf', {
@@ -189,14 +189,14 @@ function previewReport() {
 /**
  * 印刷処理
  */
-function printReport() {
+async function printReport() {
     console.log('印刷開始');
     
     if (!validateForm()) {
         return;
     }
     
-    const formData = collectFormData();
+    const formData = await collectFormData();
     const csrfToken = document.querySelector('input[name="_csrf"]').value;
     
     fetch('/accommodation-tax/nonyusho/pdf', {
@@ -233,7 +233,7 @@ function printReport() {
 /**
  * フォームデータ収集
  */
-function collectFormData() {
+async function collectFormData() {
     const shiteiNo = document.getElementById('shiteiNo')?.value || '';
     const nendoValue = document.getElementById('nendo')?.value || '';
     const shinkokuYmdValue = document.getElementById('shinkokuYmd')?.value || '';
@@ -245,33 +245,90 @@ function collectFormData() {
     // 申告年月をLocalDate形式に変換（YYYY-MM-01）
     const shinkokuYmd = shinkokuYmdValue ? shinkokuYmdValue + '-01' : null;
     
+    // 動的にデータを取得
+    const dynamicData = await loadDynamicData(shiteiNo, nendo, shinkokuYmdValue);
+    
     // 税額と合計額を計算
-    const zeigaku = '1000'; // サンプル値
     const entaiNum = parseInt(entai, 10) || 0;
-    const zeigakuNum = parseInt(zeigaku, 10) || 0;
-    const gokei = (zeigakuNum + entaiNum).toString();
+    const zeigakuNum = parseInt(dynamicData.zeigaku, 10) || 0;
+    const kasanNum = parseInt(dynamicData.kasan, 10) || 0;
+    const gokei = (zeigakuNum + kasanNum + entaiNum).toString();
     
     return {
         shiteiNo: shiteiNo,
         nendo: nendo,
         shinkokuYmd: shinkokuYmd,
         entai: entai,
-        zeigaku: zeigaku,
-        kasan: '0',
+        zeigaku: dynamicData.zeigaku,
+        kasan: dynamicData.kasan,
         gokei: gokei,
-        nokigen: '2024-12-31', // サンプル値
+        nokigen: dynamicData.nokigen,
         tokuName: document.getElementById('tokuName')?.value || '',
         tokuJusho: document.getElementById('tokuJusho')?.value || '',
         tokuYubinNo: document.getElementById('tokuYubinNo')?.value || '',
-        // サンプルデータ
-        cityName: "占冠村",
-        jichitaiCd: "01461",
-        kozaNo: "12345678",
-        kozaName: "占冠村",
-        nonyuBasho: "北海道銀行占冠支店\n札幌中央郵便局\nゆうちょ銀行",
-        shiteiKinyuName: "北海道銀行",
-        torimatome: "占冠支店"
+        cityName: dynamicData.cityName,
+        jichitaiCd: dynamicData.jichitaiCd,
+        kozaNo: dynamicData.kozaNo,
+        kozaName: dynamicData.cityName,
+        nonyuBasho: dynamicData.nonyuBasho,
+        shiteiKinyuName: dynamicData.shiteiKinyuName,
+        torimatome: dynamicData.torimatome
     };
+}
+
+/**
+ * 動的データ取得
+ */
+async function loadDynamicData(shiteiNo, nendo, shinkokuYmdValue) {
+    try {
+        console.log('動的データ取得開始:', { shiteiNo, nendo, shinkokuYmdValue });
+        const response = await fetch(`/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}`);
+        if (!response.ok) {
+            throw new Error('データの取得に失敗しました');
+        }
+        const data = await response.json();
+        console.log('取得したデータ:', data);
+        
+        // nokigenが空の場合、申告年月の翌月末を設定
+        let nokigen = data.nokigen;
+        if (!nokigen && shinkokuYmdValue) {
+            const shinkokuDate = new Date(shinkokuYmdValue + '-01');
+            shinkokuDate.setMonth(shinkokuDate.getMonth() + 2, 0); // 翌月末
+            nokigen = shinkokuDate.toISOString().split('T')[0];
+        }
+        
+        return {
+            zeigaku: data.zeigaku || '0',
+            kasan: data.kasan || '0',
+            nokigen: nokigen || '',
+            cityName: data.cityName || '',
+            jichitaiCd: data.jichitaiCd || '',
+            kozaNo: data.kozaNo || '',
+            nonyuBasho: data.nonyuBasho || '',
+            shiteiKinyuName: data.shiteiKinyuName || '',
+            torimatome: data.torimatome || ''
+        };
+    } catch (error) {
+        console.error('動的データ取得エラー:', error);
+        // エラー時はデフォルト値を返す
+        let nokigen = '';
+        if (shinkokuYmdValue) {
+            const shinkokuDate = new Date(shinkokuYmdValue + '-01');
+            shinkokuDate.setMonth(shinkokuDate.getMonth() + 2, 0);
+            nokigen = shinkokuDate.toISOString().split('T')[0];
+        }
+        return {
+            zeigaku: '0',
+            kasan: '0',
+            nokigen: nokigen,
+            cityName: '',
+            jichitaiCd: '',
+            kozaNo: '',
+            nonyuBasho: '',
+            shiteiKinyuName: '',
+            torimatome: ''
+        };
+    }
 }
 
 /**

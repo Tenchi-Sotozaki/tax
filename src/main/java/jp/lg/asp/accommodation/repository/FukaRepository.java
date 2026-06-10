@@ -73,5 +73,9 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 			@Param("nendo") String nendo,
 			@Param("delFlg") String delFlg,
 			@Param("newFlg") String newFlg);
+	/**
+	 * 指定番号と年度で最新のレコードを取得
+	 */
+	Optional<Fuka> findTopByShiteiNoAndNendoOrderByRnoDesc(String shiteiNo, String nendo);
 
 }
