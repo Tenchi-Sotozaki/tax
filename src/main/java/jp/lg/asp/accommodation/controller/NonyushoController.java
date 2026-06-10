@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import jp.lg.asp.accommodation.dto.NonyushoDto;
+import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.service.NonyushoReportsService;
 import jp.lg.asp.accommodation.service.TokugimuService;
@@ -55,6 +57,28 @@ public class NonyushoController {
         }
         
         return "reports/nonyusho";
+    }
+
+    /**
+     * 納入書動的データ取得API
+     */
+    @GetMapping("/data")
+    @ResponseBody
+    public ResponseEntity<NonyushoDataResponse> getNonyushoData(
+            @RequestParam String shiteiNo,
+            @RequestParam String nendo) {
+        try {
+            log.info("納入書動的データ取得API呼び出し: shiteiNo={}, nendo={}", shiteiNo, nendo);
+            
+            NonyushoDataResponse response = nonyushoReportsService.getNonyushoData(shiteiNo, nendo);
+            
+            log.info("納入書動的データ取得完了: shiteiNo={}, nendo={}", shiteiNo, nendo);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            log.error("納入書動的データ取得エラー: shiteiNo={}, nendo={}", shiteiNo, nendo, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
