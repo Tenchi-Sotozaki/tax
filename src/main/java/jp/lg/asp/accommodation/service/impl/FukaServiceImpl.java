@@ -508,19 +508,6 @@ public class FukaServiceImpl implements FukaService {
 
 		List<FukaUchi> uchiList = createFukaUchiList(form, parentFuka, currentJichitaiCd);
 
-		// 子リストの税額合計を親エンティティにセット
-		if (!uchiList.isEmpty()) {
-			long cityZeigakuSum = uchiList.stream()
-					.mapToLong(u -> u.getCityZeigaku() != null ? u.getCityZeigaku() : 0L)
-					.sum();
-			long kenZeigakuSum = uchiList.stream()
-					.mapToLong(u -> u.getKenZeigaku() != null ? u.getKenZeigaku() : 0L)
-					.sum();
-			parentFuka.setCityZeigaku(cityZeigakuSum);
-			parentFuka.setKenZeigaku(kenZeigakuSum);
-			parentFuka.setTotalZeigaku(cityZeigakuSum + kenZeigakuSum);
-		}
-
 		setAuditFields(parentFuka);
 		if (!uchiList.isEmpty()) {
 			uchiList.forEach(this::setAuditFields);
