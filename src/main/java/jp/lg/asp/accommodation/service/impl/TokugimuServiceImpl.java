@@ -15,10 +15,12 @@ import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
 import jp.lg.asp.accommodation.entity.Shoyusha;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -33,6 +35,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
+	private final GassanRepository gassanRepository;
 	private final GassanUchiRepository gassanUchiRepository;
 	private final ShoyushaRepository shoyushaRepository;
 
@@ -51,6 +54,9 @@ public class TokugimuServiceImpl implements TokugimuService {
 		List<Tokugimu> tokugimuList;
 		if (isEmptySearchForm(form)) {
 			tokugimuList = tokugimuRepository.findAllByJichitaiCd(jichitaiCd);
+		} else if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
+			// 指定番号が9で始まる場合、t_gassanから検索
+			tokugimuList = findTokugimuByGassanShiteiNo(form.getShiteiNo());
 		} else {
 			tokugimuList = tokugimuRepository.findBySearchConditions(
 					jichitaiCd,
@@ -108,6 +114,22 @@ public class TokugimuServiceImpl implements TokugimuService {
 							atena != null ? atena.getHojinNo() : null);
 				})
 				.filter(item -> item != null)
+				.toList();
+	}
+
+	private List<Tokugimu> findTokugimuByGassanShiteiNo(String gassanShiteiNo) {
+		List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+		if (gassanList.isEmpty()) {
+			return List.of();
+		}
+		List<String> shiteiNos = gassanUchiRepository
+				.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
+				.stream().map(GassanUchi::getShiteiNo).toList();
+		if (shiteiNos.isEmpty()) {
+			return List.of();
+		}
+		return shiteiNos.stream()
+				.flatMap(sn -> tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, sn).stream())
 				.toList();
 	}
 
