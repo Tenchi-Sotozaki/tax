@@ -308,7 +308,6 @@ public class ZeiritsuController {
 				d.setJichitaiCd(jichitaiCd);
 				d.setSeq(nextSeq);
 				d.setTeiritsuSeq(BigDecimal.valueOf(detailSeq));
-				// パーセント表記をそのまま使用（200 → 200.0）
 				BigDecimal zeiRitsu = new BigDecimal(detail.getZeiValue());
 				d.setZeiRitsu(zeiRitsu);
 				d.setKbnName(detail.getKbnName());
@@ -350,7 +349,8 @@ public class ZeiritsuController {
 				// 定率の場合の税率範囲チェック
 				try {
 					BigDecimal zeiValue = new BigDecimal(d.getZeiValue());
-					if (zeiValue.compareTo(new BigDecimal("0.00")) < 0 || zeiValue.compareTo(new BigDecimal("999.99")) > 0) {
+					if (zeiValue.compareTo(new BigDecimal("0.00")) < 0
+							|| zeiValue.compareTo(new BigDecimal("999.99")) > 0) {
 						bindingResult.rejectValue("details[" + i + "].zeiValue", "Range",
 								"税率は0.00%～999.99%の範囲で入力してください");
 					}
@@ -364,6 +364,11 @@ public class ZeiritsuController {
 							"区分名は必須です");
 				}
 			}
+		}
+
+		// 定額の場合の金額範囲重複チェック
+		if (isTeigaku) {
+			validateTeigakuRangeOverlap(form, bindingResult);
 		}
 	}
 
@@ -545,5 +550,43 @@ public class ZeiritsuController {
 		model.addAttribute("fukaTeiritsu", FukaConstants.TEIRITSU);
 		model.addAttribute("taishoCity", ZeiritsuConstants.CITY);
 		model.addAttribute("taishoKen", ZeiritsuConstants.KEN);
+	}
+
+	private void validateTeigakuRangeOverlap(ZeiritsuForm form, BindingResult bindingResult) {
+		// 有効な税額設定のみを収集
+		List<ZeiritsuDetailForm> validDetails = form.getDetails().stream()
+				.filter(d -> d.getZeiValue() != null && !d.getZeiValue().isBlank())
+				.collect(Collectors.toList());
+
+		for (int i = 0; i < validDetails.size(); i++) {
+			ZeiritsuDetailForm detail1 = validDetails.get(i);
+			Long st1 = parseLong(detail1.getRyokinSt());
+			Long ed1 = parseLong(detail1.getRyokinEd());
+
+			for (int j = i + 1; j < validDetails.size(); j++) {
+				ZeiritsuDetailForm detail2 = validDetails.get(j);
+				Long st2 = parseLong(detail2.getRyokinSt());
+				Long ed2 = parseLong(detail2.getRyokinEd());
+
+				if (isRangeOverlap(st1, ed1, st2, ed2)) {
+					int index1 = form.getDetails().indexOf(detail1);
+					int index2 = form.getDetails().indexOf(detail2);
+					bindingResult.rejectValue("details[" + index1 + "].ryokinSt", "RangeOverlap",
+							"金額範囲が重複しています。①番目と" + (index2 + 1) + "番目の範囲を確認してください。");
+					return;
+				}
+			}
+		}
+	}
+
+	private boolean isRangeOverlap(Long st1, Long ed1, Long st2, Long ed2) {
+		// 無限大の値を表現するためのLong.MAX_VALUE
+		long start1 = (st1 != null) ? st1 : 0L;
+		long end1 = (ed1 != null) ? ed1 - 1 : Long.MAX_VALUE; // 未満なので-1
+		long start2 = (st2 != null) ? st2 : 0L;
+		long end2 = (ed2 != null) ? ed2 - 1 : Long.MAX_VALUE; // 未満なので-1
+
+		// 範囲重複チェック: 両方が重ならない場合はfelse
+		return !(end1 < start2 || end2 < start1);
 	}
 }
