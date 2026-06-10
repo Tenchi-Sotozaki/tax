@@ -225,7 +225,7 @@ public class FukaServiceImpl implements FukaService {
 					// --- 当月は「定率制」が適用される ---
 					log.info("対象年月 {} は【定率制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
 					teiritsuRates = zeiritsuTeiritsuRepository
-							.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, appliedZeiritsu.getTaishoKbn(),
+							.findActiveByTaishoKbnAndTekiyoYm(appliedZeiritsu.getTaishoKbn(),
 									appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
 				} else {
 					// --- 当月は「定額制」が適用される ---
@@ -760,7 +760,7 @@ public class FukaServiceImpl implements FukaService {
 				.findFirst()
 				.ifPresent(applied -> {
 					List<ZeiritsuTeiritsu> mList = zeiritsuTeiritsuRepository
-							.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, applied.getTaishoKbn(),
+							.findActiveByTaishoKbnAndTekiyoYm(applied.getTaishoKbn(),
 									applied.getTekiyoStYm(), applied.getTekiyoEdYm());
 					for (int i = 0; i < mList.size() && i < formDetails.size(); i++) {
 						formDetails.get(i).setLabel(mList.get(i).getKbnName());
@@ -881,7 +881,7 @@ public class FukaServiceImpl implements FukaService {
 			if (FukaConstants.TEIRITSU.getValue().equals(appliedZeiritsu.getFukaKbn())) {
 				// --- 定率制の復元 ---
 				List<ZeiritsuTeiritsu> masterRates = zeiritsuTeiritsuRepository
-						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, appliedZeiritsu.getTaishoKbn(),
+						.findActiveByTaishoKbnAndTekiyoYm(appliedZeiritsu.getTaishoKbn(),
 								appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
 
 				for (ZeiritsuTeiritsu m : masterRates) {
