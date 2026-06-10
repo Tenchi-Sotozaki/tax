@@ -67,17 +67,42 @@ public class AtenaController {
 	public String importCsv(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(ATENA_INSERT);
+		
+		// ファイルが選択されているかチェック
 		if (file.isEmpty()) {
 			redirectAttributes.addFlashAttribute("errorMessage", "ファイルを選択してください。");
 			return "redirect:/atena/import";
 		}
+		
+		// ファイル形式チェック（CSVファイルのみ許可）
+		String originalFilename = file.getOriginalFilename();
+		if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".csv")) {
+			redirectAttributes.addFlashAttribute("errorMessage", "CSVファイルのみ取り込み可能です。");
+			return "redirect:/atena/import";
+		}
+		
+		// Content-Typeチェック（念のため）
+		String contentType = file.getContentType();
+		if (contentType != null && 
+			!contentType.equals("text/csv") && 
+			!contentType.equals("application/csv") && 
+			!contentType.equals("text/plain")) {
+			log.warn("不正なContent-Type: {}", contentType);
+		}
+		
 		try {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			atenaImportService.importCsv(file, jichitaiCd, auth.getName());
 			redirectAttributes.addFlashAttribute("successMessage", "CSVファイルの取込が完了しました。");
-		} catch (Exception e) {
-			log.error("CSV取込エラー", e);
+		} catch (RuntimeException e) {
+			// フォーマットエラーなどのユーザーエラー
+			log.warn("CSV取込ユーザーエラー: {}", e.getMessage());
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		} catch (Exception e) {
+			// 予期しないシステムエラー
+			log.error("CSV取込システムエラー", e);
+			redirectAttributes.addFlashAttribute("errorMessage", 
+					"システムエラーが発生しました。管理者にお問い合せください。");
 		}
 		return "redirect:/atena/import";
 	}

@@ -33,7 +33,7 @@ public class ZeiritsuTeiritsu extends BaseEntity {
 	@Column(name = "kbn_name", nullable = false, length = 20)
 	private String kbnName;
 
-	@Column(name = "zei_ritsu", nullable = false, precision = 3, scale = 2)
+	@Column(name = "zei_ritsu", nullable = false, precision = 5, scale = 2)
 	private BigDecimal zeiRitsu;
 
 	@Column(name = "del_flg", nullable = false, length = 1)

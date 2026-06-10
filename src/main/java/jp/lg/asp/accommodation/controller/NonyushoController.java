@@ -46,6 +46,7 @@ public class NonyushoController {
                 model.addAttribute("shisetsuName", tokugimuForm.getFacilityName());
                 model.addAttribute("tokuName", tokugimuForm.getName());
                 model.addAttribute("tokuJusho", tokugimuForm.getTokugimuAddress());
+                model.addAttribute("tokuYubinNo", tokugimuForm.getTokugimuYubinNo());
                 model.addAttribute("shisetsuJusho", tokugimuForm.getFacilityAddress());
             } catch (Exception e) {
                 log.warn("特別徴収義務者情報の取得に失敗: shiteiNo={}", shiteiNo, e);
