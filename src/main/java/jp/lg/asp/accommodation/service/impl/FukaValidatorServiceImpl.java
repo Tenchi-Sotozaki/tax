@@ -360,7 +360,8 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 
 				if (applied != null) {
 					List<ZeiritsuTeiritsu> masters = zeiritsuTeiritsuRepository
-							.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, applied.getSeq(), "0");
+							.findActiveByTaishoKbnAndTekiyoYm(applied.getTaishoKbn(),
+									applied.getTekiyoStYm(), applied.getTekiyoEdYm());
 					for (ZeiritsuTeiritsu m : masters) {
 						names.add(m.getKbnName() != null ? m.getKbnName() : "対象区分");
 					}

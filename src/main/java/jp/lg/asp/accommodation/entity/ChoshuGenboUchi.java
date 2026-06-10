@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 
 import lombok.Data;
 
@@ -13,7 +12,7 @@ import lombok.Data;
 @Table(name = "t_choshu_genbo_uchi")
 @Data
 @IdClass(ChoshuGenboUchiId.class)
-public class ChoshuGenboUchi {
+public class ChoshuGenboUchi extends BaseEntity {
 
 	@Id
 	@Column(name = "jichitai_cd", length = 5)
@@ -99,14 +98,4 @@ public class ChoshuGenboUchi {
 	@Column(name = "zeigaku")
 	private Long zeigaku;
 
-	@Column(name = "add_dt")
-	private java.time.LocalDateTime addDt;
-	@Column(name = "add_user")
-	private String addUser;
-	@Column(name = "upd_dt")
-	private java.time.LocalDateTime updDt;
-	@Column(name = "upd_user")
-	private String updUser;
-	@Version
-	private Integer version;
 }

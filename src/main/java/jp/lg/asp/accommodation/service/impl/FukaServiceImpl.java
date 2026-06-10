@@ -206,9 +206,12 @@ public class FukaServiceImpl implements FukaService {
 			// =========================================================
 
 
-			// 対象年月に合致する親マスタをDBから直接取得
-			Optional<Zeiritsu> appliedOpt = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
-			Zeiritsu appliedZeiritsu = appliedOpt.orElse(null);
+			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="2")を抽出
+			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
+			Zeiritsu appliedZeiritsu = appliedList.stream()
+					.filter(z -> "2".equals(z.getTaishoKbn()))
+					.findFirst()
+					.orElse(null);
 
 			List<ZeiritsuTeiritsu> teiritsuRates = new ArrayList<>();
 			List<ZeiritsuTeigaku> teigakuRates = new ArrayList<>();
@@ -222,8 +225,8 @@ public class FukaServiceImpl implements FukaService {
 					// --- 当月は「定率制」が適用される ---
 					log.info("対象年月 {} は【定率制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
 					teiritsuRates = zeiritsuTeiritsuRepository
-							.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, appliedZeiritsu.getSeq(),
-									"0");
+							.findActiveByTaishoKbnAndTekiyoYm(appliedZeiritsu.getTaishoKbn(),
+									appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
 				} else {
 					// --- 当月は「定額制」が適用される ---
 					log.info("対象年月 {} は【定額制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
@@ -757,7 +760,8 @@ public class FukaServiceImpl implements FukaService {
 				.findFirst()
 				.ifPresent(applied -> {
 					List<ZeiritsuTeiritsu> mList = zeiritsuTeiritsuRepository
-							.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, applied.getSeq(), "0");
+							.findActiveByTaishoKbnAndTekiyoYm(applied.getTaishoKbn(),
+									applied.getTekiyoStYm(), applied.getTekiyoEdYm());
 					for (int i = 0; i < mList.size() && i < formDetails.size(); i++) {
 						formDetails.get(i).setLabel(mList.get(i).getKbnName());
 						formDetails.get(i).setTaxRate(mList.get(i).getZeiRitsu() != null ? mList.get(i).getZeiRitsu() : BigDecimal.ZERO);
@@ -872,31 +876,13 @@ public class FukaServiceImpl implements FukaService {
 			}
 		}
 
-		// appliedZeiritsu==null: fukaKbn"1"(teigaku) may have taishoKbn!="2", retry without taishoKbn filter
-		if (appliedZeiritsu == null) {
-			log.warn("[hydrateMonthlyDetail] taishoKbn=2 filter found no match. Retrying without taishoKbn filter. fukaKbn={}", entity.getFukaKbn());
-			for (Zeiritsu z : allZeiritsu) {
-				if (!entity.getFukaKbn().equals(z.getFukaKbn())) {
-					continue;
-				}
-				int stYmInt2 = parseYmToInt(z.getTekiyoStYm());
-				int edYmInt2 = parseYmToInt(z.getTekiyoEdYm());
-				boolean isAfterStart2 = (stYmInt2 == 0 || stYmInt2 <= targetYmInt);
-				boolean isBeforeEnd2 = (edYmInt2 == 0 || targetYmInt <= edYmInt2);
-				if (isAfterStart2 && isBeforeEnd2) {
-					appliedZeiritsu = z;
-					log.info("[hydrateMonthlyDetail] Retry matched: seq={}, fukaKbn={}, taishoKbn={}", z.getSeq(), z.getFukaKbn(), z.getTaishoKbn());
-					break;
-				}
-			}
-		}
-
 		// 【第2段階】 子マスタを取得して画面DTOに展開
 		if (appliedZeiritsu != null) {
 			if (FukaConstants.TEIRITSU.getValue().equals(appliedZeiritsu.getFukaKbn())) {
 				// --- 定率制の復元 ---
 				List<ZeiritsuTeiritsu> masterRates = zeiritsuTeiritsuRepository
-						.findByJichitaiCdAndSeqAndDelFlgOrderByTeiritsuSeqAsc(jichitaiCd, appliedZeiritsu.getSeq(), "0");
+						.findActiveByTaishoKbnAndTekiyoYm(appliedZeiritsu.getTaishoKbn(),
+								appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
 
 				for (ZeiritsuTeiritsu m : masterRates) {
 				    FukaTaxDetailDto d = new FukaTaxDetailDto();
