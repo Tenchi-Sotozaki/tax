@@ -13,10 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.dto.ShoreikinDto;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -30,6 +32,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 	private final ShoreikinRepository shoreikinRepository;
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
+	private final GassanRepository gassanRepository;
 	private final GassanUchiRepository gassanUchiRepository;
 
 	@Value("${app.jichitai.code}")
@@ -39,14 +42,20 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 	@Transactional(readOnly = true)
 	public List<ShoreikinDto> search(ShoreikinDto form) {
 
-		List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
-				jichitaiCd,
-				form.getShiteiNo(),
-				form.getName(),
-				form.getShisetsuName(),
-				form.getKyokaShu(),
-				form.getKojinNo(),
-				form.getHojinNo());
+		List<Tokugimu> tokugimuList;
+		if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
+			// 指定番号が9で始まる場合、t_gassanから検索
+			tokugimuList = findTokugimuByGassanShiteiNo(form.getShiteiNo());
+		} else {
+			tokugimuList = tokugimuRepository.findBySearchConditions(
+					jichitaiCd,
+					form.getShiteiNo(),
+					form.getName(),
+					form.getShisetsuName(),
+					form.getKyokaShu(),
+					form.getKojinNo(),
+					form.getHojinNo());
+		}
 
 		if (tokugimuList.isEmpty()) {
 			return List.of();
@@ -144,5 +153,21 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 
 		return result;
 
+	}
+
+	private List<Tokugimu> findTokugimuByGassanShiteiNo(String gassanShiteiNo) {
+		List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+		if (gassanList.isEmpty()) {
+			return List.of();
+		}
+		List<String> shiteiNos = gassanUchiRepository
+				.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
+				.stream().map(GassanUchi::getShiteiNo).toList();
+		if (shiteiNos.isEmpty()) {
+			return List.of();
+		}
+		return shiteiNos.stream()
+				.flatMap(sn -> tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, sn).stream())
+				.toList();
 	}
 }
