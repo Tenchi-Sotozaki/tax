@@ -207,7 +207,7 @@ public class FukaServiceImpl implements FukaService {
 
 
 			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="2")を抽出
-			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
+			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, "2", targetYm);
 			Zeiritsu appliedZeiritsu = appliedList.stream()
 					.filter(z -> "2".equals(z.getTaishoKbn()))
 					.findFirst()
