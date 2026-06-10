@@ -1,7 +1,12 @@
-function requireSelected(msg) {
+// DOMの読み込み待ち
+document.addEventListener('DOMContentLoaded', function() {
+
+    function requireSelected(msg) {
         const cb = document.querySelector('.row-select:checked');
-        if (!cb) { alert(msg || 'レコードを選択してください。'); return null; }
-        
+        if (!cb) { 
+            alert(msg || 'レコードを選択してください。'); 
+            return null; 
+        }
         return cb.dataset.shiteiNo;
     }
 
@@ -76,8 +81,26 @@ function requireSelected(msg) {
     document.getElementById('btnDelete')?.addEventListener('click', () => {
         const id = requireSelected('削除するレコードを選択してください。');
         if (!id) return;
+        
         const modal = document.getElementById('deleteModal');
-        modal.querySelector('[data-form-id]').dataset.formId = 'deleteForm-' + id;
+        if (!modal) {
+            console.error('削除モーダルが見つかりません');
+            return;
+        }
+        
+        const formElement = document.getElementById('deleteForm-' + id);
+        if (!formElement) {
+            console.error('削除フォームが見つかりません: deleteForm-' + id);
+            return;
+        }
+        
+        // モーダル内のフォームIDを更新
+        const confirmButton = modal.querySelector('[data-form-id]');
+        if (confirmButton) {
+            confirmButton.dataset.formId = 'deleteForm-' + id;
+        }
+        
+        // モーダルを表示
         new bootstrap.Modal(modal).show();
     });
     document.getElementById('btnCorrection')?.addEventListener('click', () => {
@@ -89,4 +112,5 @@ function requireSelected(msg) {
         if (id) location.href = '/accommodation-tax/tokugimu/report/' + id;
     });
 
+});
 
