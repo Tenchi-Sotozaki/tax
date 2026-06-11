@@ -287,7 +287,7 @@ public class FukaServiceImpl implements FukaService {
 		// ---------------------------------------------------------
 		// 💡 【分岐追加】定率制（fukaKbn == "2"）の場合の動的初期化処理
 		// ---------------------------------------------------------
-		if ("2".equals(form.getFukaKbn())) {
+		if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 			if (teiritsuRates != null) {
 				for (ZeiritsuTeiritsu rate : teiritsuRates) {
 					FukaTaxDetailDto teiritsuDetail = new FukaTaxDetailDto();
