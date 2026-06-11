@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
-import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDaichoListItem;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
@@ -42,6 +41,7 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
+import jp.lg.asp.accommodation.service.FukaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -210,7 +210,6 @@ public class FukaServiceImpl implements FukaService {
 			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="1")を抽出
 			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, "1", targetYm);
 			Zeiritsu appliedZeiritsu = appliedList.stream()
-					.filter(z -> "1".equals(z.getTaishoKbn()))
 					.findFirst()
 					.orElse(null);
 
