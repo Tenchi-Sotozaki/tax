@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -198,7 +199,7 @@ public class FukaServiceImpl implements FukaService {
 			if (StringUtils.hasText(paymentMonth)) {
 				targetYm = paymentMonth.replace("-", "");
 			} else {
-				targetYm = LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
+				targetYm = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
 			}
 
 			// =========================================================
