@@ -95,4 +95,7 @@ public final class ScreenManagement {
 
 	// 納入申告書の提出期限等の特例適用者指定取消通知書
 	public static final String TOKUREI_SHITEI_CANCEL = "ms00000018";
+
+	// 宿泊税特別徴収事務交付金交付申請書
+	public static final String KOFU_SHINSEI = "ms00000019";
 }

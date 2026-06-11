@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+    <title>宿泊税特別徴収事務交付金交付申請書</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="mb-4">
+                        <i class="bi bi-file-earmark-text text-primary me-2"></i>宿泊税特別徴収事務交付金交付申請書
+                    </h2>
+                    
+                    <form id="kofuForm" th:object="${dto}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        
+                        <!-- 年度選択エリア -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">年度選択</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">年度</label>
+                                        <input type="number" class="form-control" th:field="*{nendo}" id="nendoInput" 
+                                               min="2020" max="2030" placeholder="年度を入力" onchange="loadReportData()">
+                                        <div class="form-text">年度を入力してください（例：2024）</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 特別徴収義務者エリア -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">特別徴収義務者</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" th:field="*{tokuName}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 対象施設エリア -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">対象施設</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">指定番号</label>
+                                        <input type="text" class="form-control" th:field="*{shiteiNo}" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">施設名称</label>
+                                        <input type="text" class="form-control" th:field="*{shisetsuName}" readonly>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md-12">
+                                        <label class="form-label">施設住所</label>
+                                        <input type="text" class="form-control" th:field="*{shisetsuJusho}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" th:field="*{cityName}">
+                        <input type="hidden" th:field="*{jorei}">
+                        <input type="hidden" th:field="*{hakkoYoshiki}">
+                        <input type="hidden" th:field="*{nonyugaku}">
+                        <input type="hidden" th:field="*{kofugaku}">
+                        <input type="hidden" th:field="*{kofuJoken}">
+                        
+                        <!-- アクションボタン -->
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary" onclick="generatePdf()">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="preview()">
+                                <i class="bi bi-eye me-1"></i> プレビュー
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="print()">
+                                <i class="bi bi-printer me-1"></i> 印刷
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/kofuShinsei.js}"></script>
+    </th:block>
+</body>
+</html>
