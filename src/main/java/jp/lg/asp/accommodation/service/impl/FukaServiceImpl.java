@@ -225,7 +225,7 @@ public class FukaServiceImpl implements FukaService {
 					// --- 当月は「定率制」が適用される ---
 					log.info("対象年月 {} は【定率制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
 					teiritsuRates = zeiritsuTeiritsuRepository
-							.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, appliedZeiritsu.getTaishoKbn(), targetYm);
+							.findActiveBySeq(jichitaiCd, appliedZeiritsu.getSeq());
 				} else {
 					// --- 当月は「定額制」が適用される ---
 					log.info("対象年月 {} は【定額制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
