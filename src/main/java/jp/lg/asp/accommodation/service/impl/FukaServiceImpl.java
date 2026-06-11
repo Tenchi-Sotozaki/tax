@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
-import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDaichoListItem;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
@@ -41,6 +41,7 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
+import jp.lg.asp.accommodation.service.FukaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -198,7 +199,7 @@ public class FukaServiceImpl implements FukaService {
 			if (StringUtils.hasText(paymentMonth)) {
 				targetYm = paymentMonth.replace("-", "");
 			} else {
-				targetYm = LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMM"));
+				targetYm = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
 			}
 
 			// =========================================================
@@ -206,10 +207,9 @@ public class FukaServiceImpl implements FukaService {
 			// =========================================================
 
 
-			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="2")を抽出
-			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, targetYm);
+			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="1")を抽出
+			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, "1", targetYm);
 			Zeiritsu appliedZeiritsu = appliedList.stream()
-					.filter(z -> "2".equals(z.getTaishoKbn()))
 					.findFirst()
 					.orElse(null);
 
@@ -225,8 +225,7 @@ public class FukaServiceImpl implements FukaService {
 					// --- 当月は「定率制」が適用される ---
 					log.info("対象年月 {} は【定率制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
 					teiritsuRates = zeiritsuTeiritsuRepository
-							.findActiveByTaishoKbnAndTekiyoYm(appliedZeiritsu.getTaishoKbn(),
-									appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
+							.findActiveBySeq(jichitaiCd, appliedZeiritsu.getSeq());
 				} else {
 					// --- 当月は「定額制」が適用される ---
 					log.info("対象年月 {} は【定額制】が適用されます (親Seq: {})", targetYm, appliedZeiritsu.getSeq());
@@ -287,7 +286,7 @@ public class FukaServiceImpl implements FukaService {
 		// ---------------------------------------------------------
 		// 💡 【分岐追加】定率制（fukaKbn == "2"）の場合の動的初期化処理
 		// ---------------------------------------------------------
-		if ("2".equals(form.getFukaKbn())) {
+		if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 			if (teiritsuRates != null) {
 				for (ZeiritsuTeiritsu rate : teiritsuRates) {
 					FukaTaxDetailDto teiritsuDetail = new FukaTaxDetailDto();
@@ -625,12 +624,12 @@ public class FukaServiceImpl implements FukaService {
 				long hakusu = detail.getStayCount() != null ? detail.getStayCount() : 0L;
 			    long kenZeigaku = 0L;
 
-				// 都道府県用マスタ(taishoKbn="1")から税額単価を取得
+				// 都道府県用マスタ(taishoKbn="2")から税額単価を取得
 			    Long ryokinForLookup = detail.getKazeiRyokin() != null ? detail.getKazeiRyokin().longValue() : 0L;
 			    
 			    Optional<ZeiritsuTeigaku> kenMasterOpt = zeiritsuTeigakuRepository
 			            .findActiveByTaishoKbnAndTekiyoYmAndRyokin(
-			                    currentJichitaiCd, "1", parentFuka.getTaishoYm(), ryokinForLookup);
+			                    currentJichitaiCd, "2", parentFuka.getTaishoYm(), ryokinForLookup);
 
 			    if (kenMasterOpt.isPresent()) {
 			        long kenTanka = kenMasterOpt.get().getZeigaku() != null ? kenMasterOpt.get().getZeigaku() : 0L;
@@ -760,8 +759,8 @@ public class FukaServiceImpl implements FukaService {
 				.findFirst()
 				.ifPresent(applied -> {
 					List<ZeiritsuTeiritsu> mList = zeiritsuTeiritsuRepository
-							.findActiveByTaishoKbnAndTekiyoYm(applied.getTaishoKbn(),
-									applied.getTekiyoStYm(), applied.getTekiyoEdYm());
+							.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, applied.getTaishoKbn(),
+									form.getMonthlyDetail().getPaymentYearMonth().replace("-", ""));
 					for (int i = 0; i < mList.size() && i < formDetails.size(); i++) {
 						formDetails.get(i).setLabel(mList.get(i).getKbnName());
 						formDetails.get(i).setTaxRate(mList.get(i).getZeiRitsu() != null ? mList.get(i).getZeiRitsu() : BigDecimal.ZERO);
@@ -858,7 +857,7 @@ public class FukaServiceImpl implements FukaService {
 		log.info("[hydrateMonthlyDetail] targetYm={}, fukaKbn={}, masterCount={}", targetYm, entity.getFukaKbn(), allZeiritsu.size());
 
 		for (Zeiritsu z : allZeiritsu) {
-			if (!"2".equals(z.getTaishoKbn())) {
+			if (!"1".equals(z.getTaishoKbn())) {
 				continue;
 			}
 			if (!entity.getFukaKbn().equals(z.getFukaKbn())) {
@@ -881,8 +880,7 @@ public class FukaServiceImpl implements FukaService {
 			if (FukaConstants.TEIRITSU.getValue().equals(appliedZeiritsu.getFukaKbn())) {
 				// --- 定率制の復元 ---
 				List<ZeiritsuTeiritsu> masterRates = zeiritsuTeiritsuRepository
-						.findActiveByTaishoKbnAndTekiyoYm(appliedZeiritsu.getTaishoKbn(),
-								appliedZeiritsu.getTekiyoStYm(), appliedZeiritsu.getTekiyoEdYm());
+						.findActiveByTaishoKbnAndTekiyoYm(jichitaiCd, appliedZeiritsu.getTaishoKbn(), targetYm);
 
 				for (ZeiritsuTeiritsu m : masterRates) {
 				    FukaTaxDetailDto d = new FukaTaxDetailDto();
