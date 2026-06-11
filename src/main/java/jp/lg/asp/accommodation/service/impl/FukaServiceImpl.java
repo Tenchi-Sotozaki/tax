@@ -207,10 +207,10 @@ public class FukaServiceImpl implements FukaService {
 			// =========================================================
 
 
-			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="2")を抽出
-			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, "2", targetYm);
+			// 対象年月に合致する親マスタをDBから取得し、市区町村用(taishoKbn="1")を抽出
+			List<Zeiritsu> appliedList = zeiritsuRepository.findActiveByJichitaiCdAndTargetYm(jichitaiCd, "1", targetYm);
 			Zeiritsu appliedZeiritsu = appliedList.stream()
-					.filter(z -> "2".equals(z.getTaishoKbn()))
+					.filter(z -> "1".equals(z.getTaishoKbn()))
 					.findFirst()
 					.orElse(null);
 
@@ -625,12 +625,12 @@ public class FukaServiceImpl implements FukaService {
 				long hakusu = detail.getStayCount() != null ? detail.getStayCount() : 0L;
 			    long kenZeigaku = 0L;
 
-				// 都道府県用マスタ(taishoKbn="1")から税額単価を取得
+				// 都道府県用マスタ(taishoKbn="2")から税額単価を取得
 			    Long ryokinForLookup = detail.getKazeiRyokin() != null ? detail.getKazeiRyokin().longValue() : 0L;
 			    
 			    Optional<ZeiritsuTeigaku> kenMasterOpt = zeiritsuTeigakuRepository
 			            .findActiveByTaishoKbnAndTekiyoYmAndRyokin(
-			                    currentJichitaiCd, "1", parentFuka.getTaishoYm(), ryokinForLookup);
+			                    currentJichitaiCd, "2", parentFuka.getTaishoYm(), ryokinForLookup);
 
 			    if (kenMasterOpt.isPresent()) {
 			        long kenTanka = kenMasterOpt.get().getZeigaku() != null ? kenMasterOpt.get().getZeigaku() : 0L;
@@ -858,7 +858,7 @@ public class FukaServiceImpl implements FukaService {
 		log.info("[hydrateMonthlyDetail] targetYm={}, fukaKbn={}, masterCount={}", targetYm, entity.getFukaKbn(), allZeiritsu.size());
 
 		for (Zeiritsu z : allZeiritsu) {
-			if (!"2".equals(z.getTaishoKbn())) {
+			if (!"1".equals(z.getTaishoKbn())) {
 				continue;
 			}
 			if (!entity.getFukaKbn().equals(z.getFukaKbn())) {
