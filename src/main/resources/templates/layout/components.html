@@ -21,6 +21,7 @@
 	<div
 		th:fragment="confirmModal(modalId, title, message, formId, btnClass, btnLabel)"
 		class="modal fade" th:id="${modalId}" tabindex="-1"
+		data-bs-backdrop="static" data-bs-keyboard="false"
 		th:aria-labelledby="${modalId + 'Label'}" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content shadow">
@@ -37,14 +38,22 @@
 				<div class="modal-body">
 					<p class="mb-0" th:text="${message}">よろしいですか？</p>
 				</div>
-				<div class="modal-footer">
+				<div class="modal-footer justify-content-center">
 					<button type="button" class="btn btn-outline-secondary"
 						data-bs-dismiss="modal">
 						<i class="bi bi-x-lg me-1"></i>キャンセル
 					</button>
 					<button type="button" class="btn" th:classappend="${btnClass}"
 						th:data-form-id="${formId}"
-						onclick="document.getElementById(this.dataset.formId).submit()">
+						onclick="
+							const formId = this.dataset.formId;
+							const form = document.getElementById(formId);
+							if (form) {
+								form.submit();
+							} else {
+								console.error('フォームが見つかりません:', formId);
+							}
+						">
 						<i
 							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>
 						<span th:text="${btnLabel}">実行</span>
