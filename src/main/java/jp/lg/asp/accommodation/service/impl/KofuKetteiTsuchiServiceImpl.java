@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import jakarta.annotation.PostConstruct;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.KofuShinseiDto;
+import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.ReportsDef;
@@ -19,18 +19,18 @@ import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
-import jp.lg.asp.accommodation.service.KofuShinseiService;
+import jp.lg.asp.accommodation.service.KofuKetteiTsuchiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 宿泊税特別徴収事務交付金交付申請書 Service実装
+ * 宿泊税特別徴収事務交付金交付決定通知書 Service実装
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KofuShinseiServiceImpl implements KofuShinseiService {
+public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
@@ -52,18 +52,9 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 	}
 
 	@Override
-	public KofuShinseiDto getReportData(String shiteiNo) {
-		// デフォルト年度（現在年度）で取得
-		LocalDate now = LocalDate.now();
-		String currentNendo = String.valueOf(
-				now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1);
-		return getReportData(shiteiNo, currentNendo);
-	}
-
-	@Override
-	public KofuShinseiDto getReportData(String shiteiNo, String nendo) {
+	public KofuKetteiTsuchiDto getReportData(String shiteiNo) {
 		try {
-			log.info("交付申請書データ取得開始 - 指定番号: {}, 年度: {}", shiteiNo, nendo);
+			log.info("交付決定通知書データ取得開始 - 指定番号: {}", shiteiNo);
 
 			// 特別徴収義務者情報取得（最新・未削除）
 			Optional<Tokugimu> tokugimuOpt = tokugimuRepository
@@ -90,20 +81,26 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 			Atena atena = atenaOpt.get();
 			log.info("宛名情報取得: {}", atena.getName());
 
-			// 奨励金情報取得
-			Optional<Shoreikin> shoreikinOpt = shoreikinRepository
-					.findByJichitaiCdAndShiteiNoAndNendo(jichitaiCode, shiteiNo, nendo);
+			// 奨励金情報取得（最新年度）
+			List<Shoreikin> shoreikinList = shoreikinRepository
+					.findActiveByJichitaiCd(jichitaiCode);
 
-			// 帳票定義から発行様式と交付条件を取得
-			String hakkoYoshiki = getReportsDefText("KOFU_SHINSEI_HAKKO_YOSHIKI");
-			String kofuJoken = getReportsDefText("KOFU_SHINSEI_KOFU_JOKEN");
+			// 指定番号でフィルタリングして最新を取得
+			Optional<Shoreikin> shoreikinOpt = shoreikinList.stream()
+					.filter(s -> shiteiNo.equals(s.getShiteiNo()))
+					.findFirst();
+
+			// 帳票定義から発行様式と条令を取得
+			String hakkoYoshiki = getReportsDefText("KOFU_KETTEI_TSUCHI_HAKKO_YOSHIKI");
 
 			// DTOに設定
-			KofuShinseiDto dto = new KofuShinseiDto();
-			dto.setShiteiNo(tokugimu.getShiteiNo());
-			dto.setNendo(nendo);
-			dto.setTokuName(atena.getName());
+			KofuKetteiTsuchiDto dto = new KofuKetteiTsuchiDto();
+			dto.setHakkoYoshiki(hakkoYoshiki);
+			dto.setTokugimuName(atena.getName());
+			dto.setCityName(jichitaiName);
+			dto.setHakkoJorei(jorei);
 			dto.setShisetsuName(tokugimu.getShisetsuName());
+			dto.setShiteiNo(tokugimu.getShiteiNo());
 
 			// 施設住所を郵便番号と住所で連結
 			StringBuilder shisetsuJusho = new StringBuilder();
@@ -115,36 +112,27 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 			}
 			dto.setShisetsuJusho(shisetsuJusho.toString());
 
-			// 奨励金情報設定（数値のみ）
+			// 奨励金情報設定
 			if (shoreikinOpt.isPresent()) {
 				Shoreikin shoreikin = shoreikinOpt.get();
-				// 数値を文字列に変換し、nullチェックを実施
-				Long kofuZeigaku = shoreikin.getKofuZeigaku();
 				Long kofuGaku = shoreikin.getKofuGaku();
-
-				// 数値のみを設定（JRXMLで単位を付与）
-				dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
 				dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
 
-				log.info("奨励金情報設定: 納入額={}, 交付額={}", dto.getNonyugaku(), dto.getKofugaku());
+				if (shoreikin.getKofuYmd() != null) {
+					dto.setKofuYmd(shoreikin.getKofuYmd().toString());
+				}
+
+				log.info("奨励金情報設定: 交付額={}", dto.getKofugaku());
 			} else {
-				// 奨励金情報が存在しない場合はデフォルト値
-				dto.setNonyugaku("0");
 				dto.setKofugaku("0");
-				log.warn("奨励金情報が見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);
+				log.warn("奨励金情報が見つかりません: shiteiNo={}", shiteiNo);
 			}
 
-			// 固定値設定
-			dto.setCityName(jichitaiName);
-			dto.setJorei(jorei);
-			dto.setHakkoYoshiki(hakkoYoshiki);
-			dto.setKofuJoken(kofuJoken);
-
-			log.info("交付申請書データ取得完了: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
+			log.info("交付決定通知書データ取得完了: {}", dto.getShiteiNo());
 			return dto;
 
 		} catch (Exception e) {
-			log.error("交付申請書データ取得中にエラーが発生しました - 指定番号: {}, 年度: {}", shiteiNo, nendo, e);
+			log.error("交付決定通知書データ取得中にエラーが発生しました - 指定番号: {}", shiteiNo, e);
 			return null;
 		}
 	}
