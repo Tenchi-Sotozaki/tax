@@ -160,6 +160,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 合算申告納入承認通知書ボタンのクリックイベント
+    const btnGassan = document.getElementById('btnReportGassan');
+    if (btnGassan) {
+        btnGassan.addEventListener('click', function() {
+            if (shiteiNo) {
+                const url = '/accommodation-tax/reports/gassanNonyuTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
 });
 
 /**

@@ -101,4 +101,7 @@ public final class ScreenManagement {
 
 	// 宿泊税特別徴収事務交付金交付決定通知書
 	public static final String KOFU_KETTEI_TSUCHI = "ms00000020";
+
+	// 合算申告納入承認通知書
+	public static final String GASSAN_NONYU_TSUCHI = "ms00000021";
 }
