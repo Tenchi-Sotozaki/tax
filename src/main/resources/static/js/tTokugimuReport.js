@@ -128,6 +128,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 奨励金交付申請書ボタンのクリックイベント
+    const btnKofuShinsei = document.getElementById('btnReportShoreikinShinsei');
+    if (btnKofuShinsei) {
+        console.log('奨励金交付申請書ボタンが見つかりました。');
+        btnKofuShinsei.addEventListener('click', function() {
+            console.log('奨励金交付申請書ボタンがクリックされました。指定番号:', shiteiNo);
+            if (shiteiNo) {
+                const url = '/accommodation-tax/reports/kofuShinsei?shiteiNo=' + encodeURIComponent(shiteiNo);
+                console.log('開くURL:', url);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
 });
 
 /**
