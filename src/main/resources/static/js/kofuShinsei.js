@@ -13,15 +13,9 @@ function loadReportData() {
         return;
     }
     
-    // 年度のバリデーション
-    if (isNaN(nendo) || nendo.length !== 4) {
-        alert('正しい年度を入力してください（例：2024）');
-        return;
-    }
-    
     const formData = new FormData();
     formData.append('shiteiNo', shiteiNo);
-    formData.append('nendo', nendo);
+    formData.append('nendo', nendo); // yyyy-MM形式で送信
     formData.append('_csrf', document.querySelector('input[name="_csrf"]').value);
     
     fetch('/accommodation-tax/reports/kofuShinsei/reload', {

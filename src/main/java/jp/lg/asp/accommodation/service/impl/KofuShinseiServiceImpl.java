@@ -115,11 +115,17 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 			}
 			dto.setShisetsuJusho(shisetsuJusho.toString());
 
-			// 奨励金情報設定
+			// 奨励金情報設定（数値のみ）
 			if (shoreikinOpt.isPresent()) {
 				Shoreikin shoreikin = shoreikinOpt.get();
-				dto.setNonyugaku(String.valueOf(shoreikin.getKofuZeigaku() != null ? shoreikin.getKofuZeigaku() : 0));
-				dto.setKofugaku(String.valueOf(shoreikin.getKofuGaku() != null ? shoreikin.getKofuGaku() : 0));
+				// 数値を文字列に変換し、nullチェックを実施
+				Long kofuZeigaku = shoreikin.getKofuZeigaku();
+				Long kofuGaku = shoreikin.getKofuGaku();
+				
+				// 数値のみを設定（JRXMLで単位を付与）
+				dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
+				dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
+				
 				log.info("奨励金情報設定: 納入額={}, 交付額={}", dto.getNonyugaku(), dto.getKofugaku());
 			} else {
 				// 奨励金情報が存在しない場合はデフォルト値

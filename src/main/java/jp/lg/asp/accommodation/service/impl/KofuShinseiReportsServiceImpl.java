@@ -29,6 +29,12 @@ public class KofuShinseiReportsServiceImpl implements KofuShinseiReportsService 
     public byte[] generateKofuShinseiPdf(KofuShinseiDto dto) {
         try {
             log.info("PDF生成開始 - 指定番号: {}", dto.getShiteiNo());
+            log.info("申告納入金額: {}", dto.getNonyugaku());
+            log.info("交付申請額: {}", dto.getKofugaku());
+            
+            // JasperReportsのIPAex明朝フォント設定
+            System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
+            System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
             
             // JRXMLファイルをコンパイル
             ClassPathResource resource = new ClassPathResource("reports/kofukinShinsei.jrxml");
@@ -50,7 +56,7 @@ public class KofuShinseiReportsServiceImpl implements KofuShinseiReportsService 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
             log.info("レポート生成完了");
 
-            // PDF出力
+            // PDF出力（IPAex明朝フォント使用）
             byte[] pdfData = JasperExportManager.exportReportToPdf(jasperPrint);
             log.info("PDF出力完了 - サイズ: {} bytes", pdfData.length);
             

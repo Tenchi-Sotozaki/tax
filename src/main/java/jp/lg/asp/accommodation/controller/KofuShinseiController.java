@@ -45,8 +45,9 @@ public class KofuShinseiController {
 		if (shiteiNo != null && !shiteiNo.isEmpty()) {
 			// 指定番号に基づいて特別徴収義務者情報と施設情報を取得
 			if (nendo != null && !nendo.isEmpty()) {
-				// 年度が指定されている場合
-				dto = kofuShinseiService.getReportData(shiteiNo, nendo);
+				// 年度が指定されている場合はyyyy部分のみを抽出
+				String nenodoYear = nendo.split("-")[0];
+				dto = kofuShinseiService.getReportData(shiteiNo, nenodoYear);
 			} else {
 				// デフォルト（現在年度）で取得
 				dto = kofuShinseiService.getReportData(shiteiNo);
@@ -57,16 +58,29 @@ public class KofuShinseiController {
 				dto.setShiteiNo(shiteiNo);
 				if (nendo != null && !nendo.isEmpty()) {
 					dto.setNendo(nendo);
+				} else {
+					// デフォルト年度を設定（yyyy-MM形式）
+					java.time.LocalDate now = java.time.LocalDate.now();
+					int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+					dto.setNendo(currentYear + "-04");
+				}
+			} else {
+				// 取得したデータに年度を設定（yyyy-MM形式で）
+				if (nendo != null && !nendo.isEmpty()) {
+					dto.setNendo(nendo);
+				} else {
+					java.time.LocalDate now = java.time.LocalDate.now();
+					int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+					dto.setNendo(currentYear + "-04");
 				}
 			}
 		}
 		
-		// 年度が設定されていない場合、デフォルト年度を設定
+		// 年度が設定されていない場合、デフォルト年度を設定（yyyy-MM形式）
 		if (dto.getNendo() == null || dto.getNendo().isEmpty()) {
 			java.time.LocalDate now = java.time.LocalDate.now();
-			String currentNendo = String.valueOf(
-					now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1);
-			dto.setNendo(currentNendo);
+			int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+			dto.setNendo(currentYear + "-04");
 		}
 
 		model.addAttribute("dto", dto);
@@ -82,8 +96,9 @@ public class KofuShinseiController {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
-			// 年度を直接使用
-			KofuShinseiDto dto = kofuShinseiService.getReportData(shiteiNo, nendo);
+			// 年度からyyyy部分のみを抽出
+			String nendoYear = nendo.split("-")[0];
+			KofuShinseiDto dto = kofuShinseiService.getReportData(shiteiNo, nendoYear);
 
 			if (dto == null) {
 				dto = new KofuShinseiDto();
@@ -107,10 +122,18 @@ public class KofuShinseiController {
 	public ResponseEntity<byte[]> generatePdf(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			KofuShinseiDto reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+			
+			// 年度が指定されている場合はその年度で取得
+			KofuShinseiDto reportData;
+			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
+				String nendoYear = dto.getNendo().split("-")[0];
+				reportData = kofuShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
+			} else {
+				reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+			}
 
 			if (reportData == null) {
-				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
+				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 				return ResponseEntity.badRequest().build();
 			}
 
@@ -134,10 +157,18 @@ public class KofuShinseiController {
 	public ResponseEntity<byte[]> preview(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			KofuShinseiDto reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+			
+			// 年度が指定されている場合はその年度で取得
+			KofuShinseiDto reportData;
+			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
+				String nendoYear = dto.getNendo().split("-")[0];
+				reportData = kofuShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
+			} else {
+				reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+			}
 
 			if (reportData == null) {
-				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
+				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 				return ResponseEntity.badRequest().build();
 			}
 
@@ -162,10 +193,18 @@ public class KofuShinseiController {
 	public ResponseEntity<byte[]> print(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			KofuShinseiDto reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+			
+			// 年度が指定されている場合はその年度で取得
+			KofuShinseiDto reportData;
+			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
+				String nendoYear = dto.getNendo().split("-")[0];
+				reportData = kofuShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
+			} else {
+				reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+			}
 
 			if (reportData == null) {
-				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
+				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 				return ResponseEntity.badRequest().build();
 			}
 
