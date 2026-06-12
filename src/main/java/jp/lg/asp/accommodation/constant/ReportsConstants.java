@@ -18,4 +18,6 @@ public final class ReportsConstants {
 	public static final String TOKUGIMU_JURI_JOREI = "RPT0000003";
 	// 納入申告書の提出期限等の特例適用者指定通知条令
 	public static final String TOKUREI_SHITEI_JOREI = "RPT0000005";
+	// 特別徴収義務者奨励金交付要綱
+	public static final String SHOREIKIN_KOFU_JOREI = "RPT0000006";
 }

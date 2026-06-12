@@ -48,7 +48,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		jichitaiName = jichitaiInfo.getName();
-		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_SHITEI_JOREI);
+		jorei = reportsCommonService.getReportsDefText(ReportsConstants.SHOREIKIN_KOFU_JOREI);
 	}
 
 	@Override
@@ -121,11 +121,11 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 				// 数値を文字列に変換し、nullチェックを実施
 				Long kofuZeigaku = shoreikin.getKofuZeigaku();
 				Long kofuGaku = shoreikin.getKofuGaku();
-				
+
 				// 数値のみを設定（JRXMLで単位を付与）
 				dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
 				dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
-				
+
 				log.info("奨励金情報設定: 納入額={}, 交付額={}", dto.getNonyugaku(), dto.getKofugaku());
 			} else {
 				// 奨励金情報が存在しない場合はデフォルト値

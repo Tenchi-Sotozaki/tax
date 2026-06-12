@@ -48,7 +48,7 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		jichitaiName = jichitaiInfo.getName();
-		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_SHITEI_JOREI);
+		jorei = reportsCommonService.getReportsDefText(ReportsConstants.SHOREIKIN_KOFU_JOREI);
 	}
 
 	@Override
