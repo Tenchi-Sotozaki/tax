@@ -98,4 +98,7 @@ public final class ScreenManagement {
 
 	// 宿泊税特別徴収事務交付金交付申請書
 	public static final String KOFU_SHINSEI = "ms00000019";
+
+	// 宿泊税特別徴収事務交付金交付決定通知書
+	public static final String KOFU_KETTEI_TSUCHI = "ms00000020";
 }
