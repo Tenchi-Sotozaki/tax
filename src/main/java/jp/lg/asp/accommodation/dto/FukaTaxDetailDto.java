@@ -15,9 +15,8 @@ public class FukaTaxDetailDto {
 	private Long taxAmount;
 
 	private BigDecimal zeiritsuSeq;
-	private BigDecimal teigakuSeq;
-	
+
 	private List<Long> taxCategoryAmounts; // 区分ごとの課税対象料金リスト
-	private Long menjoRyokin;              // 課税対象外(免除)の宿泊料金
+	private Long menjoRyokin; // 課税対象外(免除)の宿泊料金
 
 }

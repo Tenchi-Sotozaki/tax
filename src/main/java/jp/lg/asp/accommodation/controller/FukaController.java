@@ -102,8 +102,13 @@ public class FukaController {
 			}
 		}
 
-		FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo, month);
-		model.addAttribute("fukaDeclarationForm", form);
+		try {
+			FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo, month);
+			model.addAttribute("fukaDeclarationForm", form);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+			return "redirect:/declaration/payment-ledger/" + shiteiNo;
+		}
 		return CONFIG_VIEW;
 	}
 
@@ -182,7 +187,7 @@ public class FukaController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		
+
 		accessChecker.checkAccess(SCREEN_ID);
 
 		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
@@ -232,7 +237,7 @@ public class FukaController {
 			// バリデーションをすべて通過、またはユーザーが警告を承認（バイパス）したため保存を実行
 			fukaService.saveDeclaration(form);
 			return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
-			
+
 		} catch (RuntimeException e) {
 			log.error("保存処理中に予期せぬエラーが発生しました", e);
 			model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());

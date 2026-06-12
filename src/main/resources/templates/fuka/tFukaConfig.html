@@ -18,8 +18,14 @@
 			</h5>
 		</div>
 
-		<div th:if="${errorMessage}" class="alert alert-danger py-2 mb-3" role="alert">
-			<i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
+		<!-- 成功・エラーメッセージ -->
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+		    <span th:text="${successMessage}"></span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+		    <span th:text="${errorMessage}"></span>
+		    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 		<form id="fukaDeclarationForm" th:action="@{/declaration/save}" th:object="${fukaDeclarationForm}"
@@ -123,7 +129,6 @@
 								<tbody>
 									<tr th:each="detail, stat : *{monthlyDetail.taxDetails}" class="tax-detail-row">
 										<input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}" />
-										<input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].teigakuSeq}" />
 										<input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
 										<td class="text-center fw-medium bg-light">
 											<span th:text="${(detail.label != null AND detail.taxRate != null) ? detail.label + ' (' + #numbers.formatInteger(detail.taxRate, 1, 'COMMA') + '円)' : '(設定未完了)'}">区分名</span>

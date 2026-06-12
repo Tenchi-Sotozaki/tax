@@ -22,15 +22,15 @@ public class FukaDaichoForm {
 	// 指定番号
 	private String shiteiNo;
 
-	// 特別徴収義務者名称
-	private String obligorName;
-
-	// 周期区分名称
-	private String shukiKbnName;
+	// 施設名称
+	private String shisetsuName;
 
 	// 合計金額
 	private Long totalAmount;
 
 	// 納入金額管理台帳明細リスト
 	private List<FukaDaichoListItem> items = new ArrayList<>();
+
+	// 周期
+	private Integer shuki;
 }

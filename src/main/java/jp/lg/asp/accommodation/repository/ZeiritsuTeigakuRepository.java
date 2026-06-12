@@ -35,8 +35,4 @@ public interface ZeiritsuTeigakuRepository extends JpaRepository<ZeiritsuTeigaku
 
 	// 自治体コードで検索し、料金開始額の昇順（安い順）で取得する
 	List<ZeiritsuTeigaku> findByJichitaiCdOrderByRyokinStAsc(String jichitaiCd);
-
-	// 自治体コード + 親マスタseq + 削除フラグで絞り込み、料金開始額の昇順で取得する
-	List<ZeiritsuTeigaku> findByJichitaiCdAndSeqAndDelFlgOrderByRyokinStAsc(
-			String jichitaiCd, BigDecimal seq, String delFlg);
 }

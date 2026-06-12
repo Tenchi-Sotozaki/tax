@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 
 import lombok.Data;
 
@@ -13,7 +12,7 @@ import lombok.Data;
 @Table(name = "t_choshu_genbo")
 @IdClass(ChoshuGenboId.class) // 💡 複合主キーを指定
 @Data
-public class ChoshuGenbo {
+public class ChoshuGenbo extends BaseEntity {
 	@Id
 	@Column(name = "jichitai_cd")
 	private String jichitaiCd;
@@ -88,16 +87,4 @@ public class ChoshuGenbo {
 	private Long uchiIdx30;
 	@Column(name = "uchi_idx_31")
 	private Long uchiIdx31;
-
-	// 共通項目 (Audit Fields)
-	@Column(name = "add_dt")
-	private java.time.LocalDateTime addDt;
-	@Column(name = "add_user")
-	private String addUser;
-	@Column(name = "upd_dt")
-	private java.time.LocalDateTime updDt;
-	@Column(name = "upd_user")
-	private String updUser;
-	@Version
-	private Integer version;
 }

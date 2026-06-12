@@ -15,15 +15,16 @@ import jp.lg.asp.accommodation.entity.FukaId;
 public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 
 	// 基本の検索（全件表示用）
+	@Query("""
+			SELECT f FROM Fuka f
+			WHERE f.jichitaiCd = :jichitaiCd
+			AND f.shiteiNo = :shiteiNo
+			AND f.nendo = :nendo
+			AND f.newFlg = "1"
+			AND f.delFlg = "0"
+			ORDER BY f.kibetsu ASC
+			""")
 	List<Fuka> findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(
-			String jichitaiCd, String shiteiNo, String nendo);
-
-	// 申告済み絞り込み：shinkokuYmd が NULL ではない
-	List<Fuka> findByJichitaiCdAndShiteiNoAndNendoAndShinkokuYmdIsNotNullOrderByKibetsuAsc(
-			String jichitaiCd, String shiteiNo, String nendo);
-
-	// 未申告絞り込み：shinkokuYmd が NULL である
-	List<Fuka> findByJichitaiCdAndShiteiNoAndNendoAndShinkokuYmdIsNullOrderByKibetsuAsc(
 			String jichitaiCd, String shiteiNo, String nendo);
 
 	Optional<Fuka> findByJichitaiCdAndShiteiNoAndKibetsu(String jichitaiCd, String shiteiNo, Integer kibetsu);
