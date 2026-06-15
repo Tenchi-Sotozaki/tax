@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,7 +122,7 @@ public class KofukinFurikomiController {
 		}
 
 		byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}; // UTF-8 BOM
-		byte[] csvData = sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+		byte[] csvData = sb.toString().getBytes(StandardCharsets.UTF_8);
 		byte[] body = new byte[bom.length + csvData.length];
 		System.arraycopy(bom, 0, body, 0, bom.length);
 		System.arraycopy(csvData, 0, body, bom.length, csvData.length);
