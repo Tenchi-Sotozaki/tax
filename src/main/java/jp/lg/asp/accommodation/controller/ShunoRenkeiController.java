@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -123,7 +124,11 @@ public class ShunoRenkeiController {
 			sb.append('\n');
 		}
 
-		byte[] body = sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+		byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}; // UTF-8 BOM
+		byte[] csvData = sb.toString().getBytes(StandardCharsets.UTF_8);
+		byte[] body = new byte[bom.length + csvData.length];
+		System.arraycopy(bom, 0, body, 0, bom.length);
+		System.arraycopy(csvData, 0, body, bom.length, csvData.length);
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setContentType(MediaType.parseMediaType("text/csv;charset=utf-8"));
 		httpHeaders.setContentDisposition(ContentDisposition.attachment().filename("shuno_renkei.csv").build());

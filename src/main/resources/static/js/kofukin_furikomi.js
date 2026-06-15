@@ -99,20 +99,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 nendo: item.getAttribute('data-nendo')
             }));
             
-            // CSV出力のPOSTリクエスト
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/kofukinFurikomi/download';
+            // CSRFトークンを取得
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
             
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'keys';
-            input.value = JSON.stringify(keys);
-            
-            form.appendChild(input);
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
+            // JSONでPOSTリクエストを送信
+            fetch('/accommodation-tax/kofukinFurikomi/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(keys)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('CSV出力に失敗しました');
+                }
+            })
+            .then(blob => {
+                // ファイルダウンロード
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'kofukin_furikomi.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('CSV出力中にエラーが発生しました。');
+            });
         });
     }
 });
