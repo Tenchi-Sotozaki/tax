@@ -215,7 +215,7 @@ public class FukaController {
 		if (!form.isTaxCheckBypassed()) {
 			List<String> discrepancyMessages = fukaValidatorService.getDiscrepancyMessages(form);
 			if (!discrepancyMessages.isEmpty()) {
-				log.info("金額または宿泊数のズレを検知しました。確認モーダルを表示します。");
+				log.debug("金額または宿泊数のズレを検知しました。確認モーダルを表示します。");
 				model.addAttribute("showTaxWarningModal", true);
 				model.addAttribute("discrepancyMessages", discrepancyMessages);
 				return CONFIG_VIEW;
@@ -226,6 +226,7 @@ public class FukaController {
 		try {
 			// バリデーションをすべて通過、またはユーザーが警告を承認（バイパス）したため保存を実行
 			fukaService.saveDeclaration(form);
+			redirectAttributes.addFlashAttribute("successMessage", "賦課情報を更新しました。");
 			return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
 
 		} catch (RuntimeException e) {

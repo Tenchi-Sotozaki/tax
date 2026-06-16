@@ -53,6 +53,6 @@ public interface FukaService {
 	/**
 	 * 賦課区分に応じた税額計算を行う。
 	 */
-	long calculateTax(String fukaKbn, long baseValue, BigDecimal rate);
+	long calculateTax(String fukaKbn, long baseValue, BigDecimal cityRate, BigDecimal kenRate);
 
 }

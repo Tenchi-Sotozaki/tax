@@ -19,11 +19,17 @@ public class FukaMonthlyDeclarationDto {
 	@Valid
 	private List<FukaTaxDetailDto> taxDetails = new ArrayList<>();
 
+	// 免除料金
+	private Long exemptRyokin;
+
 	// 免除宿泊数
 	private Long exemptStayCount;
 
 	// 宿泊数合計
 	private Long totalStayCount;
+
+	// 宿泊料金合計
+	private Long kazeiRyokin;
 
 	// 宿泊税額合計
 	private Long totalPaymentAmount;
@@ -37,18 +43,6 @@ public class FukaMonthlyDeclarationDto {
 	// ==========================================
 	// ✨ 【新規追加】定率制用のフィールド
 	// ==========================================
-
-	// 課税対象宿泊料金
-	private Long kazeiRyokin;
-
-	// 税額（定率計算後）
-	private Long teiritsuZeigaku;
-
-	// 課税対象外宿泊料金
-	private Long menjoRyokin;
-
-	// 総宿泊料金
-	private Long totalRyokin;
 
 	// 総宿泊数（統計用）
 	private Long totalHakusu;

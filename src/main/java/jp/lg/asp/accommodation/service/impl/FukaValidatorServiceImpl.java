@@ -1,12 +1,10 @@
 package jp.lg.asp.accommodation.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
@@ -60,16 +58,8 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			return messages;
 		}
 
-		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
-
 		// 1. 宿泊数の不整合チェック
-		if (StringUtils.hasText(detail.getPaymentYearMonth())) {
-			if (FukaConstants.TEIRITSU.equals(kbn)) {
-				checkStayCountForTeiritsu(form, messages);
-			} else {
-				checkStayCountForTeigaku(detail, messages);
-			}
-		}
+		checkStayCount(detail, messages);
 
 		// 2. 税額合計の不整合チェック
 		checkTaxTotalDiscrepancy(form, messages);
@@ -89,18 +79,15 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			return 0L;
 		}
 
-		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 		long total = 0L;
 
 		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
-			BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
-
-			if (FukaConstants.TEIRITSU.equals(kbn)) {
+			if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 				long ryokin = (d.getRyokin() != null) ? d.getRyokin() : 0L;
-				total += fukaService.calculateTax(form.getFukaKbn(), ryokin, rate);
+				total += fukaService.calculateTax(form.getFukaKbn(), ryokin, d.getTaxRate(), d.getTaxKenRate());
 			} else {
 				long count = (d.getHakusu() != null) ? d.getHakusu() : 0L;
-				total += fukaService.calculateTax(form.getFukaKbn(), count, rate);
+				total += fukaService.calculateTax(form.getFukaKbn(), count, d.getTaxRate(), d.getTaxKenRate());
 			}
 		}
 		return total;
@@ -114,20 +101,6 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			return;
 		}
 
-		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
-
-		boolean hasInput;
-		if (FukaConstants.TEIRITSU.equals(kbn)) {
-			hasInput = detail.getTaxDetails().stream()
-					.anyMatch(d -> d.getRyokin() != null && d.getRyokin() > 0);
-		} else {
-			hasInput = detail.getTaxDetails().stream()
-					.anyMatch(d -> d.getHakusu() != null && d.getHakusu() > 0);
-		}
-		if (!hasInput) {
-			return;
-		}
-
 		long expectedTotal = calculateExpectedTotal(form);
 		long inputTotal = (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0L;
 
@@ -136,9 +109,9 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		}
 	}
 
-	// ===== 宿泊数チェック（定額制） =====
+	// ===== 宿泊数チェック =====
 
-	private void checkStayCountForTeigaku(FukaMonthlyDeclarationDto detail, List<String> messages) {
+	private void checkStayCount(FukaMonthlyDeclarationDto detail, List<String> messages) {
 		long sumOfDetails = 0;
 		if (detail.getTaxDetails() != null) {
 			for (FukaTaxDetailDto taxDetail : detail.getTaxDetails()) {
@@ -155,29 +128,6 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 
 		if (totalStayCount != sumOfDetails) {
 			messages.add(String.format("宿泊数の不一致: 各区分の合計 = %,d人泊、画面の総宿泊数 = %,d人泊", sumOfDetails, totalStayCount));
-		}
-	}
-
-	// ===== 宿泊数チェック（定率制） =====
-
-	private void checkStayCountForTeiritsu(FukaDeclarationForm form, List<String> messages) {
-		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
-
-		long sumOfDetails = 0;
-		if (detail.getTaxDetails() != null) {
-			for (FukaTaxDetailDto taxDetail : detail.getTaxDetails()) {
-				if (taxDetail.getHakusu() != null) {
-					sumOfDetails += taxDetail.getHakusu();
-				}
-			}
-		}
-
-		long exemptHakusu = (detail.getExemptStayCount() != null) ? detail.getExemptStayCount() : 0;
-		long totalStayCount = (detail.getTotalStayCount() != null) ? detail.getTotalStayCount() : 0;
-
-		if (totalStayCount != (sumOfDetails + exemptHakusu)) {
-			messages.add(String.format("宿泊数の不一致: 区分合計(%,d) + 対象外(%,d) = %,d人泊、画面の総宿泊数 = %,d人泊",
-					sumOfDetails, exemptHakusu, sumOfDetails + exemptHakusu, totalStayCount));
 		}
 	}
 

@@ -977,8 +977,12 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			long totalShukuhakushaSu = fuka.getKazeiHakusu();
 			long ryokin = totalShukuhakushaSu > 0 ? totalRyokin / totalShukuhakushaSu : 0;
 			long kenZeigaku = getKenZeigaku(ryokin, taishoYm) * totalShukuhakushaSu;
+			long cityZeigaku = fuka.getTotalZeigaku() - kenZeigaku >= 0
+					? fuka.getTotalZeigaku() - kenZeigaku
+					: 0L;
+			kenZeigaku = fuka.getTotalZeigaku() - cityZeigaku;
+			fuka.setCityZeigaku(cityZeigaku);
 			fuka.setKenZeigaku(kenZeigaku);
-			fuka.setCityZeigaku(fuka.getTotalZeigaku() - kenZeigaku);
 		}
 		fukaRepository.save(fuka);
 	}

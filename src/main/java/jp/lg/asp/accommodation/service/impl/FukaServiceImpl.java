@@ -454,13 +454,6 @@ public class FukaServiceImpl implements FukaService {
 					form.setModificationCategory(entity.getHenkoKbn());
 					form.setModificationReason(entity.getHenkoRiyu());
 
-					if (FukaConstants.TEIRITSU.getValue().equals(entity.getFukaKbn())) {
-						form.setKazeiRyokin(entity.getKazeiRyokin());
-						form.setTeiritsuZeigaku(entity.getZeigaku());
-						form.setMenjoRyokin(entity.getMenjoRyokin());
-						form.setKazeiHakusu(entity.getKazeiHakusu());
-					}
-
 					// 加算金
 					form.setAdditionalCategory(entity.getKasanKbn());
 					if (entity.getKasanRitsu() != null) {
@@ -492,59 +485,16 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	@Transactional
 	public void saveDeclaration(FukaDeclarationForm form) {
-		if (!Boolean.TRUE.equals(form.isTaxCheckBypassed())) {
-			if (hasTaxAmountDiscrepancy(form)) {
-				// 不整合があれば、保存処理を中断してフラグを立てる
-				form.setShowTaxWarningModal(true);
-				return; // ⚠️ ここで処理を終了し、画面に戻す（保存されない）
-			}
-		}
-
-		// 💡 追記：年度・期別の Null ガード（DBエラー防止の要だぜ）
-		if (!StringUtils.hasText(form.getNendo()) || form.getKibetsu() == null) {
-			String ym = form.getMonthlyDetail().getPaymentYearMonth();
-			if (StringUtils.hasText(ym)) {
-				form.setNendo(calculateNendo(ym));
-				form.setKibetsu(calculateKibetsu(ym));
-			}
-		}
 
 		Integer targetRno = determineNextRno(form.getShiteiNo(), form.getNendo(), form.getKibetsu());
 
-		FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
-		Fuka parentFuka = createParentFuka(form, dto, jichitaiCd);
+		Fuka parentFuka = createParentFuka(form);
 		parentFuka.setRno(targetRno);
-
-		// DTOからparentFukaへの値マッピング（NOT NULL制約違反防止：nullの場合はデフォルト値0を代入）
-		if (dto != null) {
-			parentFuka.setTotalHakusu(dto.getTotalStayCount() != null ? dto.getTotalStayCount() : 0);
-			// kazeiRyokin: DTO直下にバインドがない場合、taxDetailsの各区分から合計を算出
-			Long kazeiRyokinTotal = 0L;
-			if (dto.getKazeiRyokin() != null && dto.getKazeiRyokin() > 0) {
-				kazeiRyokinTotal = dto.getKazeiRyokin();
-			} else if (dto.getTaxDetails() != null) {
-				kazeiRyokinTotal = dto.getTaxDetails().stream()
-						.mapToLong(d -> d.getRyokin() != null ? d.getRyokin().longValue() : 0L)
-						.sum();
-			}
-			parentFuka.setKazeiRyokin(kazeiRyokinTotal);
-			// totalZeigaku: totalPaymentAmount > taxDetails[0].taxAmount > 0L
-			Long taxAmount = null;
-			if (dto.getTotalPaymentAmount() != null && dto.getTotalPaymentAmount() > 0) {
-				taxAmount = dto.getTotalPaymentAmount();
-			}
-			parentFuka.setTotalZeigaku(taxAmount != null ? taxAmount : 0L);
-			log.info(
-					"★★★ [saveDeclaration] totalZeigaku={}, taxAmount={}, nonyuKingaku={}, totalPaymentAmount={}, fukaKbn={}",
-					parentFuka.getTotalZeigaku(), taxAmount, dto.getNonyuKingaku(), dto.getTotalPaymentAmount(),
-					form.getFukaKbn());
-			parentFuka.setZeigaku(dto.getNonyuKingaku() != null ? dto.getNonyuKingaku() : 0L);
-		}
 
 		List<FukaUchi> uchiList = createFukaUchiList(form, parentFuka);
 
-		// 子リストの税額合計を親エンティティにセット
-		if (!uchiList.isEmpty()) {
+		// 定額の場合は、市区町村税額、都道府県税額に賦課内訳情報の合計を設定
+		if (FukaConstants.TEIGAKU.getValue().equals(parentFuka.getFukaKbn())) {
 			long cityZeigakuSum = uchiList.stream()
 					.mapToLong(u -> u.getCityZeigaku() != null ? u.getCityZeigaku() : 0L)
 					.sum();
@@ -553,7 +503,6 @@ public class FukaServiceImpl implements FukaService {
 					.sum();
 			parentFuka.setCityZeigaku(cityZeigakuSum);
 			parentFuka.setKenZeigaku(kenZeigakuSum);
-			parentFuka.setTotalZeigaku(cityZeigakuSum + kenZeigakuSum);
 		}
 
 		fukaRepository.save(parentFuka);
@@ -598,17 +547,17 @@ public class FukaServiceImpl implements FukaService {
 
 			if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 				// 定率制: 都道府県税額、市区町村税額算出なし
-				uchi.setZeigaku(detail.getZeigaku());
+				uchi.setZeigaku(getLongValue(detail.getZeigaku()));
 				uchi.setCityZeigaku(null);
 				uchi.setKenZeigaku(null);
-				uchi.setRyokin(detail.getRyokin());
-				uchi.setRyokinSogaku(detail.getRyokinSogaku());
+				uchi.setRyokin(getLongValue(detail.getRyokin()));
+				uchi.setRyokinSogaku(getLongValue(detail.getRyokinSogaku()));
 			} else {
 				// 定額制: 都道府県税額、市区町村税額を算出
-				long hakusu = detail.getHakusu() != null ? detail.getHakusu() : 0L;
+				long hakusu = getLongValue(detail.getHakusu());
 				long kenZeigaku = detail.getTaxKenRate().longValue() * hakusu;
 				long zeigaku = (detail.getZeigaku() != null) ? detail.getZeigaku() : 0L;
-				long cityZeigaku = zeigaku - kenZeigaku >= 0L ? zeigaku - kenZeigaku : zeigaku; // 差引き
+				long cityZeigaku = zeigaku - kenZeigaku >= 0L ? zeigaku - kenZeigaku : 0L; // 差引き
 				kenZeigaku = zeigaku - cityZeigaku;
 				uchi.setZeigaku(zeigaku);
 				uchi.setKenZeigaku(kenZeigaku);
@@ -616,7 +565,7 @@ public class FukaServiceImpl implements FukaService {
 				uchi.setRyokin(null);
 				uchi.setRyokinSogaku(null);
 			}
-			uchi.setHakusu(detail.getHakusu());
+			uchi.setHakusu(getLongValue(detail.getHakusu()));
 			uchi.setZeiRitsu(detail.getTaxRate());
 
 			uchiList.add(uchi);
@@ -644,8 +593,8 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 親エンティティを生成する。
 	 */
-	private Fuka createParentFuka(FukaDeclarationForm form, FukaMonthlyDeclarationDto dto,
-			String jichitaiCd) {
+	private Fuka createParentFuka(FukaDeclarationForm form) {
+		FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
 		String taishoYm = dto.getPaymentYearMonth().replace("年", "").replace("月", "");
 		Fuka parentFuka = new Fuka();
 		parentFuka.setJichitaiCd(jichitaiCd);
@@ -667,46 +616,59 @@ public class FukaServiceImpl implements FukaService {
 		parentFuka.setNewFlg(DEFAULT_NEW_FLG);
 		parentFuka.setDelFlg(DEFAULT_DEL_FLG);
 		parentFuka.setTaishoYm(taishoYm);
-		parentFuka.setTotalHakusu(dto.getTotalStayCount() != null ? dto.getTotalStayCount() : 0);
-		parentFuka.setTotalZeigaku(dto.getTotalPaymentAmount() != null ? dto.getTotalPaymentAmount() : 0L);
-		parentFuka.setMenjoHakusu(dto.getExemptStayCount() != null ? dto.getExemptStayCount() : 0);
-		parentFuka.setCityZeigaku(parentFuka.getTotalZeigaku());
-		parentFuka.setKenZeigaku(0L);
+		parentFuka.setTotalHakusu(getLongValue(dto.getTotalStayCount()));
+		parentFuka.setKazeiHakusu(getLongValue(dto.getTotalStayCount()) - getLongValue(dto.getExemptStayCount()));
+		parentFuka.setTotalZeigaku(getLongValue(dto.getTotalPaymentAmount()));
+		parentFuka.setZeigaku(getLongValue(dto.getTotalPaymentAmount()));
+		parentFuka.setMenjoHakusu(getLongValue(dto.getExemptStayCount()));
 
-		// 定率制（fukaKbn == '2'）の場合にフォームの定率制フィールドをエンティティにマッピングする
 		if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
-			// kazeiRyokin: form直下またはmonthlyDetailのどちらから取得（null安全）
-			Long kazeiRyokinValue = form.getKazeiRyokin();
-			if (kazeiRyokinValue == null) {
-				kazeiRyokinValue = dto.getKazeiRyokin();
-			}
-			parentFuka.setKazeiRyokin(kazeiRyokinValue != null ? kazeiRyokinValue : 0L);
-			parentFuka.setZeigaku(form.getTeiritsuZeigaku() != null ? form.getTeiritsuZeigaku() : 0L);
-			parentFuka.setMenjoRyokin(form.getMenjoRyokin() != null ? form.getMenjoRyokin() : 0L);
-			parentFuka.setKazeiHakusu(form.getKazeiHakusu() != null ? form.getKazeiHakusu() : 0L);
+			// 定率制
+			long totalRyokin = getLongValue(dto.getKazeiRyokin());
+			parentFuka.setKazeiRyokin(totalRyokin);
+			parentFuka.setMenjoRyokin(getLongValue(dto.getExemptRyokin()));
+			// 市区町村税額、都道府県税額は賦課内訳を算出
+			long totalShukuhakushaSu = parentFuka.getKazeiHakusu();
+			long ryokin = totalShukuhakushaSu > 0 ? totalRyokin / totalShukuhakushaSu : 0;
+			long kenZeigaku = getKenZeigaku(ryokin, taishoYm) * totalShukuhakushaSu;
+			long cityZeigaku = parentFuka.getTotalZeigaku() - kenZeigaku >= 0
+					? parentFuka.getTotalZeigaku() - kenZeigaku
+					: 0L;
+			kenZeigaku = parentFuka.getTotalZeigaku() - cityZeigaku;
+			parentFuka.setCityZeigaku(cityZeigaku);
+			parentFuka.setKenZeigaku(kenZeigaku);
+		} else {
+			// 定額制
+			// 市区町村税額、都道府県税額は賦課内訳の算出後に合計を設定
+			parentFuka.setCityZeigaku(0L);
+			parentFuka.setKenZeigaku(0L);
 		}
 
-		mapAdditionalFields(form, parentFuka);
+		parentFuka.setKasanKbn(form.getAdditionalCategory());
+		if (StringUtils.hasText(form.getAdditionalRate())) {
+			try {
+				parentFuka.setKasanRitsu(new BigDecimal(form.getAdditionalRate()));
+			} catch (NumberFormatException e) {
+				log.warn("加算割合の数値変換に失敗しました: {}", form.getAdditionalRate());
+				parentFuka.setKasanRitsu(null);
+			}
+		} else {
+			parentFuka.setKasanRitsu(null);
+		}
+		parentFuka.setKasanGaku(form.getAdditionalAmount());
+		parentFuka.setNokigen(form.getAdditionalDueDate());
+
 		return parentFuka;
 	}
 
 	/**
-	 * 追加項目をエンティティにマッピングする。
+	 * 都道府県税額を取得する
 	 */
-	private void mapAdditionalFields(FukaDeclarationForm form, Fuka entity) {
-		entity.setKasanKbn(form.getAdditionalCategory());
-		if (StringUtils.hasText(form.getAdditionalRate())) {
-			try {
-				entity.setKasanRitsu(new java.math.BigDecimal(form.getAdditionalRate()));
-			} catch (NumberFormatException e) {
-				log.warn("加算割合の数値変換に失敗しました: {}", form.getAdditionalRate());
-				entity.setKasanRitsu(null);
-			}
-		} else {
-			entity.setKasanRitsu(null);
-		}
-		entity.setKasanGaku(form.getAdditionalAmount());
-		entity.setNokigen(form.getAdditionalDueDate());
+	private long getKenZeigaku(Long shukuhakuRyokin, String taishoYm) {
+		Optional<ZeiritsuTeigaku> teigakuOp = zeiritsuTeigakuRepository
+				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm,
+						shukuhakuRyokin);
+		return teigakuOp.map(ZeiritsuTeigaku::getZeigaku).orElse(0L);
 	}
 
 	/**
@@ -715,6 +677,7 @@ public class FukaServiceImpl implements FukaService {
 	private void setMonthlyDetail(Fuka entity, FukaDeclarationForm form) {
 		FukaMonthlyDeclarationDto monthDto = form.getMonthlyDetail();
 		monthDto.setExemptStayCount(entity.getMenjoHakusu());
+		monthDto.setExemptRyokin(entity.getMenjoRyokin());
 		monthDto.setTotalStayCount(entity.getTotalHakusu());
 		monthDto.setTotalPaymentAmount(entity.getTotalZeigaku());
 		monthDto.setTotalCityZeigaku(entity.getCityZeigaku());
@@ -744,58 +707,27 @@ public class FukaServiceImpl implements FukaService {
 
 		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
 
-		// 明細に1件でも入力があるか確認（全未入力ならチェック不要）
-		boolean hasInput;
-		if (FukaConstants.TEIRITSU.equals(kbn)) {
-			hasInput = detail.getTaxDetails().stream()
-					.anyMatch(d -> d.getRyokin() != null && d.getRyokin() > 0);
-		} else {
-			hasInput = detail.getTaxDetails().stream()
-					.anyMatch(d -> d.getHakusu() != null && d.getHakusu() > 0);
-		}
-		if (!hasInput) {
-			return false;
-		}
-
 		// 期待される税額を全区分ループで計算
-		long calculatedTotal = 0L;
+		long calculatedZeigaku = 0L;
+		int calculatedHakusu = 0;
 		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
-			BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
-			if (FukaConstants.TEIRITSU.equals(kbn)) {
+			if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 				long ryokin = (d.getRyokin() != null) ? d.getRyokin() : 0L;
-				calculatedTotal += calculateTax(form.getFukaKbn(), ryokin, rate);
+				calculatedZeigaku += calculateTax(form.getFukaKbn(), ryokin, d.getTaxRate(), d.getTaxKenRate());
 			} else {
 				long count = (d.getHakusu() != null) ? d.getHakusu() : 0L;
-				calculatedTotal += calculateTax(form.getFukaKbn(), count, rate);
+				calculatedZeigaku += calculateTax(form.getFukaKbn(), count, d.getTaxRate(), d.getTaxKenRate());
 			}
 		}
 
 		// 画面の合計税額を取得
 		long inputTotal = (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0L;
 
-		if (calculatedTotal != inputTotal) {
-			log.warn("税額整合性エラー: 算出値={}, 画面入力値={}, fukaKbn={}", calculatedTotal, inputTotal, form.getFukaKbn());
+		if (calculatedZeigaku != inputTotal) {
+			log.info("税額整合性エラー: 算出値={}, 画面入力値={}, fukaKbn={}", calculatedZeigaku, inputTotal, form.getFukaKbn());
 			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * 年月文字列を数値（int）に正規化する。
-	 * 空白・ハイフン・スラッシュを除去し、6桁の整数として返す。
-	 * null/空/パース不能の場合は 0 を返す（0は「制限なし」として扱う）。
-	 */
-	private int parseYmToInt(String ym) {
-		if (ym == null || ym.trim().isEmpty()) {
-			return 0;
-		}
-		try {
-			String cleaned = ym.trim().replace("-", "").replace("/", "").replace(" ", "");
-			return Integer.parseInt(cleaned);
-		} catch (NumberFormatException e) {
-			log.warn("年月のパースに失敗しました（0として扱います）: '{}'", ym);
-			return 0;
-		}
 	}
 
 	// =========================================================
@@ -931,6 +863,10 @@ public class FukaServiceImpl implements FukaService {
 		}
 	}
 
+	private Long getLongValue(Long value) {
+		return value == null ? 0L : value;
+	}
+
 	/**
 	 * 月計表データを保存する。
 	 */
@@ -1041,24 +977,25 @@ public class FukaServiceImpl implements FukaService {
 	 * 賦課区分に応じた税額計算を行う。
 	 * @param fukaKbn 賦課区分コード（"1"=定額, "2"=定率）
 	 * @param baseValue 基準値（定額なら宿泊数、定率なら課税対象料金）
-	 * @param rate 税率（定額なら単価、定率ならパーセント値）
+	 * @param cityRate 市区町村税率（定額なら円、定率ならパーセント）
+	 * @param kenRate 都道府県税率（定額なら円、定率はnull）
 	 * @return 計算後の税額
 	 */
-	public long calculateTax(String fukaKbn, long baseValue, BigDecimal rate) {
-		if (rate == null || rate.compareTo(BigDecimal.ZERO) == 0)
-			return 0L;
+	public long calculateTax(String fukaKbn, long baseValue, BigDecimal cityRate, BigDecimal kenRate) {
+
+		BigDecimal city = (cityRate != null) ? cityRate : BigDecimal.ZERO;
+		BigDecimal ken = (kenRate != null) ? kenRate : BigDecimal.ZERO;
 
 		if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
 			// 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
 			return BigDecimal.valueOf(baseValue)
-					.multiply(rate)
+					.multiply(city)
 					.divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.DOWN)
 					.longValue();
 		} else {
-			// 定額制：宿泊数 × 単価
-			return BigDecimal.valueOf(baseValue)
-					.multiply(rate)
-					.longValue();
+			// 定額制：宿泊数 × 税率
+			long rate = cityRate.longValue() + kenRate.longValue();
+			return baseValue * rate;
 		}
 	}
 }

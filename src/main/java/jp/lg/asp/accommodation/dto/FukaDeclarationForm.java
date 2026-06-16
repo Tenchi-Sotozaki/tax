@@ -56,12 +56,6 @@ public class FukaDeclarationForm {
 	private boolean taxCheckBypassed = false;
 	private Boolean showTaxWarningModal = false;
 
-	// ========== 定率制（fukaKbn == '2'）入力エリア ==========
-	private Long kazeiRyokin;
-	private Long teiritsuZeigaku;
-	private Long menjoRyokin;
-	private Long kazeiHakusu;
-
 	// ========== 相関チェック ==========
 
 	/**
