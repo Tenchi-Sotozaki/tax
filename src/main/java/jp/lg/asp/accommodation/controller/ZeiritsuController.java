@@ -148,10 +148,7 @@ public class ZeiritsuController {
 					});
 		} else {
 			zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, seqDec)
-					.forEach(d -> {
-						d.setDelFlg("1");
-						zeiritsuTeiritsuRepository.save(d);
-					});
+					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeiritsuRepository.save(d); });
 		}
 
 		int detailSeq = 1;

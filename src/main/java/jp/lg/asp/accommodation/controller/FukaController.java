@@ -1,9 +1,11 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +54,7 @@ public class FukaController {
 	@GetMapping("/payment-ledger/{shiteiNo}")
 	public String showDaicho(
 			@PathVariable String shiteiNo,
-			@RequestParam(name = "nendo", required = false) String nendo,
+			@RequestParam(required = false) String nendo,
 			@RequestParam(required = false) String status,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -86,8 +88,8 @@ public class FukaController {
 	 */
 	@GetMapping("/register/{shiteiNo}")
 	public String register(
-			@PathVariable("shiteiNo") String shiteiNo,
-			@RequestParam(name = "month", required = false) String month,
+			@PathVariable String shiteiNo,
+			@RequestParam(required = false) String month,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -100,8 +102,13 @@ public class FukaController {
 			}
 		}
 
-		FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo, month);
-		model.addAttribute("fukaDeclarationForm", form);
+		try {
+			FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo, month);
+			model.addAttribute("fukaDeclarationForm", form);
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+			return "redirect:/declaration/payment-ledger/" + shiteiNo;
+		}
 		return CONFIG_VIEW;
 	}
 
@@ -116,9 +123,9 @@ public class FukaController {
 	 */
 	@GetMapping("/edit/{shiteiNo}/{nendo}/{kibetsu}")
 	public String showEdit(
-			@PathVariable("shiteiNo") String shiteiNo,
-			@PathVariable("nendo") String nendo,
-			@PathVariable("kibetsu") Integer kibetsu,
+			@PathVariable String shiteiNo,
+			@PathVariable String nendo,
+			@PathVariable Integer kibetsu,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -147,9 +154,9 @@ public class FukaController {
 	 */
 	@GetMapping("/view/{shiteiNo}/{nendo}/{kibetsu}")
 	public String showView(
-			@PathVariable("shiteiNo") String shiteiNo,
-			@PathVariable("nendo") String nendo,
-			@PathVariable("kibetsu") Integer kibetsu,
+			@PathVariable String shiteiNo,
+			@PathVariable String nendo,
+			@PathVariable Integer kibetsu,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -170,7 +177,7 @@ public class FukaController {
 	/**
 	 * 宿泊税情報の保存（登録・更新）を行う。
 	 * @param form 申告情報フォーム
-	 * @param result バリデーション結果
+	 * @param bindingResult バリデーション結果
 	 * @param model モデルオブジェクト
 	 * @param redirectAttributes リダイレクト属性
 	 * @return 画面パス
@@ -180,49 +187,51 @@ public class FukaController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+
 		accessChecker.checkAccess(SCREEN_ID);
 
-		// 1. Springが自動判定したバリデーション結果を確認
+		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
 		if (bindingResult.hasErrors()) {
 			bindingResult.getAllErrors().forEach(error -> {
 				log.error("【バリデーションエラー】項目: {}, 内容: {}", error.getObjectName(), error.getDefaultMessage());
 			});
-			fukaService.hydrateFormMetadata(form); // 画面再表示用にメタ情報をセット
 			return CONFIG_VIEW;
 		}
 
-		// 2. 独自の相関チェック（定額・定率の分岐チェック）
+		// 2. 編集時の必須項目チェック
+		if (form.isEdit() && !StringUtils.hasText(form.getModificationCategory())) {
+			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "※編集時は変更の区分を選択してください");
+			return CONFIG_VIEW;
+		}
+
+		// TODO:後回し
+		//		// 2.6. 月計表と親画面の突合チェック
+		//		fukaValidatorService.validateTallyVsParent(form, bindingResult);
+		//		if (bindingResult.hasErrors()) {
+		//			return CONFIG_VIEW;
+		//		}
+
+		// 3. 金額と宿泊数のソフトバリデーション（Soft Validation）
+		if (!form.isTaxCheckBypassed()) {
+			List<String> discrepancyMessages = fukaValidatorService.getDiscrepancyMessages(form);
+			if (!discrepancyMessages.isEmpty()) {
+				log.debug("金額または宿泊数のズレを検知しました。確認モーダルを表示します。");
+				model.addAttribute("showTaxWarningModal", true);
+				model.addAttribute("discrepancyMessages", discrepancyMessages);
+				return CONFIG_VIEW;
+			}
+		}
+
+		// 4. 保存処理（Transaction：DBへの書き込み）
 		try {
-			fukaValidatorService.validateCorrelation(form);
-		} catch (IllegalArgumentException e) {
-			model.addAttribute("errorMessage", e.getMessage());
-			fukaService.hydrateFormMetadata(form);
-			return CONFIG_VIEW;
-		}
-
-		// 3. 編集区分チェック（変数名を bindingResult に修正）
-		if (form.isEdit() && !org.springframework.util.StringUtils.hasText(form.getModificationCategory())) {
-			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "編集時は変更の区分を選択してください。");
-			fukaService.hydrateFormMetadata(form);
-			return CONFIG_VIEW;
-		}
-
-		// 4. 税額の不整合チェック
-		if (!form.isTaxCheckBypassed() && fukaService.hasTaxAmountDiscrepancy(form)) {
-			fukaService.hydrateFormMetadata(form);
-			model.addAttribute("showTaxWarningModal", true);
-			return CONFIG_VIEW;
-		}
-
-		// 5. 保存処理
-		try {
+			// バリデーションをすべて通過、またはユーザーが警告を承認（バイパス）したため保存を実行
 			fukaService.saveDeclaration(form);
-			// ...成功時のリダイレクト処理...
+			redirectAttributes.addFlashAttribute("successMessage", "賦課情報を更新しました。");
 			return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
+
 		} catch (RuntimeException e) {
-			log.error("保存処理中にエラーが発生しました", e);
+			log.error("保存処理中に予期せぬエラーが発生しました", e);
 			model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());
-			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
 		}
 	}

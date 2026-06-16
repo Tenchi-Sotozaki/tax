@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChoshuGenboUchiId implements Serializable {
-	// 💡 このエンティティの本当の主キーだけを定義する
-	private String jichitaiCd;
-	private Long uchiIdx;
+    private String jichitaiCd;
+    private Long uchiIdx;
 }

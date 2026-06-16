@@ -217,45 +217,38 @@
 			</div>
 		</form>
 
-		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
-
-		<!-- 削除確認モーダル -->
-		<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header bg-danger text-white">
-						<h5 class="modal-title">
-							<i class="bi bi-exclamation-triangle-fill me-2"></i>削除確認
-						</h5>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-					</div>
-					<div class="modal-body">
-						<p class="mb-3">
-							<i class="bi bi-info-circle text-info me-2"></i>
-							この納税管理人を削除します。
-						</p>
-						<p class="text-muted small mb-0">
-							※ 削除後は元に戻すことはできません。削除した場合、前の履歴データが最新となります。
-						</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-							<i class="bi bi-x-circle me-1"></i>キャンセル
-						</button>
-						<form th:action="@{/tax-manager/delete/{id}(id=${taxManagerForm.shiteiNo})}" method="post" style="display: inline;">
-							<button type="submit" class="btn btn-danger">
-								<i class="bi bi-trash me-1"></i>削除する
-							</button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/t_tax_manager_config.js}"></script>
+		<script th:src="@{/js/t_tokugimu_config.js}"></script>
+		<script th:inline="javascript">
+			/*<![CDATA[*/
+			document.addEventListener('DOMContentLoaded', function () {
+				// --- ① 選任免除の表示制御 ---
+				const exemptionFlag = document.getElementById('exemptionFlag');
+				const exemptionReasonArea = document.getElementById('exemptionReasonArea');
+
+				if (exemptionFlag && exemptionReasonArea) {
+					const toggleExemptionArea = () => {
+						exemptionReasonArea.style.display = exemptionFlag.checked ? 'block' : 'none';
+					};
+					toggleExemptionArea();
+					exemptionFlag.addEventListener('change', toggleExemptionArea);
+				}
+
+				// --- ② 宛名検索結果をフォームにセット（共通JSのselectAddressをオーバーライド） ---
+				window.selectAddress = function(item) {
+					const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+					setVal('managerAddress', item.address || item.jusho);
+					setVal('managerName', item.name || item.shimei);
+					setVal('managerNameKana', item.nameKana || item.shimeiKana);
+					setVal('managerPhone', item.phone || item.tel);
+					bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
+				};
+			});
+			/*]]>*/
+		</script>
 	</th:block>
 </body>
 

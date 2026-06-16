@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.dto;
 import java.time.LocalDate;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,89 +12,60 @@ import lombok.Data;
 
 /**
  * 宿泊税情報登録/編集(照会)画面用 Formクラス
- * 画面とController間で申告データを受け渡す役割を持つ
  */
 @Data
 public class FukaDeclarationForm {
 
-	// ========== 定数 ==========
-	// ※初期値が必要な項目などがある場合は規約に則り定数で定義（例として）
-	private static final int DEFAULT_AMOUNT = 0;
-
 	// ========== 制御用フィールド ==========
-	// 申告記録のID（新規登録時はnull）
+	private boolean edit;
+	private boolean view;
 	private Long declarationId;
-
-	// 特別徴収義務者の指定番号
 	private String shiteiNo;
-
-	// "1": 定額制, "2": 定率制 など、m_zeiritsu の fuka_kbn と連携する
+	private String nendo;
+	private Integer kibetsu;
+	private Integer rno;
 	private String fukaKbn;
 
+	// ========== 変更区分 ==========
+	private String modificationCategory;
+	private String modificationReason;
+
 	// ========== 納税額情報エリア ==========
-	// 登録日
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@NotNull(message = "登録日を入力してください")
+	@NotNull(message = "※登録日を入力してください")
 	private LocalDate registrationDate;
 
-	// 特別徴収義務者 (リードオンリー)
 	private String obligorName;
-
-	// 宿泊施設名称 (リードオンリー)
 	private String facilityName;
 
+	// 賦課情報
 	@Valid
 	private FukaMonthlyDeclarationDto monthlyDetail = new FukaMonthlyDeclarationDto();
 
 	// ========== 加算金額入力エリア ==========
-	// 加算金額の区分 (過少申告加算金/不申告加算金/重加算金)
 	private String additionalCategory;
-
-	// 加算金額の割合
 	private String additionalRate;
-
-	// 加算金額
 	private Long additionalAmount;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate additionalDueDate;
 
-	// 加算金額の納期限
-	@org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd")
-	private java.time.LocalDate additionalDueDate;
-
-	// ========== 更生/修正エリア ==========
-	// 変更の区分 (更生/修正)
-	private String modificationCategory;
-
-	// 変更理由
-	private String modificationReason;
-
-	// 年度
-	private String nendo;
-
-	// 期別
-	private Integer kibetsu;
-
-	// 徴収原簿用の日別データ（モーダルの入力値）
+	// 徴収原簿
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
 
-	private Integer rno;
-
+	// ========== バリデーション制御用フィールド ==========
 	private boolean taxCheckBypassed = false;
+	private Boolean showTaxWarningModal = false;
 
-	private boolean edit;
+	// ========== 相関チェック ==========
 
-	private boolean view;
-
-	// ========== 定率制（fukaKbn == '2'）入力エリア ==========
-	// 課税対象宿泊料金合計
-	private Long kazeiRyokin;
-
-	// 定率税額合計
-	private Long teiritsuZeigaku;
-
-	// 免税対象宿泊料金合計
-	private Long menjoRyokin;
-
-	// 課税対象宿泊数（定率制でも使用）
-	private Long kazeiHakusu;
-
+	/**
+	 * 加算金額区分が選択されている場合、加算金額の入力を必須とする。
+	 */
+	@AssertTrue(message = "※区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid() {
+		if (additionalCategory == null || additionalCategory.isEmpty()) {
+			return true;
+		}
+		return additionalAmount != null && additionalAmount > 0;
+	}
 }
