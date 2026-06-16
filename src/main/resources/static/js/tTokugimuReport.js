@@ -69,6 +69,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 納税管理人選任免除認定（不認定）通知書ボタンのクリックイベント
+    const btnNozeiMenjo = document.getElementById('btnReportNozeiMenjo');
+    if (btnNozeiMenjo) {
+        btnNozeiMenjo.addEventListener('click', function() {
+            if (shiteiNo) {
+                const url = '/accommodation-tax/reports/nozeiKanrininNintei?shiteiNo=' + encodeURIComponent(shiteiNo);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
+
     // 納入申告書の提出期限等の特例適用者指定通知書ボタンのクリックイベント
     const btnTokureiShitei = document.getElementById('btnReportTokureiShitei');
     if (btnTokureiShitei) {
