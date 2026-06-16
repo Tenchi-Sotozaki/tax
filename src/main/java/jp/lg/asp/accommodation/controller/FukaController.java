@@ -54,7 +54,7 @@ public class FukaController {
 	@GetMapping("/payment-ledger/{shiteiNo}")
 	public String showDaicho(
 			@PathVariable String shiteiNo,
-			@RequestParam(name = "nendo", required = false) String nendo,
+			@RequestParam(required = false) String nendo,
 			@RequestParam(required = false) String status,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -88,8 +88,8 @@ public class FukaController {
 	 */
 	@GetMapping("/register/{shiteiNo}")
 	public String register(
-			@PathVariable("shiteiNo") String shiteiNo,
-			@RequestParam(name = "month", required = false) String month,
+			@PathVariable String shiteiNo,
+			@RequestParam(required = false) String month,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -123,9 +123,9 @@ public class FukaController {
 	 */
 	@GetMapping("/edit/{shiteiNo}/{nendo}/{kibetsu}")
 	public String showEdit(
-			@PathVariable("shiteiNo") String shiteiNo,
-			@PathVariable("nendo") String nendo,
-			@PathVariable("kibetsu") Integer kibetsu,
+			@PathVariable String shiteiNo,
+			@PathVariable String nendo,
+			@PathVariable Integer kibetsu,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -154,9 +154,9 @@ public class FukaController {
 	 */
 	@GetMapping("/view/{shiteiNo}/{nendo}/{kibetsu}")
 	public String showView(
-			@PathVariable("shiteiNo") String shiteiNo,
-			@PathVariable("nendo") String nendo,
-			@PathVariable("kibetsu") Integer kibetsu,
+			@PathVariable String shiteiNo,
+			@PathVariable String nendo,
+			@PathVariable Integer kibetsu,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -195,37 +195,27 @@ public class FukaController {
 			bindingResult.getAllErrors().forEach(error -> {
 				log.error("【バリデーションエラー】項目: {}, 内容: {}", error.getObjectName(), error.getDefaultMessage());
 			});
-			fukaService.hydrateFormMetadata(form); // 画面再表示用にメタ情報をセット
 			return CONFIG_VIEW;
 		}
 
 		// 2. 編集時の必須項目チェック
 		if (form.isEdit() && !StringUtils.hasText(form.getModificationCategory())) {
 			bindingResult.rejectValue("modificationCategory", "error.modificationCategory", "※編集時は変更の区分を選択してください");
-			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
 		}
 
-		// 2.5. 月計表未登録チェック（全区分の宿泊数が0の場合）
-		if (isTallyEmpty(form)) {
-			bindingResult.reject("error.global.tallyRequired", "※月計表の登録をしてください");
-			fukaService.hydrateFormMetadata(form);
-			return CONFIG_VIEW;
-		}
-
-		// 2.6. 月計表と親画面の突合チェック
-		fukaValidatorService.validateTallyVsParent(form, bindingResult);
-		if (bindingResult.hasErrors()) {
-			fukaService.hydrateFormMetadata(form);
-			return CONFIG_VIEW;
-		}
+		// TODO:後回し
+		//		// 2.6. 月計表と親画面の突合チェック
+		//		fukaValidatorService.validateTallyVsParent(form, bindingResult);
+		//		if (bindingResult.hasErrors()) {
+		//			return CONFIG_VIEW;
+		//		}
 
 		// 3. 金額と宿泊数のソフトバリデーション（Soft Validation）
 		if (!form.isTaxCheckBypassed()) {
 			List<String> discrepancyMessages = fukaValidatorService.getDiscrepancyMessages(form);
 			if (!discrepancyMessages.isEmpty()) {
 				log.info("金額または宿泊数のズレを検知しました。確認モーダルを表示します。");
-				fukaService.hydrateFormMetadata(form);
 				model.addAttribute("showTaxWarningModal", true);
 				model.addAttribute("discrepancyMessages", discrepancyMessages);
 				return CONFIG_VIEW;
@@ -241,31 +231,7 @@ public class FukaController {
 		} catch (RuntimeException e) {
 			log.error("保存処理中に予期せぬエラーが発生しました", e);
 			model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());
-			fukaService.hydrateFormMetadata(form);
 			return CONFIG_VIEW;
 		}
-	}
-
-	/**
-	 * 月計表が未入力かどうかを判定する。
-	 * dailyItemsの全日の宿泊数・料金がすべて0の場合は未登録とみなす。
-	 */
-	private boolean isTallyEmpty(FukaDeclarationForm form) {
-		var tally = form.getMonthlyTally();
-		if (tally == null || tally.getDailyItems() == null || tally.getDailyItems().isEmpty()) {
-			return true;
-		}
-
-		return tally.getDailyItems().stream().noneMatch(item -> {
-			// 宿泊数に1件でも入力があるか
-			boolean hasCount = item.getTaxCategoryCounts() != null
-					&& item.getTaxCategoryCounts().stream().anyMatch(v -> v != null && v > 0);
-			// 料金に1件でも入力があるか（定率制用）
-			boolean hasAmount = item.getTaxCategoryAmounts() != null
-					&& item.getTaxCategoryAmounts().stream().anyMatch(v -> v != null && v > 0);
-			// 免除に入力があるか
-			boolean hasExempt = item.getExemptCount() != null && item.getExemptCount() > 0;
-			return hasCount || hasAmount || hasExempt;
-		});
 	}
 }

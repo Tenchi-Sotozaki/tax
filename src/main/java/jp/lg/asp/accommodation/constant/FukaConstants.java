@@ -16,21 +16,23 @@ public final class FukaConstants {
 	// =========================================================
 	// 定数定義
 	// =========================================================
-	
+
 	// 賦課方式
-	public static final FukaConstants TEIGAKU  = new FukaConstants("1", "定額");
+	public static final FukaConstants TEIGAKU = new FukaConstants("1", "定額");
 	public static final FukaConstants TEIRITSU = new FukaConstants("2", "定率");
 
 	// 変更区分
-	public static final FukaConstants SHINKI  = new FukaConstants("1", "新規");
-	public static final FukaConstants SHUESEI = new FukaConstants("2", "修正");
-	public static final FukaConstants KOSEI   = new FukaConstants("3", "更正");
+	public static final FukaConstants SHINKOKU = new FukaConstants("1", "申告");
+	public static final FukaConstants KOSEI = new FukaConstants("2", "更正");
+	public static final FukaConstants KETTEI = new FukaConstants("3", "決定");
+	public static final FukaConstants KANPU = new FukaConstants("4", "還付");
+	public static final FukaConstants MENJO = new FukaConstants("5", "免除");
 
 	// =========================================================
 	// 検索用リスト（Enumの values() の代わり）
 	// =========================================================
 	public static final List<FukaConstants> FUKA_HOSHIKI_LIST = List.of(TEIGAKU, TEIRITSU);
-	public static final List<FukaConstants> HENKO_KUBUN_LIST = List.of(SHINKI, SHUESEI, KOSEI);
+	public static final List<FukaConstants> HENKO_KUBUN_LIST = List.of(SHINKOKU, KOSEI, KETTEI, KANPU, MENJO);
 
 	// =========================================================
 	// 統合したロジック（計算・検索）

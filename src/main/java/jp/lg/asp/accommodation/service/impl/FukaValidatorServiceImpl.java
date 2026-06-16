@@ -10,8 +10,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
+import jp.lg.asp.accommodation.constant.ZeiritsuConstants;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
+import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto;
+import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto.DailyItem;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
@@ -93,10 +96,10 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			BigDecimal rate = (d.getTaxRate() != null) ? d.getTaxRate() : BigDecimal.ZERO;
 
 			if (FukaConstants.TEIRITSU.equals(kbn)) {
-				long ryokin = (d.getKazeiRyokin() != null) ? d.getKazeiRyokin().longValue() : 0L;
+				long ryokin = (d.getRyokin() != null) ? d.getRyokin() : 0L;
 				total += fukaService.calculateTax(form.getFukaKbn(), ryokin, rate);
 			} else {
-				long count = (d.getStayCount() != null) ? d.getStayCount() : 0L;
+				long count = (d.getHakusu() != null) ? d.getHakusu() : 0L;
 				total += fukaService.calculateTax(form.getFukaKbn(), count, rate);
 			}
 		}
@@ -116,10 +119,10 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		boolean hasInput;
 		if (FukaConstants.TEIRITSU.equals(kbn)) {
 			hasInput = detail.getTaxDetails().stream()
-					.anyMatch(d -> d.getKazeiRyokin() != null && d.getKazeiRyokin() > 0);
+					.anyMatch(d -> d.getRyokin() != null && d.getRyokin() > 0);
 		} else {
 			hasInput = detail.getTaxDetails().stream()
-					.anyMatch(d -> d.getStayCount() != null && d.getStayCount() > 0);
+					.anyMatch(d -> d.getHakusu() != null && d.getHakusu() > 0);
 		}
 		if (!hasInput) {
 			return;
@@ -139,8 +142,8 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		long sumOfDetails = 0;
 		if (detail.getTaxDetails() != null) {
 			for (FukaTaxDetailDto taxDetail : detail.getTaxDetails()) {
-				if (taxDetail.getStayCount() != null) {
-					sumOfDetails += taxDetail.getStayCount();
+				if (taxDetail.getHakusu() != null) {
+					sumOfDetails += taxDetail.getHakusu();
 				}
 			}
 		}
@@ -163,8 +166,8 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		long sumOfDetails = 0;
 		if (detail.getTaxDetails() != null) {
 			for (FukaTaxDetailDto taxDetail : detail.getTaxDetails()) {
-				if (taxDetail.getStayCount() != null) {
-					sumOfDetails += taxDetail.getStayCount();
+				if (taxDetail.getHakusu() != null) {
+					sumOfDetails += taxDetail.getHakusu();
 				}
 			}
 		}
@@ -201,11 +204,11 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		List<String> categoryNames = resolveCategoryNames(form.getFukaKbn(), categoryCount);
 
 		boolean hasCountData = dailyItems.stream()
-				.anyMatch(item -> item.getTaxCategoryCounts() != null &&
-						item.getTaxCategoryCounts().stream().anyMatch(v -> v != null && v > 0));
+				.anyMatch(item -> item.getHakusu() != null &&
+						item.getHakusu().stream().anyMatch(v -> v != null && v > 0));
 		boolean hasAmountData = FukaConstants.TEIRITSU.equals(kbn) && dailyItems.stream()
-				.anyMatch(item -> item.getTaxCategoryAmounts() != null &&
-						item.getTaxCategoryAmounts().stream().anyMatch(v -> v != null && v > 0));
+				.anyMatch(item -> item.getRyokin() != null &&
+						item.getRyokin().stream().anyMatch(v -> v != null && v > 0));
 
 		if (!hasCountData && !hasAmountData) {
 			return;
@@ -216,14 +219,14 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			for (int cat = 0; cat < categoryCount; cat++) {
 				long tallyCountSum = 0;
 				for (var item : dailyItems) {
-					var counts = item.getTaxCategoryCounts();
+					var counts = item.getHakusu();
 					if (counts != null && counts.size() > cat && counts.get(cat) != null) {
 						tallyCountSum += counts.get(cat);
 					}
 				}
 
 				FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-				long parentStayCount = (parentDetail.getStayCount() != null) ? parentDetail.getStayCount() : 0L;
+				long parentStayCount = (parentDetail.getHakusu() != null) ? parentDetail.getHakusu() : 0L;
 				String label = categoryNames.get(cat);
 
 				if (tallyCountSum != parentStayCount) {
@@ -237,15 +240,16 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		if (hasAmountData && FukaConstants.TEIRITSU.equals(kbn)) {
 			for (int cat = 0; cat < categoryCount; cat++) {
 				long tallyAmountSum = 0;
-				for (var item : dailyItems) {
-					var amounts = item.getTaxCategoryAmounts();
+				for (DailyItem item : dailyItems) {
+					var amounts = item.getRyokin();
 					if (amounts != null && amounts.size() > cat && amounts.get(cat) != null) {
 						tallyAmountSum += amounts.get(cat);
 					}
 				}
 
 				FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-				long parentRyokin = (parentDetail.getKazeiRyokin() != null) ? parentDetail.getKazeiRyokin().longValue() : 0L;
+				long parentRyokin = (parentDetail.getRyokin() != null) ? parentDetail.getRyokin().longValue()
+						: 0L;
 				String label = categoryNames.get(cat);
 
 				if (tallyAmountSum != parentRyokin) {
@@ -261,13 +265,13 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 	 * 不一致があればBindingResultにエラーを追加する。
 	 */
 	public void validateTallyVsParent(FukaDeclarationForm form, BindingResult result) {
-		var tally = form.getMonthlyTally();
-		var detail = form.getMonthlyDetail();
+		FukaMonthlyTallyDto tally = form.getMonthlyTally();
+		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
 		if (tally == null || detail == null || detail.getTaxDetails() == null) {
 			return;
 		}
 
-		var dailyItems = tally.getDailyItems();
+		List<DailyItem> dailyItems = tally.getDailyItems();
 		if (dailyItems == null || dailyItems.isEmpty()) {
 			return;
 		}
@@ -284,15 +288,15 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		// 1. 宿泊数の比較（定額制・定率制共通）
 		for (int cat = 0; cat < categoryCount; cat++) {
 			long tallyCountSum = 0;
-			for (var item : dailyItems) {
-				var counts = item.getTaxCategoryCounts();
+			for (DailyItem item : dailyItems) {
+				List<Integer> counts = item.getHakusu();
 				if (counts != null && counts.size() > cat && counts.get(cat) != null) {
 					tallyCountSum += counts.get(cat);
 				}
 			}
 
 			FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-			long parentStayCount = (parentDetail.getStayCount() != null) ? parentDetail.getStayCount() : 0L;
+			long parentStayCount = (parentDetail.getHakusu() != null) ? parentDetail.getHakusu() : 0L;
 			String label = categoryNames.get(cat);
 
 			if (tallyCountSum != parentStayCount) {
@@ -306,14 +310,15 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			for (int cat = 0; cat < categoryCount; cat++) {
 				long tallyAmountSum = 0;
 				for (var item : dailyItems) {
-					var amounts = item.getTaxCategoryAmounts();
+					var amounts = item.getRyokin();
 					if (amounts != null && amounts.size() > cat && amounts.get(cat) != null) {
 						tallyAmountSum += amounts.get(cat);
 					}
 				}
 
 				FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-				long parentRyokin = (parentDetail.getKazeiRyokin() != null) ? parentDetail.getKazeiRyokin().longValue() : 0L;
+				long parentRyokin = (parentDetail.getRyokin() != null) ? parentDetail.getRyokin().longValue()
+						: 0L;
 				String label = categoryNames.get(cat);
 
 				if (tallyAmountSum != parentRyokin) {
@@ -326,8 +331,8 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		// 3. 免除宿泊数の比較（共通）
 		long tallyExemptSum = 0;
 		for (var item : dailyItems) {
-			if (item.getExemptCount() != null) {
-				tallyExemptSum += item.getExemptCount();
+			if (item.getMenjoHakusu() != null) {
+				tallyExemptSum += item.getMenjoHakusu();
 			}
 		}
 		long parentExempt = (detail.getExemptStayCount() != null) ? detail.getExemptStayCount() : 0L;
@@ -351,11 +356,12 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		List<String> names = new ArrayList<>();
 
 		try {
-			if ("2".equals(fukaKbn)) {
+			if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
 				// 定率制: m_zeiritsu_teiritsu から区分名を取得
 				List<Zeiritsu> parents = zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd);
 				Zeiritsu applied = parents.stream()
-						.filter(z -> "2".equals(z.getTaishoKbn()) && "2".equals(z.getFukaKbn()))
+						.filter(z -> ZeiritsuConstants.CITY.getValue().equals(z.getTaishoKbn())
+								&& FukaConstants.TEIRITSU.getValue().equals(z.getFukaKbn()))
 						.findFirst().orElse(null);
 
 				if (applied != null) {
@@ -368,7 +374,8 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 				}
 			} else {
 				// 定額制: m_zeiritsu_teigaku から区分名（料金帯ラベル）を取得
-				List<ZeiritsuTeigaku> masters = zeiritsuTeigakuRepository.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
+				List<ZeiritsuTeigaku> masters = zeiritsuTeigakuRepository
+						.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
 				for (ZeiritsuTeigaku m : masters) {
 					String label = (m.getRyokinEd() != null)
 							? String.format("%,d円〜%,d円未満", m.getRyokinSt(), m.getRyokinEd() + 1)

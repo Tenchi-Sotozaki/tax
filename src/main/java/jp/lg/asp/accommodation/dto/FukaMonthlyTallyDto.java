@@ -20,11 +20,11 @@ public class FukaMonthlyTallyDto {
 	@Data
 	public static class DailyItem {
 		private Integer day; // 日付 (1〜31)
-		// index 0 -> 区分①(hakusu1), 1 -> 区分②(hakusu2)...
-		private List<Long> taxCategoryCounts = new ArrayList<>();
-		// 区分ごとの課税対象宿泊料金（定率制で使用）
-		private List<Long> taxCategoryAmounts = new ArrayList<>();
-		private Integer exemptCount; // 免除・対象外の宿泊数
+		private List<Integer> hakusu = new ArrayList<>();
+		private List<Long> ryokin = new ArrayList<>();
+		private List<Long> sogaku = new ArrayList<>();
+		private Integer menjoHakusu;
+		private Long zeigaku;
 	}
 
 	// 初期化：リストに31日分の空のオブジェクトを詰めておく
@@ -46,10 +46,12 @@ public class FukaMonthlyTallyDto {
 			DailyItem item = new DailyItem();
 			item.setDay(i);
 			for (int j = 0; j < categoryCount; j++) {
-				item.getTaxCategoryCounts().add(0L);
-				item.getTaxCategoryAmounts().add(0L);
+				item.getHakusu().add(0);
+				item.getRyokin().add(0L);
+				item.getSogaku().add(0L);
 			}
-			item.setExemptCount(0);
+			item.setMenjoHakusu(0);
+			item.setZeigaku(0L);
 			this.dailyItems.add(item);
 		}
 	}

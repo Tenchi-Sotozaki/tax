@@ -13,13 +13,22 @@ import lombok.Data;
 /**
  * 宿泊税情報登録/編集(照会)画面用 Formクラス
  */
-@Data 
+@Data
 public class FukaDeclarationForm {
 
 	// ========== 制御用フィールド ==========
+	private boolean edit;
+	private boolean view;
 	private Long declarationId;
 	private String shiteiNo;
+	private String nendo;
+	private Integer kibetsu;
+	private Integer rno;
 	private String fukaKbn;
+
+	// ========== 変更区分 ==========
+	private String modificationCategory;
+	private String modificationReason;
 
 	// ========== 納税額情報エリア ==========
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -29,6 +38,7 @@ public class FukaDeclarationForm {
 	private String obligorName;
 	private String facilityName;
 
+	// 賦課情報
 	@Valid
 	private FukaMonthlyDeclarationDto monthlyDetail = new FukaMonthlyDeclarationDto();
 
@@ -36,24 +46,15 @@ public class FukaDeclarationForm {
 	private String additionalCategory;
 	private String additionalRate;
 	private Long additionalAmount;
-	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate;
 
-	// ========== 更生/修正エリア ==========
-	private String modificationCategory;
-	private String modificationReason;
-	private String nendo;
-	private Integer kibetsu;
+	// 徴収原簿
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
-	private Integer rno;
 
 	// ========== バリデーション制御用フィールド ==========
 	private boolean taxCheckBypassed = false;
 	private Boolean showTaxWarningModal = false;
-
-	private boolean edit;
-	private boolean view;
 
 	// ========== 定率制（fukaKbn == '2'）入力エリア ==========
 	private Long kazeiRyokin;

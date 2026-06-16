@@ -41,12 +41,6 @@ public interface FukaService {
 	boolean isAlreadyRegistered(String shiteiNo, String paymentMonth);
 
 	/**
-	 * 画面表示に必要なメタデータをフォームに再セットする。
-	 * バリデーションエラーによる再表示時、消失したラベル情報を復元（Hydration）する。
-	 */
-	void hydrateFormMetadata(FukaDeclarationForm form);
-
-	/**
 	 * 申告入力された税額と、システム計算上の税額に不整合がないか判定する。
 	 */
 	boolean hasTaxAmountDiscrepancy(FukaDeclarationForm form);

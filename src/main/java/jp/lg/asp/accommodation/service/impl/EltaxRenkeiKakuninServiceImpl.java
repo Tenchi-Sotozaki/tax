@@ -885,7 +885,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		fuka.setShinkokuYmd(shinkokuYmd);
 		fuka.setTaishoYm(taishoYm);
 		fuka.setFukaKbn(fukaKbn.getValue());
-		fuka.setHenkoKbn(prev != null ? prev.getHenkoKbn() : FukaConstants.SHINKI.getValue());
+		fuka.setHenkoKbn(prev != null ? prev.getHenkoKbn() : FukaConstants.SHINKOKU.getValue());
 		fuka.setKazeiHakusu(parseLong(getDataValue(dataRow, kazeiHakusuIdx)));
 		fuka.setKazeiRyokin(parseLong(getDataValue(dataRow, kazeiRyokinIdx)));
 		fuka.setZeigaku(parseLong(getDataValue(dataRow, zeigakuIdx)));

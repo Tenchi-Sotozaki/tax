@@ -18,6 +18,6 @@ public class FukaDaichoListItem {
 	// 内部処理・遷移用
 	private String nendo; // 年度
 	private Integer kibetsu; // 期別
-	private LocalDate targetYearMonth; // 登録画面等への遷移パラメータ用
+	private String targetYearMonth; // 登録画面等への遷移パラメータ用
 	private LocalDate shinkokuYmd; // 申告日（判定用）
 }

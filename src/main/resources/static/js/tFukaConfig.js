@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 
     const fukaKbnEl = document.getElementById('fukaKbnHidden');
     const fukaKbn = fukaKbnEl ? fukaKbnEl.value : '';
@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnForceSave = document.getElementById('btnForceSave');
     const taxCheckBypassed = document.getElementById('taxCheckBypassed');
     if (btnForceSave && taxCheckBypassed) {
-        btnForceSave.addEventListener('click', function (e) {
-            e.preventDefault(); 
+        btnForceSave.addEventListener('click', function(e) {
+            e.preventDefault();
             taxCheckBypassed.value = 'true';
             const form = this.closest('form') || document.getElementById('fukaDeclarationForm');
             if (form) form.submit();
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const monthlyTallyModal = document.getElementById('monthlyTallyModal');
     if (monthlyTallyModal) {
-        monthlyTallyModal.addEventListener('keydown', function (e) {
+        monthlyTallyModal.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const btnApplyTally = document.getElementById('btnApplyTally');
@@ -106,11 +106,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const calculateTeiritsu = () => {
         if (!tableTeiritsu) return;
         const rows = tableTeiritsu.querySelectorAll('tbody tr');
-        
+
         // 隠し税率項目の数から、何区分（何列）あるかを動的に取得
         const rateInputs = tableTeiritsu.querySelectorAll('input[id^="modal-teiritsu-tax-rate-"]');
         const tierCount = rateInputs.length;
-        
+
         let columnTotals = {
             hakusu: Array(tierCount).fill(0),
             ryokin: Array(tierCount).fill(0)
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let totalMenjoRyokin = 0;
 
         rows.forEach(row => {
-            for (let i = 0; i < tierCount; i++) {
+            for (let i = 0;i < tierCount;i++) {
                 const hakusuInput = row.querySelector(`.teiritsu-kazei-hakusu-${i}`);
                 if (hakusuInput) columnTotals.hakusu[i] += parseIntSafe(hakusuInput.value);
 
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // 合計と税額の計算反映
-        for (let i = 0; i < tierCount; i++) {
+        for (let i = 0;i < tierCount;i++) {
             const totalHakusuInput = document.getElementById(`modal-teiritsu-total-kazei-hakusu-${i}`);
             if (totalHakusuInput) totalHakusuInput.value = columnTotals.hakusu[i];
 
@@ -160,20 +160,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // イベントバインド
     if (tableTeigaku) {
-        tableTeigaku.querySelector('tbody').addEventListener('input', function (e) {
+        tableTeigaku.querySelector('tbody').addEventListener('input', function(e) {
             if (e.target && e.target.tagName === 'INPUT') calculateTeigaku();
         });
     }
     if (tableTeiritsu) {
-        tableTeiritsu.querySelector('tbody').addEventListener('input', function (e) {
+        tableTeiritsu.querySelector('tbody').addEventListener('input', function(e) {
             if (e.target && e.target.tagName === 'INPUT') calculateTeiritsu();
         });
     }
 
     if (monthlyTallyModal) {
-        monthlyTallyModal.addEventListener('shown.bs.modal', function () {
+        monthlyTallyModal.addEventListener('shown.bs.modal', function() {
             if (fukaKbn === '1') calculateTeigaku();
             else if (fukaKbn === '2') calculateTeiritsu();
         });
     }
+});
+
+document.querySelectorAll('.js-comma-format').forEach(input => {
+    // ページ読み込み時に初期値があればカンマ変換
+    if (input.value) {
+        input.value = Number(input.value.replace(/,/g, '')).toLocaleString();
+    }
+
+    // フォーカスが当たったらカンマを消す（数値だけにして入力しやすくする）
+    input.addEventListener('focus', (e) => {
+        const numValue = e.target.value.replace(/,/g, '');
+        e.target.value = numValue;
+    });
+
+    // フォーカスが外れたらカンマを入れる
+    input.addEventListener('blur', (e) => {
+        const cleanValue = e.target.value.replace(/,/g, '');
+        // 半角数字のみの場合だけカンマ変換を実行
+        if (/^\d+$/.test(cleanValue)) {
+            e.target.value = Number(cleanValue).toLocaleString();
+        }
+    });
 });

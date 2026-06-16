@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 
 import lombok.Data;
 
@@ -14,18 +13,26 @@ import lombok.Data;
 @Data
 public class FukaMonthlyDeclarationDto {
 
-	@NotBlank(message = "※納入年月を選択してください")
 	private String paymentYearMonth;
 
 	// リストの中身まで検証を Cascade（連鎖：親の検証時に子も自動的に検証すること）させる
 	@Valid
 	private List<FukaTaxDetailDto> taxDetails = new ArrayList<>();
 
+	// 免除宿泊数
 	private Long exemptStayCount;
 
+	// 宿泊数合計
 	private Long totalStayCount;
 
+	// 宿泊税額合計
 	private Long totalPaymentAmount;
+
+	// 市区町村税額合計
+	private Long totalCityZeigaku;
+
+	// 都道府県税額合計
+	private Long totalKenZeigaku;
 
 	// ==========================================
 	// ✨ 【新規追加】定率制用のフィールド
@@ -48,5 +55,5 @@ public class FukaMonthlyDeclarationDto {
 
 	// 納入金額（1ヶ月分の最終的な納付額）
 	private Long nonyuKingaku;
-	
+
 }
