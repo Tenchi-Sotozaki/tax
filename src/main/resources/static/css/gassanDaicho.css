@@ -1,0 +1,37 @@
+/* 合算申告情報管理台帳スタイル */
+.table-scroll {
+    overflow-x: auto;
+}
+
+.sticky-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.row-selected {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.toolbar-divider {
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .table-scroll {
+        font-size: 0.875rem;
+    }
+    
+    .toolbar-divider {
+        display: none !important;
+    }
+}
+
+.form-label-sm {
+    font-size: 0.875rem;
+}
+
+.btn-group-sm > .btn, .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}

@@ -53,13 +53,12 @@
 
 						<!-- 登録日 -->
 						<div class="col-md-3">
-							<label for="torokuYmd" class="form-label fw-medium"> 登録日
+							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'" class="form-label fw-medium"> 登録日
 								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="torokuYmd" name="torokuYmd" th:errorclass="is-invalid"
-								th:value="*{torokuYmd != null ? #temporals.format(torokuYmd, 'yyyy-MM-dd') : ''}">
+								id="torokuYmd" th:field="*{torokuYmd}" th:errorclass="is-invalid">
 							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{torokuYmd}">
+								id="torokuYmdView" readonly th:value="*{torokuYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('torokuYmd')}"
 								th:errors="*{torokuYmd}"></div>
@@ -67,14 +66,13 @@
 
 						<!-- 申告日 -->
 						<div class="col-md-3">
-							<label for="shinkokuYmd" class="form-label fw-medium">
+							<label th:for="!${isView} ? 'shinkokuYmd' : 'shinkokuYmdView'" class="form-label fw-medium">
 								申告日 <span th:if="!${isView}"
 								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="shinkokuYmd" name="shinkokuYmd" th:errorclass="is-invalid"
-								th:value="*{shinkokuYmd != null ? #temporals.format(shinkokuYmd, 'yyyy-MM-dd') : ''}">
+								id="shinkokuYmd" th:field="*{shinkokuYmd}" th:errorclass="is-invalid">
 							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{shinkokuYmd}">
+								id="shinkokuYmdView" readonly th:value="*{shinkokuYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('shinkokuYmd')}"
 								th:errors="*{shinkokuYmd}"></div>
@@ -102,14 +100,13 @@
 
 						<!-- 適用時期(FROM) -->
 						<div class="col-md-4">
-							<label for="tekiyoStYmd" class="form-label fw-medium">
+							<label th:for="!${isView} ? 'tekiyoStYmd' : 'tekiyoStYmdView'" class="form-label fw-medium">
 								適用時期(FROM) <span th:if="!${isView}"
 								class="badge bg-danger text-white ms-1">必須</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="tekiyoStYmd" name="tekiyoStYmd" th:errorclass="is-invalid"
-								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy-MM-dd') : ''}">
+								id="tekiyoStYmd" th:field="*{tekiyoStYmd}" th:errorclass="is-invalid">
 							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{tekiyoStYmd}">
+								id="tekiyoStYmdView" readonly th:value="*{tekiyoStYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoStYmd')}"
 								th:errors="*{tekiyoStYmd}"></div>
@@ -117,13 +114,12 @@
 
 						<!-- 適用時期(TO) -->
 						<div class="col-md-4">
-							<label for="tekiyoEdYmd" class="form-label fw-medium">
+							<label th:for="!${isView} ? 'tekiyoEdYmd' : 'tekiyoEdYmdView'" class="form-label fw-medium">
 								適用時期(TO)
 							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="tekiyoEdYmd" name="tekiyoEdYmd" th:errorclass="is-invalid"
-								th:value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy-MM-dd') : ''}">
+								id="tekiyoEdYmd" th:field="*{tekiyoEdYmd}" th:errorclass="is-invalid">
 							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{tekiyoEdYmd}">
+								id="tekiyoEdYmdView" readonly th:value="*{tekiyoEdYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoEdYmd')}"
 								th:errors="*{tekiyoEdYmd}"></div>

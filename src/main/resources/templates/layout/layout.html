@@ -67,6 +67,14 @@
 											<i class="bi bi-person-lines-fill me-2"></i>宛名情報
 									</a></li>
 									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('GASSAN')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/gassan/list}"
+											th:classappend="${#strings.contains(currentUri, '/gassan/list')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-file-earmark-text me-2"></i>合算管理台帳
+										</a>
+									</li>
+									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('SHOREIKIN')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/shoreikin/list}"
