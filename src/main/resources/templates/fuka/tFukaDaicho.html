@@ -143,17 +143,11 @@
 		<th:block layout:fragment="scripts">
 			<script th:inline="javascript">
 				/*<![CDATA[*/
-				function generateViewUrl(nendo, kibetsu) {
-
-					var baseUrl = /*[[@{/declaration/view/}]]*/ '/declaration/view/';
-
-					var shiteiNo = /*[[${fukaDaichoForm.shiteiNo}]]*/ '';
-
-					return baseUrl + shiteiNo + '/' + nendo + '/' + kibetsu;
-				}
+				// Thymeleaf変数をグローバルスコープに設定
+				window.fukaDaichoFormShiteiNo = /*[[${fukaDaichoForm.shiteiNo}]]*/ '';
+				window.declarationViewBaseUrl = /*[[@{/declaration/view/}]]*/ '/declaration/view/';
 				/*]]>*/
 			</script>
-
 			<script th:src="@{/js/tFukaDaicho.js}"></script>
 		</th:block>
 </body>

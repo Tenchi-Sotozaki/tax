@@ -694,42 +694,6 @@ public class FukaServiceImpl implements FukaService {
 		setFukaUchiDataToForm(uchiList, monthDto);
 	}
 
-	/**
-	 * 申告入力された税額と、システム計算上の税額に不整合がないか判定する。
-	 * @param form 申告フォーム
-	 * @return true: 不整合あり / false: 不整合なし
-	 */
-	public boolean hasTaxAmountDiscrepancy(FukaDeclarationForm form) {
-		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
-		if (detail == null || detail.getTaxDetails() == null || detail.getTaxDetails().isEmpty()) {
-			return false;
-		}
-
-		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
-
-		// 期待される税額を全区分ループで計算
-		long calculatedZeigaku = 0L;
-		int calculatedHakusu = 0;
-		for (FukaTaxDetailDto d : detail.getTaxDetails()) {
-			if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
-				long ryokin = (d.getRyokin() != null) ? d.getRyokin() : 0L;
-				calculatedZeigaku += calculateTax(form.getFukaKbn(), ryokin, d.getTaxRate(), d.getTaxKenRate());
-			} else {
-				long count = (d.getHakusu() != null) ? d.getHakusu() : 0L;
-				calculatedZeigaku += calculateTax(form.getFukaKbn(), count, d.getTaxRate(), d.getTaxKenRate());
-			}
-		}
-
-		// 画面の合計税額を取得
-		long inputTotal = (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0L;
-
-		if (calculatedZeigaku != inputTotal) {
-			log.info("税額整合性エラー: 算出値={}, 画面入力値={}, fukaKbn={}", calculatedZeigaku, inputTotal, form.getFukaKbn());
-			return true;
-		}
-		return false;
-	}
-
 	// =========================================================
 	// 月計表（徴収原簿）保存・復元処理
 	// =========================================================

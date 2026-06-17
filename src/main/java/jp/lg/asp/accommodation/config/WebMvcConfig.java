@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	private final CommaFormattedStringToLongConverter commaFormattedStringToLongConverter;
+	private final CommaFormattedStringToIntegerConverter commaFormattedStringToIntegerConverter;
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
 		registry.addConverter(commaFormattedStringToLongConverter);
+		registry.addConverter(commaFormattedStringToIntegerConverter);
 	}
 }

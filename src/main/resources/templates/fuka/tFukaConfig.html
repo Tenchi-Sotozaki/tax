@@ -398,10 +398,10 @@
 						</div>
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">金額 (円)</label>
-							<div class="input-group input-group-sm">
-								<input type="number" class="form-control text-end" th:field="*{additionalAmount}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0">
-								<span class="input-group-text">円</span>
+							<div class="input-group input-group-sm js-comma-format">
+								<input type="text" class="form-control text-end js-comma-format"
+									th:field="*{additionalAmount}" th:readonly="${fukaDeclarationForm.view}"
+									placeholder="0">
 							</div>
 						</div>
 						<div class="col-md-3">
@@ -442,8 +442,7 @@
 								aria-label="Close"></button>
 						</div>
 						<div class="modal-body">
-							<p class="text-muted small" th:if="*{fukaKbn == '1'}">※各日の宿泊数を入力してください。入力した合計が親画面に反映されます。
-							</p>
+							<p class="text-muted small" th:if="*{fukaKbn == '1'}">※各日の宿泊数を入力してください。 </p>
 							<p class="text-muted small" th:if="*{fukaKbn == '2'}">※各日の区分ごとの宿泊数と宿泊料金を入力してください。</p>
 
 							<div class="table-responsive">
@@ -453,9 +452,9 @@
 									<thead class="table-light">
 										<tr>
 											<th rowspan="2" class="align-middle" style="width: 60px;">日付</th>
-											<th th:colspan="*{monthlyDetail.taxDetails.size()}">宿泊数 (人泊)</th>
-											<th rowspan="2" class="align-middle" style="width: 100px;">課税免除<br>(人泊)</th>
-											<th rowspan="2" class="align-middle" style="width: 80px;">合計<br>(人泊)</th>
+											<th th:colspan="*{monthlyDetail.taxDetails.size()}">宿泊数</th>
+											<th rowspan="2" class="align-middle" style="width: 100px;">課税免除</th>
+											<th rowspan="2" class="align-middle" style="width: 80px;">合計</th>
 										</tr>
 										<tr>
 											<th th:each="detail : *{monthlyDetail.taxDetails}" th:text="${detail.label}"
@@ -473,17 +472,18 @@
 														th:value="${day}">
 												</td>
 												<td th:each="detail, stat : *{monthlyDetail.taxDetails}">
-													<input type="number" class="form-control form-control-sm text-end"
+													<input type="text"
+														class="form-control form-control-sm text-end js-comma-format"
 														th:classappend="'seq' + (${stat.index} + 1)"
 														th:name="|monthlyTally.dailyItems[${day - 1}].hakusu[${stat.index}]|"
-														value="0" min="0">
+														value="0">
 												</td>
-												<td><input type="number"
-														class="form-control form-control-sm text-end exempt"
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format exempt"
 														th:name="|monthlyTally.dailyItems[${day - 1}].menjoHakusu|"
-														value="0" min="0"></td>
-												<td><input type="number"
-														class="form-control form-control-sm text-end bg-light row-total"
+														value="0"></td>
+												<td><input type="text"
+														class="form-control form-control-sm text-end bg-light row-total js-comma-format"
 														readonly value="0" tabindex="-1"></td>
 											</tr>
 										</th:block>
@@ -497,19 +497,20 @@
 														th:value="${item.day}">
 												</td>
 												<td th:each="detail, catStat : *{monthlyDetail.taxDetails}">
-													<input type="number" class="form-control form-control-sm text-end"
+													<input type="text"
+														class="form-control form-control-sm text-end js-comma-format"
 														th:classappend="'seq' + (${catStat.index} + 1)"
 														th:name="|monthlyTally.dailyItems[${stat.index}].hakusu[${catStat.index}]|"
 														th:value="${not #lists.isEmpty(item.hakusu) and item.hakusu.size() > catStat.index ? item.hakusu[catStat.index] : '0'}"
-														min="0" th:readonly="${fukaDeclarationForm.view}">
+														th:readonly="${fukaDeclarationForm.view}">
 												</td>
-												<td><input type="number"
-														class="form-control form-control-sm text-end exempt"
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format exempt"
 														th:name="|monthlyTally.dailyItems[${stat.index}].menjoHakusu|"
 														th:value="${item.menjoHakusu != null ? item.menjoHakusu : '0'}"
-														min="0" th:readonly="${fukaDeclarationForm.view}"></td>
-												<td><input type="number"
-														class="form-control form-control-sm text-end bg-light row-total"
+														th:readonly="${fukaDeclarationForm.view}"></td>
+												<td><input type="text"
+														class="form-control form-control-sm text-end bg-light row-total js-comma-format"
 														readonly value="0" tabindex="-1"></td>
 											</tr>
 										</th:block>
@@ -517,13 +518,15 @@
 									<tfoot class="align-middle">
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">合計(計)</td>
-											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input
-													type="number" class="form-control form-control-sm text-end"
-													th:id="|modal-total-count-${stat.index}|" value="0" min="0"></td>
-											<td><input type="number" class="form-control form-control-sm text-end"
-													id="modal-total-exempt" value="0" min="0"></td>
-											<td><input type="number" class="form-control form-control-sm text-end"
-													id="modal-total-all" value="0" min="0"></td>
+											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input type="text"
+													class="form-control form-control-sm text-end js-comma-format"
+													th:id="|modal-total-count-${stat.index}|" value="0"></td>
+											<td><input type="text"
+													class="form-control form-control-sm text-end js-comma-format"
+													id="modal-total-exempt" value="0"></td>
+											<td><input type="text"
+													class="form-control form-control-sm text-end js-comma-format"
+													id="modal-total-all" value="0"></td>
 										</tr>
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
@@ -542,13 +545,14 @@
 										</tr>
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">税額(円)</td>
-											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input
-													type="number" class="form-control form-control-sm text-end"
-													th:id="|modal-tax-amount-${stat.index}|" value="0" min="0"></td>
+											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input type="text"
+													class="form-control form-control-sm text-end js-comma-format"
+													th:id="|modal-tax-amount-${stat.index}|" value="0"></td>
 											<td class="bg-light text-center text-muted align-middle"><i
 													class="bi bi-slash-lg"></i></td>
-											<td><input type="number" class="form-control form-control-sm text-end"
-													id="modal-total-tax" value="0" min="0"></td>
+											<td><input type="text"
+													class="form-control form-control-sm text-end js-comma-format"
+													id="modal-total-tax" value="0"></td>
 										</tr>
 									</tfoot>
 								</table>
@@ -567,12 +571,12 @@
 										<tr>
 											<th:block th:each="detail : *{monthlyDetail.taxDetails}">
 												<th style="font-size: 0.85rem; font-weight: normal; min-width: 80px;">
-													宿泊数 (人泊)</th>
+													宿泊数</th>
 												<th style="font-size: 0.85rem; font-weight: normal; min-width: 100px;">
 													宿泊料金 (円)</th>
 											</th:block>
 											<th style="font-size: 0.85rem; font-weight: normal; min-width: 80px;">宿泊数
-												(人泊)</th>
+											</th>
 											<th style="font-size: 0.85rem; font-weight: normal; min-width: 100px;">宿泊料金
 												(円)</th>
 										</tr>
@@ -588,25 +592,25 @@
 														th:value="${day}">
 												</td>
 												<th:block th:each="detail, stat : *{monthlyDetail.taxDetails}">
-													<td><input type="number"
-															class="form-control form-control-sm text-end"
+													<td><input type="text"
+															class="form-control form-control-sm text-end js-comma-format"
 															th:classappend="'teiritsu-kazei-hakusu-' + ${stat.index}"
 															th:name="|monthlyTally.dailyItems[${day - 1}].hakusu[${stat.index}]|"
-															value="0" min="0"></td>
-													<td><input type="number"
-															class="form-control form-control-sm text-end"
+															value="0"></td>
+													<td><input type="text"
+															class="form-control form-control-sm text-end js-comma-format"
 															th:classappend="'teiritsu-kazei-ryokin-' + ${stat.index}"
 															th:name="|monthlyTally.dailyItems[${day - 1}].ryokin[${stat.index}]|"
-															value="0" min="0"></td>
+															value="0"></td>
 												</th:block>
-												<td><input type="number"
-														class="form-control form-control-sm text-end teiritsu-menjo-hakusu"
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format teiritsu-menjo-hakusu"
 														th:name="|monthlyTally.dailyItems[${day - 1}].menjoHakusu|"
-														value="0" min="0"></td>
-												<td><input type="number"
-														class="form-control form-control-sm text-end teiritsu-menjo-ryokin"
+														value="0"></td>
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format teiritsu-menjo-ryokin"
 														th:name="|monthlyTally.dailyItems[${day - 1}].menjoRyokin|"
-														value="0" min="0"></td>
+														value="0"></td>
 											</tr>
 										</th:block>
 
@@ -619,28 +623,28 @@
 														th:value="${item.day}">
 												</td>
 												<th:block th:each="detail, catStat : *{monthlyDetail.taxDetails}">
-													<td><input type="number"
-															class="form-control form-control-sm text-end"
+													<td><input type="text"
+															class="form-control form-control-sm text-end js-comma-format"
 															th:classappend="'teiritsu-kazei-hakusu-' + ${catStat.index}"
 															th:name="|monthlyTally.dailyItems[${stat.index}].hakusu[${catStat.index}]|"
 															th:value="${not #lists.isEmpty(item.hakusu) and item.hakusu.size() > catStat.index ? item.hakusu[catStat.index] : 0}"
-															min="0" th:readonly="${fukaDeclarationForm.view}"></td>
-													<td><input type="number"
-															class="form-control form-control-sm text-end"
+															th:readonly="${fukaDeclarationForm.view}"></td>
+													<td><input type="text"
+															class="form-control form-control-sm text-end js-comma-format"
 															th:classappend="'teiritsu-kazei-ryokin-' + ${catStat.index}"
 															th:name="|monthlyTally.dailyItems[${stat.index}].ryokin[${catStat.index}]|"
 															th:value="${not #lists.isEmpty(item.ryokin) and item.ryokin.size() > catStat.index ? item.ryokin[catStat.index] : 0}"
-															min="0" th:readonly="${fukaDeclarationForm.view}"></td>
+															th:readonly="${fukaDeclarationForm.view}"></td>
 												</th:block>
-												<td><input type="number"
-														class="form-control form-control-sm text-end teiritsu-menjo-hakusu"
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format teiritsu-menjo-hakusu"
 														th:name="|monthlyTally.dailyItems[${stat.index}].menjoHakusu|"
 														th:value="${item.menjoHakusu != null ? item.menjoHakusu : '0'}"
-														min="0" th:readonly="${fukaDeclarationForm.view}"></td>
-												<td><input type="number"
-														class="form-control form-control-sm text-end teiritsu-menjo-ryokin"
+														th:readonly="${fukaDeclarationForm.view}"></td>
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format teiritsu-menjo-ryokin"
 														th:name="|monthlyTally.dailyItems[${stat.index}].menjoRyokin|"
-														value="0" min="0" th:readonly="${fukaDeclarationForm.view}">
+														value="0" th:readonly="${fukaDeclarationForm.view}">
 												</td>
 											</tr>
 										</th:block>
@@ -650,18 +654,22 @@
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">合計(計)</td>
 											<th:block th:each="detail, stat : *{monthlyDetail.taxDetails}">
-												<td><input type="number" class="form-control form-control-sm text-end"
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format"
 														th:id="|modal-teiritsu-total-kazei-hakusu-${stat.index}|"
-														value="0" min="0" readonly></td>
-												<td><input type="number" class="form-control form-control-sm text-end"
+														value="0" readonly></td>
+												<td><input type="text"
+														class="form-control form-control-sm text-end js-comma-format"
 														th:id="|modal-teiritsu-total-kazei-ryokin-${stat.index}|"
-														value="0" min="0" readonly></td>
+														value="0" readonly></td>
 											</th:block>
-											<td><input type="number" class="form-control form-control-sm text-end"
-													id="modal-teiritsu-total-menjo-hakusu" value="0" min="0" readonly>
+											<td><input type="text"
+													class="form-control form-control-sm text-end js-comma-format"
+													id="modal-teiritsu-total-menjo-hakusu" value="0" readonly>
 											</td>
-											<td><input type="number" class="form-control form-control-sm text-end"
-													id="modal-teiritsu-total-menjo-ryokin" value="0" min="0" readonly>
+											<td><input type="text"
+													class="form-control form-control-sm text-end js-comma-format"
+													id="modal-teiritsu-total-menjo-ryokin" value="0" readonly>
 											</td>
 										</tr>
 										<tr>
@@ -685,10 +693,10 @@
 											<th:block th:each="detail, stat : *{monthlyDetail.taxDetails}">
 												<td class="bg-light text-center text-muted align-middle"><i
 														class="bi bi-slash-lg"></i></td>
-												<td><input type="number"
-														class="form-control form-control-sm text-end fw-bold text-danger"
+												<td><input type="text"
+														class="form-control form-control-sm text-end fw-bold text-danger js-comma-format"
 														th:id="|modal-teiritsu-total-tax-${stat.index}|" value="0"
-														min="0" readonly></td>
+														readonly></td>
 											</th:block>
 											<td class="bg-light text-center text-muted align-middle"><i
 													class="bi bi-slash-lg"></i></td>

@@ -5,18 +5,13 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
-import jp.lg.asp.accommodation.constant.ZeiritsuConstants;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto;
 import jp.lg.asp.accommodation.dto.FukaMonthlyTallyDto.DailyItem;
 import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
-import jp.lg.asp.accommodation.entity.Zeiritsu;
-import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
-import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
@@ -58,8 +53,8 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			return messages;
 		}
 
-		// 1. 宿泊数の不整合チェック
-		checkStayCount(detail, messages);
+		// 1. 合計の不整合チェック
+		checkTotalCount(form, messages);
 
 		// 2. 税額合計の不整合チェック
 		checkTaxTotalDiscrepancy(form, messages);
@@ -105,116 +100,59 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 		long inputTotal = (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0L;
 
 		if (expectedTotal != inputTotal) {
-			messages.add(String.format("税額の不一致: 明細から計算した税額合計 = %,d円、画面入力の総税額 = %,d円", expectedTotal, inputTotal));
+			messages.add(String.format("税額の不一致: 税率から算出した税額合計 = %,d円、入力した税額合計 = %,d円", expectedTotal, inputTotal));
 		}
 	}
 
-	// ===== 宿泊数チェック =====
+	// ===== 合計チェック =====
 
-	private void checkStayCount(FukaMonthlyDeclarationDto detail, List<String> messages) {
-		long sumOfDetails = 0;
+	private void checkTotalCount(FukaDeclarationForm form, List<String> messages) {
+		long sumHakusu = 0L;
+		long sumZeigaku = 0L;
+		long sumRyokin = 0L;
+		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
+
 		if (detail.getTaxDetails() != null) {
 			for (FukaTaxDetailDto taxDetail : detail.getTaxDetails()) {
 				if (taxDetail.getHakusu() != null) {
-					sumOfDetails += taxDetail.getHakusu();
+					sumHakusu += taxDetail.getHakusu();
+				}
+				if (taxDetail.getZeigaku() != null) {
+					sumZeigaku += taxDetail.getZeigaku();
+				}
+				if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
+					if (taxDetail.getRyokin() != null) {
+						sumRyokin += taxDetail.getRyokin();
+					}
 				}
 			}
 		}
 		if (detail.getExemptStayCount() != null) {
-			sumOfDetails += detail.getExemptStayCount();
+			sumHakusu += detail.getExemptStayCount();
+		}
+		if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn()) && detail.getExemptRyokin() != null) {
+			sumRyokin += detail.getExemptRyokin();
 		}
 
 		long totalStayCount = (detail.getTotalStayCount() != null) ? detail.getTotalStayCount() : 0;
-
-		if (totalStayCount != sumOfDetails) {
-			messages.add(String.format("宿泊数の不一致: 各区分の合計 = %,d人泊、画面の総宿泊数 = %,d人泊", sumOfDetails, totalStayCount));
+		if (totalStayCount != sumHakusu) {
+			messages.add(String.format("宿泊数の合計不一致: 各区分の合計 = %,d、入力した宿泊数合計 = %,d", sumHakusu, totalStayCount));
+		}
+		long totalPaymentAmount = (detail.getTotalPaymentAmount() != null) ? detail.getTotalPaymentAmount() : 0;
+		if (totalPaymentAmount != sumZeigaku) {
+			messages.add(String.format("税額の合計不一致: 各区分の合計 = %,d、入力した税額合計 = %,d", sumZeigaku, totalPaymentAmount));
+		}
+		if (FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
+			long kazeiRyokin = (detail.getKazeiRyokin() != null) ? detail.getKazeiRyokin() : 0L;
+			if (kazeiRyokin != sumRyokin) {
+				messages.add(String.format("料金の合計不一致: 各区分の合計 = %,d、画面の料金 = %,d", sumRyokin, kazeiRyokin));
+			}
 		}
 	}
 
 	// ===== 月計表突合チェック =====
 
 	private void checkTallyVsParentDiscrepancy(FukaDeclarationForm form, List<String> messages) {
-		var tally = form.getMonthlyTally();
-		var detail = form.getMonthlyDetail();
-		if (tally == null || detail == null || detail.getTaxDetails() == null) {
-			return;
-		}
-
-		var dailyItems = tally.getDailyItems();
-		if (dailyItems == null || dailyItems.isEmpty()) {
-			return;
-		}
-
-		int categoryCount = detail.getTaxDetails().size();
-		if (categoryCount == 0) {
-			return;
-		}
-
-		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
-		List<String> categoryNames = resolveCategoryNames(form.getFukaKbn(), categoryCount);
-
-		boolean hasCountData = dailyItems.stream()
-				.anyMatch(item -> item.getHakusu() != null &&
-						item.getHakusu().stream().anyMatch(v -> v != null && v > 0));
-		boolean hasAmountData = FukaConstants.TEIRITSU.equals(kbn) && dailyItems.stream()
-				.anyMatch(item -> item.getRyokin() != null &&
-						item.getRyokin().stream().anyMatch(v -> v != null && v > 0));
-
-		if (!hasCountData && !hasAmountData) {
-			return;
-		}
-
-		// ① 宿泊数: 月計表合計 vs 親画面stayCount
-		if (hasCountData) {
-			for (int cat = 0; cat < categoryCount; cat++) {
-				long tallyCountSum = 0;
-				for (var item : dailyItems) {
-					var counts = item.getHakusu();
-					if (counts != null && counts.size() > cat && counts.get(cat) != null) {
-						tallyCountSum += counts.get(cat);
-					}
-				}
-
-				FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-				long parentStayCount = (parentDetail.getHakusu() != null) ? parentDetail.getHakusu() : 0L;
-				String label = categoryNames.get(cat);
-
-				if (tallyCountSum != parentStayCount) {
-					messages.add(String.format("月計表と親画面で、%s の宿泊数が一致しません。（月計表: %,d人泊、親画面: %,d人泊）",
-							label, tallyCountSum, parentStayCount));
-				}
-			}
-		}
-
-		// ② 宿泊料金: 月計表合計 vs 親画面kazeiRyokin（定率制のみ）
-		if (hasAmountData && FukaConstants.TEIRITSU.equals(kbn)) {
-			for (int cat = 0; cat < categoryCount; cat++) {
-				long tallyAmountSum = 0;
-				for (DailyItem item : dailyItems) {
-					var amounts = item.getRyokin();
-					if (amounts != null && amounts.size() > cat && amounts.get(cat) != null) {
-						tallyAmountSum += amounts.get(cat);
-					}
-				}
-
-				FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-				long parentRyokin = (parentDetail.getRyokin() != null) ? parentDetail.getRyokin().longValue()
-						: 0L;
-				String label = categoryNames.get(cat);
-
-				if (tallyAmountSum != parentRyokin) {
-					messages.add(String.format("月計表と親画面で、%s の宿泊料金が一致しません。（月計表: %,d円、親画面: %,d円）",
-							label, tallyAmountSum, parentRyokin));
-				}
-			}
-		}
-	}
-
-	/**
-	 * 月計表（dailyItems）の合計と親画面（monthlyDetail）の入力値を突合し、
-	 * 不一致があればBindingResultにエラーを追加する。
-	 */
-	public void validateTallyVsParent(FukaDeclarationForm form, BindingResult result) {
 		FukaMonthlyTallyDto tally = form.getMonthlyTally();
 		FukaMonthlyDeclarationDto detail = form.getMonthlyDetail();
 		if (tally == null || detail == null || detail.getTaxDetails() == null) {
@@ -231,118 +169,71 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 			return;
 		}
 
-		FukaConstants kbn = FukaConstants.getFukaHoshiki(form.getFukaKbn());
-		List<String> categoryNames = resolveCategoryNames(form.getFukaKbn(), categoryCount);
-		List<String> errors = new ArrayList<>();
+		boolean hasCountData = dailyItems.stream()
+				.anyMatch(item -> item.getHakusu() != null &&
+						item.getHakusu().stream().anyMatch(v -> v != null && v > 0));
+		boolean hasAmountData = FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn()) && dailyItems.stream()
+				.anyMatch(item -> item.getRyokin() != null &&
+						item.getRyokin().stream().anyMatch(v -> v != null && v > 0));
 
-		// 1. 宿泊数の比較（定額制・定率制共通）
-		for (int cat = 0; cat < categoryCount; cat++) {
-			long tallyCountSum = 0;
-			for (DailyItem item : dailyItems) {
-				List<Integer> counts = item.getHakusu();
-				if (counts != null && counts.size() > cat && counts.get(cat) != null) {
-					tallyCountSum += counts.get(cat);
-				}
-			}
-
-			FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-			long parentStayCount = (parentDetail.getHakusu() != null) ? parentDetail.getHakusu() : 0L;
-			String label = categoryNames.get(cat);
-
-			if (tallyCountSum != parentStayCount) {
-				errors.add(String.format("月計表と親画面で、%s の宿泊数が一致しません。（月計表: %,d人泊、親画面: %,d人泊）",
-						label, tallyCountSum, parentStayCount));
-			}
+		if (!hasCountData && !hasAmountData) {
+			return;
 		}
 
-		// 2. 料金の比較（定率制のみ）
-		if (FukaConstants.TEIRITSU.equals(kbn)) {
+		// ① 宿泊数: 月計表合計 vs 親画面stayCount
+		if (hasCountData) {
+			for (int cat = 0; cat < categoryCount; cat++) {
+				long tallyCountSum = 0L;
+				for (DailyItem item : dailyItems) {
+					List<Integer> hakusu = item.getHakusu();
+					if (hakusu != null && hakusu.size() > cat && hakusu.get(cat) != null) {
+						tallyCountSum += hakusu.get(cat);
+					}
+				}
+
+				FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
+				long parentStayCount = (parentDetail.getHakusu() != null) ? parentDetail.getHakusu() : 0L;
+				String label = parentDetail.getLabel();
+				if (tallyCountSum != parentStayCount) {
+					messages.add(String.format("月計表と区分「%s」の宿泊数が一致しません。（月計表: %,d、入力値: %,d）",
+							label, tallyCountSum, parentStayCount));
+				}
+			}
+		}
+		long menjoHakusuSum = dailyItems.stream()
+				.mapToInt(item -> item.getMenjoHakusu() != null ? item.getMenjoHakusu() : 0).sum();
+		long parentMenjoHakusu = detail.getExemptStayCount() != null ? detail.getExemptStayCount() : 0L;
+		if (menjoHakusuSum != parentMenjoHakusu) {
+			messages.add(String.format("月計表と区分「課税対象外（免除）」の宿泊数が一致しません。（月計表: %,d、入力値: %,d）",
+					menjoHakusuSum, parentMenjoHakusu));
+		}
+
+		// ② 宿泊料金: 月計表合計 vs 親画面kazeiRyokin（定率制のみ）
+		if (hasAmountData && FukaConstants.TEIRITSU.getValue().equals(form.getFukaKbn())) {
 			for (int cat = 0; cat < categoryCount; cat++) {
 				long tallyAmountSum = 0;
-				for (var item : dailyItems) {
-					var amounts = item.getRyokin();
+				for (DailyItem item : dailyItems) {
+					List<Long> amounts = item.getRyokin();
 					if (amounts != null && amounts.size() > cat && amounts.get(cat) != null) {
 						tallyAmountSum += amounts.get(cat);
 					}
 				}
 
 				FukaTaxDetailDto parentDetail = detail.getTaxDetails().get(cat);
-				long parentRyokin = (parentDetail.getRyokin() != null) ? parentDetail.getRyokin().longValue()
-						: 0L;
-				String label = categoryNames.get(cat);
-
+				long parentRyokin = (parentDetail.getRyokin() != null) ? parentDetail.getRyokin().longValue() : 0L;
+				String label = parentDetail.getLabel();
 				if (tallyAmountSum != parentRyokin) {
-					errors.add(String.format("月計表と親画面で、%s の宿泊料金が一致しません。（月計表: %,d円、親画面: %,d円）",
+					messages.add(String.format("月計表と区分「%s」の宿泊料金が一致しません。（月計表: %,d円、入力値: %,d円）",
 							label, tallyAmountSum, parentRyokin));
 				}
 			}
-		}
-
-		// 3. 免除宿泊数の比較（共通）
-		long tallyExemptSum = 0;
-		for (var item : dailyItems) {
-			if (item.getMenjoHakusu() != null) {
-				tallyExemptSum += item.getMenjoHakusu();
+			long menjoRyokinSum = dailyItems.stream()
+					.mapToLong(item -> item.getMenjoRyokin() != null ? item.getMenjoRyokin() : 0L).sum();
+			long parentMenjoRyokin = detail.getExemptRyokin() != null ? detail.getExemptRyokin() : 0L;
+			if (menjoRyokinSum != parentMenjoRyokin) {
+				messages.add(String.format("月計表と区分「課税対象外（免除）」宿泊料金が一致しません。（月計表: %,d、入力値: %,d）",
+						menjoRyokinSum, parentMenjoRyokin));
 			}
 		}
-		long parentExempt = (detail.getExemptStayCount() != null) ? detail.getExemptStayCount() : 0L;
-		if (tallyExemptSum != parentExempt) {
-			errors.add(String.format("月計表と親画面で、免除宿泊数が一致しません。（月計表: %,d人泊、親画面: %,d人泊）",
-					tallyExemptSum, parentExempt));
-		}
-
-		// エラーがあればBindingResultに追加
-		if (!errors.isEmpty()) {
-			String message = String.join("\n", errors);
-			result.reject("mismatch.tally", message);
-		}
 	}
-
-	/**
-	 * DBの税率マスタから区分名リストを取得する。
-	 * 取得できない場合は「対象区分」をフォールバックとして使用する。
-	 */
-	private List<String> resolveCategoryNames(String fukaKbn, int categoryCount) {
-		List<String> names = new ArrayList<>();
-
-		try {
-			if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
-				// 定率制: m_zeiritsu_teiritsu から区分名を取得
-				List<Zeiritsu> parents = zeiritsuRepository.findActiveByJichitaiCd(jichitaiCd);
-				Zeiritsu applied = parents.stream()
-						.filter(z -> ZeiritsuConstants.CITY.getValue().equals(z.getTaishoKbn())
-								&& FukaConstants.TEIRITSU.getValue().equals(z.getFukaKbn()))
-						.findFirst().orElse(null);
-
-				if (applied != null) {
-					List<ZeiritsuTeiritsu> masters = zeiritsuTeiritsuRepository
-							.findActiveByTaishoKbnAndTekiyoYm(applied.getTaishoKbn(),
-									applied.getTekiyoStYm(), applied.getTekiyoEdYm());
-					for (ZeiritsuTeiritsu m : masters) {
-						names.add(m.getKbnName() != null ? m.getKbnName() : "対象区分");
-					}
-				}
-			} else {
-				// 定額制: m_zeiritsu_teigaku から区分名（料金帯ラベル）を取得
-				List<ZeiritsuTeigaku> masters = zeiritsuTeigakuRepository
-						.findByJichitaiCdOrderByRyokinStAsc(jichitaiCd);
-				for (ZeiritsuTeigaku m : masters) {
-					String label = (m.getRyokinEd() != null)
-							? String.format("%,d円〜%,d円未満", m.getRyokinSt(), m.getRyokinEd() + 1)
-							: String.format("%,d円以上", m.getRyokinSt());
-					names.add(label);
-				}
-			}
-		} catch (Exception e) {
-			log.warn("区分名の取得に失敗しました。フォールバック値を使用します: {}", e.getMessage());
-		}
-
-		// 足りない分をフォールバックで埋める
-		while (names.size() < categoryCount) {
-			names.add("対象区分");
-		}
-
-		return names;
-	}
-
 }
