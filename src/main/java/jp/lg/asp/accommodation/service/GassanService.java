@@ -1,6 +1,8 @@
 package jp.lg.asp.accommodation.service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 import jp.lg.asp.accommodation.dto.GassanForm;
 
@@ -29,4 +31,7 @@ public interface GassanService {
 
     /** 指定番号に紐づく合算申告を指定の合算指定番号で照会フォームとして返す */
     GassanForm getViewFormByShiteiNo(String shiteiNo, String gassanShiteiNo);
+
+    /** 宛名番号に紐づく施設一覧を取得する */
+    List<GassanForm.FacilityItem> getFacilitiesByAtenaNo(BigDecimal atenaNo);
 }

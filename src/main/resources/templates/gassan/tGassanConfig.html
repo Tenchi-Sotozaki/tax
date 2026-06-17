@@ -1,185 +1,235 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layout/layout}" lang="ja">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
 <head>
 <title>合算申告登録/編集/照会</title>
 </head>
 <body>
-    <div layout:fragment="content" class="container-fluid p-4"
-        th:with="formAction=${isEdit} ? '/gassan/edit/' + ${editId} : '/gassan/registration'">
+	<div layout:fragment="content" class="container-fluid p-4"
+		th:with="formAction=${isEdit} ? '/gassan/edit/' + ${editId} : '/gassan/registration'">
 
-        <!-- ページヘッダー -->
-        <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h2 class="h2">
-                <i class="bi bi-file-earmark-text me-2 text-primary"></i>
-                <span th:text="${isView} ? '合算申告 照会' : (${isEdit} ? '合算申告 編集' : '合算申告 新規登録')"></span>
-            </h2>
-        </div>
+		<!-- ページヘッダー -->
+		<div
+			class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h2 class="h2">
+				<i class="bi bi-file-earmark-text me-2 text-primary"></i> <span
+					th:text="${isView} ? '合算申告 照会' : (${isEdit} ? '合算申告 編集' : '合算申告 新規登録')"></span>
+			</h2>
+		</div>
 
-        <!-- エラーメッセージ -->
-        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <span th:text="${errorMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+		<!-- エラーメッセージ -->
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> <span
+				th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 
-        <form id="gassanForm" th:action="@{${formAction}}" th:object="${GassanForm}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <input type="hidden" th:field="*{atenaNo}">
-            <input type="hidden" th:field="*{fromShiteiNo}">
-            <input th:if="${isEdit}" type="hidden" th:field="*{gassanShiteiNo}">
+		<form id="gassanForm" th:action="@{${formAction}}"
+			th:object="${GassanForm}" method="post">
+			<input type="hidden" th:name="${_csrf.parameterName}"
+				th:value="${_csrf.token}" /> <input type="hidden"
+				th:field="*{atenaNo}"> <input type="hidden"
+				th:field="*{fromShiteiNo}"> <input th:if="${isEdit}"
+				type="hidden" th:field="*{gassanShiteiNo}">
 
-            <!-- バリデーションエラーサマリー -->
-            <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に
-                <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
-            </div>
+			<!-- バリデーションエラーサマリー -->
+			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
+				role="alert">
+				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
+					th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
+			</div>
 
-            <!-- ===== 基本情報 ===== -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>基本情報</h5>
-                </div>
-                <div class="card-body bg-light-subtle">
-                    <div class="row g-3">
+			<!-- ===== 申告情報エリア ===== -->
+			<div class="card mb-4 shadow-sm">
+				<div class="card-header bg-primary text-white py-3">
+					<h5 class="mb-0">
+						<i class="bi bi-info-circle me-2"></i>申告情報
+					</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div class="row g-3">
 
-                        <!-- 特別徴収義務者 -->
-                        <div class="col-md-6">
-                            <label class="form-label fw-medium">特別徴収義務者</label>
-                            <input type="text" class="form-control bg-light" th:value="*{atenaName}" readonly>
-                        </div>
+						<!-- 登録日 -->
+						<div class="col-md-3">
+							<label for="torokuYmd" class="form-label fw-medium"> 登録日
+								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
+							</label> <input th:if="!${isView}" type="date" class="form-control"
+								id="torokuYmd" name="torokuYmd" th:errorclass="is-invalid"
+								th:value="*{torokuYmd != null ? #temporals.format(torokuYmd, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{torokuYmd}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('torokuYmd')}"
+								th:errors="*{torokuYmd}"></div>
+						</div>
 
-                        <!-- 登録日 -->
-                        <div class="col-md-4">
-                            <label for="torokuYmd" class="form-label fw-medium">
-                                登録日 <span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
-                            </label>
-                            <input th:if="!${isView}" type="date" class="form-control" id="torokuYmd"
-                                name="torokuYmd" th:errorclass="is-invalid"
-                                th:value="*{torokuYmd != null ? #temporals.format(torokuYmd, 'yyyy-MM-dd') : ''}">
-                            <input th:if="${isView}" type="text" class="form-control" readonly
-                                th:value="*{torokuYmd}">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('torokuYmd')}"
-                                th:errors="*{torokuYmd}"></div>
-                        </div>
+						<!-- 申告日 -->
+						<div class="col-md-3">
+							<label for="shinkokuYmd" class="form-label fw-medium">
+								申告日 <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
+							</label> <input th:if="!${isView}" type="date" class="form-control"
+								id="shinkokuYmd" name="shinkokuYmd" th:errorclass="is-invalid"
+								th:value="*{shinkokuYmd != null ? #temporals.format(shinkokuYmd, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{shinkokuYmd}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('shinkokuYmd')}"
+								th:errors="*{shinkokuYmd}"></div>
+						</div>
 
-                        <!-- 適用時期 -->
-                        <div class="col-md-4">
-                            <label for="tekiyoStYmd" class="form-label fw-medium">
-                                適用時期 <span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
-                            </label>
-                            <!-- 登録・編集時：month入力 -->
-                            <input th:if="!${isView}" type="month" class="form-control" id="tekiyoStYmdMonth"
-                                th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy-MM') : ''}">
-                            <input th:if="!${isView}" type="hidden" id="tekiyoStYmd" name="tekiyoStYmd">
-                            <!-- 照会時：適用時期選択 -->
-                            <th:block th:if="${isView}">
-                                <select class="form-select" id="tekiyoSelect"
-                                    th:if="${not #lists.isEmpty(GassanForm.gassanList)}">
-                                    <th:block th:each="g : *{gassanList}">
-                                        <option th:value="${g.gassanShiteiNo}"
-                                            th:selected="${g.gassanShiteiNo == GassanForm.gassanShiteiNo}"
-                                            th:text="${#temporals.format(g.tekiyoStYmd, 'yy/MM')}"></option>
-                                    </th:block>
-                                </select>
-                                <input type="hidden" id="fromShiteiNoVal" th:value="*{fromShiteiNo}">
-                                <input th:if="${#lists.isEmpty(GassanForm.gassanList)}" type="text"
-                                    class="form-control" readonly
-                                    th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yy/MM') : ''}">
-                            </th:block>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('tekiyoStYmd')}"
-                                th:errors="*{tekiyoStYmd}"></div>
-                        </div>
+						<!-- 宛名検索 -->
+						<div class="col-md-6">
+							<label class="form-label fw-medium">宛名検索</label>
+							<div>
+								<button th:if="!${isView}" type="button"
+									class="btn btn-outline-primary" id="atenaSearchBtn">
+									<i class="bi bi-search me-1"></i>検索
+								</button>
+								<span th:if="*{atenaName}" class="ms-3 text-muted"
+									th:text="'選択中: ' + *{atenaName}"></span>
+							</div>
+						</div>
 
-                    </div>
-                </div>
-            </div>
+						<!-- 合算指定番号（編集・照会のみ） -->
+						<div th:if="${isEdit or isView}" class="col-md-4">
+							<label class="form-label fw-medium">合算指定番号</label> <input
+								type="text" class="form-control bg-light"
+								th:value="*{gassanShiteiNo}" readonly>
+						</div>
 
-            <!-- ===== 合算対象施設一覧 ===== -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0">
-                        <i class="bi bi-building me-2"></i>合算対象施設
-                        <span th:if="!${isView}" class="badge bg-danger text-white ms-2 fs-6">必須（2件以上選択）</span>
-                    </h5>
-                </div>
-                <div class="card-body p-0">
+						<!-- 適用時期(FROM) -->
+						<div class="col-md-4">
+							<label for="tekiyoStYmd" class="form-label fw-medium">
+								適用時期(FROM) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">必須</span>
+							</label> <input th:if="!${isView}" type="date" class="form-control"
+								id="tekiyoStYmd" name="tekiyoStYmd" th:errorclass="is-invalid"
+								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{tekiyoStYmd}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('tekiyoStYmd')}"
+								th:errors="*{tekiyoStYmd}"></div>
+						</div>
 
-                    <!-- バリデーションエラー -->
-                    <div th:if="${#fields.hasErrors('shiteiNoList')}" class="alert alert-danger py-2 mx-3 mt-3 mb-0">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                        <span th:errors="*{shiteiNoList}"></span>
-                    </div>
+						<!-- 適用時期(TO) -->
+						<div class="col-md-4">
+							<label for="tekiyoEdYmd" class="form-label fw-medium">
+								適用時期(TO)
+							</label> <input th:if="!${isView}" type="date" class="form-control"
+								id="tekiyoEdYmd" name="tekiyoEdYmd" th:errorclass="is-invalid"
+								th:value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control"
+								readonly th:value="*{tekiyoEdYmd}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('tekiyoEdYmd')}"
+								th:errors="*{tekiyoEdYmd}"></div>
+						</div>
 
-                    <table class="table table-bordered table-hover table-sm align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 50px" class="text-center">
-                                    <span th:if="!${isView}">選択</span>
-                                </th>
-                                <th style="min-width: 120px">指定番号</th>
-                                <th style="min-width: 200px">施設名称</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="facility, stat : *{facilityList}"
-                                th:classappend="${facility.checked} ? 'table-primary' : ''">
-                                <td class="text-center">
-                                    <!-- 登録・編集時：チェックボックス -->
-                                    <input th:if="!${isView}" type="checkbox"
-                                        class="form-check-input facility-check"
-                                        th:name="'shiteiNoList'"
-                                        th:value="${facility.shiteiNo}"
-                                        th:checked="${facility.checked}">
-                                    <!-- 照会時：チェック済みアイコン -->
-                                    <i th:if="${isView} and ${facility.checked}"
-                                        class="bi bi-check-circle-fill text-primary fs-5"></i>
-                                    <i th:if="${isView} and !${facility.checked}"
-                                        class="bi bi-circle text-muted fs-5"></i>
-                                </td>
-                                <td th:text="${facility.shiteiNo}"></td>
-                                <td th:text="${facility.shisetsuName}"></td>
-                            </tr>
-                            <tr th:if="${#lists.isEmpty(GassanForm.facilityList)}">
-                                <td colspan="3" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-                                    対象施設が見つかりませんでした。
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+					</div>
+				</div>
+			</div>
 
-            <!-- ===== アクションボタン ===== -->
-            <div class="d-flex justify-content-center gap-3 py-4 mb-5">
-                <th:block th:if="!${isView}">
-                    <button type="button" id="openConfirmModalBtn" class="btn btn-lg px-5"
-                        th:classappend="${isEdit} ? 'btn-success' : 'btn-primary'">
-                        <i th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
-                        <span th:text="${isEdit} ? '更新する' : '登録する'"></span>
-                    </button>
-                </th:block>
-                <th:block th:if="${isView}">
-                    <a th:href="@{/gassan/edit/{id}(id=${editId})}" class="btn btn-success btn-lg px-5">
-                        <i class="bi bi-pencil-square me-2"></i>編集する
-                    </a>
-                </th:block>
-                <a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-4">
-                    <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-                </a>
-            </div>
-        </form>
+			<!-- ===== 徴収義務者一覧エリア ===== -->
+			<div class="card mb-4 shadow-sm">
+				<div class="card-header bg-primary text-white py-3">
+					<h5 class="mb-0">
+						<i class="bi bi-building me-2"></i>徴収義務者一覧 <span
+							th:if="!${isView}" class="badge bg-danger text-white ms-2 fs-6">必須（2件以上選択）</span>
+					</h5>
+				</div>
+				<div class="card-body p-0">
 
-        <!-- 確認モーダル -->
-        <div th:if="!${isView}"
-            th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}"></div>
+					<!-- バリデーションエラー -->
+					<div th:if="${#fields.hasErrors('shiteiNoList')}"
+						class="alert alert-danger py-2 mx-3 mt-3 mb-0">
+						<i class="bi bi-exclamation-triangle-fill me-1"></i> <span
+							th:errors="*{shiteiNoList}"></span>
+					</div>
 
-    </div>
+					<table
+						class="table table-bordered table-hover table-sm align-middle mb-0">
+						<thead class="table-light">
+							<tr>
+								<th style="width: 60px" class="text-center"></th>
+								<th style="width: 80px" class="text-center"><span
+									th:if="!${isView}">代表施設</span></th>
+								<th>徴収義務者名</th>
+								<th>施設名</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="facility, stat : *{facilityList}"
+								th:classappend="${facility.checked} ? 'table-primary' : ''">
+								<td class="text-center">
+									<!-- 登録・編集時：チェックボックス --> <input th:if="!${isView}"
+									type="checkbox" class="form-check-input facility-check"
+									th:name="'shiteiNoList'" th:value="${facility.shiteiNo}"
+									th:checked="${facility.checked}"> <!-- 照会時：チェック済みアイコン -->
+									<i th:if="${isView} and ${facility.checked}"
+									class="bi bi-check-circle-fill text-primary fs-5"></i> <i
+									th:if="${isView} and !${facility.checked}"
+									class="bi bi-circle text-muted fs-5"></i>
+								</td>
+								<td class="text-center">
+									<!-- 代表施設チェックボックス --> <input th:if="!${isView}" type="radio"
+									class="form-check-input daihyo-radio" name="daihyoShiteiNo"
+									th:value="${facility.shiteiNo}" th:checked="${facility.daihyo}">
+									<!-- 照会時：代表施設アイコン --> <i
+									th:if="${isView} and ${facility.daihyo}"
+									class="bi bi-star-fill text-warning fs-5"></i>
+								</td>
+								<td th:text="${facility.choshuGimushaName}"></td>
+								<td th:text="${facility.shisetsuName}"></td>
+							</tr>
+							<tr th:if="${#lists.isEmpty(GassanForm.facilityList)}">
+								<td colspan="4" class="text-center text-muted py-4"><i
+									class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+									対象施設が見つかりませんでした。</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 
-    <th:block layout:fragment="scripts">
-        <script th:src="@{/js/t_gassan_config.js}"></script>
-    </th:block>
+			<!-- ===== アクションボタン ===== -->
+			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+				<th:block th:if="!${isView}">
+					<button type="button" id="openConfirmModalBtn"
+						class="btn btn-lg px-5"
+						th:classappend="${isEdit} ? 'btn-success' : 'btn-primary'">
+						<i
+							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+					</button>
+				</th:block>
+				<th:block th:if="${isView}">
+					<a th:href="@{/gassan/edit/{id}(id=${editId})}"
+						class="btn btn-success btn-lg px-5"> <i
+						class="bi bi-pencil-square me-2"></i>編集する
+					</a>
+				</th:block>
+				<a href="javascript:history.back()"
+					class="btn btn-outline-secondary btn-lg px-4"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+			</div>
+		</form>
+
+		<!-- 確認モーダル -->
+		<div th:if="!${isView}"
+			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}"></div>
+
+		<!-- 宛名検索モーダル -->
+		<div th:replace="~{layout/components :: addressSearchModal}"></div>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/t_gassan_config.js}"></script>
+	</th:block>
 </body>
 </html>

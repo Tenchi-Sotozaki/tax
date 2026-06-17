@@ -2,7 +2,9 @@ package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.dto.GassanForm;
 import jp.lg.asp.accommodation.dto.GassanForm.FacilityItem;
-import jp.lg.asp.accommodation.dto.GassanListItem;
+import jp.lg.asp.accommodation.dto.GassanForm.GassanListItem;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
@@ -43,7 +45,7 @@ public class GassanServiceImpl implements GassanService {
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, form.getAtenaNo());
         Set<String> checkedSet = form.getShiteiNoList() != null ? Set.copyOf(form.getShiteiNoList()) : Set.of();
         form.setFacilityList(tokugimuList.stream()
-                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), checkedSet.contains(t.getShiteiNo())))
+                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), checkedSet.contains(t.getShiteiNo())))
                 .toList());
     }
 
@@ -61,7 +63,7 @@ public class GassanServiceImpl implements GassanService {
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, gassan.getAtenaNo());
         Set<String> checkedSet = Set.copyOf(checkedShiteiNos);
         List<FacilityItem> facilityList = tokugimuList.stream()
-                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), checkedSet.contains(t.getShiteiNo())))
+                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), checkedSet.contains(t.getShiteiNo())))
                 .toList();
 
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, gassan.getAtenaNo()).orElse(null);
@@ -71,7 +73,9 @@ public class GassanServiceImpl implements GassanService {
         form.setAtenaNo(gassan.getAtenaNo());
         form.setAtenaName(atena != null ? atena.getName() : "");
         form.setTekiyoStYmd(gassan.getTekiyoStYmd());
+        form.setTekiyoEdYmd(gassan.getTekiyoEdYmd());
         form.setTorokuYmd(gassan.getTorokuYmd());
+        form.setShinkokuYmd(gassan.getShinkokuYmd());
         form.setFacilityList(facilityList);
         form.setShiteiNoList(checkedShiteiNos);
         return form;
@@ -86,7 +90,7 @@ public class GassanServiceImpl implements GassanService {
 
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo());
         List<FacilityItem> facilityList = tokugimuList.stream()
-                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), false))
+                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false))
                 .toList();
 
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo()).orElse(null);
@@ -96,6 +100,7 @@ public class GassanServiceImpl implements GassanService {
         form.setAtenaNo(tokugimu.getAtenaNo());
         form.setAtenaName(atena != null ? atena.getName() : tokugimu.getKyokaName());
         form.setTorokuYmd(LocalDate.now());
+        form.setShinkokuYmd(LocalDate.now());
         form.setFacilityList(facilityList);
         return form;
     }
@@ -104,16 +109,17 @@ public class GassanServiceImpl implements GassanService {
     @Transactional
     public void register(GassanForm form) {
         String gassanShiteiNo = generateGassanShiteiNo();
-        LocalDate today = LocalDate.now();
 
         Gassan gassan = new Gassan();
         gassan.setJichitaiCd(jichitaiCd);
         gassan.setGassanShiteiNo(gassanShiteiNo);
         gassan.setRno(BigDecimal.ONE);
         gassan.setAtenaNo(form.getAtenaNo());
-        gassan.setTorokuYmd(form.getTorokuYmd() != null ? form.getTorokuYmd() : today);
-        gassan.setShinkokuYmd(form.getTorokuYmd() != null ? form.getTorokuYmd() : today);
+        gassan.setShiteiNo(form.getDaihyoShiteiNo());
+        gassan.setTorokuYmd(form.getTorokuYmd());
+        gassan.setShinkokuYmd(form.getShinkokuYmd());
         gassan.setTekiyoStYmd(form.getTekiyoStYmd());
+        gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
         gassan.setNewFlg("1");
         gassan.setDelFlg("0");
         gassanRepository.save(gassan);
@@ -130,6 +136,9 @@ public class GassanServiceImpl implements GassanService {
                 .orElseThrow(() -> new RuntimeException("合算申告が見つかりません: " + gassanShiteiNo));
 
         gassan.setTekiyoStYmd(form.getTekiyoStYmd());
+        gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
+        gassan.setShinkokuYmd(form.getShinkokuYmd());
+        gassan.setShiteiNo(form.getDaihyoShiteiNo());
         gassanRepository.save(gassan);
 
         gassanUchiRepository.deleteByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
@@ -164,10 +173,19 @@ public class GassanServiceImpl implements GassanService {
         return buildViewForm(shiteiNo, gassanList, gassanShiteiNo);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<GassanForm.FacilityItem> getFacilitiesByAtenaNo(BigDecimal atenaNo) {
+        List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo);
+        return tokugimuList.stream()
+                .map(t -> new GassanForm.FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false))
+                .toList();
+    }
+
     private GassanForm buildViewForm(String shiteiNo, List<Gassan> gassanList, String selectedGassanShiteiNo) {
         GassanForm form = getByGassanShiteiNo(selectedGassanShiteiNo);
         form.setGassanList(gassanList.stream()
-                .map(g -> new GassanListItem(g.getGassanShiteiNo(), "", g.getTekiyoStYmd(), null, 0))
+                .map(g -> new GassanListItem(g.getGassanShiteiNo(), g.getTekiyoStYmd()))
                 .toList());
         form.setFromShiteiNo(shiteiNo);
         return form;

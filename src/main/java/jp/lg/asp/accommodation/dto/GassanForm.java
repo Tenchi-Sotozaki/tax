@@ -26,8 +26,13 @@ public class GassanForm {
     @NotNull(message = "適用時期は必須です")
     private LocalDate tekiyoStYmd;
 
+    private LocalDate tekiyoEdYmd;
+
     @NotNull(message = "登録年月日は必須です")
     private LocalDate torokuYmd;
+
+    @NotNull(message = "申告日は必須です")
+    private LocalDate shinkokuYmd;
 
     /** 選択可能な施設一覧（表示用） */
     private List<FacilityItem> facilityList = new ArrayList<>();
@@ -39,16 +44,38 @@ public class GassanForm {
     @Size(min = 2, message = "合算対象施設を2件以上選択してください")
     private List<String> shiteiNoList;
 
+    /** 代表施設指定番号 */
+    private String daihyoShiteiNo;
+
     @Data
     public static class FacilityItem {
         private String shiteiNo;
         private String shisetsuName;
+        private String choshuGimushaName;
         private boolean checked;
+        private boolean daihyo;
 
-        public FacilityItem(String shiteiNo, String shisetsuName, boolean checked) {
+        public FacilityItem() {}
+
+        public FacilityItem(String shiteiNo, String shisetsuName, String choshuGimushaName, boolean checked) {
             this.shiteiNo = shiteiNo;
             this.shisetsuName = shisetsuName;
+            this.choshuGimushaName = choshuGimushaName;
             this.checked = checked;
+            this.daihyo = false;
+        }
+    }
+
+    @Data
+    public static class GassanListItem {
+        private String gassanShiteiNo;
+        private LocalDate tekiyoStYmd;
+
+        public GassanListItem() {}
+
+        public GassanListItem(String gassanShiteiNo, LocalDate tekiyoStYmd) {
+            this.gassanShiteiNo = gassanShiteiNo;
+            this.tekiyoStYmd = tekiyoStYmd;
         }
     }
 }
