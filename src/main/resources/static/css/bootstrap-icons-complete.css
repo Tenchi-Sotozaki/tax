@@ -1,0 +1,101 @@
+/*!
+ * Bootstrap Icons v1.11.3 - プロジェクト専用版
+ * プロジェクトで使用されているアイコンのみを含む
+ */
+
+@font-face {
+  font-display: block;
+  font-family: bootstrap-icons;
+  src: url("../fonts/bootstrap-icons.woff2") format("woff2");
+}
+
+.bi::before,
+[class*=" bi-"]::before,
+[class^=bi-]::before {
+  display: inline-block;
+  font-family: bootstrap-icons !important;
+  font-style: normal;
+  font-weight: 400 !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: -.125em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* プロジェクトで使用されているアイコン */
+.bi-arrow-counterclockwise::before { content: "\f117"; }
+.bi-arrow-left::before { content: "\f12f"; }
+.bi-arrow-repeat::before { content: "\f130"; }
+.bi-bank::before { content: "\f62e"; }
+.bi-box-arrow-in-right::before { content: "\f1be"; }
+.bi-box-arrow-right::before { content: "\f1c3"; }
+.bi-building::before { content: "\f1dd"; }
+.bi-calculator::before { content: "\f1e0"; }
+.bi-calendar-check::before { content: "\f1e2"; }
+.bi-calendar-month::before { content: "\f1ed"; }
+.bi-calendar-plus::before { content: "\f1ef"; }
+.bi-calendar3::before { content: "\f214"; }
+.bi-cash-coin::before { content: "\f632"; }
+.bi-check-circle::before { content: "\f26b"; }
+.bi-check-circle-fill::before { content: "\f26a"; }
+.bi-check-lg::before { content: "\f633"; }
+.bi-check2-square::before { content: "\f271"; }
+.bi-circle::before { content: "\f28a"; }
+.bi-clock-history::before { content: "\f292"; }
+.bi-currency-yen::before { content: "\f63a"; }
+.bi-download::before { content: "\f30a"; }
+.bi-envelope::before { content: "\f32f"; }
+.bi-exclamation-octagon-fill::before { content: "\f336"; }
+.bi-exclamation-triangle::before { content: "\f33b"; }
+.bi-exclamation-triangle-fill::before { content: "\f33a"; }
+.bi-eye::before { content: "\f341"; }
+.bi-file-earmark-arrow-down::before { content: "\f356"; }
+.bi-file-earmark-arrow-up::before { content: "\f357"; }
+.bi-file-earmark-check::before { content: "\f360"; }
+.bi-file-earmark-pdf::before { content: "\f63e"; }
+.bi-file-earmark-plus::before { content: "\f37c"; }
+.bi-file-earmark-ruled::before { content: "\f385"; }
+.bi-file-earmark-spreadsheet::before { content: "\f389"; }
+.bi-file-earmark-text::before { content: "\f38b"; }
+.bi-file-earmark::before { content: "\f392"; }
+.bi-files::before { content: "\f3c2"; }
+.bi-funnel::before { content: "\f3ca"; }
+.bi-gear::before { content: "\f3e5"; }
+.bi-house::before { content: "\f425"; }
+.bi-inbox::before { content: "\f42d"; }
+.bi-info-circle::before { content: "\f431"; }
+.bi-info-circle-fill::before { content: "\f430"; }
+.bi-journal-text::before { content: "\f444"; }
+.bi-list::before { content: "\f479"; }
+.bi-list-ul::before { content: "\f478"; }
+.bi-moon-stars::before { content: "\f496"; }
+.bi-people::before { content: "\f4d0"; }
+.bi-pencil::before { content: "\f4cb"; }
+.bi-pencil-square::before { content: "\f4ca"; }
+.bi-person::before { content: "\f4e1"; }
+.bi-person-badge::before { content: "\f4d3"; }
+.bi-person-check::before { content: "\f4d6"; }
+.bi-person-circle::before { content: "\f4d7"; }
+.bi-person-gear::before { content: "\f8a7"; }
+.bi-person-lines-fill::before { content: "\f4db"; }
+.bi-person-plus::before { content: "\f4dd"; }
+.bi-person-search::before { content: "\f676"; }
+.bi-person-vcard::before { content: "\f8c9"; }
+.bi-piggy-bank::before { content: "\f64a"; }
+.bi-plus-circle::before { content: "\f4fa"; }
+.bi-plus-slash-minus::before { content: "\f6aa"; }
+.bi-printer::before { content: "\f501"; }
+.bi-save::before { content: "\f525"; }
+.bi-search::before { content: "\f52a"; }
+.bi-shield-lock::before { content: "\f538"; }
+.bi-shield-x::before { content: "\f53e"; }
+.bi-slash-circle::before { content: "\f567"; }
+.bi-slash-lg::before { content: "\f657"; }
+.bi-sliders::before { content: "\f56b"; }
+.bi-table::before { content: "\f5aa"; }
+.bi-trash::before { content: "\f5de"; }
+.bi-upload::before { content: "\f603"; }
+.bi-x::before { content: "\f62a"; }
+.bi-x-lg::before { content: "\f659"; }

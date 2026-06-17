@@ -20,7 +20,7 @@ public class SecurityConfig {
 		http
 				.authorizeHttpRequests(auth -> auth
 						// 静的リソース・ログインは誰でもアクセス可
-						.requestMatchers("/css/**", "/js/**", "/login").permitAll()
+						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**", "/login", "/*.html").permitAll()
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可
