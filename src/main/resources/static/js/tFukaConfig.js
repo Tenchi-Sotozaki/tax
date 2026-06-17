@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const parseIntSafe = (val) => {
-        const num = parseInt(val, 10);
+        const num = parseInt(val.replace(/,/g, ''), 10);
         return isNaN(num) ? 0 : num;
     };
 
@@ -71,14 +71,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const exemptInput = row.querySelector('.exempt');
             if (exemptInput) totalExempt += parseIntSafe(exemptInput.value);
             const rowTotalInput = row.querySelector('.row-total');
-            if (rowTotalInput) rowTotalInput.value = rowSum;
+            if (rowTotalInput) rowTotalInput.value = rowSum.toLocaleString();
         });
 
         let totalAllCategories = 0;
         let totalTaxAmount = 0;
         columnTotals.forEach((total, index) => {
             const totalCountInput = document.getElementById(`modal-total-count-${index}`);
-            if (totalCountInput) totalCountInput.value = total;
+            if (totalCountInput) totalCountInput.value = total.toLocaleString();
             totalAllCategories += total;
 
             const rateInput = document.getElementById(`modal-tax-rate-${index}`);
@@ -86,19 +86,19 @@ document.addEventListener('DOMContentLoaded', function() {
             if (rateInput && taxAmountInput) {
                 const rate = parseIntSafe(rateInput.value);
                 const taxAmount = total * rate;
-                taxAmountInput.value = taxAmount;
+                taxAmountInput.value = taxAmount.toLocaleString();
                 totalTaxAmount += taxAmount;
             }
         });
 
         const modalTotalExempt = document.getElementById('modal-total-exempt');
-        if (modalTotalExempt) modalTotalExempt.value = totalExempt;
+        if (modalTotalExempt) modalTotalExempt.value = totalExempt.toLocaleString();
 
         const modalTotalAll = document.getElementById('modal-total-all');
-        if (modalTotalAll) modalTotalAll.value = totalAllCategories + totalExempt;
+        if (modalTotalAll) modalTotalAll.value = (totalAllCategories + totalExempt).toLocaleString();
 
         const modalTotalTax = document.getElementById('modal-total-tax');
-        if (modalTotalTax) modalTotalTax.value = totalTaxAmount;
+        if (modalTotalTax) modalTotalTax.value = totalTaxAmount.toLocaleString();
     };
 
     // 【定率制】の計算（複数区分・動的ループ対応）
@@ -136,10 +136,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // 合計と税額の計算反映
         for (let i = 0;i < tierCount;i++) {
             const totalHakusuInput = document.getElementById(`modal-teiritsu-total-kazei-hakusu-${i}`);
-            if (totalHakusuInput) totalHakusuInput.value = columnTotals.hakusu[i];
+            if (totalHakusuInput) totalHakusuInput.value = columnTotals.hakusu[i].toLocaleString();
 
             const totalRyokinInput = document.getElementById(`modal-teiritsu-total-kazei-ryokin-${i}`);
-            if (totalRyokinInput) totalRyokinInput.value = columnTotals.ryokin[i];
+            if (totalRyokinInput) totalRyokinInput.value = columnTotals.ryokin[i].toLocaleString();
 
             const rateInput = document.getElementById(`modal-teiritsu-tax-rate-${i}`);
             const taxAmountInput = document.getElementById(`modal-teiritsu-total-tax-${i}`);
@@ -147,15 +147,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (rateInput && taxAmountInput) {
                 const ratePercent = parseFloat(rateInput.value) || 0;
                 // 定率計算：料金合計 × (税率/100) の切り捨て
-                taxAmountInput.value = Math.floor(columnTotals.ryokin[i] * (ratePercent / 100));
+                taxAmountInput.value = Math.floor(columnTotals.ryokin[i] * (ratePercent / 100)).toLocaleString();
             }
         }
 
         const totalMenjoHakusuInput = document.getElementById('modal-teiritsu-total-menjo-hakusu');
-        if (totalMenjoHakusuInput) totalMenjoHakusuInput.value = totalMenjoHakusu;
+        if (totalMenjoHakusuInput) totalMenjoHakusuInput.value = totalMenjoHakusu.toLocaleString();
 
         const totalMenjoRyokinInput = document.getElementById('modal-teiritsu-total-menjo-ryokin');
-        if (totalMenjoRyokinInput) totalMenjoRyokinInput.value = totalMenjoRyokin;
+        if (totalMenjoRyokinInput) totalMenjoRyokinInput.value = totalMenjoRyokin.toLocaleString();
     };
 
     // イベントバインド
@@ -183,6 +183,20 @@ document.querySelectorAll('.js-comma-format').forEach(input => {
     if (input.value) {
         input.value = Number(input.value.replace(/,/g, '')).toLocaleString();
     }
+
+    // 数値バリデーション関数
+    const validateNumericInput = (value) => {
+        // カンマ区切りの数値パターン（空文字も許可）
+        return /^[0-9,]*$/.test(value);
+    };
+
+    // 入力時の数値チェック
+    input.addEventListener('input', (e) => {
+        if (!validateNumericInput(e.target.value)) {
+            // 数値とカンマ以外の文字を削除
+            e.target.value = e.target.value.replace(/[^0-9,]/g, '');
+        }
+    });
 
     // フォーカスが当たったらカンマを消す（数値だけにして入力しやすくする）
     input.addEventListener('focus', (e) => {

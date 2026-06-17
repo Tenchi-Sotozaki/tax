@@ -50,3 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	        });
 	    }
 });
+
+// HTMLから移動したgenerateViewUrl関数
+function generateViewUrl(nendo, kibetsu) {
+    var baseUrl = window.declarationViewBaseUrl || '/declaration/view/';
+    var shiteiNo = window.fukaDaichoFormShiteiNo || '';
+    return baseUrl + shiteiNo + '/' + nendo + '/' + kibetsu;
+}

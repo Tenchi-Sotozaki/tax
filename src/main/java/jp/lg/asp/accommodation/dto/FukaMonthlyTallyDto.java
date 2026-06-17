@@ -24,6 +24,7 @@ public class FukaMonthlyTallyDto {
 		private List<Long> ryokin = new ArrayList<>();
 		private List<Long> sogaku = new ArrayList<>();
 		private Integer menjoHakusu;
+		private Long menjoRyokin;
 		private Long zeigaku;
 	}
 

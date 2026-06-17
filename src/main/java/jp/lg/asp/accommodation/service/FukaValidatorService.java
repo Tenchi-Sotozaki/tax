@@ -2,8 +2,6 @@ package jp.lg.asp.accommodation.service;
 
 import java.util.List;
 
-import org.springframework.validation.BindingResult;
-
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 
 /**
@@ -16,7 +14,4 @@ public interface FukaValidatorService {
 	List<String> getDiscrepancyMessages(FukaDeclarationForm form);
 
 	long calculateExpectedTotal(FukaDeclarationForm form);
-
-	void validateTallyVsParent(FukaDeclarationForm form, BindingResult result);
-
 }

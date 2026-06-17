@@ -28,26 +28,5 @@ public final class FukaConstants {
 	public static final FukaConstants KANPU = new FukaConstants("4", "還付");
 	public static final FukaConstants MENJO = new FukaConstants("5", "免除");
 
-	// =========================================================
-	// 検索用リスト（Enumの values() の代わり）
-	// =========================================================
-	public static final List<FukaConstants> FUKA_HOSHIKI_LIST = List.of(TEIGAKU, TEIRITSU);
 	public static final List<FukaConstants> HENKO_KUBUN_LIST = List.of(SHINKOKU, KOSEI, KETTEI, KANPU, MENJO);
-
-	// =========================================================
-	// 統合したロジック（計算・検索）
-	// =========================================================
-
-	/**
-	 * コード値("1"など)から賦課方式の定数オブジェクトを取得する
-	 * @param value DBなどに保存されているコード値
-	 * @return 該当する定数（見つからない場合はnull）
-	 */
-	public static FukaConstants getFukaHoshiki(String value) {
-		return FUKA_HOSHIKI_LIST.stream()
-				.filter(c -> c.getValue().equals(value))
-				.findFirst()
-				.orElse(null);
-	}
-
 }

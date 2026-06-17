@@ -29,6 +29,7 @@ import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto.DiffRow;
 import jp.lg.asp.accommodation.entity.EltaxRenkei;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
+import jp.lg.asp.accommodation.entity.NozeiShuki;
 import jp.lg.asp.accommodation.entity.Shoyusha;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
@@ -579,7 +580,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			// 納税周期
 			BigDecimal nokigen;
 			if (isNew) {
-				var nozeiList = nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd);
+				List<NozeiShuki> nozeiList = nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd);
 				nokigen = nozeiList.isEmpty() ? null : nozeiList.get(0).getSeq();
 			} else {
 				nokigen = prev.getNokigen();

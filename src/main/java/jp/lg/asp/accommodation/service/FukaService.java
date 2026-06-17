@@ -41,11 +41,6 @@ public interface FukaService {
 	boolean isAlreadyRegistered(String shiteiNo, String paymentMonth);
 
 	/**
-	 * 申告入力された税額と、システム計算上の税額に不整合がないか判定する。
-	 */
-	boolean hasTaxAmountDiscrepancy(FukaDeclarationForm form);
-
-	/**
 	 * 指定された年度・期別に該当する申告データが存在するか判定する。
 	 */
 	boolean isAlreadyRegisteredByKibetsu(String shiteiNo, String nendo, Integer kibetsu);
