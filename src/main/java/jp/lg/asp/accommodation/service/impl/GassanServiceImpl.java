@@ -108,6 +108,9 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional
     public void register(GassanForm form) {
+        // 既に合算指定済みの指定番号が含まれていないかチェック
+        validateNotAlreadyAssigned(form.getShiteiNoList());
+        
         String gassanShiteiNo = generateGassanShiteiNo();
 
         Gassan gassan = new Gassan();
@@ -115,7 +118,6 @@ public class GassanServiceImpl implements GassanService {
         gassan.setGassanShiteiNo(gassanShiteiNo);
         gassan.setRno(BigDecimal.ONE);
         gassan.setAtenaNo(form.getAtenaNo());
-        gassan.setShiteiNo(form.getDaihyoShiteiNo());
         gassan.setTorokuYmd(form.getTorokuYmd());
         gassan.setShinkokuYmd(form.getShinkokuYmd());
         gassan.setTekiyoStYmd(form.getTekiyoStYmd());
@@ -180,6 +182,27 @@ public class GassanServiceImpl implements GassanService {
         return tokugimuList.stream()
                 .map(t -> new GassanForm.FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false))
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void validateNotAlreadyAssigned(List<String> shiteiNoList) {
+        if (shiteiNoList == null || shiteiNoList.isEmpty()) {
+            return;
+        }
+        
+        // 現在有効な合算申告内訳から該当する指定番号を検索
+        List<GassanUchi> existingAssignments = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNoList);
+        
+        if (!existingAssignments.isEmpty()) {
+            // 重複している指定番号のリストを作成
+            List<String> duplicateShiteiNos = existingAssignments.stream()
+                    .map(GassanUchi::getShiteiNo)
+                    .distinct()
+                    .toList();
+            
+            throw new RuntimeException("以下の指定番号は既に合算申告に登録されています: " + String.join(", ", duplicateShiteiNos));
+        }
     }
 
     private GassanForm buildViewForm(String shiteiNo, List<Gassan> gassanList, String selectedGassanShiteiNo) {

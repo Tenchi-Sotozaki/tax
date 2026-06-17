@@ -34,4 +34,7 @@ public interface GassanService {
 
     /** 宛名番号に紐づく施設一覧を取得する */
     List<GassanForm.FacilityItem> getFacilitiesByAtenaNo(BigDecimal atenaNo);
+
+    /** 指定番号がすでに合算指定済みかチェックする */
+    void validateNotAlreadyAssigned(List<String> shiteiNoList);
 }
