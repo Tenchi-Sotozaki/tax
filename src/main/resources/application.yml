@@ -18,6 +18,8 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+    format:
+      date: yyyy-MM-dd
   servlet:
     multipart:
       max-file-size: 10MB

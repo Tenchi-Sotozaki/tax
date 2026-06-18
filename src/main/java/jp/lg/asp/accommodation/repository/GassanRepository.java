@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanId;
+import jp.lg.asp.accommodation.entity.GassanUchi;
 
 @Repository
 public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
@@ -68,4 +69,12 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
     List<Gassan> findByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
+            
+    @Query("""
+            SELECT g FROM Gassan g
+            WHERE g.gassanShiteiNo = :gassanShiteiNo
+            AND g.newFlg = '1' AND g.delFlg = '0'
+            ORDER BY g.rno
+            """)
+    List<Gassan> findByGassanShiteiNoOrderByRno(@Param("gassanShiteiNo") String gassanShiteiNo);
 }

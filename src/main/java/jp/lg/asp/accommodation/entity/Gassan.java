@@ -40,6 +40,9 @@ public class Gassan extends BaseEntity {
     @Column(name = "atena_no", nullable = false, precision = 15)
     private BigDecimal atenaNo;
 
+    @Column(name = "shitei_no", length = 8)
+    private String shiteiNo;
+
     @Column(name = "tekiyo_st_ymd", nullable = false)
     private LocalDate tekiyoStYmd;
 
