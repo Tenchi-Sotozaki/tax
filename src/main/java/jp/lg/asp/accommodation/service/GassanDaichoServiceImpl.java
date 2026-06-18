@@ -76,6 +76,10 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
                     }
                     return true;
                 })
+                .sorted((item1, item2) -> {
+                    // 合算指定番号で昇順ソート
+                    return item1.getGassanShiteiNo().compareTo(item2.getGassanShiteiNo());
+                })
                 .collect(Collectors.toList());
     }
 

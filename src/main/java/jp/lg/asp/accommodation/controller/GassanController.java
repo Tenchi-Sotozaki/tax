@@ -133,8 +133,8 @@ public class GassanController {
 
 		try {
 			gassanService.updateByGassanShiteiNo(gassanShiteiNo, form);
-			redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
-			return "redirect:/gassan/view-form/" + gassanShiteiNo;
+			redirectAttributes.addFlashAttribute("successMessage", "合算申告の更新が完了しました。");
+			return "redirect:/gassan/list";
 		} catch (Exception e) {
 			log.error("合算申告更新エラー", e);
 			gassanService.reloadFacilityList(form);
@@ -171,6 +171,8 @@ public class GassanController {
 		}
 		try {
 			gassanService.register(form);
+			redirectAttributes.addFlashAttribute("successMessage", "合算申告の登録が完了しました。");
+			return "redirect:/gassan/list";
 		} catch (Exception e) {
 			log.error("合算申告登録エラー", e);
 			gassanService.reloadFacilityList(form);
@@ -179,7 +181,5 @@ public class GassanController {
 			model.addAttribute("errorMessage", e.getMessage());
 			return FORM_VIEW;
 		}
-		redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
-		return "redirect:/gassan/registration";
 	}
 }

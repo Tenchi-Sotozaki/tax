@@ -67,8 +67,18 @@ public class GassanServiceImpl implements GassanService {
 
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, gassan.getAtenaNo());
         Set<String> checkedSet = Set.copyOf(checkedShiteiNos);
+        
+        // 代表施設は最初にチェックされた施設とする
+        String daihyoShiteiNo = checkedShiteiNos.isEmpty() ? null : checkedShiteiNos.get(0);
+        
         List<FacilityItem> facilityList = tokugimuList.stream()
-                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), checkedSet.contains(t.getShiteiNo())))
+                .map(t -> {
+                    boolean isChecked = checkedSet.contains(t.getShiteiNo());
+                    boolean isDaihyo = t.getShiteiNo().equals(daihyoShiteiNo);
+                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), isChecked);
+                    item.setDaihyo(isDaihyo);
+                    return item;
+                })
                 .toList();
 
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, gassan.getAtenaNo()).orElse(null);
@@ -83,6 +93,7 @@ public class GassanServiceImpl implements GassanService {
         form.setShinkokuYmd(gassan.getShinkokuYmd());
         form.setFacilityList(facilityList);
         form.setShiteiNoList(checkedShiteiNos);
+        form.setDaihyoShiteiNo(daihyoShiteiNo);
         return form;
     }
 
@@ -113,67 +124,101 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional
     public void register(GassanForm form) {
-        // 既に合算指定済みの指定番号が含まれていないかチェック
-        validateNotAlreadyAssigned(form.getShiteiNoList());
-        
-        String gassanShiteiNo = generateGassanShiteiNo();
+        try {
+            // 既に合算指定済みの指定番号が含まれていないかチェック
+            validateNotAlreadyAssigned(form.getShiteiNoList());
+            
+            // 代表施設を取得（最初の施設または指定された代表施設）
+            String daihyoShiteiNo = form.getDaihyoShiteiNo() != null ? form.getDaihyoShiteiNo() 
+                    : (form.getShiteiNoList() != null && !form.getShiteiNoList().isEmpty() ? form.getShiteiNoList().get(0) : null);
+            
+            if (daihyoShiteiNo == null) {
+                throw new RuntimeException("代表施設を選択してください。");
+            }
+            
+            String gassanShiteiNo = generateGassanShiteiNo();
 
-        Gassan gassan = new Gassan();
-        gassan.setJichitaiCd(jichitaiCd);
-        gassan.setGassanShiteiNo(gassanShiteiNo);
-        gassan.setRno(BigDecimal.ONE);
-        gassan.setAtenaNo(form.getAtenaNo());
-        gassan.setTorokuYmd(form.getTorokuYmd());
-        gassan.setShinkokuYmd(form.getShinkokuYmd());
-        gassan.setTekiyoStYmd(form.getTekiyoStYmd());
-        gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
-        gassan.setNewFlg("1");
-        gassan.setDelFlg("0");
-        gassanRepository.save(gassan);
+            Gassan gassan = new Gassan();
+            gassan.setJichitaiCd(jichitaiCd);
+            gassan.setGassanShiteiNo(gassanShiteiNo);
+            gassan.setRno(BigDecimal.ONE);
+            gassan.setAtenaNo(form.getAtenaNo());
+            gassan.setShiteiNo(daihyoShiteiNo); // 代表施設の指定番号を設定
+            gassan.setTorokuYmd(form.getTorokuYmd());
+            gassan.setShinkokuYmd(form.getShinkokuYmd());
+            gassan.setTekiyoStYmd(form.getTekiyoStYmd());
+            gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
+            gassan.setNewFlg("1");
+            gassan.setDelFlg("0");
+            gassanRepository.save(gassan);
 
-        saveGassanUchi(gassanShiteiNo, BigDecimal.ONE, form.getShiteiNoList());
-        log.info("合算申告登録完了: gassanShiteiNo={}", gassanShiteiNo);
+            saveGassanUchi(gassanShiteiNo, BigDecimal.ONE, form.getShiteiNoList());
+            log.info("合算申告登録完了: gassanShiteiNo={}", gassanShiteiNo);
+        } catch (Exception e) {
+            log.error("合算申告登録エラー", e);
+            
+            // データベースエラーを日本語で表示
+            String errorMessage = convertDatabaseErrorToJapanese(e.getMessage());
+            throw new RuntimeException(errorMessage, e);
+        }
     }
 
     @Override
     @Transactional
     public void updateByGassanShiteiNo(String gassanShiteiNo, GassanForm form) {
-        Gassan gassan = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
-                .stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("合算申告が見つかりません: " + gassanShiteiNo));
+        try {
+            Gassan gassan = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
+                    .stream().findFirst()
+                    .orElseThrow(() -> new RuntimeException("合算申告が見つかりません: " + gassanShiteiNo));
 
-        // 編集時は現在のレコードを除外して重複チェック
-        validateNotAlreadyAssignedForUpdate(gassanShiteiNo, form.getShiteiNoList());
-        
-        // メインテーブルの更新
-        gassan.setTekiyoStYmd(form.getTekiyoStYmd());
-        gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
-        gassan.setShinkokuYmd(form.getShinkokuYmd());
-        gassan.setTorokuYmd(form.getTorokuYmd());
-        gassanRepository.save(gassan);
-
-        // 内訳テーブルの更新（完全にセッションをクリア）
-        gassanUchiRepository.deleteByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
-        entityManager.flush();
-        entityManager.clear(); // セッションを完全にクリア
-        
-        // 新しい内訳データを一括作成・保存
-        if (form.getShiteiNoList() != null && !form.getShiteiNoList().isEmpty()) {
-            List<GassanUchi> newUchiList = form.getShiteiNoList().stream()
-                    .map(shiteiNo -> {
-                        GassanUchi uchi = new GassanUchi();
-                        uchi.setJichitaiCd(jichitaiCd);
-                        uchi.setGassanShiteiNo(gassanShiteiNo);
-                        uchi.setRno(gassan.getRno());
-                        uchi.setShiteiNo(shiteiNo);
-                        return uchi;
-                    })
-                    .toList();
+            // 編集時は現在のレコードを除外して重複チェック
+            validateNotAlreadyAssignedForUpdate(gassanShiteiNo, form.getShiteiNoList());
             
-            gassanUchiRepository.saveAll(newUchiList);
+            // 代表施設を取得（最初の施設または指定された代表施設）
+            String daihyoShiteiNo = form.getDaihyoShiteiNo() != null ? form.getDaihyoShiteiNo() 
+                    : (form.getShiteiNoList() != null && !form.getShiteiNoList().isEmpty() ? form.getShiteiNoList().get(0) : null);
+            
+            if (daihyoShiteiNo == null) {
+                throw new RuntimeException("代表施設を選択してください。");
+            }
+            
+            // メインテーブルの更新
+            gassan.setShiteiNo(daihyoShiteiNo); // 代表施設の指定番号を設定
+            gassan.setTekiyoStYmd(form.getTekiyoStYmd());
+            gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
+            gassan.setShinkokuYmd(form.getShinkokuYmd());
+            gassan.setTorokuYmd(form.getTorokuYmd());
+            gassanRepository.save(gassan);
+
+            // 内訳テーブルの更新（完全にセッションをクリア）
+            gassanUchiRepository.deleteByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+            entityManager.flush();
+            entityManager.clear(); // セッションを完全にクリア
+            
+            // 新しい内訳データを一括作成・保存
+            if (form.getShiteiNoList() != null && !form.getShiteiNoList().isEmpty()) {
+                List<GassanUchi> newUchiList = form.getShiteiNoList().stream()
+                        .map(shiteiNo -> {
+                            GassanUchi uchi = new GassanUchi();
+                            uchi.setJichitaiCd(jichitaiCd);
+                            uchi.setGassanShiteiNo(gassanShiteiNo);
+                            uchi.setRno(gassan.getRno());
+                            uchi.setShiteiNo(shiteiNo);
+                            return uchi;
+                        })
+                        .toList();
+                
+                gassanUchiRepository.saveAll(newUchiList);
+            }
+            
+            log.info("合算申告更新完了: gassanShiteiNo={}", gassanShiteiNo);
+        } catch (Exception e) {
+            log.error("合算申告更新エラー", e);
+            
+            // データベースエラーを日本語で表示
+            String errorMessage = convertDatabaseErrorToJapanese(e.getMessage());
+            throw new RuntimeException(errorMessage, e);
         }
-        
-        log.info("合算申告更新完了: gassanShiteiNo={}", gassanShiteiNo);
     }
 
     @Override
@@ -252,6 +297,39 @@ public class GassanServiceImpl implements GassanService {
             
             throw new RuntimeException("以下の指定番号は既に他の合算申告に登録されています: " + String.join(", ", duplicateShiteiNos));
         }
+    }
+    
+    /**
+     * データベースエラーを日本語に変換する
+     */
+    private String convertDatabaseErrorToJapanese(String originalMessage) {
+        if (originalMessage == null) {
+            return "データベースエラーが発生しました。";
+        }
+        
+        String lowerMessage = originalMessage.toLowerCase();
+        
+        if (lowerMessage.contains("null value") && lowerMessage.contains("not-null constraint")) {
+            return "必須項目が未入力です。入力内容を確認してください。";
+        }
+        
+        if (lowerMessage.contains("duplicate key") || lowerMessage.contains("unique constraint")) {
+            return "重複するデータが存在します。入力内容を確認してください。";
+        }
+        
+        if (lowerMessage.contains("foreign key constraint")) {
+            return "関連するデータが存在しないため、操作できません。";
+        }
+        
+        if (lowerMessage.contains("constraint")) {
+            return "データ制約エラーが発生しました。入力内容を確認してください。";
+        }
+        
+        if (lowerMessage.contains("timeout")) {
+            return "データベースへのアクセスがタイムアウトしました。しばらく待ってから再度お試しください。";
+        }
+        
+        return "データベースエラーが発生しました。しばらく待ってから再度お試しください。";
     }
 
     private GassanForm buildViewForm(String shiteiNo, List<Gassan> gassanList, String selectedGassanShiteiNo) {

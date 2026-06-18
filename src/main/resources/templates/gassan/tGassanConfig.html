@@ -141,7 +141,7 @@
 
 					<!-- バリデーションエラー -->
 					<div th:if="${#fields.hasErrors('shiteiNoList')}"
-						class="alert alert-danger py-2 mx-3 mt-3 mb-0">
+						class="alert alert-danger py-2 mx-3 mt-3 mb-3">
 						<i class="bi bi-exclamation-triangle-fill me-1"></i> <span
 							th:errors="*{shiteiNoList}"></span>
 					</div>
@@ -151,8 +151,7 @@
 						<thead class="table-light">
 							<tr>
 								<th style="width: 60px" class="text-center"></th>
-								<th style="width: 80px" class="text-center"><span
-									th:if="!${isView}">代表施設</span></th>
+								<th style="width: 80px" class="text-center">代表施設</th>
 								<th>徴収義務者名</th>
 								<th>施設名</th>
 							</tr>
@@ -173,10 +172,12 @@
 								<td class="text-center">
 									<!-- 代表施設チェックボックス --> <input th:if="!${isView}" type="radio"
 									class="form-check-input daihyo-radio" name="daihyoShiteiNo"
-									th:value="${facility.shiteiNo}" th:checked="${facility.daihyo}">
+									th:value="${facility.shiteiNo}" 
+									th:checked="${facility.daihyo}" 
+									th:disabled="!${facility.checked}">
 									<!-- 照会時：代表施設アイコン --> <i
 									th:if="${isView} and ${facility.daihyo}"
-									class="bi bi-star-fill text-warning fs-5"></i>
+									class="bi bi-check-circle-fill text-success fs-5"></i>
 								</td>
 								<td th:text="${facility.choshuGimushaName}"></td>
 								<td th:text="${facility.shisetsuName}"></td>
@@ -208,9 +209,9 @@
 						class="bi bi-pencil-square me-2"></i>編集する
 					</a>
 				</th:block>
-				<a href="javascript:history.back()"
+				<a th:href="${isEdit} ? @{/gassan/list} : 'javascript:history.back()'"
 					class="btn btn-outline-secondary btn-lg px-4"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
+					class="bi bi-arrow-left me-2"></i><span th:text="${isEdit} ? '一覧に戻る' : '一覧に戻る'"></span>
 				</a>
 			</div>
 		</form>
