@@ -180,6 +180,7 @@ CREATE TABLE IF NOT EXISTS t_gassan (
   toroku_ymd date NOT NULL,
   shinkoku_ymd date NOT NULL,
   atena_no numeric(15) NOT NULL,
+  shitei_no char(8) NOT NULL,
   tekiyo_st_ymd date NOT NULL,
   tekiyo_ed_ymd date,
   new_flg char(1) NOT NULL,
@@ -198,6 +199,7 @@ COMMENT ON COLUMN t_gassan.rno IS '履歴番号';
 COMMENT ON COLUMN t_gassan.toroku_ymd IS '登録年月日';
 COMMENT ON COLUMN t_gassan.shinkoku_ymd IS '申告年月日';
 COMMENT ON COLUMN t_gassan.atena_no IS '宛名番号';
+COMMENT ON COLUMN t_gassan.shitei_no IS '代表指定番号';
 COMMENT ON COLUMN t_gassan.tekiyo_st_ymd IS '適用開始年月日';
 COMMENT ON COLUMN t_gassan.tekiyo_ed_ymd IS '適用終了年月日';
 COMMENT ON COLUMN t_gassan.new_flg IS '最新フラグ';
@@ -245,6 +247,7 @@ CREATE TABLE IF NOT EXISTS t_fuka (
   fuka_kbn char(1) NOT NULL,
   henko_kbn char(1) NOT NULL,
   henko_riyu varchar(400),
+  sogaku numeric(14),
   kazei_hakusu numeric(9),
   kazei_ryokin numeric(14),
   zeigaku numeric(14),
@@ -254,10 +257,18 @@ CREATE TABLE IF NOT EXISTS t_fuka (
   total_zeigaku numeric(14) NOT NULL,
   city_zeigaku numeric(14) NOT NULL,
   ken_zeigaku numeric(14) NOT NULL,
-  kasan_kbn char(1),
-  kasan_ritsu numeric(5, 2),
-  kasan_gaku numeric(13),
-  nokigen date,
+  kasan_kbn1 char(1),
+  kasan_ritsu1 numeric(5, 2),
+  kasan_gaku1 numeric(13),
+  nokigen1 date,
+  kasan_kbn2 char(1),
+  kasan_ritsu2 numeric(5, 2),
+  kasan_gaku2 numeric(13),
+  nokigen2 date,
+  kasan_kbn3 char(1),
+  kasan_ritsu3 numeric(5, 2),
+  kasan_gaku3 numeric(13),
+  nokigen3 date,
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
@@ -279,6 +290,7 @@ COMMENT ON COLUMN t_fuka.taisho_ym IS '対象年月';
 COMMENT ON COLUMN t_fuka.fuka_kbn IS '賦課方式';
 COMMENT ON COLUMN t_fuka.henko_kbn IS '変更区分';
 COMMENT ON COLUMN t_fuka.henko_riyu IS '変更理由';
+COMMENT ON COLUMN t_fuka.sogaku IS '料金総額';
 COMMENT ON COLUMN t_fuka.kazei_hakusu IS '課税対象宿泊数';
 COMMENT ON COLUMN t_fuka.kazei_ryokin IS '課税対象宿泊料金';
 COMMENT ON COLUMN t_fuka.zeigaku IS '課税対象税額';
@@ -288,10 +300,18 @@ COMMENT ON COLUMN t_fuka.total_hakusu IS '合計宿泊数';
 COMMENT ON COLUMN t_fuka.total_zeigaku IS '合計税額';
 COMMENT ON COLUMN t_fuka.city_zeigaku IS '市区町村税額';
 COMMENT ON COLUMN t_fuka.ken_zeigaku IS '都道府県税額';
-COMMENT ON COLUMN t_fuka.kasan_kbn IS '加算金額区分';
-COMMENT ON COLUMN t_fuka.kasan_ritsu IS '加算割合';
-COMMENT ON COLUMN t_fuka.kasan_gaku IS '加算金額';
-COMMENT ON COLUMN t_fuka.nokigen IS '納期限';
+COMMENT ON COLUMN t_fuka.kasan_kbn1 IS '加算金額区分1';
+COMMENT ON COLUMN t_fuka.kasan_ritsu1 IS '加算割合1';
+COMMENT ON COLUMN t_fuka.kasan_gaku1 IS '加算金額1';
+COMMENT ON COLUMN t_fuka.nokigen1 IS '納期限1';
+COMMENT ON COLUMN t_fuka.kasan_kbn2 IS '加算金額区分2';
+COMMENT ON COLUMN t_fuka.kasan_ritsu2 IS '加算割合2';
+COMMENT ON COLUMN t_fuka.kasan_gaku2 IS '加算金額2';
+COMMENT ON COLUMN t_fuka.nokigen2 IS '納期限2';
+COMMENT ON COLUMN t_fuka.kasan_kbn3 IS '加算金額区分3';
+COMMENT ON COLUMN t_fuka.kasan_ritsu3 IS '加算割合3';
+COMMENT ON COLUMN t_fuka.kasan_gaku3 IS '加算金額3';
+COMMENT ON COLUMN t_fuka.nokigen3 IS '納期限3';
 COMMENT ON COLUMN t_fuka.new_flg IS '最新フラグ';
 COMMENT ON COLUMN t_fuka.del_flg IS '削除フラグ';
 COMMENT ON COLUMN t_fuka.add_dt IS '作成日時';
@@ -353,58 +373,6 @@ CREATE TABLE IF NOT EXISTS t_choshu_genbo (
   rno numeric(3) NOT NULL,
   nendo char(4) NOT NULL,
   kibetsu numeric(2) NOT NULL,
-  sogaku1_sum numeric(14),
-  hakusu1_sum numeric(9),
-  ryokin1_sum numeric(14),
-  zei_ritsu1 numeric(12, 2),
-  zeigaku1_sum numeric(14),
-  sogaku2_sum numeric(14),
-  hakusu2_sum numeric(9),
-  ryokin2_sum numeric(14),
-  zei_ritsu2 numeric(12, 2),
-  zeigaku2_sum numeric(14),
-  sogaku3_sum numeric(14),
-  hakusu3_sum numeric(9),
-  ryokin3_sum numeric(14),
-  zei_ritsu3 numeric(12, 2),
-  zeigaku3_sum numeric(14),
-  sogaku4_sum numeric(14),
-  hakusu4_sum numeric(9),
-  ryokin4_sum numeric(14),
-  zei_ritsu4 numeric(12, 2),
-  zeigaku4_sum numeric(14),
-  sogaku5_sum numeric(14),
-  hakusu5_sum numeric(9),
-  ryokin5_sum numeric(14),
-  zei_ritsu5 numeric(12, 2),
-  zeigaku5_sum numeric(14),
-  sogaku6_sum numeric(14),
-  hakusu6_sum numeric(9),
-  ryokin6_sum numeric(14),
-  zei_ritsu6 numeric(12, 2),
-  zeigaku6_sum numeric(14),
-  sogaku7_sum numeric(14),
-  hakusu7_sum numeric(9),
-  ryokin7_sum numeric(14),
-  zei_ritsu7 numeric(12, 2),
-  zeigaku7_sum numeric(14),
-  sogaku8_sum numeric(14),
-  hakusu8_sum numeric(9),
-  ryokin8_sum numeric(14),
-  zei_ritsu8 numeric(12, 2),
-  zeigaku8_sum numeric(14),
-  sogaku9_sum numeric(14),
-  hakusu9_sum numeric(9),
-  ryokin9_sum numeric(14),
-  zei_ritsu9 numeric(12, 2),
-  zeigaku9_sum numeric(14),
-  sogaku10_sum numeric(14),
-  hakusu10_sum numeric(9),
-  ryokin10_sum numeric(14),
-  zei_ritsu10 numeric(12, 2),
-  zeigaku10_sum numeric(14),
-  menjo_hakusu_sum numeric(9),
-  total_zeigaku_sum numeric(14),
   uchi_idx_1 numeric(8),
   uchi_idx_2 numeric(8),
   uchi_idx_3 numeric(8),
@@ -449,58 +417,6 @@ COMMENT ON COLUMN t_choshu_genbo.shitei_no IS '指定番号';
 COMMENT ON COLUMN t_choshu_genbo.rno IS '履歴番号';
 COMMENT ON COLUMN t_choshu_genbo.nendo IS '賦課年度';
 COMMENT ON COLUMN t_choshu_genbo.kibetsu IS '期別';
-COMMENT ON COLUMN t_choshu_genbo.sogaku1_sum IS '合計宿泊料金総額1';
-COMMENT ON COLUMN t_choshu_genbo.hakusu1_sum IS '合計宿泊数1';
-COMMENT ON COLUMN t_choshu_genbo.ryokin1_sum IS '合計宿泊料金1';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu1 IS '税率1';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku1_sum IS '合計税額1';
-COMMENT ON COLUMN t_choshu_genbo.sogaku2_sum IS '合計宿泊料金総額2';
-COMMENT ON COLUMN t_choshu_genbo.hakusu2_sum IS '合計宿泊数2';
-COMMENT ON COLUMN t_choshu_genbo.ryokin2_sum IS '合計宿泊料金2';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu2 IS '税率2';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku2_sum IS '合計税額2';
-COMMENT ON COLUMN t_choshu_genbo.sogaku3_sum IS '合計宿泊料金総額3';
-COMMENT ON COLUMN t_choshu_genbo.hakusu3_sum IS '合計宿泊数3';
-COMMENT ON COLUMN t_choshu_genbo.ryokin3_sum IS '合計宿泊料金3';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu3 IS '税率3';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku3_sum IS '合計税額3';
-COMMENT ON COLUMN t_choshu_genbo.sogaku4_sum IS '合計宿泊料金総額4';
-COMMENT ON COLUMN t_choshu_genbo.hakusu4_sum IS '合計宿泊数4';
-COMMENT ON COLUMN t_choshu_genbo.ryokin4_sum IS '合計宿泊料金4';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu4 IS '税率4';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku4_sum IS '合計税額4';
-COMMENT ON COLUMN t_choshu_genbo.sogaku5_sum IS '合計宿泊料金総額5';
-COMMENT ON COLUMN t_choshu_genbo.hakusu5_sum IS '合計宿泊数5';
-COMMENT ON COLUMN t_choshu_genbo.ryokin5_sum IS '合計宿泊料金5';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu5 IS '税率5';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku5_sum IS '合計税額5';
-COMMENT ON COLUMN t_choshu_genbo.sogaku6_sum IS '合計宿泊料金総額6';
-COMMENT ON COLUMN t_choshu_genbo.hakusu6_sum IS '合計宿泊数6';
-COMMENT ON COLUMN t_choshu_genbo.ryokin6_sum IS '合計宿泊料金6';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu6 IS '税率6';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku6_sum IS '合計税額6';
-COMMENT ON COLUMN t_choshu_genbo.sogaku7_sum IS '合計宿泊料金総額7';
-COMMENT ON COLUMN t_choshu_genbo.hakusu7_sum IS '合計宿泊数7';
-COMMENT ON COLUMN t_choshu_genbo.ryokin7_sum IS '合計宿泊料金7';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu7 IS '税率7';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku7_sum IS '合計税額7';
-COMMENT ON COLUMN t_choshu_genbo.sogaku8_sum IS '合計宿泊料金総額8';
-COMMENT ON COLUMN t_choshu_genbo.hakusu8_sum IS '合計宿泊数8';
-COMMENT ON COLUMN t_choshu_genbo.ryokin8_sum IS '合計宿泊料金8';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu8 IS '税率8';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku8_sum IS '合計税額8';
-COMMENT ON COLUMN t_choshu_genbo.sogaku9_sum IS '合計宿泊料金総額9';
-COMMENT ON COLUMN t_choshu_genbo.hakusu9_sum IS '合計宿泊数9';
-COMMENT ON COLUMN t_choshu_genbo.ryokin9_sum IS '合計宿泊料金9';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu9 IS '税率9';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku9_sum IS '合計税額9';
-COMMENT ON COLUMN t_choshu_genbo.sogaku10_sum IS '合計宿泊料金総額10';
-COMMENT ON COLUMN t_choshu_genbo.hakusu10_sum IS '合計宿泊数10';
-COMMENT ON COLUMN t_choshu_genbo.ryokin10_sum IS '合計宿泊料金10';
-COMMENT ON COLUMN t_choshu_genbo.zei_ritsu10 IS '税率10';
-COMMENT ON COLUMN t_choshu_genbo.zeigaku10_sum IS '合計税額10';
-COMMENT ON COLUMN t_choshu_genbo.menjo_hakusu_sum IS '合計免除泊数';
-COMMENT ON COLUMN t_choshu_genbo.total_zeigaku_sum IS '総合計税額';
 COMMENT ON COLUMN t_choshu_genbo.uchi_idx_1 IS '徴収原簿内訳識別子1';
 COMMENT ON COLUMN t_choshu_genbo.uchi_idx_2 IS '徴収原簿内訳識別子2';
 COMMENT ON COLUMN t_choshu_genbo.uchi_idx_3 IS '徴収原簿内訳識別子3';
@@ -573,6 +489,7 @@ CREATE TABLE IF NOT EXISTS t_choshu_genbo_uchi (
   hakusu10 numeric(8),
   ryokin10 numeric(13),
   menjo_hakusu numeric(8),
+  menjo_ryokin numeric(13),
   zeigaku numeric(13),
   add_dt timestamp NOT NULL,
   add_user varchar(20) NOT NULL,
@@ -615,6 +532,7 @@ COMMENT ON COLUMN t_choshu_genbo_uchi.sogaku10 IS '宿泊料金総額10';
 COMMENT ON COLUMN t_choshu_genbo_uchi.hakusu10 IS '宿泊数10';
 COMMENT ON COLUMN t_choshu_genbo_uchi.ryokin10 IS '宿泊料金10';
 COMMENT ON COLUMN t_choshu_genbo_uchi.menjo_hakusu IS '免除泊数';
+COMMENT ON COLUMN t_choshu_genbo_uchi.menjo_ryokin IS '免除料金';
 COMMENT ON COLUMN t_choshu_genbo_uchi.zeigaku IS '税額';
 COMMENT ON COLUMN t_choshu_genbo_uchi.add_dt IS '作成日時';
 COMMENT ON COLUMN t_choshu_genbo_uchi.add_user IS '作成者';
@@ -806,7 +724,7 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu_teiritsu (
   seq numeric(5) NOT NULL,
   teiritsu_seq numeric(8) NOT NULL,
   kbn_name char(20) NOT NULL,
-  zei_ritsu numeric(3, 2) NOT NULL,
+  zei_ritsu numeric(5, 2) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
   add_user varchar(20) NOT NULL,
@@ -1043,3 +961,4 @@ COMMENT ON COLUMN m_reports_def.add_user IS '作成者';
 COMMENT ON COLUMN m_reports_def.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_reports_def.upd_user IS '更新者';
 COMMENT ON COLUMN m_reports_def.version IS 'バージョン';
+
