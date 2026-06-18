@@ -35,17 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const modCategorySelect = document.getElementById('modificationCategory');
-    const regDateLabel = document.getElementById('registrationDateLabel');
-    if (modCategorySelect && regDateLabel) {
-        const updateDateLabel = () => {
-            const val = modCategorySelect.value;
-            regDateLabel.textContent = (val === '1') ? '更生年月日' : (val === '2') ? '修正年月日' : '登録日';
-        };
-        updateDateLabel();
-        modCategorySelect.addEventListener('change', updateDateLabel);
-    }
-
     const parseIntSafe = (val) => {
         const num = parseInt(val.replace(/,/g, ''), 10);
         return isNaN(num) ? 0 : num;

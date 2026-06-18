@@ -255,7 +255,8 @@ public class FukaServiceImpl implements FukaService {
 	public FukaDeclarationForm getDeclarationFormForRegister(String shiteiNo, String taishoYm) {
 		FukaDeclarationForm form = new FukaDeclarationForm();
 		form.setShiteiNo(shiteiNo);
-		form.setRegistrationDate(LocalDate.now());
+		form.setTorokuDate(LocalDate.now());
+		form.setShinkokuDate(LocalDate.now());
 
 		form.setNendo(calculateNendo(taishoYm));
 		form.setKibetsu(calculateKibetsu(taishoYm));
@@ -447,7 +448,8 @@ public class FukaServiceImpl implements FukaService {
 							"[getDeclarationFormForEdit] entity found: rno={}, fukaKbn={}, taishoYm={}, totalHakusu={}, totalZeigaku={}, kazeiRyokin={}",
 							entity.getRno(), entity.getFukaKbn(), entity.getTaishoYm(), entity.getTotalHakusu(),
 							entity.getTotalZeigaku(), entity.getKazeiRyokin());
-					form.setRegistrationDate(entity.getShinkokuYmd());
+					form.setTorokuDate(entity.getTorokuYmd());
+					form.setShinkokuDate(entity.getShinkokuYmd());
 					form.setNendo(entity.getNendo());
 					form.setKibetsu(entity.getKibetsu());
 					form.setFukaKbn(entity.getFukaKbn());
@@ -623,8 +625,8 @@ public class FukaServiceImpl implements FukaService {
 
 		parentFuka.setNendo(calculateNendo(taishoYm));
 		parentFuka.setKibetsu(calculateKibetsu(taishoYm));
-		parentFuka.setTorokuYmd(form.getRegistrationDate() != null ? form.getRegistrationDate() : LocalDate.now());
-		parentFuka.setShinkokuYmd(LocalDate.now());
+		parentFuka.setTorokuYmd(form.getTorokuDate() != null ? form.getTorokuDate() : LocalDate.now());
+		parentFuka.setShinkokuYmd(form.getShinkokuDate() != null ? form.getShinkokuDate() : LocalDate.now());
 		parentFuka.setFukaKbn(
 				StringUtils.hasText(form.getFukaKbn()) ? form.getFukaKbn() : FukaConstants.TEIGAKU.getValue());
 		String henkoKbn = FukaConstants.HENKO_KUBUN_LIST

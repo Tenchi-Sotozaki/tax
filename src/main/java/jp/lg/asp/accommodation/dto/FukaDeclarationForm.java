@@ -32,8 +32,11 @@ public class FukaDeclarationForm {
 
 	// ========== 納税額情報エリア ==========
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@NotNull(message = "登録日を入力してください")
-	private LocalDate registrationDate;
+	@NotNull(message = "登録年月日を入力してください")
+	private LocalDate torokuDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@NotNull(message = "申告年月日を入力してください")
+	private LocalDate shinkokuDate;
 
 	private String obligorName;
 	private String facilityName;

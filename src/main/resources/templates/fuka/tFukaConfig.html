@@ -64,14 +64,6 @@
 				<div class="card-body">
 					<div class="row g-3 mb-3">
 						<div class="col-md-4">
-							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">登録日 <span
-									class="badge bg-danger ms-1" th:if="${!fukaDeclarationForm.view}">必須</span></label>
-							<input type="date" class="form-control form-control-sm" th:field="*{registrationDate}"
-								th:readonly="${fukaDeclarationForm.view}" th:errorclass="is-invalid">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}"
-								th:errors="*{registrationDate}"></div>
-						</div>
-						<div class="col-md-4">
 							<label class="form-label form-label-sm fw-medium mb-1">特別徴収義務者</label>
 							<input type="text" class="form-control form-control-sm bg-light" th:field="*{obligorName}"
 								readonly>
@@ -80,6 +72,26 @@
 							<label class="form-label form-label-sm fw-medium mb-1">宿泊施設名称</label>
 							<input type="text" class="form-control form-control-sm bg-light" th:field="*{facilityName}"
 								readonly>
+						</div>
+					</div>
+					<div class="row g-3 mb-3">
+						<div class="col-md-4">
+							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">登録年月日
+								<span class="badge bg-danger ms-1"
+									th:if="${!fukaDeclarationForm.view}">必須</span></label>
+							<input type="date" class="form-control form-control-sm" th:field="*{torokuDate}"
+								th:readonly="${fukaDeclarationForm.view}" th:errorclass="is-invalid">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('torokuDate')}"
+								th:errors="*{torokuDate}"></div>
+						</div>
+						<div class="col-md-4">
+							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">申告年月日
+								<span class="badge bg-danger ms-1"
+									th:if="${!fukaDeclarationForm.view}">必須</span></label>
+							<input type="date" class="form-control form-control-sm" th:field="*{shinkokuDate}"
+								th:readonly="${fukaDeclarationForm.view}" th:errorclass="is-invalid">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('shinkokuDate')}"
+								th:errors="*{shinkouDate}"></div>
 						</div>
 					</div>
 
