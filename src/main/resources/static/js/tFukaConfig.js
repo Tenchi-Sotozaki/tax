@@ -112,29 +112,40 @@ document.addEventListener('DOMContentLoaded', function() {
         const tierCount = rateInputs.length;
 
         let columnTotals = {
+            sogaku: Array(tierCount).fill(0),
             hakusu: Array(tierCount).fill(0),
             ryokin: Array(tierCount).fill(0)
         };
         let totalMenjoHakusu = 0;
         let totalMenjoRyokin = 0;
+        let totalZeigaku = 0;
 
         rows.forEach(row => {
             for (let i = 0;i < tierCount;i++) {
+                const sogakuInput = row.querySelector(`.teiritsu-kazei-sogaku-${i}`);
+                if (sogakuInput) columnTotals.sogaku[i] += parseIntSafe(sogakuInput.value);
+
                 const hakusuInput = row.querySelector(`.teiritsu-kazei-hakusu-${i}`);
                 if (hakusuInput) columnTotals.hakusu[i] += parseIntSafe(hakusuInput.value);
 
                 const ryokinInput = row.querySelector(`.teiritsu-kazei-ryokin-${i}`);
                 if (ryokinInput) columnTotals.ryokin[i] += parseIntSafe(ryokinInput.value);
             }
-            const menjoHakusu = row.querySelector('.teiritsu-menjo-hakusu');
-            if (menjoHakusu) totalMenjoHakusu += parseIntSafe(menjoHakusu.value);
+            const menjoHakusuInput = row.querySelector('.teiritsu-menjo-hakusu');
+            if (menjoHakusuInput) totalMenjoHakusu += parseIntSafe(menjoHakusuInput.value);
 
-            const menjoRyokin = row.querySelector('.teiritsu-menjo-ryokin');
-            if (menjoRyokin) totalMenjoRyokin += parseIntSafe(menjoRyokin.value);
+            const menjoRyokinInput = row.querySelector('.teiritsu-menjo-ryokin');
+            if (menjoRyokinInput) totalMenjoRyokin += parseIntSafe(menjoRyokinInput.value);
+
+            const zeigakuInput = row.querySelector('.teiritsu-zeigaku');
+            if (zeigakuInput) totalZeigaku += parseIntSafe(zeigakuInput.value);
         });
 
         // 合計と税額の計算反映
         for (let i = 0;i < tierCount;i++) {
+            const totalSogakuInput = document.getElementById(`modal-teiritsu-total-kazei-sogaku-${i}`);
+            if (totalSogakuInput) totalSogakuInput.value = columnTotals.sogaku[i].toLocaleString();
+
             const totalHakusuInput = document.getElementById(`modal-teiritsu-total-kazei-hakusu-${i}`);
             if (totalHakusuInput) totalHakusuInput.value = columnTotals.hakusu[i].toLocaleString();
 
@@ -156,6 +167,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const totalMenjoRyokinInput = document.getElementById('modal-teiritsu-total-menjo-ryokin');
         if (totalMenjoRyokinInput) totalMenjoRyokinInput.value = totalMenjoRyokin.toLocaleString();
+
+        const totalZeigakuInput = document.getElementById('modal-teiritsu-total-zeigaku');
+        if (totalZeigakuInput) totalZeigakuInput.value = totalZeigaku.toLocaleString();
     };
 
     // イベントバインド

@@ -25,6 +25,9 @@ public class FukaMonthlyDeclarationDto {
 	// 免除宿泊数
 	private Long exemptStayCount;
 
+	// 宿泊料金総額合計
+	private Long totalSogaku;
+
 	// 宿泊数合計
 	private Long totalStayCount;
 

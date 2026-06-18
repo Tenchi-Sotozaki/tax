@@ -88,8 +88,9 @@ public class ShunoRenkeiController {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 
-		String[] csvHeaders = { "宛名番号", "賦課年度", "期別", "登録年月日", "申告年月日", "対象年月", "合計税額", "市区町村税額", "都道府県税額", "加算金額区分",
-				"加算割合", "加算金額", "納期限" };
+		String[] csvHeaders = { "宛名番号", "賦課年度", "期別", "登録年月日", "申告年月日", "対象年月", "合計税額", "市区町村税額", "都道府県税額",
+				"加算金額区分1", "加算割合1", "加算金額1", "納期限1", "加算金額区分2", "加算割合2", "加算金額2", "納期限2", "加算金額区分3", "加算割合3", "加算金額3",
+				"納期限3" };
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < csvHeaders.length; i++) {
 			if (i > 0)
@@ -99,7 +100,9 @@ public class ShunoRenkeiController {
 		sb.append('\n');
 
 		for (ShunoDto r : rows) {
-			String kasanKbnName = convertKasanKbn(r.getKasanKbn());
+			String kasanKbnName1 = convertKasanKbn(r.getKasanKbn1());
+			String kasanKbnName2 = convertKasanKbn(r.getKasanKbn2());
+			String kasanKbnName3 = convertKasanKbn(r.getKasanKbn3());
 			String[] cols = new String[] {
 					r.getAtenaNo() != null ? r.getAtenaNo() : "",
 					r.getNendo() != null ? r.getNendo() : "",
@@ -110,10 +113,18 @@ public class ShunoRenkeiController {
 					r.getTotalZeigaku() != null ? String.valueOf(r.getTotalZeigaku()) : "",
 					r.getCityZeigaku() != null ? String.valueOf(r.getCityZeigaku()) : "",
 					r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "",
-					kasanKbnName,
-					r.getKasanRitsu() != null ? r.getKasanRitsu().toString() : "",
-					r.getKasanGaku() != null ? String.valueOf(r.getKasanGaku()) : "",
-					r.getNokigen() != null ? r.getNokigen().toString() : ""
+					kasanKbnName1,
+					r.getKasanRitsu1() != null ? r.getKasanRitsu1().toString() : "",
+					r.getKasanGaku1() != null ? String.valueOf(r.getKasanGaku1()) : "",
+					r.getNokigen1() != null ? r.getNokigen1().toString() : "",
+					kasanKbnName2,
+					r.getKasanRitsu2() != null ? r.getKasanRitsu2().toString() : "",
+					r.getKasanGaku2() != null ? String.valueOf(r.getKasanGaku2()) : "",
+					r.getNokigen2() != null ? r.getNokigen2().toString() : "",
+					kasanKbnName3,
+					r.getKasanRitsu3() != null ? r.getKasanRitsu3().toString() : "",
+					r.getKasanGaku3() != null ? String.valueOf(r.getKasanGaku3()) : "",
+					r.getNokigen3() != null ? r.getNokigen3().toString() : "",
 			};
 			for (int i = 0; i < cols.length; i++) {
 				if (i > 0)

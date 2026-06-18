@@ -95,6 +95,9 @@ public class ChoshuGenboUchi extends BaseEntity {
 	@Column(name = "menjo_hakusu")
 	private Integer menjoHakusu;
 
+	@Column(name = "menjo_ryokin")
+	private Long menjoRyokin;
+
 	@Column(name = "zeigaku")
 	private Long zeigaku;
 

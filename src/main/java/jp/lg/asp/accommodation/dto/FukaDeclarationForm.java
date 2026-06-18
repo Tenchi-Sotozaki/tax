@@ -32,7 +32,7 @@ public class FukaDeclarationForm {
 
 	// ========== 納税額情報エリア ==========
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	@NotNull(message = "※登録日を入力してください")
+	@NotNull(message = "登録日を入力してください")
 	private LocalDate registrationDate;
 
 	private String obligorName;
@@ -43,11 +43,21 @@ public class FukaDeclarationForm {
 	private FukaMonthlyDeclarationDto monthlyDetail = new FukaMonthlyDeclarationDto();
 
 	// ========== 加算金額入力エリア ==========
-	private String additionalCategory;
-	private String additionalRate;
-	private Long additionalAmount;
+	private String additionalCategory1;
+	private String additionalRate1;
+	private Long additionalAmount1;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate additionalDueDate;
+	private LocalDate additionalDueDate1;
+	private String additionalCategory2;
+	private String additionalRate2;
+	private Long additionalAmount2;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate additionalDueDate2;
+	private String additionalCategory3;
+	private String additionalRate3;
+	private Long additionalAmount3;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate additionalDueDate3;
 
 	// 徴収原簿
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
@@ -61,11 +71,27 @@ public class FukaDeclarationForm {
 	/**
 	 * 加算金額区分が選択されている場合、加算金額の入力を必須とする。
 	 */
-	@AssertTrue(message = "※区分を選択した場合は、加算金額を入力してください")
-	public boolean isAdditionalAmountValid() {
-		if (additionalCategory == null || additionalCategory.isEmpty()) {
+	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid1() {
+		if (additionalCategory1 == null || additionalCategory1.isEmpty()) {
 			return true;
 		}
-		return additionalAmount != null && additionalAmount > 0;
+		return additionalAmount1 != null && additionalAmount1 > 0;
+	}
+
+	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid2() {
+		if (additionalCategory2 == null || additionalCategory2.isEmpty()) {
+			return true;
+		}
+		return additionalAmount2 != null && additionalAmount2 > 0;
+	}
+
+	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid3() {
+		if (additionalCategory3 == null || additionalCategory3.isEmpty()) {
+			return true;
+		}
+		return additionalAmount3 != null && additionalAmount3 > 0;
 	}
 }

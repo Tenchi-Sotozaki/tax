@@ -455,12 +455,24 @@ public class FukaServiceImpl implements FukaService {
 					form.setModificationReason(entity.getHenkoRiyu());
 
 					// 加算金
-					form.setAdditionalCategory(entity.getKasanKbn());
-					if (entity.getKasanRitsu() != null) {
-						form.setAdditionalRate(entity.getKasanRitsu().toString());
+					form.setAdditionalCategory1(entity.getKasanKbn1());
+					if (entity.getKasanRitsu1() != null) {
+						form.setAdditionalRate1(entity.getKasanRitsu1().toString());
 					}
-					form.setAdditionalAmount(entity.getKasanGaku());
-					form.setAdditionalDueDate(entity.getNokigen());
+					form.setAdditionalAmount1(entity.getKasanGaku1());
+					form.setAdditionalDueDate1(entity.getNokigen1());
+					form.setAdditionalCategory2(entity.getKasanKbn2());
+					if (entity.getKasanRitsu2() != null) {
+						form.setAdditionalRate2(entity.getKasanRitsu1().toString());
+					}
+					form.setAdditionalAmount2(entity.getKasanGaku2());
+					form.setAdditionalDueDate2(entity.getNokigen2());
+					form.setAdditionalCategory3(entity.getKasanKbn3());
+					if (entity.getKasanRitsu3() != null) {
+						form.setAdditionalRate3(entity.getKasanRitsu3().toString());
+					}
+					form.setAdditionalAmount3(entity.getKasanGaku3());
+					form.setAdditionalDueDate3(entity.getNokigen3());
 
 					// 賦課情報設定
 					setMonthlyDetail(entity, form);
@@ -485,6 +497,15 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	@Transactional
 	public void saveDeclaration(FukaDeclarationForm form) {
+
+		// 既存履歴の最新フラグをクリアする
+		List<Fuka> oldEntityList = fukaRepository
+				.findByJichitaiCdAndShiteiNoAndNendoAndKibetsuAndNewFlgAndDelFlg(jichitaiCd, form.getShiteiNo(),
+						form.getNendo(), form.getKibetsu(), DEFAULT_NEW_FLG, DEFAULT_DEL_FLG);
+		oldEntityList.stream().forEach(e -> {
+			e.setNewFlg("0");
+			fukaRepository.save(e);
+		});
 
 		Integer targetRno = determineNextRno(form.getShiteiNo(), form.getNendo(), form.getKibetsu());
 
@@ -626,6 +647,7 @@ public class FukaServiceImpl implements FukaService {
 			// 定率制
 			long totalRyokin = getLongValue(dto.getKazeiRyokin());
 			parentFuka.setKazeiRyokin(totalRyokin);
+			parentFuka.setSogaku(getLongValue(dto.getTotalSogaku()));
 			parentFuka.setMenjoRyokin(getLongValue(dto.getExemptRyokin()));
 			// 市区町村税額、都道府県税額は賦課内訳を算出
 			long totalShukuhakushaSu = parentFuka.getKazeiHakusu();
@@ -644,20 +666,53 @@ public class FukaServiceImpl implements FukaService {
 			parentFuka.setKenZeigaku(0L);
 		}
 
-		parentFuka.setKasanKbn(form.getAdditionalCategory());
-		if (StringUtils.hasText(form.getAdditionalRate())) {
-			try {
-				parentFuka.setKasanRitsu(new BigDecimal(form.getAdditionalRate()));
-			} catch (NumberFormatException e) {
-				log.warn("加算割合の数値変換に失敗しました: {}", form.getAdditionalRate());
-				parentFuka.setKasanRitsu(null);
+		if (!form.getAdditionalCategory1().isEmpty()) {
+			parentFuka.setKasanKbn1(form.getAdditionalCategory1());
+			if (StringUtils.hasText(form.getAdditionalRate1())) {
+				try {
+					parentFuka.setKasanRitsu1(new BigDecimal(form.getAdditionalRate1()));
+				} catch (NumberFormatException e) {
+					log.warn("加算割合の数値変換に失敗しました: {}", form.getAdditionalRate1());
+					parentFuka.setKasanRitsu1(null);
+				}
+			} else {
+				parentFuka.setKasanRitsu1(null);
 			}
-		} else {
-			parentFuka.setKasanRitsu(null);
+			parentFuka.setKasanGaku1(form.getAdditionalAmount1());
+			parentFuka.setNokigen1(form.getAdditionalDueDate1());
 		}
-		parentFuka.setKasanGaku(form.getAdditionalAmount());
-		parentFuka.setNokigen(form.getAdditionalDueDate());
 
+		if (!form.getAdditionalCategory2().isEmpty()) {
+			parentFuka.setKasanKbn2(form.getAdditionalCategory2());
+			if (StringUtils.hasText(form.getAdditionalRate2())) {
+				try {
+					parentFuka.setKasanRitsu2(new BigDecimal(form.getAdditionalRate2()));
+				} catch (NumberFormatException e) {
+					log.warn("加算割合の数値変換に失敗しました: {}", form.getAdditionalRate2());
+					parentFuka.setKasanRitsu2(null);
+				}
+			} else {
+				parentFuka.setKasanRitsu2(null);
+			}
+			parentFuka.setKasanGaku2(form.getAdditionalAmount2());
+			parentFuka.setNokigen2(form.getAdditionalDueDate2());
+		}
+
+		if (!form.getAdditionalCategory3().isEmpty()) {
+			parentFuka.setKasanKbn3(form.getAdditionalCategory3());
+			if (StringUtils.hasText(form.getAdditionalRate3())) {
+				try {
+					parentFuka.setKasanRitsu3(new BigDecimal(form.getAdditionalRate3()));
+				} catch (NumberFormatException e) {
+					log.warn("加算割合の数値変換に失敗しました: {}", form.getAdditionalRate3());
+					parentFuka.setKasanRitsu3(null);
+				}
+			} else {
+				parentFuka.setKasanRitsu3(null);
+			}
+			parentFuka.setKasanGaku3(form.getAdditionalAmount3());
+			parentFuka.setNokigen3(form.getAdditionalDueDate3());
+		}
 		return parentFuka;
 	}
 
@@ -678,6 +733,7 @@ public class FukaServiceImpl implements FukaService {
 		FukaMonthlyDeclarationDto monthDto = form.getMonthlyDetail();
 		monthDto.setExemptStayCount(entity.getMenjoHakusu());
 		monthDto.setExemptRyokin(entity.getMenjoRyokin());
+		monthDto.setTotalSogaku(entity.getSogaku());
 		monthDto.setTotalStayCount(entity.getTotalHakusu());
 		monthDto.setTotalPaymentAmount(entity.getTotalZeigaku());
 		monthDto.setTotalCityZeigaku(entity.getCityZeigaku());
@@ -771,12 +827,35 @@ public class FukaServiceImpl implements FukaService {
 	private boolean isDailyDataPresent(DailyItem item) {
 		if (item == null)
 			return false;
+		boolean hasSogaku = item.getSogaku() != null
+				&& item.getSogaku().stream().anyMatch(v -> v != null && v > 0);
 		boolean hasCount = item.getHakusu() != null
 				&& item.getHakusu().stream().anyMatch(v -> v != null && v > 0);
 		boolean hasAmount = item.getRyokin() != null
 				&& item.getRyokin().stream().anyMatch(v -> v != null && v > 0);
-		boolean hasExempt = item.getMenjoHakusu() != null && item.getMenjoHakusu() > 0;
-		return hasCount || hasAmount || hasExempt;
+		boolean hasMenjoHakusu = item.getMenjoHakusu() != null && item.getMenjoHakusu() > 0;
+		boolean hasMenjoRyokin = item.getMenjoRyokin() != null && item.getMenjoRyokin() > 0;
+		boolean hasZeigaku = item.getZeigaku() != null && item.getZeigaku() > 0;
+		return hasSogaku || hasCount || hasAmount || hasMenjoHakusu || hasMenjoRyokin || hasZeigaku;
+	}
+
+	private void setSogakuByIndex(ChoshuGenboUchi uchi, int index, Long value) {
+		try {
+			String methodName = "setSogaku" + index;
+			uchi.getClass().getMethod(methodName, Long.class).invoke(uchi, value);
+		} catch (Exception e) {
+			log.warn("setSogaku{} failed: {}", index, e.getMessage());
+		}
+	}
+
+	private Long getSogakuValue(ChoshuGenboUchi uchi, int index) {
+		try {
+			String methodName = "getSogaku" + index;
+			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
+			return (val != null) ? (Long) val : 0L;
+		} catch (Exception e) {
+			return 0L;
+		}
 	}
 
 	private void setHakusuByIndex(ChoshuGenboUchi uchi, int index, Integer value) {
@@ -810,16 +889,6 @@ public class FukaServiceImpl implements FukaService {
 	private Long getRyokinValue(ChoshuGenboUchi uchi, int index) {
 		try {
 			String methodName = "getRyokin" + index;
-			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
-			return (val != null) ? (Long) val : 0L;
-		} catch (Exception e) {
-			return 0L;
-		}
-	}
-
-	private Long getSogakuValue(ChoshuGenboUchi uchi, int index) {
-		try {
-			String methodName = "getSogaku" + index;
 			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
 			return (val != null) ? (Long) val : 0L;
 		} catch (Exception e) {
@@ -864,18 +933,28 @@ public class FukaServiceImpl implements FukaService {
 				uchi.setJichitaiCd(jichitaiCd);
 				uchi.setUchiIdx(targetIdx);
 
-				List<Integer> counts = item.getHakusu();
-				for (int k = 0; k < counts.size(); k++) {
-					Integer cVal = counts.get(k);
+				List<Long> sogaku = item.getSogaku();
+				if (sogaku != null) {
+					for (int k = 0; k < sogaku.size(); k++) {
+						Long aVal = sogaku.get(k);
+						if (aVal != null && aVal > 0) {
+							setSogakuByIndex(uchi, k + 1, aVal);
+						}
+					}
+				}
+
+				List<Integer> hakusu = item.getHakusu();
+				for (int k = 0; k < hakusu.size(); k++) {
+					Integer cVal = hakusu.get(k);
 					if (cVal != null && cVal > 0) {
 						setHakusuByIndex(uchi, k + 1, cVal.intValue());
 					}
 				}
 
-				List<Long> amounts = item.getRyokin();
-				if (amounts != null) {
-					for (int k = 0; k < amounts.size(); k++) {
-						Long aVal = amounts.get(k);
+				List<Long> ryokin = item.getRyokin();
+				if (ryokin != null) {
+					for (int k = 0; k < ryokin.size(); k++) {
+						Long aVal = ryokin.get(k);
 						if (aVal != null && aVal > 0) {
 							setRyokinByIndex(uchi, k + 1, aVal);
 						}
@@ -883,7 +962,11 @@ public class FukaServiceImpl implements FukaService {
 				}
 
 				uchi.setMenjoHakusu(item.getMenjoHakusu());
+				uchi.setMenjoRyokin(item.getMenjoRyokin());
+				uchi.setZeigaku(item.getZeigaku());
 				choshuGenboUchiRepository.save(uchi);
+			} else {
+				uchiIndices[i] = null;
 			}
 		}
 
@@ -932,7 +1015,8 @@ public class FukaServiceImpl implements FukaService {
 					dDto.getSogaku().set(j - 1, getSogakuValue(uchi, j));
 				}
 				dDto.setMenjoHakusu(uchi.getMenjoHakusu());
-				dDto.setZeigaku(uchi.getZeigaku());
+				dDto.setMenjoRyokin(uchi.getMenjoRyokin());
+				dDto.setZeigaku(getLongValue(uchi.getZeigaku()));
 			}
 		}
 	}
