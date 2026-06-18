@@ -58,28 +58,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const rows = tableTeigaku.querySelectorAll('tbody tr');
         let columnTotals = [];
         let totalExempt = 0;
+        let totalZeigaku = 0;
 
         rows.forEach(row => {
-            let rowSum = 0;
             const seqInputs = row.querySelectorAll('input[class*="seq"]');
             seqInputs.forEach((input, index) => {
                 const val = parseIntSafe(input.value);
-                rowSum += val;
                 if (columnTotals[index] === undefined) columnTotals[index] = 0;
                 columnTotals[index] += val;
             });
             const exemptInput = row.querySelector('.exempt');
             if (exemptInput) totalExempt += parseIntSafe(exemptInput.value);
-            const rowTotalInput = row.querySelector('.row-total');
-            if (rowTotalInput) rowTotalInput.value = rowSum.toLocaleString();
+            const rowZeigakuInput = row.querySelector('.teigaku-zeigaku');
+            if (rowZeigakuInput) totalZeigaku += parseIntSafe(rowZeigakuInput.value);
         });
 
-        let totalAllCategories = 0;
-        let totalTaxAmount = 0;
         columnTotals.forEach((total, index) => {
             const totalCountInput = document.getElementById(`modal-total-count-${index}`);
             if (totalCountInput) totalCountInput.value = total.toLocaleString();
-            totalAllCategories += total;
 
             const rateInput = document.getElementById(`modal-tax-rate-${index}`);
             const taxAmountInput = document.getElementById(`modal-tax-amount-${index}`);
@@ -87,18 +83,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const rate = parseIntSafe(rateInput.value);
                 const taxAmount = total * rate;
                 taxAmountInput.value = taxAmount.toLocaleString();
-                totalTaxAmount += taxAmount;
             }
         });
 
         const modalTotalExempt = document.getElementById('modal-total-exempt');
         if (modalTotalExempt) modalTotalExempt.value = totalExempt.toLocaleString();
 
-        const modalTotalAll = document.getElementById('modal-total-all');
-        if (modalTotalAll) modalTotalAll.value = (totalAllCategories + totalExempt).toLocaleString();
-
-        const modalTotalTax = document.getElementById('modal-total-tax');
-        if (modalTotalTax) modalTotalTax.value = totalTaxAmount.toLocaleString();
+        const modalTotalZeigaku = document.getElementById('modal-total-zeigaku');
+        if (modalTotalZeigaku) modalTotalZeigaku.value = totalZeigaku.toLocaleString();
     };
 
     // 【定率制】の計算（複数区分・動的ループ対応）

@@ -515,42 +515,17 @@
 									<thead class="table-light">
 										<tr>
 											<th rowspan="2" class="align-middle" style="width: 60px;">日付</th>
-											<th th:colspan="*{monthlyDetail.taxDetails.size()}">宿泊数</th>
-											<th rowspan="2" class="align-middle" style="width: 100px;">課税免除</th>
-											<th rowspan="2" class="align-middle" style="width: 80px;">合計</th>
+											<th th:colspan="*{monthlyDetail.taxDetails.size()+1}">宿泊数</th>
+											<th rowspan="2" class="align-middle" style="width: 120px;">税額(円)</th>
 										</tr>
 										<tr>
 											<th th:each="detail : *{monthlyDetail.taxDetails}" th:text="${detail.label}"
 												style="font-size: 0.85rem; font-weight: normal;">区分名</th>
+											<th style="font-size: 0.85rem; font-weight: normal;"> 課税対象外</th>
 										</tr>
 									</thead>
 
 									<tbody>
-										<th:block th:if="*{#lists.isEmpty(monthlyTally.dailyItems)}">
-											<tr th:each="day : ${#numbers.sequence(1, 31)}">
-												<td class="fw-bold bg-light">
-													<span th:text="${day}"></span>
-													<input type="hidden"
-														th:name="|monthlyTally.dailyItems[${day - 1}].day|"
-														th:value="${day}">
-												</td>
-												<td th:each="detail, stat : *{monthlyDetail.taxDetails}">
-													<input type="text"
-														class="form-control form-control-sm text-end js-comma-format"
-														th:classappend="'seq' + (${stat.index} + 1)"
-														th:name="|monthlyTally.dailyItems[${day - 1}].hakusu[${stat.index}]|"
-														value="0">
-												</td>
-												<td><input type="text"
-														class="form-control form-control-sm text-end js-comma-format exempt"
-														th:name="|monthlyTally.dailyItems[${day - 1}].menjoHakusu|"
-														value="0"></td>
-												<td><input type="text"
-														class="form-control form-control-sm text-end bg-light row-total js-comma-format"
-														readonly value="0" tabindex="-1"></td>
-											</tr>
-										</th:block>
-
 										<th:block th:unless="*{#lists.isEmpty(monthlyTally.dailyItems)}">
 											<tr th:each="item, stat : *{monthlyTally.dailyItems}">
 												<td class="fw-bold bg-light">
@@ -564,17 +539,21 @@
 														class="form-control form-control-sm text-end js-comma-format"
 														th:classappend="'seq' + (${catStat.index} + 1)"
 														th:name="|monthlyTally.dailyItems[${stat.index}].hakusu[${catStat.index}]|"
-														th:value="${not #lists.isEmpty(item.hakusu) and item.hakusu.size() > catStat.index ? item.hakusu[catStat.index] : '0'}"
+														th:value="${item.hakusu[catStat.index]}"
 														th:readonly="${fukaDeclarationForm.view}">
 												</td>
 												<td><input type="text"
 														class="form-control form-control-sm text-end js-comma-format exempt"
 														th:name="|monthlyTally.dailyItems[${stat.index}].menjoHakusu|"
-														th:value="${item.menjoHakusu != null ? item.menjoHakusu : '0'}"
-														th:readonly="${fukaDeclarationForm.view}"></td>
+														th:value="${item.menjoHakusu}"
+														th:readonly="${fukaDeclarationForm.view}">
+												</td>
 												<td><input type="text"
-														class="form-control form-control-sm text-end bg-light row-total js-comma-format"
-														readonly value="0" tabindex="-1"></td>
+														class="form-control form-control-sm text-end js-comma-format teigaku-zeigaku"
+														th:name="|monthlyTally.dailyItems[${stat.index}].zeigaku|"
+														th:value="${item.zeigaku}"
+														th:readonly="${fukaDeclarationForm.view}">
+												</td>
 											</tr>
 										</th:block>
 									</tbody>
@@ -589,17 +568,17 @@
 													id="modal-total-exempt" value="0"></td>
 											<td><input type="text"
 													class="form-control form-control-sm text-end js-comma-format"
-													id="modal-total-all" value="0"></td>
+													id="modal-total-zeigaku" value="0"></td>
 										</tr>
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"
 												class="text-end align-middle">
 												<span
-													th:text="${#numbers.formatInteger(detail.taxRate, 1, 'COMMA')}">0</span>
+													th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA')}">0</span>
 												円
 												<input type="hidden" th:id="|modal-tax-rate-${stat.index}|"
-													th:value="${detail.taxRate}" />
+													th:value="${detail.taxRate + detail.taxKenRate}" />
 											</td>
 											<td class="bg-light text-center text-muted align-middle"><i
 													class="bi bi-slash-lg"></i></td>
@@ -613,9 +592,8 @@
 													th:id="|modal-tax-amount-${stat.index}|" value="0"></td>
 											<td class="bg-light text-center text-muted align-middle"><i
 													class="bi bi-slash-lg"></i></td>
-											<td><input type="text"
-													class="form-control form-control-sm text-end js-comma-format"
-													id="modal-total-tax" value="0"></td>
+											<td class="bg-light text-center text-muted align-middle"><i
+													class="bi bi-slash-lg"></i></td>
 										</tr>
 									</tfoot>
 								</table>
