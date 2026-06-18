@@ -52,6 +52,7 @@ public class FukaMonthlyTallyDto {
 				item.getSogaku().add(0L);
 			}
 			item.setMenjoHakusu(0);
+			item.setMenjoRyokin(0L);
 			item.setZeigaku(0L);
 			this.dailyItems.add(item);
 		}

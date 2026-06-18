@@ -35,17 +35,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const modCategorySelect = document.getElementById('modificationCategory');
-    const regDateLabel = document.getElementById('registrationDateLabel');
-    if (modCategorySelect && regDateLabel) {
-        const updateDateLabel = () => {
-            const val = modCategorySelect.value;
-            regDateLabel.textContent = (val === '1') ? '更生年月日' : (val === '2') ? '修正年月日' : '登録日';
-        };
-        updateDateLabel();
-        modCategorySelect.addEventListener('change', updateDateLabel);
-    }
-
     const parseIntSafe = (val) => {
         const num = parseInt(val.replace(/,/g, ''), 10);
         return isNaN(num) ? 0 : num;
@@ -58,28 +47,24 @@ document.addEventListener('DOMContentLoaded', function() {
         const rows = tableTeigaku.querySelectorAll('tbody tr');
         let columnTotals = [];
         let totalExempt = 0;
+        let totalZeigaku = 0;
 
         rows.forEach(row => {
-            let rowSum = 0;
             const seqInputs = row.querySelectorAll('input[class*="seq"]');
             seqInputs.forEach((input, index) => {
                 const val = parseIntSafe(input.value);
-                rowSum += val;
                 if (columnTotals[index] === undefined) columnTotals[index] = 0;
                 columnTotals[index] += val;
             });
             const exemptInput = row.querySelector('.exempt');
             if (exemptInput) totalExempt += parseIntSafe(exemptInput.value);
-            const rowTotalInput = row.querySelector('.row-total');
-            if (rowTotalInput) rowTotalInput.value = rowSum.toLocaleString();
+            const rowZeigakuInput = row.querySelector('.teigaku-zeigaku');
+            if (rowZeigakuInput) totalZeigaku += parseIntSafe(rowZeigakuInput.value);
         });
 
-        let totalAllCategories = 0;
-        let totalTaxAmount = 0;
         columnTotals.forEach((total, index) => {
             const totalCountInput = document.getElementById(`modal-total-count-${index}`);
             if (totalCountInput) totalCountInput.value = total.toLocaleString();
-            totalAllCategories += total;
 
             const rateInput = document.getElementById(`modal-tax-rate-${index}`);
             const taxAmountInput = document.getElementById(`modal-tax-amount-${index}`);
@@ -87,18 +72,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const rate = parseIntSafe(rateInput.value);
                 const taxAmount = total * rate;
                 taxAmountInput.value = taxAmount.toLocaleString();
-                totalTaxAmount += taxAmount;
             }
         });
 
         const modalTotalExempt = document.getElementById('modal-total-exempt');
         if (modalTotalExempt) modalTotalExempt.value = totalExempt.toLocaleString();
 
-        const modalTotalAll = document.getElementById('modal-total-all');
-        if (modalTotalAll) modalTotalAll.value = (totalAllCategories + totalExempt).toLocaleString();
-
-        const modalTotalTax = document.getElementById('modal-total-tax');
-        if (modalTotalTax) modalTotalTax.value = totalTaxAmount.toLocaleString();
+        const modalTotalZeigaku = document.getElementById('modal-total-zeigaku');
+        if (modalTotalZeigaku) modalTotalZeigaku.value = totalZeigaku.toLocaleString();
     };
 
     // 【定率制】の計算（複数区分・動的ループ対応）
@@ -112,29 +93,40 @@ document.addEventListener('DOMContentLoaded', function() {
         const tierCount = rateInputs.length;
 
         let columnTotals = {
+            sogaku: Array(tierCount).fill(0),
             hakusu: Array(tierCount).fill(0),
             ryokin: Array(tierCount).fill(0)
         };
         let totalMenjoHakusu = 0;
         let totalMenjoRyokin = 0;
+        let totalZeigaku = 0;
 
         rows.forEach(row => {
             for (let i = 0;i < tierCount;i++) {
+                const sogakuInput = row.querySelector(`.teiritsu-kazei-sogaku-${i}`);
+                if (sogakuInput) columnTotals.sogaku[i] += parseIntSafe(sogakuInput.value);
+
                 const hakusuInput = row.querySelector(`.teiritsu-kazei-hakusu-${i}`);
                 if (hakusuInput) columnTotals.hakusu[i] += parseIntSafe(hakusuInput.value);
 
                 const ryokinInput = row.querySelector(`.teiritsu-kazei-ryokin-${i}`);
                 if (ryokinInput) columnTotals.ryokin[i] += parseIntSafe(ryokinInput.value);
             }
-            const menjoHakusu = row.querySelector('.teiritsu-menjo-hakusu');
-            if (menjoHakusu) totalMenjoHakusu += parseIntSafe(menjoHakusu.value);
+            const menjoHakusuInput = row.querySelector('.teiritsu-menjo-hakusu');
+            if (menjoHakusuInput) totalMenjoHakusu += parseIntSafe(menjoHakusuInput.value);
 
-            const menjoRyokin = row.querySelector('.teiritsu-menjo-ryokin');
-            if (menjoRyokin) totalMenjoRyokin += parseIntSafe(menjoRyokin.value);
+            const menjoRyokinInput = row.querySelector('.teiritsu-menjo-ryokin');
+            if (menjoRyokinInput) totalMenjoRyokin += parseIntSafe(menjoRyokinInput.value);
+
+            const zeigakuInput = row.querySelector('.teiritsu-zeigaku');
+            if (zeigakuInput) totalZeigaku += parseIntSafe(zeigakuInput.value);
         });
 
         // 合計と税額の計算反映
         for (let i = 0;i < tierCount;i++) {
+            const totalSogakuInput = document.getElementById(`modal-teiritsu-total-kazei-sogaku-${i}`);
+            if (totalSogakuInput) totalSogakuInput.value = columnTotals.sogaku[i].toLocaleString();
+
             const totalHakusuInput = document.getElementById(`modal-teiritsu-total-kazei-hakusu-${i}`);
             if (totalHakusuInput) totalHakusuInput.value = columnTotals.hakusu[i].toLocaleString();
 
@@ -156,6 +148,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const totalMenjoRyokinInput = document.getElementById('modal-teiritsu-total-menjo-ryokin');
         if (totalMenjoRyokinInput) totalMenjoRyokinInput.value = totalMenjoRyokin.toLocaleString();
+
+        const totalZeigakuInput = document.getElementById('modal-teiritsu-total-zeigaku');
+        if (totalZeigakuInput) totalZeigakuInput.value = totalZeigaku.toLocaleString();
     };
 
     // イベントバインド
