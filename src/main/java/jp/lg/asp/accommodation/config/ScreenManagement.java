@@ -52,7 +52,10 @@ public final class ScreenManagement {
 	public static final String ELTAX_RENKEI_KAKUNIN = "ELTAX_RENKEI_KAKU";
 
 	// 合算申告登録/編集/照会
-	public static final String GASSAN_CONFIG = "GASSANCONF";
+	public static final String GASSAN_CONFIG = "mi00000001";
+
+	// 合算申告情報管理台帳
+	public static final String GASSAN_LIST = "ms00000006";
 
 	// 収納管理情報連携
 	public static final String SHUNO_RENKEI = "SHUNO_RENKEI";

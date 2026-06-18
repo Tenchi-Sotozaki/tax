@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -39,6 +38,7 @@ public class GassanController {
 	private final ScreenAccessChecker accessChecker;
 
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.GASSAN_CONFIG;
+	private static final String SCREEN_ID_LIST = ScreenManagement.GASSAN_LIST;
 	private static final String FORM_VIEW = "gassan/tGassanConfig";
 	private static final String DAICHO_VIEW = "gassan/tGassanDaicho";
 
@@ -57,7 +57,7 @@ public class GassanController {
 	public String showDaicho(
 			@ModelAttribute("searchForm") GassanDaichoSearchForm searchForm,
 			Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkAccess(SCREEN_ID_LIST);
 
 		List<GassanDaichoItem> items = gassanDaichoService.search(searchForm);
 		model.addAttribute("items", items);
@@ -150,7 +150,7 @@ public class GassanController {
 	@ResponseBody
 	public List<GassanForm.FacilityItem> getFacilitiesByAtena(@RequestBody Map<String, Object> request) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
-		
+
 		BigDecimal atenaNo = new BigDecimal(request.get("atenaNo").toString());
 		return gassanService.getFacilitiesByAtenaNo(atenaNo);
 	}
