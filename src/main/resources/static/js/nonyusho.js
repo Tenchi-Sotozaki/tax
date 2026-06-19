@@ -241,6 +241,7 @@ async function collectFormData() {
     
     // 年度から年のみを抽出（YYYY-MM から YYYY を取得）
     const nendo = nendoValue ? nendoValue.split('-')[0] : '';
+    console.log('年度抽出結果:', { nendoValue, nendo });
     
     // 申告年月をLocalDate形式に変換（YYYY-MM-01）
     const shinkokuYmd = shinkokuYmdValue ? shinkokuYmdValue + '-01' : null;
@@ -282,10 +283,24 @@ async function collectFormData() {
 async function loadDynamicData(shiteiNo, nendo, shinkokuYmdValue) {
     try {
         console.log('動的データ取得開始:', { shiteiNo, nendo, shinkokuYmdValue });
-        const response = await fetch(`/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}`);
-        if (!response.ok) {
-            throw new Error('データの取得に失敗しました');
+        
+        // パラメーターのバリデーション
+        if (!shiteiNo || !nendo) {
+            throw new Error('指定番号と年度が必要です');
         }
+        
+        const url = `/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}`;
+        console.log('リクエストURL:', url);
+        
+        const response = await fetch(url);
+        console.log('レスポンスステータス:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('サーバーエラー:', errorText);
+            throw new Error(`データの取得に失敗しました (${response.status})`);
+        }
+        
         const data = await response.json();
         console.log('取得したデータ:', data);
         

@@ -81,33 +81,46 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		NonyushoDataResponse response = new NonyushoDataResponse();
 
 		try {
-			// t_fukaテーブルからデータ取得
-			Optional<Fuka> fukaOpt = fukaRepository.findTopByShiteiNoAndNendoOrderByRnoDesc(shiteiNo, nendo);
+			// t_fukaテーブルからデータ取得（自治体コード、有効フラグを考慮）
+			log.info("賆課データ検索開始: jichitaiCode={}, shiteiNo={}, nendo={}", jichitaiCode, shiteiNo, nendo);
+			Optional<Fuka> fukaOpt = fukaRepository.findTopByJichitaiCdAndShiteiNoAndNendoAndNewFlgAndDelFlgOrderByRnoDesc(
+					jichitaiCode, shiteiNo, nendo, "1", "0");
 
 			if (fukaOpt.isPresent()) {
 				Fuka fuka = fukaOpt.get();
+				log.info("取得した賆課情報: rno={}, totalZeigaku={}, kasanGaku1={}, kasanGaku2={}, kasanGaku3={}", 
+						fuka.getRno(), fuka.getTotalZeigaku(), fuka.getKasanGaku1(), fuka.getKasanGaku2(), fuka.getKasanGaku3());
+				
 				response.setZeigaku(fuka.getTotalZeigaku() != null ? fuka.getTotalZeigaku().toString() : "0");
-				Long kasanGaku = fuka.getKasanGaku1() != null ? fuka.getKasanGaku1()
-						: 0L
-								+ (fuka.getKasanGaku2() != null ? fuka.getKasanGaku2() : 0L)
-								+ (fuka.getKasanGaku3() != null ? fuka.getKasanGaku3() : 0L);
+				Long kasanGaku = (fuka.getKasanGaku1() != null ? fuka.getKasanGaku1() : 0L)
+						+ (fuka.getKasanGaku2() != null ? fuka.getKasanGaku2() : 0L)
+						+ (fuka.getKasanGaku3() != null ? fuka.getKasanGaku3() : 0L);
 				response.setKasan(kasanGaku.toString());
+				
+				log.info("設定した税額: zeigaku={}, kasan={}", response.getZeigaku(), response.getKasan());
 
-				// nokigenの設定
+				// nokigenの設定（null値を除外して処理）
 				List<LocalDate> dates = Arrays.asList(
 						fuka.getNokigen1(),
 						fuka.getNokigen2(),
-						fuka.getNokigen3());
+						fuka.getNokigen3())
+						.stream()
+						.filter(date -> date != null) // null値を除外
+						.collect(java.util.stream.Collectors.toList());
+						
 				Optional<LocalDate> minDate = dates.stream().min(Comparator.naturalOrder());
 				if (minDate.isPresent()) {
 					response.setNokigen(minDate.get().toString());
+					log.info("納期限設定（最早日）: {}", minDate.get());
 				} else if (fuka.getShinkokuYmd() != null) {
 					// shinkoku_Ymdの翌月末を計算
 					LocalDate nextMonthEnd = fuka.getShinkokuYmd().plusMonths(1)
 							.withDayOfMonth(fuka.getShinkokuYmd().plusMonths(1).lengthOfMonth());
 					response.setNokigen(nextMonthEnd.toString());
+					log.info("納期限設定（申告日基準）: {}", nextMonthEnd);
 				} else {
 					response.setNokigen("");
+					log.warn("納期限が設定できませんでした");
 				}
 			} else {
 				log.warn("該当するt_fukaレコードが見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);
