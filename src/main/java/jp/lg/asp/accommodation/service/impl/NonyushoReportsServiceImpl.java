@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -73,21 +74,46 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		}
 	}
 
+	/**
+	 * 納入書動的データ取得（新メソッド）
+	 */
 	@Override
-	public NonyushoDataResponse getNonyushoData(String shiteiNo, String nendo) {
-		log.info("納入書動的データ取得開始: shiteiNo={}, nendo={}", shiteiNo, nendo);
+	public NonyushoDataResponse getNonyushoData(String shiteiNo, String nendo, String shinkokuYm) {
+		log.info("納入書動的データ取得開始: shiteiNo={}, nendo={}, shinkokuYm={}", shiteiNo, nendo, shinkokuYm);
 		log.info("設定された自治体コード: {}", jichitaiCode);
 
 		NonyushoDataResponse response = new NonyushoDataResponse();
 
 		try {
-			// t_fukaテーブルからデータ取得（自治体コード、有効フラグを考慮）
-			log.info("賆課データ検索開始: jichitaiCode={}, shiteiNo={}, nendo={}", jichitaiCode, shiteiNo, nendo);
-			Optional<Fuka> fukaOpt = fukaRepository.findTopByJichitaiCdAndShiteiNoAndNendoAndNewFlgAndDelFlgOrderByRnoDesc(
-					jichitaiCode, shiteiNo, nendo, "1", "0");
-
-			if (fukaOpt.isPresent()) {
-				Fuka fuka = fukaOpt.get();
+			// 申告年月から対象年月を算出（YYYY-MM 形式をYYYYMMに変換）
+			final String taishoYm;
+			if (shinkokuYm != null && !shinkokuYm.isEmpty()) {
+				taishoYm = shinkokuYm.replace("-", ""); // "2026-03" -> "202603"
+				log.info("申告年月から対象年月を算出: shinkokuYm={} -> taishoYm={}", shinkokuYm, taishoYm);
+			} else {
+				taishoYm = null;
+			}
+			
+			// t_fukaテーブルからデータ取得（対象年月で絞り込み）
+			log.info("賆課データ検索開始: jichitaiCode={}, shiteiNo={}, nendo={}, taishoYm={}", jichitaiCode, shiteiNo, nendo, taishoYm);
+			
+			// 最新の賆課データを取得
+			List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCode, shiteiNo, nendo);
+			
+			// 対象年月が指定されている場合、その条件でフィルタリング
+			if (taishoYm != null) {
+				fukaList = fukaList.stream()
+						.filter(f -> taishoYm.equals(f.getTaishoYm()))
+						.collect(java.util.stream.Collectors.toList());
+			}
+			
+			log.info("取得した賆課データ件数: {}", fukaList.size());
+			
+			if (!fukaList.isEmpty()) {
+				// 最新のレコードを取得（rno最大）
+				Fuka fuka = fukaList.stream()
+						.max(Comparator.comparing(Fuka::getRno))
+						.orElse(fukaList.get(0));
 				log.info("取得した賆課情報: rno={}, totalZeigaku={}, kasanGaku1={}, kasanGaku2={}, kasanGaku3={}", 
 						fuka.getRno(), fuka.getTotalZeigaku(), fuka.getKasanGaku1(), fuka.getKasanGaku2(), fuka.getKasanGaku3());
 				
