@@ -128,9 +128,9 @@
 							<td th:text="${item.taishoYm}">対象年月</td>
 							<td class="text-center" th:text="${item.totalZeigaku}">宿泊税額</td>
 							<td
-								th:text="${item.torokuYmd != null ? #dates.format(item.torokuYmd, 'yyyy-MM-dd') : ''}">登録年月日</td>
+								th:text="${item.torokuYmd != null ? #temporals.format(item.torokuYmd, 'yyyy-MM-dd') : ''}">登録年月日</td>
 							<td
-								th:text="${item.shinkokuYmd != null ? #dates.format(item.shinkokuYmd, 'yyyy-MM-dd') : ''}">申告年月日</td>
+								th:text="${item.shinkokuYmd != null ? #temporals.format(item.shinkokuYmd, 'yyyy-MM-dd') : ''}">申告年月日</td>
 						</tr>
 					</th:block>
 					<th:block th:if="${items == null or items.empty}">
