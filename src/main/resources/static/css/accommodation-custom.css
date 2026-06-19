@@ -1,0 +1,175 @@
+/* ==========================================
+   宿泊税システム 基本テンプレート
+   カラー・共通パーツ設定
+========================================== */
+
+:root {
+    /* ブランドカラー */
+    --acomo-blue: #3598c5;        /* アクアスマートブルー：主要操作・見出し・検索 */
+    --acomo-green: #68b83e;       /* リーフサポートグリーン：登録・更新・完了 */
+
+    /* サイドメニュー */
+    --acomo-navy: #1b2d57;        /* シビックトラストネイビー */
+    --acomo-sidebar-active: #3598c5;
+
+    /* 補助カラー */
+    --acomo-light-blue: #e8f5fb;  /* テーブルヘッダー・淡い背景 */
+    --acomo-border: #d8e3ea;      /* 罫線 */
+    --acomo-bg-light: #f5f8fa;    /* 画面背景 */
+
+    /* 操作色 */
+    --acomo-warning: #f4a62a;     /* 申告・注意 */
+    --acomo-danger: #dc3545;      /* 削除 */
+}
+
+/* ==========================================
+   AcOmO ロゴ
+========================================== */
+
+.system-logo {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding-left: 8px;
+}
+
+.acomo-logo {
+    width: 180px;
+    height: auto;
+    display: block;
+}
+
+/* ==========================================
+   サイドメニュー
+========================================== */
+
+#sidebar {
+    background-color: var(--acomo-navy) !important;
+}
+
+.menu-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+.accordion-button:not(.collapsed),
+.accordion-button:hover {
+    background-color: rgba(53, 152, 197, 0.18) !important;
+}
+
+/* ==========================================
+   ボタン色ルール
+========================================== */
+
+/* 青＝主要操作 */
+.btn-primary {
+    background-color: var(--acomo-blue);
+    border-color: var(--acomo-blue);
+}
+
+.btn-primary:hover {
+    background-color: #2f89b2;
+    border-color: #2f89b2;
+}
+
+.btn-outline-primary {
+    color: var(--acomo-blue);
+    border-color: var(--acomo-blue);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--acomo-blue);
+    border-color: var(--acomo-blue);
+    color: #fff;
+}
+
+/* 緑＝登録・更新・完了 */
+.btn-success,
+.btn-acomo-register {
+    background-color: var(--acomo-green);
+    border-color: var(--acomo-green);
+    color: #fff;
+}
+
+.btn-success:hover,
+.btn-acomo-register:hover {
+    background-color: #5da836;
+    border-color: #5da836;
+    color: #fff;
+}
+
+/* オレンジ＝申告・注意 */
+.btn-warning {
+    background-color: var(--acomo-warning);
+    border-color: var(--acomo-warning);
+    color: #212529;
+}
+
+/* 赤＝削除 */
+.btn-danger,
+.btn-outline-danger:hover {
+    background-color: var(--acomo-danger);
+    border-color: var(--acomo-danger);
+    color: #fff;
+}
+
+/* ==========================================
+   テキスト・背景色
+========================================== */
+
+.text-primary {
+    color: var(--acomo-blue) !important;
+}
+
+.bg-success {
+    background-color: var(--acomo-green) !important;
+}
+
+/* ==========================================
+   カード／フォーム
+========================================== */
+
+.card {
+    border-radius: 12px;
+    border-color: var(--acomo-border);
+}
+
+.form-control,
+.form-select {
+    border-color: var(--acomo-border);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--acomo-blue);
+    box-shadow: 0 0 0 0.2rem rgba(53, 152, 197, 0.18);
+}
+
+/* ==========================================
+   テーブル
+========================================== */
+
+.table-primary {
+    --bs-table-bg: var(--acomo-light-blue);
+    --bs-table-border-color: var(--acomo-border);
+}
+
+.table thead th {
+    background-color: var(--acomo-light-blue);
+    border-color: var(--acomo-border);
+}
+
+/* ==========================================
+   バッジ
+========================================== */
+
+.badge.bg-success {
+    background-color: var(--acomo-green) !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}

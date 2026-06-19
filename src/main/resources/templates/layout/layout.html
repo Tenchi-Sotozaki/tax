@@ -13,6 +13,7 @@
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 <link rel="stylesheet" th:href="@{/css/bootstrap-icons-complete.css}">
 <link rel="stylesheet" th:href="@{/css/accommodation.css}">
+<link rel="stylesheet" th:href="@{/css/accommodation-custom.css}">
 </head>
 <body class="vh-100 overflow-hidden">
 
@@ -22,11 +23,10 @@
 		<nav id="sidebar"
 			class="d-flex flex-column flex-shrink-0 bg-dark text-white"
 			style="width: 260px; overflow-y: auto;">
-
 			<!-- システム名 -->
 			<div class="px-3 py-3 border-bottom border-secondary">
-				<h5 class="mb-0 fw-bold text-white">
-					<i class="bi bi-building me-2 text-info"></i>宿泊税システム
+				<h5 class="mb-0 fw-bold text-white system-logo">
+					<img th:src="@{/images/logo-acomo.svg?v=2}" alt="AcOmO" class="acomo-logo">
 				</h5>
 			</div>
 
