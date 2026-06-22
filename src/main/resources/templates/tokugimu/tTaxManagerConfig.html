@@ -92,14 +92,14 @@
 
 						<!-- 照会画面での表示 -->
 						<div class="col-md-4" th:if="${isView ?: false}">
-							<label class="form-label fw-medium">登録日</label>
-							<input type="text" class="form-control" readonly
+							<label class="form-label fw-medium">登録日</label> <input
+								type="text" class="form-control" readonly
 								th:value="*{registrationDate}">
 						</div>
 
 						<div class="col-md-4" th:if="${isView ?: false}">
-							<label class="form-label fw-medium">申告日</label>
-							<input type="text" class="form-control" readonly
+							<label class="form-label fw-medium">申告日</label> <input
+								type="text" class="form-control" readonly
 								th:value="*{declarationDate}">
 						</div>
 
@@ -198,14 +198,14 @@
 					<i class="bi bi-save me-2"></i> <span
 						th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
 				</button>
-				
+
 				<!-- 編集時のみ削除ボタンを表示 -->
 				<button type="button" class="btn btn-danger btn-lg px-5"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
 					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
 					<i class="bi bi-trash me-2"></i>削除する
 				</button>
-				
+
 				<a
 					th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.shiteiNo})}"
 					class="btn btn-primary btn-lg px-5" th:if="${isView ?: false}">
@@ -221,34 +221,7 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/t_tokugimu_config.js}"></script>
-		<script th:inline="javascript">
-			/*<![CDATA[*/
-			document.addEventListener('DOMContentLoaded', function () {
-				// --- ① 選任免除の表示制御 ---
-				const exemptionFlag = document.getElementById('exemptionFlag');
-				const exemptionReasonArea = document.getElementById('exemptionReasonArea');
-
-				if (exemptionFlag && exemptionReasonArea) {
-					const toggleExemptionArea = () => {
-						exemptionReasonArea.style.display = exemptionFlag.checked ? 'block' : 'none';
-					};
-					toggleExemptionArea();
-					exemptionFlag.addEventListener('change', toggleExemptionArea);
-				}
-
-				// --- ② 宛名検索結果をフォームにセット（共通JSのselectAddressをオーバーライド） ---
-				window.selectAddress = function(item) {
-					const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-					setVal('managerAddress', item.address || item.jusho);
-					setVal('managerName', item.name || item.shimei);
-					setVal('managerNameKana', item.nameKana || item.shimeiKana);
-					setVal('managerPhone', item.phone || item.tel);
-					bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
-				};
-			});
-			/*]]>*/
-		</script>
+		<script th:src="@{/js/t_tax_manager_config.js}"></script>
 	</th:block>
 </body>
 
