@@ -66,7 +66,7 @@
         }
         // サーバー側の /download/csv を呼び出してファイルを取得する
         const keys = selected.map(s => ({ shiteiNo: s.shiteiNo, nendo: s.nendo || '', kibetsu: s.kibetsu != null && s.kibetsu !== '' ? Number(s.kibetsu) : null }));
-        fetch(window.location.origin + '/shunoRenkei/download/csv', {
+        fetch(window.location.origin + '/shunoRenkei/download', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

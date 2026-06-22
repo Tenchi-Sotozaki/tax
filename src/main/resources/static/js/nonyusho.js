@@ -11,13 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 年度フィールドの初期化
     initializeNendoField();
     
-    // 申告年月の初期値を設定（当月）
-    const shinkokuYmdField = document.getElementById('shinkokuYmd');
-    if (shinkokuYmdField && !shinkokuYmdField.value) {
+    // 対象年月の初期値を設定（当月）
+    const taishoYmField = document.getElementById('taishoYm');
+    if (taishoYmField && !taishoYmField.value) {
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');
-        shinkokuYmdField.value = `${year}-${month}`;
+        taishoYmField.value = `${year}-${month}`;
     }
     
     // 延滞金の初期値を設定
@@ -236,17 +236,18 @@ async function printReport() {
 async function collectFormData() {
     const shiteiNo = document.getElementById('shiteiNo')?.value || '';
     const nendoValue = document.getElementById('nendo')?.value || '';
-    const shinkokuYmdValue = document.getElementById('shinkokuYmd')?.value || '';
+    const taishoYmValue = document.getElementById('taishoYm')?.value || '';
     const entai = document.getElementById('entai')?.value || '0';
     
     // 年度から年のみを抽出（YYYY-MM から YYYY を取得）
     const nendo = nendoValue ? nendoValue.split('-')[0] : '';
+    console.log('年度抽出結果:', { nendoValue, nendo });
     
-    // 申告年月をLocalDate形式に変換（YYYY-MM-01）
-    const shinkokuYmd = shinkokuYmdValue ? shinkokuYmdValue + '-01' : null;
+    // 対象年月をLocalDate形式に変換（YYYY-MM-01）
+    const shinkokuYmd = taishoYmValue ? taishoYmValue + '-01' : null;
     
     // 動的にデータを取得
-    const dynamicData = await loadDynamicData(shiteiNo, nendo, shinkokuYmdValue);
+    const dynamicData = await loadDynamicData(shiteiNo, nendo, taishoYmValue);
     
     // 税額と合計額を計算
     const entaiNum = parseInt(entai, 10) || 0;
@@ -279,22 +280,36 @@ async function collectFormData() {
 /**
  * 動的データ取得
  */
-async function loadDynamicData(shiteiNo, nendo, shinkokuYmdValue) {
+async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
     try {
-        console.log('動的データ取得開始:', { shiteiNo, nendo, shinkokuYmdValue });
-        const response = await fetch(`/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}`);
-        if (!response.ok) {
-            throw new Error('データの取得に失敗しました');
+        console.log('動的データ取得開始:', { shiteiNo, nendo, taishoYmValue });
+        
+        // パラメーターのバリデーション
+        if (!shiteiNo || !nendo) {
+            throw new Error('指定番号と年度が必要です');
         }
+        
+        const url = `/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}&shinkokuYm=${encodeURIComponent(taishoYmValue || '')}`;
+        console.log('リクエストURL:', url);
+        
+        const response = await fetch(url);
+        console.log('レスポンスステータス:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('サーバーエラー:', errorText);
+            throw new Error(`データの取得に失敗しました (${response.status})`);
+        }
+        
         const data = await response.json();
         console.log('取得したデータ:', data);
         
-        // nokigenが空の場合、申告年月の翌月末を設定
+        // nokigenが空の場合、対象年月の翌月末を設定
         let nokigen = data.nokigen;
-        if (!nokigen && shinkokuYmdValue) {
-            const shinkokuDate = new Date(shinkokuYmdValue + '-01');
-            shinkokuDate.setMonth(shinkokuDate.getMonth() + 2, 0); // 翌月末
-            nokigen = shinkokuDate.toISOString().split('T')[0];
+        if (!nokigen && taishoYmValue) {
+            const taishoDate = new Date(taishoYmValue + '-01');
+            taishoDate.setMonth(taishoDate.getMonth() + 2, 0); // 翌月末
+            nokigen = taishoDate.toISOString().split('T')[0];
         }
         
         return {
@@ -312,10 +327,10 @@ async function loadDynamicData(shiteiNo, nendo, shinkokuYmdValue) {
         console.error('動的データ取得エラー:', error);
         // エラー時はデフォルト値を返す
         let nokigen = '';
-        if (shinkokuYmdValue) {
-            const shinkokuDate = new Date(shinkokuYmdValue + '-01');
-            shinkokuDate.setMonth(shinkokuDate.getMonth() + 2, 0);
-            nokigen = shinkokuDate.toISOString().split('T')[0];
+        if (taishoYmValue) {
+            const taishoDate = new Date(taishoYmValue + '-01');
+            taishoDate.setMonth(taishoDate.getMonth() + 2, 0);
+            nokigen = taishoDate.toISOString().split('T')[0];
         }
         return {
             zeigaku: '0',
@@ -337,7 +352,7 @@ async function loadDynamicData(shiteiNo, nendo, shinkokuYmdValue) {
 function validateForm() {
     const shiteiNo = document.getElementById('shiteiNo')?.value;
     const nendoValue = document.getElementById('nendo')?.value;
-    const shinkokuYmd = document.getElementById('shinkokuYmd')?.value;
+    const taishoYm = document.getElementById('taishoYm')?.value;
     
     if (!shiteiNo) {
         showErrorMessage('指定番号を入力してください。');
@@ -349,8 +364,8 @@ function validateForm() {
         return false;
     }
     
-    if (!shinkokuYmd) {
-        showErrorMessage('申告年月を入力してください。');
+    if (!taishoYm) {
+        showErrorMessage('対象年月を入力してください。');
         return false;
     }
     

@@ -74,8 +74,9 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 			@Param("delFlg") String delFlg,
 			@Param("newFlg") String newFlg);
 	/**
-	 * 指定番号と年度で最新のレコードを取得
+	 * 指定番号と年度で最新のレコードを取得（自治体コード付き）
 	 */
-	Optional<Fuka> findTopByShiteiNoAndNendoOrderByRnoDesc(String shiteiNo, String nendo);
+	Optional<Fuka> findTopByJichitaiCdAndShiteiNoAndNendoAndNewFlgAndDelFlgOrderByRnoDesc(
+			String jichitaiCd, String shiteiNo, String nendo, String newFlg, String delFlg);
 
 }

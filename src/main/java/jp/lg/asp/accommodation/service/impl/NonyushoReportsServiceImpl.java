@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -73,41 +74,79 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		}
 	}
 
+	/**
+	 * 納入書動的データ取得（新メソッド）
+	 */
 	@Override
-	public NonyushoDataResponse getNonyushoData(String shiteiNo, String nendo) {
-		log.info("納入書動的データ取得開始: shiteiNo={}, nendo={}", shiteiNo, nendo);
+	public NonyushoDataResponse getNonyushoData(String shiteiNo, String nendo, String shinkokuYm) {
+		log.info("納入書動的データ取得開始: shiteiNo={}, nendo={}, shinkokuYm={}", shiteiNo, nendo, shinkokuYm);
 		log.info("設定された自治体コード: {}", jichitaiCode);
 
 		NonyushoDataResponse response = new NonyushoDataResponse();
 
 		try {
-			// t_fukaテーブルからデータ取得
-			Optional<Fuka> fukaOpt = fukaRepository.findTopByShiteiNoAndNendoOrderByRnoDesc(shiteiNo, nendo);
-
-			if (fukaOpt.isPresent()) {
-				Fuka fuka = fukaOpt.get();
+			// 申告年月から対象年月を算出（YYYY-MM 形式をYYYYMMに変換）
+			final String taishoYm;
+			if (shinkokuYm != null && !shinkokuYm.isEmpty()) {
+				taishoYm = shinkokuYm.replace("-", ""); // "2026-03" -> "202603"
+				log.info("申告年月から対象年月を算出: shinkokuYm={} -> taishoYm={}", shinkokuYm, taishoYm);
+			} else {
+				taishoYm = null;
+			}
+			
+			// t_fukaテーブルからデータ取得（対象年月で絞り込み）
+			log.info("賆課データ検索開始: jichitaiCode={}, shiteiNo={}, nendo={}, taishoYm={}", jichitaiCode, shiteiNo, nendo, taishoYm);
+			
+			// 最新の賆課データを取得
+			List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCode, shiteiNo, nendo);
+			
+			// 対象年月が指定されている場合、その条件でフィルタリング
+			if (taishoYm != null) {
+				fukaList = fukaList.stream()
+						.filter(f -> taishoYm.equals(f.getTaishoYm()))
+						.collect(java.util.stream.Collectors.toList());
+			}
+			
+			log.info("取得した賆課データ件数: {}", fukaList.size());
+			
+			if (!fukaList.isEmpty()) {
+				// 最新のレコードを取得（rno最大）
+				Fuka fuka = fukaList.stream()
+						.max(Comparator.comparing(Fuka::getRno))
+						.orElse(fukaList.get(0));
+				log.info("取得した賆課情報: rno={}, totalZeigaku={}, kasanGaku1={}, kasanGaku2={}, kasanGaku3={}", 
+						fuka.getRno(), fuka.getTotalZeigaku(), fuka.getKasanGaku1(), fuka.getKasanGaku2(), fuka.getKasanGaku3());
+				
 				response.setZeigaku(fuka.getTotalZeigaku() != null ? fuka.getTotalZeigaku().toString() : "0");
-				Long kasanGaku = fuka.getKasanGaku1() != null ? fuka.getKasanGaku1()
-						: 0L
-								+ (fuka.getKasanGaku2() != null ? fuka.getKasanGaku2() : 0L)
-								+ (fuka.getKasanGaku3() != null ? fuka.getKasanGaku3() : 0L);
+				Long kasanGaku = (fuka.getKasanGaku1() != null ? fuka.getKasanGaku1() : 0L)
+						+ (fuka.getKasanGaku2() != null ? fuka.getKasanGaku2() : 0L)
+						+ (fuka.getKasanGaku3() != null ? fuka.getKasanGaku3() : 0L);
 				response.setKasan(kasanGaku.toString());
+				
+				log.info("設定した税額: zeigaku={}, kasan={}", response.getZeigaku(), response.getKasan());
 
-				// nokigenの設定
+				// nokigenの設定（null値を除外して処理）
 				List<LocalDate> dates = Arrays.asList(
 						fuka.getNokigen1(),
 						fuka.getNokigen2(),
-						fuka.getNokigen3());
+						fuka.getNokigen3())
+						.stream()
+						.filter(date -> date != null) // null値を除外
+						.collect(java.util.stream.Collectors.toList());
+						
 				Optional<LocalDate> minDate = dates.stream().min(Comparator.naturalOrder());
 				if (minDate.isPresent()) {
 					response.setNokigen(minDate.get().toString());
+					log.info("納期限設定（最早日）: {}", minDate.get());
 				} else if (fuka.getShinkokuYmd() != null) {
 					// shinkoku_Ymdの翌月末を計算
 					LocalDate nextMonthEnd = fuka.getShinkokuYmd().plusMonths(1)
 							.withDayOfMonth(fuka.getShinkokuYmd().plusMonths(1).lengthOfMonth());
 					response.setNokigen(nextMonthEnd.toString());
+					log.info("納期限設定（申告日基準）: {}", nextMonthEnd);
 				} else {
 					response.setNokigen("");
+					log.warn("納期限が設定できませんでした");
 				}
 			} else {
 				log.warn("該当するt_fukaレコードが見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);

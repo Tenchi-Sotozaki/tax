@@ -66,17 +66,18 @@ public class NonyushoController {
     @ResponseBody
     public ResponseEntity<NonyushoDataResponse> getNonyushoData(
             @RequestParam String shiteiNo,
-            @RequestParam String nendo) {
+            @RequestParam String nendo,
+            @RequestParam(required = false) String shinkokuYm) {
         try {
-            log.info("納入書動的データ取得API呼び出し: shiteiNo={}, nendo={}", shiteiNo, nendo);
+            log.info("納入書動的データ取得API呼び出し: shiteiNo={}, nendo={}, shinkokuYm={}", shiteiNo, nendo, shinkokuYm);
             
-            NonyushoDataResponse response = nonyushoReportsService.getNonyushoData(shiteiNo, nendo);
+            NonyushoDataResponse response = nonyushoReportsService.getNonyushoData(shiteiNo, nendo, shinkokuYm);
             
-            log.info("納入書動的データ取得完了: shiteiNo={}, nendo={}", shiteiNo, nendo);
+            log.info("納入書動的データ取得完了: shiteiNo={}, nendo={}, shinkokuYm={}", shiteiNo, nendo, shinkokuYm);
             return new ResponseEntity<>(response, HttpStatus.OK);
             
         } catch (Exception e) {
-            log.error("納入書動的データ取得エラー: shiteiNo={}, nendo={}", shiteiNo, nendo, e);
+            log.error("納入書動的データ取得エラー: shiteiNo={}, nendo={}, shinkokuYm={}", shiteiNo, nendo, shinkokuYm, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
