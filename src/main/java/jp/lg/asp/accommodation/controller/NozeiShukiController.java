@@ -97,7 +97,7 @@ public class NozeiShukiController {
 					: "redirect:/admin/nozei-shuki/edit/" + nozeiShuki.getSeq();
 		}
 
-		return "redirect:/admin/nozei-shuki";
+		return "redirect:/admin/nozei-shuki/list";
 	}
 
 	@PostMapping("/delete/{seq}")

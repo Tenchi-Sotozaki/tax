@@ -102,16 +102,13 @@ public class TaxManagerService {
 	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) {
 		log.info("納税管理人保存処理開始: shiteiNo={}, atenaNo={}", shiteiNo, form.getAtenaNo());
 		
-		// 特別徴収義務者との同一人物チェック
-		if (form.getAtenaNo() != null && !form.getAtenaNo().trim().isEmpty()) {
+		// 選任免除が有効でない場合のみ特別徴収義務者との同一人物チェック
+		if (!form.isExemptionFlag() && form.getAtenaNo() != null && !form.getAtenaNo().trim().isEmpty()) {
 			if (isSamePerson(form.getAtenaNo(), form.getObligorAtenaNo())) {
 				log.warn("特別徴収義務者と同一人物のため登録拒否: 納税管理人宛名番号={}, 特徴宛名番号={}", 
 					form.getAtenaNo(), form.getObligorAtenaNo());
 				throw new IllegalArgumentException("特別徴収義務者と同一人物のため、納税管理人として登録できません。");
 			}
-		} else {
-			log.warn("宛名番号が未入力です。shiteiNo={}", shiteiNo);
-			throw new IllegalArgumentException("宛名番号は必須です。");
 		}
 
 		// 1. 新しい履歴番号を算出
@@ -134,12 +131,23 @@ public class TaxManagerService {
 		newEntity.setTorokuYmd(form.getRegistrationDate());
 		newEntity.setShinkokuYmd(form.getDeclarationDate()); // フォームからの申告日を使用
 
-		newEntity.setAtenaNo(form.getAtenaNo());
-		newEntity.setName(form.getManagerName());
-		newEntity.setNameKana(form.getManagerNameKana());
-		newEntity.setYubinNo(form.getManagerYubinNo());
-		newEntity.setJusho(form.getManagerAddress());
-		newEntity.setTel(form.getManagerPhone());
+		// 選任免除が有効でない場合のみ納税管理人情報を設定
+		if (!form.isExemptionFlag()) {
+			newEntity.setAtenaNo(form.getAtenaNo());
+			newEntity.setName(form.getManagerName());
+			newEntity.setNameKana(form.getManagerNameKana());
+			newEntity.setYubinNo(form.getManagerYubinNo());
+			newEntity.setJusho(form.getManagerAddress());
+			newEntity.setTel(form.getManagerPhone());
+		} else {
+			// 選任免除の場合は納税管理人情報をnullに設定
+			newEntity.setAtenaNo(null);
+			newEntity.setName(null);
+			newEntity.setNameKana(null);
+			newEntity.setYubinNo(null);
+			newEntity.setJusho(null);
+			newEntity.setTel(null);
+		}
 		newEntity.setMenjoRiyu(form.getExemptionReason());
 
 		newEntity.setNewFlg(FLG_ON); // 新しいレコードは必ず最新
