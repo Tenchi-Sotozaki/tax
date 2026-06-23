@@ -28,11 +28,10 @@ public class ReportsDef extends BaseEntity {
 	@Column(name = "kbn", nullable = false, length = 1)
 	private String kbn;
 
-	@Column(name = "def_text", nullable = false, length = 1000)
+	@Column(name = "def_text", length = 1000)
 	private String defText;
 
-	@Lob
-	@Column(name = "def_data", nullable = false)
+	@Column(name = "def_data")
 	private byte[] defData;
 
 }

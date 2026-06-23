@@ -242,7 +242,8 @@
 									<ul class="nav flex-column ms-3">
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{#}"> <i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
+											th:href="@{/admin/reports-config}"
+											th:classappend="${#strings.contains(currentUri, '/admin/reports-config')} ? 'text-white fw-medium' : ''"> <i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
 										</a></li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
