@@ -7,14 +7,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
 
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.util.StringUtils;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.StringUtils;
+
 import lombok.Data;
 
 @Data
@@ -48,19 +49,21 @@ public class TaxManagerForm {
 	private String shiteiNo;
 
 	// ===== カスタムバリデーションアノテーション =====
-	
+
 	@Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = TaxManagerValidator.class)
 	@Documented
 	public @interface TaxManagerValid {
 		String message() default "入力内容に誤りがあります";
+
 		Class<?>[] groups() default {};
+
 		Class<? extends Payload>[] payload() default {};
 	}
 
 	// ===== カスタムバリデーター =====
-	
+
 	public static class TaxManagerValidator implements ConstraintValidator<TaxManagerValid, TaxManagerForm> {
 
 		@Override
@@ -80,11 +83,9 @@ public class TaxManagerForm {
 				}
 			} else {
 				// --- 選任免除が「無効」の場合 ---
-				// 宛名番号チェック
-				if (!StringUtils.hasText(form.getAtenaNo())) {
-					addError(context, "atenaNo", "宛名番号を入力してください");
-					isValid = false;
-				}
+				// 免除理由をクリア
+				form.setExemptionReason(null);
+				
 				// 郵便番号・住所・氏名・ふりがな・電話番号が空ならエラー
 				if (!StringUtils.hasText(form.getManagerYubinNo())) {
 					addError(context, "managerYubinNo", "住所（郵便番号）を入力してください");
