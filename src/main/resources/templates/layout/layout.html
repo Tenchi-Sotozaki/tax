@@ -26,7 +26,8 @@
 			<!-- システム名 -->
 			<div class="px-3 py-3 border-bottom border-secondary">
 				<h5 class="mb-0 fw-bold text-white system-logo">
-					<img th:src="@{/images/logo-acomo.svg?v=2}" alt="AcOmO" class="acomo-logo">
+					<img th:src="@{/images/logo-acomo.svg?v=2}" alt="AcOmO"
+						class="acomo-logo">
 				</h5>
 			</div>
 
@@ -67,10 +68,10 @@
 									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('GASSAN')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/gassan/list}"
-											th:classappend="${#strings.contains(currentUri, '/gassan/list')} ? 'text-white fw-medium' : ''">
+										th:href="@{/gassan/list}"
+										th:classappend="${#strings.contains(currentUri, '/gassan/list')} ? 'text-white fw-medium' : ''">
 											<i class="bi bi-file-earmark-text me-2"></i>合算申告管理台帳
-										</a>
+									</a>
 									</li>
 									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('SHOREIKIN')}">
@@ -243,7 +244,14 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/reports-config}"
-											th:classappend="${#strings.contains(currentUri, '/admin/reports-config')} ? 'text-white fw-medium' : ''"> <i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
+											th:classappend="${#strings.contains(currentUri, '/admin/reports-config')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/kofu-ritsu}"
+											th:classappend="${#strings.contains(currentUri, '/admin/kofu-ritsu')} ? 'text-white fw-medium' : ''"> <i
+												class="bi bi-cash-coin me-2"></i>交付率
 										</a></li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
