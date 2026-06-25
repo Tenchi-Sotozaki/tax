@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.service.KoseiKetteiTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 public class KoseiKetteiTsuchiController {
 
     private final KoseiKetteiTsuchiReportsService reportsService;
-
-    /** PDFファイル名 */
-    private static final String PDF_FILENAME        = "kosei_kettei_tsuchi.pdf";
-    /** プレビューファイル名 */
-    private static final String PREVIEW_FILENAME    = "kosei_kettei_tsuchi_preview.pdf";
+    private final ScreenAccessChecker accessChecker;
+    private static final String SCREEN_ID = ScreenManagement.KOSEI_KETTEI_TSUCHI;
 
     /**
      * 画面表示
@@ -37,6 +36,7 @@ public class KoseiKetteiTsuchiController {
     public String index(
             @RequestParam(required = false) String shiteiNo,
             Model model) {
+        accessChecker.checkAccess(SCREEN_ID);
 
         String safeShiteiNo = shiteiNo != null ? shiteiNo : "";
 
@@ -58,8 +58,20 @@ public class KoseiKetteiTsuchiController {
             @RequestParam String b1Ym,
             @RequestParam(required = false) String b2Ym,
             @RequestParam(required = false) String b3Ym) {
+        try {
+            accessChecker.checkAccess(SCREEN_ID);
 
-        return buildPdfResponse(shiteiNo, b1Ym, b2Ym, b3Ym, PDF_FILENAME, false);
+            byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.add("Content-Disposition", "inline; filename=kosei_kettei_tsuchi.pdf");
+
+            return ResponseEntity.ok().headers(headers).body(pdfData);
+        } catch (Exception e) {
+            log.error("PDF生成中にエラーが発生しました: shiteiNo={}, b1Ym={}", shiteiNo, b1Ym, e);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
@@ -71,37 +83,46 @@ public class KoseiKetteiTsuchiController {
             @RequestParam String b1Ym,
             @RequestParam(required = false) String b2Ym,
             @RequestParam(required = false) String b3Ym) {
-
-        return buildPdfResponse(shiteiNo, b1Ym, b2Ym, b3Ym, PREVIEW_FILENAME, true);
-    }
-
-    /**
-     * PDF ResponseEntityを構築する共通メソッド
-     * @param shiteiNo  指定番号
-     * @param b1Ym      対象月b1（YYYYMM）
-     * @param b2Ym      対象月b2（YYYYMM、任意）
-     * @param b3Ym      対象月b3（YYYYMM、任意）
-     * @param filename  ダウンロードファイル名
-     * @param noCache   キャッシュ無効化フラグ（プレビュー時はtrue）
-     * @return PDF ResponseEntity
-     */
-    private ResponseEntity<byte[]> buildPdfResponse(
-            String shiteiNo, String b1Ym, String b2Ym, String b3Ym,
-            String filename, boolean noCache) {
         try {
+            accessChecker.checkAccess(SCREEN_ID);
+
             byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.add("Content-Disposition", "inline; filename=" + filename);
-            if (noCache) {
-                headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-            }
+            headers.add("Content-Disposition", "inline; filename=kosei_kettei_tsuchi_preview.pdf");
+            headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 
             return ResponseEntity.ok().headers(headers).body(pdfData);
-
         } catch (Exception e) {
-            log.error("PDF生成中にエラーが発生しました: shiteiNo={}, b1Ym={}", shiteiNo, b1Ym, e);
+            log.error("プレビュー生成中にエラーが発生しました: shiteiNo={}, b1Ym={}", shiteiNo, b1Ym, e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * 印刷
+     */
+    @PostMapping("/koseiKetteiTsuchi/print")
+    public ResponseEntity<byte[]> print(
+            @RequestParam String shiteiNo,
+            @RequestParam String b1Ym,
+            @RequestParam(required = false) String b2Ym,
+            @RequestParam(required = false) String b3Ym) {
+        try {
+            accessChecker.checkAccess(SCREEN_ID);
+
+            byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.add("Content-Disposition", "inline; filename=kosei_kettei_tsuchi_print.pdf");
+            headers.add("X-Print-Action", "true");
+            headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+
+            return ResponseEntity.ok().headers(headers).body(pdfData);
+        } catch (Exception e) {
+            log.error("印刷用PDF生成中にエラーが発生しました: shiteiNo={}, b1Ym={}", shiteiNo, b1Ym, e);
             return ResponseEntity.internalServerError().build();
         }
     }
