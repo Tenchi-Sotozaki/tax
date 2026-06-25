@@ -110,4 +110,7 @@ public final class ScreenManagement {
 
 	// 合算申告納入承認通知書
 	public static final String GASSAN_NONYU_TSUCHI = "ms00000021";
+
+	// 交付率設定
+	public static final String KOFU_RITSU_CONFIG = "KOFU_RITSU";
 }

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>交付率設定</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h2 class="h2">
+				<i class="bi bi-cash-coin me-2 text-primary"></i>交付率設定
+			</h2>
+		</div>
+
+		<!-- メッセージ表示 -->
+		<div th:if="${successMessage}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- 入力フォーム -->
+		<div class="card shadow-sm mb-4">
+			<div class="card-body">
+				<form th:action="@{/admin/kofu-ritsu/save}" method="post"
+					th:object="${configForm}" novalidate>
+
+					<div class="row g-3">
+						<div class="col-md-4">
+							<label for="kofuRitsu" class="form-label">交付率（%） <span class="text-danger">*</span></label>
+							<input type="number" id="kofuRitsu"
+								th:field="*{kofuRitsu}" step="0.01" min="0" max="999.99"
+								th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
+								class="form-control">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('kofuRitsu')}"
+								th:errors="*{kofuRitsu}"></div>
+						</div>
+						<div class="col-md-4">
+							<label for="tekiyoStYmd" class="form-label">適用期間（FROM） <span class="text-danger">*</span></label>
+							<input type="date" id="tekiyoStYmd"
+								th:field="*{tekiyoStYmd}"
+								th:classappend="${#fields.hasErrors('tekiyoStYmd')} ? 'is-invalid' : ''"
+								class="form-control">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('tekiyoStYmd')}"
+								th:errors="*{tekiyoStYmd}"></div>
+						</div>
+						<div class="col-md-4">
+							<label for="tekiyoEdYmd" class="form-label">適用期間（TO）</label>
+							<input type="date" class="form-control" id="tekiyoEdYmd"
+								th:field="*{tekiyoEdYmd}">
+						</div>
+					</div>
+
+					<div class="d-flex justify-content-end mt-3">
+						<button type="submit" class="btn btn-primary">
+							<i class="bi bi-check-circle me-1"></i>登録する
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- 履歴一覧 -->
+		<div class="card shadow-sm">
+			<div class="card-header">
+				<h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>交付率履歴</h5>
+			</div>
+			<div class="card-body p-0">
+				<table class="table table-striped table-hover mb-0">
+					<thead class="table-light">
+						<tr>
+							<th>No.</th>
+							<th>交付率（%）</th>
+							<th>適用期間（FROM）</th>
+							<th>適用期間（TO）</th>
+							<th>状態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${historyList}">
+							<td th:text="${item.rno}"></td>
+							<td th:text="${item.kofuRitsu}"></td>
+							<td th:text="${item.tekiyoStYmd}"></td>
+							<td th:text="${item.tekiyoEdYmd}"></td>
+							<td>
+								<span th:if="${item.newFlg == 1}" class="badge bg-success">最新</span>
+								<span th:if="${item.newFlg != 1}" class="badge bg-secondary">過去</span>
+							</td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(historyList)}">
+							<td colspan="5" class="text-center text-muted py-3">データがありません</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
