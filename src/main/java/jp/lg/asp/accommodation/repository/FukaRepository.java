@@ -79,4 +79,20 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 	Optional<Fuka> findTopByJichitaiCdAndShiteiNoAndNendoAndNewFlgAndDelFlgOrderByRnoDesc(
 			String jichitaiCd, String shiteiNo, String nendo, String newFlg, String delFlg);
 
+	/**
+	 * 指定番号の taisho_ym 一覧を重複なし星順で取得
+	 */
+	@Query("""
+			SELECT DISTINCT f.taishoYm FROM Fuka f
+			WHERE f.jichitaiCd = :jichitaiCd
+			AND f.shiteiNo = :shiteiNo
+			AND f.newFlg = '1'
+			AND f.delFlg = '0'
+			AND f.taishoYm IS NOT NULL
+			ORDER BY f.taishoYm ASC
+			""")
+	List<String> findTaishoYmListByJichitaiCdAndShiteiNo(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo);
+
 }

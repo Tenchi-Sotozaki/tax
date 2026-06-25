@@ -186,6 +186,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 宿泊税更正・決定通知書ボタンのクリックイベント
+    const btnKosei = document.getElementById('btnReportKosei');
+    if (btnKosei) {
+        btnKosei.addEventListener('click', function() {
+            if (shiteiNo) {
+                const url = '/accommodation-tax/reports/koseiKetteiTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                window.location.href = url;
+            } else {
+                alert('指定番号が取得できませんでした。');
+            }
+        });
+    }
 });
 
 /**

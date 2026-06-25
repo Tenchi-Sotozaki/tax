@@ -110,6 +110,9 @@ public final class ScreenManagement {
 
 	// 合算申告納入承認通知書
 	public static final String GASSAN_NONYU_TSUCHI = "ms00000021";
+	
+	//　宿泊税更生・決定通知書
+	public static final String KOSEI_KETTEI_TSUCHI = "ms00000023";
 
 	// 交付率設定
 	public static final String KOFU_RITSU_CONFIG = "sc00000005";

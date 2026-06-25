@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>宿泊税更正・決定通知書</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<h2 class="mb-4">
+						<i class="bi bi-file-earmark-text text-primary me-2"></i>宿泊税更正・決定通知書
+					</h2>
+
+					<div id="appConfig"
+					     th:data-ctx-path="@{/}"
+					     th:data-taisho-ym-list="${taishoYmList}"
+					     style="display:none;">
+					</div>
+
+					<form id="koseiKetteiForm" method="post">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						<input type="hidden" name="shiteiNo" th:value="${dto.shitei_no}" />
+
+						<!-- 対象施設エリア -->
+						<div class="card mb-4">
+							<div class="card-header">
+								<h5 class="mb-0">対象施設</h5>
+							</div>
+							<div class="card-body">
+								<div class="row g-3">
+									<div class="col-md-6">
+										<label class="form-label">指定番号</label>
+										<input type="text" class="form-control" th:value="${dto.shitei_no}" readonly>
+									</div>
+									<div class="col-md-6">
+										<label class="form-label">施設名称</label>
+										<input type="text" class="form-control" th:value="${dto.shisetsu_name}" readonly>
+									</div>
+								</div>
+								<div class="row g-3 mt-2">
+									<div class="col-md-12">
+										<label class="form-label">施設住所</label>
+										<input type="text" class="form-control" th:value="${dto.shisetsu_jusho}" readonly>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- 対象月選択エリア -->
+						<div class="card mb-4">
+							<div class="card-header">
+								<h5 class="mb-0">対象月(3ヵ月間まで出力可能)</h5>
+							</div>
+							<div class="card-body">
+								<div class="row g-3 align-items-end">
+
+									<!-- 対象月１（必須） -->
+									<div class="col-md-3">
+										<label class="form-label fw-bold">
+											対象月１<span class="badge bg-danger ms-1">必須</span>
+										</label>
+										<select id="b1Ym" name="b1Ym" class="form-select" required>
+											<option value="">--- 選択してください ---</option>
+											<option th:each="ym : ${taishoYmList}"
+													th:value="${ym}"
+													th:text="${#strings.substring(ym,0,4) + '年' + #strings.substring(ym,4,6) + '月'}">
+											</option>
+										</select>
+									</div>
+
+									<!-- 対象月２（任意・チェックで有効化） -->
+									<div class="col-md-3" id="b2Container" style="display:none;">
+										<div class="form-check mb-1">
+											<input class="form-check-input" type="checkbox" id="b2Check" checked>
+											<label class="form-check-label fw-bold" for="b2Check">
+												対象月２をPDFに含める
+											</label>
+										</div>
+										<div class="form-control bg-light" id="b2YmBox">
+											<span id="b2YmDisplay" class="text-dark"></span>
+										</div>
+										<input type="hidden" id="b2Ym" name="b2Ym" />
+									</div>
+
+									<!-- 対象月３（任意・対象月２チェック時のみ選択可） -->
+									<div class="col-md-3" id="b3Container" style="display:none;">
+										<div class="form-check mb-1">
+											<input class="form-check-input" type="checkbox" id="b3Check" checked>
+											<label class="form-check-label fw-bold" for="b3Check">
+												対象月３をPDFに含める
+											</label>
+										</div>
+										<div class="form-control bg-light" id="b3YmBox">
+											<span id="b3YmDisplay" class="text-dark"></span>
+										</div>
+										<input type="hidden" id="b3Ym" name="b3Ym" />
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<!-- アクションボタン -->
+						<div class="d-flex gap-2">
+							<button type="button" class="btn btn-primary" onclick="generatePdf()">
+								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
+							</button>
+							<button type="button" class="btn btn-info" onclick="previewPdf()">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
+							<button type="button" class="btn btn-secondary" onclick="print()">
+								<i class="bi bi-printer me-1"></i> 印刷
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/kosei_kettei_tsuchi.js}"></script>
+	</th:block>
+</body>
+</html>
