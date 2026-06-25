@@ -152,7 +152,7 @@
 			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000020" x="24" y="142" width="120" height="15" fontSize="9.0" fontName="IPAex明朝">
 				<text><![CDATA[（特別徴収義務者）]]></text>
 			</element>
-			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000021" x="24" y="155" width="65" height="15" vTextAlign="Middle" fontName="IPAex明朝">
+			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000021" x="24" y="155" width="72" height="15" vTextAlign="Middle" fontName="IPAex明朝">
 				<text><![CDATA[住所（所在地）]]></text>
 			</element>
 			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000022" x="24" y="172" width="65" height="15" vTextAlign="Middle" fontName="IPAex明朝">

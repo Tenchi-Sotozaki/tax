@@ -46,12 +46,16 @@
 						<!-- 対象月選択エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">対象月</h5>
+								<h5 class="mb-0">対象月(3ヵ月間まで出力可能)</h5>
 							</div>
 							<div class="card-body">
-								<div class="row g-3 align-items-center">
+								<div class="row g-3 align-items-end">
+
+									<!-- 対象月１（必須） -->
 									<div class="col-md-3">
-										<label class="form-label">b1（必須）<span class="badge bg-danger ms-1">必須</span></label>
+										<label class="form-label fw-bold">
+											対象月１<span class="badge bg-danger ms-1">必須</span>
+										</label>
 										<select id="b1Ym" name="b1Ym" class="form-select" required>
 											<option value="">--- 選択してください ---</option>
 											<option th:each="ym : ${taishoYmList}"
@@ -60,22 +64,35 @@
 											</option>
 										</select>
 									</div>
-									<div class="col-md-3">
-										<label class="form-label">b2（自動）</label>
-										<div class="form-control bg-light">
-											<span id="b2YmDisplay" style="display:none;"></span>
-											<span id="b2YmEmpty" class="text-muted">-</span>
+
+									<!-- 対象月２（任意・チェックで有効化） -->
+									<div class="col-md-3" id="b2Container" style="display:none;">
+										<div class="form-check mb-1">
+											<input class="form-check-input" type="checkbox" id="b2Check" checked>
+											<label class="form-check-label fw-bold" for="b2Check">
+												対象月２をPDFに含める
+											</label>
+										</div>
+										<div class="form-control bg-light" id="b2YmBox">
+											<span id="b2YmDisplay" class="text-dark"></span>
 										</div>
 										<input type="hidden" id="b2Ym" name="b2Ym" />
 									</div>
-									<div class="col-md-3">
-										<label class="form-label">b3（自動）</label>
-										<div class="form-control bg-light">
-											<span id="b3YmDisplay" style="display:none;"></span>
-											<span id="b3YmEmpty" class="text-muted">-</span>
+
+									<!-- 対象月３（任意・対象月２チェック時のみ選択可） -->
+									<div class="col-md-3" id="b3Container" style="display:none;">
+										<div class="form-check mb-1">
+											<input class="form-check-input" type="checkbox" id="b3Check" checked>
+											<label class="form-check-label fw-bold" for="b3Check">
+												対象月３をPDFに含める
+											</label>
+										</div>
+										<div class="form-control bg-light" id="b3YmBox">
+											<span id="b3YmDisplay" class="text-dark"></span>
 										</div>
 										<input type="hidden" id="b3Ym" name="b3Ym" />
 									</div>
+
 								</div>
 							</div>
 						</div>
@@ -102,7 +119,7 @@
 
 			function generatePdf() {
 				if (!document.getElementById('b1Ym').value) {
-					alert('対象月（b1）を選択してください。');
+					alert('対象月１を選択してください。');
 					return;
 				}
 				const form = document.getElementById('koseiKetteiForm');
@@ -113,7 +130,7 @@
 
 			function previewPdf() {
 				if (!document.getElementById('b1Ym').value) {
-					alert('対象月（b1）を選択してください。');
+					alert('対象月１を選択してください。');
 					return;
 				}
 				const form = document.getElementById('koseiKetteiForm');
@@ -134,24 +151,77 @@
 				return `${ym.substring(0, 4)}年${ym.substring(4, 6)}月`;
 			}
 
+			/** b3の表示・値をb2チェック状態と連動して更新 */
+			function updateB3(b1, b2Checked) {
+				const b3Ym        = b1 ? addMonths(b1, 2) : '';
+				const b3Exists    = b3Ym && taishoYmList.includes(b3Ym);
+				const b3Container = document.getElementById('b3Container');
+				const b3Check     = document.getElementById('b3Check');
+				const b3Display   = document.getElementById('b3YmDisplay');
+				const b3Input     = document.getElementById('b3Ym');
+
+				if (b3Exists && b2Checked) {
+					// b2がONかつb3データあり → b3を表示・有効
+					b3Container.style.display = '';
+					b3Check.disabled  = false;
+					b3Display.textContent = toLabel(b3Ym);
+					if (b3Check.checked) {
+						b3Input.value = b3Ym;
+					}
+				} else {
+					// b2がOFF または b3データなし → b3を非表示
+					b3Container.style.display = 'none';
+					b3Check.checked  = false;
+					b3Input.value    = '';
+				}
+			}
+
+			/** 対象月１変更時 */
 			document.getElementById('b1Ym').addEventListener('change', function () {
 				const b1 = this.value;
-				['b2', 'b3'].forEach((id, i) => {
-					const disp  = document.getElementById(id + 'YmDisplay');
-					const empty = document.getElementById(id + 'YmEmpty');
-					const inp   = document.getElementById(id + 'Ym');
-					if (b1 && taishoYmList.includes(addMonths(b1, i + 1))) {
-						const ym       = addMonths(b1, i + 1);
-						inp.value      = ym;
-						disp.textContent   = toLabel(ym) + '（自動）';
-						disp.style.display = '';
-						empty.style.display = 'none';
-					} else {
-						inp.value          = '';
-						disp.style.display = 'none';
-						empty.style.display = '';
-					}
-				});
+
+				// b2処理
+				const b2Ym        = b1 ? addMonths(b1, 1) : '';
+				const b2Exists    = b2Ym && taishoYmList.includes(b2Ym);
+				const b2Container = document.getElementById('b2Container');
+				const b2Check     = document.getElementById('b2Check');
+				const b2Display   = document.getElementById('b2YmDisplay');
+				const b2Input     = document.getElementById('b2Ym');
+
+				if (b2Exists) {
+					b2Container.style.display = '';
+					b2Check.checked       = true;
+					b2Display.textContent = toLabel(b2Ym);
+					b2Input.value         = b2Ym;
+				} else {
+					b2Container.style.display = 'none';
+					b2Check.checked  = false;
+					b2Input.value    = '';
+				}
+
+				// b3処理
+				updateB3(b1, b2Exists && b2Check.checked);
+			});
+
+			/** 対象月２チェック変更時 */
+			document.getElementById('b2Check').addEventListener('change', function () {
+				const b1     = document.getElementById('b1Ym').value;
+				const b2Ym   = addMonths(b1, 1);
+				const b2Input = document.getElementById('b2Ym');
+
+				b2Input.value = this.checked ? b2Ym : '';
+
+				// b2OFFならb3も連動してOFF・非表示
+				updateB3(b1, this.checked);
+			});
+
+			/** 対象月３チェック変更時 */
+			document.getElementById('b3Check').addEventListener('change', function () {
+				const b1     = document.getElementById('b1Ym').value;
+				const b3Ym   = addMonths(b1, 2);
+				const b3Input = document.getElementById('b3Ym');
+
+				b3Input.value = this.checked ? b3Ym : '';
 			});
 		</script>
 	</th:block>
