@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -22,10 +24,12 @@ import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
+@Slf4j // ★追加
 public class AdminUserController {
 
 	private final UserRepository userRepository;
@@ -39,6 +43,7 @@ public class AdminUserController {
 	private static final String SCREEN_ID = ScreenManagement.USER_MANAGEMENT;
 	private static final String LIST_VIEW = "admin/userDaicho";
 	private static final String FORM_VIEW = "admin/userConfig";
+	private static final BigDecimal ADMIN_ROLE_ID = BigDecimal.ONE;
 
 	@GetMapping("/user-search")
 	public String list(@ModelAttribute UserSearchForm searchForm, Model model) {
@@ -54,10 +59,13 @@ public class AdminUserController {
 
 	@GetMapping("/user-registration")
 	public String showRegistrationForm(Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		if (!isInitialSetup()) {
+			accessChecker.checkAccess(SCREEN_ID);
+		}
 		model.addAttribute("userForm", new UserForm());
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", false);
+		model.addAttribute("isInitialSetup", isInitialSetup()); // ★追加
 		return FORM_VIEW;
 	}
 
@@ -67,7 +75,13 @@ public class AdminUserController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+
+		boolean initialSetup = isInitialSetup(); // ★追加
+
+
+		if (!initialSetup) {
+			accessChecker.checkAccess(SCREEN_ID);
+		}
 
 		if (!form.getPassword().equals(form.getPasswordConfirm())) {
 			bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
@@ -75,6 +89,7 @@ public class AdminUserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", false);
+			model.addAttribute("isInitialSetup", initialSetup); // ★追加
 			return FORM_VIEW;
 		}
 
@@ -89,11 +104,18 @@ public class AdminUserController {
 		user.setName(form.getName());
 		user.setNameKana(form.getNameKana());
 		user.setBusho(form.getBusho());
-		user.setRoleId(form.getRoleId());
+		
+		if (initialSetup) {
+			user.setRoleId(ADMIN_ROLE_ID);
+			log.info("初期セットアップ: 管理者ロール（roleId={}）を付与: userId={}", ADMIN_ROLE_ID, form.getId());
+		} else {
+			user.setRoleId(form.getRoleId());
+		}
+
 		userRepository.save(user);
 
 		redirectAttributes.addFlashAttribute("successMessage", isNew ? "ユーザーを登録しました。" : "ユーザー情報を更新しました。");
-		return "redirect:/admin/user-search";
+		return initialSetup ? "redirect:/login" : "redirect:/admin/user-search";
 	}
 
 	@GetMapping("/user-edit/{id}")
@@ -145,7 +167,7 @@ public class AdminUserController {
 		}
 
 		user.setName(form.getName());
-		user.setNameKana(form.getNameKana());
+		user.setNameKana(user.getNameKana());
 		user.setBusho(form.getBusho());
 		user.setRoleId(form.getRoleId());
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {
@@ -163,6 +185,10 @@ public class AdminUserController {
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
 		return "redirect:/admin/user-search";
+	}
+
+	private boolean isInitialSetup() {
+		return userRepository.countByJichitaiCd(jichitaiCd) == 0;
 	}
 
 	private UserId buildUserId(String id) {

@@ -21,6 +21,8 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						// 静的リソース・ログインは誰でもアクセス可
 						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**", "/login", "/*.html").permitAll()
+						// 初期セットアップ用ユーザー登録を未認証で許可
+						.requestMatchers("/admin/user-registration").permitAll()
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可
@@ -52,13 +54,12 @@ public class SecurityConfig {
 				.password(encoder.encode("admin123"))
 				.roles("ADMIN")
 				.build();
-
 		var user = User.builder()
 				.username("user")
 				.password(encoder.encode("user123"))
 				.roles("USER")
 				.build();
-
+		
 		return new InMemoryUserDetailsManager(admin, user);
 	}
 
