@@ -112,5 +112,5 @@ public final class ScreenManagement {
 	public static final String GASSAN_NONYU_TSUCHI = "ms00000021";
 
 	// 交付率設定
-	public static final String KOFU_RITSU_CONFIG = "KOFU_RITSU";
+	public static final String KOFU_RITSU_CONFIG = "sc00000005";
 }
