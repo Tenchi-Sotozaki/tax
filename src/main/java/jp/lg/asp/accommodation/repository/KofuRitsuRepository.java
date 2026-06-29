@@ -23,4 +23,7 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 
 	@Query("SELECT COALESCE(MAX(k.rno), 0) + 1 FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd")
 	BigDecimal findNextRno(@Param("jichitaiCd") String jichitaiCd);
+	
+	@Query("SELECT k.kofuRitsu FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd")
+	BigDecimal findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 }

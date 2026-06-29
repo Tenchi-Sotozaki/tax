@@ -18,6 +18,7 @@ import jp.lg.asp.accommodation.entity.ShoreikinId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
+import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.ShoreikinConfigService;
@@ -37,12 +38,10 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
 	private final FukaRepository fukaRepository;
+	private final KofuRitsuRepository kofuRitsuRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
-
-	@Value("${app.kofukin.rate:3.00}")
-	private BigDecimal defaultKofuRitsu;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -86,13 +85,13 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				// 新規登録モード
 				dto.setExists(false);
 				dto.setMode("create");
-				dto.setKofuRitsu(defaultKofuRitsu);
+				dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd));
 			}
 		} else {
 			// 新規登録モード
 			dto.setExists(false);
 			dto.setMode("create");
-			dto.setKofuRitsu(defaultKofuRitsu);
+			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd));
 		}
 
 		return dto;
@@ -162,7 +161,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 
 		// デフォルト交付率を設定
 		if (dto.getKofuRitsu() == null) {
-			dto.setKofuRitsu(defaultKofuRitsu);
+			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd));
 		}
 
 		// 交付額を算出（納入税額 × 交付率 ÷ 100）
