@@ -117,7 +117,7 @@ function validateForm() {
         return false;
     }
 
-    if (!riyu.trim()) {
+    if (shonin.value === '不承認' && !riyu.trim()) {
         alert('不承認理由を入力してください。');
         document.getElementById('riyu').focus();
         return false;
@@ -134,5 +134,23 @@ document.addEventListener('DOMContentLoaded', function() {
             String(today.getMonth() + 1).padStart(2, '0') + '-' +
             String(today.getDate()).padStart(2, '0');
         hakkoYmdInput.value = formattedDate;
+    }
+
+    // 不承認選択時のみ理由欄を表示
+    const shoninRadios = document.querySelectorAll('input[name="shonin"]');
+    const riyuArea = document.getElementById('riyuArea');
+    shoninRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            riyuArea.style.display = this.value === '不承認' ? '' : 'none';
+            if (this.value !== '不承認') {
+                document.getElementById('riyu').value = '';
+            }
+        });
+    });
+
+    // 初期表示時に不承認が選択済みの場合は表示
+    const checkedShonin = document.querySelector('input[name="shonin"]:checked');
+    if (checkedShonin && checkedShonin.value === '不承認') {
+        riyuArea.style.display = '';
     }
 });
