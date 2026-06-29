@@ -148,7 +148,7 @@
     box-shadow: 0 0 0 0.2rem rgba(53, 152, 197, 0.18);
 }
 
-.bg-primary {
+.card-header {
     background-color: var(--acomo-light-blue) !important;
     color: #212529 !important;
 }
