@@ -5,6 +5,7 @@
 // -----------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
+    initSmoothScroll();
 });
 
 // -----------------------------------------------------------------------
@@ -280,4 +281,26 @@ function setValue(id, value) {
     if (element && !element.readOnly) {
         element.value = value;
     }
+}
+
+// -----------------------------------------------------------------------
+// スムーズスクロール（フロートヘッダーの高さを考慮）
+// -----------------------------------------------------------------------
+function initSmoothScroll() {
+    const scrollContainer = document.querySelector('main.overflow-auto');
+    if (!scrollContainer) return;
+
+    document.querySelectorAll('.sticky-top a[href^="#"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (!target) return;
+            const header = document.querySelector('.sticky-top');
+            const headerBottom = header.getBoundingClientRect().bottom;
+            const containerTop = scrollContainer.getBoundingClientRect().top;
+            const targetTop = target.getBoundingClientRect().top;
+            const offset = targetTop - headerBottom;
+            scrollContainer.scrollBy({ top: offset, behavior: 'smooth' });
+        });
+    });
 }
