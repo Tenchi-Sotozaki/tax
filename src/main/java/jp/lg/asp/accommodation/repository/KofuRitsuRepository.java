@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,9 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 	@Query("SELECT COALESCE(MAX(k.rno), 0) + 1 FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd")
 	BigDecimal findNextRno(@Param("jichitaiCd") String jichitaiCd);
 	
-	@Query("SELECT k.kofuRitsu FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd")
-	BigDecimal findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+	@Query("SELECT k.kofuRitsu FROM KofuRitsu k " +
+		       "WHERE k.jichitaiCd = :jichitaiCd " +
+		       "AND k.tekiyoStYmd <= :nendoMatsubi " +
+		       "AND (k.tekiyoEdYmd IS NULL OR k.tekiyoEdYmd >= :nendoMatsubi)")
+	BigDecimal findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendoMatsubi") LocalDate nendoMatsubi);
 }

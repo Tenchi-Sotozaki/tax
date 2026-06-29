@@ -2,6 +2,7 @@ package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,13 +86,20 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				// 新規登録モード
 				dto.setExists(false);
 				dto.setMode("create");
-				dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd));
+				
+				// 入力された年度から年度末年月日を計算
+				LocalDate nendoMatsubi = LocalDate.of(Integer.parseInt(nendo) + 1, 3, 31);
+				
+				// 交付率を取得して設定
+				dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, nendoMatsubi));
 			}
 		} else {
 			// 新規登録モード
 			dto.setExists(false);
 			dto.setMode("create");
-			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd));
+			
+			// 交付率を取得して設定 ( 処理日を指定 )
+			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
 		}
 
 		return dto;
@@ -161,7 +169,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 
 		// デフォルト交付率を設定
 		if (dto.getKofuRitsu() == null) {
-			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd));
+			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
 		}
 
 		// 交付額を算出（納入税額 × 交付率 ÷ 100）

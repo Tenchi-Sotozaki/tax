@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.time.LocalDate;
+
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -41,8 +43,15 @@ public class ShoreikinBulkController {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
+		
+		// 年度を設定
 		dto.setNendo(nendo);
-		dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd));
+		
+		// 入力された年度から年度末年月日を計算
+		LocalDate nendoMatsubi = LocalDate.of(Integer.parseInt(nendo) + 1, 3, 31);
+		
+		// 交付率を取得して設定
+		dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, nendoMatsubi));
 
 		model.addAttribute("bulkForm", dto);
 		return BULK_VIEW;
