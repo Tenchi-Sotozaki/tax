@@ -14,10 +14,10 @@
 		<!-- ページヘッダー -->
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h2 class="h2">
+			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-sliders me-2 text-primary"></i> <span
 					th:text="${isView} ? '賦課方式設定照会' : (${isEdit} ? '賦課方式設定編集' : '賦課方式設定登録')"></span>
-			</h2>
+			</h5>
 		</div>
 
 		<div th:if="${successMessage}"
