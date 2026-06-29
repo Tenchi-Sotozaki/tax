@@ -67,7 +67,7 @@ public class NozeiShukiController {
 		NozeiShuki nozeiShuki = nozeiShukiService.findBySeq(seq);
 		if (nozeiShuki == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "指定されたデータが見つかりません。");
-			return "redirect:/admin/nozei-shuki";
+			return "redirect:/admin/nozei-shuki/list";
 		}
 
 		model.addAttribute("nozeiShuki", nozeiShuki);
@@ -110,6 +110,6 @@ public class NozeiShukiController {
 			redirectAttributes.addFlashAttribute("errorMessage", "削除に失敗しました: " + e.getMessage());
 		}
 
-		return "redirect:/admin/nozei-shuki";
+		return "redirect:/admin/nozei-shuki/list";
 	}
 }
