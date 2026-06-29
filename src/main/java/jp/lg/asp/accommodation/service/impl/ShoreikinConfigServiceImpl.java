@@ -73,38 +73,49 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 			Optional<Shoreikin> shoreikinOpt = shoreikinRepository.findById(id);
 
 			if (shoreikinOpt.isPresent()) {
-				// 既存データがある場合（照会モード）
-				Shoreikin shoreikin = shoreikinOpt.get();
-				dto.setKofuZeigaku(shoreikin.getKofuZeigaku());
-				dto.setKofuRitsu(shoreikin.getKofuRitsu());
-				dto.setKofuGaku(shoreikin.getKofuGaku());
-				dto.setKofuYmd(shoreikin.getKofuYmd());
-				dto.setVersion(shoreikin.getVersion());
-				dto.setExists(true);
-				dto.setMode("view");
-			} else {
-				// 新規登録モード
-				dto.setExists(false);
-				dto.setMode("create");
-				
-				// 入力された年度から年度末年月日を計算
-				LocalDate nendoMatsubi = LocalDate.of(Integer.parseInt(nendo) + 1, 3, 31);
-				
-				// 交付率を取得して設定
-				dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, nendoMatsubi));
-			}
+	            // 既存データがある場合（照会モード）
+	            Shoreikin shoreikin = shoreikinOpt.get();
+	            dto.setKofuZeigaku(shoreikin.getKofuZeigaku());
+	            dto.setKofuRitsu(shoreikin.getKofuRitsu());
+	            dto.setKofuGaku(shoreikin.getKofuGaku());
+	            dto.setKofuYmd(shoreikin.getKofuYmd());
+	            dto.setVersion(shoreikin.getVersion());
+	            dto.setExists(true);
+	            dto.setMode("view");
+	        } else {
+	            // 新規登録モード
+	            dto.setExists(false);
+	            dto.setMode("create");
+	            
+	            
+	            LocalDate nendoMatsubi = LocalDate.now();
+	            
+	            // 年度が半角4桁の数字で構成されている
+	            if (nendo.matches("^\\d{4}$")) {
+	            		// 入力された年度から年度末年月日を計算
+		            nendoMatsubi = LocalDate.of(Integer.parseInt(nendo) + 1, 3, 31);
+	            }
+	            
+	            // 交付率を取得して設定
+	            dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, nendoMatsubi));
+	        }
 		} else {
 			// 新規登録モード
-			dto.setExists(false);
-			dto.setMode("create");
-			
-			// 交付率を取得して設定 ( 処理日を指定 )
-			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
+	        dto.setExists(false);
+	        dto.setMode("create");
+	        
+	        // nendoが空の場合、処理日から現在の年度を計算してDTOに設定
+	        LocalDate today = LocalDate.now();
+	        int currentNendo = (today.getMonthValue() >= 4) ? today.getYear() : today.getYear() - 1;
+	        dto.setNendo(String.valueOf(currentNendo));
+	        
+	        // 交付率を取得して設定 ( 処理日を指定 )
+	        dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today));
 		}
 
 		return dto;
 	}
-
+	
 	@Override
 	@Transactional
 	public ShoreikinConfigDto createShoreikin(ShoreikinConfigDto dto) {
