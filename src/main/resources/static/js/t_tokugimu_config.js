@@ -212,67 +212,67 @@ function initCopyCheckboxes() {
 }
 
 function copyTokugimuInfoToFacility(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('facilityAddressNo', tokugimuAddressNo);
-    setValue('facilityAddress', tokugimuAddress);
-    setValue('facilityName', name);
-    setValue('facilityNameKana', nameKana);
-    setValue('facilityPhone', tokugimuPhone);
+    if (enabled) {
+        setValue('facilityAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('facilityAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('facilityName', document.getElementById('name')?.value || '');
+        setValue('facilityNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('facilityPhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('facilityAddressNo', '');
+        setValue('facilityAddress', '');
+        setValue('facilityName', '');
+        setValue('facilityNameKana', '');
+        setValue('facilityPhone', '');
+    }
 }
 
 function copyTokugimuInfoToLicense(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('licenseAddressNo', tokugimuAddressNo);
-    setValue('licenseAddress', tokugimuAddress);
-    setValue('licenseName', name);
-    setValue('licenseNameKana', nameKana);
-    setValue('licensePhone', tokugimuPhone);
+    if (enabled) {
+        setValue('licenseAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('licenseAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('licenseName', document.getElementById('name')?.value || '');
+        setValue('licenseNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('licensePhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('licenseAddressNo', '');
+        setValue('licenseAddress', '');
+        setValue('licenseName', '');
+        setValue('licenseNameKana', '');
+        setValue('licensePhone', '');
+    }
 }
 
 function copyTokugimuInfoToOwner(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('ownerAddressNo', tokugimuAddressNo);
-    setValue('ownerAddress', tokugimuAddress);
-    setValue('ownerName', name);
-    setValue('ownerNameKana', nameKana);
-    setValue('ownerPhone', tokugimuPhone);
+    if (enabled) {
+        setValue('ownerAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('ownerAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('ownerName', document.getElementById('name')?.value || '');
+        setValue('ownerNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('ownerPhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('ownerAddressNo', '');
+        setValue('ownerAddress', '');
+        setValue('ownerName', '');
+        setValue('ownerNameKana', '');
+        setValue('ownerPhone', '');
+    }
 }
 
 function copyTokugimuInfoToMail(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('mailAddressNo', tokugimuAddressNo);
-    setValue('mailAddress', tokugimuAddress);
-    setValue('mailName', name);
-    setValue('mailNameKana', nameKana);
-    setValue('mailPhone', tokugimuPhone);
+    if (enabled) {
+        setValue('mailAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('mailAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('mailName', document.getElementById('name')?.value || '');
+        setValue('mailNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('mailPhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('mailAddressNo', '');
+        setValue('mailAddress', '');
+        setValue('mailName', '');
+        setValue('mailNameKana', '');
+        setValue('mailPhone', '');
+    }
 }
 
 function setValue(id, value) {
