@@ -73,7 +73,6 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 			Optional<Shoreikin> shoreikinOpt = shoreikinRepository.findById(id);
 
 			if (shoreikinOpt.isPresent()) {
-
 				// 既存データがある場合（照会モード）
 				Shoreikin shoreikin = shoreikinOpt.get();
 				dto.setKofuZeigaku(shoreikin.getKofuZeigaku());
