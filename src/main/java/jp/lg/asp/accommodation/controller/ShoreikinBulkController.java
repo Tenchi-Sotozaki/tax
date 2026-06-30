@@ -43,15 +43,12 @@ public class ShoreikinBulkController {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
-		
-		// 年度を設定
-		dto.setNendo(nendo);
-		
-		// 入力された年度から年度末年月日を計算
-		LocalDate nendoMatsubi = LocalDate.of(Integer.parseInt(nendo) + 1, 3, 31);
-		
-		// 交付率を取得して設定
-		dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, nendoMatsubi));
+	   
+	    // 決定した年度を設定
+	    dto.setNendo(nendo);
+	    
+	    // 交付率を取得して設定
+	    dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
 
 		model.addAttribute("bulkForm", dto);
 		return BULK_VIEW;
@@ -71,7 +68,7 @@ public class ShoreikinBulkController {
 		try {
 			ShoreikinBulkDto result = shoreikinBulkService.executeBulkSanshutsu(bulkForm);
 			model.addAttribute("bulkForm", result);
-
+			
 			if (result.getFailureCount() == 0) {
 				model.addAttribute("successMessage", result.getResultMessage());
 			} else {
