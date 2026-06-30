@@ -68,7 +68,6 @@ public class ShoreikinBulkController {
 		try {
 			ShoreikinBulkDto result = shoreikinBulkService.executeBulkSanshutsu(bulkForm);
 			model.addAttribute("bulkForm", result);
-			
 			if (result.getFailureCount() == 0) {
 				model.addAttribute("successMessage", result.getResultMessage());
 			} else {
