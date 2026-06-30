@@ -47,7 +47,6 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	@Override
 	@Transactional(readOnly = true)
 	public ShoreikinConfigDto getShoreikin(String shiteiNo, String nendo) {
-		
 		ShoreikinConfigDto dto = new ShoreikinConfigDto();
 		dto.setShiteiNo(shiteiNo);
 		dto.setNendo(nendo);
@@ -74,7 +73,6 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 			Optional<Shoreikin> shoreikinOpt = shoreikinRepository.findById(id);
 
 			if (shoreikinOpt.isPresent()) {
-
 				// 既存データがある場合（照会モード）
 				Shoreikin shoreikin = shoreikinOpt.get();
 				dto.setKofuZeigaku(shoreikin.getKofuZeigaku());
@@ -84,9 +82,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				dto.setVersion(shoreikin.getVersion());
 				dto.setExists(true);
 				dto.setMode("view");
-
 			} else {
-
 				// 新規登録モード
 				dto.setExists(false);
 				dto.setMode("create");
