@@ -1,168 +1,172 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
 <head>
-    <title>特別徴収事務交付金一括算出</title>
+	<title>特別徴収事務交付金一括算出</title>
 </head>
+
 <body>
-    <div layout:fragment="content">
-        <div class="container-fluid p-4">
-            <h2 class="mb-4">特別徴収事務交付金一括算出</h2>
+	<div layout:fragment="content">
+		<div class="container-fluid p-4">
+			<div
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+				<h5 class="mb-0 fw-bold text-dark">特別徴収事務交付金一括算出</h5>
+			</div>
 
-            <!-- 成功・警告・エラーメッセージ -->
-            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <span th:text="${successMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <div th:if="${warningMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
-                <span th:text="${warningMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+			<!-- 成功・警告・エラーメッセージ -->
+			<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+				<span th:text="${successMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${warningMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
+				<span th:text="${warningMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+				<span th:text="${errorMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
 
-            <!-- 対象条件エリア -->
-            <form th:action="@{/shoreikin/bulk/execute}" th:object="${bulkForm}" method="post">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">対象条件</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <!-- 交付金年度 -->
-                            <div class="col-md-3">
-                                <label for="nendo" class="form-label">交付金年度 <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="nendo" th:field="*{nendo}" 
-                                       th:classappend="${#fields.hasErrors('nendo')} ? 'is-invalid' : ''"
-                                       maxlength="4" pattern="[0-9]{4}" title="4桁の数字で入力してください" 
-                                       required placeholder="例：2026">
-                                <div th:if="${#fields.hasErrors('nendo')}" class="invalid-feedback">
-                                    <span th:errors="*{nendo}"></span>
-                                </div>
-                            </div>
+			<!-- 対象条件エリア -->
+			<form th:action="@{/shoreikin/bulk/execute}" th:object="${bulkForm}" method="post">
+				<div class="card mb-4">
+					<div class="card-header">
+						<h5 class="mb-0">対象条件</h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<!-- 交付金年度 -->
+							<div class="col-md-3">
+								<label for="nendo" class="form-label">交付金年度 <span class="text-danger">*</span></label>
+								<input type="text" class="form-control" id="nendo" th:field="*{nendo}"
+									th:classappend="${#fields.hasErrors('nendo')} ? 'is-invalid' : ''" maxlength="4"
+									pattern="[0-9]{4}" title="4桁の数字で入力してください" required placeholder="例：2026">
+								<div th:if="${#fields.hasErrors('nendo')}" class="invalid-feedback">
+									<span th:errors="*{nendo}"></span>
+								</div>
+							</div>
 
-                            <!-- 交付率 -->
-                            <div class="col-md-3">
-                                <label for="kofuRitsu" class="form-label">交付率 <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="kofuRitsu" th:field="*{kofuRitsu}"
-                                           th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
-                                           step="0.01" min="0" max="99999.99" required>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                <div th:if="${#fields.hasErrors('kofuRitsu')}" class="invalid-feedback">
-                                    <span th:errors="*{kofuRitsu}"></span>
-                                </div>
-                            </div>
+							<!-- 交付率 -->
+							<div class="col-md-3">
+								<label for="kofuRitsu" class="form-label">交付率 <span class="text-danger">*</span></label>
+								<div class="input-group">
+									<input type="number" class="form-control" id="kofuRitsu" th:field="*{kofuRitsu}"
+										th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
+										step="0.01" min="0" max="99999.99" required>
+									<span class="input-group-text">%</span>
+								</div>
+								<div th:if="${#fields.hasErrors('kofuRitsu')}" class="invalid-feedback">
+									<span th:errors="*{kofuRitsu}"></span>
+								</div>
+							</div>
 
-                            <!-- 算出済みを含む -->
-                            <div class="col-md-3">
-                                <label class="form-label">&nbsp;</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="includeCalculated" 
-                                           th:field="*{includeCalculated}">
-                                    <label class="form-check-label" for="includeCalculated">
-                                        算出済みを含む
-                                    </label>
-                                </div>
-                            </div>
+							<!-- 算出済みを含む -->
+							<div class="col-md-3">
+								<label class="form-label">&nbsp;</label>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox" id="includeCalculated"
+										th:field="*{includeCalculated}">
+									<label class="form-check-label" for="includeCalculated">
+										算出済みを含む
+									</label>
+								</div>
+							</div>
 
-                        </div>
+						</div>
 
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary me-2"
-                                        onclick="return confirm('交付金を一括算出しますか？')">
-                                    <i class="bi bi-calculator"></i> 一括算出実行
-                                </button>
-                                <a th:href="@{/shoreikin/list}" class="btn btn-secondary">
-                                    <i class="bi bi-arrow-left"></i> 戻る
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
+						<div class="row mt-3">
+							<div class="col-12">
+								<button type="submit" class="btn btn-primary me-2"
+									onclick="return confirm('交付金を一括算出しますか？')">
+									<i class="bi bi-calculator"></i> 一括算出実行
+								</button>
+								<a th:href="@{/shoreikin/list}" class="btn btn-secondary">
+									<i class="bi bi-arrow-left"></i> 戻る
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
 
-            <!-- 処理結果エリア -->
-            <div th:if="${bulkForm.executed}" class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">処理結果</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="card text-center bg-light">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">対象件数</h6>
-                                    <h4 class="card-text text-info" th:text="${bulkForm.targetCount}">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center bg-light">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">スキップ件数</h6>
-                                    <h4 class="card-text text-warning" th:text="${bulkForm.skipCount}">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center bg-light">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">成功件数</h6>
-                                    <h4 class="card-text text-success" th:text="${bulkForm.successCount}">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-center bg-light">
-                                <div class="card-body">
-                                    <h6 class="card-title text-muted">失敗件数</h6>
-                                    <h4 class="card-text text-danger" th:text="${bulkForm.failureCount}">0</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+			<!-- 処理結果エリア -->
+			<div th:if="${bulkForm.executed}" class="card">
+				<div class="card-header">
+					<h5 class="mb-0">処理結果</h5>
+				</div>
+				<div class="card-body">
+					<div class="row g-3">
+						<div class="col-md-3">
+							<div class="card text-center bg-light">
+								<div class="card-body">
+									<h6 class="card-title text-muted">対象件数</h6>
+									<h4 class="card-text text-info" th:text="${bulkForm.targetCount}">0</h4>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="card text-center bg-light">
+								<div class="card-body">
+									<h6 class="card-title text-muted">スキップ件数</h6>
+									<h4 class="card-text text-warning" th:text="${bulkForm.skipCount}">0</h4>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="card text-center bg-light">
+								<div class="card-body">
+									<h6 class="card-title text-muted">成功件数</h6>
+									<h4 class="card-text text-success" th:text="${bulkForm.successCount}">0</h4>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-3">
+							<div class="card text-center bg-light">
+								<div class="card-body">
+									<h6 class="card-title text-muted">失敗件数</h6>
+									<h4 class="card-text text-danger" th:text="${bulkForm.failureCount}">0</h4>
+								</div>
+							</div>
+						</div>
+					</div>
 
-                    <div class="mt-3">
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <span th:text="${bulkForm.resultMessage}"></span>
-                        </div>
-                    </div>
+					<div class="mt-3">
+						<div class="alert alert-info">
+							<i class="bi bi-info-circle me-2"></i>
+							<span th:text="${bulkForm.resultMessage}"></span>
+						</div>
+					</div>
 
-                    <div class="mt-3">
-                        <a th:href="@{/shoreikin/list}" class="btn btn-success">
-                            <i class="bi bi-list-ul"></i> 交付金一覧に戻る
-                        </a>
-                    </div>
-                </div>
-            </div>
+					<div class="mt-3">
+						<a th:href="@{/shoreikin/list}" class="btn btn-success">
+							<i class="bi bi-list-ul"></i> 交付金一覧に戻る
+						</a>
+					</div>
+				</div>
+			</div>
 
-            <!-- 注意事項 -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h6 class="mb-0 text-warning">
-                        <i class="bi bi-exclamation-triangle me-2"></i>注意事項
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <ul class="mb-0 small text-muted">
-                        <li>指定した年度の賦課情報を基に、特別徴収義務者ごとの交付金を算出します。</li>
-                        <li>既に交付金が算出済みの特別徴収義務者を対象にするには算出済みを含むにチェックを入れてください。</li>
-                        <li>処理には時間がかかる場合があります。実行後はしばらくお待ちください。</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+			<!-- 注意事項 -->
+			<div class="card mt-4">
+				<div class="card-header">
+					<h6 class="mb-0 text-warning">
+						<i class="bi bi-exclamation-triangle me-2"></i>注意事項
+					</h6>
+				</div>
+				<div class="card-body">
+					<ul class="mb-0 small text-muted">
+						<li>指定した年度の賦課情報を基に、特別徴収義務者ごとの交付金を算出します。</li>
+						<li>既に交付金が算出済みの特別徴収義務者を対象にするには算出済みを含むにチェックを入れてください。</li>
+						<li>処理には時間がかかる場合があります。実行後はしばらくお待ちください。</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <th:block layout:fragment="scripts">
-        <script th:src="@{/js/shoreikinBulk.js}"></script>
-    </th:block>
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/shoreikinBulk.js}"></script>
+	</th:block>
 </body>
+
 </html>
