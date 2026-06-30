@@ -43,12 +43,12 @@ public class ShoreikinBulkController {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
-	   
-	    // 決定した年度を設定
-	    dto.setNendo(nendo);
-	    
-	    // 交付率を取得して設定
-	    dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
+
+		// 決定した年度を設定
+		dto.setNendo(nendo);
+
+		// 交付率を取得して設定
+		dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
 
 		model.addAttribute("bulkForm", dto);
 		return BULK_VIEW;
