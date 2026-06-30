@@ -37,7 +37,6 @@ public class ShoreikinBulkServiceImpl implements ShoreikinBulkService {
 			dto.setResultMessage("交付金年度が指定されていません");
 			return dto;
 		}
-		
 		// 賦課情報がある特別徴収義務者を取得
 		List<Fuka> fukaList = fukaRepository
 				.findByJichitaiCdAndNendoAndNewFlgAndDelFlg(jichitaiCd, dto.getNendo(), "1", "0");
