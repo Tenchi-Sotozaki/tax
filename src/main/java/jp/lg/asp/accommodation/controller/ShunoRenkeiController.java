@@ -110,7 +110,7 @@ public class ShunoRenkeiController {
 					r.getKibetsu() != null ? String.valueOf(r.getKibetsu()) : "",
 					r.getTorokuYmd() != null ? r.getTorokuYmd().toString() : "",
 					r.getShinkokuYmd() != null ? r.getShinkokuYmd().toString() : "",
-					r.getTaishoYm() != null ? r.getTaishoYm() : "",
+					r.getTaishoYm() != null ? formatTaishoYm(r.getTaishoYm()) : "",
 					r.getTotalZeigaku() != null ? String.valueOf(r.getTotalZeigaku()) : "",
 					r.getCityZeigaku() != null ? String.valueOf(r.getCityZeigaku()) : "",
 					r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "",
@@ -160,6 +160,17 @@ public class ShunoRenkeiController {
 			model.addAttribute("rows", java.util.Collections.emptyList());
 			return "renkei/shunoRenkeiKakunin";
 		}
+	}
+
+	private String formatTaishoYm(String taishoYm) {
+		if (taishoYm == null || taishoYm.isEmpty()) {
+			return "";
+		}
+		String[] parts = taishoYm.split("-");
+		if (parts.length == 2) {
+			return parts[0] + "年" + parts[1] + "月";
+		}
+		return taishoYm;
 	}
 
 	private String convertKasanKbn(String kasanKbn) {
