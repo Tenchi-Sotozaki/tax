@@ -86,7 +86,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				// 新規登録モード
 				dto.setExists(false);
 				dto.setMode("create");
-				
+
 				LocalDate today = LocalDate.now();
 				dto.setNendo(String.valueOf(today.getYear()));
 
