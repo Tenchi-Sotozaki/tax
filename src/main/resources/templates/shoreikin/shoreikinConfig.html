@@ -49,30 +49,6 @@
 					type="hidden" th:field="*{mode}"> <input type="hidden"
 					th:field="*{version}">
 
-				<!-- 特別徴収義務者エリア -->
-				<div class="card mb-4">
-					<div class="card-header">
-						<h5 class="mb-0">特別徴収義務者情報</h5>
-					</div>
-					<div class="card-body">
-						<div class="row g-3">
-							<div class="col-md-4">
-								<label class="form-label">指定番号</label> <input type="text"
-									class="form-control" th:value="${configForm.shiteiNo}" readonly>
-							</div>
-							<div class="col-md-4">
-								<label class="form-label">施設名称</label> <input type="text"
-									class="form-control" th:value="${configForm.shisetsuName}"
-									readonly>
-							</div>
-							<div class="col-md-4">
-								<label class="form-label">氏名</label> <input type="text"
-									class="form-control" th:value="${configForm.name}" readonly>
-							</div>
-						</div>
-					</div>
-				</div>
-
 				<!-- 交付金情報エリア -->
 				<div class="card mb-4">
 					<div class="card-header">
