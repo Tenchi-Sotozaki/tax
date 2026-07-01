@@ -145,17 +145,16 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 	public List<ShunoDto> findByKeys(String jichitaiCd, List<ShunoDto.Key> keys) {
 		List<ShunoDto> result = new ArrayList<>();
 		for (ShunoDto.Key k : keys) {
-			fukaRepository
-					.findByJichitaiCdAndShiteiNoAndNendoAndKibetsu(jichitaiCd, k.getShiteiNo(), k.getNendo(),
-							k.getKibetsu())
-					.ifPresent(f -> {
-						// Tokugimu情報を取得してDTOを作成
-						List<Tokugimu> toks = tokugimuRepository.findByJichitaiCdAndShiteiNo(f.getJichitaiCd(),
-								f.getShiteiNo());
-						if (!toks.isEmpty()) {
-							result.add(toDtoFromTokugimuAndFuka(toks.get(0), f));
-						}
-					});
+			List<Fuka> fukaList = fukaRepository.findLatestByNendoAndKibetsu(jichitaiCd, k.getShiteiNo(),
+					k.getNendo(), k.getKibetsu());
+			if (!fukaList.isEmpty()) {
+				Fuka f = fukaList.get(0);
+				List<Tokugimu> toks = tokugimuRepository.findByJichitaiCdAndShiteiNo(f.getJichitaiCd(),
+						f.getShiteiNo());
+				if (!toks.isEmpty()) {
+					result.add(toDtoFromTokugimuAndFuka(toks.get(0), f));
+				}
+			}
 		}
 		return result;
 	}
