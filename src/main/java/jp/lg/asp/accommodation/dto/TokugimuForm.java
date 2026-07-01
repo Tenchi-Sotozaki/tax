@@ -146,20 +146,21 @@ public class TokugimuForm {
 
 	@AssertTrue(message = "共同事業者の氏名は必須です")
 	public boolean isKyodoNameValid() {
-		if (!kyodoFlg) return true;
+		if (!kyodoFlg)
+			return true;
 		return kyodoList.stream().allMatch(k -> k.getKyodoName() != null && !k.getKyodoName().isBlank());
 	}
 
 	@AssertTrue(message = "共同事業者の氏名(ふりがな)は必須です")
 	public boolean isKyodoNameKanaValid() {
-		if (!kyodoFlg) return true;
+		if (!kyodoFlg)
+			return true;
 		return kyodoList.stream().allMatch(k -> k.getKyodoNameKana() != null && !k.getKyodoNameKana().isBlank());
 	}
 
 	// ===== その他の情報 (t_tokugimu) =====
 
 	private String eltaxUmu; // Tokugimu.eltaxUmu
-	private BigDecimal taxCycle; // Tokugimu.nokigen（NozeiShuki.seq）
 	private String remarks; // Tokugimu.biko
 
 	// ===== 施設営業休止/再開/廃止情報（編集時のみ使用） =====
