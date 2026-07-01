@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.dto.KyodoJigyoshaDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
@@ -360,14 +361,19 @@ public class TokugimuServiceImpl implements TokugimuService {
 				});
 
 		// 共同事業者情報
-		kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo())
-				.stream().findFirst().ifPresent(k -> {
-					form.setKyodoName(k.getKyodoJigyoshaName());
-					form.setKyodoNameKana(k.getKyodoJigyoshaNameKana());
-					form.setKyodoAddressNo(k.getKyodoJigyoshaYubinNo());
-					form.setKyodoAddress(k.getKyodoJigyoshaJusho());
-					form.setKyodoPhone(k.getKyodoJigyoshaTel());
-				});
+		List<KyodoJigyosha> kyodoList = kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo());
+		if (!kyodoList.isEmpty()) {
+			form.setKyodoFlg(true);
+			form.setKyodoList(kyodoList.stream().map(k -> {
+				KyodoJigyoshaDto dto = new KyodoJigyoshaDto();
+				dto.setKyodoName(k.getKyodoJigyoshaName());
+				dto.setKyodoNameKana(k.getKyodoJigyoshaNameKana());
+				dto.setKyodoAddressNo(k.getKyodoJigyoshaYubinNo());
+				dto.setKyodoAddress(k.getKyodoJigyoshaJusho());
+				dto.setKyodoPhone(k.getKyodoJigyoshaTel());
+				return dto;
+			}).toList());
+		}
 
 		// 状態判定
 		form.setSuspensionStartDate(t.getKyushiStYmd());
@@ -414,20 +420,22 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {
-		if (form.getKyodoName() == null || form.getKyodoName().isBlank()) {
-			return;
+		if (!form.isKyodoFlg() || form.getKyodoList() == null) return;
+		for (int i = 0; i < form.getKyodoList().size(); i++) {
+			KyodoJigyoshaDto dto = form.getKyodoList().get(i);
+			if (dto.getKyodoName() == null || dto.getKyodoName().isBlank()) continue;
+			KyodoJigyosha k = new KyodoJigyosha();
+			k.setJichitaiCd(jichitaiCd);
+			k.setShiteiNo(shiteiNo);
+			k.setRno(rno);
+			k.setIdx(BigDecimal.valueOf(i + 1));
+			k.setKyodoJigyoshaName(dto.getKyodoName());
+			k.setKyodoJigyoshaNameKana(dto.getKyodoNameKana());
+			k.setKyodoJigyoshaYubinNo(dto.getKyodoAddressNo());
+			k.setKyodoJigyoshaJusho(dto.getKyodoAddress());
+			k.setKyodoJigyoshaTel(dto.getKyodoPhone());
+			kyodoJigyoshaRepository.save(k);
 		}
-		KyodoJigyosha k = new KyodoJigyosha();
-		k.setJichitaiCd(jichitaiCd);
-		k.setShiteiNo(shiteiNo);
-		k.setRno(rno);
-		k.setIdx(BigDecimal.ONE);
-		k.setKyodoJigyoshaName(form.getKyodoName());
-		k.setKyodoJigyoshaNameKana(form.getKyodoNameKana());
-		k.setKyodoJigyoshaYubinNo(form.getKyodoAddressNo());
-		k.setKyodoJigyoshaJusho(form.getKyodoAddress());
-		k.setKyodoJigyoshaTel(form.getKyodoPhone());
-		kyodoJigyoshaRepository.save(k);
 	}
 
 	private void saveShoyusha(String shiteiNo, BigDecimal rno, TokugimuForm form, LocalDateTime now, String user) {

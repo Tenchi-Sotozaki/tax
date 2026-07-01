@@ -532,65 +532,75 @@
 
 			<!-- ===== 共同事業者情報 ===== -->
 			<div id="kyodo-info" class="card mb-4 shadow-sm">
-				<div class="card-header py-3 d-flex align-items-center gap-2">
-					<input class="form-check-input" type="checkbox" id="kyodoCheck" name="kyodoFlg" value="true" th:checked="*{kyodoFlg}">
+				<div
+					class="card-header py-3 d-flex justify-content-between align-items-center gap-2">
 					<h5 class="mb-0">
-						<i class="bi bi-gear me-2"></i>共同事業者情報
+						<i class="bi bi-people me-2"></i>共同事業者情報
 					</h5>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="kyodoCheck"
+							name="kyodoFlg" value="true" th:checked="*{kyodoFlg}"> <label
+							class="form-check-label" for="kyodoCheck">表示する</label>
+					</div>
 				</div>
-				<div id="kyodoBody" class="card-body bg-light-subtle" style="display:none;">
-					<div class="row g-3">
-
-						<div class="col-md-4">
-							<label for="kyodoAddressNo" class="form-label fw-medium">
-								郵便番号 </label> <input type="text" class="form-control"
-								id="kyodoAddressNo" th:field="*{kyodoAddressNo}"
-								th:errorclass="is-invalid">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('kyodoAddressNo')}"
-								th:errors="*{kyodoAddressNo}"></div>
-						</div>
-
-						<div class="col-md-8">
-							<label for="kyodoAddress" class="form-label fw-medium">
-								住所 </label> <input type="text" class="form-control" id="kyodoAddress"
-								th:field="*{kyodoAddress}" th:errorclass="is-invalid">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('kyodoAddress')}"
-								th:errors="*{kyodoAddress}"></div>
-						</div>
-
-
-						<div class="col-md-6">
-							<label for="kyodoName" class="form-label fw-medium"> 氏名 <span
-								th:if="!${isView}" class="badge bg-danger text-white ms-1">*</span>
-							</label> <input type="text" class="form-control" id="kyodoName"
-								th:field="*{kyodoName}" th:errorclass="is-invalid">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('kyodoName')}"
-								th:errors="*{kyodoName}"></div>
-						</div>
-
-						<div class="col-md-6">
-							<label for="kyodoNameKana" class="form-label fw-medium">
-								氏名(ふりがな) <span th:if="!${isView}"
-								class="badge bg-danger text-white ms-1">*</span>
-							</label> <input type="text" class="form-control" id="kyodoNameKana"
-								th:field="*{kyodoNameKana}" th:errorclass="is-invalid">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('kyodoNameKana')}"
-								th:errors="*{kyodoNameKana}"></div>
-						</div>
-
-						<div class="col-md-6">
-							<label for="tokugimuPhone" class="form-label fw-medium">
-								電話番号 </label> <input type="tel" class="form-control" id="tokugimuPhone"
-								th:field="*{kyodoPhone}" th:errorclass="is-invalid">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('kyodoPhone')}"
-								th:errors="*{kyodoPhone}"></div>
-						</div>
-
+				<div id="kyodoBody" class="card-body bg-light-subtle"
+					style="display: none;">
+					<div id="kyodoRows">
+						<!-- 編集・照会時: 保存済みデータを表示 -->
+						<th:block th:each="kyodo, stat : *{kyodoList}">
+							<div class="kyodo-row border rounded p-3 mb-3">
+								<div
+									class="d-flex justify-content-between align-items-center mb-2">
+									<span class="fw-medium">共同事業者 <span
+										th:text="${stat.index + 1}"></span></span>
+									<button type="button"
+										class="btn btn-sm btn-outline-danger kyodo-remove-btn"
+										th:if="!${isView}">
+										<i class="bi bi-trash"></i>
+									</button>
+								</div>
+								<div class="row g-3">
+									<div class="col-md-4">
+										<label class="form-label fw-medium">郵便番号</label> <input
+											type="text" class="form-control"
+											th:field="*{kyodoList[__${stat.index}__].kyodoAddressNo}"
+											th:readonly="${isView}">
+									</div>
+									<div class="col-md-8">
+										<label class="form-label fw-medium">住所</label> <input
+											type="text" class="form-control"
+											th:field="*{kyodoList[__${stat.index}__].kyodoAddress}"
+											th:readonly="${isView}">
+									</div>
+									<div class="col-md-6">
+										<label class="form-label fw-medium">氏名 <span
+											th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span></label>
+										<input type="text" class="form-control"
+											th:field="*{kyodoList[__${stat.index}__].kyodoName}"
+											th:readonly="${isView}">
+									</div>
+									<div class="col-md-6">
+										<label class="form-label fw-medium">氏名(ふりがな) <span
+											th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span></label>
+										<input type="text" class="form-control"
+											th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
+											placeholder="ひらがなで入力" th:readonly="${isView}">
+									</div>
+									<div class="col-md-6">
+										<label class="form-label fw-medium">電話番号</label> <input
+											type="tel" class="form-control"
+											th:field="*{kyodoList[__${stat.index}__].kyodoPhone}"
+											placeholder="例）03-1234-5678" th:readonly="${isView}">
+									</div>
+								</div>
+							</div>
+						</th:block>
+					</div>
+					<div th:if="!${isView}" class="mt-2">
+						<button type="button" id="kyodoAddBtn"
+							class="btn btn-outline-secondary btn-sm">
+							<i class="bi bi-plus-circle me-1"></i>共同事業者を追加
+						</button>
 					</div>
 				</div>
 			</div>

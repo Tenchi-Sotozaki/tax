@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
@@ -140,30 +142,18 @@ public class TokugimuForm {
 
 	// ===== 共同事業者情報 (t_kyodo_jigyosha) =====
 	private boolean kyodoFlg;
-
-	@Size(max = 10)
-	private String kyodoAddressNo;
-
-	@Size(max = 200)
-	private String kyodoAddress;
-
-	@Size(max = 200)
-	private String kyodoName;
-
-	@Size(max = 200)
-	private String kyodoNameKana;
-
-	@Size(max = 20)
-	private String kyodoPhone;
+	private List<KyodoJigyoshaDto> kyodoList = new ArrayList<>();
 
 	@AssertTrue(message = "共同事業者の氏名は必須です")
 	public boolean isKyodoNameValid() {
-		return !kyodoFlg || (kyodoName != null && !kyodoName.isBlank());
+		if (!kyodoFlg) return true;
+		return kyodoList.stream().allMatch(k -> k.getKyodoName() != null && !k.getKyodoName().isBlank());
 	}
 
 	@AssertTrue(message = "共同事業者の氏名(ふりがな)は必須です")
 	public boolean isKyodoNameKanaValid() {
-		return !kyodoFlg || (kyodoNameKana != null && !kyodoNameKana.isBlank());
+		if (!kyodoFlg) return true;
+		return kyodoList.stream().allMatch(k -> k.getKyodoNameKana() != null && !k.getKyodoNameKana().isBlank());
 	}
 
 	// ===== その他の情報 (t_tokugimu) =====
