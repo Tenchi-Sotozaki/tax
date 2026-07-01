@@ -65,7 +65,7 @@ public class KoseiKetteiTsuchiController {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.add("Content-Disposition", "inline; filename=kosei_kettei_tsuchi.pdf");
+            headers.setContentDispositionFormData("inline", "kosei_kettei_tsuchi.pdf");
 
             return ResponseEntity.ok().headers(headers).body(pdfData);
         } catch (Exception e) {

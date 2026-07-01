@@ -20,4 +20,8 @@ public final class ReportsConstants {
 	public static final String TOKUREI_SHITEI_JOREI = "RPT0000005";
 	// 特別徴収義務者奨励金交付要綱
 	public static final String SHOREIKIN_KOFU_JOREI = "RPT0000006";
+	// 更正・決定通知書 法令引用文1
+	public static final String KOSEI_KETTEI_HOREI_INYOU1 = "RPT0000007";
+	// 更正・決定通知書 法令引用文2
+	public static final String KOSEI_KETTEI_HOREI_INYOU2 = "RPT0000008";
 }

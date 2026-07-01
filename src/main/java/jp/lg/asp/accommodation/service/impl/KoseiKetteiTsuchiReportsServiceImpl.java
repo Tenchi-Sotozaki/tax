@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KoseiKetteiTsuchiReportsDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
@@ -25,6 +26,7 @@ import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.KoseiKetteiTsuchiReportsService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -46,9 +48,14 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     private final FukaUchiRepository fukaUchiRepository;
     private final TokugimuRepository tokugimuRepository;
     private final AtenaRepository atenaRepository;
+    private final ReportsCommonService reportsCommonService;
 
     @Value("${app.jichitai.code}")
     private String jichitaiCd;
+
+    private String cityName;
+    private String horeiInyou1;
+    private String horeiInyou2;
 
     /** 課税区分最大数 */
     private static final int MAX_KBN = 5;
@@ -59,12 +66,15 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     private static final String JRXML_TEIGAKU  = "reports/kouseiKetteiTsuchisho_teigaku.jrxml";
 
     /**
-     * JasperReportsフォント設定（起動時に一度だけ実行）
+     * 起動時初期化（フォント設定・自治体情報・法令引用文キャッシュ）
      */
     @PostConstruct
-    private void initJasperFontSettings() {
+    private void init() {
         System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
         System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
+        cityName     = reportsCommonService.getJichitaiInfo().getName();
+        horeiInyou1  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
+        horeiInyou2  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
     }
 
     /**
@@ -91,6 +101,9 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             log.info("JRXMLコンパイル完了: {}", jrxmlPath);
 
             Map<String, Object> parameters = new HashMap<>();
+            parameters.put("city",          cityName);
+            parameters.put("horei_inyou1",  horeiInyou1);
+            parameters.put("horei_inyou2",  horeiInyou2);
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(dto));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
