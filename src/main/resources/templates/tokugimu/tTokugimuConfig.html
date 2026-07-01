@@ -9,26 +9,38 @@
 	<div layout:fragment="content" class="container-fluid px-4 pb-4"
 		th:with="formAction=${isEdit} ? '/tokugimu/edit/' + ${editId} : '/tokugimu/registration'">
 
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom sticky-top shadow-sm pt-3"
+		<div class="pb-2 mb-3 border-bottom sticky-top shadow-sm pt-3"
 			style="z-index: 1020; top: -1rem; background-color: #f8f9fa;">
-			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-person-plus me-2 text-primary"></i> <span
-					th:text="${isView} ? '特別徴収義務者 照会' : (${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録')"></span>
-			</h5>
-			<div class="d-flex gap-2">
-				<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
-				<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
-				<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
-				<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
-				<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
-				<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
-				<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
-				<a href="#business-status-info"
-					class="btn btn-outline-warning btn-sm"
-					th:if="${isEdit} or ${isView}">営業状況情報</a>
+			<div
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
+				<h5 class="mb-0 fw-bold text-dark">
+					<i class="bi bi-person-plus me-2 text-primary"></i> <span
+						th:text="${isView} ? '特別徴収義務者 照会' : (${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録')"></span>
+				</h5>
+				<div class="d-flex gap-2">
+					<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
+					<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
+					<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
+					<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
+					<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
+					<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
+					<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
+					<a href="#business-status-info"
+						class="btn btn-outline-warning btn-sm"
+						th:if="${isEdit} or ${isView}">営業状況情報</a>
+				</div>
+			</div>
+			<!-- 特別徴収義務者情報 -->
+			<div class="mt-2 mb-0 ps-3">
+				<span class="fw-semibold">指定番号：</span> <span
+					th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
+					class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
+					th:text="${tokugimuName}" class="me-4"></span> <span
+					class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
 			</div>
 		</div>
+
+
 
 		<!-- 登録・更新成功メッセージ -->
 		<div th:if="${successMessage}"
@@ -539,7 +551,7 @@
 					</h5>
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" id="kyodoCheck"
-							name="kyodoFlg" value="true" th:checked="*{kyodoFlg}"> <label
+							name="kyodoFlg" value="true" th:checked="*{kyodoFlg}" th:disabled="${isView}"> <label
 							class="form-check-label" for="kyodoCheck">表示する</label>
 					</div>
 				</div>
