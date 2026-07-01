@@ -148,18 +148,18 @@ public class ShunoRenkeiController {
 
 	@PostMapping("/kakunin")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
-			com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
+			accessChecker.checkAccess(SCREEN_ID);
 			List<ShunoDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShunoDto.Key.class));
 			List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 			model.addAttribute("rows", rows);
-			return "renkei/shunoRenkeiKakunin";
 		} catch (Exception e) {
+			e.printStackTrace();
 			model.addAttribute("rows", java.util.Collections.emptyList());
-			return "renkei/shunoRenkeiKakunin";
 		}
+		return "renkei/shunoRenkeiKakunin";
 	}
 
 	private String formatTaishoYm(String taishoYm) {
