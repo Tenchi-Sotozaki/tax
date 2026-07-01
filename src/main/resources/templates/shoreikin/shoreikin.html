@@ -1,239 +1,274 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
 <head>
-    <title>特別徴収事務交付金</title>
+<title>特別徴収事務交付金</title>
 </head>
+
 <body>
-    <div layout:fragment="content">
-        <div class="container-fluid p-4">
-            <h2 class="mb-4">特別徴収事務交付金</h2>
+	<div layout:fragment="content">
+		<div class="container-fluid p-4">
+			<div
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+				<h5 class="mb-0 fw-bold text-dark">特別徴収事務交付金</h5>
+			</div>
 
-            <!-- 成功・エラーメッセージ -->
-            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <span th:text="${successMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+			<!-- 特別徴収義務者情報 -->
+			<div class="mb-4">
+				<span class="fw-semibold">指定番号：</span> <span
+					th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
+					class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
+					th:text="${tokugimuName}" class="me-4"></span> <span
+					class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
+			</div>
 
-            <!-- 抽出条件エリア -->
-            <div class="accordion mb-3 shadow-sm" id="searchAccordion">
-                <div class="accordion-item border">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button py-2 fw-semibold" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#searchPanel">
-                            <i class="bi bi-funnel me-2 text-primary"></i>抽出条件
-                        </button>
-                    </h2>
-                    <div id="searchPanel" class="accordion-collapse collapse show">
-                        <div class="accordion-body pt-3 pb-2 px-3">
-                            <form th:action="@{/shoreikin/search}" th:object="${searchForm}" method="post">
-                                <!-- SP:1列 / タブレット:2列 / PC:4列 -->
-                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
-                                    <!-- 交付金年度 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">交付金年度</label>
-                                        <input type="text" class="form-control form-control-sm" th:field="*{nendo}" placeholder="年度" maxlength="4">
-                                    </div>
+			<!-- 成功・エラーメッセージ -->
+			<div th:if="${successMessage}"
+				class="alert alert-success alert-dismissible fade show" role="alert">
+				<span th:text="${successMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${errorMessage}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
+				<span th:text="${errorMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
 
-                                    <!-- 交付金算出有無 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">交付金算出有無</label>
-                                        <select class="form-select form-select-sm" th:field="*{kofuSanshutsuUmu}">
-                                            <option value="999">すべて</option>
-                                            <option value="1">算出有</option>
-                                            <option value="2">算出無</option>
-                                        </select>
-                                    </div>
+			<!-- 抽出条件エリア -->
+			<div class="accordion mb-3 shadow-sm" id="searchAccordion">
+				<div class="accordion-item border">
+					<h2 class="accordion-header">
+						<button class="accordion-button py-2 fw-semibold" type="button"
+							data-bs-toggle="collapse" data-bs-target="#searchPanel">
+							<i class="bi bi-funnel me-2 text-primary"></i>抽出条件
+						</button>
+					</h2>
+					<div id="searchPanel" class="accordion-collapse collapse show">
+						<div class="accordion-body pt-3 pb-2 px-3">
+							<form th:action="@{/shoreikin/search}" th:object="${searchForm}"
+								method="post">
+								<!-- SP:1列 / タブレット:2列 / PC:4列 -->
+								<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
+									<!-- 交付金年度 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">交付金年度</label>
+										<input type="text" class="form-control form-control-sm"
+											th:field="*{nendo}" placeholder="年度" maxlength="4">
+									</div>
 
-                                    <!-- 指定番号 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
-                                        <input type="text" class="form-control form-control-sm" th:field="*{shiteiNo}" placeholder="指定番号" maxlength="8">
-                                    </div>
+									<!-- 交付金算出有無 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">交付金算出有無</label>
+										<select class="form-select form-select-sm"
+											th:field="*{kofuSanshutsuUmu}">
+											<option value="999">すべて</option>
+											<option value="1">算出有</option>
+											<option value="2">算出無</option>
+										</select>
+									</div>
 
-                                    <!-- 氏名／名称 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">氏名／名称</label>
-                                        <input type="text" class="form-control form-control-sm" th:field="*{name}" placeholder="氏名または名称" maxlength="200">
-                                    </div>
+									<!-- 指定番号 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
+										<input type="text" class="form-control form-control-sm"
+											th:field="*{shiteiNo}" placeholder="指定番号" maxlength="8">
+									</div>
 
-                                    <!-- 施設名称 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">施設名称</label>
-                                        <input type="text" class="form-control form-control-sm" th:field="*{shisetsuName}" placeholder="施設名称" maxlength="200">
-                                    </div>
+									<!-- 氏名／名称 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">氏名／名称</label>
+										<input type="text" class="form-control form-control-sm"
+											th:field="*{name}" placeholder="氏名または名称" maxlength="200">
+									</div>
 
-                                    <!-- 営業種別 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">営業種別</label>
-                                        <select class="form-select form-select-sm" th:field="*{kyokaShu}">
-                                            <option value="999">すべて</option>
-                                            <option value="1">ホテル</option>
-                                            <option value="2">旅館</option>
-                                            <option value="3">簡易宿所</option>
-                                            <option value="4">民泊</option>
-                                        </select>
-                                    </div>
+									<!-- 施設名称 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">施設名称</label>
+										<input type="text" class="form-control form-control-sm"
+											th:field="*{shisetsuName}" placeholder="施設名称" maxlength="200">
+									</div>
 
-                                    <!-- 合算対象 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">合算対象</label>
-                                        <select class="form-select form-select-sm" th:field="*{gassanTaisho}">
-                                            <option value="999">すべて</option>
-                                            <option value="1">非対象</option>
-                                            <option value="2">対象</option>
-                                        </select>
-                                    </div>
+									<!-- 営業種別 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">営業種別</label>
+										<select class="form-select form-select-sm"
+											th:field="*{kyokaShu}">
+											<option value="999">すべて</option>
+											<option value="1">ホテル</option>
+											<option value="2">旅館</option>
+											<option value="3">簡易宿所</option>
+											<option value="4">民泊</option>
+										</select>
+									</div>
 
-                                    <!-- ステータス -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">ステータス</label>
-                                        <select class="form-select form-select-sm" th:field="*{status}">
-                                            <option value="999">すべて</option>
-                                            <option value="1">営業中</option>
-                                            <option value="2">休止</option>
-                                            <option value="3">廃止</option>
-                                        </select>
-                                    </div>
+									<!-- 合算対象 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">合算対象</label>
+										<select class="form-select form-select-sm"
+											th:field="*{gassanTaisho}">
+											<option value="999">すべて</option>
+											<option value="1">非対象</option>
+											<option value="2">対象</option>
+										</select>
+									</div>
 
-                                    <!-- 個人番号 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
-                                        <input type="text" class="form-control form-control-sm" th:field="*{kojinNo}" placeholder="個人番号" maxlength="64">
-                                    </div>
+									<!-- ステータス -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">ステータス</label>
+										<select class="form-select form-select-sm"
+											th:field="*{status}">
+											<option value="999">すべて</option>
+											<option value="1">営業中</option>
+											<option value="2">休止</option>
+											<option value="3">廃止</option>
+										</select>
+									</div>
 
-                                    <!-- 法人番号 -->
-                                    <div class="col">
-                                        <label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
-                                        <input type="text" class="form-control form-control-sm" th:field="*{hojinNo}" placeholder="法人番号" maxlength="13">
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-end gap-2 pt-1 border-top">
-                                    <a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary btn-sm">
-                                        <i class="bi bi-arrow-counterclockwise me-1"></i>リセット
-                                    </a>
-                                    <button type="submit" class="btn btn-primary btn-sm px-4">
-                                        <i class="bi bi-search me-1"></i>検索する
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+									<!-- 個人番号 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
+										<input type="text" class="form-control form-control-sm"
+											th:field="*{kojinNo}" placeholder="個人番号" maxlength="64">
+									</div>
 
-            <!-- 情報一覧エリア -->
-            <!-- ========== ツールバー（ボタンエリア） ========== -->
-            <div class="card shadow-sm mb-2">
-                <div class="card-body py-2 px-3">
-                    <div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
-                        <!-- グループ1: 基本操作 -->
-                        <div class="d-flex flex-wrap gap-1">
-                            <form th:action="@{/shoreikin/bulkCalculate}" th:object="${searchForm}" method="post" class="d-inline">
-                                <input type="hidden" th:field="*{nendo}">
-                                <input type="hidden" th:field="*{shisetsuName}">
-                                <input type="hidden" th:field="*{kyokaShu}">
-                                <input type="hidden" th:field="*{gassanTaisho}">
-                                <input type="hidden" th:field="*{status}">
-                                <input type="hidden" th:field="*{kojinNo}">
-                                <input type="hidden" th:field="*{hojinNo}">
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    <i class="bi bi-calculator me-1"></i>一括算出
-                                </button>
-                            </form>
-                            <button type="button" class="btn btn-info btn-sm" onclick="viewKofu()">
-                                <i class="bi bi-eye me-1"></i>交付金照会
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="viewKoza()">
-                                <i class="bi bi-bank me-1"></i>口座照会
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+									<!-- 法人番号 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
+										<input type="text" class="form-control form-control-sm"
+											th:field="*{hojinNo}" placeholder="法人番号" maxlength="13">
+									</div>
+								</div>
+								<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+									<a th:href="@{/shoreikin/list}"
+										class="btn btn-outline-secondary btn-sm"> <i
+										class="bi bi-arrow-counterclockwise me-1"></i>リセット
+									</a>
+									<button type="submit" class="btn btn-primary btn-sm px-4">
+										<i class="bi bi-search me-1"></i>検索する
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
 
-            <form id="listForm">
+			<!-- 情報一覧エリア -->
+			<!-- ========== ツールバー（ボタンエリア） ========== -->
+			<div class="card shadow-sm mb-2">
+				<div class="card-body py-2 px-3">
+					<div class="d-flex flex-wrap align-items-center gap-1"
+						style="row-gap: 0.4rem;">
+						<!-- グループ1: 基本操作 -->
+						<div class="d-flex flex-wrap gap-1">
+							<form th:action="@{/shoreikin/bulkCalculate}"
+								th:object="${searchForm}" method="post" class="d-inline">
+								<input type="hidden" th:field="*{nendo}"> <input
+									type="hidden" th:field="*{shisetsuName}"> <input
+									type="hidden" th:field="*{kyokaShu}"> <input
+									type="hidden" th:field="*{gassanTaisho}"> <input
+									type="hidden" th:field="*{status}"> <input
+									type="hidden" th:field="*{kojinNo}"> <input
+									type="hidden" th:field="*{hojinNo}">
+								<button type="submit" class="btn btn-success btn-sm">
+									<i class="bi bi-calculator me-1"></i>一括算出
+								</button>
+							</form>
+							<button type="button" class="btn btn-info btn-sm"
+								onclick="viewKofu()">
+								<i class="bi bi-eye me-1"></i>交付金照会
+							</button>
+							<button type="button" class="btn btn-outline-secondary btn-sm"
+								onclick="viewKoza()">
+								<i class="bi bi-bank me-1"></i>口座照会
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
-                <!-- ========== 一覧テーブル ========== -->
-                <div class="card shadow-sm">
-                    <div class="card-body p-0">
-                        <div class="table-scroll" style="max-height: 55vh; min-height: 200px; overflow-y: auto; overflow-x: auto;">
-                            <table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
-                                <thead class="table-primary" style="position: sticky; top: 0; z-index: 1;">
-                                    <tr>
-                                        <th style="width: 40px" class="text-center"></th>
-                                        <th style="min-width: 100px">指定番号</th>
-                                        <th style="min-width: 140px">施設名称</th>
-                                        <th style="min-width: 140px">氏名</th>
-                                        <th style="min-width: 80px">交付年度</th>
-                                        <th style="min-width: 120px">交付額</th>
-                                        <th style="min-width: 100px">交付年月日</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:if="${#lists.isEmpty(items)}">
-                                        <td colspan="7" class="text-center text-muted py-5">
-                                            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-                                            該当するデータが見つかりませんでした。
-                                        </td>
-                                    </tr>
-                                    <tr th:each="item : ${items}">
-                                        <td class="text-center">
-                                            <input type="checkbox" name="selectedItems" 
-                                                   th:value="${item.listShiteiNo}" 
-                                                   th:attr="data-nendo=${item.kofuNendo}"
-                                                   class="form-check-input item-checkbox">
-                                        </td>
-                                        <td class="fw-bold text-primary" th:text="${item.listShiteiNo}"></td>
-                                        <td th:text="${item.listShisetsuName}"></td>
-                                        <td th:text="${item.shimei}"></td>
-                                        <td class="text-center">
-                                            <span th:if="${item.kofuNendo != null}" th:text="${item.kofuNendo}"></span>
-                                            <span th:if="${item.kofuNendo == null}" class="text-muted">-</span>
-                                        </td>
-                                        <td class="text-end">
-                                            <span th:if="${item.kofuGaku != null}" 
-                                                  th:text="${#numbers.formatDecimal(item.kofuGaku, 0, 'COMMA', 0, 'POINT')} + '円'" 
-                                                  class="fw-medium"></span>
-                                            <span th:if="${item.kofuGaku == null}" class="text-muted">-</span>
-                                        </td>
-                                        <td class="text-center">
-                                            <span th:if="${item.kofuYmd != null}" 
-                                                  th:text="${#temporals.format(item.kofuYmd, 'yyyy/MM/dd')}"></span>
-                                            <span th:if="${item.kofuYmd == null}" class="text-muted">-</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white py-2 border-top">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted small">
-                                検索結果: <strong th:text="${#lists.size(items)}">0</strong> 件
-                            </span>
-                            <nav>
-                                <ul class="pagination pagination-sm justify-content-center mb-0">
-                                    <li class="page-item disabled"><a class="page-link" href="#">前へ</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">次へ</a></li>
-                                </ul>
-                            </nav>
-                            <div></div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+			<form id="listForm">
 
-    <th:block layout:fragment="scripts">
-        <script th:src="@{/js/shoreikin.js}"></script>
-    </th:block>
+				<!-- ========== 一覧テーブル ========== -->
+				<div class="card shadow-sm">
+					<div class="card-body p-0">
+						<div class="table-scroll"
+							style="max-height: 55vh; min-height: 200px; overflow-y: auto; overflow-x: auto;">
+							<table
+								class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
+								<thead class="table-primary"
+									style="position: sticky; top: 0; z-index: 1;">
+									<tr>
+										<th style="width: 40px" class="text-center"></th>
+										<th style="min-width: 100px">指定番号</th>
+										<th style="min-width: 140px">施設名称</th>
+										<th style="min-width: 140px">氏名</th>
+										<th style="min-width: 80px">交付年度</th>
+										<th style="min-width: 120px">交付額</th>
+										<th style="min-width: 100px">交付年月日</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:if="${#lists.isEmpty(items)}">
+										<td colspan="7" class="text-center text-muted py-5"><i
+											class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+											該当するデータが見つかりませんでした。</td>
+									</tr>
+									<tr th:each="item : ${items}">
+										<td class="text-center"><input type="checkbox"
+											name="selectedItems" th:value="${item.listShiteiNo}"
+											th:attr="data-nendo=${item.kofuNendo}"
+											class="form-check-input item-checkbox"></td>
+										<td class="fw-bold text-primary"
+											th:text="${item.listShiteiNo}"></td>
+										<td th:text="${item.listShisetsuName}"></td>
+										<td th:text="${item.shimei}"></td>
+										<td class="text-center"><span
+											th:if="${item.kofuNendo != null}" th:text="${item.kofuNendo}"></span>
+											<span th:if="${item.kofuNendo == null}" class="text-muted">-</span>
+										</td>
+										<td class="text-end"><span
+											th:if="${item.kofuGaku != null}"
+											th:text="${#numbers.formatDecimal(item.kofuGaku, 0, 'COMMA', 0, 'POINT')} + '円'"
+											class="fw-medium"></span> <span
+											th:if="${item.kofuGaku == null}" class="text-muted">-</span>
+										</td>
+										<td class="text-center"><span
+											th:if="${item.kofuYmd != null}"
+											th:text="${#temporals.format(item.kofuYmd, 'yyyy/MM/dd')}"></span>
+											<span th:if="${item.kofuYmd == null}" class="text-muted">-</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="card-footer bg-white py-2 border-top">
+						<div class="d-flex justify-content-between align-items-center">
+							<span class="text-muted small"> 検索結果: <strong
+								th:text="${#lists.size(items)}">0</strong> 件
+							</span>
+							<nav>
+								<ul class="pagination pagination-sm justify-content-center mb-0">
+									<li class="page-item disabled"><a class="page-link"
+										href="#">前へ</a></li>
+									<li class="page-item active"><a class="page-link" href="#">1</a></li>
+									<li class="page-item"><a class="page-link" href="#">次へ</a></li>
+								</ul>
+							</nav>
+							<div></div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/shoreikin.js}"></script>
+	</th:block>
 </body>
+
 </html>

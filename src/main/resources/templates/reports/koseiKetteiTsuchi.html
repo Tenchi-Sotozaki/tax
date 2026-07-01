@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
+
 <head>
-<title>宿泊税更正・決定通知書</title>
+	<title>宿泊税更正・決定通知書</title>
 </head>
+
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-12">
-					<h2 class="mb-4">
-						<i class="bi bi-file-earmark-text text-primary me-2"></i>宿泊税更正・決定通知書
-					</h2>
+					<div
+						class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+						<h5 class="mb-0 fw-bold text-dark">
+							<i class="bi bi-file-earmark-text text-primary me-2"></i>宿泊税更正・決定通知書
+						</h5>
+					</div>
 
-					<div id="appConfig"
-					     th:data-ctx-path="@{/}"
-					     th:data-taisho-ym-list="${taishoYmList}"
-					     style="display:none;">
+					<div id="appConfig" th:data-ctx-path="@{/}" th:data-taisho-ym-list="${taishoYmList}"
+						style="display:none;">
 					</div>
 
 					<form id="koseiKetteiForm" method="post">
@@ -37,13 +39,15 @@
 									</div>
 									<div class="col-md-6">
 										<label class="form-label">施設名称</label>
-										<input type="text" class="form-control" th:value="${dto.shisetsu_name}" readonly>
+										<input type="text" class="form-control" th:value="${dto.shisetsu_name}"
+											readonly>
 									</div>
 								</div>
 								<div class="row g-3 mt-2">
 									<div class="col-md-12">
 										<label class="form-label">施設住所</label>
-										<input type="text" class="form-control" th:value="${dto.shisetsu_jusho}" readonly>
+										<input type="text" class="form-control" th:value="${dto.shisetsu_jusho}"
+											readonly>
 									</div>
 								</div>
 							</div>
@@ -64,9 +68,8 @@
 										</label>
 										<select id="b1Ym" name="b1Ym" class="form-select" required>
 											<option value="">--- 選択してください ---</option>
-											<option th:each="ym : ${taishoYmList}"
-													th:value="${ym}"
-													th:text="${#strings.substring(ym,0,4) + '年' + #strings.substring(ym,4,6) + '月'}">
+											<option th:each="ym : ${taishoYmList}" th:value="${ym}"
+												th:text="${#strings.substring(ym,0,4) + '年' + #strings.substring(ym,4,6) + '月'}">
 											</option>
 										</select>
 									</div>
@@ -125,4 +128,5 @@
 		<script th:src="@{/js/kosei_kettei_tsuchi.js}"></script>
 	</th:block>
 </body>
+
 </html>

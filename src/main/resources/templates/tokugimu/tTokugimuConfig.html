@@ -27,15 +27,6 @@
 					class="btn btn-outline-warning btn-sm"
 					th:if="${isEdit} or ${isView}">営業状況情報</a>
 			</div>
-
-			<!-- 特別徴収義務者情報 -->
-			<div class="mb-4">
-				<span class="fw-semibold">指定番号：</span> <span
-					th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
-					class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-					th:text="${tokugimuName}" class="me-4"></span> <span
-					class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
-			</div>
 		</div>
 
 		<!-- 登録・更新成功メッセージ -->
@@ -179,8 +170,9 @@
 						</h5>
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox"
-								id="copyToFacility"> <label class="form-check-label"
-								for="copyToFacility"> 特別徴収義務者情報と同じ </label>
+								id="copyToFacility"> <label
+								class="form-check-label" for="copyToFacility">
+								特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>
@@ -322,8 +314,9 @@
 						</h5>
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox"
-								id="copyToLicense"> <label class="form-check-label"
-								for="copyToLicense"> 特別徴収義務者情報と同じ </label>
+								id="copyToLicense"> <label
+								class="form-check-label" for="copyToLicense">
+								特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>

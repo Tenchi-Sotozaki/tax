@@ -22,15 +22,6 @@
 			</h5>
 		</div>
 
-		<!-- 特別徴収義務者情報 -->
-		<div class="mb-4">
-			<span class="fw-semibold">指定番号：</span> <span
-				th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
-				class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-				th:text="${tokugimuName}" class="me-4"></span> <span
-				class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
-		</div>
-
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show" role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i><span
@@ -118,6 +109,18 @@
 								data-bs-toggle="modal" data-bs-target="#addressSearchModal">
 								<i class="bi bi-search me-1"></i>宛名検索
 							</button>
+						</div>
+
+						<div class="col-md-6">
+							<label class="form-label fw-medium">特別徴収義務者</label> <input
+								type="text" class="form-control" th:field="*{obligorName}"
+								readonly>
+						</div>
+
+						<div class="col-md-6">
+							<label class="form-label fw-medium">施設名称</label> <input
+								type="text" class="form-control" th:field="*{facilityName}"
+								readonly>
 						</div>
 
 						<div class="col-md-6">

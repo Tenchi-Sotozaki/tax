@@ -79,8 +79,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const shiteiNo = checkedItems[0].getAttribute('data-shiteiNo');
             const nendo = checkedItems[0].getAttribute('data-nendo');
             
-            // 照会画面への遷移（実装に応じて調整）
-            window.location.href = `/kofukinFurikomi/view/${shiteiNo}/${nendo}`;
+            const keys = [{ shiteiNo: shiteiNo, nendo: nendo }];
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/accommodation-tax/kofukinFurikomi/kakunin';
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'keysJson';
+            input.value = JSON.stringify(keys);
+            form.appendChild(input);
+            if (csrfToken && csrfHeader) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = csrfToken;
+                form.appendChild(csrfInput);
+            }
+            document.body.appendChild(form);
+            form.submit();
         });
     }
     
