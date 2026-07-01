@@ -17,11 +17,13 @@ import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
+import jp.lg.asp.accommodation.entity.KyodoJigyosha;
 import jp.lg.asp.accommodation.entity.Shoyusha;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
+import jp.lg.asp.accommodation.repository.KyodoJigyoshaRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokugimuService;
@@ -38,6 +40,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	private final GassanRepository gassanRepository;
 	private final GassanUchiRepository gassanUchiRepository;
 	private final ShoyushaRepository shoyushaRepository;
+	private final KyodoJigyoshaRepository kyodoJigyoshaRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
@@ -244,6 +247,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		tokugimuRepository.save(t);
 
 		saveShoyusha(shiteiNo, BigDecimal.ONE, form, now, systemUser);
+		saveKyodoJigyosha(shiteiNo, BigDecimal.ONE, form);
 
 		log.info("特別徴収義務者登録完了: shiteiNo={}", shiteiNo);
 	}
@@ -280,6 +284,10 @@ public class TokugimuServiceImpl implements TokugimuService {
 		// 4. 所有者情報の更新
 		shoyushaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 		saveShoyusha(shiteiNo, t.getRno(), form, now, systemUser);
+
+		// 5. 共同事業者情報の更新
+		kyodoJigyoshaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		saveKyodoJigyosha(shiteiNo, t.getRno(), form);
 
 		log.info("特別徴収義務者更新完了: shiteiNo={}, name={}", shiteiNo, form.getName());
 	}
@@ -351,6 +359,16 @@ public class TokugimuServiceImpl implements TokugimuService {
 					form.setOwnerPhone(s.getShoyushaTel());
 				});
 
+		// 共同事業者情報
+		kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo())
+				.stream().findFirst().ifPresent(k -> {
+					form.setKyodoName(k.getKyodoJigyoshaName());
+					form.setKyodoNameKana(k.getKyodoJigyoshaNameKana());
+					form.setKyodoAddressNo(k.getKyodoJigyoshaYubinNo());
+					form.setKyodoAddress(k.getKyodoJigyoshaJusho());
+					form.setKyodoPhone(k.getKyodoJigyoshaTel());
+				});
+
 		// 状態判定
 		form.setSuspensionStartDate(t.getKyushiStYmd());
 		form.setSuspensionEndDate(t.getKyushiEdYmd());
@@ -393,6 +411,23 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setKyushiEdYmd(form.getSuspensionEndDate());
 		t.setEigyoEdYmd(form.getResumptionOrAbolitionDate());
 		t.setKyuhaishiRiyu(form.getSuspensionOrAbolitionReason());
+	}
+
+	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {
+		if (form.getKyodoName() == null || form.getKyodoName().isBlank()) {
+			return;
+		}
+		KyodoJigyosha k = new KyodoJigyosha();
+		k.setJichitaiCd(jichitaiCd);
+		k.setShiteiNo(shiteiNo);
+		k.setRno(rno);
+		k.setIdx(BigDecimal.ONE);
+		k.setKyodoJigyoshaName(form.getKyodoName());
+		k.setKyodoJigyoshaNameKana(form.getKyodoNameKana());
+		k.setKyodoJigyoshaYubinNo(form.getKyodoAddressNo());
+		k.setKyodoJigyoshaJusho(form.getKyodoAddress());
+		k.setKyodoJigyoshaTel(form.getKyodoPhone());
+		kyodoJigyoshaRepository.save(k);
 	}
 
 	private void saveShoyusha(String shiteiNo, BigDecimal rno, TokugimuForm form, LocalDateTime now, String user) {

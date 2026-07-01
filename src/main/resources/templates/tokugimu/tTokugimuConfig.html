@@ -22,6 +22,7 @@
 				<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
 				<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
 				<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
+				<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
 				<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
 				<a href="#business-status-info"
 					class="btn btn-outline-warning btn-sm"
@@ -170,9 +171,8 @@
 						</h5>
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox"
-								id="copyToFacility"> <label
-								class="form-check-label" for="copyToFacility">
-								特別徴収義務者情報と同じ </label>
+								id="copyToFacility"> <label class="form-check-label"
+								for="copyToFacility"> 特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>
@@ -314,9 +314,8 @@
 						</h5>
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox"
-								id="copyToLicense"> <label
-								class="form-check-label" for="copyToLicense">
-								特別徴収義務者情報と同じ </label>
+								id="copyToLicense"> <label class="form-check-label"
+								for="copyToLicense"> 特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>
@@ -525,6 +524,71 @@
 								th:field="*{mailPhone}" th:errorclass="is-invalid"
 								placeholder="例）03-1234-5678" th:readonly="${isView}">
 
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- ===== 共同事業者情報 ===== -->
+			<div id="kyodo-info" class="card mb-4 shadow-sm">
+				<div class="card-header py-3 d-flex align-items-center gap-2">
+					<input class="form-check-input" type="checkbox" id="kyodoCheck" name="kyodoFlg" value="true" th:checked="*{kyodoFlg}">
+					<h5 class="mb-0">
+						<i class="bi bi-gear me-2"></i>共同事業者情報
+					</h5>
+				</div>
+				<div id="kyodoBody" class="card-body bg-light-subtle" style="display:none;">
+					<div class="row g-3">
+
+						<div class="col-md-4">
+							<label for="kyodoAddressNo" class="form-label fw-medium">
+								郵便番号 </label> <input type="text" class="form-control"
+								id="kyodoAddressNo" th:field="*{kyodoAddressNo}"
+								th:errorclass="is-invalid">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('kyodoAddressNo')}"
+								th:errors="*{kyodoAddressNo}"></div>
+						</div>
+
+						<div class="col-md-8">
+							<label for="kyodoAddress" class="form-label fw-medium">
+								住所 </label> <input type="text" class="form-control" id="kyodoAddress"
+								th:field="*{kyodoAddress}" th:errorclass="is-invalid">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('kyodoAddress')}"
+								th:errors="*{kyodoAddress}"></div>
+						</div>
+
+
+						<div class="col-md-6">
+							<label for="kyodoName" class="form-label fw-medium"> 氏名 <span
+								th:if="!${isView}" class="badge bg-danger text-white ms-1">*</span>
+							</label> <input type="text" class="form-control" id="kyodoName"
+								th:field="*{kyodoName}" th:errorclass="is-invalid">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('kyodoName')}"
+								th:errors="*{kyodoName}"></div>
+						</div>
+
+						<div class="col-md-6">
+							<label for="kyodoNameKana" class="form-label fw-medium">
+								氏名(ふりがな) <span th:if="!${isView}"
+								class="badge bg-danger text-white ms-1">*</span>
+							</label> <input type="text" class="form-control" id="kyodoNameKana"
+								th:field="*{kyodoNameKana}" th:errorclass="is-invalid">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('kyodoNameKana')}"
+								th:errors="*{kyodoNameKana}"></div>
+						</div>
+
+						<div class="col-md-6">
+							<label for="tokugimuPhone" class="form-label fw-medium">
+								電話番号 </label> <input type="tel" class="form-control" id="tokugimuPhone"
+								th:field="*{kyodoPhone}" th:errorclass="is-invalid">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('kyodoPhone')}"
+								th:errors="*{kyodoPhone}"></div>
 						</div>
 
 					</div>

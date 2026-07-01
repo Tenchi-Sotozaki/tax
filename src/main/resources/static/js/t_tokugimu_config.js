@@ -6,6 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
     initSmoothScroll();
+    initKyodoSection();
 });
 
 // -----------------------------------------------------------------------
@@ -210,6 +211,18 @@ function initCopyCheckboxes() {
             copyTokugimuInfoToMail(copyToMail.checked);
         });
     }
+
+    // 共同事業者情報の表示切替
+    const kyodoCheck = document.getElementById('kyodoCheck');
+    if (kyodoCheck) {
+        kyodoCheck.addEventListener('change', () => {
+            const kyodoBody = document.getElementById('kyodoBody');
+            kyodoBody.style.display = kyodoCheck.checked ? '' : 'none';
+            if (!kyodoCheck.checked) {
+                kyodoBody.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+            }
+        });
+    }
 }
 
 function copyTokugimuInfoToFacility(enabled) {
@@ -280,6 +293,16 @@ function setValue(id, value) {
     const element = document.getElementById(id);
     if (element && !element.readOnly) {
         element.value = value;
+    }
+}
+
+// -----------------------------------------------------------------------
+// 共同事業者セクション初期化（編集・照会時にデータがあれば表示）
+// -----------------------------------------------------------------------
+function initKyodoSection() {
+    const kyodoCheck = document.getElementById('kyodoCheck');
+    if (kyodoCheck && kyodoCheck.checked) {
+        document.getElementById('kyodoBody').style.display = '';
     }
 }
 

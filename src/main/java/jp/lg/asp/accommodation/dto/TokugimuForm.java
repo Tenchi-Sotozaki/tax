@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -33,7 +34,7 @@ public class TokugimuForm {
 	@NotBlank(message = "氏名または名称は必須です")
 	private String name; // Atena.name（読取専用・宛名検索で自動入力）
 
-	@NotBlank(message = "ふりがなは必須です")
+	@NotBlank(message = "氏名(ふりがな)は必須です")
 	@Size(max = 200)
 	private String nameKana; // Atena.nameKana（読取専用・宛名検索で自動入力）
 
@@ -87,7 +88,7 @@ public class TokugimuForm {
 	@Size(max = 200)
 	private String licenseName; // Tokugimu.kyokaName
 
-	@NotBlank(message = "営業許可のふりがなは必須です")
+	@NotBlank(message = "営業許可の氏名(ふりがな)は必須です")
 	@Size(max = 200)
 	private String licenseNameKana; // Tokugimu.kyokaNameKana
 
@@ -107,7 +108,7 @@ public class TokugimuForm {
 	@Size(max = 200)
 	private String ownerAddress;
 
-	@NotBlank(message = "所有者のふりがなは必須です")
+	@NotBlank(message = "所有者の氏名(ふりがな)は必須です")
 	@Size(max = 200)
 	private String ownerNameKana;
 
@@ -126,7 +127,7 @@ public class TokugimuForm {
 	@Size(max = 200)
 	private String mailAddress; // Tokugimu.soufusakiJusho
 
-	@NotBlank(message = "書類送付先のふりがな氏名は必須です")
+	@NotBlank(message = "書類送付先の氏名(ふりがな)は必須です")
 	@Size(max = 200)
 	private String mailNameKana; // Tokugimu.soufusakiNameKana
 
@@ -136,6 +137,34 @@ public class TokugimuForm {
 
 	@Size(max = 20)
 	private String mailPhone; // Tokugimu.soufusakiTel
+
+	// ===== 共同事業者情報 (t_kyodo_jigyosha) =====
+	private boolean kyodoFlg;
+
+	@Size(max = 10)
+	private String kyodoAddressNo;
+
+	@Size(max = 200)
+	private String kyodoAddress;
+
+	@Size(max = 200)
+	private String kyodoName;
+
+	@Size(max = 200)
+	private String kyodoNameKana;
+
+	@Size(max = 20)
+	private String kyodoPhone;
+
+	@AssertTrue(message = "共同事業者の氏名は必須です")
+	public boolean isKyodoNameValid() {
+		return !kyodoFlg || (kyodoName != null && !kyodoName.isBlank());
+	}
+
+	@AssertTrue(message = "共同事業者の氏名(ふりがな)は必須です")
+	public boolean isKyodoNameKanaValid() {
+		return !kyodoFlg || (kyodoNameKana != null && !kyodoNameKana.isBlank());
+	}
 
 	// ===== その他の情報 (t_tokugimu) =====
 
@@ -157,7 +186,8 @@ public class TokugimuForm {
 	// 納入書用の特別徴収義務者郵便番号を取得
 	public String getTokugimuYubinNo() {
 		// 送付先郵便番号が優先、なければ特別徴収義務者郵便番号
-		return mailAddressNo != null && !mailAddressNo.isBlank() 
-			? mailAddressNo : tokugimuAddressNo;
+		return mailAddressNo != null && !mailAddressNo.isBlank()
+				? mailAddressNo
+				: tokugimuAddressNo;
 	}
 }
