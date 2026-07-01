@@ -626,16 +626,6 @@
 
 						</div>
 
-						<div class="col-md-6">
-							<label for="taxCycle" class="form-label fw-medium">納税周期</label> <select
-								class="form-select" id="taxCycle" th:field="*{taxCycle}"
-								th:style="${isView} ? 'pointer-events:none; background-color:#e9ecef;' : ''">
-								<option value="">選択してください</option>
-								<option th:each="opt : ${taxCycleOptions}"
-									th:value="${opt.seq.intValue()}" th:text="${opt.label}"></option>
-							</select>
-						</div>
-
 						<div class="col-md-12">
 							<label for="remarks" class="form-label fw-medium">備考</label>
 							<textarea class="form-control" id="remarks" rows="3"
