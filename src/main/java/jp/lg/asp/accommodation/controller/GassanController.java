@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -59,7 +60,7 @@ public class GassanController {
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID_LIST);
 
-		List<GassanDaichoItem> items = gassanDaichoService.search(searchForm);
+		Page<GassanDaichoItem> items = gassanDaichoService.search(searchForm);
 		model.addAttribute("items", items);
 		return DAICHO_VIEW;
 	}
