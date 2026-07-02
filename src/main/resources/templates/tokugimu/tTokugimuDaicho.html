@@ -149,27 +149,19 @@
 							<i class="bi bi-printer me-1"></i>帳票発行
 						</button>
 					</div>
-
-					<!-- 表示件数選択プルダウン -->
-					<div class="ms-auto d-flex align-items-center gap-2">
-						<label class="form-label form-label-sm mb-0">表示件数</label>
-						<select class="form-select form-select-sm" style="width: auto;"
-							onchange="location.href=this.value">
-							<option th:each="s : ${#arrays.toArray({5, 10, 20})}" th:value="@{/tokugimu/list(page=0, 
-								pageSize=${s}, 
-								shiteiNo=${searchForm.shiteiNo}, 
-								name=${searchForm.name}, 
-								shisetsuName=${searchForm.shisetsuName}, 
-								kyokaShu=${searchForm.kyokaShu}, 
-								gasanTaisho=${searchForm.gasanTaisho}, 
-								status=${searchForm.status}, 
-								kojinNo=${searchForm.kojinNo}, 
-								hojinNo=${searchForm.hojinNo})}" th:text="${s}" th:selected="${s == searchForm.pageSize}">
-							</option>
-						</select>
-					</div>
 				</div>
 			</div>
+		</div>
+
+		<!-- 表示件数選択プルダウン -->
+		<div class="d-flex justify-content-end align-items-center mb-1">
+			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
+			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
+				<option th:each="s : ${#arrays.toArray({5, 10, 20})}"
+					th:value="@{/tokugimu/list(page=0, pageSize=${s}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+					th:text="${s}" th:selected="${s == searchForm.pageSize}">
+				</option>
+			</select>
 		</div>
 
 		<!-- ========== 一覧テーブル ========== -->
