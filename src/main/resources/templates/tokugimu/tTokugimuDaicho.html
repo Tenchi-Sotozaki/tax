@@ -157,7 +157,19 @@
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ3: 納入台帳 -->
+					<!-- グループ3: 納税周期(特例申請) -->
+					<div class="d-flex flex-wrap gap-1">
+						<button type="button" id="btnNozeiShuki"
+							class="btn btn-success btn-sm">
+							<i class="bi bi-calendar-plus me-1"></i>納税周期登録
+						</button>
+						<button type="button" id="btnNozeiShukiView"
+							class="btn btn-outline-success btn-sm">
+							<i class="bi bi-calendar-check me-1"></i>納税周期照会
+						</button>
+					</div>
+					<div class="vr mx-1 toolbar-divider"></div>
+					<!-- グループ4: 納入台帳 -->
 					<button type="button" id="btnPaymentLedger"
 						class="btn btn-outline-secondary btn-sm">
 						<i class="bi bi-currency-yen me-1"></i>納入金額管理台帳
@@ -235,8 +247,7 @@
 		<form th:each="item : ${items}"
 			th:id="'deleteForm-' + ${item.shiteiNo}"
 			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}"
-			method="post" class="d-none">
-		</form>
+			method="post" class="d-none"></form>
 
 		<!-- 削除確認モーダル -->
 		<div
