@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +56,11 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TokugimuListItem> search(TokugimuSearchForm form) {
+	public Page<TokugimuListItem> search(TokugimuSearchForm form) {
+		
+		// 5件ごとにページを切り替える
+		PageRequest pageable = PageRequest.of(form.getPage(), 5);
+		
 		// 初期遷移時（検索条件がすべて空）は全件取得
 		List<Tokugimu> tokugimuList;
 		if (isEmptySearchForm(form)) {
@@ -73,7 +80,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		}
 
 		if (tokugimuList.isEmpty()) {
-			return List.of();
+			return Page.empty(pageable);
 		}
 
 		List<BigDecimal> atenaNos = tokugimuList.stream().map(Tokugimu::getAtenaNo).toList();
@@ -85,7 +92,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		Map<String, Boolean> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos)
 				.stream().collect(Collectors.toMap(GassanUchi::getShiteiNo, g -> true, (a, b) -> a));
 
-		return tokugimuList.stream()
+		List<TokugimuListItem> allItems = tokugimuList.stream()
 				.map(t -> {
 					Atena atena = atenaMap.get(t.getAtenaNo());
 					boolean isGassanTarget = gassanMap.containsKey(t.getShiteiNo());
@@ -119,6 +126,11 @@ public class TokugimuServiceImpl implements TokugimuService {
 				})
 				.filter(item -> item != null)
 				.toList();
+
+		int start = (int) pageable.getOffset();
+		int end = Math.min(start + pageable.getPageSize(), allItems.size());
+		List<TokugimuListItem> pageContent = start >= allItems.size() ? List.of() : allItems.subList(start, end);
+		return new PageImpl<>(pageContent, pageable, allItems.size());
 	}
 
 	private List<Tokugimu> findTokugimuByGassanShiteiNo(String gassanShiteiNo) {
