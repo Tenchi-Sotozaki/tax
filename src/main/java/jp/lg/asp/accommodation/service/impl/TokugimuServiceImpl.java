@@ -58,8 +58,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Transactional(readOnly = true)
 	public Page<TokugimuListItem> search(TokugimuSearchForm form) {
 		
-		// 5件ごとにページを切り替える
-		PageRequest pageable = PageRequest.of(form.getPage(), 5);
+		// 指定した件数ごとにページを切り替える
+		PageRequest pageable = PageRequest.of(form.getPage(), form.getPageSize());
 		
 		// 初期遷移時（検索条件がすべて空）は全件取得
 		List<Tokugimu> tokugimuList;
