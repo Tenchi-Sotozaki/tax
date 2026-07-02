@@ -110,7 +110,7 @@ public final class ScreenManagement {
 
 	// 合算申告納入承認通知書
 	public static final String GASSAN_NONYU_TSUCHI = "ms00000021";
-	
+
 	//　宿泊税更生・決定通知書
 	public static final String KOSEI_KETTEI_TSUCHI = "ms00000023";
 
@@ -118,5 +118,11 @@ public final class ScreenManagement {
 	public static final String KOFU_RITSU_CONFIG = "sc00000005";
 
 	// 適用納税周期登録/編集/照会
-	public static final String TEKIYO_NOZEI_SHUKI_CONFIG = "TEKIYO_NOZEI";
+	public static final String TEKIYO_NOZEI_SHUKI_CONFIG = "ms00000024";
+
+	// 納入期限登録/編集
+	public static final String NOKIGEN_CONFIG = "sc00000005";
+
+	// 納入期限照会
+	public static final String NOKIGEN = "ss00000006";
 }
