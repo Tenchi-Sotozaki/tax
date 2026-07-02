@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,11 +10,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
+import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
@@ -39,9 +42,14 @@ public class TokugimuController {
 	// ========== 一覧・検索 ==========
 
 	@GetMapping("/list")
-	public String list(@ModelAttribute TokugimuSearchForm searchForm, Model model) {
+	public String list(@ModelAttribute TokugimuSearchForm searchForm,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int pageSize, Model model) {
 		accessChecker.checkAccess(TOKUGIMU_DAICHO);
-		model.addAttribute("items", tokugimuService.search(searchForm));
+		searchForm.setPage(page);
+		searchForm.setPageSize(pageSize);
+		Page<TokugimuListItem> pageResult = tokugimuService.search(searchForm);
+		model.addAttribute("items", pageResult);
 		model.addAttribute("searchForm", searchForm);
 		return LIST_VIEW;
 	}

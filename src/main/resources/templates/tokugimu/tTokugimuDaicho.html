@@ -16,7 +16,7 @@
 				<i class="bi bi-building text-primary me-2"></i>特別徴収義務者管理台帳
 			</h5>
 			<span class="text-muted small"> 検索結果: <strong
-				th:text="${#lists.size(items)}">0</strong> 件
+				th:text="${items.totalElements}">0</strong> 件
 			</span>
 		</div>
 
@@ -157,7 +157,10 @@
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ3: 納税周期(特例申請) -->
+					<!-- グループ3: 納入台帳 -->
+					<button type="button" id="btnPaymentLedger" class="btn btn-outline-secondary btn-sm">
+
+					<!-- グループ4: 納税周期(特例申請) -->
 					<div class="d-flex flex-wrap gap-1">
 						<button type="button" id="btnNozeiShuki"
 							class="btn btn-success btn-sm">
@@ -169,7 +172,7 @@
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ4: 納入台帳 -->
+					<!-- グループ5: 納入台帳 -->
 					<button type="button" id="btnPaymentLedger"
 						class="btn btn-outline-secondary btn-sm">
 						<i class="bi bi-currency-yen me-1"></i>納入金額管理台帳
@@ -184,6 +187,17 @@
 					</div>
 				</div>
 			</div>
+		</div>
+
+		<!-- 表示件数選択プルダウン -->
+		<div class="d-flex justify-content-end align-items-center mb-1">
+			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
+			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
+				<option th:each="s : ${#arrays.toArray({5, 10, 20})}"
+					th:value="@{/tokugimu/list(page=0, pageSize=${s}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+					th:text="${s}" th:selected="${s == searchForm.pageSize}">
+				</option>
+			</select>
 		</div>
 
 		<!-- ========== 一覧テーブル ========== -->
@@ -203,7 +217,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:each="item : ${items}">
+							<tr th:each="item : ${items.content}">
 								<td class="text-center"><input type="checkbox"
 									class="form-check-input row-select"
 									th:data-shitei-no="${item.shiteiNo}"></td>
@@ -223,7 +237,7 @@
 									th:unless="${item.consolidationTarget == 'target'}">非対象</span>
 								</td>
 							</tr>
-							<tr th:if="${#lists.isEmpty(items)}">
+							<tr th:if="${items.totalElements == 0}">
 								<td colspan="7" class="text-center text-muted py-5"><i
 									class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
 									該当するデータが見つかりませんでした。</td>
@@ -235,16 +249,29 @@
 			<div class="card-footer bg-white py-2 border-top">
 				<nav>
 					<ul class="pagination pagination-sm justify-content-center mb-0">
-						<li class="page-item disabled"><a class="page-link" href="#">前へ</a></li>
-						<li class="page-item active"><a class="page-link" href="#">1</a></li>
-						<li class="page-item"><a class="page-link" href="#">次へ</a></li>
+						<li class="page-item" th:classappend="${items.first} ? 'disabled'">
+							<a class="page-link"
+								th:href="@{/tokugimu/list(page=${items.number - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
+						</li>
+						<li class="page-item" th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
+							th:classappend="${i == items.number} ? 'active'">
+							<a class="page-link"
+								th:href="@{/tokugimu/list(page=${i}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+								th:text="${i + 1}">1</a>
+						</li>
+						<li class="page-item" th:classappend="${items.last} ? 'disabled'">
+							<a class="page-link"
+								th:href="@{/tokugimu/list(page=${items.number + 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
+						</li>
 					</ul>
 				</nav>
+				<div style="width: 120px;"></div>
+			</div>
 			</div>
 		</div>
 
 		<!-- 削除フォーム（隠し） -->
-		<form th:each="item : ${items}"
+		<form th:each="item : ${items.content}"
 			th:id="'deleteForm-' + ${item.shiteiNo}"
 			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}"
 			method="post" class="d-none"></form>
