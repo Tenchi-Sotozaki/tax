@@ -192,4 +192,20 @@ public class KoseiKetteiTsuchiReportsDto {
 
     // ── fukaKbn（JRXML切り替え用。帳票フィールドではない）──
     private String fukaKbn;
+    
+    private String kasan_kbn1;
+    private String kasan_kbn2;
+    private String kasan_kbn3;
+    
+    
+    private String todoufuken;
+    
+    private String henko_kbn;
+    
+    private String kbn_name1;
+    private String kbn_name2;
+    private String kbn_name3;
+    private String kbn_name4;
+    private String kbn_name5;
+    
 }

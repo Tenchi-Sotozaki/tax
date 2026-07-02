@@ -9,7 +9,7 @@ function generatePdf() {
     }
     const form = document.getElementById('koseiKetteiForm');
     form.action = ctxPath + 'reports/koseiKetteiTsuchi/pdf';
-    form.target = '_blank';
+    form.target = '_self';
     form.submit();
 }
 
@@ -18,10 +18,29 @@ function previewPdf() {
         alert('対象月１を選択してください。');
         return;
     }
-    const form = document.getElementById('koseiKetteiForm');
-    form.action = ctxPath + 'reports/koseiKetteiTsuchi/preview';
-    form.target = '_blank';
-    form.submit();
+
+    const form     = document.getElementById('koseiKetteiForm');
+    const formData = new FormData(form);
+
+    fetch(ctxPath + 'reports/koseiKetteiTsuchi/preview', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('プレビューの生成に失敗しました');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('プレビューの表示に失敗しました。');
+        });
 }
 
 function print() {

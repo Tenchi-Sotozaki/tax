@@ -427,6 +427,9 @@ public class FukaServiceImpl implements FukaService {
 				detail.setCityZeigaku(matched.getCityZeigaku());
 				detail.setKenZeigaku(matched.getKenZeigaku());
 			}
+			   if (detail.getTaxKenRate() == null) {
+			        detail.setTaxKenRate(BigDecimal.ZERO);
+			    }
 		}
 	}
 
@@ -465,7 +468,7 @@ public class FukaServiceImpl implements FukaService {
 					form.setAdditionalDueDate1(entity.getNokigen1());
 					form.setAdditionalCategory2(entity.getKasanKbn2());
 					if (entity.getKasanRitsu2() != null) {
-						form.setAdditionalRate2(entity.getKasanRitsu1().toString());
+					    form.setAdditionalRate2(entity.getKasanRitsu1().toString()); // ← kasan_ritsu1になっている
 					}
 					form.setAdditionalAmount2(entity.getKasanGaku2());
 					form.setAdditionalDueDate2(entity.getNokigen2());
