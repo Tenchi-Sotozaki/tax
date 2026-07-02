@@ -347,7 +347,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setMailNameKana(t.getSoufusakiNameKana());
 		form.setMailPhone(t.getSoufusakiTel());
 		form.setEltaxUmu(t.getEltaxUmu());
-		form.setTaxCycle(t.getNokigen());
 		form.setRemarks(t.getBiko());
 
 		// 所有者情報
@@ -361,7 +360,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 				});
 
 		// 共同事業者情報
-		List<KyodoJigyosha> kyodoList = kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo());
+		List<KyodoJigyosha> kyodoList = kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd,
+				t.getShiteiNo());
 		if (!kyodoList.isEmpty()) {
 			form.setKyodoFlg(true);
 			form.setKyodoList(kyodoList.stream().map(k -> {
@@ -411,7 +411,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setSoufusakiNameKana(form.getMailNameKana());
 		t.setSoufusakiTel(form.getMailPhone());
 		t.setEltaxUmu(form.getEltaxUmu());
-		t.setNokigen(form.getTaxCycle());
 		t.setBiko(form.getRemarks());
 		t.setKyushiStYmd(form.getSuspensionStartDate());
 		t.setKyushiEdYmd(form.getSuspensionEndDate());
@@ -420,10 +419,12 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {
-		if (!form.isKyodoFlg() || form.getKyodoList() == null) return;
+		if (!form.isKyodoFlg() || form.getKyodoList() == null)
+			return;
 		for (int i = 0; i < form.getKyodoList().size(); i++) {
 			KyodoJigyoshaDto dto = form.getKyodoList().get(i);
-			if (dto.getKyodoName() == null || dto.getKyodoName().isBlank()) continue;
+			if (dto.getKyodoName() == null || dto.getKyodoName().isBlank())
+				continue;
 			KyodoJigyosha k = new KyodoJigyosha();
 			k.setJichitaiCd(jichitaiCd);
 			k.setShiteiNo(shiteiNo);
