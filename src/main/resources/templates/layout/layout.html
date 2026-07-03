@@ -285,6 +285,12 @@
 												<i class="bi bi-shield-lock me-2"></i>権限管理
 										</a>
 										</li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/jichitai-config}"
+											th:classappend="${#strings.contains(currentUri, '/admin/jichitai-config')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-building me-2"></i>自治体情報
+										</a></li>
 									</ul>
 								</div>
 							</div>
