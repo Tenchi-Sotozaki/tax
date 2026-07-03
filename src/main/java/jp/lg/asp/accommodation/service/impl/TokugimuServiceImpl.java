@@ -26,6 +26,7 @@ import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
 import jp.lg.asp.accommodation.repository.KyodoJigyoshaRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokugimuService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	private final GassanUchiRepository gassanUchiRepository;
 	private final ShoyushaRepository shoyushaRepository;
 	private final KyodoJigyoshaRepository kyodoJigyoshaRepository;
+	private final JichitaiRepository jichitaiRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
@@ -58,8 +60,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 		List<Tokugimu> tokugimuList;
 		if (isEmptySearchForm(form)) {
 			tokugimuList = tokugimuRepository.findAllByJichitaiCd(jichitaiCd);
-		} else if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
-			// 指定番号が9で始まる場合、t_gassanから検索
+		} else if (form.getShiteiNo() != null && isGassanShiteiNo(form.getShiteiNo())) {
+			// 合算指定番号プレフィックスで始まる場合、t_gassanから検索
 			tokugimuList = findTokugimuByGassanShiteiNo(form.getShiteiNo());
 		} else {
 			tokugimuList = tokugimuRepository.findBySearchConditions(
@@ -135,6 +137,13 @@ public class TokugimuServiceImpl implements TokugimuService {
 		return shiteiNos.stream()
 				.flatMap(sn -> tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, sn).stream())
 				.toList();
+	}
+
+	private boolean isGassanShiteiNo(String shiteiNo) {
+		String gassanPrefix = jichitaiRepository.findById(jichitaiCd)
+				.map(j -> j.getGassanStChar() != null ? j.getGassanStChar() : "900")
+				.orElse("900");
+		return shiteiNo.startsWith(gassanPrefix);
 	}
 
 	private boolean isEmptySearchForm(TokugimuSearchForm form) {
@@ -215,8 +224,11 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private String generateShiteiNo() {
-		int max = tokugimuRepository.findMaxShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
-		return String.format("%08d", max + 1);
+		String prefix = jichitaiRepository.findById(jichitaiCd)
+				.map(j -> j.getShiteiStChar() != null ? j.getShiteiStChar() : "000")
+				.orElse("000");
+		int max = tokugimuRepository.findMaxShiteiNoByJichitaiCdAndPrefix(jichitaiCd, prefix).orElse(0);
+		return prefix + String.format("%05d", max + 1);
 	}
 
 	@Override
