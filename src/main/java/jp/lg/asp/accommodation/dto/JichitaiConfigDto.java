@@ -13,5 +13,5 @@ public class JichitaiConfigDto {
 	@NotNull(message = "年度開始月を入力してください。")
 	@Min(value = 1, message = "年度開始月は1〜12の範囲で入力してください。")
 	@Max(value = 12, message = "年度開始月は1〜12の範囲で入力してください。")
-	private Integer startMonth;
+	private Integer nendoStMonth;
 }

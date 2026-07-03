@@ -60,9 +60,9 @@
 					th:object="${configForm}" novalidate>
 					<div class="row g-3 align-items-end">
 						<div class="col-md-3">
-							<label for="startMonth" class="form-label">年度開始月 <span class="text-danger">*</span></label>
-							<select id="startMonth" th:field="*{startMonth}"
-								th:classappend="${#fields.hasErrors('startMonth')} ? 'is-invalid' : ''"
+							<label for="nendoStMonth" class="form-label">年度開始月 <span class="text-danger">*</span></label>
+							<select id="nendoStMonth" th:field="*{nendoStMonth}"
+								th:classappend="${#fields.hasErrors('nendoStMonth')} ? 'is-invalid' : ''"
 								class="form-select">
 								<option value="">選択してください</option>
 								<option th:each="m : ${#numbers.sequence(1, 12)}"
@@ -70,8 +70,8 @@
 									th:text="${m + '月'}">
 								</option>
 							</select>
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('startMonth')}"
-								th:errors="*{startMonth}"></div>
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('nendoStMonth')}"
+								th:errors="*{nendoStMonth}"></div>
 						</div>
 						<div class="col-md-2">
 							<button type="submit" class="btn btn-primary">

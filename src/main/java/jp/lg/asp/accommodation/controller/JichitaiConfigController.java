@@ -32,7 +32,7 @@ public class JichitaiConfigController {
 	public String index(Model model) {
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 		JichitaiConfigDto form = new JichitaiConfigDto();
-		form.setStartMonth(jichitai.getStartMonth());
+		form.setNendoStMonth(jichitai.getNendoStMonth());
 		model.addAttribute("configForm", form);
 		model.addAttribute("jichitai", jichitai);
 		return "admin/jichitaiConfig";
@@ -49,7 +49,7 @@ public class JichitaiConfigController {
 		}
 		try {
 			Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
-			jichitai.setStartMonth(configForm.getStartMonth());
+			jichitai.setNendoStMonth(configForm.getNendoStMonth());
 			jichitaiRepository.save(jichitai);
 			redirectAttributes.addFlashAttribute("successMessage", "年度開始月を保存しました。");
 		} catch (Exception e) {

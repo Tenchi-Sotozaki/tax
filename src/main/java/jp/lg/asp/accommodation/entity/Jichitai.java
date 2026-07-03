@@ -24,7 +24,7 @@ public class Jichitai extends BaseEntity {
 	@Column(name = "kbn_name", nullable = false, length = 10)
 	private String kbnName;
 
-	@Column(name = "start_month")
-	private Integer startMonth;
+	@Column(name = "nendo_st_month")
+	private Integer nendoStMonth;
 
 }
