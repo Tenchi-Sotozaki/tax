@@ -75,7 +75,7 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 		TokugimuJuriTsuchiDto dto = new TokugimuJuriTsuchiDto();
 		dto.setShiteiNo(tokugimu.getShiteiNo());
 		dto.setTokuName(atena.getName());
-		dto.setBiko(tokugimu.getBiko().isEmpty() ? "" : tokugimu.getBiko());
+		dto.setBiko(tokugimu.getBiko() != null ? tokugimu.getBiko() : "");
 
 		// 住所を郵便番号と住所で連結
 		String tokuJusho = "";
