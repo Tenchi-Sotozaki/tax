@@ -44,7 +44,9 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 	@PostConstruct
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
-		cityName = jichitaiInfo.getName();
+		if (jichitaiInfo != null) {
+			cityName = jichitaiInfo.getName();
+		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_SHITEI_JOREI);
 	}
 

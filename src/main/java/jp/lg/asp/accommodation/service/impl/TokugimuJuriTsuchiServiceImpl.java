@@ -40,7 +40,9 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 	@PostConstruct
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
-		jichitaiName = jichitaiInfo.getName();
+		if (jichitaiInfo != null) {
+			jichitaiName = jichitaiInfo.getName();
+		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
 	}
 
