@@ -213,6 +213,12 @@
 											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/list')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-sliders me-2"></i>賦課方式
 										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/shitei-gassan/view}"
+											th:classappend="${#strings.contains(currentUri, '/admin/shitei-gassan')} ? 'text-white fw-medium' : ''"> <i
+												class="bi bi-sliders me-2"></i>指定番号・合算指定番号設定
+										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
@@ -224,8 +230,8 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nokigen/list}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nokigen/list')} ? 'text-white fw-medium' : ''"> <i
-												class="bi bi-calendar-check me-2"></i>納入期限
+											th:classappend="${#strings.contains(currentUri, '/admin/nokigen/list')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-calendar-check me-2"></i>納入期限
 										</a></li>
 									</ul>
 								</div>
@@ -267,6 +273,12 @@
 										</a></li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/shitei-gassan/register}"
+											th:classappend="${#strings.contains(currentUri, '/admin/shitei-gassan')} ? 'text-white fw-medium' : ''"> <i
+												class="bi bi-sliders me-2"></i>指定番号・合算指定番号設定
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki/register}"
 											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/register')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar me-2"></i>納税周期
@@ -274,8 +286,8 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nokigen/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nokigen')} ? 'text-white fw-medium' : ''"> <i
-												class="bi bi-calendar-check me-2"></i>納入期限
+											th:classappend="${#strings.contains(currentUri, '/admin/nokigen')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-calendar-check me-2"></i>納入期限
 										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ROLE_MGMT')}">
