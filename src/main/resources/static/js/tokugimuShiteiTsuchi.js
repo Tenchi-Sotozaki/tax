@@ -25,11 +25,10 @@ function preview() {
     }
 
     const form = document.getElementById('tsuchiForm');
-    const formData = new URLSearchParams(new FormData(form));
+    const formData = new FormData(form);
 
     fetch('/accommodation-tax/reports/tokugimuShiteiTsuchi/preview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData
     })
         .then(response => {
@@ -59,11 +58,10 @@ function print() {
     }
 
     const form = document.getElementById('tsuchiForm');
-    const formData = new URLSearchParams(new FormData(form));
+    const formData = new FormData(form);
 
     fetch('/accommodation-tax/reports/tokugimuShiteiTsuchi/print', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData
     })
         .then(response => {
