@@ -25,6 +25,7 @@ public class Jichitai extends BaseEntity {
 	private String kbnName;
 
 	@Column(name = "nendo_st_month", length = 2)
+
 	private String nendoStMonth;
 
 	@Column(name = "shitei_st_char", length = 3)
