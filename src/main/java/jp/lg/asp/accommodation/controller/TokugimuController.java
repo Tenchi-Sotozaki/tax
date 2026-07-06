@@ -78,6 +78,7 @@ public class TokugimuController {
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", false);
+			model.addAttribute("validationErrors", TokugimuForm.TokugimuValidator.validate(form).values());
 			return FORM_VIEW;
 		}
 		try {
@@ -134,6 +135,7 @@ public class TokugimuController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("editId", id);
+			model.addAttribute("validationErrors", TokugimuForm.TokugimuValidator.validate(form).values());
 			return FORM_VIEW;
 		}
 		try {

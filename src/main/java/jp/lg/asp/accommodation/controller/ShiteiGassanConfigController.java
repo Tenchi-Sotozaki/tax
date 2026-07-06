@@ -85,6 +85,16 @@ public class ShiteiGassanConfigController {
 					.map(j -> j.getShiteiStChar() == null && j.getGassanStChar() == null)
 					.orElse(true);
 			model.addAttribute("mode", isNew ? "register" : "edit");
+			model.addAttribute("validationErrors", ShiteiGassanConfigDto.validate(dto).values());
+			return VIEW;
+		}
+		var errors = ShiteiGassanConfigDto.validate(dto);
+		if (!errors.isEmpty()) {
+			boolean isNew = jichitaiRepository.findById(jichitaiCd)
+					.map(j -> j.getShiteiStChar() == null && j.getGassanStChar() == null)
+					.orElse(true);
+			model.addAttribute("mode", isNew ? "register" : "edit");
+			model.addAttribute("validationErrors", errors.values());
 			return VIEW;
 		}
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd)

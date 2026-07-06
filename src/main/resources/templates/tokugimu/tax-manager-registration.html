@@ -45,6 +45,9 @@
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>
 				入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${#fields.allErrors()}" th:text="${err}" class="small"></li>
+				</ul>
 			</div>
 
 			<!-- 納税管理人情報 -->

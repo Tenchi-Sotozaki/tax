@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.NozeiShukiDto;
@@ -35,7 +34,6 @@ public class NozeiShukiController {
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.NOZEI_SHUKI_CONFIG;
 
 	@GetMapping("/list")
-	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
 	public String index(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<NozeiShukiDto> nozeiShukiList = nozeiShukiService.findAll();
@@ -44,7 +42,6 @@ public class NozeiShukiController {
 	}
 
 	@GetMapping("/search")
-	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public ResponseEntity<Map<String, Object>> search(@RequestParam(required = false) Integer shuki) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<NozeiShukiDto> nozeiShukiList = nozeiShukiService.findByShuki(shuki);
@@ -57,7 +54,6 @@ public class NozeiShukiController {
 	}
 
 	@GetMapping("/register")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String register(Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("nozeiShuki", new NozeiShuki());
@@ -66,7 +62,6 @@ public class NozeiShukiController {
 	}
 
 	@GetMapping("/edit/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable BigDecimal seq, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		NozeiShuki nozeiShuki = nozeiShukiService.findBySeq(seq);
@@ -81,7 +76,6 @@ public class NozeiShukiController {
 	}
 
 	@PostMapping("/save")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録・編集")
 	public String save(NozeiShuki nozeiShuki, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -115,7 +109,6 @@ public class NozeiShukiController {
 	}
 
 	@PostMapping("/delete/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public String delete(@PathVariable BigDecimal seq, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		try {

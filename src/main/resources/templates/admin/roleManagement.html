@@ -122,10 +122,15 @@
 							<input type="hidden" id="roleId" name="roleId"> <input
 								type="hidden" id="version" name="version">
 
+							<div id="roleModalErrors" class="alert alert-danger d-none" role="alert">
+								<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span id="roleModalErrorCount"></span> 件のエラーがあります。
+								<ul class="mb-0 mt-1" id="roleModalErrorList"></ul>
+							</div>
+
 							<div class="mb-3">
 								<label for="roleName" class="form-label">権限名 <span
 									class="text-danger">*</span></label> <input type="text"
-									class="form-control" id="roleName" name="name" required>
+									class="form-control" id="roleName" name="name">
 							</div>
 
 							<div class="mb-3">

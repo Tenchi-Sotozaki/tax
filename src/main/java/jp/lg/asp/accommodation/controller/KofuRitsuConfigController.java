@@ -37,6 +37,7 @@ public class KofuRitsuConfigController {
 			RedirectAttributes redirectAttributes) {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("historyList", kofuRitsuConfigService.findAll());
+			model.addAttribute("validationErrors", KofuRitsuConfigDto.validate(configForm).values());
 			return "admin/kofuRitsuConfig";
 		}
 		try {

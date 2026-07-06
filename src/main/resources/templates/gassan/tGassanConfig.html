@@ -44,10 +44,13 @@
 				type="hidden" th:field="*{gassanShiteiNo}">
 
 			<!-- バリデーションエラーサマリー -->
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
+			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger"
 				role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
-					th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+				</ul>
 			</div>
 
 			<!-- ===== 申告情報エリア ===== -->
@@ -63,8 +66,7 @@
 						<!-- 登録日 -->
 						<div class="col-md-3">
 							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'"
-								class="form-label fw-medium"> 登録日 <span
-								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
+								class="form-label fw-medium"> 登録日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="torokuYmd" th:field="*{torokuYmd}"
 								th:errorclass="is-invalid"> <input th:if="${isView}"
@@ -78,8 +80,7 @@
 						<!-- 申告日 -->
 						<div class="col-md-3">
 							<label th:for="!${isView} ? 'shinkokuYmd' : 'shinkokuYmdView'"
-								class="form-label fw-medium"> 申告日 <span
-								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
+								class="form-label fw-medium"> 申告日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="shinkokuYmd" th:field="*{shinkokuYmd}"
 								th:errorclass="is-invalid"> <input th:if="${isView}"
@@ -113,8 +114,7 @@
 						<!-- 適用時期(FROM) -->
 						<div class="col-md-4">
 							<label th:for="!${isView} ? 'tekiyoStYmd' : 'tekiyoStYmdView'"
-								class="form-label fw-medium"> 適用時期(FROM) <span
-								th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
+								class="form-label fw-medium"> 適用時期(FROM) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="tekiyoStYmd" th:field="*{tekiyoStYmd}"
 								th:errorclass="is-invalid"> <input th:if="${isView}"

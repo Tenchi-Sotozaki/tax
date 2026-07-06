@@ -19,10 +19,13 @@
 		<form th:action="${isEdit} ? @{/admin/user-edit/{id}(id=${userForm.originalId})} : @{/admin/user-registration}"
 			th:object="${userForm}" method="post">
 
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
+			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger"
 				role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>
 				入力内容にエラーがあります。各項目を確認してください。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+				</ul>
 			</div>
 
 			<div class="card mb-4 shadow-sm">
@@ -37,8 +40,7 @@
 						<input type="hidden" th:field="*{originalId}">
 
 						<div class="col-md-4">
-							<label for="id" class="form-label fw-medium"> ID <span
-								class="badge bg-danger text-white ms-1">必須</span>
+							<label for="id" class="form-label fw-medium"> ID <span class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="id" th:field="*{id}"
 								th:errorclass="is-invalid" th:readonly="${isEdit}">
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('id')}"
@@ -46,8 +48,7 @@
 						</div>
 
 						<div class="col-md-4">
-							<label for="name" class="form-label fw-medium"> 氏名 <span
-								class="badge bg-danger text-white ms-1">必須</span>
+							<label for="name" class="form-label fw-medium"> 氏名 <span class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="name"
 								th:field="*{name}" th:errorclass="is-invalid">
 							<div class="invalid-feedback"
@@ -56,7 +57,7 @@
 
 						<div class="col-md-4">
 							<label for="nameKana" class="form-label fw-medium"> ふりがな
-								<span class="badge bg-danger text-white ms-1">必須</span>
+								<span class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="nameKana"
 								th:field="*{nameKana}" th:errorclass="is-invalid"
 								placeholder="ひらがなで入力">
@@ -65,8 +66,7 @@
 						</div>
 
 						<div class="col-md-6">
-							<label for="busho" class="form-label fw-medium"> 部署 <span
-								class="badge bg-danger text-white ms-1">必須</span>
+							<label for="busho" class="form-label fw-medium"> 部署 <span class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="busho"
 								th:field="*{busho}" th:errorclass="is-invalid">
 							<div class="invalid-feedback"
@@ -74,8 +74,7 @@
 						</div>
 
 						<div class="col-md-6">
-							<label for="roleId" class="form-label fw-medium"> 権限 <span
-								class="badge bg-danger text-white ms-1">必須</span>
+							<label for="roleId" class="form-label fw-medium"> 権限 <span class="text-danger">*</span>
 							</label> <select class="form-select" id="roleId" th:field="*{roleId}"
 								th:errorclass="is-invalid">
 								<option value="">選択してください</option>
@@ -100,7 +99,7 @@
 						<div class="col-md-4">
 							<label for="password" class="form-label fw-medium"> <span
 								th:if="${isEdit}">新しいパスワード</span> <span th:if="!${isEdit}">パスワード
-									<span class="badge bg-danger text-white ms-1">必須</span>
+									<span class="text-danger">*</span>
 							</span> <span th:if="${isEdit}" class="text-muted small ms-1">（変更する場合のみ入力）</span>
 							</label> <input type="password" class="form-control" id="password"
 								th:field="*{password}" th:errorclass="is-invalid"
@@ -111,8 +110,7 @@
 
 						<div class="col-md-4">
 							<label for="passwordConfirm" class="form-label fw-medium">
-								パスワード（確認用） <span th:if="!${isEdit}"
-								class="badge bg-danger text-white ms-1">必須</span>
+								パスワード（確認用） <span class="text-danger" th:if="!${isEdit}">*</span>
 							</label> <input type="text" class="form-control" id="passwordConfirm"
 								name="passwordConfirm" th:errorclass="is-invalid"
 								autocomplete="new-password">

@@ -124,6 +124,7 @@ public class ZeiritsuController {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("seq", seq);
 			addConstants(model);
+			model.addAttribute("validationErrors", ZeiritsuForm.validate(form).values());
 			return FORM_VIEW;
 		}
 
@@ -153,7 +154,10 @@ public class ZeiritsuController {
 					});
 		} else {
 			zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, seqDec)
-					.forEach(d -> { d.setDelFlg("1"); zeiritsuTeiritsuRepository.save(d); });
+					.forEach(d -> {
+						d.setDelFlg("1");
+						zeiritsuTeiritsuRepository.save(d);
+					});
 		}
 
 		int detailSeq = 1;
@@ -262,6 +266,7 @@ public class ZeiritsuController {
 			model.addAttribute("isView", false);
 			model.addAttribute("isEdit", false);
 			addConstants(model);
+			model.addAttribute("validationErrors", ZeiritsuForm.validate(form).values());
 			return FORM_VIEW;
 		}
 
@@ -347,7 +352,7 @@ public class ZeiritsuController {
 				boolean edBlank = d.getRyokinEd() == null || d.getRyokinEd().isBlank();
 				if (stBlank && edBlank) {
 					bindingResult.rejectValue("details[" + i + "].ryokinSt", "RequiredEither",
-							"「円以上」または「円未満」のどちらかは必須です");
+							"「円以上」または「円未満」のどちらかは必須です ");
 				}
 			}
 			if (hasZei && !isTeigaku) {

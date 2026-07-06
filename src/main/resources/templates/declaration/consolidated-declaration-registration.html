@@ -23,9 +23,12 @@
         <input type="hidden" th:field="*{obligorId}">
 
         <!-- バリデーションエラーサマリー -->
-        <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
+        <div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+            入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。各項目を確認してください。
+            <ul class="mb-0 mt-1">
+                <li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+            </ul>
         </div>
 
         <!-- 申告情報エリア -->
@@ -39,7 +42,7 @@
                     <!-- 登録日 -->
                     <div class="col-md-4">
                         <label for="registrationDate" class="form-label fw-medium">
-                            登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+                            登録日 <span class="text-danger">*</span>
                         </label>
                         <input type="date" class="form-control" id="registrationDate"
                                th:field="*{registrationDate}" th:errorclass="is-invalid">
@@ -59,7 +62,7 @@
                     <!-- 適用時期 -->
                     <div class="col-md-4">
                         <label for="applicablePeriod" class="form-label fw-medium">
-                            適用時期 <span class="badge bg-danger text-white ms-1">必須</span>
+                            適用時期 <span class="text-danger">*</span>
                         </label>
                         <input type="month" class="form-control" id="applicablePeriod"
                                th:field="*{applicablePeriod}" th:errorclass="is-invalid">
@@ -70,7 +73,7 @@
                     <!-- 施設名一覧（動的チェックボックス） -->
                     <div class="col-md-12">
                         <label class="form-label fw-medium">
-                            施設名一覧 <span class="badge bg-danger text-white ms-1">必須</span>
+                            施設名一覧 <span class="text-danger">*</span>
                         </label>
                         <div class="row g-2 mt-1">
                             <div class="col-md-6" th:each="facility : ${facilityOptions}">

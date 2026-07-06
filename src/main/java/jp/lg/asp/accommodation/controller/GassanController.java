@@ -136,6 +136,7 @@ public class GassanController {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("editId", gassanShiteiNo);
+			model.addAttribute("validationErrors", GassanForm.validate(form).values());
 			return FORM_VIEW;
 		}
 
@@ -177,6 +178,7 @@ public class GassanController {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
+			model.addAttribute("validationErrors", GassanForm.validate(form).values());
 			return FORM_VIEW;
 		}
 		try {

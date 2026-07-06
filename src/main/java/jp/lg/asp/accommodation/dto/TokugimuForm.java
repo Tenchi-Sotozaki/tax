@@ -1,184 +1,199 @@
 package jp.lg.asp.accommodation.dto;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import jakarta.validation.Payload;
 import jakarta.validation.constraints.Size;
+
+import org.springframework.util.StringUtils;
 
 import lombok.Data;
 
 @Data
+@TokugimuForm.TokugimuValid
 public class TokugimuForm {
 
-	// 編集時のID保持用（新規登録時は null）
 	private Long id;
-
-	// 宛名番号（宛名検索で選択した m_atena.atena_no）
 	private Long atenaNo;
 
-	// ===== 特別徴収義務者情報 (m_atena) =====
-
-	@NotNull(message = "登録日は必須です")
+	// ===== 特別徴収義務者情報 =====
 	private LocalDate registrationDate;
-
 	@Size(max = 10)
-	@NotBlank(message = "郵便番号は必須です")
-	private String tokugimuAddressNo; // Atena.yubinNo（読取専用・宛名検索で自動入力）
-
-	@NotBlank(message = "住所は必須です")
-	private String tokugimuAddress; // Atena.jusho（読取専用・宛名検索で自動入力）
-
-	@NotBlank(message = "氏名または名称は必須です")
-	private String name; // Atena.name（読取専用・宛名検索で自動入力）
-
-	@NotBlank(message = "氏名(ふりがな)は必須です")
+	private String tokugimuAddressNo;
+	private String tokugimuAddress;
+	private String name;
 	@Size(max = 200)
-	private String nameKana; // Atena.nameKana（読取専用・宛名検索で自動入力）
+	private String nameKana;
+	private String personalNumber;
+	private String corporateNumber;
+	private String tokugimuPhone;
 
-	private String personalNumber; // Atena.kojinNo（読取専用・宛名検索で自動入力）
-	private String corporateNumber; // Atena.hojinNo（読取専用・宛名検索で自動入力）
-
-	@NotBlank(message = "電話番号は必須です")
-	private String tokugimuPhone; // Atena.tel1（読取専用・宛名検索で自動入力）
-
-	// ===== 宿泊施設情報 (t_tokugimu) =====
-
+	// ===== 宿泊施設情報 =====
 	@Size(max = 10)
-	private String facilityAddressNo; // Tokugimu.shisetsuYubinNo
-
+	private String facilityAddressNo;
 	@Size(max = 200)
-	private String facilityAddress; // Tokugimu.shisetsuJusho
-
-	@NotBlank(message = "施設名称は必須です")
+	private String facilityAddress;
 	@Size(max = 200)
-	private String facilityName; // Tokugimu.shisetsuName
-
-	@NotBlank(message = "施設名称(ふりがな)は必須です")
+	private String facilityName;
 	@Size(max = 200)
-	private String facilityNameKana; // Tokugimu.shisetsuNameKana
-
+	private String facilityNameKana;
 	@Size(max = 20)
-	private String facilityPhone; // Tokugimu.shisetsuTel
+	private String facilityPhone;
+	private BigDecimal floorArea;
+	private String aboveGroundFloor;
+	private String basementFloor;
+	private Integer roomCount;
+	private Integer capacity;
+	private LocalDate businessStartDate;
 
-	private BigDecimal floorArea; // Tokugimu.yukaMenseki
-
-	private String aboveGroundFloor; // Tokugimu.chijoKai
-
-	private String basementFloor; // Tokugimu.chikaKai
-
-	private Integer roomCount; // Tokugimu.kyakushitsuSu
-
-	private Integer capacity; // Tokugimu.shuyoSu
-
-	@NotNull(message = "営業開始(予定)日は必須です")
-	private LocalDate businessStartDate; // Tokugimu.eigyoStYmd
-
-	// ===== 営業許可等情報 (t_tokugimu) =====
-
+	// ===== 営業許可等情報 =====
 	@Size(max = 10)
-	private String licenseAddressNo; // Tokugimu.kyokaYubinNo
-
+	private String licenseAddressNo;
 	@Size(max = 200)
-	private String licenseAddress; // Tokugimu.kyokaJusho
-
-	@NotBlank(message = "営業許可の氏名は必須です")
+	private String licenseAddress;
 	@Size(max = 200)
-	private String licenseName; // Tokugimu.kyokaName
-
-	@NotBlank(message = "営業許可の氏名(ふりがな)は必須です")
+	private String licenseName;
 	@Size(max = 200)
-	private String licenseNameKana; // Tokugimu.kyokaNameKana
-
+	private String licenseNameKana;
 	@Size(max = 20)
-	private String licensePhone; // Tokugimu.kyokaTel
-
-	private String businessType; // Tokugimu.kyokaShu
-
+	private String licensePhone;
+	private String businessType;
 	@Size(max = 200)
-	private String licenseNumber; // Tokugimu.kyokaNo
+	private String licenseNumber;
 
-	// ===== 施設所有者情報 (t_shoyusha) =====
-
+	// ===== 施設所有者情報 =====
 	@Size(max = 10)
 	private String ownerAddressNo;
-
 	@Size(max = 200)
 	private String ownerAddress;
-
-	@NotBlank(message = "所有者の氏名(ふりがな)は必須です")
-	@Size(max = 200)
-	private String ownerNameKana;
-
-	@NotBlank(message = "所有者の氏名は必須です")
 	@Size(max = 200)
 	private String ownerName;
-
+	@Size(max = 200)
+	private String ownerNameKana;
 	@Size(max = 20)
 	private String ownerPhone;
 
-	// ===== 書類送付先情報 (t_tokugimu) =====
-
+	// ===== 書類送付先情報 =====
 	@Size(max = 10)
-	private String mailAddressNo; // Tokugimu.soufusakiYubinNo
-
+	private String mailAddressNo;
 	@Size(max = 200)
-	private String mailAddress; // Tokugimu.soufusakiJusho
-
-	@NotBlank(message = "書類送付先の氏名(ふりがな)は必須です")
+	private String mailAddress;
 	@Size(max = 200)
-	private String mailNameKana; // Tokugimu.soufusakiNameKana
-
-	@NotBlank(message = "書類送付先の氏名は必須です")
+	private String mailName;
 	@Size(max = 200)
-	private String mailName; // Tokugimu.soufusakiName
-
+	private String mailNameKana;
 	@Size(max = 20)
-	private String mailPhone; // Tokugimu.soufusakiTel
+	private String mailPhone;
 
-	// ===== 共同事業者情報 (t_kyodo_jigyosha) =====
+	// ===== 共同事業者情報 =====
 	private boolean kyodoFlg;
 	private List<KyodoJigyoshaDto> kyodoList = new ArrayList<>();
 
-	@AssertTrue(message = "共同事業者の氏名は必須です")
-	public boolean isKyodoNameValid() {
-		if (!kyodoFlg)
-			return true;
-		return kyodoList.stream().allMatch(k -> k.getKyodoName() != null && !k.getKyodoName().isBlank());
-	}
+	// ===== その他の情報 =====
+	private String eltaxUmu;
+	private String remarks;
 
-	@AssertTrue(message = "共同事業者の氏名(ふりがな)は必須です")
-	public boolean isKyodoNameKanaValid() {
-		if (!kyodoFlg)
-			return true;
-		return kyodoList.stream().allMatch(k -> k.getKyodoNameKana() != null && !k.getKyodoNameKana().isBlank());
-	}
-
-	// ===== その他の情報 (t_tokugimu) =====
-
-	private String eltaxUmu; // Tokugimu.eltaxUmu
-	private String remarks; // Tokugimu.biko
-
-	// ===== 施設営業休止/再開/廃止情報（編集時のみ使用） =====
-
+	// ===== 施設営業休止/再開/廃止情報 =====
 	private String declarationCategory;
-	private LocalDate suspensionStartDate; // Tokugimu.kyushiStYmd
-	private LocalDate suspensionEndDate; // Tokugimu.kyushiEdYmd
+	private LocalDate suspensionStartDate;
+	private LocalDate suspensionEndDate;
 	private boolean suspensionEndDateUndecided;
-	private LocalDate resumptionOrAbolitionDate; // Tokugimu.eigyoEdYmd
-	private String suspensionOrAbolitionReason; // Tokugimu.kyuhaishiRiyu
+	private LocalDate resumptionOrAbolitionDate;
+	private String suspensionOrAbolitionReason;
 
 	private String shiteiNo;
 
-	// 納入書用の特別徴収義務者郵便番号を取得
 	public String getTokugimuYubinNo() {
-		// 送付先郵便番号が優先、なければ特別徴収義務者郵便番号
-		return mailAddressNo != null && !mailAddressNo.isBlank()
-				? mailAddressNo
-				: tokugimuAddressNo;
+		return mailAddressNo != null && !mailAddressNo.isBlank() ? mailAddressNo : tokugimuAddressNo;
+	}
+
+	// ===== カスタムバリデーションアノテーション =====
+
+	@Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
+	@Retention(RetentionPolicy.RUNTIME)
+	@Constraint(validatedBy = TokugimuValidator.class)
+	@Documented
+	public @interface TokugimuValid {
+		String message() default "入力内容に誤りがあります";
+
+		Class<?>[] groups() default {};
+
+		Class<? extends Payload>[] payload() default {};
+	}
+
+	// ===== カスタムバリデーター =====
+
+	public static class TokugimuValidator implements ConstraintValidator<TokugimuValid, TokugimuForm> {
+
+		/** HTML表示順に対応したフィールド名→エラーメッセージのマップを返す */
+		public static Map<String, String> validate(TokugimuForm f) {
+			Map<String, String> errors = new LinkedHashMap<>();
+
+			if (f.getRegistrationDate() == null)
+				errors.put("registrationDate", "特別徴収義務者情報の登録日は必須です");
+			if (!StringUtils.hasText(f.getTokugimuAddressNo()))
+				errors.put("tokugimuAddressNo", "特別徴収義務者情報の郵便番号は必須です");
+			if (!StringUtils.hasText(f.getTokugimuAddress()))
+				errors.put("tokugimuAddress", "特別徴収義務者情報の住所は必須です");
+			if (!StringUtils.hasText(f.getName()))
+				errors.put("name", "特別徴収義務者情報の氏名または名称は必須です");
+			if (!StringUtils.hasText(f.getNameKana()))
+				errors.put("nameKana", "特別徴収義務者情報の氏名(ふりがな)は必須です");
+			if (!StringUtils.hasText(f.getTokugimuPhone()))
+				errors.put("tokugimuPhone", "特別徴収義務者情報の電話番号は必須です");
+			if (!StringUtils.hasText(f.getFacilityName()))
+				errors.put("facilityName", "宿泊施設情報の施設名称は必須です");
+			if (!StringUtils.hasText(f.getFacilityNameKana()))
+				errors.put("facilityNameKana", "宿泊施設情報の施設名称(ふりがな)は必須です");
+			if (f.getBusinessStartDate() == null)
+				errors.put("businessStartDate", "宿泊施設情報の営業開始(予定)日は必須です");
+			if (!StringUtils.hasText(f.getLicenseName()))
+				errors.put("licenseName", "営業許可等情報の氏名は必須です");
+			if (!StringUtils.hasText(f.getLicenseNameKana()))
+				errors.put("licenseNameKana", "営業許可等情報の氏名(ふりがな)は必須です");
+			if (!StringUtils.hasText(f.getOwnerName()))
+				errors.put("ownerName", "施設所有者情報の氏名は必須です");
+			if (!StringUtils.hasText(f.getOwnerNameKana()))
+				errors.put("ownerNameKana", "施設所有者情報の氏名(ふりがな)は必須です");
+			if (!StringUtils.hasText(f.getMailName()))
+				errors.put("mailName", "書類送付先情報の氏名は必須です");
+			if (!StringUtils.hasText(f.getMailNameKana()))
+				errors.put("mailNameKana", "書類送付先情報の氏名(ふりがな)は必須です");
+			if (f.isKyodoFlg()) {
+				if (f.getKyodoList().stream().anyMatch(k -> !StringUtils.hasText(k.getKyodoName())))
+					errors.put("kyodoName", "共同事業者情報の氏名は必須です");
+				if (f.getKyodoList().stream().anyMatch(k -> !StringUtils.hasText(k.getKyodoNameKana())))
+					errors.put("kyodoNameKana", "共同事業者情報の氏名(ふりがな)は必須です");
+			}
+
+			return errors;
+		}
+
+		@Override
+		public void initialize(TokugimuValid constraintAnnotation) {
+		}
+
+		@Override
+		public boolean isValid(TokugimuForm f, ConstraintValidatorContext ctx) {
+			ctx.disableDefaultConstraintViolation();
+			Map<String, String> errors = validate(f);
+			errors.forEach((field, message) -> ctx.buildConstraintViolationWithTemplate(message)
+					.addPropertyNode(field)
+					.addConstraintViolation());
+			return errors.isEmpty();
+		}
 	}
 }

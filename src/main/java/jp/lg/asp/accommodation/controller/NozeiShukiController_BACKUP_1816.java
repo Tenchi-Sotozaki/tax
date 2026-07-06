@@ -81,8 +81,12 @@ public class NozeiShukiController {
 	}
 
 	@PostMapping("/save")
+<<<<<<< HEAD
 	@OpeLog(screenId = SCREEN_ID, operation = "登録・編集")
+	public String save(NozeiShuki nozeiShuki, RedirectAttributes redirectAttributes) {
+=======
 	public String save(NozeiShuki nozeiShuki, Model model, RedirectAttributes redirectAttributes) {
+>>>>>>> shusei_kamei
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
 		if (nozeiShuki.getShuki() == null) {
