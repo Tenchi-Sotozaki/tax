@@ -52,6 +52,7 @@ public class RoleServiceImpl implements RoleService {
 		Role role;
 		if (form.getRoleId() != null) {
 			role = roleRepository.findByIdWithDetails(jichitaiCd, form.getRoleId()).orElseThrow();
+			role.setName(form.getName());
 
 			// 既存のroleDetailsをscreenIdでMap化
 			Map<String, RoleDetail> existingMap = role.getRoleDetails() == null ? new HashMap<>()
