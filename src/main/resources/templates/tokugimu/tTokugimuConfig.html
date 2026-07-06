@@ -751,8 +751,14 @@
 					</button>
 				</th:block>
 				<a th:href="@{/tokugimu/list}"
-					th:onclick="${!(isView ?: false)} ? 'return confirm(\'入力内容は破棄されます。よろしいですか？\')' : ''"
-					class="btn btn-outline-secondary btn-lg px-4"> <i
+					class="btn btn-outline-secondary btn-lg px-4"
+					th:if="${isView ?: false}"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<a th:href="@{/tokugimu/list}"
+					class="btn btn-outline-secondary btn-lg px-4"
+					th:unless="${isView ?: false}"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>

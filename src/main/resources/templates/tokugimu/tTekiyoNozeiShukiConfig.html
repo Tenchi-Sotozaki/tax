@@ -72,7 +72,7 @@
 							<label class="form-label fw-medium"> 納税周期 <span
 								class="text-danger" th:if="${!(isView ?: false)}">*</span>
 							</label> <select class="form-select" th:field="*{seq}"
-								th:disabled="${isView ?: false}">
+								th:disabled="${isView ?: false}" th:data-initial-value="*{seq}">
 								<option value="">-- 選択してください --</option>
 								<option th:each="opt : ${nozeiShukiOptions}"
 									th:value="${opt.seq}" th:text="${opt.label}"></option>
@@ -83,7 +83,8 @@
 							<label class="form-label fw-medium"> 適用開始年月日 <span
 								class="text-danger" th:if="${!(isView ?: false)}">*</span>
 							</label> <input th:if="${!(isView ?: false)}" type="date"
-								class="form-control" th:field="*{tekiyoStYmd}"> <input
+								class="form-control" th:field="*{tekiyoStYmd}"
+								th:data-initial-value="*{tekiyoStYmd}"> <input
 								th:if="${isView ?: false}" type="text" class="form-control"
 								readonly th:value="*{tekiyoStYmd}">
 						</div>
@@ -91,9 +92,9 @@
 						<div class="col-md-4">
 							<label class="form-label fw-medium">適用終了年月日</label> <input
 								th:if="${!(isView ?: false)}" type="date" class="form-control"
-								th:field="*{tekiyoEdYmd}"> <input
-								th:if="${isView ?: false}" type="text" class="form-control"
-								readonly th:value="*{tekiyoEdYmd}">
+								th:field="*{tekiyoEdYmd}" th:data-initial-value="*{tekiyoEdYmd}">
+							<input th:if="${isView ?: false}" type="text"
+								class="form-control" readonly th:value="*{tekiyoEdYmd}">
 						</div>
 
 					</div>
@@ -109,8 +110,12 @@
 
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
-					th:onclick="${!(isView ?: false)} ? 'return confirm(\'入力内容は破棄されます。よろしいですか？\')' : ''">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a> <a th:href="@{/tokugimu/list}"
+					class="btn btn-outline-secondary btn-lg px-4"
+					th:unless="${isView ?: false}"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>
 		</form>
