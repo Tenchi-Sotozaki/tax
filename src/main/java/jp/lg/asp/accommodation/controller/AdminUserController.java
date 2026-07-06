@@ -93,11 +93,9 @@ public class AdminUserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", false);
-<<<<<<< HEAD
-			model.addAttribute("isInitialSetup", initialSetup); // ★追加
-=======
+			model.addAttribute("isInitialSetup", initialSetup); 
 			model.addAttribute("validationErrors", UserForm.validate(form, true).values());
->>>>>>> refs/remotes/origin/master
+
 			return FORM_VIEW;
 		}
 
