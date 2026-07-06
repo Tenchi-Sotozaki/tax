@@ -240,3 +240,68 @@ function hideCheckMessage() {
         btn.disabled = false;
     });
 }
+
+// -----------------------------------------------------------------------
+// 値の変更を監視して色を変える処理
+// -----------------------------------------------------------------------
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 対象となる入力要素（input, textarea, select）をすべて取得
+    const inputs = document.querySelectorAll('.form-control, .form-check-input');
+
+    // 色を変更する関数
+    function checkValue(input) {
+        const initialValue = input.getAttribute('data-initial-value');
+        if (initialValue === null) return; // 初期値が設定されていない項目はスキップ
+
+        let currentValue;
+        let isChanged = false;
+
+        if (input.type === 'checkbox') {
+            // チェックボックスの判定（文字列の "true"/"false" と比較）
+            currentValue = input.checked ? 'true' : 'false';
+            isChanged = (currentValue !== initialValue);
+        } else {
+            // 通常の入力項目の判定
+            currentValue = input.value;
+            isChanged = (currentValue !== initialValue);
+        }
+
+        // 変化があれば警告色(薄い黄色とオレンジ枠)を付与、戻れば削除
+        if (isChanged) {
+            input.style.border = '3px solid #ffeb3b'; // 黄色
+        } else {
+            input.style.border = ''; // 元のスタイルに戻す
+        }
+    }
+
+    // 通常の手入力に対するイベントを設定
+    inputs.forEach(input => {
+        input.addEventListener('input', () => checkValue(input));
+        input.addEventListener('change', () => checkValue(input));
+    });
+
+    // 画面全体でクリックや何かしらの操作があった時、readonly項目の色を再チェック
+    const readonlyInputs = document.querySelectorAll('input[readonly], input[disabled], textarea[readonly]');
+
+    document.addEventListener('click', () => {
+        readonlyInputs.forEach(input => checkValue(input));
+    });
+    document.addEventListener('change', () => {
+        readonlyInputs.forEach(input => checkValue(input));
+    });
+
+    // 選任免除チェックボックスの初期制御
+    const exemptionFlag = document.getElementById('exemptionFlag');
+    const exemptionReasonArea = document.getElementById('exemptionReasonArea');
+    if (exemptionFlag && exemptionReasonArea) {
+        exemptionFlag.addEventListener('change', () => {
+            if (exemptionFlag.checked) {
+                exemptionReasonArea.style.display = 'block';
+            } else {
+                exemptionReasonArea.style.display = 'none';
+            }
+        });
+    }
+});
