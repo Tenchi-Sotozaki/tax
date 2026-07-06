@@ -41,6 +41,7 @@ public class ShoreikinController {
 	@PostMapping("/search")
 	public String search(@ModelAttribute ShoreikinDto searchForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		searchForm.setPage(0);
 		model.addAttribute("items", shoreikinService.search(searchForm));
 		model.addAttribute("searchForm", searchForm);
 		return LIST_VIEW;
