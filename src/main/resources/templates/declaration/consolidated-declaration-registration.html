@@ -106,7 +106,8 @@
             <button type="submit" class="btn btn-primary btn-lg px-5">
                 <i class="bi bi-save me-2"></i>登録する
             </button>
-            <a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
+            <a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4"
+               onclick="return confirm('入力内容は破棄されます。よろしいですか？')">
                 <i class="bi bi-arrow-left me-2"></i>一覧に戻る
             </a>
         </div>

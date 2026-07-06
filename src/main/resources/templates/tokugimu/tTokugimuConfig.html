@@ -30,13 +30,22 @@
 						th:if="${isEdit} or ${isView}">営業状況情報</a>
 				</div>
 			</div>
-			<!-- 特別徴収義務者情報 -->
-			<div class="mt-2 mb-0 ps-3">
-				<span class="fw-semibold">指定番号：</span> <span
-					th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
-					class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-					th:text="${tokugimuName}" class="me-4"></span> <span
-					class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
+			<div
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
+				<!-- 特別徴収義務者情報 -->
+				<div class="mt-2 mb-0 ps-3">
+					<span class="fw-semibold">指定番号：</span> <span
+						th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
+						class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
+						th:text="${tokugimuName}" class="me-4"></span> <span
+						class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
+				</div>
+				<th:block th:if="${isView}">
+					<a th:href="@{/tokugimu/edit/{id}(id=${editId})}"
+						class="btn btn-primary btn-sm mt-2"> <i
+						class="bi bi-pencil-square me-2"></i>編集する
+					</a>
+				</th:block>
 			</div>
 		</div>
 
@@ -59,12 +68,14 @@
 			<input type="hidden" th:field="*{atenaNo}" id="atenaNo">
 
 			<!-- バリデーションエラーサマリー -->
-			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show"
-				role="alert">
+			<div
+				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
 					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 				<ul class="mb-0 mt-1">
-					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+					<li th:each="err : ${validationErrors}" th:text="${err}"
+						class="small"></li>
 				</ul>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
@@ -132,7 +143,8 @@
 
 
 						<div class="col-md-6">
-							<label for="name" class="form-label fw-medium"> 氏名 <span class="text-danger" th:if="!${isView}">*</span>
+							<label for="name" class="form-label fw-medium"> 氏名 <span
+								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="name"
 								th:field="*{name}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly>
@@ -434,7 +446,8 @@
 						</div>
 
 						<div class="col-md-6">
-							<label for="ownerName" class="form-label fw-medium"> 氏名 <span class="text-danger" th:if="!${isView}">*</span>
+							<label for="ownerName" class="form-label fw-medium"> 氏名 <span
+								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="ownerName"
 								th:field="*{ownerName}" th:errorclass="is-invalid"
 								th:readonly="${isView}">
@@ -500,7 +513,8 @@
 						</div>
 
 						<div class="col-md-6">
-							<label for="mailName" class="form-label fw-medium"> 氏名 <span class="text-danger" th:if="!${isView}">*</span>
+							<label for="mailName" class="form-label fw-medium"> 氏名 <span
+								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="mailName"
 								th:field="*{mailName}" th:errorclass="is-invalid"
 								th:readonly="${isView}">
@@ -540,8 +554,9 @@
 					</h5>
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" id="kyodoCheck"
-							name="kyodoFlg" value="true" th:checked="*{kyodoFlg}" th:disabled="${isView}"> <label
-							class="form-check-label" for="kyodoCheck">表示する</label>
+							name="kyodoFlg" value="true" th:checked="*{kyodoFlg}"
+							th:disabled="${isView}"> <label class="form-check-label"
+							for="kyodoCheck">表示する</label>
 					</div>
 				</div>
 				<div id="kyodoBody" class="card-body bg-light-subtle"
@@ -574,14 +589,16 @@
 											th:readonly="${isView}">
 									</div>
 									<div class="col-md-6">
-										<label class="form-label fw-medium">氏名 <span class="text-danger" th:if="!${isView}">*</span></label>
-										<input type="text" class="form-control"
+										<label class="form-label fw-medium">氏名 <span
+											class="text-danger" th:if="!${isView}">*</span></label> <input
+											type="text" class="form-control"
 											th:field="*{kyodoList[__${stat.index}__].kyodoName}"
 											th:readonly="${isView}">
 									</div>
 									<div class="col-md-6">
-										<label class="form-label fw-medium">氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span></label>
-										<input type="text" class="form-control"
+										<label class="form-label fw-medium">氏名(ふりがな) <span
+											class="text-danger" th:if="!${isView}">*</span></label> <input
+											type="text" class="form-control"
 											th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
 											placeholder="ひらがなで入力" th:readonly="${isView}">
 									</div>
@@ -733,13 +750,8 @@
 						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
 					</button>
 				</th:block>
-				<th:block th:if="${isView}">
-					<a th:href="@{/tokugimu/edit/{id}(id=${editId})}"
-						class="btn btn-success btn-lg px-5"> <i
-						class="bi bi-pencil-square me-2"></i>編集する
-					</a>
-				</th:block>
 				<a th:href="@{/tokugimu/list}"
+					th:onclick="${!isView} ? 'return confirm(\'入力内容は破棄されます。よろしいですか？\')' : ''"
 					class="btn btn-outline-secondary btn-lg px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>

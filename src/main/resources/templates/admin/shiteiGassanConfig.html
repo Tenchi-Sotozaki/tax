@@ -89,7 +89,8 @@
 						th:if="!${mode == 'view'}">
 						<div th:if="${mode == 'edit'}">
 							<a th:href="@{/admin/shitei-gassan/view}"
-								class="btn btn-outline-secondary"> <i
+								class="btn btn-outline-secondary"
+								onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 								class="bi bi-arrow-left me-1"></i>照会に戻る
 							</a>
 						</div>

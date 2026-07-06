@@ -103,7 +103,8 @@
 					<i class="bi bi-pencil-square me-2"></i>編集する
 				</a>
 
-				<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-4">
+				<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-4"
+					th:onclick="${!(isView ?: false)} ? 'return confirm(\'入力内容は破棄されます。よろしいですか？\')' : ''">
 					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>
