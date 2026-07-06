@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
      * @param {HTMLElement} input - 判定対象の入力要素
      */
     function checkValue(input) {
-		
-		// サーバーから渡された画面表示時点の初期値を取得
+
+        // サーバーから渡された画面表示時点の初期値を取得
         const initialValue = input.getAttribute('data-initial-value');
 
         // 現在の値と初期値が一致しているか判定
