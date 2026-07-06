@@ -131,4 +131,7 @@ public final class ScreenManagement {
 
 	// 指定番号・合算指定番号照会
 	public static final String SHITEI_GASSAN = "ss00000007";
+
+	// 操作ログ照会
+	public static final String OPE_LOG_VIEW = "ss00000008";
 }
