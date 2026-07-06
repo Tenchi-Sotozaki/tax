@@ -39,7 +39,7 @@ public class ShiteiGassanConfigController {
 	/** 設定メニューからの遷移：登録済みなら照会へ、未登録なら登録画面へ */
 	@GetMapping("/register")
 	public String register(Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
 		if (jichitai != null && (jichitai.getShiteiStChar() != null || jichitai.getGassanStChar() != null)) {
 			redirectAttributes.addFlashAttribute("infoMessage", "既に登録されています。照会画面に遷移しました。");
@@ -68,7 +68,7 @@ public class ShiteiGassanConfigController {
 	/** 照会画面の編集ボタンから遷移 */
 	@GetMapping("/edit")
 	public String edit(Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
 		model.addAttribute("configDto", toDto(jichitai));
 		model.addAttribute("mode", "edit");
@@ -79,7 +79,7 @@ public class ShiteiGassanConfigController {
 	@PostMapping("/save")
 	public String save(@Valid @ModelAttribute("configDto") ShiteiGassanConfigDto dto,
 			BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		if (bindingResult.hasErrors()) {
 			boolean isNew = jichitaiRepository.findById(jichitaiCd)
 					.map(j -> j.getShiteiStChar() == null && j.getGassanStChar() == null)

@@ -92,7 +92,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable("seq") Long seq,
 			Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		Zeiritsu z = findOrThrow(jichitaiCd, BigDecimal.valueOf(seq));
 		model.addAttribute("zeiritsuForm", toForm(z, jichitaiCd));
 		model.addAttribute("isView", false);
@@ -111,7 +111,7 @@ public class ZeiritsuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		validateDetails(form, bindingResult);
 
@@ -204,7 +204,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public String delete(@PathVariable("seq") Long seq,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		BigDecimal seqDec = BigDecimal.valueOf(seq);
 
@@ -239,7 +239,7 @@ public class ZeiritsuController {
 	@GetMapping("/register")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String showForm(Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		model.addAttribute("zeiritsuForm", new ZeiritsuForm());
 		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", false);
@@ -255,7 +255,7 @@ public class ZeiritsuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		validateDetails(form, bindingResult);
 

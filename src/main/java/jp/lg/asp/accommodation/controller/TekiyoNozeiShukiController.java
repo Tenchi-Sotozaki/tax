@@ -33,7 +33,7 @@ public class TekiyoNozeiShukiController {
 	@GetMapping("/edit/{id}")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		TekiyoNozeiShukiForm form = tekiyoNozeiShukiService.getByShiteiNo(id);
 
 		if (form.isEdit() && "register".equals(from)) {
@@ -70,7 +70,7 @@ public class TekiyoNozeiShukiController {
 			@ModelAttribute("tekiyoNozeiShukiForm") TekiyoNozeiShukiForm form,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		try {
 			tekiyoNozeiShukiService.save(id, form);

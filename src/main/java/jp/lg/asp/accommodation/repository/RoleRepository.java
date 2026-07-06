@@ -23,4 +23,7 @@ public interface RoleRepository extends JpaRepository<Role, RoleId> {
 
     @Query("SELECT COUNT(rd) FROM RoleDetail rd WHERE rd.jichitaiCd = :jichitaiCd AND rd.roleId = :roleId AND TRIM(rd.screenId) = TRIM(:screenId) AND rd.permission >= '1'")
     long countAccessibleScreen(@Param("jichitaiCd") String jichitaiCd, @Param("roleId") Long roleId, @Param("screenId") String screenId);
+
+    @Query("SELECT COUNT(rd) FROM RoleDetail rd WHERE rd.jichitaiCd = :jichitaiCd AND rd.roleId = :roleId AND TRIM(rd.screenId) = TRIM(:screenId) AND rd.permission >= '2'")
+    long countWritableScreen(@Param("jichitaiCd") String jichitaiCd, @Param("roleId") Long roleId, @Param("screenId") String screenId);
 }
