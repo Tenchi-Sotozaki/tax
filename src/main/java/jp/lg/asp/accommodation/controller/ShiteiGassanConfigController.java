@@ -58,6 +58,9 @@ public class ShiteiGassanConfigController {
 			redirectAttributes.addFlashAttribute("errorMessage", "自治体情報が見つかりません。");
 			return "redirect:/admin/shitei-gassan/register";
 		}
+		if (jichitai.getShiteiStChar() == null && jichitai.getGassanStChar() == null) {
+			return "redirect:/admin/shitei-gassan/register";
+		}
 		ShiteiGassanConfigDto dto = toDto(jichitai);
 		model.addAttribute("configDto", dto);
 		model.addAttribute("mode", "view");
