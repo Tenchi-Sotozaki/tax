@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinRenkeiDto;
@@ -38,6 +39,7 @@ public class ShoreikinRenkeiController {
     private static final String SCREEN_ID = ScreenManagement.KOFUKIN_FURIKOMI;
 
     @GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
     public String index(
             @RequestParam(required = false) String nendo,
             @RequestParam(required = false) String shiteiNo,
@@ -59,6 +61,7 @@ public class ShoreikinRenkeiController {
 
     @GetMapping("/search")
     @ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "検索")
     public List<ShoreikinRenkeiDto> search(
             @RequestParam(required = false) String nendo,
             @RequestParam(required = false) String shiteiNo,
@@ -69,6 +72,7 @@ public class ShoreikinRenkeiController {
     }
 
     @PostMapping("/download")
+	@OpeLog(screenId = SCREEN_ID, operation = "ダウンロード")
     public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShoreikinRenkeiDto.Key> keys) {
         accessChecker.checkAccess(SCREEN_ID);
         List<ShoreikinRenkeiDto> rows = shoreikinRenkeiService.findByKeys(jichitaiCd, keys);
@@ -117,6 +121,7 @@ public class ShoreikinRenkeiController {
     }
 
     @PostMapping("/kakunin")
+	@OpeLog(screenId = SCREEN_ID, operation = "確認")
     public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
         accessChecker.checkAccess(SCREEN_ID);
         try {

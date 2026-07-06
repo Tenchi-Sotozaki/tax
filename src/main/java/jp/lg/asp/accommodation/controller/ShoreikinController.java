@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinDto;
@@ -31,6 +32,7 @@ public class ShoreikinController {
 	private static final String LIST_VIEW = "shoreikin/shoreikin";
 
 	@GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
 	public String list(@ModelAttribute ShoreikinDto searchForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("items", shoreikinService.search(searchForm));
@@ -39,6 +41,7 @@ public class ShoreikinController {
 	}
 
 	@PostMapping("/search")
+	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public String search(@ModelAttribute ShoreikinDto searchForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("items", shoreikinService.search(searchForm));
@@ -47,6 +50,7 @@ public class ShoreikinController {
 	}
 
 	@PostMapping("/bulkCalculate")
+	@OpeLog(screenId = SCREEN_ID, operation = "一括算出")
 	public String bulkCalculate(@ModelAttribute ShoreikinDto searchForm,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -56,6 +60,7 @@ public class ShoreikinController {
 	}
 
 	@PostMapping("/viewKofu")
+	@OpeLog(screenId = SCREEN_ID, operation = "交付金照会")
 	public String viewKofu(@RequestParam List<String> selectedItems,
 			@RequestParam(required = false) String nendo,
 			RedirectAttributes redirectAttributes) {
@@ -82,6 +87,7 @@ public class ShoreikinController {
 	}
 
 	@PostMapping("/viewKoza")
+	@OpeLog(screenId = SCREEN_ID, operation = "口座照会")
 	public String viewKoza(@RequestParam List<String> selectedItems,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);

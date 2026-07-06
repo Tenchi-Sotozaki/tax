@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.RoleForm;
@@ -38,6 +39,7 @@ public class RoleController {
 	private static final String SCREEN_ID = ScreenManagement.ROLE_MANAGEMENT;
 
 	@GetMapping("/management")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String roleManagement(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		try {
@@ -56,6 +58,7 @@ public class RoleController {
 
 	@PostMapping("/save")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "登録・更新")
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
@@ -71,6 +74,7 @@ public class RoleController {
 
 	@GetMapping("/detail/{roleId}")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "権限詳細取得")
 	public Map<String, Object> getRoleDetail(@PathVariable Long roleId) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Role role = roleService.findById(jichitaiCd, roleId);
@@ -98,6 +102,7 @@ public class RoleController {
 
 	@GetMapping("/users/{roleId}")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "権限付与ユーザー照会")
 	public Map<String, Object> getAssignedUsers(@PathVariable Long roleId) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Role role = roleService.findById(jichitaiCd, roleId);
@@ -117,6 +122,7 @@ public class RoleController {
 
 	@PostMapping("/users/{roleId}")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "権限付与ユーザー更新")
 	public Map<String, Object> updateAssignedUsers(@PathVariable Long roleId,
 			@RequestBody Map<String, List<String>> body) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -133,6 +139,7 @@ public class RoleController {
 
 	@PostMapping("/delete/{roleId}")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public Map<String, Object> deleteRole(@PathVariable Long roleId) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();

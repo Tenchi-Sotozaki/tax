@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
@@ -39,6 +40,7 @@ public class ShoreikinBulkController {
 	private String jichitaiCd;
 
 	@GetMapping("/bulk")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String bulk(@RequestParam(required = false) String nendo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
@@ -55,6 +57,7 @@ public class ShoreikinBulkController {
 	}
 
 	@PostMapping("/bulk/execute")
+	@OpeLog(screenId = SCREEN_ID, operation = "一括算出")
 	public String executeBulk(@Valid @ModelAttribute ShoreikinBulkDto bulkForm,
 			BindingResult bindingResult,
 			Model model) {

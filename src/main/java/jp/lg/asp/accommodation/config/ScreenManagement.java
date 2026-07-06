@@ -13,43 +13,43 @@ public final class ScreenManagement {
 	}
 
 	// 特別徴収義務者管理台帳
-	public static final String TOKUGIMU_DAICHO = "TOKUGIMU";
+	public static final String TOKUGIMU_DAICHO = "ms00000001";
 
 	// 宛名管理台帳
-	public static final String ATENA_DAICHO = "ATENA";
+	public static final String ATENA_DAICHO = "ms00000008";
 
 	// 宛名取込
-	public static final String ATENA_INSERT = "ATENAINS";
+	public static final String ATENA_INSERT = "mt00000001";
 
 	//特別徴収義務者登録/編集/照会
-	public static final String TOKUGIMU_CONFIG = "TOKUCONFIG";
+	public static final String TOKUGIMU_CONFIG = "ms00000002";
 
 	// 納入申告登録
-	public static final String FUKA_CONFIG = "DECLARATIO";
+	public static final String FUKA_CONFIG = "ms00000005";
 
 	// 納入金額管理台帳
-	public static final String FUKA_DAICHO = "FUKA";
+	public static final String FUKA_DAICHO = "ms00000004";
 
 	// 納税管理人登録/編集/照会
-	public static final String TAXMANAGER_CONFIG = "TAX_MANAGE";
+	public static final String TAXMANAGER_CONFIG = "ms00000003";
 
 	// ユーザー管理
-	public static final String USER_MANAGEMENT = "USER_MGMT";
+	public static final String USER_MANAGEMENT = "ss00000002";
 
 	// 権限管理
-	public static final String ROLE_MANAGEMENT = "ROLE_MGMT";
+	public static final String ROLE_MANAGEMENT = "sc00000004";
 
 	// 納税周期管理
-	public static final String NOZEI_SHUKI = "NOZEI_SHUK";
+	public static final String NOZEI_SHUKI = "ss00000005";
 
 	// 納税周期登録/編集
 	public static final String NOZEI_SHUKI_CONFIG = "sc00000003";
 
 	// 電子申告情報取込
-	public static final String ELTAX_RENKEI = "ELTAX_RENKEI";
+	public static final String ELTAX_RENKEI = "mt00000002";
 
 	// 電子申告情報取込確認
-	public static final String ELTAX_RENKEI_KAKUNIN = "ELTAX_RENKEI_KAKU";
+	public static final String ELTAX_RENKEI_KAKUNIN = "mt00000003";
 
 	// 合算申告登録/編集/照会
 	public static final String GASSAN_CONFIG = "mi00000001";
@@ -58,28 +58,28 @@ public final class ScreenManagement {
 	public static final String GASSAN_LIST = "ms00000006";
 
 	// 収納管理情報連携
-	public static final String SHUNO_RENKEI = "SHUNO_RENKEI";
+	public static final String SHUNO_RENKEI = "mo00000001";
 
 	// 交付金振込情報連携
-	public static final String KOFUKIN_FURIKOMI = "KOFUKIN_FURIKOMI";
+	public static final String KOFUKIN_FURIKOMI = "mo00000003";
 
 	// 賦課方式設定（税率管理マスタ）
-	public static final String ZEIRITSU_CONFIG = "ZEIRITSU";
+	public static final String ZEIRITSU_CONFIG = "sc00000002";
 
 	// 特別徴収事務交付金
-	public static final String SHOREIKIN = "SHOREIKIN";
+	public static final String SHOREIKIN = "ms00000009";
 
 	// 特別徴収事務交付金一括算出
-	public static final String SHOREIKIN_BULK = "SHOREIKIN_BULK";
+	public static final String SHOREIKIN_BULK = "ms00000010";
 
 	// 特別徴収事務交付金照会/登録/編集
-	public static final String SHOREIKIN_CONFIG = "SHOREIKIN_CONFGI";
+	public static final String SHOREIKIN_CONFIG = "ms00000011";
 
 	// 振込先口座照会/登録/編集
-	public static final String FURIKOMI_KOZA = "FURIKOMI_KOZA";
+	public static final String FURIKOMI_KOZA = "ms00000012";
 
 	// 帳票出力
-	public static final String TOKUGIMU_REPORT = "TOKU_REPORT";
+	public static final String TOKUGIMU_REPORT = "ms00000007";
 
 	// 特別徴収義務者指定通知書
 	public static final String TOKUGIMU_SHITEI_TSUCHI = "ms00000013";

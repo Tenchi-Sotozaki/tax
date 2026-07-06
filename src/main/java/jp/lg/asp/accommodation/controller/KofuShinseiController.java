@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.KofuShinseiDto;
@@ -36,6 +37,7 @@ public class KofuShinseiController {
 	 * 画面表示
 	 */
 	@GetMapping("/kofuShinsei")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String nendo,
 			Model model) {
@@ -91,6 +93,7 @@ public class KofuShinseiController {
 	 * 年度変更時のデータ取得API
 	 */
 	@PostMapping("/kofuShinsei/reload")
+	@OpeLog(screenId = SCREEN_ID, operation = "年度更新")
 	public ResponseEntity<KofuShinseiDto> reloadData(@RequestParam String shiteiNo,
 			@RequestParam String nendo) {
 		try {
@@ -119,6 +122,7 @@ public class KofuShinseiController {
 	 * PDF出力
 	 */
 	@PostMapping("/kofuShinsei/pdf")
+	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	public ResponseEntity<byte[]> generatePdf(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
@@ -154,6 +158,7 @@ public class KofuShinseiController {
 	 * プレビュー
 	 */
 	@PostMapping("/kofuShinsei/preview")
+	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
 	public ResponseEntity<byte[]> preview(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
@@ -190,6 +195,7 @@ public class KofuShinseiController {
 	 * 印刷
 	 */
 	@PostMapping("/kofuShinsei/print")
+	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
 	public ResponseEntity<byte[]> print(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);

@@ -36,7 +36,6 @@ CREATE TABLE IF NOT EXISTS t_tokugimu (
   kyushi_ed_ymd date,
   kyuhaishi_riyu varchar(400),
   eltax_umu char(1),
-  nokigen numeric(3),
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
@@ -83,7 +82,6 @@ COMMENT ON COLUMN t_tokugimu.kyushi_st_ymd IS '休止開始年月日';
 COMMENT ON COLUMN t_tokugimu.kyushi_ed_ymd IS '休止終了年月日';
 COMMENT ON COLUMN t_tokugimu.kyuhaishi_riyu IS '休廃止理由';
 COMMENT ON COLUMN t_tokugimu.eltax_umu IS 'eLTAX利用有無';
-COMMENT ON COLUMN t_tokugimu.nokigen IS '納税周期選択';
 COMMENT ON COLUMN t_tokugimu.new_flg IS '最新フラグ';
 COMMENT ON COLUMN t_tokugimu.del_flg IS '削除フラグ';
 COMMENT ON COLUMN t_tokugimu.add_dt IS '作成日時';
@@ -125,6 +123,74 @@ COMMENT ON COLUMN t_shoyusha.add_user IS '作成者';
 COMMENT ON COLUMN t_shoyusha.upd_dt IS '更新日時';
 COMMENT ON COLUMN t_shoyusha.upd_user IS '更新者';
 COMMENT ON COLUMN t_shoyusha.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_kyodo_jigyosha (
+  jichitai_cd char(5) NOT NULL,
+  shitei_no char(8) NOT NULL,
+  rno numeric(3) NOT NULL,
+  idx numeric(3) NOT NULL,
+  kyodo_jigyosha_name varchar(200) NOT NULL,
+  kyodo_jigyosha_name_kana varchar(200) NOT NULL,
+  kyodo_jigyosha_yubin_no varchar(10),
+  kyodo_jigyosha_jusho varchar(200),
+  kyodo_jigyosha_tel varchar(20),
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_kyodo_jigyosha_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, idx)
+);
+COMMENT ON TABLE t_kyodo_jigyosha IS '宿泊施設共同事業者情報';
+COMMENT ON COLUMN t_kyodo_jigyosha.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_kyodo_jigyosha.shitei_no IS '指定番号';
+COMMENT ON COLUMN t_kyodo_jigyosha.rno IS '履歴番号';
+COMMENT ON COLUMN t_kyodo_jigyosha.idx IS '共同事業者連番';
+COMMENT ON COLUMN t_kyodo_jigyosha.kyodo_jigyosha_name IS '施設所有者名称';
+COMMENT ON COLUMN t_kyodo_jigyosha.kyodo_jigyosha_name_kana IS '施設所有者名称かな';
+COMMENT ON COLUMN t_kyodo_jigyosha.kyodo_jigyosha_yubin_no IS '施設所有者郵便番号';
+COMMENT ON COLUMN t_kyodo_jigyosha.kyodo_jigyosha_jusho IS '施設所有者住所';
+COMMENT ON COLUMN t_kyodo_jigyosha.kyodo_jigyosha_tel IS '施設所有者電話番号';
+COMMENT ON COLUMN t_kyodo_jigyosha.add_dt IS '作成日時';
+COMMENT ON COLUMN t_kyodo_jigyosha.add_user IS '作成者';
+COMMENT ON COLUMN t_kyodo_jigyosha.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_kyodo_jigyosha.upd_user IS '更新者';
+COMMENT ON COLUMN t_kyodo_jigyosha.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_nozei_shuki (
+  jichitai_cd char(5) NOT NULL,
+  shitei_no char(8) NOT NULL,
+  rno numeric(3) NOT NULL,
+  idx_rno numeric(3),
+  seq numeric(3) NOT NULL,
+  tekiyo_st_ymd date,
+  tekiyo_ed_ymd date,
+  new_flg char(1),
+  del_flg char(1),
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno)
+);
+COMMENT ON TABLE t_nozei_shuki IS '納税周期情報';
+COMMENT ON COLUMN t_nozei_shuki.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_nozei_shuki.shitei_no IS '指定番号';
+COMMENT ON COLUMN t_nozei_shuki.rno IS '特別徴収義務者履歴番号';
+COMMENT ON COLUMN t_nozei_shuki.idx_rno IS '履歴番号';
+COMMENT ON COLUMN t_nozei_shuki.seq IS '管理番号';
+COMMENT ON COLUMN t_nozei_shuki.tekiyo_st_ymd IS '適用開始年月日';
+COMMENT ON COLUMN t_nozei_shuki.tekiyo_ed_ymd IS '適用終了年月日';
+COMMENT ON COLUMN t_nozei_shuki.new_flg IS '最新フラグ';
+COMMENT ON COLUMN t_nozei_shuki.del_flg IS '削除フラグ';
+COMMENT ON COLUMN t_nozei_shuki.add_dt IS '作成日時';
+COMMENT ON COLUMN t_nozei_shuki.add_user IS '作成者';
+COMMENT ON COLUMN t_nozei_shuki.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_nozei_shuki.upd_user IS '更新者';
+COMMENT ON COLUMN t_nozei_shuki.version IS 'バージョン';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_nokan (
@@ -919,6 +985,9 @@ CREATE TABLE IF NOT EXISTS m_jichitai (
   jichitai_cd char(5) NOT NULL,
   name varchar(20) NOT NULL,
   kbn_name varchar(10) NOT NULL,
+  nendo_st_month char(2),
+  shitei_st_char char(3),
+  gassan_st_char char(3),
   add_dt timestamp NOT NULL,
   add_user varchar(20) NOT NULL,
   upd_dt timestamp NOT NULL,
@@ -930,11 +999,86 @@ COMMENT ON TABLE m_jichitai IS '自治体情報マスタ';
 COMMENT ON COLUMN m_jichitai.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_jichitai.name IS '自治体名称';
 COMMENT ON COLUMN m_jichitai.kbn_name IS '自治体種別名';
+COMMENT ON COLUMN m_jichitai.nendo_st_month IS '年度開始月';
+COMMENT ON COLUMN m_jichitai.shitei_st_char IS '指定番号';
+COMMENT ON COLUMN m_jichitai.gassan_st_char IS '合算指定番号';
 COMMENT ON COLUMN m_jichitai.add_dt IS '作成日時';
 COMMENT ON COLUMN m_jichitai.add_user IS '作成者';
 COMMENT ON COLUMN m_jichitai.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_jichitai.upd_user IS '更新者';
 COMMENT ON COLUMN m_jichitai.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_nokigen (
+  jichitai_cd char(5) NOT NULL,
+  nendo char(4) NOT NULL,
+  nokigen_1st char(8) NOT NULL,
+  nokigen_2nd char(8) NOT NULL,
+  nokigen_3rd char(8) NOT NULL,
+  nokigen_4th char(8) NOT NULL,
+  nokigen_5th char(8) NOT NULL,
+  nokigen_6th char(8) NOT NULL,
+  nokigen_7th char(8) NOT NULL,
+  nokigen_8th char(8) NOT NULL,
+  nokigen_9th char(8) NOT NULL,
+  nokigen_10th char(8) NOT NULL,
+  nokigen_11th char(8) NOT NULL,
+  nokigen_12th char(8) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_nokigen_pkey PRIMARY KEY (jichitai_cd,nendo)
+);
+COMMENT ON TABLE m_nokigen IS '納入期限マスタ';
+COMMENT ON COLUMN m_nokigen.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_nokigen.nendo IS '対象年度';
+COMMENT ON COLUMN m_nokigen.nokigen_1st IS '1期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_2nd IS '2期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_3rd IS '3期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_4th IS '4期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_5th IS '5期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_6th IS '6期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_7th IS '7期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_8th IS '8期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_9th IS '9期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_10th IS '10期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_11th IS '11期納期';
+COMMENT ON COLUMN m_nokigen.nokigen_12th IS '12期納期';
+COMMENT ON COLUMN m_nokigen.add_dt IS '作成日時';
+COMMENT ON COLUMN m_nokigen.add_user IS '作成者';
+COMMENT ON COLUMN m_nokigen.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_nokigen.upd_user IS '更新者';
+COMMENT ON COLUMN m_nokigen.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_kofu_ritsu (
+  jichitai_cd char(5) NOT NULL,
+  rno numeric(3) NOT NULL,
+  kofu_ritsu numeric(5, 2) NOT NULL,
+  tekiyo_st_ymd date NOT NULL,
+  tekiyo_ed_ymd date,
+  new_flg numeric(1),
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_kofu_ritsu_pkey PRIMARY KEY (jichitai_cd,rno)
+);
+COMMENT ON TABLE m_kofu_ritsu IS '交付率情報マスタ';
+COMMENT ON COLUMN m_kofu_ritsu.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_kofu_ritsu.rno IS '履歴番号';
+COMMENT ON COLUMN m_kofu_ritsu.kofu_ritsu IS '交付率情報';
+COMMENT ON COLUMN m_kofu_ritsu.tekiyo_st_ymd IS '適用開始年月日';
+COMMENT ON COLUMN m_kofu_ritsu.tekiyo_ed_ymd IS '適用終了年月日';
+COMMENT ON COLUMN m_kofu_ritsu.new_flg IS '最新フラグ';
+COMMENT ON COLUMN m_kofu_ritsu.add_dt IS '作成日時';
+COMMENT ON COLUMN m_kofu_ritsu.add_user IS '作成者';
+COMMENT ON COLUMN m_kofu_ritsu.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_kofu_ritsu.upd_user IS '更新者';
+COMMENT ON COLUMN m_kofu_ritsu.version IS 'バージョン';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_reports_def (
@@ -961,4 +1105,110 @@ COMMENT ON COLUMN m_reports_def.add_user IS '作成者';
 COMMENT ON COLUMN m_reports_def.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_reports_def.upd_user IS '更新者';
 COMMENT ON COLUMN m_reports_def.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_reports (
+  jichitai_cd char(5) NOT NULL,
+  rpt_id char(10) NOT NULL,
+  rpt_name varchar(100) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_reports_pkey PRIMARY KEY (jichitai_cd, rpt_id)
+);
+COMMENT ON TABLE m_reports IS '帳票管理マスタ';
+COMMENT ON COLUMN m_reports.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_reports.rpt_id IS '帳票ＩＤ';
+COMMENT ON COLUMN m_reports.rpt_name IS '帳票名称';
+COMMENT ON COLUMN m_reports.add_dt IS '作成日時';
+COMMENT ON COLUMN m_reports.add_user IS '作成者';
+COMMENT ON COLUMN m_reports.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_reports.upd_user IS '更新者';
+COMMENT ON COLUMN m_reports.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_operation_log (
+  jichitai_cd char(5) NOT NULL,
+  seq numeric(8) NOT NULL,
+  screen_id char(10) NOT NULL,
+  sousa varchar(100) NOT NULL,
+  param varchar(2000),
+  ope_user varchar(20) NOT NULL,
+  ope_dt timestamp NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_operation_log_pkey PRIMARY KEY (jichitai_cd, seq)
+);
+COMMENT ON TABLE t_operation_log IS '操作ログ';
+COMMENT ON COLUMN t_operation_log.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_operation_log.seq IS '管理番号';
+COMMENT ON COLUMN t_operation_log.screen_id IS '画面ＩＤ';
+COMMENT ON COLUMN t_operation_log.sousa IS '操作';
+COMMENT ON COLUMN t_operation_log.param IS 'リクエストパラメータ';
+COMMENT ON COLUMN t_operation_log.ope_user IS '操作者';
+COMMENT ON COLUMN t_operation_log.ope_dt IS '操作日時';
+COMMENT ON COLUMN t_operation_log.add_dt IS '作成日時';
+COMMENT ON COLUMN t_operation_log.add_user IS '作成者';
+COMMENT ON COLUMN t_operation_log.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_operation_log.upd_user IS '更新者';
+COMMENT ON COLUMN t_operation_log.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_reports_log (
+  jichitai_cd char(5) NOT NULL,
+  seq numeric(8) NOT NULL,
+  rpt_id char(10) NOT NULL,
+  sousa char(1) NOT NULL,
+  shitei_no char(8),
+  ope_user varchar(20) NOT NULL,
+  ope_dt timestamp NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_reports_log_pkey PRIMARY KEY (jichitai_cd, seq)
+);
+COMMENT ON TABLE t_reports_log IS '帳票ログ';
+COMMENT ON COLUMN t_reports_log.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_reports_log.seq IS '管理番号';
+COMMENT ON COLUMN t_reports_log.rpt_id IS '帳票ＩＤ';
+COMMENT ON COLUMN t_reports_log.sousa IS '操作';
+COMMENT ON COLUMN t_reports_log.shitei_no IS '指定番号';
+COMMENT ON COLUMN t_reports_log.ope_user IS '操作者';
+COMMENT ON COLUMN t_reports_log.ope_dt IS '操作日時';
+COMMENT ON COLUMN t_reports_log.add_dt IS '作成日時';
+COMMENT ON COLUMN t_reports_log.add_user IS '作成者';
+COMMENT ON COLUMN t_reports_log.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_reports_log.upd_user IS '更新者';
+COMMENT ON COLUMN t_reports_log.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_rpt_status (
+  jichitai_cd char(5) NOT NULL,
+  shitei_no char(8) NOT NULL,
+  rpt_id char(10) NOT NULL,
+  create_dt timestamp NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user varchar(20) NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user varchar(20) NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_rpt_status_pkey PRIMARY KEY (jichitai_cd, shitei_no, rpt_id)
+);
+COMMENT ON TABLE t_rpt_status IS '帳票発行状況';
+COMMENT ON COLUMN t_rpt_status.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_rpt_status.shitei_no IS '指定番号';
+COMMENT ON COLUMN t_rpt_status.rpt_id IS '帳票ＩＤ';
+COMMENT ON COLUMN t_rpt_status.create_dt IS '帳票作成日時';
+COMMENT ON COLUMN t_rpt_status.add_dt IS '作成日時';
+COMMENT ON COLUMN t_rpt_status.add_user IS '作成者';
+COMMENT ON COLUMN t_rpt_status.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_rpt_status.upd_user IS '更新者';
+COMMENT ON COLUMN t_rpt_status.version IS 'バージョン';
 

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShunoDto;
@@ -40,6 +41,7 @@ public class ShunoRenkeiController {
 	private static final String SCREEN_ID = ScreenManagement.SHUNO_RENKEI;
 
 	@GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
 	public String index(
 			@RequestParam(required = false) String shinkokuFrom,
 			@RequestParam(required = false) String shinkokuTo,
@@ -69,6 +71,7 @@ public class ShunoRenkeiController {
 
 	@GetMapping("/search")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public List<ShunoDto> search(
 			@RequestParam(required = false) String shinkokuFrom,
 			@RequestParam(required = false) String shinkokuTo,
@@ -85,6 +88,7 @@ public class ShunoRenkeiController {
 	}
 
 	@PostMapping("/download")
+	@OpeLog(screenId = SCREEN_ID, operation = "ダウンロード")
 	public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShunoDto.Key> keys) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
@@ -147,6 +151,7 @@ public class ShunoRenkeiController {
 	}
 
 	@PostMapping("/kakunin")
+	@OpeLog(screenId = SCREEN_ID, operation = "確認")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
 		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+	<title>操作ログ照会</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-journal-text me-2 text-primary"></i>操作ログ照会
+			</h5>
+		</div>
+
+		<!-- ======== 検索条件 ======== -->
+		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
+			<div class="accordion-item border">
+				<h2 class="accordion-header">
+					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
+						data-bs-target="#searchPanel">
+						<i class="bi bi-funnel me-2"></i>検索条件
+					</button>
+				</h2>
+			</div>
+			<div id="searchPanel" class="accordion-collapse collapse show">
+				<div class="accordion-body pt-3 pb-2 px-3">
+					<form th:action="@{/log/ope-log/search}" th:object="${form}" method="post" id="searchForm">
+						<input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}"
+							th:value="${_csrf.token}" />
+
+						<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
+
+							<!-- 画面名 -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">画面名</label>
+								<select class="form-select form-select-sm" th:field="*{screenId}">
+									<option value="">-- 選択してください --</option>
+									<option th:each="s : ${screens}" th:value="${s.screenId}" th:text="${s.screenName}">
+									</option>
+								</select>
+							</div>
+
+							<!-- 操作 -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">操作</label>
+								<input type="text" class="form-control form-control-sm" th:field="*{sousa}"
+									placeholder="部分一致">
+							</div>
+
+							<!-- 操作者 -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">操作者</label>
+								<input type="text" class="form-control form-control-sm" th:field="*{opeUser}"
+									placeholder="前方一致">
+							</div>
+
+							<!-- 操作日時 FROM -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">操作日時（FROM）</label>
+								<input type="datetime-local" class="form-control form-control-sm" id="opeDtFrom"
+									th:field="*{opeDtFrom}">
+							</div>
+
+							<!-- 操作日時 TO -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">操作日時（TO）</label>
+								<input type="datetime-local" class="form-control form-control-sm" id="opeDtTo"
+									th:field="*{opeDtTo}">
+							</div>
+
+							<!-- 任意項目 -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">任意項目</label>
+								<input type="text" class="form-control form-control-sm" th:field="*{param}"
+									placeholder="パラメータ部分一致">
+							</div>
+
+						</div>
+
+						<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+							<button type="button" class="btn btn-outline-secondary btn-sm" id="resetBtn">
+								<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
+							</button>
+							<button type="submit" class="btn btn-primary btn-sm px-4">
+								<i class="bi bi-search me-1"></i>検索する
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- ======== 件数 ======== -->
+		<div class="d-flex justify-content-end align-items-center mb-2">
+			<span class="text-muted small">検索結果：<span th:text="${items.size()}">0</span> 件
+			</span>
+		</div>
+
+		<!-- ======== 一覧テーブル ======== -->
+		<div class="card shadow-sm mb-5">
+			<div class="table-responsive">
+				<table class="table table-striped table-hover table-bordered align-middle mb-0">
+					<thead class="table-primary">
+						<tr>
+							<th style="width: 80px;">No.</th>
+							<th style="width: 180px;">画面名</th>
+							<th style="width: 200px;">操作</th>
+							<th style="width: 120px;">操作者</th>
+							<th style="width: 170px;">操作日時</th>
+							<th>パラメータ</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${items.isEmpty()}">
+							<td colspan="6" class="text-center text-muted py-4">該当するログが見つかりません</td>
+						</tr>
+						<tr th:each="item, stat : ${items}">
+							<td th:text="${stat.count}"></td>
+							<td th:text="${item.screenName}"></td>
+							<td th:text="${item.sousa}"></td>
+							<td th:text="${item.opeUser}"></td>
+							<td th:text="${#temporals.format(item.opeDt, 'yyyy/MM/dd HH:mm:ss')}"></td>
+							<td>
+								<pre class="mb-0 small param-cell" th:text="${item.param}"></pre>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/opeLogView.js}"></script>
+	</th:block>
+</body>
+
+</html>
