@@ -1,43 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}" lang="ja">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
 <head>
-    <title>収納管理連携 - 照会</title>
+<title>収納管理連携 - 照会</title>
 </head>
 <body>
-<div layout:fragment="content" class="container-fluid p-4">
+	<div layout:fragment="content" class="container-fluid p-4">
 
-    <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-eye me-2 text-primary"></i>照会</h5>
-    </div>
+		<div
+			class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-eye me-2 text-primary"></i>収納管理情報確認
+			</h5>
+			<span class="text-muted small"> 選択件数: <strong
+				th:text="${#lists.size(rows)}">0</strong> 件
+			</span>
+		</div>
 
-    <div class="card">
-        <div class="card-body">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th>指定番号</th>
-                        <th>宛名番号</th>
-                        <th>氏名/名称</th>
-                        <th>対象年月</th>
-                        <th class="text-end">合計税額</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="r : ${rows}">
-                        <td th:text="${r.shiteiNo}"></td>
-                        <td th:text="${r.atenaNo}"></td>
-                        <td th:text="${r.name}"></td>
-                        <td th:text="${r.taishoYm}"></td>
-                        <td class="text-end" th:text="${r.totalZeigaku}"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+		<div class="table-container mb-3">
+			<table
+				class="table table-bordered table-hover table-sm align-middle mb-0">
+				<thead class="table-info">
+					<tr>
+						<th style="width: 100px;">指定番号</th>
+						<th style="width: 100px;">宛名番号</th>
+						<th style="width: 200px;">氏名/名称</th>
+						<th style="width: 150px;">対象年月</th>
+						<th style="width: 150px;">合計税額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:if="${rows != null and !rows.empty}">
+						<tr th:each="r : ${rows}">
+							<td th:text="${r.shiteiNo}"></td>
+							<td th:text="${r.atenaNo}"></td>
+							<td th:text="${r.name}"></td>
+							<td th:text="${r.taishoYm}"></td>
+							<td th:text="${r.totalZeigaku}">円</td>
+						</tr>
+					</th:block>
+					<th:block th:if="${rows == null or rows.empty}">
+						<tr>
+							<td colspan="15" class="text-center py-4 text-muted">該当データがありません</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
 
-</div>
+		</div>
+
+		<!-- 戻るボタン -->
+		<div class="mb-3 text-center">
+			<a th:href="@{/shunoRenkei/list}"
+				class="btn btn-outline-secondary btn-lg px-4"> <i
+				class="bi bi-arrow-left me-2"></i>戻る
+			</a>
+		</div>
+
+	</div>
 
 </body>
 </html>

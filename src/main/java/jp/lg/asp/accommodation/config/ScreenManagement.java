@@ -116,4 +116,19 @@ public final class ScreenManagement {
 
 	// 交付率設定
 	public static final String KOFU_RITSU_CONFIG = "sc00000005";
+
+	// 適用納税周期登録/編集/照会
+	public static final String TEKIYO_NOZEI_SHUKI_CONFIG = "ms00000024";
+
+	// 納入期限登録/編集
+	public static final String NOKIGEN_CONFIG = "sc00000006";
+
+	// 納入期限照会
+	public static final String NOKIGEN = "ss00000006";
+
+	// 指定番号・合算指定番号設定/編集
+	public static final String SHITEI_GASSAN_CONFIG = "sc00000007";
+
+	// 指定番号・合算指定番号照会
+	public static final String SHITEI_GASSAN = "ss00000007";
 }

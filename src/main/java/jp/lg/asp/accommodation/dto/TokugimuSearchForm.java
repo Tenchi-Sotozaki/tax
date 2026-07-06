@@ -31,4 +31,10 @@ public class TokugimuSearchForm {
 
 	/** No.8 \u6cd5\u4eba\u756a\u53f7 (m_atena.hojin_no) */
 	private String hojinNo;
+	
+	/** No.9 */
+	private int page = 0;
+
+	/** No.10 */
+	private int pageSize = 5;
 }

@@ -19,104 +19,70 @@
 			</span>
 		</div>
 
-		<!-- 戻るボタン -->
-		<div class="mb-3">
-			<a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
-				<i class="bi bi-arrow-left me-1"></i>戻る
-			</a>
-		</div>
-
 		<!-- 確認データ一覧 -->
-		<div class="table-container">
-			<table class="table table-bordered table-hover table-sm align-middle mb-0">
+		<div class="table-container mb-3">
+			<table
+				class="table table-bordered table-hover table-sm align-middle mb-0">
 				<thead class="table-info">
 					<tr>
 						<th style="width: 100px;">指定番号</th>
 						<th style="width: 100px;">宛名番号</th>
 						<th style="width: 200px;">氏名/名称</th>
-						<th style="width: 100px;">対象年月</th>
-						<th style="width: 100px;">振込日</th>
-						<th style="width: 120px;">振込金額</th>
-						<th style="width: 120px;">支払金額</th>
-						<th style="width: 80px;">手数料</th>
-						<th style="width: 80px;">振込区分</th>
-						<th style="width: 80px;">振込状況</th>
+						<th style="width: 80px;">年度</th>
+						<th style="width: 120px;">交付年月日</th>
+						<th style="width: 120px;">納入税額</th>
+						<th style="width: 80px;">交付率</th>
+						<th style="width: 120px;">交付額</th>
+						<th style="width: 100px;">銀行コード</th>
 						<th style="width: 150px;">銀行名</th>
-						<th style="width: 150px;">支店名</th>
-						<th style="width: 80px;">預金種別</th>
+						<th style="width: 100px;">支店コード</th>
+						<th style="width: 130px;">支店名</th>
+						<th style="width: 100px;">預金種目</th>
 						<th style="width: 100px;">口座番号</th>
 						<th style="width: 200px;">口座名義</th>
-						<th style="width: 200px;">備考</th>
 					</tr>
 				</thead>
 				<tbody>
 					<th:block th:if="${rows != null and !rows.empty}">
 						<tr th:each="row : ${rows}">
-							<td th:text="${row.shiteiNo}">指定番号</td>
-							<td th:text="${row.atenaNo}">宛名番号</td>
-							<td th:text="${row.name}">氏名/名称</td>
-							<td th:text="${row.taishoYm}">対象年月</td>
+							<td th:text="${row.shiteiNo}"></td>
+							<td th:text="${row.atenaNo}"></td>
+							<td th:text="${row.name}"></td>
+							<td th:text="${row.nendo}"></td>
 							<td
-								th:text="${row.furikomiYmd != null ? #dates.format(row.furikomiYmd, 'yyyy-MM-dd') : ''}">振込日</td>
-							<td class="text-end" th:text="${#numbers.formatInteger(row.furikomiGaku, 3, 'COMMA')}">振込金額</td>
-							<td class="text-end" th:text="${#numbers.formatInteger(row.shiharaiGaku, 3, 'COMMA')}">支払金額</td>
-							<td class="text-end" th:text="${#numbers.formatInteger(row.tesuryo, 3, 'COMMA')}">手数料</td>
-							<td class="text-center">
-								<span th:switch="${row.furikomiKbn}">
-									<span th:case="'1'" class="badge bg-primary">通常</span>
-									<span th:case="'2'" class="badge bg-warning">緊急</span>
-									<span th:case="*" th:text="${row.furikomiKbn}"></span>
-								</span>
-							</td>
-							<td class="text-center">
-								<span th:switch="${row.furikomiStatus}">
-									<span th:case="'0'" class="badge bg-secondary">未処理</span>
-									<span th:case="'1'" class="badge bg-success">処理済</span>
-									<span th:case="'2'" class="badge bg-danger">エラー</span>
-									<span th:case="*" th:text="${row.furikomiStatus}"></span>
-								</span>
-							</td>
-							<td th:text="${row.ginkoName}">銀行名</td>
-							<td th:text="${row.shitenName}">支店名</td>
-							<td class="text-center">
-								<span th:switch="${row.yokinShubetsu}">
-									<span th:case="'1'">普通</span>
-									<span th:case="'2'">当座</span>
-									<span th:case="'3'">貯蓄</span>
-									<span th:case="*" th:text="${row.yokinShubetsu}"></span>
-								</span>
-							</td>
-							<td th:text="${row.kozaNo}">口座番号</td>
-							<td th:text="${row.kozaMeigi}">口座名義</td>
-							<td th:text="${row.biko}">備考</td>
+								th:text="${row.kofuYmd != null ? #temporals.format(row.kofuYmd, 'yyyy-MM-dd') : ''}"></td>
+							<td
+								th:text="${row.kofuZeigaku != null ? #numbers.formatInteger(row.kofuZeigaku, 3, 'COMMA') : ''}"></td>
+							<td th:text="${row.kofuRitsu}"></td>
+							<td
+								th:text="${row.kofuGaku != null ? #numbers.formatInteger(row.kofuGaku, 3, 'COMMA') : ''}"></td>
+							<td th:text="${row.bankCd}"></td>
+							<td th:text="${row.bankName}"></td>
+							<td th:text="${row.branchCd}"></td>
+							<td th:text="${row.branchName}"></td>
+							<td><span th:switch="${row.shumoku}"> <span
+									th:case="'1'">普通</span> <span th:case="'2'">当座</span> <span
+									th:case="*" th:text="${row.shumoku}"></span>
+							</span></td>
+							<td th:text="${row.kozaNo}"></td>
+							<td th:text="${row.meigi}"></td>
 						</tr>
 					</th:block>
 					<th:block th:if="${rows == null or rows.empty}">
 						<tr>
-							<td colspan="16" class="text-center py-4 text-muted">該当データがありません</td>
+							<td colspan="15" class="text-center py-4 text-muted">該当データがありません</td>
 						</tr>
 					</th:block>
 				</tbody>
 			</table>
 		</div>
 
-		<!-- 合計情報 -->
-		<div class="card mt-3" th:if="${rows != null and !rows.empty}">
-			<div class="card-body">
-				<div class="row">
-					<div class="col-md-4">
-						<strong>合計件数:</strong> <span th:text="${#lists.size(rows)}">0</span> 件
-					</div>
-					<div class="col-md-4">
-						<strong>振込金額合計:</strong> 
-						<span th:text="${#numbers.formatInteger(#aggregates.sum(rows.![furikomiGaku]), 3, 'COMMA')}">0</span> 円
-					</div>
-					<div class="col-md-4">
-						<strong>支払金額合計:</strong> 
-						<span th:text="${#numbers.formatInteger(#aggregates.sum(rows.![shiharaiGaku]), 3, 'COMMA')}">0</span> 円
-					</div>
-				</div>
-			</div>
+		<!-- 戻るボタン -->
+		<div class="mb-3 text-center">
+			<a th:href="@{/kofukinFurikomi/list}"
+				class="btn btn-outline-secondary btn-lg px-4"> <i
+				class="bi bi-arrow-left me-2"></i>戻る
+			</a>
 		</div>
 	</div>
 </body>

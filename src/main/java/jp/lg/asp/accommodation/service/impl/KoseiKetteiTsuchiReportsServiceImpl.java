@@ -16,15 +16,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KoseiKetteiTsuchiReportsDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
+import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
+import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
 import jp.lg.asp.accommodation.service.KoseiKetteiTsuchiReportsService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -42,13 +47,21 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 @RequiredArgsConstructor
 public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiReportsService {
 
-    private final FukaRepository fukaRepository;
-    private final FukaUchiRepository fukaUchiRepository;
-    private final TokugimuRepository tokugimuRepository;
-    private final AtenaRepository atenaRepository;
+	private final FukaRepository fukaRepository;
+	private final FukaUchiRepository fukaUchiRepository;
+	private final TokugimuRepository tokugimuRepository;
+	private final AtenaRepository atenaRepository;
+	private final ReportsCommonService reportsCommonService;
+	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository; // ← 追加
+    
 
     @Value("${app.jichitai.code}")
     private String jichitaiCd;
+
+    private String cityName;
+    private String todoufuken;
+    private String horeiInyou1;
+    private String horeiInyou2;
 
     /** 課税区分最大数 */
     private static final int MAX_KBN = 5;
@@ -59,12 +72,17 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     private static final String JRXML_TEIGAKU  = "reports/kouseiKetteiTsuchisho_teigaku.jrxml";
 
     /**
-     * JasperReportsフォント設定（起動時に一度だけ実行）
+     * 起動時初期化（フォント設定・自治体情報・法令引用文キャッシュ）
      */
     @PostConstruct
-    private void initJasperFontSettings() {
+    private void init() {
         System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
         System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
+        Jichitai jichitai = reportsCommonService.getJichitaiInfo();
+        cityName     = jichitai.getName();
+        todoufuken   = jichitai.getKbnName();
+        horeiInyou1  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
+        horeiInyou2  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
     }
 
     /**
@@ -88,9 +106,12 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             }
 
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-            log.info("JRXMLコンパイル完了: {}", jrxmlPath);
+            log.debug("JRXMLコンパイル完了: {}", jrxmlPath);
 
             Map<String, Object> parameters = new HashMap<>();
+            parameters.put("city",          cityName);
+            parameters.put("horei_inyou1",  horeiInyou1);
+            parameters.put("horei_inyou2",  horeiInyou2);
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(dto));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
@@ -195,11 +216,16 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         // 納入税額・加算金・納期限の設定
         if (firstFuka != null) {
             setNofuAndKasan(dto, shiteiNo, firstFuka, ymArr);
+            dto.setHenko_kbn(firstFuka.getHenkoKbn());
         }
+
+        // 都道府県名（m_jichitai.kbn_name）
+        dto.setTodoufuken(todoufuken);
 
         return dto;
     }
 
+    
     /**
      * 施設情報・宛名をDTOに設定する
      */
@@ -258,6 +284,14 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         dto.setKasan_gaku2(firstFuka.getKasanGaku2()  != null ? String.valueOf(firstFuka.getKasanGaku2())  : "");
         dto.setKasan_ritsu3(firstFuka.getKasanRitsu3() != null ? firstFuka.getKasanRitsu3().toPlainString() : "");
         dto.setKasan_gaku3(firstFuka.getKasanGaku3()  != null ? String.valueOf(firstFuka.getKasanGaku3())  : "");
+        // 加算金区分（kasan_kbn）のセット
+        // DBのカラム値 "1"=過少申告加算金, "2"=不申告加算金, "3"=重加算金
+        // nullの場合は空文字（blankWhenNull="true" により帳票上は何も印字されない）
+        dto.setKasan_kbn1(nvl(firstFuka.getKasanKbn1()));
+        dto.setKasan_kbn2(nvl(firstFuka.getKasanKbn2()));
+        dto.setKasan_kbn3(nvl(firstFuka.getKasanKbn3()));
+        
+        
 
         if (firstFuka.getNokigen1() != null) {
             dto.setNofu_kigen_nen(String.valueOf(firstFuka.getNokigen1().getYear()));
@@ -355,6 +389,24 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                         .findFirst().orElse("");
                 setField(dto, "zei_ritsu" + kbn, rate);
             }
+
+            // 区分名（kbn_name1〜5）をm_zeiritsu_teiritsuから取得
+            uchiList.stream()
+            .map(FukaUchi::getZeiritsuSeq)
+            .filter(seq -> seq != null)
+            .findFirst()
+            .ifPresent(zeiritsuSeq -> {
+                List<ZeiritsuTeiritsu> teiritsuList =
+                    zeiritsuTeiritsuRepository.findActiveBySeq(
+                        jichitaiCd, zeiritsuSeq);
+                for (ZeiritsuTeiritsu t : teiritsuList) {
+                    int tSeq = t.getTeiritsuSeq().intValue();
+                    if (tSeq >= 1 && tSeq <= MAX_KBN) {
+                        setField(dto, "kbn_name" + tSeq,
+                            nvl(t.getKbnName()).trim());
+                    }
+                }
+            });
         }
     }
 

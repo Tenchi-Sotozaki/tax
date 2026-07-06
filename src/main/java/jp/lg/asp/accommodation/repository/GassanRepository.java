@@ -45,8 +45,10 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
             """)
     List<Gassan> findAllByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 
-    @Query(value = "SELECT MAX(CAST(gassan_shitei_no AS INTEGER)) FROM t_gassan WHERE jichitai_cd = :jichitaiCd AND gassan_shitei_no ~ '^[0-9]+$'", nativeQuery = true)
-    Optional<Integer> findMaxGassanShiteiNoByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+    @Query(value = "SELECT MAX(CAST(SUBSTRING(gassan_shitei_no, 4) AS INTEGER)) FROM t_gassan WHERE jichitai_cd = :jichitaiCd AND gassan_shitei_no ~ '^[0-9]+$' AND SUBSTRING(gassan_shitei_no, 1, 3) = :prefix", nativeQuery = true)
+    Optional<Integer> findMaxGassanShiteiNoByJichitaiCdAndPrefix(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("prefix") String prefix);
 
     @Modifying
     @Query("""

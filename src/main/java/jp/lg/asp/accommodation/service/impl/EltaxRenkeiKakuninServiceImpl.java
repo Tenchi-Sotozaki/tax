@@ -37,6 +37,7 @@ import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
 import jp.lg.asp.accommodation.repository.EltaxRenkeiRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -57,6 +58,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	private final FukaUchiRepository fukaUchiRepository;
 	private final ZeiritsuTeigakuRepository zeiritsuTeigakuRepository;
 	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository;
+	private final JichitaiRepository jichitaiRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
@@ -542,8 +544,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			// 指定番号の決定
 			String shiteiNo;
 			if (isNew) {
-				int max = tokugimuRepository.findMaxShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
-				shiteiNo = String.format("%08d", max + 1);
+				String prefix = jichitaiRepository.findById(jichitaiCd)
+						.map(j -> j.getShiteiStChar() != null ? j.getShiteiStChar() : "000")
+						.orElse("000");
+				int max = tokugimuRepository.findMaxShiteiNoByJichitaiCdAndPrefix(jichitaiCd, prefix).orElse(0);
+				shiteiNo = prefix + String.format("%05d", max + 1);
 			} else {
 				shiteiNo = getDataValue(dataRow, shisetsuNoIdx);
 			}

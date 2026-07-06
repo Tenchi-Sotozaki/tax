@@ -67,6 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
                               '/accommodation-tax/tax-manager/edit/{id}?from=register');
 	nav('btnTaxManagerView',  '特別徴収義務者を選択してください。',
 							  '/accommodation-tax/tax-manager/view/{id}');
+    nav('btnNozeiShuki',      '特別徴収義務者を選択してください。',
+                              '/accommodation-tax/tekiyo-nozei-shuki/edit/{id}?from=register');
+    nav('btnNozeiShukiView',  '特別徴収義務者を選択してください。',
+                              '/accommodation-tax/tekiyo-nozei-shuki/view/{id}');
     nav('btnPaymentLedger',   '事業者を選択してください。',
                               '/accommodation-tax/declaration/payment-ledger/{id}');
 

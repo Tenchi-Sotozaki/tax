@@ -57,12 +57,20 @@
         const keys = selected.map(s => ({ shiteiNo: s.shiteiNo, nendo: s.nendo || '', kibetsu: s.kibetsu != null && s.kibetsu !== '' ? Number(s.kibetsu) : null }));
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = window.location.origin + '/shunoRenkei/kakunin';
+        form.action = '/accommodation-tax/shunoRenkei/kakunin';
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'keysJson';
         input.value = JSON.stringify(keys);
         form.appendChild(input);
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+        }
         document.body.appendChild(form);
         form.submit();
     });

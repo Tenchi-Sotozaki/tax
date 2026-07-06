@@ -4,8 +4,6 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
 <title>交付金振込情報連携</title>
-<meta name="_csrf" th:content="${_csrf.token}"/>
-<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 <link rel="stylesheet" th:href="@{/css/kofukinFurikomi.css}">
 </head>
 <body>
@@ -39,10 +37,12 @@
 								<div class="col">
 									<label for="nendo"
 										class="form-label form-label-sm fw-medium mb-1">対象年度</label> <input
-										type="date" class="form-control form-control-sm year-only-input" id="nendo"
-										name="nendoDate" th:value="*{nendo != null ? nendo + '-01-01' : ''}"
-										placeholder="年度を選択">
-									<input type="hidden" name="nendo" id="nendoHidden" th:value="*{nendo}">
+										type="date"
+										class="form-control form-control-sm year-only-input"
+										id="nendo" name="nendoDate"
+										th:value="*{nendo != null ? nendo + '-01-01' : ''}"
+										placeholder="年度を選択"> <input type="hidden" name="nendo"
+										id="nendoHidden" th:value="*{nendo}">
 								</div>
 								<div class="col">
 									<label for="shiteiNo"

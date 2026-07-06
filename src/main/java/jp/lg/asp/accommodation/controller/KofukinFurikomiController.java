@@ -139,18 +139,18 @@ public class KofukinFurikomiController {
 	@PostMapping("/kakunin")
 	@OpeLog(screenId = SCREEN_ID, operation = "確認")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
-			com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
+			accessChecker.checkAccess(SCREEN_ID);
 			List<ShoreikinRenkeiDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShoreikinRenkeiDto.Key.class));
 			List<ShoreikinRenkeiDto> rows = shoreikinRenkeiService.findByKeys(jichitaiCd, keys);
 			model.addAttribute("rows", rows);
-			return "renkei/kofukinFurikomiKakunin";
 		} catch (Exception e) {
+			e.printStackTrace();
 			model.addAttribute("rows", java.util.Collections.emptyList());
-			return "renkei/kofukinFurikomiKakunin";
 		}
+		return "renkei/kofukinFurikomiKakunin";
 	}
 
 	private String convertShumoku(String shumoku) {
