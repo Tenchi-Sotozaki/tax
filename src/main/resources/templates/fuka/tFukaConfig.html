@@ -518,8 +518,15 @@
 
 				<a
 					th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
-					th:onclick="${!fukaDeclarationForm.view} ? 'return confirm(\'入力内容は破棄されます。よろしいですか？\')' : ''"
-					class="btn btn-outline-secondary px-4 shadow-sm"> <i
+					class="btn btn-outline-secondary px-4 shadow-sm"
+					th:if="${fukaDeclarationForm.view}"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<a
+					th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
+					class="btn btn-outline-secondary px-4 shadow-sm"
+					th:unless="${fukaDeclarationForm.view}"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>

@@ -167,7 +167,12 @@
 					</div>
 
 					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
-						th:onclick="${!configForm.viewMode} ? 'return confirm(\'入力内容は破棄されます。よろしいですか？\')' : ''"> <i
+						th:if="${configForm.viewMode}"> <i
+						class="bi bi-arrow-left"></i> 戻る
+					</a>
+					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+						th:unless="${configForm.viewMode}"
+						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 						class="bi bi-arrow-left"></i> 戻る
 					</a>
 				</div>
