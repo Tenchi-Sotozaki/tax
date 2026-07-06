@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
@@ -39,6 +40,7 @@ public class TokugimuController {
 	// ========== 一覧・検索 ==========
 
 	@GetMapping("/list")
+	@OpeLog(screenId = TOKUGIMU_DAICHO, operation = "一覧表示")
 	public String list(@ModelAttribute TokugimuSearchForm searchForm, Model model) {
 		accessChecker.checkAccess(TOKUGIMU_DAICHO);
 		model.addAttribute("items", tokugimuService.search(searchForm));
@@ -49,6 +51,7 @@ public class TokugimuController {
 	// ========== 新規登録 ==========
 
 	@GetMapping("/registration")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", new TokugimuForm());
@@ -58,6 +61,7 @@ public class TokugimuController {
 	}
 
 	@PostMapping("/registration")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "登録")
 	public String register(
 			@Validated @ModelAttribute("TokugimuForm") TokugimuForm form,
 			BindingResult bindingResult,
@@ -86,6 +90,7 @@ public class TokugimuController {
 	// ========== 照会 ==========
 
 	@GetMapping("/view/{id}")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "照会")
 	public String showView(@PathVariable("id") String id, Model model) {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
@@ -99,6 +104,7 @@ public class TokugimuController {
 	// ========== 編集 ==========
 
 	@GetMapping("/edit/{id}")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "編集画面表示")
 	public String showEditForm(@PathVariable("id") String id, Model model) {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
@@ -112,6 +118,7 @@ public class TokugimuController {
 	// ========== 編集（更新） ==========
 
 	@PostMapping("/edit/{id}")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "編集")
 	public String update(
 			@PathVariable("id") String id,
 			@Validated @ModelAttribute("TokugimuForm") TokugimuForm form,
@@ -139,6 +146,7 @@ public class TokugimuController {
 	// ========== 帳票出力 ==========
 
 	@GetMapping("/report/{id}")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "帳票出力")
 	public String showReport(@PathVariable("id") String id, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
@@ -153,6 +161,7 @@ public class TokugimuController {
 	// ========== 削除 ==========
 
 	@PostMapping("/delete/{id}")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "削除")
 	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		tokugimuService.deleteByShiteiNo(id);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.EltaxConstants;
@@ -31,6 +32,7 @@ public class EltaxRenkeiController {
 	private static final String SCREEN_ID = ScreenManagement.ELTAX_RENKEI;
 
 	@GetMapping
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("eltaxRenkeiList", eltaxRenkeiService.findAll());
@@ -39,6 +41,7 @@ public class EltaxRenkeiController {
 	}
 
 	@GetMapping("/download/{seq}")
+	@OpeLog(screenId = SCREEN_ID, operation = "取込確認")
 	public ResponseEntity<byte[]> download(@PathVariable BigDecimal seq) {
 		accessChecker.checkAccess(SCREEN_ID);
 

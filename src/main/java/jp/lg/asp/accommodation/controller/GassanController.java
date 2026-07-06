@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.GassanDaichoItem;
@@ -43,6 +44,7 @@ public class GassanController {
 	private static final String DAICHO_VIEW = "gassan/tGassanDaicho";
 
 	@GetMapping("/registration")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
 	public String showRegistrationForm(Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -54,6 +56,7 @@ public class GassanController {
 	}
 
 	@GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID_LIST, operation = "初期表示")
 	public String showDaicho(
 			@ModelAttribute("searchForm") GassanDaichoSearchForm searchForm,
 			Model model) {
@@ -65,6 +68,7 @@ public class GassanController {
 	}
 
 	@GetMapping("/view/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
 	public String showView(@PathVariable String gassanShiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -79,6 +83,7 @@ public class GassanController {
 	}
 
 	@GetMapping("/view-form/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会")
 	public String showViewForm(@PathVariable String gassanShiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -97,6 +102,7 @@ public class GassanController {
 	}
 
 	@GetMapping("/edit/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String showEditForm(@PathVariable String gassanShiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -115,6 +121,7 @@ public class GassanController {
 	}
 
 	@PostMapping("/edit/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String updateGassan(
 			@PathVariable String gassanShiteiNo,
 			@Validated @ModelAttribute("GassanForm") GassanForm form,
@@ -148,6 +155,7 @@ public class GassanController {
 
 	@PostMapping("/facilities-by-atena")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "施設一覧取得")
 	public List<GassanForm.FacilityItem> getFacilitiesByAtena(@RequestBody Map<String, Object> request) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -156,6 +164,7 @@ public class GassanController {
 	}
 
 	@PostMapping("/registration")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String register(
 			@Validated @ModelAttribute("GassanForm") GassanForm form,
 			BindingResult bindingResult,

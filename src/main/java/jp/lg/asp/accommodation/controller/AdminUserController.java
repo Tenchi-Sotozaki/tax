@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.UserForm;
@@ -41,6 +42,7 @@ public class AdminUserController {
 	private static final String FORM_VIEW = "admin/userConfig";
 
 	@GetMapping("/user-search")
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String list(@ModelAttribute UserSearchForm searchForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("items", userRepository.search(
@@ -53,6 +55,7 @@ public class AdminUserController {
 	}
 
 	@GetMapping("/user-registration")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("userForm", new UserForm());
@@ -62,6 +65,7 @@ public class AdminUserController {
 	}
 
 	@PostMapping("/user-registration")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録")
 	public String register(
 			@Validated(UserForm.OnCreate.class) @ModelAttribute("userForm") UserForm form,
 			BindingResult bindingResult,
@@ -97,6 +101,7 @@ public class AdminUserController {
 	}
 
 	@GetMapping("/user-edit/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String showEditForm(@PathVariable String id, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		User user = userRepository.findById(buildUserId(id))
@@ -117,6 +122,7 @@ public class AdminUserController {
 	}
 
 	@PostMapping("/user-edit/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集")
 	public String update(
 			@PathVariable String id,
 			@Validated(UserForm.OnUpdate.class) @ModelAttribute("userForm") UserForm form,
@@ -158,6 +164,7 @@ public class AdminUserController {
 	}
 
 	@PostMapping("/user-delete/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 		userRepository.deleteById(buildUserId(id));

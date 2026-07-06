@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
@@ -38,6 +39,7 @@ public class NozeiKanriShoninTsuchiController {
 	 * 画面表示
 	 */
 	@GetMapping
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
@@ -79,6 +81,7 @@ public class NozeiKanriShoninTsuchiController {
 	 * PDF出力
 	 */
 	@PostMapping("/pdf")
+	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	public ResponseEntity<byte[]> generatePdf(NozeiKanriShoninTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
@@ -107,6 +110,7 @@ public class NozeiKanriShoninTsuchiController {
 	 * プレビュー
 	 */
 	@PostMapping("/preview")
+	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
 	public ResponseEntity<byte[]> preview(NozeiKanriShoninTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
@@ -140,6 +144,7 @@ public class NozeiKanriShoninTsuchiController {
 	 * 印刷
 	 */
 	@PostMapping("/print")
+	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
 	public ResponseEntity<byte[]> print(NozeiKanriShoninTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);

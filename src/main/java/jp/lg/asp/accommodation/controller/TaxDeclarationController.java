@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TaxDeclarationForm;
@@ -50,6 +51,7 @@ public class TaxDeclarationController {
 	// -------------------------------------------------------------------------
 
 	@GetMapping("/old-register/{obligorId}")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String showForm(@PathVariable String obligorId, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("taxDeclarationForm",
@@ -64,6 +66,7 @@ public class TaxDeclarationController {
 	// -------------------------------------------------------------------------
 
 	@PostMapping("/register")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録")
 	public String register(
 			@Validated @ModelAttribute("taxDeclarationForm") TaxDeclarationForm form,
 			BindingResult bindingResult,
@@ -95,6 +98,7 @@ public class TaxDeclarationController {
 	 * フォームが未入力の場合は ID のみで生成（後方互換）。
 	 */
 	@GetMapping("/pdf/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	public ResponseEntity<byte[]> exportPdf(
 			@PathVariable String id,
 			@ModelAttribute("taxDeclarationForm") TaxDeclarationForm form) {

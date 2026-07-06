@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto;
@@ -34,6 +35,7 @@ public class EltaxRenkeiKakuninController {
 	 * ファイルを受け取り、確認画面を表示する（DB未登録）
 	 */
 	@PostMapping("/preview")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String preview(
 			@RequestParam("file") MultipartFile file,
 			HttpSession session,
@@ -61,6 +63,7 @@ public class EltaxRenkeiKakuninController {
 	 * 確認後、セッションのファイルをDBへ登録する
 	 */
 	@PostMapping("/commit")
+	@OpeLog(screenId = SCREEN_ID, operation = "取込")
 	public String commit(
 			@RequestParam(required = false) String atenaNo,
 			HttpSession session,
