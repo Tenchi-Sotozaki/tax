@@ -23,12 +23,13 @@
         <input type="hidden" th:field="*{obligorId}">
 
         <!-- バリデーションエラーサマリー -->
-        <div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger" role="alert">
+        <div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。各項目を確認してください。
             <ul class="mb-0 mt-1">
                 <li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
             </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
         <!-- 申告情報エリア -->
