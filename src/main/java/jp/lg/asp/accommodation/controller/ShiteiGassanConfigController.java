@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.validation.Valid;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShiteiGassanConfigDto;
@@ -54,11 +55,8 @@ public class ShiteiGassanConfigController {
 	public String view(Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
-		if (jichitai == null) {
-			redirectAttributes.addFlashAttribute("errorMessage", "自治体情報が見つかりません。");
-			return "redirect:/admin/shitei-gassan/register";
-		}
 		if (jichitai.getShiteiStChar() == null && jichitai.getGassanStChar() == null) {
+			redirectAttributes.addFlashAttribute("infoMessage", "登録された情報がありません。登録画面に遷移しました。");
 			return "redirect:/admin/shitei-gassan/register";
 		}
 		ShiteiGassanConfigDto dto = toDto(jichitai);
@@ -72,10 +70,6 @@ public class ShiteiGassanConfigController {
 	public String edit(Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
-		if (jichitai == null) {
-			redirectAttributes.addFlashAttribute("errorMessage", "自治体情報が見つかりません。");
-			return "redirect:/admin/shitei-gassan/view";
-		}
 		model.addAttribute("configDto", toDto(jichitai));
 		model.addAttribute("mode", "edit");
 		return VIEW;
