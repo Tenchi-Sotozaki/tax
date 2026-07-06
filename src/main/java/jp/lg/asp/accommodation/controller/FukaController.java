@@ -95,7 +95,7 @@ public class FukaController {
 			@RequestParam(required = false) String month,
 			RedirectAttributes redirectAttributes,
 			Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		// 二重申告を防止するためのアクセスガード
 		if (month != null && !month.isEmpty()) {
@@ -132,7 +132,7 @@ public class FukaController {
 			@PathVariable Integer kibetsu,
 			RedirectAttributes redirectAttributes,
 			Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		// 未申告データに対する編集アクセス制限
 		if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
@@ -194,7 +194,7 @@ public class FukaController {
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
 		if (bindingResult.hasErrors()) {

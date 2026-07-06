@@ -70,7 +70,7 @@ public class AtenaController {
 	@OpeLog(screenId = ATENA_INSERT, operation = "取込")
 	public String importCsv(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(ATENA_INSERT);
+		accessChecker.checkWriteAccess(ATENA_INSERT);
 		
 		// ファイルが選択されているかチェック
 		if (file.isEmpty()) {

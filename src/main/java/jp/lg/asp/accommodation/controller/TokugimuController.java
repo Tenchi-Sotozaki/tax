@@ -61,7 +61,7 @@ public class TokugimuController {
 	@GetMapping("/registration")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
-		accessChecker.checkAccess(TOKUGIMU_CONFIG);
+		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", new TokugimuForm());
 		model.addAttribute("isEdit", false);
 		return FORM_VIEW;
@@ -74,7 +74,7 @@ public class TokugimuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(TOKUGIMU_CONFIG);
+		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", false);
@@ -112,7 +112,7 @@ public class TokugimuController {
 	@GetMapping("/edit/{id}")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "編集画面表示")
 	public String showEditForm(@PathVariable("id") String id, Model model) {
-		accessChecker.checkAccess(TOKUGIMU_CONFIG);
+		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
 		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", true);
@@ -130,7 +130,7 @@ public class TokugimuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(TOKUGIMU_CONFIG);
+		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", true);
@@ -168,7 +168,7 @@ public class TokugimuController {
 	@PostMapping("/delete/{id}")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "削除")
 	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(TOKUGIMU_CONFIG);
+		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 		tokugimuService.deleteByShiteiNo(id);
 		redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " のデータを削除しました。");
 		return "redirect:/tokugimu/list";

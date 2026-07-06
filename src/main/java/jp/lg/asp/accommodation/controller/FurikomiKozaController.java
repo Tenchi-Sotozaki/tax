@@ -62,7 +62,7 @@ public class FurikomiKozaController {
 	@PostMapping("/edit")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集切り替え")
 	public String editMode(@ModelAttribute FurikomiKozaDto kozaForm, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		kozaForm.setMode("edit");
 		model.addAttribute("kozaForm", kozaForm);
@@ -84,7 +84,7 @@ public class FurikomiKozaController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		if (bindingResult.hasErrors()) {
 			kozaForm.setMode("create");
@@ -117,7 +117,7 @@ public class FurikomiKozaController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		if (bindingResult.hasErrors()) {
 			kozaForm.setMode("edit");

@@ -60,7 +60,7 @@ public class RoleController {
 	@ResponseBody
 	@OpeLog(screenId = SCREEN_ID, operation = "登録・更新")
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		if (form.getName() == null || form.getName().isBlank()) {
 			result.put("success", false);
@@ -130,7 +130,7 @@ public class RoleController {
 	@OpeLog(screenId = SCREEN_ID, operation = "権限付与ユーザー更新")
 	public Map<String, Object> updateAssignedUsers(@PathVariable Long roleId,
 			@RequestBody Map<String, List<String>> body) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		try {
 			roleService.updateUserRole(jichitaiCd, roleId, body.get("userIds"), "admin");
@@ -146,7 +146,7 @@ public class RoleController {
 	@ResponseBody
 	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public Map<String, Object> deleteRole(@PathVariable Long roleId) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		
 		if (roleId == 1L) {

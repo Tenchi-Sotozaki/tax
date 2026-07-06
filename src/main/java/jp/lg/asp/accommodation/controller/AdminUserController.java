@@ -57,7 +57,7 @@ public class AdminUserController {
 	@GetMapping("/user-registration")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		model.addAttribute("userForm", new UserForm());
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", false);
@@ -71,7 +71,7 @@ public class AdminUserController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		if (!form.getPassword().equals(form.getPasswordConfirm())) {
 			bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
@@ -104,7 +104,7 @@ public class AdminUserController {
 	@GetMapping("/user-edit/{id}")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String showEditForm(@PathVariable String id, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
 
@@ -130,7 +130,7 @@ public class AdminUserController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
@@ -168,7 +168,7 @@ public class AdminUserController {
 	@PostMapping("/user-delete/{id}")
 	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
 		return "redirect:/admin/user-search";
