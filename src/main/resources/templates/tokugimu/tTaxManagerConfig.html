@@ -60,10 +60,15 @@
 				th:field="*{atenaNo}" /> <input type="hidden"
 				th:field="*{obligorAtenaNo}" />
 
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
-				role="alert">
+			<div
+				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+				class="alert alert-danger" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
-					th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${validationErrors}" th:text="${err}"
+						class="small"></li>
+				</ul>
 			</div>
 
 			<div th:if="${!(isView ?: false)}" class="mb-3">
@@ -81,9 +86,10 @@
 					<div class="row g-3">
 						<div class="col-md-4" th:if="${!(isView ?: false)}">
 							<label for="registrationDate" class="form-label fw-medium">
-								登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+								登録日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
-								th:field="*{registrationDate}" th:readonly="${isView ?: false}">
+								th:field="*{registrationDate}" th:readonly="${isView ?: false}"
+								th:classappend="${#fields.hasErrors('registrationDate')} ? 'is-invalid'">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('registrationDate')}"
 								th:errors="*{registrationDate}"></div>
@@ -91,9 +97,10 @@
 
 						<div class="col-md-4" th:if="${!(isView ?: false)}">
 							<label for="declarationDate" class="form-label fw-medium">
-								申告日 <span class="badge bg-danger text-white ms-1">必須</span>
+								申告日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
-								th:field="*{declarationDate}" th:readonly="${isView ?: false}">
+								th:field="*{declarationDate}" th:readonly="${isView ?: false}"
+								th:classappend="${#fields.hasErrors('declarationDate')} ? 'is-invalid'">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('declarationDate')}"
 								th:errors="*{declarationDate}"></div>
@@ -124,7 +131,7 @@
 							<label class="form-label fw-medium">住所(郵便番号)</label> <input
 								type="text" class="form-control" id="managerYubinNo"
 								th:field="*{managerYubinNo}" readonly
-								th:classappend="${#fields.hasErrors('managerAddress')} ? 'is-invalid'">
+								th:classappend="${#fields.hasErrors('managerYubinNo')} ? 'is-invalid'">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('managerYubinNo')}"
 								th:errors="*{managerYubinNo}"></div>
@@ -143,7 +150,8 @@
 						<div class="col-md-6">
 							<label class="form-label fw-medium">氏名</label> <input type="text"
 								class="form-control" id="managerName" th:field="*{managerName}"
-								readonly>
+								readonly
+								th:classappend="${#fields.hasErrors('managerName')} ? 'is-invalid'">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('managerName')}"
 								th:errors="*{managerName}"></div>
@@ -152,7 +160,8 @@
 						<div class="col-md-6">
 							<label class="form-label fw-medium">ふりがな</label> <input
 								type="text" class="form-control" id="managerNameKana"
-								th:field="*{managerNameKana}" readonly>
+								th:field="*{managerNameKana}" readonly
+								th:classappend="${#fields.hasErrors('managerNameKana')} ? 'is-invalid'">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('managerNameKana')}"
 								th:errors="*{managerNameKana}"></div>
@@ -161,7 +170,8 @@
 						<div class="col-md-6">
 							<label class="form-label fw-medium">電話番号</label> <input
 								type="tel" class="form-control" id="managerPhone"
-								th:field="*{managerPhone}" readonly>
+								th:field="*{managerPhone}" readonly
+								th:classappend="${#fields.hasErrors('managerPhone')} ? 'is-invalid'">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('managerPhone')}"
 								th:errors="*{managerPhone}"></div>
@@ -179,8 +189,7 @@
 						<div class="col-md-12" id="exemptionReasonArea"
 							style="display: none;">
 							<label for="exemptionReason" class="form-label fw-medium">選任免除理由
-								<span class="badge bg-danger text-white ms-1"
-								th:if="${!(isView ?: false)}">必須</span>
+								<span class="text-danger" th:if="${!(isView ?: false)}">*</span>
 							</label>
 							<textarea class="form-control" id="exemptionReason" rows="3"
 								th:field="*{exemptionReason}" th:readonly="${isView ?: false}"></textarea>

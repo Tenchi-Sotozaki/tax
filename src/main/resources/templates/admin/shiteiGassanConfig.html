@@ -21,6 +21,13 @@
 					class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+			<ul class="mb-0 mt-1">
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+			</ul>
+		</div>
+
 		</div>
 
 		<!-- メッセージ表示 -->
@@ -45,10 +52,9 @@
 				<form th:action="@{/admin/shitei-gassan/save}" method="post"
 					th:object="${configDto}">
 					<input type="hidden" th:field="*{version}">
-
-					<div class="row mb-3">
+<div class="row mb-3">
 						<div class="col-md-4">
-							<label for="shiteiStChar" class="form-label">指定番号</label> <input
+							<label for="shiteiStChar" class="form-label">指定番号 <span class="text-danger">*</span></label> <input
 								type="text" class="form-control" th:field="*{shiteiStChar}"
 								id="shiteiStChar" maxlength="3" placeholder="例：001"
 								th:readonly="${mode == 'view'}">
@@ -61,7 +67,7 @@
 
 					<div class="row mb-3">
 						<div class="col-md-4">
-							<label for="gassanStChar" class="form-label">合算指定番号</label> <input
+							<label for="gassanStChar" class="form-label">合算指定番号 <span class="text-danger">*</span></label> <input
 								type="text" class="form-control" th:field="*{gassanStChar}"
 								id="gassanStChar" maxlength="3" placeholder="例：001"
 								th:readonly="${mode == 'view'}">

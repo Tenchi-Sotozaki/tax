@@ -76,8 +76,16 @@ public class NozeiShukiController {
 	}
 
 	@PostMapping("/save")
-	public String save(NozeiShuki nozeiShuki, RedirectAttributes redirectAttributes) {
+	public String save(NozeiShuki nozeiShuki, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+
+		if (nozeiShuki.getShuki() == null) {
+			model.addAttribute("nozeiShuki", nozeiShuki);
+			model.addAttribute("mode", nozeiShuki.getSeq() == null ? "register" : "edit");
+			model.addAttribute("validationErrors", java.util.List.of("納税周期は必須です"));
+			return "admin/nozeiShukiConfig";
+		}
+
 		try {
 			if (nozeiShuki.getSeq() == null && nozeiShukiService.existsByShuki(nozeiShuki.getShuki())) {
 				redirectAttributes.addFlashAttribute("errorMessage", "この周期は既に登録されています。");

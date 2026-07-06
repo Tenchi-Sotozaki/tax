@@ -118,6 +118,7 @@ public class TaxManagerController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", form.isEdit());
 			model.addAttribute("isView", false);
+			model.addAttribute("validationErrors", TaxManagerForm.TaxManagerValidator.validate(form).values());
 			return FORM_VIEW;
 		}
 

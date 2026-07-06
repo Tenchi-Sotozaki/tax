@@ -3,7 +3,9 @@ package jp.lg.asp.accommodation.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,20 +15,7 @@ import lombok.Data;
 public class GassanForm {
 
     private String gassanShiteiNo;
-
-    /** 遷移元指定番号（画面保持用） */
     private String fromShiteiNo;
-
-    @NotNull(message = "宛名番号は必須です")
-    private BigDecimal atenaNo;
-
-    /** 特別徴収義務者名（表示用） */
-    private String atenaName;
-
-    @NotNull(message = "適用時期は必須です")
-    private LocalDate tekiyoStYmd;
-
-    private LocalDate tekiyoEdYmd;
 
     @NotNull(message = "登録年月日は必須です")
     private LocalDate torokuYmd;
@@ -34,18 +23,33 @@ public class GassanForm {
     @NotNull(message = "申告日は必須です")
     private LocalDate shinkokuYmd;
 
-    /** 選択可能な施設一覧（表示用） */
-    private List<FacilityItem> facilityList = new ArrayList<>();
+    @NotNull(message = "宛名番号は必須です")
+    private BigDecimal atenaNo;
 
-    /** 適用時期選択リスト（照会画面用） */
+    private String atenaName;
+
+    @NotNull(message = "適用時期は必須です")
+    private LocalDate tekiyoStYmd;
+
+    private LocalDate tekiyoEdYmd;
+
+    private List<FacilityItem> facilityList = new ArrayList<>();
     private List<GassanListItem> gassanList = new ArrayList<>();
 
-    /** チェックされた指定番号リスト（登録対象） */
     @Size(min = 2, message = "合算対象施設を2件以上選択してください")
     private List<String> shiteiNoList;
 
-    /** 代表施設指定番号 */
     private String daihyoShiteiNo;
+
+    public static Map<String, String> validate(GassanForm f) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        if (f.getTorokuYmd() == null) errors.put("torokuYmd", "登録年月日は必須です");
+        if (f.getShinkokuYmd() == null) errors.put("shinkokuYmd", "申告日は必須です");
+        if (f.getAtenaNo() == null) errors.put("atenaNo", "宛名番号は必須です");
+        if (f.getTekiyoStYmd() == null) errors.put("tekiyoStYmd", "適用時期は必須です");
+        if (f.getShiteiNoList() == null || f.getShiteiNoList().size() < 2) errors.put("shiteiNoList", "合算対象施設を2件以上選択してください");
+        return errors;
+    }
 
     @Data
     public static class FacilityItem {

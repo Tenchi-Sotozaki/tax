@@ -280,7 +280,7 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/register')} ? 'text-white fw-medium' : ''">
+											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki') and !#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar me-2"></i>納税周期
 										</a></li>
 										<li class="nav-item"><a

@@ -75,6 +75,7 @@ public class AdminUserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", false);
+			model.addAttribute("validationErrors", UserForm.validate(form, true).values());
 			return FORM_VIEW;
 		}
 
@@ -141,6 +142,7 @@ public class AdminUserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", true);
+			model.addAttribute("validationErrors", UserForm.validate(form, false).values());
 			return FORM_VIEW;
 		}
 

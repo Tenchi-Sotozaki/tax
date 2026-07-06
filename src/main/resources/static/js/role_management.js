@@ -23,11 +23,17 @@ function openRoleModal(mode) {
     const saveBtn = document.getElementById('saveBtn');
 
     if (mode === 'create') {
-        title.textContent = '権限登録';
+        title.textContent = '\u6a29\u9650\u767b\u9332';
         saveBtn.style.display = 'block';
         document.getElementById('roleForm').reset();
         document.getElementById('roleId').value = '';
         document.querySelectorAll('#roleForm input').forEach(input => input.disabled = false);
+        document.getElementById('roleModalErrors').classList.add('d-none');
+        document.getElementById('roleModalErrorList').innerHTML = '';
+        const rn = document.getElementById('roleName');
+        rn.classList.remove('is-invalid');
+        const fb = rn.nextElementSibling;
+        if (fb && fb.classList.contains('invalid-feedback')) fb.remove();
     } else {
         const checked = document.querySelector('.role-checkbox:checked');
         if (!checked) return;
@@ -76,6 +82,33 @@ function saveRole() {
     const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
     const form = document.getElementById('roleForm');
     const formData = new FormData(form);
+
+    const name = formData.get('name');
+    const errorsEl = document.getElementById('roleModalErrors');
+    const errorList = document.getElementById('roleModalErrorList');
+    const errorCount = document.getElementById('roleModalErrorCount');
+
+    errorsEl.classList.add('d-none');
+    errorList.innerHTML = '';
+
+    const roleNameInput = document.getElementById('roleName');
+    roleNameInput.classList.remove('is-invalid');
+    let existingFeedback = roleNameInput.nextElementSibling;
+    if (existingFeedback && existingFeedback.classList.contains('invalid-feedback')) {
+        existingFeedback.remove();
+    }
+
+    if (!name || !name.trim()) {
+        errorList.innerHTML = '<li>\u6a29\u9650\u540d\u306f\u5fc5\u9808\u3067\u3059</li>';
+        errorCount.textContent = '1';
+        errorsEl.classList.remove('d-none');
+        roleNameInput.classList.add('is-invalid');
+        const feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+        feedback.textContent = '\u6a29\u9650\u540d\u306f\u5fc5\u9808\u3067\u3059';
+        roleNameInput.insertAdjacentElement('afterend', feedback);
+        return;
+    }
 
     const data = {
         roleId: formData.get('roleId') || null,

@@ -104,8 +104,16 @@ public class NokigenController {
 	}
 
 	@PostMapping("/save")
-	public String save(Nokigen nokigen, RedirectAttributes redirectAttributes) {
+	public String save(Nokigen nokigen, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+
+		if (nokigen.getNendo() == null || nokigen.getNendo().isBlank()) {
+			model.addAttribute("nokigen", nokigen);
+			model.addAttribute("mode", "register");
+			model.addAttribute("validationErrors", java.util.List.of("年度は必須です"));
+			return "admin/nokigenConfig";
+		}
+
 		try {
 			boolean isNew = !nokigenService.existsByNendo(nokigen.getNendo());
 			if (isNew && nokigenService.existsByNendo(nokigen.getNendo())) {

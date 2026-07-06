@@ -15,6 +15,13 @@
 					th:text="${mode == 'register' ? '納税周期登録' : '納税周期編集'}">納税周期設定</span>
 			</h5>
 		</div>
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+			<ul class="mb-0 mt-1">
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+			</ul>
+		</div>
+
 
 		<!-- メッセージ表示 -->
 		<div th:if="${successMessage}"
@@ -41,13 +48,13 @@
 						th:field="*{updDt}"> <input type="hidden"
 						th:field="*{updUser}"> <input type="hidden"
 						th:field="*{version}">
-
-					<div class="row">
+<div class="row">
 						<div class="col-md-6">
 							<div class="mb-3">
 								<label for="shuki" class="form-label">納税周期 <span
 									class="text-danger">*</span></label> <select class="form-select"
-									th:field="*{shuki}" id="shuki" required>
+									th:field="*{shuki}" id="shuki"
+									th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'">
 									<option value="">選択してください</option>
 									<option value="1">毎月</option>
 									<option value="2">2ヶ月</option>
@@ -56,6 +63,9 @@
 									<option value="6">6ヶ月</option>
 									<option value="12">年1回</option>
 								</select>
+								<div class="invalid-feedback" th:if="${validationErrors != null and !validationErrors.isEmpty()}">
+									<span th:each="err : ${validationErrors}" th:text="${err}"></span>
+								</div>
 							</div>
 						</div>
 					</div>

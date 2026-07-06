@@ -59,6 +59,11 @@ public class RoleController {
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
+		if (form.getName() == null || form.getName().isBlank()) {
+			result.put("success", false);
+			result.put("errors", java.util.List.of("権限名は必須です"));
+			return result;
+		}
 		try {
 			roleService.saveRole(form, jichitaiCd, "admin");
 			result.put("success", true);
