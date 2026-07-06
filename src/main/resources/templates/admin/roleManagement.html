@@ -68,6 +68,7 @@
 							<td th:text="${role.roleId}" class="text-center"></td>
 							<td th:text="${role.name}"></td>
 							<td><span th:each="detail, iterStat : ${role.roleDetails}"
+								th:if="${detail.screen != null}"
 								th:text="${detail.screen.screenName + (detail.permission == 1 ? '(参照)' : '(更新)') + (!iterStat.last ? ', ' : '')}"></span>
 							</td>
 						</tr>

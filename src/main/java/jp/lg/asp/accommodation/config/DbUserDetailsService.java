@@ -8,20 +8,17 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * 本番用 UserDetailsService（DB連携）
- * 差し替え時は SecurityConfig#userDetailsService の @Bean を削除し、
- * このクラスの @Component コメントを外すこと。
- * 現在は @Component を無効化しているため Spring に登録されない。
- */
-// @Component
+@Slf4j
+@Component
 @RequiredArgsConstructor
 public class DbUserDetailsService implements UserDetailsService {
 
@@ -43,7 +40,12 @@ public class DbUserDetailsService implements UserDetailsService {
 		pk.setId(username);
 
 		User user = userRepository.findById(pk)
-				.orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません: " + username));
+				.orElseThrow(() -> {
+					log.warn("ユーザー見つからず: username={}, jichitaiCd={}", username, jichitaiCd);
+					return new UsernameNotFoundException("ユーザーが見つかりません: " + username);
+				});
+
+		String password = user.getPassword() != null ? user.getPassword().trim() : "";
 
 		/**
 		 * m_role_dtl に管理系画面（USER_MANAGEMENT / ROLE_MANAGEMENT / NOZEI_SHUKI）への
@@ -60,7 +62,7 @@ public class DbUserDetailsService implements UserDetailsService {
 
 		return new org.springframework.security.core.userdetails.User(
 				user.getId(),
-				user.getPassword(),
+				password,
 				List.of(new SimpleGrantedAuthority(role)));
 	}
 }

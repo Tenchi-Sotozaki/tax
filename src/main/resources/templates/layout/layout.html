@@ -52,7 +52,7 @@
 							<div class="accordion-body py-1 px-0">
 								<ul class="nav flex-column ms-3">
 									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('TOKUGIMU')}">
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000001')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/tokugimu/list}"
 										th:classappend="${#strings.contains(currentUri, '/tokugimu')} ? 'text-white fw-medium' : ''">
@@ -66,7 +66,7 @@
 											<i class="bi bi-person-lines-fill me-2"></i>宛名情報
 									</a></li>
 									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('GASSAN')}">
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000006')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/gassan/list}"
 										th:classappend="${#strings.contains(currentUri, '/gassan/list')} ? 'text-white fw-medium' : ''">
@@ -74,7 +74,7 @@
 									</a>
 									</li>
 									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('SHOREIKIN')}">
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000009')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/shoreikin/list}"
 										th:classappend="${#strings.contains(currentUri, '/shoreikin')} ? 'text-white fw-medium' : ''">
@@ -102,7 +102,7 @@
 							<div class="accordion-body py-1 px-0">
 								<ul class="nav flex-column ms-3">
 									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('GASSAN')}">
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('mi00000001')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/gassan/registration}"
 										th:classappend="${#strings.contains(currentUri, '/gassan/registration')} ? 'text-white fw-medium' : ''">
@@ -200,7 +200,7 @@
 								<div class="accordion-body py-1 px-0">
 									<ul class="nav flex-column ms-3">
 										<li class="nav-item"
-											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('USER_MGMT')}">
+											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ss00000002')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/user-search}"
 											th:classappend="${#strings.contains(currentUri, '/admin/user')} ? 'text-white fw-medium' : ''">
@@ -220,7 +220,7 @@
 												class="bi bi-sliders me-2"></i>指定番号・合算指定番号設定
 										</a></li>
 										<li class="nav-item"
-											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
+											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ss00000005')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki/list}"
 											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
@@ -297,7 +297,7 @@
 												<i class="bi bi-calendar-check me-2"></i>納入期限
 										</a></li>
 										<li class="nav-item"
-											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ROLE_MGMT')}">
+											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('sc00000004')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/role/management}"
 											th:classappend="${#strings.contains(currentUri, '/admin/role')} ? 'text-white fw-medium' : ''">
