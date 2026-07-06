@@ -44,6 +44,7 @@ public class ShoreikinController {
 	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public String search(@ModelAttribute ShoreikinDto searchForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		searchForm.setPage(0);
 		model.addAttribute("items", shoreikinService.search(searchForm));
 		model.addAttribute("searchForm", searchForm);
 		return LIST_VIEW;
