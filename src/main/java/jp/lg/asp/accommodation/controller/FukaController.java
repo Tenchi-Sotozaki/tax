@@ -201,6 +201,21 @@ public class FukaController {
 			bindingResult.getAllErrors().forEach(error -> {
 				log.error("【バリデーションエラー】項目: {}, 内容: {}", error.getObjectName(), error.getDefaultMessage());
 			});
+			// 表示順を入力欄順に制御
+			java.util.List<String> validationErrors = new java.util.ArrayList<>();
+			java.util.List<String> fieldOrder = java.util.List.of(
+					"torokuDate", "shinkokuDate",
+					"modificationCategory",
+					"additionalAmountValid1", "additionalAmountValid2", "additionalAmountValid3");
+			for (String field : fieldOrder) {
+				bindingResult.getAllErrors().stream()
+						.filter(e -> e instanceof org.springframework.validation.FieldError
+								? ((org.springframework.validation.FieldError) e).getField().equals(field)
+								: e.getCode() != null && e.getCode().contains(field))
+						.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+						.forEach(validationErrors::add);
+			}
+			model.addAttribute("validationErrors", validationErrors);
 			return CONFIG_VIEW;
 		}
 
