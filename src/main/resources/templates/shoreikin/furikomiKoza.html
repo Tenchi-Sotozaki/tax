@@ -176,7 +176,8 @@
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"> <i
+					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+						th:onclick="${!kozaForm.viewMode} ? 'return confirm(\'入力内容は破棄されます。よろしいですか？\')' : ''"> <i
 						class="bi bi-arrow-left"></i> 戻る
 					</a>
 				</div>
