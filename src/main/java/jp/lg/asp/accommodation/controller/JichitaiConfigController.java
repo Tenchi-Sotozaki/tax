@@ -45,6 +45,10 @@ public class JichitaiConfigController {
 		if (bindingResult.hasErrors()) {
 			Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 			model.addAttribute("jichitai", jichitai);
+			model.addAttribute("validationErrors",
+					bindingResult.getAllErrors().stream()
+							.map(e -> e.getDefaultMessage())
+							.toList());
 			return "admin/jichitaiConfig";
 		}
 		try {

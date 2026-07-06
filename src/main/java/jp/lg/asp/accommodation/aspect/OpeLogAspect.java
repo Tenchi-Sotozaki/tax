@@ -57,6 +57,9 @@ public class OpeLogAspect {
 		try {
 			HttpServletRequest request = getCurrentRequest();
 			String param = request != null ? getRequestParameters(request) : null;
+			if (param != null && param.length() > 2000) {
+				param = param.substring(0, 2000);
+			}
 
 			OperationLog entity = new OperationLog();
 			entity.setJichitaiCd(jichitaiCd);

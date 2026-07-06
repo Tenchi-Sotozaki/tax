@@ -16,6 +16,13 @@
 		</div>
 
 		<!-- メッセージ表示 -->
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+			<ul class="mb-0 mt-1">
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+			</ul>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
@@ -72,6 +79,7 @@
 							</select>
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('nendoStMonth')}"
 								th:errors="*{nendoStMonth}"></div>
+
 						</div>
 						<div class="col-md-2">
 							<button type="submit" class="btn btn-primary">
