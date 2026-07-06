@@ -26,7 +26,8 @@
 			<!-- システム名 -->
 			<div class="px-3 py-3 border-bottom border-secondary">
 				<h5 class="mb-0 fw-bold text-white system-logo">
-					<img th:src="@{/images/logo-acomo.svg?v=2}" alt="AcOmO" class="acomo-logo">
+					<img th:src="@{/images/logo-acomo.svg?v=2}" alt="AcOmO"
+						class="acomo-logo">
 				</h5>
 			</div>
 
@@ -67,10 +68,10 @@
 									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('GASSAN')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/gassan/list}"
-											th:classappend="${#strings.contains(currentUri, '/gassan/list')} ? 'text-white fw-medium' : ''">
+										th:href="@{/gassan/list}"
+										th:classappend="${#strings.contains(currentUri, '/gassan/list')} ? 'text-white fw-medium' : ''">
 											<i class="bi bi-file-earmark-text me-2"></i>合算申告管理台帳
-										</a>
+									</a>
 									</li>
 									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('SHOREIKIN')}">
@@ -212,15 +213,34 @@
 											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/list')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-sliders me-2"></i>賦課方式
 										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/shitei-gassan/view}"
+											th:classappend="${#strings.contains(currentUri, '/admin/shitei-gassan/view')} ? 'text-white fw-medium' : ''"> <i
+												class="bi bi-sliders me-2"></i>指定番号・合算指定番号設定
+										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki/list}"
 											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-calendar-check me-2"></i>納税周期
+												<i class="bi bi-calendar me-2"></i>納税周期
 										</a>
 										</li>
-									</ul>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/nokigen/list}"
+											th:classappend="${#strings.contains(currentUri, '/admin/nokigen/list')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-calendar-check me-2"></i>納入期限
+										</a></li>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/log/ope-log}"
+											th:classappend="${#strings.contains(currentUri, '/log/ope-log')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-journal-text me-2"></i>操作ログ照会
+										</a>
+										</li>									</ul>
 								</div>
 							</div>
 						</div>
@@ -242,7 +262,15 @@
 									<ul class="nav flex-column ms-3">
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{#}"> <i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
+											th:href="@{/admin/reports-config}"
+											th:classappend="${#strings.contains(currentUri, '/admin/reports-config')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/kofu-ritsu}"
+											th:classappend="${#strings.contains(currentUri, '/admin/kofu-ritsu')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-cash-coin me-2"></i>交付率
 										</a></li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
@@ -250,14 +278,24 @@
 											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/register')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-sliders me-2"></i>賦課方式
 										</a></li>
-										<li class="nav-item"
-											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('NOZEI_SHUK')}">
-											<a class="nav-link text-white-50 py-1 sidebar-link"
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/shitei-gassan/register}"
+											th:classappend="${#strings.contains(currentUri, '/admin/shitei-gassan/register')} ? 'text-white fw-medium' : ''"> <i
+												class="bi bi-sliders me-2"></i>指定番号・合算指定番号設定
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nozei-shuki/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/register')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-calendar-check me-2"></i>納税周期
-										</a>
-										</li>
+											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki') and !#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-calendar me-2"></i>納税周期
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/nokigen/register}"
+											th:classappend="${#strings.contains(currentUri, '/admin/nokigen')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-calendar-check me-2"></i>納入期限
+										</a></li>
 										<li class="nav-item"
 											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ROLE_MGMT')}">
 											<a class="nav-link text-white-50 py-1 sidebar-link"
@@ -266,6 +304,12 @@
 												<i class="bi bi-shield-lock me-2"></i>権限管理
 										</a>
 										</li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/jichitai-config}"
+											th:classappend="${#strings.contains(currentUri, '/admin/jichitai-config')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-building me-2"></i>自治体情報
+										</a></li>
 									</ul>
 								</div>
 							</div>
@@ -318,6 +362,7 @@
 	</div>
 
 	<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/js/common.js}"></script>
 	<script>
     // アクティブなアコーディオンを自動展開
     document.querySelectorAll('.sidebar-link').forEach(link => {
@@ -334,6 +379,7 @@
         document.getElementById('sidebar').classList.toggle('d-none');
     });
 </script>
+	<script th:src="@{/js/browserBack.js}"></script>
 	<th:block layout:fragment="scripts"></th:block>
 </body>
 </html>

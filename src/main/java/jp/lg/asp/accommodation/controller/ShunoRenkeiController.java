@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShunoDto;
@@ -40,6 +41,7 @@ public class ShunoRenkeiController {
 	private static final String SCREEN_ID = ScreenManagement.SHUNO_RENKEI;
 
 	@GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
 	public String index(
 			@RequestParam(required = false) String shinkokuFrom,
 			@RequestParam(required = false) String shinkokuTo,
@@ -69,6 +71,7 @@ public class ShunoRenkeiController {
 
 	@GetMapping("/search")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public List<ShunoDto> search(
 			@RequestParam(required = false) String shinkokuFrom,
 			@RequestParam(required = false) String shinkokuTo,
@@ -85,6 +88,7 @@ public class ShunoRenkeiController {
 	}
 
 	@PostMapping("/download")
+	@OpeLog(screenId = SCREEN_ID, operation = "ダウンロード")
 	public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShunoDto.Key> keys) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
@@ -110,7 +114,7 @@ public class ShunoRenkeiController {
 					r.getKibetsu() != null ? String.valueOf(r.getKibetsu()) : "",
 					r.getTorokuYmd() != null ? r.getTorokuYmd().toString() : "",
 					r.getShinkokuYmd() != null ? r.getShinkokuYmd().toString() : "",
-					r.getTaishoYm() != null ? r.getTaishoYm() : "",
+					r.getTaishoYm() != null ? formatTaishoYm(r.getTaishoYm()) : "",
 					r.getTotalZeigaku() != null ? String.valueOf(r.getTotalZeigaku()) : "",
 					r.getCityZeigaku() != null ? String.valueOf(r.getCityZeigaku()) : "",
 					r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "",
@@ -147,19 +151,31 @@ public class ShunoRenkeiController {
 	}
 
 	@PostMapping("/kakunin")
+	@OpeLog(screenId = SCREEN_ID, operation = "確認")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
-			com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
+			accessChecker.checkAccess(SCREEN_ID);
 			List<ShunoDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShunoDto.Key.class));
 			List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 			model.addAttribute("rows", rows);
-			return "renkei/shunoRenkeiKakunin";
 		} catch (Exception e) {
+			e.printStackTrace();
 			model.addAttribute("rows", java.util.Collections.emptyList());
-			return "renkei/shunoRenkeiKakunin";
 		}
+		return "renkei/shunoRenkeiKakunin";
+	}
+
+	private String formatTaishoYm(String taishoYm) {
+		if (taishoYm == null || taishoYm.isEmpty()) {
+			return "";
+		}
+		String[] parts = taishoYm.split("-");
+		if (parts.length == 2) {
+			return parts[0] + "年" + parts[1] + "月";
+		}
+		return taishoYm;
 	}
 
 	private String convertKasanKbn(String kasanKbn) {

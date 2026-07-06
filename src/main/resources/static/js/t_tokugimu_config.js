@@ -5,6 +5,8 @@
 // -----------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
+    initSmoothScroll();
+    initKyodoSection();
 });
 
 // -----------------------------------------------------------------------
@@ -209,70 +211,93 @@ function initCopyCheckboxes() {
             copyTokugimuInfoToMail(copyToMail.checked);
         });
     }
+
+    // 共同事業者情報の表示切替
+    const kyodoCheck = document.getElementById('kyodoCheck');
+    if (kyodoCheck) {
+        kyodoCheck.addEventListener('change', () => {
+            const kyodoBody = document.getElementById('kyodoBody');
+            kyodoBody.style.display = kyodoCheck.checked ? '' : 'none';
+            if (!kyodoCheck.checked) {
+                kyodoBody.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+            }
+        });
+    }
+
+    // 共同事業者追加ボタン
+    const kyodoAddBtn = document.getElementById('kyodoAddBtn');
+    if (kyodoAddBtn) {
+        kyodoAddBtn.addEventListener('click', addKyodoRow);
+    }
+
+    // 共同事業者削除ボタン（初期表示分）
+    document.querySelectorAll('.kyodo-remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => removeKyodoRow(btn));
+    });
 }
 
 function copyTokugimuInfoToFacility(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('facilityAddressNo', tokugimuAddressNo);
-    setValue('facilityAddress', tokugimuAddress);
-    setValue('facilityName', name);
-    setValue('facilityNameKana', nameKana);
-    setValue('facilityPhone', tokugimuPhone);
+    if (enabled) {
+        setValue('facilityAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('facilityAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('facilityName', document.getElementById('name')?.value || '');
+        setValue('facilityNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('facilityPhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('facilityAddressNo', '');
+        setValue('facilityAddress', '');
+        setValue('facilityName', '');
+        setValue('facilityNameKana', '');
+        setValue('facilityPhone', '');
+    }
 }
 
 function copyTokugimuInfoToLicense(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('licenseAddressNo', tokugimuAddressNo);
-    setValue('licenseAddress', tokugimuAddress);
-    setValue('licenseName', name);
-    setValue('licenseNameKana', nameKana);
-    setValue('licensePhone', tokugimuPhone);
+    if (enabled) {
+        setValue('licenseAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('licenseAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('licenseName', document.getElementById('name')?.value || '');
+        setValue('licenseNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('licensePhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('licenseAddressNo', '');
+        setValue('licenseAddress', '');
+        setValue('licenseName', '');
+        setValue('licenseNameKana', '');
+        setValue('licensePhone', '');
+    }
 }
 
 function copyTokugimuInfoToOwner(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('ownerAddressNo', tokugimuAddressNo);
-    setValue('ownerAddress', tokugimuAddress);
-    setValue('ownerName', name);
-    setValue('ownerNameKana', nameKana);
-    setValue('ownerPhone', tokugimuPhone);
+    if (enabled) {
+        setValue('ownerAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('ownerAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('ownerName', document.getElementById('name')?.value || '');
+        setValue('ownerNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('ownerPhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('ownerAddressNo', '');
+        setValue('ownerAddress', '');
+        setValue('ownerName', '');
+        setValue('ownerNameKana', '');
+        setValue('ownerPhone', '');
+    }
 }
 
 function copyTokugimuInfoToMail(enabled) {
-    if (!enabled) return;
-    
-    const tokugimuAddressNo = document.getElementById('tokugimuAddressNo')?.value || '';
-    const tokugimuAddress = document.getElementById('tokugimuAddress')?.value || '';
-    const name = document.getElementById('name')?.value || '';
-    const nameKana = document.getElementById('nameKana')?.value || '';
-    const tokugimuPhone = document.getElementById('tokugimuPhone')?.value || '';
-    
-    setValue('mailAddressNo', tokugimuAddressNo);
-    setValue('mailAddress', tokugimuAddress);
-    setValue('mailName', name);
-    setValue('mailNameKana', nameKana);
-    setValue('mailPhone', tokugimuPhone);
+    if (enabled) {
+        setValue('mailAddressNo', document.getElementById('tokugimuAddressNo')?.value || '');
+        setValue('mailAddress', document.getElementById('tokugimuAddress')?.value || '');
+        setValue('mailName', document.getElementById('name')?.value || '');
+        setValue('mailNameKana', document.getElementById('nameKana')?.value || '');
+        setValue('mailPhone', document.getElementById('tokugimuPhone')?.value || '');
+    } else {
+        setValue('mailAddressNo', '');
+        setValue('mailAddress', '');
+        setValue('mailName', '');
+        setValue('mailNameKana', '');
+        setValue('mailPhone', '');
+    }
 }
 
 function setValue(id, value) {
@@ -280,4 +305,95 @@ function setValue(id, value) {
     if (element && !element.readOnly) {
         element.value = value;
     }
+}
+
+// -----------------------------------------------------------------------
+// 共同事業者行追加・削除
+// -----------------------------------------------------------------------
+function addKyodoRow() {
+    const rows = document.getElementById('kyodoRows');
+    const idx = rows.querySelectorAll('.kyodo-row').length;
+    const div = document.createElement('div');
+    div.className = 'kyodo-row border rounded p-3 mb-3';
+    div.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-medium">共同事業者 ${idx + 1}</span>
+            <button type="button" class="btn btn-sm btn-outline-danger kyodo-remove-btn"><i class="bi bi-trash"></i></button>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-medium">郵便番号</label>
+                <input type="text" class="form-control" name="kyodoList[${idx}].kyodoAddressNo">
+            </div>
+            <div class="col-md-8">
+                <label class="form-label fw-medium">住所</label>
+                <input type="text" class="form-control" name="kyodoList[${idx}].kyodoAddress">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-medium">氏名 <span class="badge bg-danger text-white ms-1">必須</span></label>
+                <input type="text" class="form-control" name="kyodoList[${idx}].kyodoName">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-medium">氏名(ふりがな) <span class="badge bg-danger text-white ms-1">必須</span></label>
+                <input type="text" class="form-control" name="kyodoList[${idx}].kyodoNameKana" placeholder="ひらがなで入力">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-medium">電話番号</label>
+                <input type="tel" class="form-control" name="kyodoList[${idx}].kyodoPhone" placeholder="例）03-1234-5678">
+            </div>
+        </div>`;
+    div.querySelector('.kyodo-remove-btn').addEventListener('click', () => removeKyodoRow(div.querySelector('.kyodo-remove-btn')));
+    rows.appendChild(div);
+    renumberKyodoRows();
+}
+
+function removeKyodoRow(btn) {
+    btn.closest('.kyodo-row').remove();
+    renumberKyodoRows();
+}
+
+function renumberKyodoRows() {
+    document.querySelectorAll('#kyodoRows .kyodo-row').forEach((row, i) => {
+        row.querySelector('span.fw-medium').textContent = `共同事業者 ${i + 1}`;
+        row.querySelectorAll('input').forEach(input => {
+            input.name = input.name.replace(/kyodoList\[\d+\]/, `kyodoList[${i}]`);
+        });
+    });
+}
+
+// -----------------------------------------------------------------------
+// 共同事業者セクション初期化（編集・照会時にデータがあれば表示）
+// -----------------------------------------------------------------------
+function initKyodoSection() {
+    const kyodoCheck = document.getElementById('kyodoCheck');
+    if (kyodoCheck && kyodoCheck.checked) {
+        document.getElementById('kyodoBody').style.display = '';
+    }
+    // 保存済みデータがない場合は初期行を追加
+    const rows = document.getElementById('kyodoRows');
+    if (rows && rows.querySelectorAll('.kyodo-row').length === 0) {
+        addKyodoRow();
+    }
+}
+
+// -----------------------------------------------------------------------
+// スムーズスクロール（フロートヘッダーの高さを考慮）
+// -----------------------------------------------------------------------
+function initSmoothScroll() {
+    const scrollContainer = document.querySelector('main.overflow-auto');
+    if (!scrollContainer) return;
+
+    document.querySelectorAll('.sticky-top a[href^="#"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (!target) return;
+            const header = document.querySelector('.sticky-top');
+            const headerBottom = header.getBoundingClientRect().bottom;
+            const containerTop = scrollContainer.getBoundingClientRect().top;
+            const targetTop = target.getBoundingClientRect().top;
+            const offset = targetTop - headerBottom;
+            scrollContainer.scrollBy({ top: offset, behavior: 'smooth' });
+        });
+    });
 }

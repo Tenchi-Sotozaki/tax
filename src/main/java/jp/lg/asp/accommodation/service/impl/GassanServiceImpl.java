@@ -23,6 +23,7 @@ import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.GassanService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class GassanServiceImpl implements GassanService {
     private final GassanUchiRepository gassanUchiRepository;
     private final AtenaRepository atenaRepository;
     private final TokugimuRepository tokugimuRepository;
+    private final JichitaiRepository jichitaiRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -342,8 +344,11 @@ public class GassanServiceImpl implements GassanService {
     }
 
     private String generateGassanShiteiNo() {
-        int max = gassanRepository.findMaxGassanShiteiNoByJichitaiCd(jichitaiCd).orElse(0);
-        return String.format("%08d", Math.max(max, 90000000) + 1);
+        String prefix = jichitaiRepository.findById(jichitaiCd)
+                .map(j -> j.getGassanStChar() != null ? j.getGassanStChar() : "900")
+                .orElse("900");
+        int max = gassanRepository.findMaxGassanShiteiNoByJichitaiCdAndPrefix(jichitaiCd, prefix).orElse(0);
+        return prefix + String.format("%05d", max + 1);
     }
 
     private void saveGassanUchi(String gassanShiteiNo, BigDecimal rno, List<String> shiteiNoList) {

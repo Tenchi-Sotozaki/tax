@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +43,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ShoreikinDto> search(ShoreikinDto form) {
+	public Page<ShoreikinDto> search(ShoreikinDto form) {
 
 		List<Tokugimu> tokugimuList;
 		if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
@@ -58,7 +61,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 		}
 
 		if (tokugimuList.isEmpty()) {
-			return List.of();
+			return Page.empty(PageRequest.of(form.getPage(), form.getPageSize()));
 		}
 
 		List<BigDecimal> atenaNos = tokugimuList.stream().map(Tokugimu::getAtenaNo).distinct().toList();
@@ -151,7 +154,12 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 				})
 				.toList();
 
-		return result;
+		// ページ分割
+		PageRequest pageable = PageRequest.of(form.getPage(), form.getPageSize());
+		int start = (int) pageable.getOffset();
+		int end = Math.min(start + pageable.getPageSize(), result.size());
+		List<ShoreikinDto> pageContent = start >= result.size() ? List.of() : result.subList(start, end);
+		return new PageImpl<>(pageContent, pageable, result.size());
 
 	}
 

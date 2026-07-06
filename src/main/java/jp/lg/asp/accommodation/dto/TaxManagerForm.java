@@ -7,14 +7,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
 
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.util.StringUtils;
-
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.StringUtils;
+
 import lombok.Data;
 
 @Data
@@ -24,13 +24,11 @@ public class TaxManagerForm {
 	private Long collectorId;
 	private String obligorName;
 	private String facilityName;
-	private String obligorAtenaNo; // 特別徴収義務者の宛名番号
+	private String obligorAtenaNo;
 
-	@NotNull(message = "登録日は必須です")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate registrationDate;
 
-	@NotNull(message = "申告日は必須です")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate declarationDate;
 
@@ -48,75 +46,61 @@ public class TaxManagerForm {
 	private String shiteiNo;
 
 	// ===== カスタムバリデーションアノテーション =====
-	
+
 	@Target({ ElementType.TYPE, ElementType.ANNOTATION_TYPE })
 	@Retention(RetentionPolicy.RUNTIME)
 	@Constraint(validatedBy = TaxManagerValidator.class)
 	@Documented
 	public @interface TaxManagerValid {
 		String message() default "入力内容に誤りがあります";
+
 		Class<?>[] groups() default {};
+
 		Class<? extends Payload>[] payload() default {};
 	}
 
 	// ===== カスタムバリデーター =====
-	
+
 	public static class TaxManagerValidator implements ConstraintValidator<TaxManagerValid, TaxManagerForm> {
 
 		@Override
 		public void initialize(TaxManagerValid constraintAnnotation) {
 		}
 
-		@Override
-		public boolean isValid(TaxManagerForm form, ConstraintValidatorContext context) {
-			boolean isValid = true;
-
+		public static java.util.Map<String, String> validate(TaxManagerForm form) {
+			java.util.Map<String, String> errors = new java.util.LinkedHashMap<>();
+			if (form.getRegistrationDate() == null)
+				errors.put("registrationDate", "登録日は必須です");
+			if (form.getDeclarationDate() == null)
+				errors.put("declarationDate", "申告日は必須です");
 			if (form.isExemptionFlag()) {
-				// --- 選任免除が「有効」の場合 ---
-				// 免除理由が空ならエラー
-				if (!StringUtils.hasText(form.getExemptionReason())) {
-					addError(context, "exemptionReason", "選任免除理由を入力してください");
-					isValid = false;
-				}
+				if (!StringUtils.hasText(form.getExemptionReason()))
+					errors.put("exemptionReason", "選任免除理由は必須です");
 			} else {
-				// --- 選任免除が「無効」の場合 ---
-				// 宛名番号チェック
-				if (!StringUtils.hasText(form.getAtenaNo())) {
-					addError(context, "atenaNo", "宛名番号を入力してください");
-					isValid = false;
-				}
-				// 郵便番号・住所・氏名・ふりがな・電話番号が空ならエラー
-				if (!StringUtils.hasText(form.getManagerYubinNo())) {
-					addError(context, "managerYubinNo", "住所（郵便番号）を入力してください");
-					isValid = false;
-				}
-				if (!StringUtils.hasText(form.getManagerAddress())) {
-					addError(context, "managerAddress", "住所（所在地）を入力してください");
-					isValid = false;
-				}
-				if (!StringUtils.hasText(form.getManagerName())) {
-					addError(context, "managerName", "氏名を入力してください");
-					isValid = false;
-				}
-				if (!StringUtils.hasText(form.getManagerNameKana())) {
-					addError(context, "managerNameKana", "ふりがなを入力してください");
-					isValid = false;
-				}
-				if (!StringUtils.hasText(form.getManagerPhone())) {
-					addError(context, "managerPhone", "電話番号を入力してください");
-					isValid = false;
-				}
+				form.setExemptionReason(null);
+				if (!StringUtils.hasText(form.getManagerYubinNo()))
+					errors.put("managerYubinNo", "住所（郵便番号）は必須です");
+				if (!StringUtils.hasText(form.getManagerAddress()))
+					errors.put("managerAddress", "住所（所在地）は必須です");
+				if (!StringUtils.hasText(form.getManagerName()))
+					errors.put("managerName", "氏名は必須です");
+				if (!StringUtils.hasText(form.getManagerNameKana()))
+					errors.put("managerNameKana", "ふりがなは必須です");
+				if (!StringUtils.hasText(form.getManagerPhone()))
+					errors.put("managerPhone", "電話番号は必須です");
 			}
-
-			return isValid;
+			return errors;
 		}
 
-		// 特定のフィールドにエラーメッセージを紐付けるための補助メソッド
-		private void addError(ConstraintValidatorContext context, String fieldName, String message) {
+		@Override
+		public boolean isValid(TaxManagerForm form, ConstraintValidatorContext context) {
 			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(message)
-					.addPropertyNode(fieldName)
-					.addConstraintViolation();
+			java.util.Map<String, String> errors = validate(form);
+			errors.forEach((field, message) ->
+				context.buildConstraintViolationWithTemplate(message)
+						.addPropertyNode(field).addConstraintViolation()
+			);
+			return errors.isEmpty();
 		}
 	}
 }

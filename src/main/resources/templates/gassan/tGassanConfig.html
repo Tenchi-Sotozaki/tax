@@ -12,10 +12,19 @@
 		<!-- ページヘッダー -->
 		<div
 			class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h2 class="h2">
+			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-file-earmark-text me-2 text-primary"></i> <span
 					th:text="${isView} ? '合算申告 照会' : (${isEdit} ? '合算申告 編集' : '合算申告 新規登録')"></span>
-			</h2>
+			</h5>
+		</div>
+
+		<!-- 特別徴収義務者情報 -->
+		<div class="mb-4">
+			<span class="fw-semibold">指定番号：</span> <span
+				th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
+				class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
+				th:text="${tokugimuName}" class="me-4"></span> <span
+				class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
 		</div>
 
 		<!-- エラーメッセージ -->
@@ -35,15 +44,19 @@
 				type="hidden" th:field="*{gassanShiteiNo}">
 
 			<!-- バリデーションエラーサマリー -->
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
+			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show"
 				role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
-					th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+				</ul>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
 			<!-- ===== 申告情報エリア ===== -->
 			<div class="card mb-4 shadow-sm">
-				<div class="card-header bg-primary text-white py-3">
+				<div class="card-header py-3">
 					<h5 class="mb-0">
 						<i class="bi bi-info-circle me-2"></i>申告情報
 					</h5>
@@ -53,12 +66,13 @@
 
 						<!-- 登録日 -->
 						<div class="col-md-3">
-							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'" class="form-label fw-medium"> 登録日
-								<span th:if="!${isView}" class="badge bg-danger text-white ms-1">必須</span>
+							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'"
+								class="form-label fw-medium"> 登録日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="torokuYmd" th:field="*{torokuYmd}" th:errorclass="is-invalid">
-							<input th:if="${isView}" type="text" class="form-control"
-								id="torokuYmdView" readonly th:value="*{torokuYmd}">
+								id="torokuYmd" th:field="*{torokuYmd}"
+								th:errorclass="is-invalid"> <input th:if="${isView}"
+								type="text" class="form-control" id="torokuYmdView" readonly
+								th:value="*{torokuYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('torokuYmd')}"
 								th:errors="*{torokuYmd}"></div>
@@ -66,13 +80,13 @@
 
 						<!-- 申告日 -->
 						<div class="col-md-3">
-							<label th:for="!${isView} ? 'shinkokuYmd' : 'shinkokuYmdView'" class="form-label fw-medium">
-								申告日 <span th:if="!${isView}"
-								class="badge bg-danger text-white ms-1">必須</span>
+							<label th:for="!${isView} ? 'shinkokuYmd' : 'shinkokuYmdView'"
+								class="form-label fw-medium"> 申告日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="shinkokuYmd" th:field="*{shinkokuYmd}" th:errorclass="is-invalid">
-							<input th:if="${isView}" type="text" class="form-control"
-								id="shinkokuYmdView" readonly th:value="*{shinkokuYmd}">
+								id="shinkokuYmd" th:field="*{shinkokuYmd}"
+								th:errorclass="is-invalid"> <input th:if="${isView}"
+								type="text" class="form-control" id="shinkokuYmdView" readonly
+								th:value="*{shinkokuYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('shinkokuYmd')}"
 								th:errors="*{shinkokuYmd}"></div>
@@ -100,13 +114,13 @@
 
 						<!-- 適用時期(FROM) -->
 						<div class="col-md-4">
-							<label th:for="!${isView} ? 'tekiyoStYmd' : 'tekiyoStYmdView'" class="form-label fw-medium">
-								適用時期(FROM) <span th:if="!${isView}"
-								class="badge bg-danger text-white ms-1">必須</span>
+							<label th:for="!${isView} ? 'tekiyoStYmd' : 'tekiyoStYmdView'"
+								class="form-label fw-medium"> 適用時期(FROM) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="tekiyoStYmd" th:field="*{tekiyoStYmd}" th:errorclass="is-invalid">
-							<input th:if="${isView}" type="text" class="form-control"
-								id="tekiyoStYmdView" readonly th:value="*{tekiyoStYmd}">
+								id="tekiyoStYmd" th:field="*{tekiyoStYmd}"
+								th:errorclass="is-invalid"> <input th:if="${isView}"
+								type="text" class="form-control" id="tekiyoStYmdView" readonly
+								th:value="*{tekiyoStYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoStYmd')}"
 								th:errors="*{tekiyoStYmd}"></div>
@@ -114,12 +128,13 @@
 
 						<!-- 適用時期(TO) -->
 						<div class="col-md-4">
-							<label th:for="!${isView} ? 'tekiyoEdYmd' : 'tekiyoEdYmdView'" class="form-label fw-medium">
-								適用時期(TO)
-							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="tekiyoEdYmd" th:field="*{tekiyoEdYmd}" th:errorclass="is-invalid">
-							<input th:if="${isView}" type="text" class="form-control"
-								id="tekiyoEdYmdView" readonly th:value="*{tekiyoEdYmd}">
+							<label th:for="!${isView} ? 'tekiyoEdYmd' : 'tekiyoEdYmdView'"
+								class="form-label fw-medium"> 適用時期(TO) </label> <input
+								th:if="!${isView}" type="date" class="form-control"
+								id="tekiyoEdYmd" th:field="*{tekiyoEdYmd}"
+								th:errorclass="is-invalid"> <input th:if="${isView}"
+								type="text" class="form-control" id="tekiyoEdYmdView" readonly
+								th:value="*{tekiyoEdYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoEdYmd')}"
 								th:errors="*{tekiyoEdYmd}"></div>
@@ -131,10 +146,10 @@
 
 			<!-- ===== 徴収義務者一覧エリア ===== -->
 			<div class="card mb-4 shadow-sm">
-				<div class="card-header bg-primary text-white py-3">
+				<div class="card-header py-3">
 					<h5 class="mb-0">
 						<i class="bi bi-building me-2"></i>徴収義務者一覧 <span
-							th:if="!${isView}" class="badge bg-danger text-white ms-2 fs-6">必須（2件以上選択）</span>
+							th:if="!${isView}" class="badge bg-danger ms-2 fs-6">必須（2件以上選択）</span>
 					</h5>
 				</div>
 				<div class="card-body p-0">
@@ -172,11 +187,9 @@
 								<td class="text-center">
 									<!-- 代表施設チェックボックス --> <input th:if="!${isView}" type="radio"
 									class="form-check-input daihyo-radio" name="daihyoShiteiNo"
-									th:value="${facility.shiteiNo}" 
-									th:checked="${facility.daihyo}" 
-									th:disabled="!${facility.checked}">
-									<!-- 照会時：代表施設アイコン --> <i
-									th:if="${isView} and ${facility.daihyo}"
+									th:value="${facility.shiteiNo}" th:checked="${facility.daihyo}"
+									th:disabled="!${facility.checked}"> <!-- 照会時：代表施設アイコン -->
+									<i th:if="${isView} and ${facility.daihyo}"
 									class="bi bi-check-circle-fill text-success fs-5"></i>
 								</td>
 								<td th:text="${facility.choshuGimushaName}"></td>
@@ -209,9 +222,11 @@
 						class="bi bi-pencil-square me-2"></i>編集する
 					</a>
 				</th:block>
-				<a th:href="${isEdit} ? @{/gassan/list} : 'javascript:history.back()'"
+				<a
+					th:href="${isEdit} ? @{/gassan/list} : 'javascript:history.back()'"
 					class="btn btn-outline-secondary btn-lg px-4"> <i
-					class="bi bi-arrow-left me-2"></i><span th:text="${isEdit} ? '一覧に戻る' : '一覧に戻る'"></span>
+					class="bi bi-arrow-left me-2"></i><span
+					th:text="${isEdit} ? '一覧に戻る' : '一覧に戻る'"></span>
 				</a>
 			</div>
 		</form>

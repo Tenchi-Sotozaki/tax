@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.GassanDaichoItem;
@@ -43,6 +45,7 @@ public class GassanController {
 	private static final String DAICHO_VIEW = "gassan/tGassanDaicho";
 
 	@GetMapping("/registration")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
 	public String showRegistrationForm(Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -54,17 +57,19 @@ public class GassanController {
 	}
 
 	@GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID_LIST, operation = "初期表示")
 	public String showDaicho(
 			@ModelAttribute("searchForm") GassanDaichoSearchForm searchForm,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID_LIST);
 
-		List<GassanDaichoItem> items = gassanDaichoService.search(searchForm);
+		Page<GassanDaichoItem> items = gassanDaichoService.search(searchForm);
 		model.addAttribute("items", items);
 		return DAICHO_VIEW;
 	}
 
 	@GetMapping("/view/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
 	public String showView(@PathVariable String gassanShiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -79,6 +84,7 @@ public class GassanController {
 	}
 
 	@GetMapping("/view-form/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会")
 	public String showViewForm(@PathVariable String gassanShiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -97,6 +103,7 @@ public class GassanController {
 	}
 
 	@GetMapping("/edit/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String showEditForm(@PathVariable String gassanShiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -115,6 +122,7 @@ public class GassanController {
 	}
 
 	@PostMapping("/edit/{gassanShiteiNo}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String updateGassan(
 			@PathVariable String gassanShiteiNo,
 			@Validated @ModelAttribute("GassanForm") GassanForm form,
@@ -128,6 +136,7 @@ public class GassanController {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("editId", gassanShiteiNo);
+			model.addAttribute("validationErrors", GassanForm.validate(form).values());
 			return FORM_VIEW;
 		}
 
@@ -148,6 +157,7 @@ public class GassanController {
 
 	@PostMapping("/facilities-by-atena")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "施設一覧取得")
 	public List<GassanForm.FacilityItem> getFacilitiesByAtena(@RequestBody Map<String, Object> request) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
@@ -156,6 +166,7 @@ public class GassanController {
 	}
 
 	@PostMapping("/registration")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String register(
 			@Validated @ModelAttribute("GassanForm") GassanForm form,
 			BindingResult bindingResult,
@@ -167,6 +178,7 @@ public class GassanController {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
+			model.addAttribute("validationErrors", GassanForm.validate(form).values());
 			return FORM_VIEW;
 		}
 		try {

@@ -21,8 +21,8 @@ function bindEvents() {
         const toggleExemptionArea = () => {
             exemptionReasonArea.style.display = exemptionFlag.checked ? 'block' : 'none';
             
-            // 選任免除をチェックした場合、納税管理人情報をクリア
             if (exemptionFlag.checked) {
+                // 選任免除をチェックした場合、納税管理人情報をクリア
                 const clearField = (id) => {
                     const el = document.getElementById(id);
                     if (el) el.value = '';
@@ -39,6 +39,10 @@ function bindEvents() {
                 
                 // チェックメッセージもクリア
                 hideCheckMessage();
+            } else {
+                // 選任免除のチェックを外した場合、免除理由をクリア
+                const exemptionReasonField = document.getElementById('exemptionReason');
+                if (exemptionReasonField) exemptionReasonField.value = '';
             }
         };
         toggleExemptionArea();

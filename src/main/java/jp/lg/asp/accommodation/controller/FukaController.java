@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
@@ -52,6 +53,7 @@ public class FukaController {
 	 * @return 画面パス
 	 */
 	@GetMapping("/payment-ledger/{shiteiNo}")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String showDaicho(
 			@PathVariable String shiteiNo,
 			@RequestParam(required = false) String nendo,
@@ -87,6 +89,7 @@ public class FukaController {
 	 * @return 画面パス
 	 */
 	@GetMapping("/register/{shiteiNo}")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String register(
 			@PathVariable String shiteiNo,
 			@RequestParam(required = false) String month,
@@ -122,6 +125,7 @@ public class FukaController {
 	 * @return 画面パス
 	 */
 	@GetMapping("/edit/{shiteiNo}/{nendo}/{kibetsu}")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String showEdit(
 			@PathVariable String shiteiNo,
 			@PathVariable String nendo,
@@ -153,6 +157,7 @@ public class FukaController {
 	 * @return 画面パス
 	 */
 	@GetMapping("/view/{shiteiNo}/{nendo}/{kibetsu}")
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String showView(
 			@PathVariable String shiteiNo,
 			@PathVariable String nendo,
@@ -183,6 +188,7 @@ public class FukaController {
 	 * @return 画面パス
 	 */
 	@PostMapping("/save")
+	@OpeLog(screenId = SCREEN_ID, operation = "保存（登録・更新）")
 	public String save(@Validated @ModelAttribute("fukaDeclarationForm") FukaDeclarationForm form,
 			BindingResult bindingResult,
 			Model model,

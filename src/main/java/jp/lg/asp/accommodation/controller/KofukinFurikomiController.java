@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinRenkeiDto;
@@ -40,6 +41,7 @@ public class KofukinFurikomiController {
 	private static final String SCREEN_ID = ScreenManagement.KOFUKIN_FURIKOMI;
 
 	@GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID, operation = "一覧")
 	public String index(
 			@RequestParam(required = false) String nendo,
 			@RequestParam(required = false) String shiteiNo,
@@ -69,6 +71,7 @@ public class KofukinFurikomiController {
 
 	@GetMapping("/search")
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public List<ShoreikinRenkeiDto> search(
 			@RequestParam(required = false) String nendo,
 			@RequestParam(required = false) String shiteiNo,
@@ -79,6 +82,7 @@ public class KofukinFurikomiController {
 	}
 
 	@PostMapping("/download")
+	@OpeLog(screenId = SCREEN_ID, operation = "ダウンロード")
 	public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShoreikinRenkeiDto.Key> keys) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<ShoreikinRenkeiDto> rows = shoreikinRenkeiService.findByKeys(jichitaiCd, keys);
@@ -133,19 +137,20 @@ public class KofukinFurikomiController {
 	}
 
 	@PostMapping("/kakunin")
+	@OpeLog(screenId = SCREEN_ID, operation = "確認")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
-			com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
+			accessChecker.checkAccess(SCREEN_ID);
 			List<ShoreikinRenkeiDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShoreikinRenkeiDto.Key.class));
 			List<ShoreikinRenkeiDto> rows = shoreikinRenkeiService.findByKeys(jichitaiCd, keys);
 			model.addAttribute("rows", rows);
-			return "renkei/kofukinFurikomiKakunin";
 		} catch (Exception e) {
+			e.printStackTrace();
 			model.addAttribute("rows", java.util.Collections.emptyList());
-			return "renkei/kofukinFurikomiKakunin";
 		}
+		return "renkei/kofukinFurikomiKakunin";
 	}
 
 	private String convertShumoku(String shumoku) {

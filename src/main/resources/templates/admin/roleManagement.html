@@ -11,9 +11,9 @@
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h2 class="h2">
+			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-shield-lock me-2 text-primary"></i> 権限管理台帳
-			</h2>
+			</h5>
 		</div>
 
 		<div id="flashMessage"
@@ -122,10 +122,15 @@
 							<input type="hidden" id="roleId" name="roleId"> <input
 								type="hidden" id="version" name="version">
 
+							<div id="roleModalErrors" class="alert alert-danger d-none" role="alert">
+								<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span id="roleModalErrorCount"></span> 件のエラーがあります。
+								<ul class="mb-0 mt-1" id="roleModalErrorList"></ul>
+							</div>
+
 							<div class="mb-3">
 								<label for="roleName" class="form-label">権限名 <span
 									class="text-danger">*</span></label> <input type="text"
-									class="form-control" id="roleName" name="name" required>
+									class="form-control" id="roleName" name="name">
 							</div>
 
 							<div class="mb-3">

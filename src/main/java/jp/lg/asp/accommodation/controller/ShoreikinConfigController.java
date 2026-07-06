@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinConfigDto;
@@ -43,6 +44,7 @@ public class ShoreikinConfigController {
 	 * @return 画面パス
 	 */
 	@GetMapping("/config")
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String config(@RequestParam String shiteiNo,
 			@RequestParam(required = false) String nendo,
 			Model model) {
@@ -61,6 +63,7 @@ public class ShoreikinConfigController {
 	 * @return 画面パス
 	 */
 	@PostMapping("/config/edit")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集モード切替")
 	public String editMode(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
@@ -77,6 +80,7 @@ public class ShoreikinConfigController {
 	 * @return 画面パス
 	 */
 	@PostMapping("/config/calculate")
+	@OpeLog(screenId = SCREEN_ID, operation = "算出")
 	public String calculate(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
@@ -101,6 +105,7 @@ public class ShoreikinConfigController {
 	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/config/create")
+	@OpeLog(screenId = SCREEN_ID, operation = "新規登録")
 	public String create(@Valid @ModelAttribute ShoreikinConfigDto configForm,
 			BindingResult bindingResult,
 			Model model,
@@ -133,6 +138,7 @@ public class ShoreikinConfigController {
 	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/config/update")
+	@OpeLog(screenId = SCREEN_ID, operation = "更新")
 	public String update(@Valid @ModelAttribute ShoreikinConfigDto configForm,
 			BindingResult bindingResult,
 			Model model,

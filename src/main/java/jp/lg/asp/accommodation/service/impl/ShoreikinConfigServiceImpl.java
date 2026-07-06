@@ -2,6 +2,7 @@ package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import jp.lg.asp.accommodation.entity.ShoreikinId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
+import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.ShoreikinConfigService;
@@ -37,12 +39,10 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
 	private final FukaRepository fukaRepository;
+	private final KofuRitsuRepository kofuRitsuRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
-
-	@Value("${app.kofukin.rate:3.00}")
-	private BigDecimal defaultKofuRitsu;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -86,13 +86,23 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				// 新規登録モード
 				dto.setExists(false);
 				dto.setMode("create");
-				dto.setKofuRitsu(defaultKofuRitsu);
+
+				LocalDate today = LocalDate.now();
+				dto.setNendo(String.valueOf(today.getYear()));
+
+				// 交付率を取得して設定 ( 処理日を指定 )
+				dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today));
 			}
 		} else {
 			// 新規登録モード
 			dto.setExists(false);
 			dto.setMode("create");
-			dto.setKofuRitsu(defaultKofuRitsu);
+
+			LocalDate today = LocalDate.now();
+			dto.setNendo(String.valueOf(today.getYear()));
+
+			// 交付率を取得して設定 ( 処理日を指定 )
+			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today));
 		}
 
 		return dto;
@@ -162,7 +172,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 
 		// デフォルト交付率を設定
 		if (dto.getKofuRitsu() == null) {
-			dto.setKofuRitsu(defaultKofuRitsu);
+			dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
 		}
 
 		// 交付額を算出（納入税額 × 交付率 ÷ 100）

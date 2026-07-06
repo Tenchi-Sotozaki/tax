@@ -53,26 +53,32 @@ public class ShoreikinDto {
 	/** No.10 法人番号 (m_atena.hojin_no) */
 	private String hojinNo;
 
+	/** No.11 ページ番号 */
+	private int page = 0;
+
+	/** No.12 1ページあたりの表示件数 */
+	private int pageSize = 10;
+
 	// ========== 情報一覧エリア（表示用） ==========
 
-	/** No.12 チェックボックス用 */
+	/** No.13 チェックボックス用 */
 	private boolean selected;
 
-	/** No.13 指定番号（一覧表示用） */
+	/** No.14 指定番号（一覧表示用） */
 	private String listShiteiNo;
 
-	/** No.14 施設名称（t_tokugimu.shisetsu_name） */
+	/** No.15 施設名称（t_tokugimu.shisetsu_name） */
 	private String listShisetsuName;
 
-	/** No.15 氏名（m_atena.name） */
+	/** No.16 氏名（m_atena.name） */
 	private String shimei;
 
-	/** No.16 交付年度 (t_shoreikin.nendo) */
+	/** No.17 交付年度 (t_shoreikin.nendo) */
 	private Integer kofuNendo;
 
-	/** No.17 交付額 (t_shoreikin.kofu_gaku) */
+	/** No.18 交付額 (t_shoreikin.kofu_gaku) */
 	private Long kofuGaku;
 
-	/** No.18 交付年月日 (t_shoreikin.kofu_ymd) */
+	/** No.19 交付年月日 (t_shoreikin.kofu_ymd) */
 	private LocalDate kofuYmd;
 }

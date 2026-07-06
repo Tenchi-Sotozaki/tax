@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.AtenaSearchForm;
@@ -40,6 +41,7 @@ public class AtenaController {
 	private static final String ATENA_INSERT = ScreenManagement.ATENA_INSERT;
 
 	@GetMapping("/list")
+	@OpeLog(screenId = ATENA_DAICHO, operation = "照会")
 	public String list(@ModelAttribute AtenaSearchForm searchForm, Model model) {
 		accessChecker.checkAccess(ATENA_DAICHO);
 		model.addAttribute("items", atenaRepository.search(
@@ -57,6 +59,7 @@ public class AtenaController {
 	}
 
 	@GetMapping("/import")
+	@OpeLog(screenId = ATENA_INSERT, operation = "取込画面表示")
 	public String showImport(Model model) {
 		accessChecker.checkAccess(ATENA_INSERT);
 		model.addAttribute("history", atenaImportService.findHistory(jichitaiCd));
@@ -64,6 +67,7 @@ public class AtenaController {
 	}
 
 	@PostMapping("/import")
+	@OpeLog(screenId = ATENA_INSERT, operation = "取込")
 	public String importCsv(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(ATENA_INSERT);

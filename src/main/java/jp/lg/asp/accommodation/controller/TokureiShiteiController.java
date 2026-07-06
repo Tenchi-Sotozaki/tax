@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
@@ -38,6 +39,7 @@ public class TokureiShiteiController {
 	 * 画面表示
 	 */
 	@GetMapping
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TokureiShiteiDto dto = new TokureiShiteiDto();
@@ -61,6 +63,7 @@ public class TokureiShiteiController {
 	 * PDF出力
 	 */
 	@PostMapping("/pdf")
+	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	public ResponseEntity<byte[]> generatePdf(TokureiShiteiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -76,6 +79,7 @@ public class TokureiShiteiController {
 	 * プレビュー
 	 */
 	@PostMapping("/preview")
+	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
 	public ResponseEntity<byte[]> preview(TokureiShiteiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -94,6 +98,7 @@ public class TokureiShiteiController {
 	 * 印刷
 	 */
 	@PostMapping("/print")
+	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
 	public ResponseEntity<byte[]> print(TokureiShiteiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);

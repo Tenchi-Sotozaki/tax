@@ -9,15 +9,16 @@
 </head>
 
 <body>
-	<div layout:fragment="content" class="container-fluid p-4">
+	<div layout:fragment="content" class="container-fluid p-4" id="zeiritsuConfigRoot"
+		th:data-is-view="${isView}">
 
 		<!-- ページヘッダー -->
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h2 class="h2">
+			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-sliders me-2 text-primary"></i> <span
 					th:text="${isView} ? '賦課方式設定照会' : (${isEdit} ? '賦課方式設定編集' : '賦課方式設定登録')"></span>
-			</h2>
+			</h5>
 		</div>
 
 		<div th:if="${successMessage}"
@@ -37,18 +38,19 @@
 			th:action="${isEdit} ? @{/admin/zeiritsu/edit/{seq}(seq=${seq})} : @{/admin/zeiritsu/register}"
 			th:object="${zeiritsuForm}" method="post">
 
-			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger"
+			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show"
 				role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
-					th:text="${#fields.errors().size()}"></span> 件のエラーがあります。
-				<ul class="mb-0 mt-2" th:if="${#fields.hasGlobalErrors()}">
-					<li th:each="error : ${#fields.globalErrors()}" th:text="${error}"></li>
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 				</ul>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
 			<!-- 基本情報 -->
 			<div class="card mb-4 shadow-sm">
-				<div class="card-header bg-primary text-white py-3">
+				<div class="card-header py-3">
 					<h5 class="mb-0">
 						<i class="bi bi-sliders me-2"></i>税率管理情報
 					</h5>
@@ -57,8 +59,7 @@
 					<div class="row g-3" style="max-width: 480px;">
 
 						<div class="col-12">
-							<label class="form-label fw-medium">賦課方式 <span
-								class="badge bg-danger text-white ms-1" th:unless="${isView}">必須</span>
+							<label class="form-label fw-medium">賦課方式 <span class="text-danger" th:unless="${isView}">*</span>
 							</label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
@@ -82,8 +83,7 @@
 
 						<div class="col-12">
 							<label for="tekiyoStYm" class="form-label fw-medium">適用開始時期
-								<span class="badge bg-danger text-white ms-1"
-								th:unless="${isView}">必須</span>
+								<span class="text-danger" th:unless="${isView}">*</span>
 							</label> <input type="month" id="tekiyoStYm" name="tekiyoStYmDisplay"
 								class="form-control"
 								th:classappend="${#fields.hasErrors('tekiyoStYm')} ? 'is-invalid'"
@@ -112,8 +112,7 @@
 						</div>
 
 						<div class="col-12">
-							<label class="form-label fw-medium">区分 <span
-								class="badge bg-danger text-white ms-1" th:unless="${isView}">必須</span>
+							<label class="form-label fw-medium">区分 <span class="text-danger" th:unless="${isView}">*</span>
 							</label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
@@ -162,8 +161,7 @@
 							<tbody>
 								<!-- ① 必須 -->
 								<tr>
-									<td class="text-center fw-medium">① <span
-										class="badge bg-danger" th:unless="${isView}">必須</span>
+									<td class="text-center fw-medium">① <span class="text-danger" th:unless="${isView}">*</span>
 									</td>
 									<td><input type="text" class="form-control"
 										th:field="*{details[0].zeiValue}" th:readonly="${isView}">
@@ -386,53 +384,7 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:inline="javascript">
-			/*<![CDATA[*/
-			const isView = /*[[${isView}]]*/ false;
-
-			document.addEventListener('DOMContentLoaded', function () {
-				const displaySt = document.querySelector('input[name="tekiyoStYmDisplay"]');
-				const hiddenSt = document.getElementById('tekiyoStYmHidden');
-				const displayEd = document.querySelector('input[name="tekiyoEdYmDisplay"]');
-				const hiddenEd = document.getElementById('tekiyoEdYmHidden');
-
-				// 既存値の復元（yyyyMM → yyyy-MM）
-				if (hiddenSt && hiddenSt.value && hiddenSt.value.length === 6) {
-					displaySt.value = hiddenSt.value.substring(0, 4) + '-' + hiddenSt.value.substring(4, 6);
-				}
-				if (hiddenEd && hiddenEd.value && hiddenEd.value.length === 6) {
-					displayEd.value = hiddenEd.value.substring(0, 4) + '-' + hiddenEd.value.substring(4, 6);
-				}
-				// 入力変更時にhiddenへ反映（照会モードは不要）
-				if (displaySt && !isView) {
-					displaySt.addEventListener('change', function () {
-						hiddenSt.value = displaySt.value ? displaySt.value.replace('-', '') : '';
-					});
-				}
-				if (displayEd && !isView) {
-					displayEd.addEventListener('change', function () {
-						hiddenEd.value = displayEd.value ? displayEd.value.replace('-', '') : '';
-					});
-				}
-
-				// 賦課方式切替でラベル変更・条件切替
-				const zeiValueLabel = document.getElementById('zeiValueLabel');
-				const conditionLabel = document.getElementById('conditionLabel');
-				const zeiValueHint = document.getElementById('zeiValueHint');
-				function updateLabel() {
-					const checked = document.querySelector('input[name="fukaKbn"]:checked');
-					const isTeiritsu = checked && checked.value === '2';
-					zeiValueLabel.textContent = (checked && checked.value === '1') ? '税額' : '税率';
-					conditionLabel.textContent = isTeiritsu ? '区分名' : '条件';
-					zeiValueHint.classList.toggle('d-none', !isTeiritsu);
-					document.querySelectorAll('.teigaku-condition').forEach(el => el.style.display = isTeiritsu ? 'none' : '');
-					document.querySelectorAll('.teiritsu-condition').forEach(el => el.style.display = isTeiritsu ? '' : 'none');
-				}
-				document.querySelectorAll('input[name="fukaKbn"]').forEach(r => r.addEventListener('change', updateLabel));
-				updateLabel();
-			});
-			/*]]>*/
-		</script>
+		<script th:src="@{/js/zeiritsuConfig.js}"></script>
 	</th:block>
 </body>
 

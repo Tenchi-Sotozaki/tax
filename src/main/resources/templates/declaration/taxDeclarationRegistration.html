@@ -9,9 +9,9 @@
      th:with="obligorId=${taxDeclarationForm.obligorId}">
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2 class="h2">
+        <h5 class="mb-0 fw-bold text-dark">
             <i class="bi bi-pencil-square me-2 text-primary"></i>宿泊税情報登録/編集
-        </h2>
+        </h5>
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
             <i class="bi bi-plus-circle me-1"></i>新規登録
         </span>
@@ -32,6 +32,9 @@
         <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+            <ul class="mb-0 mt-1">
+                <li th:each="err : ${#fields.allErrors()}" th:text="${err}" class="small"></li>
+            </ul>
         </div>
 
         <!-- 基本情報 -->

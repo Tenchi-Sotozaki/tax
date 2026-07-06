@@ -1,5 +1,8 @@
 /* 合算申告情報管理台帳スタイル */
 .table-scroll {
+    max-height: 55vh;
+    min-height: 200px;
+    overflow-y: auto;
     overflow-x: auto;
 }
 

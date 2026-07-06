@@ -36,6 +36,16 @@
         checks.forEach(c => c.checked = e.target.checked);
     });
 
+    // 行クリックでチェックボックスをトグル
+    document.querySelectorAll('#shunoTable tbody tr').forEach(tr => {
+        tr.style.cursor = 'pointer';
+        tr.addEventListener('click', function (e) {
+            if (e.target.type === 'checkbox') return;
+            const cb = tr.querySelector('input[name="selectedIds"]');
+            if (cb) cb.checked = !cb.checked;
+        });
+    });
+
     // 照会ボタン（選択したレコードの簡易表示）
     document.getElementById('viewBtn')?.addEventListener('click', function () {
         const selected = get_selected_rows();
@@ -47,12 +57,20 @@
         const keys = selected.map(s => ({ shiteiNo: s.shiteiNo, nendo: s.nendo || '', kibetsu: s.kibetsu != null && s.kibetsu !== '' ? Number(s.kibetsu) : null }));
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = window.location.origin + '/shunoRenkei/kakunin';
+        form.action = '/accommodation-tax/shunoRenkei/kakunin';
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'keysJson';
         input.value = JSON.stringify(keys);
         form.appendChild(input);
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+        }
         document.body.appendChild(form);
         form.submit();
     });
@@ -66,11 +84,15 @@
         }
         // サーバー側の /download/csv を呼び出してファイルを取得する
         const keys = selected.map(s => ({ shiteiNo: s.shiteiNo, nendo: s.nendo || '', kibetsu: s.kibetsu != null && s.kibetsu !== '' ? Number(s.kibetsu) : null }));
-        fetch(window.location.origin + '/shunoRenkei/download', {
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+        fetch('/accommodation-tax/shunoRenkei/download', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             credentials: 'same-origin',
             body: JSON.stringify(keys)
         }).then(resp => {

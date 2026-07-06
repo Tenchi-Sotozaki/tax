@@ -2,6 +2,7 @@ package jp.lg.asp.accommodation.repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsuId;
-
 @Repository
 public interface ZeiritsuTeiritsuRepository extends JpaRepository<ZeiritsuTeiritsu, ZeiritsuTeiritsuId> {
 
@@ -24,4 +24,8 @@ public interface ZeiritsuTeiritsuRepository extends JpaRepository<ZeiritsuTeirit
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("taishoKbn") String taishoKbn,
 			@Param("tekiyoYm") String tekiyoYm);
+
+	
+	Optional<ZeiritsuTeiritsu> findByJichitaiCdAndSeqAndTeiritsuSeq(
+	    String jichitaiCd, Integer seq, Long teiritsuSeq);
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.NozeiShukiDto;
@@ -34,6 +35,7 @@ public class NozeiShukiController {
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.NOZEI_SHUKI_CONFIG;
 
 	@GetMapping("/list")
+	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
 	public String index(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<NozeiShukiDto> nozeiShukiList = nozeiShukiService.findAll();
@@ -42,6 +44,7 @@ public class NozeiShukiController {
 	}
 
 	@GetMapping("/search")
+	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public ResponseEntity<Map<String, Object>> search(@RequestParam(required = false) Integer shuki) {
 		accessChecker.checkAccess(SCREEN_ID);
 		List<NozeiShukiDto> nozeiShukiList = nozeiShukiService.findByShuki(shuki);
@@ -54,6 +57,7 @@ public class NozeiShukiController {
 	}
 
 	@GetMapping("/register")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String register(Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("nozeiShuki", new NozeiShuki());
@@ -62,12 +66,13 @@ public class NozeiShukiController {
 	}
 
 	@GetMapping("/edit/{seq}")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable BigDecimal seq, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		NozeiShuki nozeiShuki = nozeiShukiService.findBySeq(seq);
 		if (nozeiShuki == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "指定されたデータが見つかりません。");
-			return "redirect:/admin/nozei-shuki";
+			return "redirect:/admin/nozei-shuki/list";
 		}
 
 		model.addAttribute("nozeiShuki", nozeiShuki);
@@ -76,8 +81,17 @@ public class NozeiShukiController {
 	}
 
 	@PostMapping("/save")
-	public String save(NozeiShuki nozeiShuki, RedirectAttributes redirectAttributes) {
+	@OpeLog(screenId = SCREEN_ID, operation = "登録・編集")
+	public String save(NozeiShuki nozeiShuki, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+
+		if (nozeiShuki.getShuki() == null) {
+			model.addAttribute("nozeiShuki", nozeiShuki);
+			model.addAttribute("mode", nozeiShuki.getSeq() == null ? "register" : "edit");
+			model.addAttribute("validationErrors", java.util.List.of("納税周期は必須です"));
+			return "admin/nozeiShukiConfig";
+		}
+
 		try {
 			if (nozeiShuki.getSeq() == null && nozeiShukiService.existsByShuki(nozeiShuki.getShuki())) {
 				redirectAttributes.addFlashAttribute("errorMessage", "この周期は既に登録されています。");
@@ -97,10 +111,11 @@ public class NozeiShukiController {
 					: "redirect:/admin/nozei-shuki/edit/" + nozeiShuki.getSeq();
 		}
 
-		return "redirect:/admin/nozei-shuki";
+		return "redirect:/admin/nozei-shuki/list";
 	}
 
 	@PostMapping("/delete/{seq}")
+	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public String delete(@PathVariable BigDecimal seq, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		try {
@@ -110,6 +125,6 @@ public class NozeiShukiController {
 			redirectAttributes.addFlashAttribute("errorMessage", "削除に失敗しました: " + e.getMessage());
 		}
 
-		return "redirect:/admin/nozei-shuki";
+		return "redirect:/admin/nozei-shuki/list";
 	}
 }

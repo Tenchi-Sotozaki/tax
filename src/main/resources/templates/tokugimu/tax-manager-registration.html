@@ -11,11 +11,11 @@
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h2 class="h2">
+			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-person-lines-fill me-2 text-primary" th:if="${isView}"></i>
 				<i class="bi bi-person-gear me-2 text-primary" th:unless="${isView}"></i>
 				<span th:text="${isView ? '納税管理人照会' : (isEdit ? '納税管理人編集' : '納税管理人登録')}"></span>
-			</h2>
+			</h5>
 			<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
 				<i
 					th:class="${isView ? 'bi bi-eye me-1' : (isEdit ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
@@ -45,11 +45,14 @@
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>
 				入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+				<ul class="mb-0 mt-1">
+					<li th:each="err : ${#fields.allErrors()}" th:text="${err}" class="small"></li>
+				</ul>
 			</div>
 
 			<!-- 納税管理人情報 -->
 			<div class="card mb-4 shadow-sm">
-				<div class="card-header bg-primary text-white py-3">
+				<div class="card-header py-3">
 					<h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管理人情報</h5>
 				</div>
 				<div class="card-body bg-light-subtle">

@@ -63,9 +63,10 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
 
-	@Query(value = "SELECT MAX(CAST(shitei_no AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$'", nativeQuery = true)
-	Optional<Integer> findMaxShiteiNoByJichitaiCd(
-			@Param("jichitaiCd") String jichitaiCd);
+	@Query(value = "SELECT MAX(CAST(SUBSTRING(shitei_no, 4) AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$' AND SUBSTRING(shitei_no, 1, 3) = :prefix", nativeQuery = true)
+	Optional<Integer> findMaxShiteiNoByJichitaiCdAndPrefix(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("prefix") String prefix);
 
 	Optional<Tokugimu> findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
 			String jichitaiCd, String shiteiNo, String newFlg, String delFlg);

@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import jakarta.validation.Valid;
 
@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
+import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.service.ShoreikinBulkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,26 +31,33 @@ public class ShoreikinBulkController {
 
 	private final ShoreikinBulkService shoreikinBulkService;
 	private final ScreenAccessChecker accessChecker;
+	private final KofuRitsuRepository kofuRitsuRepository;
 
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN;
 	private static final String BULK_VIEW = "shoreikin/shoreikinBulk";
 
-	@Value("${app.kofukin.rate}")
-	private BigDecimal defaultKofuritsu;
+	@Value("${app.jichitai.code}")
+	private String jichitaiCd;
 
 	@GetMapping("/bulk")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String bulk(@RequestParam(required = false) String nendo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
+
+		// 決定した年度を設定
 		dto.setNendo(nendo);
-		dto.setKofuRitsu(defaultKofuritsu);
+
+		// 交付率を取得して設定
+		dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
 
 		model.addAttribute("bulkForm", dto);
 		return BULK_VIEW;
 	}
 
 	@PostMapping("/bulk/execute")
+	@OpeLog(screenId = SCREEN_ID, operation = "一括算出")
 	public String executeBulk(@Valid @ModelAttribute ShoreikinBulkDto bulkForm,
 			BindingResult bindingResult,
 			Model model) {

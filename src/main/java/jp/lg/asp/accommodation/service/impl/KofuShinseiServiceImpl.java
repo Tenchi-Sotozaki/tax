@@ -47,7 +47,9 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 	@PostConstruct
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
-		jichitaiName = jichitaiInfo.getName();
+		if (jichitaiInfo != null) {
+			jichitaiName = jichitaiInfo.getName();
+		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.SHOREIKIN_KOFU_JOREI);
 	}
 

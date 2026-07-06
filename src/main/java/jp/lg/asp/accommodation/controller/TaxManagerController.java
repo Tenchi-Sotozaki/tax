@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
@@ -64,6 +64,7 @@ public class TaxManagerController {
 	}
 
 	@GetMapping("/edit/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TaxManagerForm form = taxManagerService.getByShiteiNo(id);
@@ -88,6 +89,7 @@ public class TaxManagerController {
 	}
 
 	@GetMapping("/view/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String view(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TaxManagerForm form = taxManagerService.getByShiteiNo(id);
@@ -104,6 +106,7 @@ public class TaxManagerController {
 	}
 
 	@PostMapping("/save/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録")
 	public String save(@PathVariable("id") String id,
 			@Validated @ModelAttribute("taxManagerForm") TaxManagerForm form,
 			BindingResult bindingResult,
@@ -118,6 +121,7 @@ public class TaxManagerController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", form.isEdit());
 			model.addAttribute("isView", false);
+			model.addAttribute("validationErrors", TaxManagerForm.TaxManagerValidator.validate(form).values());
 			return FORM_VIEW;
 		}
 

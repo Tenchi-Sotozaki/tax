@@ -41,8 +41,10 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 	@PostConstruct
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
-		jichitaiName = jichitaiInfo.getName();
-		city = jichitaiInfo.getKbnName();
+		if (jichitaiInfo != null) {
+			jichitaiName = jichitaiInfo.getName();
+			city = jichitaiInfo.getKbnName();
+		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_SHITEI_JOREI);
 	}
 

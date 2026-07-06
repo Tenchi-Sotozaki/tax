@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FurikomiKozaDto;
@@ -42,6 +43,7 @@ public class FurikomiKozaController {
 	 * @return 画面パス
 	 */
 	@GetMapping
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String view(@RequestParam String shiteiNo, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
@@ -58,6 +60,7 @@ public class FurikomiKozaController {
 	 * @return 画面パス
 	 */
 	@PostMapping("/edit")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集切り替え")
 	public String editMode(@ModelAttribute FurikomiKozaDto kozaForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
@@ -76,6 +79,7 @@ public class FurikomiKozaController {
 	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/create")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録")
 	public String create(@Valid @ModelAttribute FurikomiKozaDto kozaForm,
 			BindingResult bindingResult,
 			Model model,
@@ -108,6 +112,7 @@ public class FurikomiKozaController {
 	 * @return リダイレクト先または画面パス
 	 */
 	@PostMapping("/update")
+	@OpeLog(screenId = SCREEN_ID, operation = "更新")
 	public String update(@Valid @ModelAttribute FurikomiKozaDto kozaForm,
 			BindingResult bindingResult,
 			Model model,

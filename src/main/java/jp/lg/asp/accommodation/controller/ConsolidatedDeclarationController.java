@@ -52,8 +52,8 @@ public class ConsolidatedDeclarationController {
             RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
-            // バリデーションエラー時は施設リストを再セットして再表示
             model.addAttribute("facilityOptions", buildDummyFacilities(form.getObligorId()));
+            model.addAttribute("validationErrors", ConsolidatedDeclarationForm.validate(form).values());
             return "declaration/consolidated-declaration-registration";
         }
 

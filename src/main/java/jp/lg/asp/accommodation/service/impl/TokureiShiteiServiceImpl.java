@@ -40,7 +40,9 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 	@PostConstruct
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
-		cityName = jichitaiInfo.getName();
+		if (jichitaiInfo != null) {
+			cityName = jichitaiInfo.getName();
+		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_SHITEI_JOREI);
 	}
 
