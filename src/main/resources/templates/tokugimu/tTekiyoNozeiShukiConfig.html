@@ -81,8 +81,7 @@
 
 						<div class="col-md-4">
 							<label class="form-label fw-medium"> 適用開始年月日 <span
-								class="text-danger" th:if="${!(isView ?: false)}"
-								th:data-initial-value="*{tekiyoStYmd}">*</span>
+								class="text-danger" th:if="${!(isView ?: false)}">*</span>
 							</label> <input th:if="${!(isView ?: false)}" type="date"
 								class="form-control" th:field="*{tekiyoStYmd}"
 								th:data-initial-value="*{tekiyoStYmd}"> <input
@@ -122,5 +121,8 @@
 			</div>
 		</form>
 	</div>
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/tekiyoNozeiShuki.js}"></script>
+	</th:block>
 </body>
 </html>
