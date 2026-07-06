@@ -15,11 +15,12 @@
 					th:text="${mode == 'register' ? '納税周期登録' : '納税周期編集'}">納税周期設定</span>
 			</h5>
 		</div>
-		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger" role="alert">
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show" role="alert">
 			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 			<ul class="mb-0 mt-1">
 				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 			</ul>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 
