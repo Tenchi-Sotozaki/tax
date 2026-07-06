@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
@@ -30,6 +31,7 @@ public class TekiyoNozeiShukiController {
 	private static final String FORM_VIEW = "tokugimu/tTekiyoNozeiShukiConfig";
 
 	@GetMapping("/edit/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TekiyoNozeiShukiForm form = tekiyoNozeiShukiService.getByShiteiNo(id);
@@ -46,6 +48,7 @@ public class TekiyoNozeiShukiController {
 	}
 
 	@GetMapping("/view/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String view(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TekiyoNozeiShukiForm form = tekiyoNozeiShukiService.getByShiteiNo(id);
@@ -62,6 +65,7 @@ public class TekiyoNozeiShukiController {
 	}
 
 	@PostMapping("/save/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録・更新")
 	public String save(@PathVariable("id") String id,
 			@ModelAttribute("tekiyoNozeiShukiForm") TekiyoNozeiShukiForm form,
 			Model model,
