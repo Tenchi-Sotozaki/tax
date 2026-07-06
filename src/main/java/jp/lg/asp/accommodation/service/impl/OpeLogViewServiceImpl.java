@@ -1,10 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,11 +19,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OpeLogViewServiceImpl implements OpeLogViewService {
 
-	private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
 	private final ScreenRepository screenRepository;
 	private final OperationLogRepository operationLogRepository;
-	private final EntityManager em;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
