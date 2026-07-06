@@ -1,19 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-<title th:text="${(isView ?: false) ? '適用納税周期照会' : ((isEdit ?: false) ? '適用納税周期編集' : '適用納税周期登録')}">適用納税周期登録/編集</title>
+	<title th:text="${(isView ?: false) ? '適用納税周期照会' : ((isEdit ?: false) ? '適用納税周期編集' : '適用納税周期登録')}">適用納税周期登録/編集
+	</title>
 </head>
 
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
 
-		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-calendar-check me-2 text-success"></i>
-				<span th:text="${(isView ?: false) ? '適用納税周期照会' : ((isEdit ?: false) ? '適用納税周期編集' : '適用納税周期登録')}"></span>
+				<span
+					th:text="${(isView ?: false) ? '適用納税周期照会' : ((isEdit ?: false) ? '適用納税周期編集' : '適用納税周期登録')}"></span>
 			</h5>
 		</div>
 
@@ -59,10 +61,10 @@
 								納税周期
 								<span class="badge bg-danger text-white ms-1" th:if="${!(isView ?: false)}">必須</span>
 							</label>
-							<select class="form-select" th:field="*{seq}" th:disabled="${isView ?: false}">
+							<select class="form-select" th:field="*{seq}" th:disabled="${isView ?: false}"
+								th:data-initial-value="*{seq}">
 								<option value="">-- 選択してください --</option>
-								<option th:each="opt : ${nozeiShukiOptions}"
-									th:value="${opt.seq}"
+								<option th:each="opt : ${nozeiShukiOptions}" th:value="${opt.seq}"
 									th:text="${opt.label}"></option>
 							</select>
 						</div>
@@ -72,14 +74,18 @@
 								適用開始年月日
 								<span class="badge bg-danger text-white ms-1" th:if="${!(isView ?: false)}">必須</span>
 							</label>
-							<input th:if="${!(isView ?: false)}" type="date" class="form-control" th:field="*{tekiyoStYmd}">
-							<input th:if="${isView ?: false}" type="text" class="form-control" readonly th:value="*{tekiyoStYmd}">
+							<input th:if="${!(isView ?: false)}" type="date" class="form-control"
+								th:field="*{tekiyoStYmd}" th:data-initial-value="*{tekiyoStYmd}">
+							<input th:if="${isView ?: false}" type="text" class="form-control" readonly
+								th:value="*{tekiyoStYmd}">
 						</div>
 
 						<div class="col-md-4">
 							<label class="form-label fw-medium">適用終了年月日</label>
-							<input th:if="${!(isView ?: false)}" type="date" class="form-control" th:field="*{tekiyoEdYmd}">
-							<input th:if="${isView ?: false}" type="text" class="form-control" readonly th:value="*{tekiyoEdYmd}">
+							<input th:if="${!(isView ?: false)}" type="date" class="form-control"
+								th:field="*{tekiyoEdYmd}" th:data-initial-value="*{tekiyoEdYmd}">
+							<input th:if="${isView ?: false}" type="text" class="form-control" readonly
+								th:value="*{tekiyoEdYmd}">
 						</div>
 
 					</div>
@@ -103,5 +109,11 @@
 			</div>
 		</form>
 	</div>
+
+	<!-- JavaScriptファイル読み込み -->
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/tekiyoNozeiShuki.js}"></script>
+	</th:block>
 </body>
+
 </html>
