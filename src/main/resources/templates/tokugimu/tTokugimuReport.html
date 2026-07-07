@@ -17,13 +17,7 @@
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
-		<div class="mb-4">
-			<span class="fw-semibold">指定番号：</span> <span
-				th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
-				class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-				th:text="${tokugimuName}" class="me-4"></span> <span
-				class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
-		</div>
+		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
 		<!-- 帳票ボタン一覧 -->
 		<div class="card shadow-sm">
@@ -57,12 +51,16 @@
 			</div>
 		</div>
 
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<!-- 指定番号をJavaScriptで取得できるように隠し要素として配置 -->
 		<span id="shiteiNoData" style="display: none;" th:text="${shiteiNo}"></span>
 		<script th:src="@{/js/tTokugimuReport.js}"></script>
+		<script th:src="@{/js/shitei_gassan_search.js}"></script>
 	</th:block>
 
 </body>
