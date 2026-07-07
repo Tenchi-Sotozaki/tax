@@ -171,6 +171,66 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (fukaKbn === '2') calculateTeiritsu();
         });
     }
+
+    // 編集モードでなければ処理を行わない
+    const contentContainer = document.querySelector('[data-is-edit]');
+    const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
+    if (!isEdit) return;
+
+    function checkValue(input) {
+
+        // チェックボックスとラジオボタンは対象外
+        if (input.type === 'checkbox' || input.type === 'radio') return;
+
+        const initialValue = input.getAttribute('data-initial-value') || '';
+
+        // nullという文字列になってしまうのを防ぐ
+        let initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
+
+        // 比較のためにカンマを除去
+        initialStr = initialStr.replace(/,/g, '');
+
+        let currentStr = String(input.value).trim();
+
+        // 比較のために入力値からもカンマを除去
+        currentStr = currentStr.replace(/,/g, '');
+
+        // 要素がモーダル内にあるか判定
+        if (input.closest('#monthlyTallyModal')) {
+			
+            // 初期値が空なら '0' に統一
+            if (initialStr === '') {
+                initialStr = '0';
+            }
+			
+            // 現在の入力値が空なら '0' に統一
+            if (currentStr === '') {
+                currentStr = '0';
+            }
+        }
+
+        // 変更があったか判定
+        const isChanged = (currentStr !== initialStr);
+
+        if (isChanged) {
+            input.style.border = '3px solid #ffeb3b';
+        } else {
+            input.style.border = '';
+        }
+    }
+
+    // 画面表示時に最初から値が変わっているものを検知、および各イベントへの登録
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    inputs.forEach(input => {
+
+        // 画面を開いた瞬間にズレがあるかチェック
+        checkValue(input);
+
+        // イベント登録
+        input.addEventListener('input', () => checkValue(input));
+        input.addEventListener('change', () => checkValue(input));
+        input.addEventListener('blur', () => checkValue(input));
+    });
 });
 
 document.querySelectorAll('.js-comma-format').forEach(input => {
