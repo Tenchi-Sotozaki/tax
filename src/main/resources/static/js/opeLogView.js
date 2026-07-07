@@ -87,9 +87,24 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         addItem('前へ', currentPage - 1, currentPage === 1, false);
-        for (let i = 1;i <= totalPages;i++) {
-            addItem(String(i), i, false, i === currentPage);
+
+        const pages = new Set([1, totalPages]);
+        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+            if (i >= 1 && i <= totalPages) pages.add(i);
         }
+        const sorted = Array.from(pages).sort((a, b) => a - b);
+        let prev = 0;
+        for (const p of sorted) {
+            if (p - prev > 1) {
+                const li = document.createElement('li');
+                li.className = 'page-item disabled';
+                li.innerHTML = '<span class="page-link">…</span>';
+                pagination.appendChild(li);
+            }
+            addItem(String(p), p, false, p === currentPage);
+            prev = p;
+        }
+
         addItem('次へ', currentPage + 1, currentPage === totalPages, false);
     }
 
