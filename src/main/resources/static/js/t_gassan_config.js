@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tekiyoSelect = document.getElementById('tekiyoSelect');
     const fromShiteiNoVal = document.getElementById('fromShiteiNoVal');
     if (tekiyoSelect && fromShiteiNoVal) {
-        tekiyoSelect.addEventListener('change', function () {
+        tekiyoSelect.addEventListener('change', function() {
             location.href = '/accommodation-tax/gassan/view-by-shitei/'
                 + fromShiteiNoVal.value + '?gassanShiteiNo=' + this.value;
         });
@@ -59,6 +59,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // 確認モーダルの実行ボタンでフォーム送信
     document.querySelector('#registerModal .btn-confirm')?.addEventListener('click', () => {
         document.getElementById('gassanForm')?.submit();
+    });
+
+    // 編集モードでなければ処理を行わない
+    const contentContainer = document.querySelector('[data-is-edit]');
+    const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
+    if (!isEdit) return;
+
+    // 編集変更チェック
+    function checkValue(input) {
+
+        // チェックボックスとラジオボタンは対象外
+        if (input.type === 'checkbox' || input.type === 'radio') return;
+
+		// 宛名検索のモーダルは処理しない
+        if (input.closest('.modal')) return;
+
+        const initialValue = input.getAttribute('data-initial-value') || '';
+
+        // nullという文字列になってしまうのを防ぐ
+        let initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
+        let currentStr = String(input.value).trim();
+
+        // 変更があったか判定
+        const isChanged = (currentStr !== initialStr);
+
+        if (isChanged) {
+            input.style.border = '3px solid #ffeb3b';
+        } else {
+            input.style.border = '';
+        }
+    }
+
+    // 画面表示時に最初から値が変わっているものを検知、および各イベントへの登録
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    inputs.forEach(input => {
+        // 画面を開いた瞬間にズレがあるかチェック
+        checkValue(input);
+
+        // イベント登録
+        input.addEventListener('input', () => checkValue(input));
+        input.addEventListener('change', () => checkValue(input));
+        input.addEventListener('blur', () => checkValue(input));
     });
 });
 
@@ -186,14 +228,14 @@ function loadFacilitiesByAtena(atenaNo, atenaName) {
         },
         body: JSON.stringify({ atenaNo: atenaNo })
     })
-    .then(response => response.json())
-    .then(facilities => {
-        updateFacilityTable(facilities);
-    })
-    .catch(error => {
-        console.error('施設一覧取得エラー:', error);
-        alert('施設一覧の取得に失敗しました。');
-    });
+        .then(response => response.json())
+        .then(facilities => {
+            updateFacilityTable(facilities);
+        })
+        .catch(error => {
+            console.error('施設一覧取得エラー:', error);
+            alert('施設一覧の取得に失敗しました。');
+        });
 }
 
 // 施設一覧テーブルを更新する関数
