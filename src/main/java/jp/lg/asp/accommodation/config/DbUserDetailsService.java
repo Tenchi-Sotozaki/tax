@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import org.springframework.stereotype.Component;
+
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
@@ -21,7 +23,7 @@ import lombok.RequiredArgsConstructor;
  * このクラスの @Component コメントを外すこと。
  * 現在は @Component を無効化しているため Spring に登録されない。
  */
-// @Component
+@Component
 @RequiredArgsConstructor
 public class DbUserDetailsService implements UserDetailsService {
 
