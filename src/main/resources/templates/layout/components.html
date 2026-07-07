@@ -143,14 +143,16 @@
   使用例:
     <div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 -->
-	<div th:fragment="selectedTokugimuInfo" class="mt-2 mb-0 ps-3 d-flex align-items-center">
-		<span class="fw-semibold">指定番号：</span>
-		<span th:text="${selectedShiteiGassan?.gassanShiteiNo != null ? selectedShiteiGassan.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}" class="me-4"></span>
-		<span class="fw-semibold">氏名：</span>
-		<span th:text="${selectedShiteiGassan?.name}" class="me-4"></span>
-		<span class="fw-semibold">施設名称：</span>
-		<span th:text="${selectedShiteiGassan?.shisetsuName}" class="me-2"></span>
-		<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal">
+	<div th:fragment="selectedTokugimuInfo"
+		class="mt-2 mb-2 ps-3 d-flex align-items-center">
+		<span class="fw-semibold">指定番号：</span> <span
+			th:text="${selectedShiteiGassan?.gassanShiteiNo != null ? selectedShiteiGassan.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}"
+			class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
+			th:text="${selectedShiteiGassan?.name}" class="me-4"></span> <span
+			class="fw-semibold">施設名称：</span> <span
+			th:text="${selectedShiteiGassan?.shisetsuName}" class="me-2"></span>
+		<button type="button" class="btn btn-outline-primary btn-sm"
+			data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal">
 			<i class="bi bi-search me-1"></i>特別徴収義務者指定
 		</button>
 	</div>
@@ -162,8 +164,8 @@
 -->
 	<div th:fragment="shiteiGassanSearchModal" id="shiteiGassanSearchModal"
 		class="modal fade" tabindex="-1" data-bs-backdrop="static"
-		data-bs-keyboard="false" aria-labelledby="shiteiGassanSearchModalLabel"
-		aria-hidden="true">
+		data-bs-keyboard="false"
+		aria-labelledby="shiteiGassanSearchModalLabel" aria-hidden="true">
 		<div
 			class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 			<div class="modal-content shadow">
@@ -180,61 +182,78 @@
 						<!-- 1行目 -->
 						<div class="col-md-6">
 							<label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
-							<input type="text" id="sgSearchShiteiNo" class="form-control form-control-sm" placeholder="指定番号">
+							<input type="text" id="sgSearchShiteiNo"
+								class="form-control form-control-sm" placeholder="指定番号">
 						</div>
 						<div class="col-md-6">
 							<label class="form-label form-label-sm fw-medium mb-1">合算指定番号</label>
-							<input type="text" id="sgSearchGassanShiteiNo" class="form-control form-control-sm" placeholder="合算指定番号">
+							<input type="text" id="sgSearchGassanShiteiNo"
+								class="form-control form-control-sm" placeholder="合算指定番号">
 						</div>
 						<!-- 2行目 -->
 						<div class="col-md-6">
 							<div class="d-flex align-items-center mb-1">
 								<label class="form-label form-label-sm fw-medium me-3 mb-0">氏名/名称</label>
 								<div class="form-check form-check-inline mb-0">
-									<input class="form-check-input" type="radio" name="sgSearchNameMatchType" id="sgNamePartial" value="partial" checked>
-									<label class="form-check-label small" for="sgNamePartial">部分</label>
-								</div>
-								<div class="form-check form-check-inline mb-0">
-									<input class="form-check-input" type="radio" name="sgSearchNameMatchType" id="sgNamePrefix" value="prefix">
+									<input class="form-check-input" type="radio"
+										name="sgSearchNameMatchType" id="sgNamePrefix" value="prefix">
 									<label class="form-check-label small" for="sgNamePrefix">前方</label>
 								</div>
 								<div class="form-check form-check-inline mb-0">
-									<input class="form-check-input" type="radio" name="sgSearchNameMatchType" id="sgNameExact" value="exact">
+									<input class="form-check-input" type="radio"
+										name="sgSearchNameMatchType" id="sgNamePartial"
+										value="partial" checked> <label
+										class="form-check-label small" for="sgNamePartial">部分</label>
+								</div>
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio"
+										name="sgSearchNameMatchType" id="sgNameExact" value="exact">
 									<label class="form-check-label small" for="sgNameExact">完全</label>
 								</div>
 							</div>
-							<input type="text" id="sgSearchName" class="form-control form-control-sm" placeholder="氏名/名称">
+							<input type="text" id="sgSearchName"
+								class="form-control form-control-sm" placeholder="氏名/名称">
 						</div>
 						<div class="col-md-6">
 							<div class="d-flex align-items-center mb-1">
 								<label class="form-label form-label-sm fw-medium me-3 mb-0">施設名称</label>
 								<div class="form-check form-check-inline mb-0">
-									<input class="form-check-input" type="radio" name="sgSearchShisetsuNameMatchType" id="sgShisetsuPartial" value="partial" checked>
-									<label class="form-check-label small" for="sgShisetsuPartial">部分</label>
+									<input class="form-check-input" type="radio"
+										name="sgSearchShisetsuNameMatchType" id="sgShisetsuPrefix"
+										value="prefix"> <label class="form-check-label small"
+										for="sgShisetsuPrefix">前方</label>
 								</div>
 								<div class="form-check form-check-inline mb-0">
-									<input class="form-check-input" type="radio" name="sgSearchShisetsuNameMatchType" id="sgShisetsuPrefix" value="prefix">
-									<label class="form-check-label small" for="sgShisetsuPrefix">前方</label>
+									<input class="form-check-input" type="radio"
+										name="sgSearchShisetsuNameMatchType" id="sgShisetsuPartial"
+										value="partial" checked> <label
+										class="form-check-label small" for="sgShisetsuPartial">部分</label>
 								</div>
 								<div class="form-check form-check-inline mb-0">
-									<input class="form-check-input" type="radio" name="sgSearchShisetsuNameMatchType" id="sgShisetsuExact" value="exact">
-									<label class="form-check-label small" for="sgShisetsuExact">完全</label>
+									<input class="form-check-input" type="radio"
+										name="sgSearchShisetsuNameMatchType" id="sgShisetsuExact"
+										value="exact"> <label class="form-check-label small"
+										for="sgShisetsuExact">完全</label>
 								</div>
 							</div>
-							<input type="text" id="sgSearchShisetsuName" class="form-control form-control-sm" placeholder="施設名称">
+							<input type="text" id="sgSearchShisetsuName"
+								class="form-control form-control-sm" placeholder="施設名称">
 						</div>
 						<!-- 3行目 -->
 						<div class="col-md-6">
 							<label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
-							<input type="text" id="sgSearchKojinNo" class="form-control form-control-sm" placeholder="個人番号">
+							<input type="text" id="sgSearchKojinNo"
+								class="form-control form-control-sm" placeholder="個人番号">
 						</div>
 						<div class="col-md-6">
 							<label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
-							<input type="text" id="sgSearchHojinNo" class="form-control form-control-sm" placeholder="法人番号">
+							<input type="text" id="sgSearchHojinNo"
+								class="form-control form-control-sm" placeholder="法人番号">
 						</div>
 					</div>
 					<div class="d-flex justify-content-end mb-3">
-						<button type="button" id="sgSearchBtn" class="btn btn-primary btn-sm px-4">
+						<button type="button" id="sgSearchBtn"
+							class="btn btn-primary btn-sm px-4">
 							<i class="bi bi-search me-1"></i>検索する
 						</button>
 					</div>
