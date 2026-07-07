@@ -46,14 +46,14 @@ public class AtenaController {
 		accessChecker.checkAccess(ATENA_DAICHO);
 		model.addAttribute("items", atenaRepository.search(
 				jichitaiCd,
-				emptyToNull(searchForm.getAtenaNo()),
-				emptyToNull(searchForm.getName()),
-				emptyToNull(searchForm.getNameKana()),
-				emptyToNull(searchForm.getYubinNo()),
-				emptyToNull(searchForm.getJusho()),
-				emptyToNull(searchForm.getTel()),
-				hashIfPresent(searchForm.getKojinNo()),
-				emptyToNull(searchForm.getHojinNo())));
+				toLikePattern(searchForm.getAtenaNo(), "exact"),
+				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
+				toLikePattern(searchForm.getNameKana(), "exact"),
+				toLikePattern(searchForm.getYubinNo(), "exact"),
+				toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
+				toLikePattern(searchForm.getTel(), "exact"),
+				toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
+				toLikePattern(searchForm.getHojinNo(), "exact")));
 		model.addAttribute("searchForm", searchForm);
 		return "atena/atenaDaicho";
 	}
@@ -117,5 +117,14 @@ public class AtenaController {
 
 	private String hashIfPresent(String s) {
 		return (s == null || s.isBlank()) ? null : hashUtil.sha256(s);
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank()) return "%";
+		return switch (matchType) {
+			case "prefix" -> value + "%";
+			case "exact"  -> value;
+			default       -> "%" + value + "%"; // partial
+		};
 	}
 }
