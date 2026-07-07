@@ -330,11 +330,11 @@ function addKyodoRow() {
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoAddress">
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-medium">氏名 <span class="badge bg-danger text-white ms-1">必須</span></label>
+                <label class="form-label fw-medium">氏名 <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoName">
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-medium">氏名(ふりがな) <span class="badge bg-danger text-white ms-1">必須</span></label>
+                <label class="form-label fw-medium">氏名(ふりがな) <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoNameKana" placeholder="ひらがなで入力">
             </div>
             <div class="col-md-6">
