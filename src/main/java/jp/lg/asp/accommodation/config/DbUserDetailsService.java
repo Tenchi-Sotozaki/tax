@@ -10,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import org.springframework.stereotype.Component;
-
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
@@ -19,16 +17,8 @@ import jp.lg.asp.accommodation.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-<<<<<<< HEAD
-/**
- * 本番用 UserDetailsService（DB連携）
- * 差し替え時は SecurityConfig#userDetailsService の @Bean を削除し、
- * このクラスの @Component コメントを外すこと。
- * 現在は @Component を無効化しているため Spring に登録されない。
- */
-=======
+
 @Slf4j
->>>>>>> refs/remotes/origin/master
 @Component
 @RequiredArgsConstructor
 public class DbUserDetailsService implements UserDetailsService {

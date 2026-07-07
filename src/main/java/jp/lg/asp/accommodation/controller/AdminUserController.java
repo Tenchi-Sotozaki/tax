@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-@Slf4j // ★追加
+@Slf4j 
 public class AdminUserController {
 
 	private final UserRepository userRepository;
@@ -62,13 +62,9 @@ public class AdminUserController {
 	@GetMapping("/user-registration")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
-<<<<<<< HEAD
-		if (!isInitialSetup()) {
-			accessChecker.checkAccess(SCREEN_ID);
-		}
-=======
+
 		accessChecker.checkWriteAccess(SCREEN_ID);
->>>>>>> refs/remotes/origin/master
+
 		model.addAttribute("userForm", new UserForm());
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", false);
@@ -83,17 +79,8 @@ public class AdminUserController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-<<<<<<< HEAD
-
-		boolean initialSetup = isInitialSetup(); // ★追加
-
-
-		if (!initialSetup) {
-			accessChecker.checkAccess(SCREEN_ID);
-		}
-=======
 		accessChecker.checkWriteAccess(SCREEN_ID);
->>>>>>> refs/remotes/origin/master
+		boolean initialSetup = isInitialSetup();
 
 		if (!form.getPassword().equals(form.getPasswordConfirm())) {
 			bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
