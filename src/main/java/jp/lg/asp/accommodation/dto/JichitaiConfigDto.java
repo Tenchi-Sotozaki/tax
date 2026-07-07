@@ -1,8 +1,6 @@
 package jp.lg.asp.accommodation.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,8 +9,6 @@ import lombok.Setter;
 @Setter
 public class JichitaiConfigDto {
 
-	@NotNull(message = "年度開始月を入力してください。")
-	@Min(value = 1, message = "年度開始月は1〜12の範囲で入力してください。")
-	@Max(value = 12, message = "年度開始月は1〜12の範囲で入力してください。")
+	@NotBlank(message = "年度開始月は必須です。")
 	private String nendoStMonth;
 }

@@ -59,7 +59,7 @@ public class NozeiShukiController {
 	@GetMapping("/register")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String register(Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("nozeiShuki", new NozeiShuki());
 		model.addAttribute("mode", "register");
 		return "admin/nozeiShukiConfig";
@@ -68,7 +68,7 @@ public class NozeiShukiController {
 	@GetMapping("/edit/{seq}")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable BigDecimal seq, Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		NozeiShuki nozeiShuki = nozeiShukiService.findBySeq(seq);
 		if (nozeiShuki == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "指定されたデータが見つかりません。");
@@ -83,7 +83,7 @@ public class NozeiShukiController {
 	@PostMapping("/save")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録・編集")
 	public String save(NozeiShuki nozeiShuki, Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		if (nozeiShuki.getShuki() == null) {
 			model.addAttribute("nozeiShuki", nozeiShuki);
@@ -117,7 +117,7 @@ public class NozeiShukiController {
 	@PostMapping("/delete/{seq}")
 	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public String delete(@PathVariable BigDecimal seq, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		try {
 			nozeiShukiService.delete(seq);
 			redirectAttributes.addFlashAttribute("successMessage", "納税周期を削除しました。");

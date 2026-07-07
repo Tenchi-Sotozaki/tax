@@ -65,7 +65,7 @@ public class ShoreikinConfigController {
 	@PostMapping("/config/edit")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集モード切替")
 	public String editMode(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		configForm.setMode("edit");
 		model.addAttribute("configForm", configForm);
@@ -110,7 +110,7 @@ public class ShoreikinConfigController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		if (bindingResult.hasErrors()) {
 			configForm.setMode("create");
@@ -143,7 +143,7 @@ public class ShoreikinConfigController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		if (bindingResult.hasErrors()) {
 			configForm.setMode("edit");

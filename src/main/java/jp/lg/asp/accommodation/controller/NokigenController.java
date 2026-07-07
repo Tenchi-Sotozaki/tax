@@ -42,7 +42,7 @@ public class NokigenController {
 
 	@GetMapping("/register")
 	public String register(Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("nokigen", new Nokigen());
 		model.addAttribute("mode", "register");
 		return "admin/nokigenConfig";
@@ -65,7 +65,7 @@ public class NokigenController {
 
 	@GetMapping("/edit/{nendo}")
 	public String edit(@PathVariable String nendo, Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Nokigen nokigen = nokigenService.findByNendo(nendo);
 		if (nokigen == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "指定されたデータが見つかりません。");
@@ -105,7 +105,7 @@ public class NokigenController {
 
 	@PostMapping("/save")
 	public String save(Nokigen nokigen, Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		if (nokigen.getNendo() == null || nokigen.getNendo().isBlank()) {
 			model.addAttribute("nokigen", nokigen);

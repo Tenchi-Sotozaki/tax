@@ -66,7 +66,7 @@ public class TaxManagerController {
 	@GetMapping("/edit/{id}")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		TaxManagerForm form = taxManagerService.getByShiteiNo(id);
 		
 		// 既に納税管理人が登録されている場合の処理
@@ -112,7 +112,7 @@ public class TaxManagerController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		// デバッグ情報を出力
 		log.info("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, exemptionFlag={}", 
@@ -141,7 +141,7 @@ public class TaxManagerController {
 
 	@PostMapping("/delete/{id}")
 	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		log.info("納税管理人削除処理: shiteiNo={}", id);
 

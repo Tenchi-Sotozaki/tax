@@ -69,7 +69,7 @@ public class EltaxRenkeiKakuninController {
 			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		byte[] fileBytes = (byte[]) session.getAttribute(SESSION_KEY_FILE);
 		String fileName = (String) session.getAttribute(SESSION_KEY_FILE_NAME);
 		if (fileBytes == null || fileBytes.length == 0) {

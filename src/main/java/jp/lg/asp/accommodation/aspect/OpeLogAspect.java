@@ -57,6 +57,9 @@ public class OpeLogAspect {
 		try {
 			HttpServletRequest request = getCurrentRequest();
 			String param = request != null ? getRequestParameters(request) : null;
+			if (param != null && param.length() > 2000) {
+				param = param.substring(0, 2000);
+			}
 
 			OperationLog entity = new OperationLog();
 			entity.setJichitaiCd(jichitaiCd);
@@ -85,9 +88,11 @@ public class OpeLogAspect {
 
 	private String getRequestParameters(HttpServletRequest request) {
 		try {
-			Map<String, String[]> parameterMap = request.getParameterMap().entrySet().stream()
+			Map<String, Object> parameterMap = new java.util.LinkedHashMap<>();
+			parameterMap.put("path", request.getRequestURI());
+			request.getParameterMap().entrySet().stream()
 					.filter(e -> !e.getKey().equalsIgnoreCase("_csrf"))
-					.collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+					.forEach(e -> parameterMap.put(e.getKey(), e.getValue()));
 			return objectMapper.writeValueAsString(parameterMap);
 		} catch (Exception e) {
 			log.warn("リクエストパラメータの取得に失敗", e);

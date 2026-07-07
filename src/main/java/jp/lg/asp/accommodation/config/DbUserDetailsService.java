@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
 
 import org.springframework.stereotype.Component;
 
@@ -16,13 +17,18 @@ import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+<<<<<<< HEAD
 /**
  * 本番用 UserDetailsService（DB連携）
  * 差し替え時は SecurityConfig#userDetailsService の @Bean を削除し、
  * このクラスの @Component コメントを外すこと。
  * 現在は @Component を無効化しているため Spring に登録されない。
  */
+=======
+@Slf4j
+>>>>>>> refs/remotes/origin/master
 @Component
 @RequiredArgsConstructor
 public class DbUserDetailsService implements UserDetailsService {
@@ -35,8 +41,16 @@ public class DbUserDetailsService implements UserDetailsService {
 
 	// layout.html の sec:authorize="hasRole('ADMIN')" と対応する管理系画面ID
 	private static final Set<String> ADMIN_SCREENS = Set.of(
-			ScreenManagement.USER_MANAGEMENT.strip(), ScreenManagement.ROLE_MANAGEMENT.strip(),
-			ScreenManagement.NOZEI_SHUKI.strip());
+			ScreenManagement.USER_MANAGEMENT.strip(),
+			ScreenManagement.ROLE_MANAGEMENT.strip(),
+			ScreenManagement.NOZEI_SHUKI.strip(),
+			ScreenManagement.NOZEI_SHUKI_CONFIG.strip(),
+			ScreenManagement.ZEIRITSU_CONFIG.strip(),
+			ScreenManagement.KOFU_RITSU_CONFIG.strip(),
+			ScreenManagement.NOKIGEN_CONFIG.strip(),
+			ScreenManagement.NOKIGEN.strip(),
+			ScreenManagement.SHITEI_GASSAN_CONFIG.strip(),
+			ScreenManagement.SHITEI_GASSAN.strip());
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -45,7 +59,12 @@ public class DbUserDetailsService implements UserDetailsService {
 		pk.setId(username);
 
 		User user = userRepository.findById(pk)
-				.orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません: " + username));
+				.orElseThrow(() -> {
+					log.warn("ユーザー見つからず: username={}, jichitaiCd={}", username, jichitaiCd);
+					return new UsernameNotFoundException("ユーザーが見つかりません: " + username);
+				});
+
+		String password = user.getPassword() != null ? user.getPassword().trim() : "";
 
 		/**
 		 * m_role_dtl に管理系画面（USER_MANAGEMENT / ROLE_MANAGEMENT / NOZEI_SHUKI）への
@@ -62,7 +81,7 @@ public class DbUserDetailsService implements UserDetailsService {
 
 		return new org.springframework.security.core.userdetails.User(
 				user.getId(),
-				user.getPassword(),
+				password,
 				List.of(new SimpleGrantedAuthority(role)));
 	}
 }

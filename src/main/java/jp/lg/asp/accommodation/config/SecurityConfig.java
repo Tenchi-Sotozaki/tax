@@ -17,9 +17,14 @@ public class SecurityConfig {
 		http
 				.authorizeHttpRequests(auth -> auth
 						// 静的リソース・ログインは誰でもアクセス可
+<<<<<<< HEAD
 						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**", "/login", "/*.html").permitAll()
 						// 初期セットアップ用ユーザー登録を未認証で許可
 						.requestMatchers("/admin/user-registration").permitAll()
+=======
+						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**", "/login", "/*.html")
+						.permitAll()
+>>>>>>> refs/remotes/origin/master
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可
@@ -37,6 +42,33 @@ public class SecurityConfig {
 		return http.build();
 	}
 
+<<<<<<< HEAD
+=======
+	/**
+	 * モックユーザー定義（開発用）
+	 * 本番では DB 連携の UserDetailsService に差し替えること。
+	 *
+	 * admin / admin123 → ROLE_ADMIN（管理者）
+	 * user  / user123  → ROLE_USER（一般ユーザー）
+	 */
+
+	public UserDetailsService userDetailsService(PasswordEncoder encoder) {
+		var admin = User.builder()
+				.username("admin")
+				.password(encoder.encode("admin123"))
+				.roles("ADMIN")
+				.build();
+
+		var user = User.builder()
+				.username("user")
+				.password(encoder.encode("user123"))
+				.roles("USER")
+				.build();
+
+		return new InMemoryUserDetailsManager(admin, user);
+	}
+
+>>>>>>> refs/remotes/origin/master
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

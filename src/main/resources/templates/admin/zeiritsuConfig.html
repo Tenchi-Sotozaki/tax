@@ -343,11 +343,17 @@
 					<i class="bi bi-save me-2"></i>登録する
 				</button>
 				<!-- 一覧に戻る（照会・編集） / 一覧に戻る（新規） -->
-				<a th:if="${isView or isEdit}" th:href="@{/admin/zeiritsu/list}"
+				<a th:if="${isView}" th:href="@{/admin/zeiritsu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<a th:if="${isEdit}" th:href="@{/admin/zeiritsu/list}"
+					class="btn btn-outline-secondary btn-lg px-4"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:unless="${isView or isEdit}"
 					th:href="@{/admin/zeiritsu/list}"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"
 					class="btn btn-outline-secondary btn-lg px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>

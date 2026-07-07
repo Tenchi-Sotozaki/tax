@@ -57,4 +57,32 @@ public class ScreenAccessChecker {
             throw new AccessDeniedException(screenId, userId);
         }
     }
+
+    /**
+     * ログイン中ユーザーが指定画面に対して更新権限を持つか検証する。
+     * 更新権限（permission >= 2）がない場合は AccessDeniedException をスローする。
+     *
+     * @param screenId 画面ID（m_screen.screen_id）
+     */
+    public void checkWriteAccess(String screenId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String userId = auth.getName();
+
+        UserId pk = new UserId();
+        pk.setJichitaiCd(jichitaiCd);
+        pk.setId(userId);
+
+        User user = userRepository.findById(pk).orElse(null);
+
+        if (user == null || user.getRoleId() == null) {
+            return;
+        }
+
+        long count = roleRepository.countWritableScreen(
+                jichitaiCd, user.getRoleId().longValue(), screenId.strip());
+
+        if (count == 0) {
+            throw new AccessDeniedException(screenId, userId);
+        }
+    }
 }

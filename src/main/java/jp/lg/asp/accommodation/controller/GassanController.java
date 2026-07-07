@@ -47,7 +47,7 @@ public class GassanController {
 	@GetMapping("/registration")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
 	public String showRegistrationForm(Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		GassanForm form = new GassanForm();
 		model.addAttribute("GassanForm", form);
@@ -105,7 +105,7 @@ public class GassanController {
 	@GetMapping("/edit/{gassanShiteiNo}")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String showEditForm(@PathVariable String gassanShiteiNo, Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		try {
 			GassanForm form = gassanService.getByGassanShiteiNo(gassanShiteiNo);
@@ -129,7 +129,7 @@ public class GassanController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		if (bindingResult.hasErrors()) {
 			gassanService.reloadFacilityList(form);
@@ -172,7 +172,7 @@ public class GassanController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		if (bindingResult.hasErrors()) {
 			gassanService.reloadFacilityList(form);

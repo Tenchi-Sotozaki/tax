@@ -16,6 +16,12 @@
 				<i class="bi bi-file-earmark-text me-2 text-primary"></i> <span
 					th:text="${isView} ? '合算申告 照会' : (${isEdit} ? '合算申告 編集' : '合算申告 新規登録')"></span>
 			</h5>
+			<th:block th:if="${isView}">
+				<a th:href="@{/gassan/edit/{id}(id=${editId})}"
+					class="btn btn-primary btn-sm"> <i
+					class="bi bi-pencil-square me-2"></i>編集する
+				</a>
+			</th:block>
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
@@ -44,12 +50,14 @@
 				type="hidden" th:field="*{gassanShiteiNo}">
 
 			<!-- バリデーションエラーサマリー -->
-			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show"
-				role="alert">
+			<div
+				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
 					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 				<ul class="mb-0 mt-1">
-					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+					<li th:each="err : ${validationErrors}" th:text="${err}"
+						class="small"></li>
 				</ul>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
@@ -67,7 +75,8 @@
 						<!-- 登録日 -->
 						<div class="col-md-3">
 							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'"
-								class="form-label fw-medium"> 登録日 <span class="text-danger" th:if="!${isView}">*</span>
+								class="form-label fw-medium"> 登録日 <span
+								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="torokuYmd" th:field="*{torokuYmd}"
 								th:errorclass="is-invalid"> <input th:if="${isView}"
@@ -81,7 +90,8 @@
 						<!-- 申告日 -->
 						<div class="col-md-3">
 							<label th:for="!${isView} ? 'shinkokuYmd' : 'shinkokuYmdView'"
-								class="form-label fw-medium"> 申告日 <span class="text-danger" th:if="!${isView}">*</span>
+								class="form-label fw-medium"> 申告日 <span
+								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="shinkokuYmd" th:field="*{shinkokuYmd}"
 								th:errorclass="is-invalid"> <input th:if="${isView}"
@@ -115,7 +125,8 @@
 						<!-- 適用時期(FROM) -->
 						<div class="col-md-4">
 							<label th:for="!${isView} ? 'tekiyoStYmd' : 'tekiyoStYmdView'"
-								class="form-label fw-medium"> 適用時期(FROM) <span class="text-danger" th:if="!${isView}">*</span>
+								class="form-label fw-medium"> 適用時期(FROM) <span
+								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="tekiyoStYmd" th:field="*{tekiyoStYmd}"
 								th:errorclass="is-invalid"> <input th:if="${isView}"
@@ -216,17 +227,15 @@
 						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
 					</button>
 				</th:block>
-				<th:block th:if="${isView}">
-					<a th:href="@{/gassan/edit/{id}(id=${editId})}"
-						class="btn btn-success btn-lg px-5"> <i
-						class="bi bi-pencil-square me-2"></i>編集する
-					</a>
-				</th:block>
-				<a
-					th:href="${isEdit} ? @{/gassan/list} : 'javascript:history.back()'"
-					class="btn btn-outline-secondary btn-lg px-4"> <i
-					class="bi bi-arrow-left me-2"></i><span
-					th:text="${isEdit} ? '一覧に戻る' : '一覧に戻る'"></span>
+
+				<a th:href="@{/gassan/list}"
+					class="btn btn-outline-secondary btn-lg px-4"
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a> <a th:href="@{/gassan/list}"
+					class="btn btn-outline-secondary btn-lg px-4"
+					th:unless="${isView ?: false}"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>
 		</form>

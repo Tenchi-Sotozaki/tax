@@ -61,7 +61,7 @@ public class ShoreikinBulkController {
 	public String executeBulk(@Valid @ModelAttribute ShoreikinBulkDto bulkForm,
 			BindingResult bindingResult,
 			Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("bulkForm", bulkForm);

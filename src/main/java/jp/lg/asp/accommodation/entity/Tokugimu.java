@@ -149,10 +149,7 @@ public class Tokugimu extends BaseEntity {
 
 	@Column(name = "del_flg", nullable = false, length = 1)
 	private String delFlg;
-
-
 	
-
 	@jakarta.persistence.Transient 
 	public String getStatus() {
 		LocalDate now = LocalDate.now();
