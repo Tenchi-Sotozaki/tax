@@ -88,9 +88,11 @@ public class OpeLogAspect {
 
 	private String getRequestParameters(HttpServletRequest request) {
 		try {
-			Map<String, String[]> parameterMap = request.getParameterMap().entrySet().stream()
+			Map<String, Object> parameterMap = new java.util.LinkedHashMap<>();
+			parameterMap.put("path", request.getRequestURI());
+			request.getParameterMap().entrySet().stream()
 					.filter(e -> !e.getKey().equalsIgnoreCase("_csrf"))
-					.collect(java.util.stream.Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+					.forEach(e -> parameterMap.put(e.getKey(), e.getValue()));
 			return objectMapper.writeValueAsString(parameterMap);
 		} catch (Exception e) {
 			log.warn("リクエストパラメータの取得に失敗", e);
