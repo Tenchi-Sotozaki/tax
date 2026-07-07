@@ -9,11 +9,13 @@ function updateButtons() {
 
     const singleSelection = checked.length === 1;
     const anySelection = checked.length >= 1;
+	
+	const includesAdminRole = Array.from(checked).some(cb => cb.value === '1');
 
-    editBtn.disabled = !singleSelection;
-    viewBtn.disabled = !singleSelection;
-    usersBtn.disabled = !singleSelection;
-    deleteBtn.disabled = !anySelection;
+	editBtn.disabled = !singleSelection || includesAdminRole;
+	viewBtn.disabled = !singleSelection;
+	usersBtn.disabled = !singleSelection;
+	deleteBtn.disabled = !anySelection || includesAdminRole;
 }
 
 function openRoleModal(mode) {

@@ -66,12 +66,14 @@ public class DbUserDetailsService implements UserDetailsService {
 						.anyMatch(rd -> rd.getPermission() != null && rd.getPermission().compareTo("1") >= 0
 								&& ADMIN_SCREENS.contains(rd.getScreenId().strip())))
 				.orElse(false);
-
 		String role = isAdmin ? "ROLE_ADMIN" : "ROLE_USER";
 
-		return new org.springframework.security.core.userdetails.User(
-				user.getId(),
-				password,
-				List.of(new SimpleGrantedAuthority(role)));
+		boolean mustChangePassword = "1".equals(user.getInitialPasswordFlg());
+
+	    return new AppUserDetails(
+	            user.getId(),
+	            password,
+	            List.of(new SimpleGrantedAuthority(role)),
+	            mustChangePassword);
 	}
 }

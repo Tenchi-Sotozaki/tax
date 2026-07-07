@@ -62,6 +62,11 @@ public class RoleController {
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
+	    if (form.getRoleId() != null && form.getRoleId() == 1L) {
+	        result.put("success", false);
+	        result.put("errors", java.util.List.of("管理者ロール（Adminアカウント用）は編集できません"));
+	        return result;
+	    }
 		if (form.getName() == null || form.getName().isBlank()) {
 			result.put("success", false);
 			result.put("errors", java.util.List.of("権限名は必須です"));
