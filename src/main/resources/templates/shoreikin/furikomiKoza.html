@@ -18,16 +18,17 @@
 						編集</span> <span th:if="${kozaForm.createMode}" class="text-muted">-
 						登録</span>
 				</h5>
+
+				<div th:if="${kozaForm.viewMode}">
+					<button type="button" class="btn btn-primary btn-sm"
+						onclick="editMode()">
+						<i class="bi bi-pencil"></i> 編集する
+					</button>
+				</div>
 			</div>
 
 			<!-- 特別徴収義務者情報 -->
-			<div class="mb-4">
-				<span class="fw-semibold">指定番号：</span> <span
-					th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
-					class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-					th:text="${tokugimuName}" class="me-4"></span> <span
-					class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
-			</div>
+			<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
 			<!-- 成功・エラーメッセージ -->
 			<div th:if="${successMessage}"
@@ -153,12 +154,6 @@
 
 				<!-- アクションボタン -->
 				<div class="d-flex gap-2">
-					<!-- 照会モード -->
-					<div th:if="${kozaForm.viewMode}">
-						<button type="button" class="btn btn-primary" onclick="editMode()">
-							<i class="bi bi-pencil"></i> 編集する
-						</button>
-					</div>
 
 					<!-- 登録モード -->
 					<div th:if="${kozaForm.createMode}">
@@ -177,10 +172,9 @@
 					</div>
 
 					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
-						th:if="${kozaForm.viewMode}"> <i
-						class="bi bi-arrow-left"></i> 戻る
-					</a>
-					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+						th:if="${kozaForm.viewMode}"> <i class="bi bi-arrow-left"></i>
+						戻る
+					</a> <a th:href="@{/shoreikin/list}" class="btn btn-secondary"
 						th:unless="${kozaForm.viewMode}"
 						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 						class="bi bi-arrow-left"></i> 戻る
@@ -223,10 +217,14 @@
 					th:field="*{version}">
 			</form>
 		</div>
+
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/furikomiKoza.js}"></script>
+		<script th:src="@{/js/shitei_gassan_search.js}"></script>
 	</th:block>
 </body>
 

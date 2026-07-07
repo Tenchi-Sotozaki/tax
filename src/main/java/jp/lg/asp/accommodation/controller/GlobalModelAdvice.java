@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.exception.AccessDeniedException;
@@ -34,6 +36,13 @@ public class GlobalModelAdvice {
     @ModelAttribute("currentUri")
     public String currentUri(HttpServletRequest request) {
         return request.getRequestURI();
+    }
+
+    @ModelAttribute("selectedShiteiGassan")
+    public ShiteiGassanSearchDto selectedShiteiGassan(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null) return null;
+        return (ShiteiGassanSearchDto) session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
     }
 
     /**

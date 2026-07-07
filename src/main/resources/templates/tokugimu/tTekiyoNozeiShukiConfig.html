@@ -24,14 +24,7 @@
 			</a>
 		</div>
 
-		<div class="mb-4">
-			<span class="fw-semibold">指定番号：</span> <span
-				th:text="${tekiyoNozeiShukiForm.shiteiNo}" class="me-4"></span> <span
-				class="fw-semibold">氏名：</span> <span
-				th:text="${tekiyoNozeiShukiForm.obligorName}" class="me-4"></span> <span
-				class="fw-semibold">施設名称：</span> <span
-				th:text="${tekiyoNozeiShukiForm.facilityName}"></span>
-		</div>
+		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show" role="alert">
@@ -120,9 +113,13 @@
 				</a>
 			</div>
 		</form>
+
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/tekiyoNozeiShuki.js}"></script>
+		<script th:src="@{/js/shitei_gassan_search.js}"></script>
 	</th:block>
 </body>
 </html>

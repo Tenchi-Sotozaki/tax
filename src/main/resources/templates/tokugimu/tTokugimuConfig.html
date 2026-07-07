@@ -33,13 +33,10 @@
 			<div
 				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
 				<!-- 特別徴収義務者情報 -->
-				<div class="mt-2 mb-0 ps-3">
-					<span class="fw-semibold">指定番号：</span> <span
-						th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
-						class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-						th:text="${tokugimuName}" class="me-4"></span> <span
-						class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
+				<div th:if="${isEdit} or ${isView}">
+					<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 				</div>
+
 				<th:block th:if="${isView}">
 					<a th:href="@{/tokugimu/edit/{id}(id=${editId})}"
 						class="btn btn-primary btn-sm mt-2"> <i
@@ -752,10 +749,8 @@
 				</th:block>
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
-					th:if="${isView ?: false}"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
-				<a th:href="@{/tokugimu/list}"
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a> <a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
 					th:unless="${isView ?: false}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
@@ -770,9 +765,13 @@
 
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
+
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/shitei_gassan_search.js}"></script>
 		<script th:src="@{/js/t_tokugimu_config.js}"></script>
 	</th:block>
 </body>
