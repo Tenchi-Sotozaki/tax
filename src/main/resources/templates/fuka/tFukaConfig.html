@@ -19,6 +19,12 @@
 				<i class="bi bi-file-earmark-text text-primary me-2"></i> <span
 					th:text="${fukaDeclarationForm.view ? '宿泊税納入情報照会' : (fukaDeclarationForm.edit ? '宿泊税納入情報編集' : '宿泊税納入情報登録')}"></span>
 			</h5>
+
+			<a th:if="${fukaDeclarationForm.view}"
+				th:href="@{/declaration/edit/{shiteiNo}/{nendo}/{kibetsu}(shiteiNo=${fukaDeclarationForm.shiteiNo}, nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
+				class="btn btn-primary btn-sm"> <i
+				class="bi bi-pencil-square me-2"></i>編集する
+			</a>
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
@@ -593,11 +599,6 @@
 			</div>
 
 			<div class="d-flex justify-content-center gap-3 mt-4 mb-5 pt-2">
-				<a th:if="${fukaDeclarationForm.view}"
-					th:href="@{/declaration/edit/{shiteiNo}/{nendo}/{kibetsu}(shiteiNo=${fukaDeclarationForm.shiteiNo}, nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
-					class="btn btn-warning px-5 shadow-sm"> <i
-					class="bi bi-pencil-square me-2"></i>編集する
-				</a>
 
 				<button type="submit" class="btn btn-primary px-5 shadow-sm"
 					th:unless="${fukaDeclarationForm.view}">
