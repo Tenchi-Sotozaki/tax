@@ -37,25 +37,25 @@
 							method="get">
 							<div class="row g-2 mb-2">
 								<!-- 1行目：宛名番号、氏名/名称 -->
-								<div class="col-12 col-sm-6 col-md-3">
+								<div class="col-12 col-sm-6 col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">宛名番号</label>
 									<input type="text" class="form-control form-contorl-sm"
 										th:field="*{atenaNo}" placeholder="宛名番号">
 								</div>
-								<div class="col-12 col-sm-6 col-md-3">
+								<div class="col-12 col-sm-6 col-md-8">
 									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
 										<label class="form-label form-label-sm fw-medium mb-0">氏名/名称</label>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
-											<label class="form-check-label small" for="namePrefix">前方一致</label>
+											<label class="form-check-label small" for="namePrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
-											<label class="form-check-label small" for="namePartial">部分一致</label>
+											<label class="form-check-label small" for="namePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
-											<label class="form-check-label small" for="nameExact">完全一致</label>
+											<label class="form-check-label small" for="nameExact">完全</label>
 										</div>
 									</div>
 									<input type="text" class="form-control form-contorl-sm"
@@ -78,15 +78,15 @@
 										<label class="form-label form-label-sm fw-medium mb-0">住所</label>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="prefix" id="jushoPrefix">
-											<label class="form-check-label small" for="jushoPrefix">前方一致</label>
+											<label class="form-check-label small" for="jushoPrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="partial" id="jushoPartial">
-											<label class="form-check-label small" for="jushoPartial">部分一致</label>
+											<label class="form-check-label small" for="jushoPartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="exact" id="jushoExact">
-											<label class="form-check-label small" for="jushoExact">完全一致</label>
+											<label class="form-check-label small" for="jushoExact">完全</label>
 										</div>
 									</div>
 									<input type="text" class="form-control form-control-sm"
