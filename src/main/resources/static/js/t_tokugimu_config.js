@@ -397,3 +397,62 @@ function initSmoothScroll() {
         });
     });
 }
+
+// -----------------------------------------------------------------------
+// 特別徴収義務者 登録・編集画面用 変更検知スクリプト
+// -----------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 追加：編集モードでなければ処理を行わない
+    const contentContainer = document.querySelector('[data-is-edit]');
+    const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
+    if (!isEdit) return;
+
+    // 対象となる入力要素を取得
+    const inputs = document.querySelectorAll('.form-control, .form-select, .form-check-input');
+
+    /**
+     * 値が変わったかどうかを判定し、枠線を黄色にする
+     */
+    function checkValue(input) {
+
+        // 属性がない場合は空文字にする
+        const initialValue = input.getAttribute('data-initial-value') || '';
+        let isChanged = false;
+
+        // nullという文字列になってしまうのを防ぐ
+        const initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
+
+        // チェックボックスとラジオボタンは枠線を付けない
+        if (input.type != 'checkbox' && input.type != 'radio') {
+
+            const currentStr = String(input.value).trim();
+            isChanged = (currentStr !== initialStr);
+        }
+		
+        if (isChanged) {
+            input.style.border = '3px solid #ffeb3b';
+        } else {
+            input.style.border = '';
+        }
+    }
+
+    // 手入力や選択変更に対するリアルタイムイベントを設定
+    inputs.forEach(input => {
+        input.addEventListener('input', () => checkValue(input));
+        input.addEventListener('change', () => checkValue(input));
+        input.addEventListener('blur', () => checkValue(input));
+    });
+
+    // 画面全体でクリックや変更があった時にすべての項目を一斉再チェック
+    document.addEventListener('click', () => {
+        inputs.forEach(input => checkValue(input));
+    });
+    document.addEventListener('change', () => {
+        inputs.forEach(input => checkValue(input));
+    });
+
+    // 値をコピーした後に、強制的にイベントを発生させて黄色枠をトリガーする
+    targetInput.value = sourceInput.value;
+    targetInput.dispatchEvent(new Event('change'));
+});
