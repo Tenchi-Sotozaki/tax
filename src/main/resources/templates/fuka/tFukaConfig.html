@@ -10,7 +10,8 @@
 </head>
 
 <body>
-	<div layout:fragment="content" class="container-fluid px-4 py-3">
+	<div layout:fragment="content" class="container-fluid px-4 py-3"
+		th:data-is-edit="${fukaDeclarationForm.edit}">
 
 		<div
 			class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
@@ -41,9 +42,11 @@
 				id="taxCheckBypassed" /> <input type="hidden" id="modalTriggerFlag"
 				th:value="${showTaxWarningModal != null ? showTaxWarningModal : false}" />
 
-			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+			<div
+				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 				class="alert alert-danger alert-dismissible fade show" role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 				<ul class="mb-0 mt-1">
 					<li th:each="err : ${validationErrors}" th:text="${err}"
 						class="small"></li>
@@ -79,28 +82,32 @@
 				</div>
 				<div class="card-body">
 					<div class="row g-3 mb-3">
+
+						<!-- 登録年月日 -->
 						<div class="col-md-4">
 							<label id="registrationDateLabel"
 								class="form-label form-label-sm fw-medium mb-1">登録年月日 <span
-								class="text-danger"
-								th:if="${!fukaDeclarationForm.view}">*</span></label> <input
-								type="date" class="form-control form-control-sm"
+								class="text-danger" th:if="${!fukaDeclarationForm.view}">*
+							</span>
+							</label> <input type="date" class="form-control form-control-sm"
 								th:field="*{torokuDate}"
 								th:readonly="${fukaDeclarationForm.view}"
-								th:errorclass="is-invalid">
+								th:errorclass="is-invalid" th:data-initial-value="*{torokuDate}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('torokuDate')}"
 								th:errors="*{torokuDate}"></div>
 						</div>
+
+						<!-- 申告年月日 -->
 						<div class="col-md-4">
 							<label id="registrationDateLabel"
 								class="form-label form-label-sm fw-medium mb-1">申告年月日 <span
-								class="text-danger"
-								th:if="${!fukaDeclarationForm.view}">*</span></label> <input
-								type="date" class="form-control form-control-sm"
+								class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span>
+							</label> <input type="date" class="form-control form-control-sm"
 								th:field="*{shinkokuDate}"
 								th:readonly="${fukaDeclarationForm.view}"
-								th:errorclass="is-invalid">
+								th:errorclass="is-invalid"
+								th:data-initial-value="*{shinkokuDate}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('shinkokuDate')}"
 								th:errors="*{shinkokuDate}"></div>
@@ -110,12 +117,16 @@
 					<hr class="my-3">
 
 					<div class="row g-3 align-items-start mb-3">
+
+						<!-- 納入年月 -->
 						<div class="col-md-3">
 							<label class="form-label fw-medium mb-1 bg-light">納入年月 </label> <input
 								type="text" class="form-control form-control-sm"
-								th:field="*{monthlyDetail.paymentYearMonth}" readOnly>
+								th:field="*{monthlyDetail.paymentYearMonth}" readOnly
+								th:data-initial-value="*{monthlyDetail.paymentYearMonth}">
 						</div>
 
+						<!-- 月計表 -->
 						<div class="col-md-3">
 							<div class="mt-2" th:if="${!fukaDeclarationForm.view}">
 								<button type="button" class="btn btn-outline-info btn-sm"
@@ -131,6 +142,7 @@
 							</div>
 						</div>
 
+						<!-- 変更区分 -->
 						<div class="col-md-2">
 							<label class="form-label form-label-sm fw-medium mb-1">
 								変更の区分 <span class="badge bg-danger ms-1"
@@ -138,7 +150,8 @@
 							</label> <select id="modificationCategory"
 								class="form-select form-select-sm"
 								th:field="*{modificationCategory}" th:errorclass="is-invalid"
-								th:disabled="${fukaDeclarationForm.view}">
+								th:disabled="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{modificationCategory}">
 								<option value="1">申告</option>
 								<option value="2">更正</option>
 								<option value="3">決定</option>
@@ -151,11 +164,14 @@
 							<input type="hidden" th:if="${fukaDeclarationForm.view}"
 								th:field="*{modificationCategory}" />
 						</div>
+
+						<!-- 変更理由 -->
 						<div class="col-md-4">
 							<label class="form-label form-label-sm fw-medium mb-1">変更理由</label>
 							<textarea class="form-control form-control-sm" rows="1"
 								th:field="*{modificationReason}"
-								th:readonly="${fukaDeclarationForm.view}"></textarea>
+								th:readonly="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{modificationReason}"></textarea>
 						</div>
 					</div>
 
@@ -173,42 +189,56 @@
 									</tr>
 								</thead>
 								<tbody>
+									<!-- テーブル -->
 									<tr th:each="detail, stat : *{monthlyDetail.taxDetails}"
 										class="tax-detail-row">
+
 										<input type="hidden"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeiritsuSeq}" />
+
 										<input type="hidden"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
+
 										<td class="text-center fw-medium bg-light"><span
 											th:text="${detail.label}">区分名</span></td>
+
 										<td class="text-center fw-medium bg-light"><span
 											th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA') + ' 円'}">税率</span>
 										</td>
+
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].hakusu}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].hakusu}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeigaku}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].zeigaku}">
 										</td>
 										<td><input type="text"
 											th:if="${fukaDeclarationForm.view}"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].cityZeigaku}"
 											class="form-control form-control-sm text-end bg-light js-comma-format"
-											readonly placeholder="0"> <th:block
-												th:unless="${fukaDeclarationForm.view}">自動算出</th:block></td>
+											readonly placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].cityZeigaku}">
+											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
+										</td>
 										<td><input type="text"
 											th:if="${fukaDeclarationForm.view}"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].kenZeigaku}"
 											class="form-control form-control-sm text-end bg-light js-comma-format"
-											readonly placeholder="0"> <th:block
-												th:unless="${fukaDeclarationForm.view}">自動算出</th:block></td>
+											readonly placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].kenZeigaku}">
+											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
+										</td>
 									</tr>
+
+									<!-- 課税対象外宿泊数 -->
 									<tr>
 										<td class="text-center fw-medium bg-light">課税対象外宿泊数</td>
 										<td class="bg-light"></td>
@@ -216,7 +246,8 @@
 											th:field="*{monthlyDetail.exemptStayCount}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.exemptStayCount}">
 										</td>
 										<td class="bg-light"></td>
 										<td class="bg-light"></td>
@@ -224,33 +255,41 @@
 									</tr>
 								</tbody>
 								<tfoot class="table-primary fw-bold">
+
+									<!-- 合計 -->
 									<tr>
 										<td class="text-center">合計</td>
-										<td></td>
+
 										<td><input type="text"
 											th:field="*{monthlyDetail.totalStayCount}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalStayCount}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.totalPaymentAmount}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalPaymentAmount}">
 										</td>
 										<td><input type="text"
 											th:if="${fukaDeclarationForm.view}"
 											th:field="*{monthlyDetail.totalCityZeigaku}"
 											class="form-control form-control-sm text-end bg-light js-comma-format"
-											readonly placeholder="0"> <th:block
-												th:unless="${fukaDeclarationForm.view}">自動算出</th:block></td>
+											readonly placeholder="0"
+											th:data-initial-value="*{fukaDeclarationForm.view}">
+											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
+										</td>
 										<td><input type="text"
 											th:if="${fukaDeclarationForm.view}"
 											th:field="*{monthlyDetail.totalKenZeigaku}"
 											class="form-control form-control-sm text-end bg-light js-comma-format"
-											readonly placeholder="0"> <th:block
-												th:unless="${fukaDeclarationForm.view}">自動算出</th:block></td>
+											readonly placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalKenZeigaku}">
+											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
+										</td>
 									</tr>
 								</tfoot>
 							</table>
@@ -286,25 +325,29 @@
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].ryokinSogaku}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].ryokinSogaku}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].hakusu}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].hakusu}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].ryokin}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].ryokin}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].zeigaku}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].zeigaku}">
 										</td>
 										<td class="bg-light"></td>
 										<td class="bg-light"></td>
@@ -317,13 +360,15 @@
 											th:field="*{monthlyDetail.exemptStayCount}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.exemptStayCount}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.exemptRyokin}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.exemptRyokin}">
 										</td>
 										<td class="bg-light"></td>
 										<td class="bg-light"></td>
@@ -338,38 +383,46 @@
 											th:field="*{monthlyDetail.totalSogaku}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalSogaku}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.totalStayCount}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalStayCount}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.kazeiRyokin}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.kazeiRyokin}">
 										</td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.totalPaymentAmount}"
 											class="form-control form-control-sm text-end js-comma-format"
 											th:classappend="${fukaDeclarationForm.view} ? 'bg-light' : ''"
-											th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalPaymentAmount}">
 										</td>
 										<td><input type="text"
 											th:if="${fukaDeclarationForm.view}"
 											th:field="*{monthlyDetail.totalCityZeigaku}"
 											class="form-control form-control-sm text-end bg-light js-comma-format"
-											readonly placeholder="0"> <th:block
-												th:unless="${fukaDeclarationForm.view}">自動算出</th:block></td>
+											readonly placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalCityZeigaku}">
+											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
+										</td>
 										<td><input type="text"
 											th:if="${fukaDeclarationForm.view}"
 											th:field="*{monthlyDetail.totalKenZeigaku}"
 											class="form-control form-control-sm text-end bg-light js-comma-format"
-											readonly placeholder="0"> <th:block
-												th:unless="${fukaDeclarationForm.view}">自動算出</th:block></td>
+											readonly placeholder="0"
+											th:data-initial-value="*{monthlyDetail.totalKenZeigaku}">
+											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
+										</td>
 									</tr>
 								</tfoot>
 							</table>
@@ -384,114 +437,156 @@
 						<i class="bi bi-plus-slash-minus me-2"></i>加算金額入力
 					</h6>
 				</div>
+
+				<!-- 1行目 -->
 				<div class="card-body py-3">
 					<div class="row g-3 align-items-end">
+
+						<!-- 区分 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">区分</label>
 							<select class="form-select form-select-sm"
 								th:field="*{additionalCategory1}"
-								th:disabled="${fukaDeclarationForm.view}">
+								th:disabled="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{additionalCategory1}">
 								<option value="">区分を選択してください</option>
 								<option value="1">過少申告加算金</option>
 								<option value="2">不申告加算金</option>
 								<option value="3">重加算金</option>
 							</select>
 						</div>
+
+						<!-- 割合 -->
 						<div class="col-md-2">
 							<label class="form-label form-label-sm fw-medium mb-1">割合
 								(%)</label> <input type="text"
 								class="form-control form-control-sm text-end"
 								th:field="*{additionalRate1}"
-								th:readonly="${fukaDeclarationForm.view}" placeholder="0.0">
+								th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
+								th:data-initial-value="*{additionalRate1}">
 						</div>
+
+						<!-- 金額 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">金額
 								(円)</label>
 							<div class="input-group input-group-sm js-comma-format">
 								<input type="text" class="form-control text-end js-comma-format"
 									th:field="*{additionalAmount1}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+									th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+									th:data-initial-value="*{additionalAmount1}">
 							</div>
 						</div>
+
+						<!-- 納期限 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">納期限</label>
 							<input type="date" class="form-control form-control-sm"
 								th:field="*{additionalDueDate1}"
-								th:readonly="${fukaDeclarationForm.view}">
+								th:readonly="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{additionalDueDate1}">
 						</div>
 					</div>
 				</div>
+
+				<!-- 2行目 -->
 				<div class="card-body py-3">
 					<div class="row g-3 align-items-end">
+
+						<!-- 区分 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">区分</label>
 							<select class="form-select form-select-sm"
 								th:field="*{additionalCategory2}"
-								th:disabled="${fukaDeclarationForm.view}">
+								th:disabled="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{additionalCategory2}">
 								<option value="">区分を選択してください</option>
 								<option value="1">過少申告加算金</option>
 								<option value="2">不申告加算金</option>
 								<option value="3">重加算金</option>
 							</select>
 						</div>
+
+						<!-- 割合 -->
 						<div class="col-md-2">
 							<label class="form-label form-label-sm fw-medium mb-1">割合
 								(%)</label> <input type="text"
 								class="form-control form-control-sm text-end"
 								th:field="*{additionalRate2}"
-								th:readonly="${fukaDeclarationForm.view}" placeholder="0.0">
+								th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
+								th:data-initial-value="*{additionalRate2}">
 						</div>
+
+						<!-- 金額 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">金額
 								(円)</label>
 							<div class="input-group input-group-sm js-comma-format">
 								<input type="text" class="form-control text-end js-comma-format"
 									th:field="*{additionalAmount2}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+									th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+									th:data-initial-value="*{additionalAmount2}">
 							</div>
 						</div>
+
+						<!-- 納期限 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">納期限</label>
 							<input type="date" class="form-control form-control-sm"
 								th:field="*{additionalDueDate2}"
-								th:readonly="${fukaDeclarationForm.view}">
+								th:readonly="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{additionalDueDate2}">
 						</div>
 					</div>
 				</div>
+
+				<!-- 3行目 -->
 				<div class="card-body py-3">
 					<div class="row g-3 align-items-end">
+
+						<!-- 区分 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">区分</label>
 							<select class="form-select form-select-sm"
 								th:field="*{additionalCategory3}"
-								th:disabled="${fukaDeclarationForm.view}">
+								th:disabled="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{additionalCategory3}">
 								<option value="">区分を選択してください</option>
 								<option value="1">過少申告加算金</option>
 								<option value="2">不申告加算金</option>
 								<option value="3">重加算金</option>
 							</select>
 						</div>
+
+						<!-- 割合 -->
 						<div class="col-md-2">
 							<label class="form-label form-label-sm fw-medium mb-1">割合
 								(%)</label> <input type="text"
 								class="form-control form-control-sm text-end"
 								th:field="*{additionalRate3}"
-								th:readonly="${fukaDeclarationForm.view}" placeholder="0.0">
+								th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
+								th:data-initial-value="*{additionalRate3}">
 						</div>
+
+						<!-- 金額 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">金額
 								(円)</label>
 							<div class="input-group input-group-sm js-comma-format">
 								<input type="text" class="form-control text-end js-comma-format"
 									th:field="*{additionalAmount3}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+									th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+									th:data-initial-value="*{additionalAmount3}">
 							</div>
 						</div>
+
+						<!-- 納期限 -->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">納期限</label>
 							<input type="date" class="form-control form-control-sm"
 								th:field="*{additionalDueDate3}"
-								th:readonly="${fukaDeclarationForm.view}">
+								th:readonly="${fukaDeclarationForm.view}"
+								th:data-initial-value="*{additionalDueDate3}">
 						</div>
 					</div>
 				</div>
@@ -515,8 +610,7 @@
 					class="btn btn-outline-secondary px-4 shadow-sm"
 					th:if="${fukaDeclarationForm.view}"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
-				<a
+				</a> <a
 					th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
 					class="btn btn-outline-secondary px-4 shadow-sm"
 					th:unless="${fukaDeclarationForm.view}"
@@ -525,6 +619,7 @@
 				</a>
 			</div>
 
+			<!-- 月計表モーダル -->
 			<div class="modal fade" id="monthlyTallyModal" tabindex="-1"
 				aria-labelledby="monthlyTallyModalLabel" aria-hidden="true">
 				<div class="modal-dialog modal-xl modal-dialog-scrollable">
