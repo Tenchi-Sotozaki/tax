@@ -52,25 +52,24 @@ public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
         @Param("atenaNo") BigDecimal atenaNo
     );
 
-    @Query(value = "SELECT * FROM m_atena a WHERE a.jichitai_cd = :jichitaiCd"
-        + " AND (:atenaNo  IS NULL OR CAST(a.atena_no AS text) LIKE CONCAT('%', :atenaNo, '%'))"
-        + " AND (:name     IS NULL OR a.name      LIKE CONCAT('%', :name, '%'))"
-        + " AND (:nameKana IS NULL OR a.name_kana LIKE CONCAT('%', :nameKana, '%'))"
-        + " AND (:yubinNo  IS NULL OR a.yubin_no  LIKE CONCAT('%', :yubinNo, '%'))"
-        + " AND (:jusho    IS NULL OR a.jusho     LIKE CONCAT('%', :jusho, '%'))"
-        + " AND (:tel      IS NULL OR a.tel1      LIKE CONCAT('%', :tel, '%') OR a.tel2 LIKE CONCAT('%', :tel, '%'))"
-        + " AND (:kojinNo  IS NULL OR a.kojin_no  = :kojinNo)"
-        + " AND (:hojinNo  IS NULL OR a.hojin_no  LIKE CONCAT('%', :hojinNo, '%'))",
-        nativeQuery = true)
+    @Query("SELECT a FROM Atena a WHERE a.jichitaiCd = :jichitaiCd"
+        + " AND (:atenaNo      = '%' OR CAST(a.atenaNo AS string) = :atenaNo)"
+        + " AND a.name                           LIKE :namePattern"
+        + " AND (:nameKana     = '%' OR COALESCE(a.nameKana, '') = :nameKana)"
+        + " AND (:yubinNo      = '%' OR COALESCE(a.yubinNo, '')  = :yubinNo)"
+        + " AND COALESCE(a.jusho, '')            LIKE :jushoPattern"
+        + " AND (:tel          = '%' OR a.tel1 = :tel OR COALESCE(a.tel2, '') = :tel)"
+        + " AND (:kojinNo      = '%' OR COALESCE(a.kojinNo, '')  = :kojinNo)"
+        + " AND (:hojinNo      = '%' OR COALESCE(a.hojinNo, '')  = :hojinNo)")
     List<Atena> search(
-        @Param("jichitaiCd") String jichitaiCd,
-        @Param("atenaNo")    @Nullable String atenaNo,
-        @Param("name")       @Nullable String name,
-        @Param("nameKana")   @Nullable String nameKana,
-        @Param("yubinNo")    @Nullable String yubinNo,
-        @Param("jusho")      @Nullable String jusho,
-        @Param("tel")        @Nullable String tel,
-        @Param("kojinNo")    @Nullable String kojinNo,
-        @Param("hojinNo")    @Nullable String hojinNo
+        @Param("jichitaiCd")   String jichitaiCd,
+        @Param("atenaNo")      String atenaNo,
+        @Param("namePattern")  String namePattern,
+        @Param("nameKana")     String nameKana,
+        @Param("yubinNo")      String yubinNo,
+        @Param("jushoPattern") String jushoPattern,
+        @Param("tel")          String tel,
+        @Param("kojinNo")      String kojinNo,
+        @Param("hojinNo")      String hojinNo
     );
 }
