@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
     initSmoothScroll();
     initKyodoSection();
+    initBusinessStatusSection();
 });
 
 // -----------------------------------------------------------------------
@@ -148,17 +149,28 @@ function onDeclarationTypeChange(e) {
     const suspendEnd = document.getElementById('suspensionEndDate');
     const undecided = document.getElementById('suspensionEndDateUndecided');
     const resumeClose = document.getElementById('resumptionOrAbolitionDate');
+    const reason = document.getElementById('suspensionOrAbolitionReason');
+    const today = new Date().toLocaleDateString('sv-SE');
 
-    [suspendStart, suspendEnd, undecided, resumeClose].forEach(el => {
-        if (el) el.disabled = true;
+    // 全て非活性にしてクリア
+    [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
+        if (el) { el.disabled = true; el.value = ''; }
     });
+    if (undecided) { undecided.disabled = true; undecided.checked = false; }
 
     if (value === '休止') {
-        [suspendStart, suspendEnd, undecided].forEach(el => {
+        [suspendStart, suspendEnd, undecided, reason].forEach(el => {
             if (el) el.disabled = false;
         });
-    } else if (value === '再開' || value === '廃止') {
-        if (resumeClose) resumeClose.disabled = false;
+        if (suspendStart && !suspendStart.value) suspendStart.value = today;
+        if (suspendEnd && !suspendEnd.value) suspendEnd.value = today;
+    } else if (value === '再開') {
+        if (resumeClose) { resumeClose.disabled = false; if (!resumeClose.value) resumeClose.value = today; }
+    } else if (value === '廃止') {
+        [resumeClose, reason].forEach(el => {
+            if (el) el.disabled = false;
+        });
+        if (resumeClose && !resumeClose.value) resumeClose.value = today;
     }
 }
 
@@ -220,6 +232,20 @@ function initCopyCheckboxes() {
             kyodoBody.style.display = kyodoCheck.checked ? '' : 'none';
             if (!kyodoCheck.checked) {
                 kyodoBody.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+            }
+        });
+    }
+
+    // 営業状況情報の表示切替
+    const businessStatusCheck = document.getElementById('businessStatusCheck');
+    if (businessStatusCheck) {
+        businessStatusCheck.addEventListener('change', () => {
+            const body = document.getElementById('businessStatusBody');
+            body.style.display = businessStatusCheck.checked ? '' : 'none';
+            if (!businessStatusCheck.checked) {
+                body.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea, select').forEach(el => el.value = '');
+                body.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+                body.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
             }
         });
     }
@@ -373,6 +399,48 @@ function initKyodoSection() {
     const rows = document.getElementById('kyodoRows');
     if (rows && rows.querySelectorAll('.kyodo-row').length === 0) {
         addKyodoRow();
+    }
+}
+
+// -----------------------------------------------------------------------
+// 営業状況セクション初期化（編集・照会時にデータがあれば表示）
+// -----------------------------------------------------------------------
+function initBusinessStatusSection() {
+    const check = document.getElementById('businessStatusCheck');
+    if (check && check.checked) {
+        document.getElementById('businessStatusBody').style.display = '';
+    }
+    // 初期表示時に申告区分の状態に応じて入力項目を制御
+    applyDeclarationState();
+}
+
+function applyDeclarationState() {
+    const checked = document.querySelector('input[name="declarationCategory"]:checked');
+    const suspendStart = document.getElementById('suspensionStartDate');
+    const suspendEnd = document.getElementById('suspensionEndDate');
+    const undecided = document.getElementById('suspensionEndDateUndecided');
+    const resumeClose = document.getElementById('resumptionOrAbolitionDate');
+    const reason = document.getElementById('suspensionOrAbolitionReason');
+
+    // ラジオ未選択時は全て非活性
+    [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
+        if (el) el.disabled = true;
+    });
+    if (undecided) undecided.disabled = true;
+
+    if (!checked) return;
+    const value = checked.value;
+
+    if (value === '休止') {
+        [suspendStart, suspendEnd, undecided, reason].forEach(el => {
+            if (el) el.disabled = false;
+        });
+    } else if (value === '再開') {
+        if (resumeClose) resumeClose.disabled = false;
+    } else if (value === '廃止') {
+        [resumeClose, reason].forEach(el => {
+            if (el) el.disabled = false;
+        });
     }
 }
 

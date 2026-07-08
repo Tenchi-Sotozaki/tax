@@ -404,6 +404,9 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setSuspensionEndDate(t.getKyushiEdYmd());
 		form.setResumptionOrAbolitionDate(t.getEigyoEdYmd());
 		form.setSuspensionOrAbolitionReason(t.getKyuhaishiRiyu());
+		form.setBusinessStatusFlg(
+				t.getKyushiStYmd() != null || t.getKyushiEdYmd() != null
+				|| t.getEigyoEdYmd() != null || t.getKyuhaishiRiyu() != null);
 	}
 
 	private void applyFormToTokugimu(Tokugimu t, TokugimuForm form) {
@@ -436,10 +439,17 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setSoufusakiTel(form.getMailPhone());
 		t.setEltaxUmu(form.getEltaxUmu());
 		t.setBiko(form.getRemarks());
-		t.setKyushiStYmd(form.getSuspensionStartDate());
-		t.setKyushiEdYmd(form.getSuspensionEndDate());
-		t.setEigyoEdYmd(form.getResumptionOrAbolitionDate());
-		t.setKyuhaishiRiyu(form.getSuspensionOrAbolitionReason());
+		if (form.isBusinessStatusFlg()) {
+			t.setKyushiStYmd(form.getSuspensionStartDate());
+			t.setKyushiEdYmd(form.getSuspensionEndDate());
+			t.setEigyoEdYmd(form.getResumptionOrAbolitionDate());
+			t.setKyuhaishiRiyu(form.getSuspensionOrAbolitionReason());
+		} else {
+			t.setKyushiStYmd(null);
+			t.setKyushiEdYmd(null);
+			t.setEigyoEdYmd(null);
+			t.setKyuhaishiRiyu(null);
+		}
 	}
 
 	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {

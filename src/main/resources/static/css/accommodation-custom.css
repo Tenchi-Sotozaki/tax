@@ -167,6 +167,27 @@
     border-color: var(--acomo-border);
 }
 
+/* テーブルセル：固定幅＋省略表示 */
+.table td,
+.table th {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ==========================================
+   入力項目：固定幅＋省略表示
+========================================== */
+
+.form-control,
+.form-select {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* ==========================================
    バッジ
 ========================================== */

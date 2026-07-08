@@ -107,6 +107,7 @@ public class TokugimuForm {
 	private String remarks;
 
 	// ===== 施設営業休止/再開/廃止情報 =====
+	private boolean businessStatusFlg;
 	private String declarationCategory;
 	private LocalDate suspensionStartDate;
 	private LocalDate suspensionEndDate;
