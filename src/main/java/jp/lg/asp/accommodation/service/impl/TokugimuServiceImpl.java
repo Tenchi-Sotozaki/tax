@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -6,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -48,8 +48,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	private final KyodoJigyoshaRepository kyodoJigyoshaRepository;
 	private final JichitaiRepository jichitaiRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private String getCurrentUser() {
 		var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -59,6 +58,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Override
 	@Transactional(readOnly = true)
 	public Page<TokugimuListItem> search(TokugimuSearchForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		
 		// 指定した件数ごとにページを切り替える
 		PageRequest pageable = PageRequest.of(form.getPage(), form.getPageSize());
@@ -138,6 +138,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private List<Tokugimu> findTokugimuByGassanShiteiNo(String gassanShiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
 		if (gassanList.isEmpty()) {
 			return List.of();
@@ -154,6 +155,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private boolean isGassanShiteiNo(String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		String gassanPrefix = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> j.getGassanStChar() != null ? j.getGassanStChar() : "900")
 				.orElse("900");
@@ -214,6 +216,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Override
 	@Transactional(readOnly = true)
 	public TokugimuForm getTokugimuByShiteiNo(String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 1. 指定番号から Tokugimu（施設情報）を取得
 		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
 				.stream().findFirst()
@@ -236,6 +239,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	public String getTokugimuName(String obligorId) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		try {
 			BigDecimal atenaNo = BigDecimal.valueOf(Long.parseLong(obligorId));
 			Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo).orElse(null);
@@ -247,6 +251,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private String generateShiteiNo() {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		String prefix = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> j.getShiteiStChar() != null ? j.getShiteiStChar() : "000")
 				.orElse("000");
@@ -257,6 +262,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Override
 	@Transactional
 	public void register(TokugimuForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		LocalDateTime now = LocalDateTime.now();
 		String systemUser = getCurrentUser();
 
@@ -294,6 +300,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Override
 	@Transactional
 	public void updateByShiteiNo(String shiteiNo, TokugimuForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		LocalDateTime now = LocalDateTime.now();
 		String systemUser = getCurrentUser();
 
@@ -334,6 +341,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Override
 	@Transactional
 	public void deleteByShiteiNo(String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
 				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("削除対象が見つかりません: " + shiteiNo));
@@ -346,6 +354,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	// ========== ヘルパーメソッド ==========
 
 	private void mapEntityToForm(TokugimuForm form, Tokugimu t, Atena atena) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 事業者情報
 		form.setTokugimuAddressNo(atena.getYubinNo());
 		form.setTokugimuAddress(atena.getJusho());
@@ -464,6 +473,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		if (!form.isKyodoFlg() || form.getKyodoList() == null)
 			return;
 		for (int i = 0; i < form.getKyodoList().size(); i++) {
@@ -485,6 +495,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private void saveShoyusha(String shiteiNo, BigDecimal rno, TokugimuForm form, LocalDateTime now, String user) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Shoyusha s = new Shoyusha();
 		s.setJichitaiCd(jichitaiCd);
 		s.setShiteiNo(shiteiNo);
@@ -501,6 +512,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Override
 	@Transactional(readOnly = true)
 	public String getShiteiNoById(Long id) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		BigDecimal atenaNo = BigDecimal.valueOf(id);
 		return tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo)
 				.stream().findFirst()

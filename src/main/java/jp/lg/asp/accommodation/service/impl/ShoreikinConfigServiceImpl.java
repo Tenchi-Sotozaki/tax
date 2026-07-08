@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,12 +41,12 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	private final FukaRepository fukaRepository;
 	private final KofuRitsuRepository kofuRitsuRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public ShoreikinConfigDto getShoreikin(String shiteiNo, String nendo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		ShoreikinConfigDto dto = new ShoreikinConfigDto();
 		dto.setShiteiNo(shiteiNo);
 		dto.setNendo(nendo);
@@ -111,6 +111,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	@Override
 	@Transactional
 	public ShoreikinConfigDto createShoreikin(ShoreikinConfigDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 交付金情報を新規登録
 		Shoreikin shoreikin = new Shoreikin();
 		shoreikin.setJichitaiCd(jichitaiCd);
@@ -134,6 +135,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	@Override
 	@Transactional
 	public ShoreikinConfigDto updateShoreikin(ShoreikinConfigDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		ShoreikinId id = new ShoreikinId(jichitaiCd, dto.getShiteiNo(), dto.getNendo());
 		Optional<Shoreikin> shoreikinOpt = shoreikinRepository.findById(id);
 
@@ -166,6 +168,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	@Override
 	@Transactional(readOnly = true)
 	public ShoreikinConfigDto calculateShoreikin(ShoreikinConfigDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 納入税額を算出
 		Long kofuZeigaku = calculateKofuZeigaku(dto.getShiteiNo(), dto.getNendo());
 		dto.setKofuZeigaku(kofuZeigaku);
@@ -190,6 +193,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	@Override
 	@Transactional(readOnly = true)
 	public Long calculateKofuZeigaku(String shiteiNo, String nendo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 指定年度の賦課情報を取得（del_flg='0', new_flg='1'）
 		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(
 				jichitaiCd, shiteiNo, nendo, "0", "1");

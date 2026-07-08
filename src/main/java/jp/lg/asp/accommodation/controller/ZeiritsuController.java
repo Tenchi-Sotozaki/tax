@@ -1,10 +1,10 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -49,8 +49,7 @@ public class ZeiritsuController {
 	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository;
 	private final ScreenAccessChecker accessChecker;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.ZEIRITSU_CONFIG;
 	private static final String LIST_VIEW = "admin/zeiritsuDaicho";
@@ -62,6 +61,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
 	public String list(@ModelAttribute ZeiritsuSearchForm searchForm,
 			Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		List<ZeiritsuListItem> items = search(jichitaiCd, searchForm);
 		model.addAttribute("items", items);
@@ -76,6 +76,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String view(@PathVariable("seq") Long seq,
 			Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		Zeiritsu z = findOrThrow(jichitaiCd, BigDecimal.valueOf(seq));
 		model.addAttribute("zeiritsuForm", toForm(z, jichitaiCd));
@@ -92,6 +93,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable("seq") Long seq,
 			Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Zeiritsu z = findOrThrow(jichitaiCd, BigDecimal.valueOf(seq));
 		model.addAttribute("zeiritsuForm", toForm(z, jichitaiCd));
@@ -111,6 +113,7 @@ public class ZeiritsuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		validateDetails(form, bindingResult);
@@ -204,6 +207,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public String delete(@PathVariable("seq") Long seq,
 			RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		BigDecimal seqDec = BigDecimal.valueOf(seq);
@@ -255,6 +259,7 @@ public class ZeiritsuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		validateDetails(form, bindingResult);

@@ -41,7 +41,5 @@ logging:
     jp.lg.asp: INFO
 
 app:
-  jichitai:
-    code: '01202'
   hash:
     salt: 'xQ7#mK2$vP9@nL4&wR6!jF8^hD3*bN5'

@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -7,7 +8,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,12 +38,12 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 	private final GassanRepository gassanRepository;
 	private final GassanUchiRepository gassanUchiRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<ShoreikinDto> search(ShoreikinDto form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		List<Tokugimu> tokugimuList;
 		if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
@@ -175,6 +175,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 	}
 
 	private List<Tokugimu> findTokugimuByGassanShiteiNo(String gassanShiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
 		if (gassanList.isEmpty()) {
 			return List.of();

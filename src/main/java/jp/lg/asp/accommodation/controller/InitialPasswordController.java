@@ -2,7 +2,6 @@ package jp.lg.asp.accommodation.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.UserRepository;
@@ -27,9 +27,7 @@ public class InitialPasswordController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext; // ★変更: @Value フィールドを削除し、これを追加
 
     private static final String FORM_VIEW = "auth/initialPassword";
 
@@ -62,6 +60,8 @@ public class InitialPasswordController {
             return FORM_VIEW;
         }
 
+        String jichitaiCd = jichitaiContext.getJichitaiCd(); // ★変更: セッションから取得（invalidateする前に取得しておく）
+
         UserId pk = new UserId();
         pk.setJichitaiCd(jichitaiCd);
         pk.setId(authentication.getName());
@@ -78,9 +78,12 @@ public class InitialPasswordController {
         user.setInitialPasswordFlg("0");
         userRepository.save(user);
 
-        log.info("初回パスワード変更が完了しました: userId={}", authentication.getName());
 
+        log.info("初回パスワード変更が完了しました: userId={}, jichitaiCd={}", ADMIN_ID, jichitaiCd);
+
+        // セッションを破棄すると自治体コードも消えるため、新しいセッションに引き継ぐ
         request.getSession().invalidate();
+        request.getSession(true).setAttribute("jichitaiCd", jichitaiCd);
         redirectAttributes.addFlashAttribute("successMessage", "パスワードを設定しました。設定したパスワードでログインしてください。");
         return "redirect:/login";
     }

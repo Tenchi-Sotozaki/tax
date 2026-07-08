@@ -1,10 +1,8 @@
 package jp.lg.asp.accommodation.controller;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinRenkeiDto;
@@ -33,8 +32,7 @@ public class ShoreikinRenkeiController {
     private final ScreenAccessChecker accessChecker;
     private final ShoreikinRenkeiService shoreikinRenkeiService;
 
-    @Value("${app.jichitai.code:00000}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     private static final String SCREEN_ID = ScreenManagement.KOFUKIN_FURIKOMI;
 
@@ -46,6 +44,7 @@ public class ShoreikinRenkeiController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false, defaultValue = "partial") String nameMatchType,
             Model model) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
 
         accessChecker.checkAccess(SCREEN_ID);
         List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
@@ -69,6 +68,7 @@ public class ShoreikinRenkeiController {
             @RequestParam(required = false) String shiteiNo,
             @RequestParam(required = false) String name,
             @RequestParam(required = false, defaultValue = "partial") String nameMatchType) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
 
         accessChecker.checkAccess(SCREEN_ID);
         return shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
@@ -77,6 +77,7 @@ public class ShoreikinRenkeiController {
     @PostMapping("/download")
 	@OpeLog(screenId = SCREEN_ID, operation = "ダウンロード")
     public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShoreikinRenkeiDto.Key> keys) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         accessChecker.checkAccess(SCREEN_ID);
         List<ShoreikinRenkeiDto> rows = shoreikinRenkeiService.findByKeys(jichitaiCd, keys);
 
@@ -126,6 +127,7 @@ public class ShoreikinRenkeiController {
     @PostMapping("/kakunin")
 	@OpeLog(screenId = SCREEN_ID, operation = "確認")
     public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         accessChecker.checkAccess(SCREEN_ID);
         try {
             com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();

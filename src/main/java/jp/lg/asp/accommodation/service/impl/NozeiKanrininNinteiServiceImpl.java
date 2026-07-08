@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +27,12 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
     private final AtenaRepository atenaRepository;
     private final JichitaiRepository jichitaiRepository;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     @Override
     @Transactional(readOnly = true)
     public NozeiKanrininNinteiDto getNinteiInfo(String shiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         log.debug("納税管理人選任免除認定通知書情報取得開始: shiteiNo={}", shiteiNo);
 
         Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);

@@ -1,9 +1,9 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +22,12 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 	private final ScreenRepository screenRepository;
 	private final OperationLogRepository operationLogRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<OpeLogViewDto> search(OpeLogViewDto form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		List<OperationLog> logList = operationLogRepository.findByConditions(
 				jichitaiCd,
@@ -59,6 +59,7 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Screen> findAllScreens() {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return screenRepository.findByJichitaiCdOrderByScreenId(jichitaiCd);
 	}
 

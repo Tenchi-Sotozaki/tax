@@ -1,9 +1,9 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import jp.lg.asp.accommodation.dto.AddressDto;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +20,7 @@ public class AddressSearchApiController {
 
     private final AtenaRepository atenaRepository;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     @GetMapping("/search")
     public List<AddressDto> search(
@@ -31,6 +30,7 @@ public class AddressSearchApiController {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String kojinNo,
             @RequestParam(required = false) String hojinNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
 
         if (!StringUtils.hasText(addressNumber) && !StringUtils.hasText(name) && !StringUtils.hasText(address)
                 && !StringUtils.hasText(phone) && !StringUtils.hasText(kojinNo) && !StringUtils.hasText(hojinNo)) {

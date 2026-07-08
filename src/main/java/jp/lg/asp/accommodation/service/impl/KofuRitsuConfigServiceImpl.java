@@ -1,9 +1,9 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,24 +19,26 @@ public class KofuRitsuConfigServiceImpl implements KofuRitsuConfigService {
 
 	private final KofuRitsuRepository kofuRitsuRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public KofuRitsu findCurrent() {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return kofuRitsuRepository.findCurrentByJichitaiCd(jichitaiCd).orElse(null);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<KofuRitsu> findAll() {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return kofuRitsuRepository.findAllByJichitaiCd(jichitaiCd);
 	}
 
 	@Override
 	@Transactional
 	public void register(KofuRitsuConfigDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 既存の最新レコードのnew_flgを0に更新
 		kofuRitsuRepository.findCurrentByJichitaiCd(jichitaiCd).ifPresent(current -> {
 			current.setNewFlg(0);

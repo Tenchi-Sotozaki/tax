@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -34,8 +34,7 @@ public class AtenaController {
 	private final ScreenAccessChecker accessChecker;
 	private final HashUtil hashUtil;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String ATENA_DAICHO = ScreenManagement.ATENA_DAICHO;
 	private static final String ATENA_INSERT = ScreenManagement.ATENA_INSERT;
@@ -43,6 +42,7 @@ public class AtenaController {
 	@GetMapping("/list")
 	@OpeLog(screenId = ATENA_DAICHO, operation = "照会")
 	public String list(@ModelAttribute AtenaSearchForm searchForm, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_DAICHO);
 		model.addAttribute("items", atenaRepository.search(
 				jichitaiCd,
@@ -61,6 +61,7 @@ public class AtenaController {
 	@GetMapping("/import")
 	@OpeLog(screenId = ATENA_INSERT, operation = "取込画面表示")
 	public String showImport(Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_INSERT);
 		model.addAttribute("history", atenaImportService.findHistory(jichitaiCd));
 		return "atena/atenaRenkei";
@@ -70,6 +71,7 @@ public class AtenaController {
 	@OpeLog(screenId = ATENA_INSERT, operation = "取込")
 	public String importCsv(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(ATENA_INSERT);
 		
 		// ファイルが選択されているかチェック

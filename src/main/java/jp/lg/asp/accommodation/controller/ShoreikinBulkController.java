@@ -1,10 +1,10 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.time.LocalDate;
 
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,12 +36,12 @@ public class ShoreikinBulkController {
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN;
 	private static final String BULK_VIEW = "shoreikin/shoreikinBulk";
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@GetMapping("/bulk")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String bulk(@RequestParam(required = false) String nendo, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();

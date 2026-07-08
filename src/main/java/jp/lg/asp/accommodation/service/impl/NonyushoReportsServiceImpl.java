@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -11,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +51,7 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	private final JichitaiRepository jichitaiRepository;
 	private final ReportsDefRepository reportsDefRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCode;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	public byte[] generateNonyushoPdf(NonyushoDto dto) {
@@ -79,6 +78,7 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	 */
 	@Override
 	public NonyushoDataResponse getNonyushoData(String shiteiNo, String nendo, String shinkokuYm) {
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		log.info("納入書動的データ取得開始: shiteiNo={}, nendo={}, shinkokuYm={}", shiteiNo, nendo, shinkokuYm);
 		log.info("設定された自治体コード: {}", jichitaiCode);
 
@@ -196,6 +196,7 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	 * m_reports_defテーブルから指定したテキストのdef_dataを取得
 	 */
 	private String getReportsDefData(String defText) {
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
 			Optional<ReportsDef> reportsDefOpt = reportsDefRepository.findByJichitaiCdAndDefText(jichitaiCode, defText);
 			if (reportsDefOpt.isPresent()) {

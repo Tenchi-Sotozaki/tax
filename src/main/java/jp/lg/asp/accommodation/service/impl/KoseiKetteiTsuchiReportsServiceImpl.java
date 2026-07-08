@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -8,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import jakarta.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,8 +54,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository; // ← 追加
     
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     private String cityName;
     private String todoufuken;
@@ -74,7 +72,6 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     /**
      * 起動時初期化（フォント設定・自治体情報・法令引用文キャッシュ）
      */
-    @PostConstruct
     private void init() {
         System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
         System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
@@ -91,6 +88,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     @Override
     @Transactional(readOnly = true)
     public byte[] generatePdf(String shiteiNo, String b1Ym, String b2Ym, String b3Ym) {
+    	init();
         KoseiKetteiTsuchiReportsDto dto = null;
         try {
             dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym);
@@ -132,6 +130,8 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     @Override
     @Transactional(readOnly = true)
     public List<String> findTaishoYmList(String shiteiNo) {
+    	init();
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         return fukaRepository.findTaishoYmListByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
     }
 
@@ -141,6 +141,8 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     @Override
     @Transactional(readOnly = true)
     public KoseiKetteiTsuchiReportsDto buildDtoForDisplay(String shiteiNo) {
+    	init();
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         KoseiKetteiTsuchiReportsDto dto = new KoseiKetteiTsuchiReportsDto();
         dto.setShitei_no(shiteiNo);
 
@@ -230,6 +232,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
      * 施設情報・宛名をDTOに設定する
      */
     private void setShisetsuInfo(KoseiKetteiTsuchiReportsDto dto, String shiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         if (tokugimuList.isEmpty()) {
             log.warn("t_tokugimuが見つかりません: shiteiNo={}", shiteiNo);
@@ -255,6 +258,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
      * taishoYmからFukaを検索する
      */
     private Optional<Fuka> findFukaByTaishoYm(String shiteiNo, String taishoYm) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Fuka> fukaList = fukaRepository
                 .findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(
                         jichitaiCd, shiteiNo, taishoYm.substring(0, 4));
@@ -311,6 +315,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
      * @param blockNo ブロック番号（1=b1, 2=b2, 3=b3）
      */
     private void setKibetsuBlockByFuka(KoseiKetteiTsuchiReportsDto dto, Fuka fuka, int blockNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         String prefix    = "b" + blockNo + "_";
         String taishoYm  = nvl(fuka.getTaishoYm());
         setField(dto, prefix + "nen",   taishoYm.length() == 6 ? taishoYm.substring(0, 4) : "");

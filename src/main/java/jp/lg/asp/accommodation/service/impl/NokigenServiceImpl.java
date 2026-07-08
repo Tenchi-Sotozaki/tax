@@ -1,8 +1,8 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,30 +18,33 @@ public class NokigenServiceImpl implements NokigenService {
 
     private final NokigenRepository nokigenRepository;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     @Override
     @Transactional(readOnly = true)
     public List<Nokigen> findAll() {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         return nokigenRepository.findAllByJichitaiCd(jichitaiCd);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Nokigen findByNendo(String nendo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         return nokigenRepository.findById(new NokigenId(jichitaiCd, nendo)).orElse(null);
     }
 
     @Override
     @Transactional(readOnly = true)
     public boolean existsByNendo(String nendo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         return nokigenRepository.countByJichitaiCdAndNendo(jichitaiCd, nendo) > 0;
     }
 
     @Override
     @Transactional
     public Nokigen save(Nokigen nokigen) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         nokigen.setJichitaiCd(jichitaiCd);
         // HTMLのdate入力(yyyy-MM-dd)をDBのchar(8)(yyyyMMdd)に変換
         nokigen.setNokigen1st(toDbDate(nokigen.getNokigen1st()));
