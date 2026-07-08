@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnGassan) {
         btnGassan.addEventListener('click', function() {
             if (shiteiNo) {
-                const url = '/accommodation-tax/reports/gassanNonyuTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                const url = '/accommodation-tax/tokugimu/report/' + encodeURIComponent(shiteiNo) + '/gassan';
                 window.location.href = url;
             } else {
                 alert('指定番号が取得できませんでした。');
