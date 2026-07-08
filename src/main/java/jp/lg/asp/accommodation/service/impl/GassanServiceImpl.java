@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,8 +108,24 @@ public class GassanServiceImpl implements GassanService {
                 .orElseThrow(() -> new RuntimeException("施設が見つかりません: " + shiteiNo));
 
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo());
+        
+        // 合算指定済みの指定番号を取得
+        List<String> allShiteiNos = tokugimuList.stream().map(Tokugimu::getShiteiNo).toList();
+        List<GassanUchi> assignedList = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, allShiteiNos);
+        Map<String, String> assignedMap = new HashMap<>();
+        for (GassanUchi uchi : assignedList) {
+            assignedMap.put(uchi.getShiteiNo(), uchi.getGassanShiteiNo());
+        }
+        
         List<FacilityItem> facilityList = tokugimuList.stream()
-                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false))
+                .map(t -> {
+                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false);
+                    if (assignedMap.containsKey(t.getShiteiNo())) {
+                        item.setDisabled(true);
+                        item.setGassanShiteiNo(assignedMap.get(t.getShiteiNo()));
+                    }
+                    return item;
+                })
                 .toList();
 
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo()).orElse(null);

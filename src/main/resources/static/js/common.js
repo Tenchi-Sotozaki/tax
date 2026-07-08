@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function attachTooltipListeners(root) {
-        root.querySelectorAll('.table td, .table th, .form-control, .form-select').forEach(function (el) {
+        root.querySelectorAll('.table td, .table th, .form-control, .form-select, .tokugimu-info-value').forEach(function (el) {
             if (el.dataset.tooltipBound) return;
             el.dataset.tooltipBound = '1';
             el.addEventListener('mouseenter', showTooltip);
