@@ -9,8 +9,8 @@
 </head>
 
 <body>
-	<div layout:fragment="content" class="container-fluid p-4" id="zeiritsuConfigRoot"
-		th:data-is-view="${isView}">
+	<div layout:fragment="content" class="container-fluid p-4"
+		id="zeiritsuConfigRoot" th:data-is-view="${isView}">
 
 		<!-- ページヘッダー -->
 		<div
@@ -19,6 +19,13 @@
 				<i class="bi bi-sliders me-2 text-primary"></i> <span
 					th:text="${isView} ? '賦課方式設定照会' : (${isEdit} ? '賦課方式設定編集' : '賦課方式設定登録')"></span>
 			</h5>
+
+			<!-- 照会モード -->
+			<a th:if="${isView}"
+				th:href="@{/admin/zeiritsu/edit/{seq}(seq=${seq})}"
+				class="btn btn-primary btn-sm"> <i
+				class="bi bi-pencil-square me-2"></i>編集する
+			</a>
 		</div>
 
 		<div th:if="${successMessage}"
@@ -38,12 +45,14 @@
 			th:action="${isEdit} ? @{/admin/zeiritsu/edit/{seq}(seq=${seq})} : @{/admin/zeiritsu/register}"
 			th:object="${zeiritsuForm}" method="post">
 
-			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show"
-				role="alert">
+			<div
+				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
 					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 				<ul class="mb-0 mt-1">
-					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+					<li th:each="err : ${validationErrors}" th:text="${err}"
+						class="small"></li>
 				</ul>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
@@ -59,7 +68,8 @@
 					<div class="row g-3" style="max-width: 480px;">
 
 						<div class="col-12">
-							<label class="form-label fw-medium">賦課方式 <span class="text-danger" th:unless="${isView}">*</span>
+							<label class="form-label fw-medium">賦課方式 <span
+								class="text-danger" th:unless="${isView}">*</span>
 							</label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
@@ -112,7 +122,8 @@
 						</div>
 
 						<div class="col-12">
-							<label class="form-label fw-medium">区分 <span class="text-danger" th:unless="${isView}">*</span>
+							<label class="form-label fw-medium">区分 <span
+								class="text-danger" th:unless="${isView}">*</span>
 							</label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
@@ -161,7 +172,8 @@
 							<tbody>
 								<!-- ① 必須 -->
 								<tr>
-									<td class="text-center fw-medium">① <span class="text-danger" th:unless="${isView}">*</span>
+									<td class="text-center fw-medium">① <span
+										class="text-danger" th:unless="${isView}">*</span>
 									</td>
 									<td><input type="text" class="form-control"
 										th:field="*{details[0].zeiValue}" th:readonly="${isView}">
@@ -321,20 +333,15 @@
 
 			<!-- ボタンエリア -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<!-- 照会モード -->
-				<a th:if="${isView}"
-					th:href="@{/admin/zeiritsu/edit/{seq}(seq=${seq})}"
-					class="btn btn-warning btn-lg px-5"> <i
-					class="bi bi-pencil-square me-2"></i>編集する
-				</a>
 				<!-- 編集モード -->
 				<button th:if="${isEdit}" type="submit"
 					class="btn btn-warning btn-lg px-5">
 					<i class="bi bi-save me-2"></i>更新する
 				</button>
 				<!-- 削除ボタン（編集モードのみ） -->
-				<button th:if="${isEdit}" type="button" class="btn btn-danger btn-lg px-4" 
-						data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+				<button th:if="${isEdit}" type="button"
+					class="btn btn-danger btn-lg px-4" data-bs-toggle="modal"
+					data-bs-target="#deleteConfirmModal">
 					<i class="bi bi-trash me-2"></i>削除する
 				</button>
 				<!-- 新規登録モード -->
@@ -346,8 +353,7 @@
 				<a th:if="${isView}" th:href="@{/admin/zeiritsu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
-				<a th:if="${isEdit}" th:href="@{/admin/zeiritsu/list}"
+				</a> <a th:if="${isEdit}" th:href="@{/admin/zeiritsu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -362,7 +368,8 @@
 
 		<!-- 削除フォーム（隠し） -->
 		<form th:if="${isEdit}" id="deleteZeiritsuForm"
-			th:action="@{/admin/zeiritsu/delete/{seq}(seq=${seq})}" method="post" class="d-none"></form>
+			th:action="@{/admin/zeiritsu/delete/{seq}(seq=${seq})}" method="post"
+			class="d-none"></form>
 
 		<!-- 削除確認モーダル -->
 		<div th:if="${isEdit}"
