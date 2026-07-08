@@ -35,25 +35,61 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
- * 全画面共通：テーブルセル・入力項目のオーバーフロー時にtitle属性（ツールチップ）を自動付与
+ * 全画面共通：テーブルセル・入力項目のオーバーフロー時にカスタムツールチップを表示
  */
 document.addEventListener('DOMContentLoaded', function () {
-    function applyTooltips(root) {
+    // ツールチップ要素を作成
+    const tooltip = document.createElement('div');
+    tooltip.id = 'acomo-tooltip';
+    tooltip.style.cssText = 'position:fixed;z-index:9999;padding:6px 12px;background:#1b2d57;color:#fff;border-radius:6px;font-size:13px;max-width:400px;word-break:break-all;pointer-events:none;opacity:0;transition:opacity 0.15s;white-space:pre-wrap;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+    document.body.appendChild(tooltip);
+
+    let showTimer = null;
+
+    function showTooltip(e) {
+        const el = e.currentTarget;
+        const text = el.tagName === 'INPUT' || el.tagName === 'SELECT' ? (el.value || '') : el.textContent.trim();
+        if (!text || el.scrollWidth <= el.clientWidth) {
+            return;
+        }
+        showTimer = setTimeout(function () {
+            tooltip.textContent = text;
+            tooltip.style.opacity = '1';
+            positionTooltip(e);
+        }, 300);
+    }
+
+    function hideTooltip() {
+        clearTimeout(showTimer);
+        tooltip.style.opacity = '0';
+    }
+
+    function positionTooltip(e) {
+        const x = e.clientX + 12;
+        const y = e.clientY + 16;
+        const maxX = window.innerWidth - tooltip.offsetWidth - 8;
+        const maxY = window.innerHeight - tooltip.offsetHeight - 8;
+        tooltip.style.left = Math.min(x, maxX) + 'px';
+        tooltip.style.top = Math.min(y, maxY) + 'px';
+    }
+
+    function attachTooltipListeners(root) {
         root.querySelectorAll('.table td, .table th, .form-control, .form-select').forEach(function (el) {
-            if (el.scrollWidth > el.clientWidth) {
-                el.title = el.textContent.trim() || el.value || '';
-            } else {
-                el.removeAttribute('title');
-            }
+            if (el.dataset.tooltipBound) return;
+            el.dataset.tooltipBound = '1';
+            el.addEventListener('mouseenter', showTooltip);
+            el.addEventListener('mousemove', positionTooltip);
+            el.addEventListener('mouseleave', hideTooltip);
         });
     }
-    applyTooltips(document);
+
+    attachTooltipListeners(document);
 
     // 動的に追加される要素にも対応
     const observer = new MutationObserver(function (mutations) {
         mutations.forEach(function (m) {
             m.addedNodes.forEach(function (node) {
-                if (node.nodeType === 1) applyTooltips(node);
+                if (node.nodeType === 1) attachTooltipListeners(node);
             });
         });
     });
