@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
+
 <head>
-<title
-	th:text="${mode == 'register' ? '指定番号・合算指定番号設定登録' : (mode == 'edit' ? '指定番号・合算指定番号設定編集' : '指定番号・合算指定番号設定照会')}">指定番号・合算指定番号設定</title>
+	<title
+		th:text="${mode == 'register' ? '指定番号・合算指定番号設定登録' : (mode == 'edit' ? '指定番号・合算指定番号設定編集' : '指定番号・合算指定番号設定照会')}">
+		指定番号・合算指定番号設定</title>
 </head>
+
 <body>
-	<div layout:fragment="content" class="container-fluid p-4">
+	<div layout:fragment="content" class="container-fluid p-4" th:data-is-edit="${mode == 'edit'}">
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -16,82 +18,80 @@
 					th:text="${mode == 'register' ? '指定番号・合算指定番号設定登録' : (mode == 'edit' ? '指定番号・合算指定番号設定編集' : '指定番号・合算指定番号設定照会')}">指定番号・合算指定番号設定</span>
 			</h5>
 			<div th:if="${mode == 'view'}">
-				<a th:href="@{/admin/shitei-gassan/edit}"
-					class="btn btn-sm btn-primary"> <i
-					class="bi bi-pencil-square me-1"></i>編集する
+				<a th:href="@{/admin/shitei-gassan/edit}" class="btn btn-sm btn-primary"> <i
+						class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
 		</div>
 
-		<div
-			th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 			class="alert alert-danger alert-dismissible fade show" role="alert">
 			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
 				th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 			<ul class="mb-0 mt-1">
-				<li th:each="err : ${validationErrors}" th:text="${err}"
-					class="small"></li>
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 			</ul>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 		<!-- メッセージ表示 -->
-		<div th:if="${successMessage}"
-			class="alert alert-success alert-dismissible fade show" role="alert">
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${infoMessage}"
-			class="alert alert-info alert-dismissible fade show" role="alert">
+		<div th:if="${infoMessage}" class="alert alert-info alert-dismissible fade show" role="alert">
 			<span th:text="${infoMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 		<div class="card shadow-sm">
 			<div class="card-body">
-				<form th:action="@{/admin/shitei-gassan/save}" method="post"
-					th:object="${configDto}">
+				<form th:action="@{/admin/shitei-gassan/save}" method="post" th:object="${configDto}">
 					<input type="hidden" th:field="*{version}">
+
+					<!-- 指定番号 -->
 					<div class="row mb-3">
 						<div class="col-md-4">
-							<label for="shiteiStChar" class="form-label">指定番号 <span
-								class="text-danger">*</span></label> <input type="text"
-								class="form-control" th:field="*{shiteiStChar}"
-								id="shiteiStChar" maxlength="3" placeholder="例：001"
-								th:readonly="${mode == 'view'}">
-							<div th:if="${#fields.hasErrors('shiteiStChar')}"
-								class="text-danger small mt-1">
+							<label for="shiteiStChar" class="form-label">
+								指定番号 <span class="text-danger">*</span>
+							</label>
+
+							<input type="text" class="form-control" th:field="*{shiteiStChar}" id="shiteiStChar"
+								maxlength="3" placeholder="例：001" th:readonly="${mode == 'view'}"
+								th:data-initial-value="*{shiteiStChar}">
+
+							<div th:if="${#fields.hasErrors('shiteiStChar')}" class="text-danger small mt-1">
 								<span th:errors="*{shiteiStChar}"></span>
 							</div>
 						</div>
 					</div>
 
+					<!-- 合算指定番号 -->
 					<div class="row mb-3">
 						<div class="col-md-4">
-							<label for="gassanStChar" class="form-label">合算指定番号 <span
-								class="text-danger">*</span></label> <input type="text"
-								class="form-control" th:field="*{gassanStChar}"
-								id="gassanStChar" maxlength="3" placeholder="例：001"
-								th:readonly="${mode == 'view'}">
-							<div th:if="${#fields.hasErrors('gassanStChar')}"
-								class="text-danger small mt-1">
+							<label for="gassanStChar" class="form-label">
+								合算指定番号 <span class="text-danger">*</span>
+							</label>
+
+							<input type="text" class="form-control" th:field="*{gassanStChar}" id="gassanStChar"
+								maxlength="3" placeholder="例：001" th:readonly="${mode == 'view'}"
+								th:data-initial-value="*{gassanStChar}">
+
+							<div th:if="${#fields.hasErrors('gassanStChar')}" class="text-danger small mt-1">
 								<span th:errors="*{gassanStChar}"></span>
 							</div>
 						</div>
 					</div>
 
-					<div class="d-flex justify-content-end gap-2"
-						th:if="!${mode == 'view'}">
+					<div class="d-flex justify-content-end gap-2" th:if="!${mode == 'view'}">
 						<div th:if="${mode == 'edit'}">
-							<a th:href="@{/admin/shitei-gassan/view}"
-								class="btn btn-outline-secondary"
+							<a th:href="@{/admin/shitei-gassan/view}" class="btn btn-outline-secondary"
 								onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
-								class="bi bi-arrow-left me-1"></i>照会に戻る
+									class="bi bi-arrow-left me-1"></i>照会に戻る
 							</a>
 						</div>
 						<button type="submit" class="btn btn-primary">
@@ -104,5 +104,11 @@
 		</div>
 
 	</div>
+
+	<!-- JavaScriptファイル読み込み -->
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/shiteiGassanConfig.js}"></script>
+	</th:block>
 </body>
+
 </html>
