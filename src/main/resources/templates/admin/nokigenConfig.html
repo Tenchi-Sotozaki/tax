@@ -53,6 +53,11 @@
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
+		<div th:if="${warnMessage}"
+			class="alert alert-warning alert-dismissible fade show" role="alert">
+			<span th:text="${warnMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 
 		<!-- 入力フォーム -->
 		<div class="card shadow-sm">
