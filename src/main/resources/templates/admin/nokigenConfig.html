@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
+
 <head>
-<title
-	th:text="${mode == 'register' ? '納入期限登録' : (mode == 'edit' ? '納入期限編集' : '納入期限照会')}">納入期限設定</title>
+	<title th:text="${mode == 'register' ? '納入期限登録' : (mode == 'edit' ? '納入期限編集' : '納入期限照会')}">納入期限設定</title>
 </head>
+
 <body>
-	<div layout:fragment="content" class="container-fluid p-4">
+	<div layout:fragment="content" class="container-fluid p-4" th:data-is-edit="${mode == 'edit'}">
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -15,46 +15,36 @@
 				<i class="bi bi-calendar-check me-2 text-primary"></i> <span
 					th:text="${mode == 'register' ? '納入期限登録' : (mode == 'edit' ? '納入期限編集' : '納入期限照会')}">納入期限設定</span>
 			</h5>
-			<div th:if="${mode == 'view'}"
-				class="d-flex align-items-center gap-2">
-				<select class="form-select form-select-sm" id="nendoSelect"
-					th:data-base-url="@{/admin/nokigen/view/}"
+			<div th:if="${mode == 'view'}" class="d-flex align-items-center gap-2">
+				<select class="form-select form-select-sm" id="nendoSelect" th:data-base-url="@{/admin/nokigen/view/}"
 					onchange="changeNendo(this)">
-					<option th:each="n : ${nendoList}" th:value="${n}"
-						th:text="${n + '年度'}" th:selected="${n == nokigen.nendo}"></option>
+					<option th:each="n : ${nendoList}" th:value="${n}" th:text="${n + '年度'}"
+						th:selected="${n == nokigen.nendo}"></option>
 				</select> <a th:href="@{/admin/nokigen/edit/{nendo}(nendo=${nokigen.nendo})}"
-					class="btn btn-sm btn-primary text-nowrap"> <i
-					class="bi bi-pencil-square me-1"></i>編集する
+					class="btn btn-sm btn-primary text-nowrap"> <i class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
 		</div>
-		<div
-			th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 			class="alert alert-danger alert-dismissible fade show" role="alert">
 			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
 				th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 			<ul class="mb-0 mt-1">
-				<li th:each="err : ${validationErrors}" th:text="${err}"
-					class="small"></li>
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 			</ul>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-
-
 		<!-- メッセージ表示 -->
-		<div th:if="${successMessage}"
-			class="alert alert-success alert-dismissible fade show" role="alert">
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${warnMessage}"
-			class="alert alert-warning alert-dismissible fade show" role="alert">
+		<div th:if="${warnMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
 			<span th:text="${warnMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
@@ -62,22 +52,23 @@
 		<!-- 入力フォーム -->
 		<div class="card shadow-sm">
 			<div class="card-body">
-				<form id="nokigenForm" th:action="@{/admin/nokigen/save}" method="post"
-					th:object="${nokigen}">
-					<input type="hidden" th:field="*{jichitaiCd}"> <input
-						type="hidden" th:field="*{addDt}"> <input type="hidden"
-						th:field="*{addUser}"> <input type="hidden"
-						th:field="*{updDt}"> <input type="hidden"
-						th:field="*{updUser}"> <input type="hidden"
-						th:field="*{version}">
+				<form id="nokigenForm" th:action="@{/admin/nokigen/save}" method="post" th:object="${nokigen}">
+					<input type="hidden" th:field="*{jichitaiCd}"> <input type="hidden" th:field="*{addDt}"> <input
+						type="hidden" th:field="*{addUser}"> <input type="hidden" th:field="*{updDt}"> <input
+						type="hidden" th:field="*{updUser}"> <input type="hidden" th:field="*{version}">
 					<input type="hidden" name="mode" th:value="${mode}">
 					<div class="row mb-3 align-items-end">
+						<!-- 年度 -->
 						<div class="col-md-3">
-							<label for="nendo" class="form-label">年度 <span
-								class="text-danger" th:if="${mode == 'register'}">*</span></label> <input
-								type="text" class="form-control" th:field="*{nendo}" id="nendo"
-								placeholder="例：2024" th:readonly="${mode != 'register'}"
-								th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'">
+							<label for="nendo" class="form-label">
+								年度 <span　class="text-danger" th:if="${mode == 'register'}">*</span>
+							</label>
+
+							<input type="text" class="form-control" th:field="*{nendo}" id="nendo" placeholder="例：2024"
+								th:readonly="${mode != 'register'}"
+								th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'"
+								th:data-initial-value="*{nendo}">
+
 							<div class="invalid-feedback"
 								th:if="${validationErrors != null and !validationErrors.isEmpty()}">
 								<span th:each="err : ${validationErrors}" th:text="${err}"></span>
@@ -86,81 +77,142 @@
 					</div>
 
 					<div class="row g-3 mb-3">
+						<!-- 1期 -->
 						<div class="col-md-3">
-							<label for="nokigen1st" class="form-label">1期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[0]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen1st}"
-								id="nokigen1st" th:readonly="${mode == 'view'}">
+							<label for="nokigen1st" class="form-label">
+								1期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[0]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen1st}" id="nokigen1st"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen1st}">
 						</div>
+						<!-- 2期 -->
 						<div class="col-md-3">
-							<label for="nokigen2nd" class="form-label">2期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[1]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen2nd}"
-								id="nokigen2nd" th:readonly="${mode == 'view'}">
+							<label for="nokigen2nd" class="form-label">
+								2期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[1]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen2nd}" id="nokigen2nd"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen2nd}">
 						</div>
+						<!-- 3期 -->
 						<div class="col-md-3">
-							<label for="nokigen3rd" class="form-label">3期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[2]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen3rd}"
-								id="nokigen3rd" th:readonly="${mode == 'view'}">
+							<label for="nokigen3rd" class="form-label">
+								3期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[2]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen3rd}" id="nokigen3rd"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen3rd}">
 						</div>
+						<!-- 4期 -->
 						<div class="col-md-3">
-							<label for="nokigen4th" class="form-label">4期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[3]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen4th}"
-								id="nokigen4th" th:readonly="${mode == 'view'}">
+							<label for="nokigen4th" class="form-label">
+								4期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[3]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen4th}" id="nokigen4th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen4th}">
 						</div>
+						<!-- 5期 -->
 						<div class="col-md-3">
-							<label for="nokigen5th" class="form-label">5期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[4]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen5th}"
-								id="nokigen5th" th:readonly="${mode == 'view'}">
+							<label for="nokigen5th" class="form-label">
+								5期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[4]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen5th}" id="nokigen5th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen5th}">
 						</div>
+						<!-- 6期 -->
 						<div class="col-md-3">
-							<label for="nokigen6th" class="form-label">6期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[5]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen6th}"
-								id="nokigen6th" th:readonly="${mode == 'view'}">
+							<label for="nokigen6th" class="form-label">
+								6期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[5]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen6th}" id="nokigen6th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen6th}">
 						</div>
+						<!-- 7期 -->
 						<div class="col-md-3">
-							<label for="nokigen7th" class="form-label">7期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[6]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen7th}"
-								id="nokigen7th" th:readonly="${mode == 'view'}">
+							<label for="nokigen7th" class="form-label">
+								7期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[6]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen7th}" id="nokigen7th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen7th}">
 						</div>
+						<!-- 8期 -->
 						<div class="col-md-3">
-							<label for="nokigen8th" class="form-label">8期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[7]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen8th}"
-								id="nokigen8th" th:readonly="${mode == 'view'}">
+							<label for="nokigen8th" class="form-label">
+								8期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[7]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen8th}" id="nokigen8th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen8th}">
 						</div>
+						<!-- 9期 -->
 						<div class="col-md-3">
-							<label for="nokigen9th" class="form-label">9期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[8]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen9th}"
-								id="nokigen9th" th:readonly="${mode == 'view'}">
+							<label for="nokigen9th" class="form-label">
+								9期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[8]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen9th}" id="nokigen9th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen9th}">
 						</div>
+						<!-- 10期 -->
 						<div class="col-md-3">
-							<label for="nokigen10th" class="form-label">10期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[9]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen10th}"
-								id="nokigen10th" th:readonly="${mode == 'view'}">
+							<label for="nokigen10th" class="form-label">
+								10期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[9]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen10th}" id="nokigen10th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen10th}">
 						</div>
+						<!-- 11期 -->
 						<div class="col-md-3">
-							<label for="nokigen11th" class="form-label">11期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[10]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen11th}"
-								id="nokigen11th" th:readonly="${mode == 'view'}">
+							<label for="nokigen11th" class="form-label">
+								11期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[10]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen11th}" id="nokigen11th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen11th}">
 						</div>
+						<!-- 12期 -->
 						<div class="col-md-3">
-							<label for="nokigen12th" class="form-label">12期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[11]} + ')'" class="text-muted"></span></label> <input
-								type="date" class="form-control" th:field="*{nokigen12th}"
-								id="nokigen12th" th:readonly="${mode == 'view'}">
+							<label for="nokigen12th" class="form-label">
+								12期 <span th:if="${kiMonthLabels}" th:text="'(' + ${kiMonthLabels[11]} + ')'"
+									class="text-muted"></span>
+							</label>
+
+							<input type="date" class="form-control" th:field="*{nokigen12th}" id="nokigen12th"
+								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen12th}">
 						</div>
 					</div>
 
 					<div class="d-flex justify-content-end align-items-center" th:if="${mode == 'register'}">
 						<span class="small text-muted me-2">土日の場合：</span>
 						<div class="form-check form-check-inline mb-0">
-							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend" id="shiftFriday" value="friday" style="width:0.85em;height:0.85em;">
+							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
+								id="shiftFriday" value="friday" style="width:0.85em;height:0.85em;">
 							<label class="form-check-label small" for="shiftFriday">前の金曜にずらす</label>
 						</div>
 						<div class="form-check form-check-inline mb-0">
-							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend" id="shiftMonday" value="monday" style="width:0.85em;height:0.85em;">
+							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
+								id="shiftMonday" value="monday" style="width:0.85em;height:0.85em;">
 							<label class="form-check-label small" for="shiftMonday">次の月曜にずらす</label>
 						</div>
 						<button type="button" class="btn btn-outline-secondary btn-sm ms-3"
-							th:data-url="@{/admin/nokigen/prev-data/}"
-							th:data-exists-url="@{/admin/nokigen/exists/}"
+							th:data-url="@{/admin/nokigen/prev-data/}" th:data-exists-url="@{/admin/nokigen/exists/}"
 							onclick="copyPrevYear(this)">
 							<i class="bi bi-copy me-1"></i>前年度を複写する
 						</button>
@@ -183,4 +235,5 @@
 <th:block layout:fragment="scripts">
 	<script th:src="@{/js/nokigenConfig.js}"></script>
 </th:block>
+
 </html>
