@@ -44,6 +44,9 @@ function openRoleModal(mode) {
         if (mode === 'edit') {
             title.textContent = '権限編集';
             saveBtn.style.display = 'block';
+
+
+
         } else {
             title.textContent = '権限照会';
             saveBtn.style.display = 'none';
@@ -233,3 +236,126 @@ function deleteRoles() {
         sessionStorage.removeItem('flashMessage');
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // 画面表示時の初期状態を記憶するためのマップ
+    const initialValues = {};
+
+    // ラジオボタンをnameごとに処理
+    const allRadios = document.querySelectorAll('#screenPermissions input[type="radio"]');
+
+    allRadios.forEach(radio => {
+
+        // 最初にcheckedがついているもののvalueを記憶
+        if (radio.checked) {
+            initialValues[radio.name] = radio.value;
+        }
+
+        // ラジオボタンがクリックされた時のイベント
+        radio.addEventListener('change', function() {
+            checkRadioChange(this.name);
+        });
+    });
+
+    // 変更があったか判定して色を変える
+    function checkRadioChange(name) {
+
+        // 現在チェックされているラジオボタンを取得
+        const checkedRadio = document.querySelector(`input[name="${name}"]:checked`);
+        const currentValue = checkedRadio ? checkedRadio.value : '';
+
+        // 記憶しておいた初期値を取得
+        const initialValue = initialValues[name];
+
+        // 対象のラジオボタンが存在する行（tr）を取得
+        const tr = document.querySelector(`input[name="${name}"]`).closest('tr');
+        if (!tr) return;
+
+        // 初期値と現在の値が違っていれば背景色を黄色にする
+        if (currentValue !== initialValue) {
+            tr.style.backgroundColor = '#fff9c4';
+        } else {
+            tr.style.backgroundColor = '';
+        }
+    }
+});
+
+// モーダル内のラジオボタン変更検知＆色変更ロジック
+(function() {
+
+    // 各初期値を保持する変数
+    let initialRadioValues = {};
+    let initialRoleName = '';
+
+    const roleModal = document.getElementById('roleModal');
+    const roleNameInput = document.getElementById('roleName');
+
+    if (roleModal) {
+        roleModal.addEventListener('shown.bs.modal', function() {
+            // ラジオボタンの初期化
+            initialRadioValues = {};
+            const radios = document.querySelectorAll('#screenPermissions input[type="radio"]');
+            radios.forEach(radio => {
+                if (radio.checked) {
+                    initialRadioValues[radio.name] = radio.value;
+                }
+                const tdList = radio.closest('tr').querySelectorAll('td');
+                tdList.forEach(td => td.style.removeProperty('background-color'));
+            });
+
+            // 権限名の初期化
+            if (roleNameInput) {
+                initialRoleName = roleNameInput.value;
+                // 枠線の色とシャドウを初期状態に戻す
+                roleNameInput.style.removeProperty('border-color');
+                roleNameInput.style.removeProperty('box-shadow');
+            }
+        });
+    }
+
+    // ラジオボタンの変更イベント
+    const screenPermissions = document.getElementById('screenPermissions');
+    if (screenPermissions) {
+        screenPermissions.addEventListener('change', function(event) {
+            if (event.target && event.target.type === 'radio') {
+                const clickedRadio = event.target;
+                const name = clickedRadio.name;
+                const currentValue = clickedRadio.value;
+                const initialValue = initialRadioValues[name];
+
+                const tr = clickedRadio.closest('tr');
+                const tdList = tr.querySelectorAll('td');
+
+                if (currentValue !== initialValue) {
+                    tdList.forEach(td => {
+                        td.style.setProperty('background-color', '#fff9c4', 'important');
+                    });
+                } else {
+                    tdList.forEach(td => {
+                        td.style.removeProperty('background-color');
+                    });
+                }
+            }
+        });
+    }
+
+    // 権限名の変更イベント
+    if (roleNameInput) {
+        roleNameInput.addEventListener('input', function() {
+            // エラー表示中はBootstrapの赤枠(is-invalid)を優先するため、判定から除外する
+            if (this.classList.contains('is-invalid')) {
+                this.style.removeProperty('border');
+                return;
+            }
+
+            if (this.value !== initialRoleName) {
+                // 黄色い枠を適用
+                this.style.setProperty('border', '3px solid #ffeb3b', 'important');
+            } else {
+                // 元に戻ったらスタイルを削除
+                this.style.removeProperty('border');
+            }
+        });
+    }
+})();
