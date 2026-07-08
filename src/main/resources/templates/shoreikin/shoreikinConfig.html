@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}">
 
 <head>
-<title>特別徴収事務交付金照会／登録／編集</title>
+	<title>特別徴収事務交付金照会／登録／編集</title>
 </head>
 
 <body>
 	<div layout:fragment="content">
 		<div class="container-fluid p-4">
-			<div
-				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+				th:data-is-edit="${configForm.editMode}">
+
 				<h5 class="mb-0 fw-bold text-dark">
 					特別徴収事務交付金 <span th:if="${configForm.viewMode}" class="text-muted">-
 						照会</span> <span th:if="${configForm.editMode}" class="text-muted">-
@@ -31,24 +31,20 @@
 			<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
 			<!-- 成功・エラーメッセージ -->
-			<div th:if="${successMessage}"
-				class="alert alert-success alert-dismissible fade show" role="alert">
+			<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 				<span th:text="${successMessage}"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
-			<div th:if="${errorMessage}"
-				class="alert alert-danger alert-dismissible fade show" role="alert">
+			<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 				<span th:text="${errorMessage}"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
 			<!-- 統合メインフォーム -->
-			<form
-				th:action="${configForm.createMode ? '/accommodation-tax/shoreikin/config/create' : ''}"
+			<form th:action="${configForm.createMode ? '/accommodation-tax/shoreikin/config/create' : ''}"
 				th:object="${configForm}" method="post">
-				<input type="hidden" th:field="*{shiteiNo}"> <input
-					type="hidden" th:field="*{mode}"> <input type="hidden"
-					th:field="*{version}">
+				<input type="hidden" th:field="*{shiteiNo}"> <input type="hidden" th:field="*{mode}"> <input
+					type="hidden" th:field="*{version}">
 
 				<!-- 交付金情報エリア -->
 				<div class="card mb-4">
@@ -57,82 +53,117 @@
 					</div>
 					<div class="card-body">
 						<div class="row g-3">
+
+							<!-- 交付金年度 -->
 							<div class="col-md-3">
-								<label for="nendo" class="form-label">交付金年度 <span
-									class="text-danger">*</span></label> <input type="text"
-									class="form-control" id="nendo" th:field="*{nendo}"
-									th:readonly="${configForm.viewMode or configForm.editMode}"
-									maxlength="4"
+
+								<label for="nendo" class="form-label">交付金年度
+									<span class="text-danger">*</span>
+								</label>
+
+								<input type="text" class="form-control" id="nendo" th:field="*{nendo}"
+									th:readonly="${configForm.viewMode or configForm.editMode}" maxlength="4"
 									th:classappend="${#fields.hasErrors('nendo')} ? 'is-invalid' : ''"
-									pattern="[0-9]{4}" title="4桁の数字で入力してください" required>
-								<div th:if="${#fields.hasErrors('nendo')}"
-									class="invalid-feedback">
+									pattern="[0-9]{4}" title="4桁の数字で入力してください" required th:data-initial-value="*{nendo}">
+
+								<div th:if="${#fields.hasErrors('nendo')}" class="invalid-feedback">
 									<span th:errors="*{nendo}"></span>
 								</div>
+
 							</div>
+
+							<!-- 納入税額 -->
 							<div class="col-md-3">
-								<label for="kofuZeigaku" class="form-label">納入税額 <span
-									class="text-danger">*</span></label>
+
+								<label for="kofuZeigaku" class="form-label">納入税額
+									<span class="text-danger">*</span>
+								</label>
+
 								<div class="input-group">
-									<input type="number" class="form-control text-end"
-										id="kofuZeigaku" th:field="*{kofuZeigaku}"
-										th:readonly="${configForm.viewMode}"
+
+									<input type="number" class="form-control text-end" id="kofuZeigaku"
+										th:field="*{kofuZeigaku}" th:readonly="${configForm.viewMode}"
 										th:classappend="${#fields.hasErrors('kofuZeigaku')} ? 'is-invalid' : ''"
-										step="1" min="0" max="99999999999999" required> <span
-										class="input-group-text">円</span>
+										step="1" min="0" max="99999999999999" required
+										th:data-initial-value="*{kofuZeigaku}">
+
+									<span class="input-group-text">円</span>
 								</div>
-								<div th:if="${#fields.hasErrors('kofuZeigaku')}"
-									class="invalid-feedback">
+
+								<div th:if="${#fields.hasErrors('kofuZeigaku')}" class="invalid-feedback">
 									<span th:errors="*{kofuZeigaku}"></span>
 								</div>
+
 							</div>
+
+							<!-- 交付率 -->
 							<div class="col-md-3">
-								<label for="kofuRitsu" class="form-label">交付率 <span
-									class="text-danger">*</span></label>
+
+								<label for="kofuRitsu" class="form-label">
+									交付率 <span class="text-danger">*</span>
+								</label>
+
 								<div class="input-group">
-									<input type="number" class="form-control text-end"
-										id="kofuRitsu" th:field="*{kofuRitsu}"
-										th:readonly="${configForm.viewMode}"
+
+									<input type="number" class="form-control text-end" id="kofuRitsu"
+										th:field="*{kofuRitsu}" th:readonly="${configForm.viewMode}"
 										th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
-										step="0.01" min="0" max="99999.99" required> <span
-										class="input-group-text">%</span>
+										step="0.01" min="0" max="99999.99" required
+										th:data-initial-value="*{kofuRitsu}">
+
+									<span class="input-group-text">%</span>
+
 								</div>
-								<div th:if="${#fields.hasErrors('kofuRitsu')}"
-									class="invalid-feedback">
+
+								<div th:if="${#fields.hasErrors('kofuRitsu')}" class="invalid-feedback">
 									<span th:errors="*{kofuRitsu}"></span>
 								</div>
+
 							</div>
+
+							<!-- 交付額 -->
 							<div class="col-md-3">
-								<label for="kofuGaku" class="form-label">交付額 <span
-									class="text-danger">*</span></label>
+
+								<label for="kofuGaku" class="form-label">
+									交付額 <span class="text-danger">*</span>
+								</label>
+
 								<div class="input-group">
-									<input type="number" class="form-control text-end"
-										id="kofuGaku" th:field="*{kofuGaku}"
-										th:readonly="${configForm.viewMode}"
-										th:classappend="${#fields.hasErrors('kofuGaku')} ? 'is-invalid' : ''"
-										step="1" min="0" max="9999999999999" required> <span
-										class="input-group-text">円</span>
+
+									<input type="number" class="form-control text-end" id="kofuGaku"
+										th:field="*{kofuGaku}" th:readonly="${configForm.viewMode}"
+										th:classappend="${#fields.hasErrors('kofuGaku')} ? 'is-invalid' : ''" step="1"
+										min="0" max="9999999999999" required th:data-initial-value="*{kofuGaku}">
+
+									<span class="input-group-text">円</span>
 								</div>
-								<div th:if="${#fields.hasErrors('kofuGaku')}"
-									class="invalid-feedback">
+
+								<div th:if="${#fields.hasErrors('kofuGaku')}" class="invalid-feedback">
 									<span th:errors="*{kofuGaku}"></span>
 								</div>
+
 							</div>
 						</div>
+
+						<!-- 交付年月日 -->
 						<div class="row g-3 mt-2">
+
 							<div class="col-md-3">
-								<label for="kofuYmd" class="form-label">交付年月日</label> <input
-									type="date" class="form-control" id="kofuYmd"
+
+								<label for="kofuYmd" class="form-label">交付年月日</label>
+
+								<input type="date" class="form-control" id="kofuYmd"
 									th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
-									name="kofuYmd" th:readonly="${configForm.viewMode}">
+									name="kofuYmd" th:readonly="${configForm.viewMode}"
+									th:data-initial-value="*{kofuYmd}">
 							</div>
+
 						</div>
 
 						<!-- 算出ボタン（編集・登録モードのみ） -->
 						<div th:if="${configForm.editable}" class="row mt-3">
 							<div class="col-12">
-								<button type="button" class="btn btn-info"
-									onclick="calculateShoreikin()">
+								<button type="button" class="btn btn-info" onclick="calculateShoreikin()">
 									<i class="bi bi-calculator"></i> 算出
 								</button>
 								<small class="text-muted ms-2">
@@ -147,70 +178,57 @@
 
 					<!-- 登録モード -->
 					<div th:if="${configForm.createMode}">
-						<button type="submit" class="btn btn-success"
-							onclick="return confirm('交付金情報を登録しますか？')">
+						<button type="submit" class="btn btn-success" onclick="return confirm('交付金情報を登録しますか？')">
 							<i class="bi bi-check-circle"></i> 登録する
 						</button>
 					</div>
 
 					<!-- 編集モード -->
 					<div th:if="${configForm.editMode}">
-						<button type="button" class="btn btn-success"
-							onclick="updateShoreikin()">
+						<button type="button" class="btn btn-success" onclick="updateShoreikin()">
 							<i class="bi bi-arrow-repeat"></i> 更新する
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
-						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
+					<a th:href="@{/shoreikin/list}" class="btn btn-secondary" th:if="${configForm.viewMode}"> <i
+							class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a th:href="@{/shoreikin/list}" class="btn btn-secondary"
-						th:unless="${configForm.viewMode}"
-						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
-						class="bi bi-arrow-left"></i> 戻る
+					</a> <a th:href="@{/shoreikin/list}" class="btn btn-secondary" th:unless="${configForm.viewMode}"
+						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i class="bi bi-arrow-left"></i> 戻る
 					</a>
 				</div>
 			</form>
 
 			<!-- 更新用フォーム（編集モード） -->
-			<form th:action="@{/shoreikin/config/update}"
-				th:if="${configForm.editMode}" th:object="${configForm}"
+			<form th:action="@{/shoreikin/config/update}" th:if="${configForm.editMode}" th:object="${configForm}"
 				method="post" id="updateForm" style="display: none;">
-				<input type="hidden" th:field="*{shiteiNo}"> <input
-					type="hidden" th:field="*{nendo}"> <input type="hidden"
-					th:field="*{kofuZeigaku}"> <input type="hidden"
-					th:field="*{kofuRitsu}"> <input type="hidden"
-					th:field="*{kofuGaku}"> <input type="hidden"
+				<input type="hidden" th:field="*{shiteiNo}"> <input type="hidden" th:field="*{nendo}"> <input
+					type="hidden" th:field="*{kofuZeigaku}"> <input type="hidden" th:field="*{kofuRitsu}"> <input
+					type="hidden" th:field="*{kofuGaku}"> <input type="hidden"
 					th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
 					name="kofuYmd"> <input type="hidden" th:field="*{version}">
 				<input type="hidden" th:field="*{mode}">
 			</form>
 
 			<!-- 編集モード切り替え用フォーム -->
-			<form th:action="@{/shoreikin/config/edit}" th:object="${configForm}"
-				method="post" id="editForm" style="display: none;">
-				<input type="hidden" th:field="*{shiteiNo}"> <input
-					type="hidden" th:field="*{nendo}"> <input type="hidden"
-					th:field="*{kofuZeigaku}"> <input type="hidden"
-					th:field="*{kofuRitsu}"> <input type="hidden"
-					th:field="*{kofuGaku}"> <input type="hidden"
+			<form th:action="@{/shoreikin/config/edit}" th:object="${configForm}" method="post" id="editForm"
+				style="display: none;">
+				<input type="hidden" th:field="*{shiteiNo}"> <input type="hidden" th:field="*{nendo}"> <input
+					type="hidden" th:field="*{kofuZeigaku}"> <input type="hidden" th:field="*{kofuRitsu}"> <input
+					type="hidden" th:field="*{kofuGaku}"> <input type="hidden"
 					th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
 					name="kofuYmd"> <input type="hidden" th:field="*{version}">
-				<input type="hidden" th:field="*{shisetsuName}"> <input
-					type="hidden" th:field="*{name}">
+				<input type="hidden" th:field="*{shisetsuName}"> <input type="hidden" th:field="*{name}">
 			</form>
 
 			<!-- 算出用フォーム -->
-			<form th:action="@{/shoreikin/config/calculate}"
-				th:object="${configForm}" method="post" id="calculateForm"
+			<form th:action="@{/shoreikin/config/calculate}" th:object="${configForm}" method="post" id="calculateForm"
 				style="display: none;">
-				<input type="hidden" th:field="*{shiteiNo}"> <input
-					type="hidden" th:field="*{nendo}"> <input type="hidden"
-					th:field="*{kofuRitsu}"> <input type="hidden"
+				<input type="hidden" th:field="*{shiteiNo}"> <input type="hidden" th:field="*{nendo}"> <input
+					type="hidden" th:field="*{kofuRitsu}"> <input type="hidden"
 					th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
 					name="kofuYmd"> <input type="hidden" th:field="*{version}">
-				<input type="hidden" th:field="*{mode}"> <input
-					type="hidden" th:field="*{shisetsuName}"> <input
+				<input type="hidden" th:field="*{mode}"> <input type="hidden" th:field="*{shisetsuName}"> <input
 					type="hidden" th:field="*{name}">
 			</form>
 
