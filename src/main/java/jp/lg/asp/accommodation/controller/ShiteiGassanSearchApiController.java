@@ -130,7 +130,8 @@ public class ShiteiGassanSearchApiController {
     }
 
     private List<ShiteiGassanSearchDto> searchByName(String name, String matchType) {
-        List<Atena> atenaList = atenaRepository.search(jichitaiCd, null, applyMatch(name, matchType), null, null, null, null, null, null);
+        String namePattern = applyMatchPattern(name, matchType);
+        List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", namePattern, "%", "%", "%", "%", "%", "%");
         return searchTokugimuByAtenaList(atenaList);
     }
 
@@ -143,12 +144,12 @@ public class ShiteiGassanSearchApiController {
     }
 
     private List<ShiteiGassanSearchDto> searchByKojinNo(String kojinNo) {
-        List<Atena> atenaList = atenaRepository.search(jichitaiCd, null, null, null, null, null, null, kojinNo, null);
+        List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", "%", "%", "%", "%", "%", kojinNo, "%");
         return searchTokugimuByAtenaList(atenaList);
     }
 
     private List<ShiteiGassanSearchDto> searchByHojinNo(String hojinNo) {
-        List<Atena> atenaList = atenaRepository.search(jichitaiCd, null, null, null, null, null, null, null, hojinNo);
+        List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", "%", "%", "%", "%", "%", "%", hojinNo);
         return searchTokugimuByAtenaList(atenaList);
     }
 
@@ -192,9 +193,15 @@ public class ShiteiGassanSearchApiController {
         return results;
     }
 
-    private String applyMatch(String value, String matchType) {
-        if (value == null) return null;
-        return value;
+    private String applyMatchPattern(String value, String matchType) {
+        if (value == null) return "%";
+        if ("exact".equals(matchType)) {
+            return value;
+        } else if ("prefix".equals(matchType)) {
+            return value + "%";
+        } else {
+            return "%" + value + "%";
+        }
     }
 
     private boolean matchesName(String target, String keyword, String matchType) {

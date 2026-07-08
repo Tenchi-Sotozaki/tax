@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
+
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
@@ -161,6 +164,19 @@ public class TokugimuController {
 		// 合算指定番号がある場合は追加
 		// model.addAttribute("gassanShiteiNo", form.getGassanShiteiNo()); // 合算関連フィールドが存在する場合
 		return REPORT_VIEW;
+	}
+
+	@GetMapping("/report/{id}/gassan")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
+	public String showGassanReport(@PathVariable("id") String id, HttpSession session,
+			Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
+			return "redirect:/tokugimu/report/" + id;
+		}
+		return "redirect:/reports/gassanNonyuTsuchi?shiteiNo=" + id;
 	}
 
 	// ========== 削除 ==========
