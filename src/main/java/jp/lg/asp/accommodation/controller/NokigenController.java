@@ -36,6 +36,10 @@ public class NokigenController {
 
 	private void addKiMonthLabels(Model model) {
 		jichitaiRepository.findById(jichitaiCd).ifPresent(j -> {
+			if (j.getNendoStMonth() == null || j.getNendoStMonth().trim().isEmpty()) {
+				model.addAttribute("warnMessage", "年度開始月が未設定です。");
+				return;
+			}
 			int st = Integer.parseInt(j.getNendoStMonth().trim());
 			java.util.List<String> labels = new java.util.ArrayList<>();
 			for (int i = 0; i < 12; i++) {
