@@ -166,7 +166,7 @@ public class NokigenController {
 			addKiMonthLabels(model);
 			return "admin/nokigenConfig";
 		}
-		return "redirect:/admin/nokigen/register";
+		return "redirect:/admin/nokigen/view/" + nokigen.getNendo();
 	}
 
 	/** yyyyMMdd → yyyy-MM-dd に変換してHTML date inputに対応 */
