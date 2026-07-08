@@ -95,31 +95,14 @@
 			</div>
 		</div>
 
+		<!-- 削除フォーム（隠し） -->
+		<form id="deleteNozeiShukiForm"
+			th:action="@{/admin/nozei-shuki/delete/{seq}(seq=${nozeiShuki.seq})}"
+			method="post" class="d-none"></form>
+
 		<!-- 削除確認モーダル -->
-		<div class="modal fade" id="deleteModal" tabindex="-1"
-			aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">削除確認</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-					</div>
-					<div class="modal-body">
-						<p>この納税周期を削除しますか？</p>
-						<p class="text-muted">削除した納税周期は復元できません。</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal">キャンセル</button>
-						<form
-							th:action="@{/admin/nozei-shuki/delete/{seq}(seq=${nozeiShuki.seq})}"
-							method="post" style="display: inline;">
-							<button type="submit" class="btn btn-danger">削除する</button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
+		<div
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', 'この納税周期を削除します。削除した納税周期は復元できません。よろしいですか？', 'deleteNozeiShukiForm', 'btn-danger', '削除する')}"></div>
 
 	</div>
 

@@ -360,33 +360,13 @@
 			</div>
 		</form>
 
+		<!-- 削除フォーム（隠し） -->
+		<form th:if="${isEdit}" id="deleteZeiritsuForm"
+			th:action="@{/admin/zeiritsu/delete/{seq}(seq=${seq})}" method="post" class="d-none"></form>
+
 		<!-- 削除確認モーダル -->
-		<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header bg-danger text-white">
-						<h5 class="modal-title" id="deleteConfirmModalLabel">
-							<i class="bi bi-exclamation-triangle me-2"></i>削除確認
-						</h5>
-						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body text-center">
-						<p class="fs-5 mb-3">この賦課方式設定を削除しますか？</p>
-						<p class="text-muted mb-0">削除したデータは復旧できません。</p>
-					</div>
-					<div class="modal-footer justify-content-center">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-							<i class="bi bi-x me-2"></i>キャンセル
-						</button>
-						<form th:if="${isEdit}" th:action="@{/admin/zeiritsu/delete/{seq}(seq=${seq})}" method="post" style="display: inline;">
-							<button type="submit" class="btn btn-danger">
-								<i class="bi bi-trash me-2"></i>削除する
-							</button>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
+		<div th:if="${isEdit}"
+			th:replace="~{layout/components :: confirmModal('deleteConfirmModal', '削除確認', 'この賦課方式設定を削除します。削除したデータは復旧できません。よろしいですか？', 'deleteZeiritsuForm', 'btn-danger', '削除する')}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
