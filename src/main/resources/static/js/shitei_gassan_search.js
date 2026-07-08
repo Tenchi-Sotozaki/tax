@@ -28,6 +28,15 @@ function initShiteiGassanSearchModal(onSelect) {
 // 自動初期化
 document.addEventListener('DOMContentLoaded', () => {
     initShiteiGassanSearchModal(null);
+
+    // showShiteiModalフラグがtrueの場合、モーダルを自動オープン
+    const container = document.querySelector('[data-show-shitei-modal]');
+    if (container && container.dataset.showShiteiModal === 'true') {
+        const modal = document.getElementById('shiteiGassanSearchModal');
+        if (modal) {
+            new bootstrap.Modal(modal).show();
+        }
+    }
 });
 
 async function executeShiteiGassanSearch() {
@@ -89,6 +98,13 @@ function renderShiteiGassanResults(data) {
 }
 
 async function selectShiteiGassan(d) {
+    // 合算指定番号がある場合はエラー（合算申告登録画面の場合）
+    const container = document.querySelector('[data-show-shitei-modal]');
+    if (container && d.gassanShiteiNo) {
+        alert('合算申告登録済みの特別徴収義務者です。\n特別徴収義務者を再度指定してください。');
+        return;
+    }
+
     // セッションに保存
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;

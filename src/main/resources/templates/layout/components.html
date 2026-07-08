@@ -146,11 +146,14 @@
 	<div th:fragment="selectedTokugimuInfo"
 		class="mt-2 mb-2 ps-3 d-flex align-items-center">
 		<span class="fw-semibold">指定番号：</span> <span
-			th:text="${selectedShiteiGassan?.gassanShiteiNo != null ? selectedShiteiGassan.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}"
-			class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-			th:text="${selectedShiteiGassan?.name}" class="me-4"></span> <span
-			class="fw-semibold">施設名称：</span> <span
-			th:text="${selectedShiteiGassan?.shisetsuName}" class="me-2"></span>
+			class="tokugimu-info-value me-4"
+			th:text="${selectedShiteiGassan?.gassanShiteiNo != null ? selectedShiteiGassan.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}"></span>
+		<span class="fw-semibold">氏名：</span> <span
+			class="tokugimu-info-value me-4"
+			th:text="${selectedShiteiGassan?.name}"></span>
+		<span class="fw-semibold">施設名称：</span> <span
+			class="tokugimu-info-value me-2"
+			th:text="${selectedShiteiGassan?.shisetsuName}"></span>
 		<button type="button" class="btn btn-outline-primary btn-sm"
 			data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal">
 			<i class="bi bi-search me-1"></i>特別徴収義務者指定

@@ -188,6 +188,18 @@
     white-space: nowrap;
 }
 
+/*
+  特別徴収義務者情報表示エリア：固定幅＋省略表示
+*/
+.tokugimu-info-value {
+    display: inline-block;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
 /* ==========================================
    バッジ
 ========================================== */

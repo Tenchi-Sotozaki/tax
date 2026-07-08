@@ -241,16 +241,14 @@
 				<div style="width: 120px;"></div>
 			</div>
 		</div>
-	</div>
+		<!-- 削除フォーム（隠し） -->
+		<form th:each="item : ${items.content}" th:id="'deleteForm-' + ${item.shiteiNo}"
+			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}" method="post" class="d-none"></form>
 
-	<!-- 削除フォーム（隠し） -->
-	<form th:each="item : ${items.content}" th:id="'deleteForm-' + ${item.shiteiNo}"
-		th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}" method="post" class="d-none"></form>
-
-	<!-- 削除確認モーダル -->
-	<div
-		th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
-	</div>
+		<!-- 削除確認モーダル -->
+		<div
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
+		</div>
 	</div>
 
 	<th:block layout:fragment="scripts">
