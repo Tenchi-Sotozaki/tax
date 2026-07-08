@@ -65,7 +65,7 @@
 						<tr>
 							<th></th>
 							<th>周期</th>
-							<th>納期限</th>
+							<th>申告期限</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -74,15 +74,9 @@
 						</tr>
 						<tr th:each="item : ${nozeiShukiList}">
 							<td><input type="checkbox" class="nozei-shuki-checkbox"
-								th:value="${item.seq}" onchange="updateButtons()"></td>
+								th:value="${item.seq}" onchange="exclusiveCheck(this)"></td>
 							<td th:text="${item.label}"></td>
-							<td
-								th:text="${item.shuki != null ? (item.shuki.intValue() == 1 ? '翌月末日' : 
-								(item.shuki.intValue() == 2 ? '6月,8月,10月,12月,翌年2月,翌年4月の各末日' : 
-								(item.shuki.intValue() == 3 ? '7月,10月,翌年1月,翌年4月の各末日' : 
-								(item.shuki.intValue() == 4 ? '8月,12月,翌年4月の各末日' : 
-								(item.shuki.intValue() == 6 ? '10月,翌年4月の各末日' : 
-								(item.shuki.intValue() == 12 ? '翌年5月末日' : '設定により決定'))))))  : ''}"></td>
+							<td th:text="${item.shinkokuKigen}"></td>
 						</tr>
 					</tbody>
 				</table>

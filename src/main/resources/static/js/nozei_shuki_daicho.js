@@ -3,9 +3,14 @@ document.addEventListener('DOMContentLoaded', () => searchNozeiShuki());
 function updateButtons() {
     const checked = document.querySelectorAll('.nozei-shuki-checkbox:checked');
     const editBtn = document.getElementById('editBtn');
+    editBtn.disabled = checked.length !== 1;
+}
 
-    const singleSelection = checked.length === 1;
-    editBtn.disabled = !singleSelection;
+function exclusiveCheck(current) {
+    document.querySelectorAll('.nozei-shuki-checkbox').forEach(cb => {
+        if (cb !== current) cb.checked = false;
+    });
+    updateButtons();
 }
 
 function searchNozeiShuki() {
@@ -41,38 +46,10 @@ function updateTable(data) {
 
     data.forEach(item => {
         const tr = document.createElement('tr');
-        
-        // 納期限の計算
-        let noki = '';
-        if (item.shuki) {
-            switch (item.shuki) {
-                case 1:
-                    noki = '翌月末日';
-                    break;
-				case 2:
-					noki = '6月,8月,10月,12月,翌年2月,翌年4月の各末日';
-					break;
-                case 3:
-                    noki = '7月,10月,翌年1月,翌年4月の各末日';
-                    break;
-                case 4:
-                    noki = '8月,12月,翌年4月の各末日';
-                    break;
-                case 6:
-                    noki = '10月,翌年4月の各末日';
-                    break;
-                case 12:
-                    noki = '翌年5月末日';
-                    break;
-                default:
-                    noki = '設定により決定';
-            }
-        }
-        
         tr.innerHTML = `
-            <td><input type="checkbox" class="nozei-shuki-checkbox" value="${item.seq}" onchange="updateButtons()"></td>
+            <td><input type="checkbox" class="nozei-shuki-checkbox" value="${item.seq}" onchange="exclusiveCheck(this)"></td>
             <td>${item.label}</td>
-            <td>${noki}</td>
+            <td>${item.shinkokuKigen || ''}</td>
         `;
         tbody.appendChild(tr);
     });
