@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -6,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -35,8 +35,7 @@ public class ShunoRenkeiController {
 	private final ScreenAccessChecker accessChecker;
 	private final ShunoRenkeiService shunoRenkeiService;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.SHUNO_RENKEI;
 
@@ -49,6 +48,7 @@ public class ShunoRenkeiController {
 			@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String name,
 			Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		accessChecker.checkAccess(SCREEN_ID);
 		LocalDate from = shinkokuFrom == null || shinkokuFrom.isEmpty() ? null
@@ -78,6 +78,7 @@ public class ShunoRenkeiController {
 			@RequestParam(required = false) String taishoMonth,
 			@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String name) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		accessChecker.checkAccess(SCREEN_ID);
 		LocalDate from = shinkokuFrom == null || shinkokuFrom.isEmpty() ? null
@@ -90,6 +91,7 @@ public class ShunoRenkeiController {
 	@PostMapping("/download")
 	@OpeLog(screenId = SCREEN_ID, operation = "ダウンロード")
 	public ResponseEntity<byte[]> downloadCsv(@RequestBody List<ShunoDto.Key> keys) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 
@@ -153,6 +155,7 @@ public class ShunoRenkeiController {
 	@PostMapping("/kakunin")
 	@OpeLog(screenId = SCREEN_ID, operation = "確認")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
 			accessChecker.checkAccess(SCREEN_ID);

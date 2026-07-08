@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,12 +43,12 @@ public class GassanServiceImpl implements GassanService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     @Override
     @Transactional(readOnly = true)
     public void reloadFacilityList(GassanForm form) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, form.getAtenaNo());
         Set<String> checkedSet = form.getShiteiNoList() != null ? Set.copyOf(form.getShiteiNoList()) : Set.of();
         form.setFacilityList(tokugimuList.stream()
@@ -59,6 +59,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional(readOnly = true)
     public GassanForm getByGassanShiteiNo(String gassanShiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         Gassan gassan = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
                 .stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("合算申告が見つかりません: " + gassanShiteiNo));
@@ -102,6 +103,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional(readOnly = true)
     public GassanForm buildFormByShiteiNo(String shiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
                 .stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("施設が見つかりません: " + shiteiNo));
@@ -126,6 +128,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional
     public void register(GassanForm form) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         try {
             // 既に合算指定済みの指定番号が含まれていないかチェック
             validateNotAlreadyAssigned(form.getShiteiNoList());
@@ -167,6 +170,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional
     public void updateByGassanShiteiNo(String gassanShiteiNo, GassanForm form) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         try {
             Gassan gassan = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
                     .stream().findFirst()
@@ -224,6 +228,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional
     public void deleteByGassanShiteiNo(String gassanShiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         gassanRepository.deleteLogicallyByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
         log.info("合算申告論理削除完了: gassanShiteiNo={}", gassanShiteiNo);
     }
@@ -231,6 +236,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional(readOnly = true)
     public GassanForm getLatestByShiteiNo(String shiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         if (gassanList.isEmpty()) {
             throw new RuntimeException("合算申告が見つかりません: shiteiNo=" + shiteiNo);
@@ -241,6 +247,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional(readOnly = true)
     public GassanForm getViewFormByShiteiNo(String shiteiNo, String gassanShiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         if (gassanList.isEmpty()) {
             throw new RuntimeException("合算申告が見つかりません: shiteiNo=" + shiteiNo);
@@ -251,6 +258,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional(readOnly = true)
     public List<GassanForm.FacilityItem> getFacilitiesByAtenaNo(BigDecimal atenaNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo);
         return tokugimuList.stream()
                 .map(t -> new GassanForm.FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false))
@@ -260,6 +268,7 @@ public class GassanServiceImpl implements GassanService {
     @Override
     @Transactional(readOnly = true)
     public void validateNotAlreadyAssigned(List<String> shiteiNoList) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         if (shiteiNoList == null || shiteiNoList.isEmpty()) {
             return;
         }
@@ -279,6 +288,7 @@ public class GassanServiceImpl implements GassanService {
     }
     
     private void validateNotAlreadyAssignedForUpdate(String currentGassanShiteiNo, List<String> shiteiNoList) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         if (shiteiNoList == null || shiteiNoList.isEmpty()) {
             return;
         }
@@ -342,6 +352,7 @@ public class GassanServiceImpl implements GassanService {
     }
 
     private String generateGassanShiteiNo() {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         String prefix = jichitaiRepository.findById(jichitaiCd)
                 .map(j -> j.getGassanStChar() != null ? j.getGassanStChar() : "900")
                 .orElse("900");
@@ -350,6 +361,7 @@ public class GassanServiceImpl implements GassanService {
     }
 
     private void saveGassanUchi(String gassanShiteiNo, BigDecimal rno, List<String> shiteiNoList) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         if (shiteiNoList == null || shiteiNoList.isEmpty()) return;
         for (String shiteiNo : shiteiNoList) {
             GassanUchi uchi = new GassanUchi();

@@ -5,9 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +16,12 @@ import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class AdminSeedRunner implements ApplicationRunner {
+public class AdminSeedService {
 
     private static final String[] ALL_SCREEN_IDS = {
         "ms00000001", "ms00000008", "mt00000001", "ms00000002", "ms00000005",
@@ -43,12 +42,13 @@ public class AdminSeedRunner implements ApplicationRunner {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
 
-    @Override
     @Transactional
-    public void run(ApplicationArguments args) {
+    public void seedIfNeeded(String jichitaiCd) {
+        if (jichitaiCd == null || jichitaiCd.isBlank()) {
+            return;
+        }
+
         UserId adminUserId = new UserId();
         adminUserId.setJichitaiCd(jichitaiCd);
         adminUserId.setId(ADMIN_ID);
@@ -56,6 +56,8 @@ public class AdminSeedRunner implements ApplicationRunner {
         if (alreadyExists) {
             return;
         }
+
+        log.info("自治体コード={} のAdminアカウントが未作成のため、新規作成します", jichitaiCd);
 
         RoleForm roleForm = new RoleForm();
         roleForm.setRoleId(null);
@@ -65,9 +67,6 @@ public class AdminSeedRunner implements ApplicationRunner {
 
         Long createdRoleId = roleRepository.findMaxRoleIdByJichitaiCd(jichitaiCd);
 
-        //          固定の初期パスワードではなく、誰も知らないランダムな値をハッシュ化して保存する
-        //         （初回アクセス時はログイン画面を経由せず直接パスワード設定画面へ誘導されるため、
-        //          この値自体が使われることはない）
         String placeholderPassword = UUID.randomUUID().toString();
 
         User admin = new User();

@@ -1,8 +1,8 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,8 +29,7 @@ public class ShiteiGassanConfigController {
 	private final JichitaiRepository jichitaiRepository;
 	private final ScreenAccessChecker accessChecker;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.SHITEI_GASSAN_CONFIG;
 	private static final String SCREEN_ID = ScreenManagement.SHITEI_GASSAN;
@@ -39,6 +38,7 @@ public class ShiteiGassanConfigController {
 	/** 設定メニューからの遷移：登録済みなら照会へ、未登録なら登録画面へ */
 	@GetMapping("/register")
 	public String register(Model model, RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
 		if (jichitai != null && (jichitai.getShiteiStChar() != null || jichitai.getGassanStChar() != null)) {
@@ -53,6 +53,7 @@ public class ShiteiGassanConfigController {
 	/** 照会メニューからの遷移 */
 	@GetMapping("/view")
 	public String view(Model model, RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
 		if (jichitai.getShiteiStChar() == null && jichitai.getGassanStChar() == null) {
@@ -68,6 +69,7 @@ public class ShiteiGassanConfigController {
 	/** 照会画面の編集ボタンから遷移 */
 	@GetMapping("/edit")
 	public String edit(Model model, RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
 		model.addAttribute("configDto", toDto(jichitai));
@@ -79,6 +81,7 @@ public class ShiteiGassanConfigController {
 	@PostMapping("/save")
 	public String save(@Valid @ModelAttribute("configDto") ShiteiGassanConfigDto dto,
 			BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		if (bindingResult.hasErrors()) {
 			boolean isNew = jichitaiRepository.findById(jichitaiCd)

@@ -1,9 +1,9 @@
 package jp.lg.asp.accommodation.service;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +24,7 @@ public class TaxManagerService {
 	private final TaxManagerRepository taxManagerRepository;
 	private final TokugimuRepository tokugimuRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	// ========== 規約に基づく定数定義 ==========
 	private static final String FLG_ON = "1";
@@ -55,6 +54,7 @@ public class TaxManagerService {
 	 */
 	@Transactional(readOnly = true)
 	public TaxManagerForm getByShiteiNo(String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		TaxManagerForm form = new TaxManagerForm();
 		form.setCollectorId(null);
 		form.setShiteiNo(shiteiNo);
@@ -100,6 +100,7 @@ public class TaxManagerService {
 	 */
 	@Transactional
 	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		log.info("納税管理人保存処理開始: shiteiNo={}, atenaNo={}", shiteiNo, form.getAtenaNo());
 		
 		// 選任免除が有効でない場合のみ特別徴収義務者との同一人物チェック
@@ -163,6 +164,7 @@ public class TaxManagerService {
 	 */
 	@Transactional
 	public void deleteByShiteiNo(String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		log.info("納税管理人削除処理開始: shiteiNo={}", shiteiNo);
 		
 		// 1. 最新の納税管理人情報を取得

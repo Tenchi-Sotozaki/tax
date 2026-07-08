@@ -1,11 +1,11 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +27,12 @@ public class ShoreikinBulkServiceImpl implements ShoreikinBulkService {
 	private final ShoreikinRepository shoreikinRepository;
 	private final FukaRepository fukaRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional
 	public ShoreikinBulkDto executeBulkSanshutsu(ShoreikinBulkDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		if (dto.getNendo() == null || dto.getNendo().isEmpty()) {
 			dto.setResultMessage("交付金年度が指定されていません");
 			return dto;
@@ -96,6 +96,7 @@ public class ShoreikinBulkServiceImpl implements ShoreikinBulkService {
 	 * 指定年度の賦課情報から交付金税額を算出
 	 */
 	private Long calculateKofuZeigaku(String shiteiNo, String nendo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 指定年度の賦課情報を取得（del_flg='0', new_flg='1'）
 		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(
 				jichitaiCd, shiteiNo, nendo, "0", "1");

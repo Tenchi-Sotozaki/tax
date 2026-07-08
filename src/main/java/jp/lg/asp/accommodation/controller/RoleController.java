@@ -1,11 +1,11 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,14 +33,14 @@ public class RoleController {
 	private final RoleService roleService;
 	private final ScreenAccessChecker accessChecker;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.ROLE_MANAGEMENT;
 
 	@GetMapping("/management")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String roleManagement(Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		try {
 			List<Role> roles = roleService.findAllRoles(jichitaiCd);
@@ -60,6 +60,7 @@ public class RoleController {
 	@ResponseBody
 	@OpeLog(screenId = SCREEN_ID, operation = "登録・更新")
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 	    if (form.getRoleId() != null && form.getRoleId() == 1L) {
@@ -86,6 +87,7 @@ public class RoleController {
 	@ResponseBody
 	@OpeLog(screenId = SCREEN_ID, operation = "権限詳細取得")
 	public Map<String, Object> getRoleDetail(@PathVariable Long roleId) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		Role role = roleService.findById(jichitaiCd, roleId);
 
@@ -114,6 +116,7 @@ public class RoleController {
 	@ResponseBody
 	@OpeLog(screenId = SCREEN_ID, operation = "権限付与ユーザー照会")
 	public Map<String, Object> getAssignedUsers(@PathVariable Long roleId) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		Role role = roleService.findById(jichitaiCd, roleId);
 		List<User> allUsers = roleService.findAllUsers(jichitaiCd);
@@ -135,6 +138,7 @@ public class RoleController {
 	@OpeLog(screenId = SCREEN_ID, operation = "権限付与ユーザー更新")
 	public Map<String, Object> updateAssignedUsers(@PathVariable Long roleId,
 			@RequestBody Map<String, List<String>> body) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		try {
@@ -151,6 +155,7 @@ public class RoleController {
 	@ResponseBody
 	@OpeLog(screenId = SCREEN_ID, operation = "削除")
 	public Map<String, Object> deleteRole(@PathVariable Long roleId) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		

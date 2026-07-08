@@ -1,9 +1,9 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.constant.FukaConstants;
@@ -33,8 +33,7 @@ public class FukaValidatorServiceImpl implements FukaValidatorService {
 	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository;
 	private final ZeiritsuTeigakuRepository zeiritsuTeigakuRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	/**
 	 * 不整合があれば true を返す。（既存互換）

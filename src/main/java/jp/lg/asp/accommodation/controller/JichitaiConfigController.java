@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,11 +25,11 @@ public class JichitaiConfigController {
 
 	private final JichitaiRepository jichitaiRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@GetMapping
 	public String index(Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 		JichitaiConfigDto form = new JichitaiConfigDto();
 		form.setNendoStMonth(jichitai.getNendoStMonth());
@@ -42,6 +42,7 @@ public class JichitaiConfigController {
 	public String save(@Valid @ModelAttribute("configForm") JichitaiConfigDto configForm,
 			BindingResult bindingResult, Model model,
 			RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		if (bindingResult.hasErrors()) {
 			Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 			model.addAttribute("jichitai", jichitai);

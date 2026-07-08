@@ -3,7 +3,6 @@ package jp.lg.asp.accommodation.config;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,9 +24,7 @@ public class DbUserDetailsService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
-
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	// layout.html の sec:authorize="hasRole('ADMIN')" と対応する管理系画面ID
 	private static final Set<String> ADMIN_SCREENS = Set.of(
@@ -44,6 +41,8 @@ public class DbUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+
 		UserId pk = new UserId();
 		pk.setJichitaiCd(jichitaiCd);
 		pk.setId(username);
@@ -56,10 +55,6 @@ public class DbUserDetailsService implements UserDetailsService {
 
 		String password = user.getPassword() != null ? user.getPassword().trim() : "";
 
-		/**
-		 * m_role_dtl に管理系画面（USER_MANAGEMENT / ROLE_MANAGEMENT / NOZEI_SHUKI）への
-		 *アクセス権（permission >= 1）が1件でもあれば ROLE_ADMIN、なければ ROLE_USER
-		**/
 		boolean isAdmin = user.getRoleId() != null && roleRepository
 				.findByIdWithDetails(jichitaiCd, user.getRoleId().longValue())
 				.map(role -> role.getRoleDetails() != null && role.getRoleDetails().stream()

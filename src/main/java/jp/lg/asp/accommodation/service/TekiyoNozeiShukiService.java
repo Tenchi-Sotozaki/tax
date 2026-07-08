@@ -1,8 +1,8 @@
 package jp.lg.asp.accommodation.service;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +24,13 @@ public class TekiyoNozeiShukiService {
     private final TokugimuRepository tokugimuRepository;
     private final NozeiShukiRepository nozeiShukiRepository;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     private static final String FLG_ON = "1";
     private static final String FLG_OFF = "0";
 
     public List<NozeiShukiDto> getNozeiShukiOptions() {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         return nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd)
                 .stream()
                 .map(n -> new NozeiShukiDto(n.getSeq(), n.getShuki()))
@@ -39,6 +39,7 @@ public class TekiyoNozeiShukiService {
 
     @Transactional(readOnly = true)
     public TekiyoNozeiShukiForm getByShiteiNo(String shiteiNo) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
         form.setShiteiNo(shiteiNo);
 
@@ -61,6 +62,7 @@ public class TekiyoNozeiShukiService {
 
     @Transactional
     public void save(String shiteiNo, TekiyoNozeiShukiForm form) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         Integer maxRno = tekiyoNozeiShukiRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         Integer newRno = maxRno + 1;
 

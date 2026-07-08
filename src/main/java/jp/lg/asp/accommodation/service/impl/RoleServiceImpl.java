@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.RoleDetail;
@@ -30,6 +31,7 @@ public class RoleServiceImpl implements RoleService {
 	private final RoleRepository roleRepository;
 	private final ScreenRepository screenRepository;
 	private final UserRepository userRepository;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	public List<Role> findAllRoles(String jichitaiCd) {
@@ -38,7 +40,7 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public List<Screen> findAllScreens() {
-		return screenRepository.findByJichitaiCdOrderByScreenId("01202");
+		return screenRepository.findByJichitaiCdOrderByScreenId(jichitaiContext.getJichitaiCd());
 	}
 
 	@Override

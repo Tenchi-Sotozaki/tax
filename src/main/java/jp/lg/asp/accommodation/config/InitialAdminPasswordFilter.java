@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,9 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class InitialAdminPasswordFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
-
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext; // ★変更: @Value フィールドを削除し、これを追加
 
     private static final String ADMIN_ID = "管理者";
     private static final String LOGIN_PATH = "/login";
@@ -41,10 +38,12 @@ public class InitialAdminPasswordFilter extends OncePerRequestFilter {
         boolean isLoginGet = "GET".equalsIgnoreCase(request.getMethod()) && LOGIN_PATH.equals(path);
 
         if (isLoginGet) {
+            String jichitaiCd = jichitaiContext.getJichitaiCd(); // ★変更: セッションから取得
+
             UserId pk = new UserId();
             pk.setJichitaiCd(jichitaiCd);
             pk.setId(ADMIN_ID);
-            boolean stillInitial = userRepository.findById(pk)
+            boolean stillInitial = jichitaiCd != null && userRepository.findById(pk)
                     .map(u -> "1".equals(u.getInitialPasswordFlg()))
                     .orElse(false);
             if (stillInitial) {

@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,8 +36,7 @@ public class AdminUserController {
 	private final PasswordEncoder passwordEncoder;
 	private final ScreenAccessChecker accessChecker;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.USER_MANAGEMENT;
 	private static final String LIST_VIEW = "admin/userDaicho";
@@ -46,6 +45,7 @@ public class AdminUserController {
 	@GetMapping("/user-search")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String list(@ModelAttribute UserSearchForm searchForm, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("items", userRepository.search(
 				jichitaiCd,
@@ -59,6 +59,7 @@ public class AdminUserController {
 	@GetMapping("/user-registration")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 	    accessChecker.checkWriteAccess(SCREEN_ID);
 	    model.addAttribute("userForm", new UserForm());
 	    model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
@@ -73,6 +74,7 @@ public class AdminUserController {
 	        BindingResult bindingResult,
 	        Model model,
 	        RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 	    accessChecker.checkWriteAccess(SCREEN_ID);
 	    if (!form.getPassword().equals(form.getPasswordConfirm())) {
 	        bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
@@ -103,6 +105,7 @@ public class AdminUserController {
 	@GetMapping("/user-edit/{id}")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String showEditForm(@PathVariable String id, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
@@ -129,6 +132,7 @@ public class AdminUserController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		User user = userRepository.findById(buildUserId(id))
@@ -174,6 +178,7 @@ public class AdminUserController {
 	}
 
 	private UserId buildUserId(String id) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		UserId pk = new UserId();
 		pk.setJichitaiCd(jichitaiCd);
 		pk.setId(id);
