@@ -30,5 +30,4 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 			@Param("nameKana") String nameKana,
 			@Param("busho") String busho);
 	
-	long countByJichitaiCd(String jichitaiCd);
 }

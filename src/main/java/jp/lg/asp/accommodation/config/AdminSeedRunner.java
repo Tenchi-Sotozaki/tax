@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.config;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -23,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminSeedRunner implements ApplicationRunner {
 
-    // 画面ID一覧（seed_admin_role.sql と同じ値）
     private static final String[] ALL_SCREEN_IDS = {
         "ms00000001", "ms00000008", "mt00000001", "ms00000002", "ms00000005",
         "ms00000004", "ms00000003", "ss00000002", "sc00000004", "ss00000005",
@@ -36,8 +36,7 @@ public class AdminSeedRunner implements ApplicationRunner {
         "ss00000008"
     };
 
-    private static final String ADMIN_ID = "admin";
-    private static final String INITIAL_PASSWORD = "ChangeMe0000"; // TODO: 運用ルール確定後に見直す
+    private static final String ADMIN_ID = "管理者";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -58,16 +57,19 @@ public class AdminSeedRunner implements ApplicationRunner {
             return;
         }
 
-        // 1. 全権限ロールを既存のRoleService.saveRole()経由で作成
         RoleForm roleForm = new RoleForm();
-        roleForm.setRoleId(null); // null = 新規作成。DBが空ならroleId=1が採番される
+        roleForm.setRoleId(null);
         roleForm.setName("管理者");
         roleForm.setScreenPermissions(buildFullPermissionMap());
         roleService.saveRole(roleForm, jichitaiCd, "SYSTEM");
 
         Long createdRoleId = roleRepository.findMaxRoleIdByJichitaiCd(jichitaiCd);
 
-        // 2. Adminユーザーを作成
+        //          固定の初期パスワードではなく、誰も知らないランダムな値をハッシュ化して保存する
+        //         （初回アクセス時はログイン画面を経由せず直接パスワード設定画面へ誘導されるため、
+        //          この値自体が使われることはない）
+        String placeholderPassword = UUID.randomUUID().toString();
+
         User admin = new User();
         admin.setJichitaiCd(jichitaiCd);
         admin.setId(ADMIN_ID);
@@ -75,7 +77,7 @@ public class AdminSeedRunner implements ApplicationRunner {
         admin.setNameKana("しすてむかんりしゃ");
         admin.setBusho("システム管理課");
         admin.setRoleId(BigDecimal.valueOf(createdRoleId));
-        admin.setPassword(passwordEncoder.encode(INITIAL_PASSWORD));
+        admin.setPassword(passwordEncoder.encode(placeholderPassword));
         admin.setInitialPasswordFlg("1");
         admin.setAddUser("SYSTEM");
         admin.setUpdUser("SYSTEM");
@@ -85,7 +87,7 @@ public class AdminSeedRunner implements ApplicationRunner {
     private Map<String, Integer> buildFullPermissionMap() {
         Map<String, Integer> permissions = new LinkedHashMap<>();
         for (String screenId : ALL_SCREEN_IDS) {
-            permissions.put(screenId, 2); // 2 = 更新権限
+            permissions.put(screenId, 2);
         }
         return permissions;
     }

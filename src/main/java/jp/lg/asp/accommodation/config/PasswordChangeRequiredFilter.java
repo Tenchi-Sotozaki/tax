@@ -17,23 +17,27 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class PasswordChangeRequiredFilter extends OncePerRequestFilter {
 
     // 強制リダイレクトの対象外にするパス（無限リダイレクト防止）
-	private static final Set<String> ALLOWED_PATHS = Set.of(
-		    "/admin/password-change", "/login", "/logout", "/error"
-		);
+    private static final Set<String> ALLOWED_PATHS = Set.of(
+            "/admin/password-change", "/login", "/logout", "/error"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                      FilterChain filterChain) throws ServletException, IOException {
 
+        String contextPath = request.getContextPath();
         String uri = request.getRequestURI();
-        boolean isStatic = uri.startsWith("/css/") || uri.startsWith("/js/")
-        	    || uri.startsWith("/images/") || uri.startsWith("/fonts/") || uri.startsWith("/webjars/");
+        // ↓コンテキストパスを取り除いた、アプリ内での相対パスに直す
+        String path = uri.startsWith(contextPath) ? uri.substring(contextPath.length()) : uri;
 
-        if (!isStatic && !ALLOWED_PATHS.contains(uri)) {
+        boolean isStatic = path.startsWith("/css/") || path.startsWith("/js/")
+                || path.startsWith("/images/") || path.startsWith("/fonts/") || path.startsWith("/webjars/");
+
+        if (!isStatic && !ALLOWED_PATHS.contains(path)) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.getPrincipal() instanceof AppUserDetails userDetails
                     && userDetails.isMustChangePassword()) {
-                response.sendRedirect(request.getContextPath() + "/admin/password-change");
+                response.sendRedirect(contextPath + "/admin/password-change");
                 return;
             }
         }

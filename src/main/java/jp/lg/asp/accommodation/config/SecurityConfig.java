@@ -15,16 +15,16 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http,
-	        PasswordChangeRequiredFilter passwordChangeRequiredFilter) throws Exception {
+			PasswordChangeRequiredFilter passwordChangeRequiredFilter,
+			InitialAdminPasswordFilter initialAdminPasswordFilter) throws Exception { // ★引数を追加
 		http
 				.authorizeHttpRequests(auth -> auth
 						// 静的リソースとログイン画面は誰でもアクセス可
 						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**",
 								"/login", "/error", "/*.html")
 						.permitAll()
-						// 初期セットアップ用: ユーザー登録画面は認証なしで許可
-						// ※コントローラ側で「初期セットアップ中以外は権限チェック」を必ず入れること
-						.requestMatchers("/admin/user-registration").permitAll()
+						// ★追加：初回パスワード設定画面は未認証でもアクセス可
+						.requestMatchers("/admin/password-change").permitAll()
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可
@@ -39,8 +39,10 @@ public class SecurityConfig {
 				.logout(logout -> logout
 						.logoutSuccessUrl("/login?logout")
 						.permitAll())
-        .addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class);
-return http.build();
+				// ★追加：ログイン前に、初期パスワードのままなら誘導するフィルター
+				.addFilterBefore(initialAdminPasswordFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class);
+		return http.build();
 	}
 
 	@Bean

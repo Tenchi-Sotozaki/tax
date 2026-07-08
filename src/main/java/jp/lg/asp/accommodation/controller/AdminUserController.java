@@ -1,7 +1,5 @@
 package jp.lg.asp.accommodation.controller;
 
-import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -44,7 +42,6 @@ public class AdminUserController {
 	private static final String SCREEN_ID = ScreenManagement.USER_MANAGEMENT;
 	private static final String LIST_VIEW = "admin/userDaicho";
 	private static final String FORM_VIEW = "admin/userConfig";
-	private static final BigDecimal ADMIN_ROLE_ID = BigDecimal.ONE;
 
 	@GetMapping("/user-search")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
@@ -62,61 +59,45 @@ public class AdminUserController {
 	@GetMapping("/user-registration")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
-
-		accessChecker.checkWriteAccess(SCREEN_ID);
-
-		model.addAttribute("userForm", new UserForm());
-		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
-		model.addAttribute("isEdit", false);
-		model.addAttribute("isInitialSetup", isInitialSetup()); // ★追加
-		return FORM_VIEW;
+	    accessChecker.checkWriteAccess(SCREEN_ID);
+	    model.addAttribute("userForm", new UserForm());
+	    model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+	    model.addAttribute("isEdit", false);
+	    return FORM_VIEW;
 	}
 
 	@PostMapping("/user-registration")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録")
 	public String register(
-			@Validated(UserForm.OnCreate.class) @ModelAttribute("userForm") UserForm form,
-			BindingResult bindingResult,
-			Model model,
-			RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
-		boolean initialSetup = isInitialSetup();
-
-		if (!form.getPassword().equals(form.getPasswordConfirm())) {
-			bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
-		}
-		if (bindingResult.hasErrors()) {
-			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
-			model.addAttribute("isEdit", false);
-			model.addAttribute("isInitialSetup", initialSetup); 
-			model.addAttribute("validationErrors", UserForm.validate(form, true).values());
-
-			return FORM_VIEW;
-		}
-
-		User user = userRepository.findById(buildUserId(form.getId()))
-				.orElse(new User());
-		boolean isNew = user.getId() == null;
-		if (isNew) {
-			user.setJichitaiCd(jichitaiCd);
-			user.setId(form.getId());
-		}
-		user.setPassword(passwordEncoder.encode(form.getPassword()));
-		user.setName(form.getName());
-		user.setNameKana(form.getNameKana());
-		user.setBusho(form.getBusho());
-		
-		if (initialSetup) {
-			user.setRoleId(ADMIN_ROLE_ID);
-			log.info("初期セットアップ: 管理者ロール（roleId={}）を付与: userId={}", ADMIN_ROLE_ID, form.getId());
-		} else {
-			user.setRoleId(form.getRoleId());
-		}
-
-		userRepository.save(user);
-
-		redirectAttributes.addFlashAttribute("successMessage", isNew ? "ユーザーを登録しました。" : "ユーザー情報を更新しました。");
-		return initialSetup ? "redirect:/login" : "redirect:/admin/user-search";
+	        @Validated(UserForm.OnCreate.class) @ModelAttribute("userForm") UserForm form,
+	        BindingResult bindingResult,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
+	    accessChecker.checkWriteAccess(SCREEN_ID);
+	    if (!form.getPassword().equals(form.getPasswordConfirm())) {
+	        bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
+	    }
+	    if (bindingResult.hasErrors()) {
+	        model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+	        model.addAttribute("isEdit", false);
+	        model.addAttribute("validationErrors", UserForm.validate(form, true).values());
+	        return FORM_VIEW;
+	    }
+	    User user = userRepository.findById(buildUserId(form.getId()))
+	            .orElse(new User());
+	    boolean isNew = user.getId() == null;
+	    if (isNew) {
+	        user.setJichitaiCd(jichitaiCd);
+	        user.setId(form.getId());
+	    }
+	    user.setPassword(passwordEncoder.encode(form.getPassword()));
+	    user.setName(form.getName());
+	    user.setNameKana(form.getNameKana());
+	    user.setBusho(form.getBusho());
+	    user.setRoleId(form.getRoleId());
+	    userRepository.save(user);
+	    redirectAttributes.addFlashAttribute("successMessage", isNew ? "ユーザーを登録しました。" : "ユーザー情報を更新しました。");
+	    return "redirect:/admin/user-search";
 	}
 
 	@GetMapping("/user-edit/{id}")
@@ -190,10 +171,6 @@ public class AdminUserController {
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
 		return "redirect:/admin/user-search";
-	}
-
-	private boolean isInitialSetup() {
-		return userRepository.countByJichitaiCd(jichitaiCd) == 0;
 	}
 
 	private UserId buildUserId(String id) {
