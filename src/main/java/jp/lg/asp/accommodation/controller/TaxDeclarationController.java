@@ -1,10 +1,5 @@
 package jp.lg.asp.accommodation.controller;
 
-import jp.lg.asp.accommodation.dto.TaxDeclarationForm;
-import jp.lg.asp.accommodation.service.DeclarationService;
-import jp.lg.asp.accommodation.service.ReportService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,88 +16,106 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.TaxDeclarationForm;
+import jp.lg.asp.accommodation.service.DeclarationService;
+import jp.lg.asp.accommodation.service.ReportService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/declaration")
-@SessionAttributes("taxDeclarationForm")   // フォームをセッションに保持してPDF出力時に再利用
+@SessionAttributes("taxDeclarationForm") // フォームをセッションに保持してPDF出力時に再利用
 public class TaxDeclarationController {
 
-    private final DeclarationService declarationService;
-    private final ReportService      reportService;
+	private final DeclarationService declarationService;
+	private final ReportService reportService;
+	private final ScreenAccessChecker accessChecker;
 
-    private static final String VIEW = "declaration/tax-declaration-registration";
+	private static final String SCREEN_ID = ScreenManagement.FUKA_CONFIG;
 
-    /** セッション初期化用（Spring MVC が @SessionAttributes で使用） */
-    @ModelAttribute("taxDeclarationForm")
-    public TaxDeclarationForm initForm() {
-        return new TaxDeclarationForm();
-    }
+	private static final String VIEW = "declaration/tax-declaration-registration";
 
-    // -------------------------------------------------------------------------
-    // GET: 登録画面表示
-    // -------------------------------------------------------------------------
+	/** セッション初期化用（Spring MVC が @SessionAttributes で使用） */
+	@ModelAttribute("taxDeclarationForm")
+	public TaxDeclarationForm initForm() {
+		return new TaxDeclarationForm();
+	}
 
-    @GetMapping("/register/{obligorId}")
-    public String showForm(@PathVariable String obligorId, Model model) {
-        model.addAttribute("taxDeclarationForm",
-                declarationService.buildInitialDeclarationForm(obligorId));
-        model.addAttribute("obligorName",
-                declarationService.getObligorName(obligorId));
-        return VIEW;
-    }
+	// -------------------------------------------------------------------------
+	// GET: 登録画面表示
+	// -------------------------------------------------------------------------
 
-    // -------------------------------------------------------------------------
-    // POST: 登録処理
-    // -------------------------------------------------------------------------
+	@GetMapping("/old-register/{obligorId}")
+	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
+	public String showForm(@PathVariable String obligorId, Model model) {
+		accessChecker.checkAccess(SCREEN_ID);
+		model.addAttribute("taxDeclarationForm",
+				declarationService.buildInitialDeclarationForm(obligorId));
+		model.addAttribute("obligorName",
+				declarationService.getObligorName(obligorId));
+		return VIEW;
+	}
 
-    @PostMapping("/register")
-    public String register(
-            @Validated @ModelAttribute("taxDeclarationForm") TaxDeclarationForm form,
-            BindingResult bindingResult,
-            Model model,
-            SessionStatus sessionStatus,
-            RedirectAttributes redirectAttributes) {
+	// -------------------------------------------------------------------------
+	// POST: 登録処理
+	// -------------------------------------------------------------------------
 
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("obligorName",
-                    declarationService.getObligorName(form.getObligorId()));
-            return VIEW;
-        }
+	@PostMapping("/register")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録")
+	public String register(
+			@Validated @ModelAttribute("taxDeclarationForm") TaxDeclarationForm form,
+			BindingResult bindingResult,
+			Model model,
+			SessionStatus sessionStatus,
+			RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
 
-        declarationService.registerDeclaration(form);
-        sessionStatus.setComplete();   // 登録完了後にセッションをクリア
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("obligorName",
+					declarationService.getObligorName(form.getObligorId()));
+			return VIEW;
+		}
 
-        redirectAttributes.addFlashAttribute("successMessage", "宿泊税情報を登録しました。");
-        return "redirect:/declaration/payment-ledger/" + form.getObligorId();
-    }
+		declarationService.registerDeclaration(form);
+		sessionStatus.setComplete(); // 登録完了後にセッションをクリア
 
-    // -------------------------------------------------------------------------
-    // GET: PDF出力（セッションのフォームデータを使用）
-    // -------------------------------------------------------------------------
+		redirectAttributes.addFlashAttribute("successMessage", "宿泊税情報を登録しました。");
+		return "redirect:/declaration/payment-ledger/" + form.getObligorId();
+	}
 
-    /**
-     * GET /declaration/pdf/{id}
-     * セッションに保持されている TaxDeclarationForm を使って PDF を生成する。
-     * フォームが未入力の場合は ID のみで生成（後方互換）。
-     */
-    @GetMapping("/pdf/{id}")
-    public ResponseEntity<byte[]> exportPdf(
-            @PathVariable String id,
-            @ModelAttribute("taxDeclarationForm") TaxDeclarationForm form) {
+	// -------------------------------------------------------------------------
+	// GET: PDF出力（セッションのフォームデータを使用）
+	// -------------------------------------------------------------------------
 
-        // フォームに obligorId がセットされていない場合は id を補完
-        if (form.getObligorId() == null) {
-            form.setObligorId(id);
-        }
+	/**
+	 * GET /declaration/pdf/{id}
+	 * セッションに保持されている TaxDeclarationForm を使って PDF を生成する。
+	 * フォームが未入力の場合は ID のみで生成（後方互換）。
+	 */
+	@GetMapping("/pdf/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	public ResponseEntity<byte[]> exportPdf(
+			@PathVariable String id,
+			@ModelAttribute("taxDeclarationForm") TaxDeclarationForm form) {
+		accessChecker.checkAccess(SCREEN_ID);
 
-        byte[] pdf = reportService.generateDeclarationPdf(form);
+		// フォームに obligorId がセットされていない場合は id を補完
+		if (form.getObligorId() == null) {
+			form.setObligorId(id);
+		}
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"tax-declaration-" + id + ".pdf\"");
-        headers.setContentLength(pdf.length);
+		byte[] pdf = reportService.generateDeclarationPdf(form);
 
-        return ResponseEntity.ok().headers(headers).body(pdf);
-    }
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"tax-declaration-" + id + ".pdf\"");
+		headers.setContentLength(pdf.length);
+
+		return ResponseEntity.ok().headers(headers).body(pdf);
+	}
 }

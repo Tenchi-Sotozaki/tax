@@ -1,0 +1,15 @@
+/* 画面固有の最小スタイル（既存スタイルに合わせる） */
+.table-container {
+    overflow-x: auto;
+}
+
+.registration-link {
+    text-decoration: none;
+}
+
+/* 小さなレスポンシブ調整 */
+@media (max-width: 768px) {
+    .table-container table th, .table-container table td {
+        font-size: 0.9rem;
+    }
+}

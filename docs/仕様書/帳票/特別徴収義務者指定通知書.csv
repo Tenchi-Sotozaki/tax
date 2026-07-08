@@ -1,0 +1,22 @@
+,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,作成者,斉藤,
+帳票項目一覧表,,帳票物理名,tokugimu_shitei_tsuchi,作成日,2026/5/27,
+,,帳票論理名,特別徴収義務者指定通知書,更新日,2026/6/1,
+,,,,,,
+No.,項目名,フィールド名,DBテーブル,DBカラム,型,備考
+1,発行日,hakkoYmd,ー,ー,String,画面入力値を設定
+2,市区町村名,cityName,ー,ー,String,application.ymlから取得
+3,条令,jorei,ー,ー,String,application.ymlから取得
+4,指定番号,shiteiNo,t_tokugimu,shitei_no,String,
+5,特別徴収義務者住所,tokuJusho,m_atena,"yubin_no
+jusho",String,郵便番号と住所を連結して設定
+6,特別徴収義務者名,tokuName,m_atena,name,String,
+7,施設所在地,shisetsuJusho,t_tokugimu,"shisetsu_yubin_no
+shisetsu_jusho",String,郵便番号と住所を連結して設定
+8,施設名称,shisetsuName,t_tokugimu,shisetsu_name,String,
+9,理由,riyu,ー,ー,String,画面入力値を設定
+10,市区町村,city,ー,ー,String,application.ymlから取得
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,

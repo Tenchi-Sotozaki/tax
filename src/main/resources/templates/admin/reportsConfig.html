@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+
+<head>
+<title>帳票設定</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="p-4">
+		<div class="container-fluid">
+
+			<h4 class="mb-4">
+				<i class="bi bi-file-earmark-ruled me-2 text-primary"></i>帳票設定
+			</h4>
+
+			<!-- メッセージ表示 -->
+			<div th:if="${successMessage}"
+				class="alert alert-success alert-dismissible fade show" role="alert">
+				<i class="bi bi-check-circle me-2"></i> <span
+					th:text="${successMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+
+			<div th:if="${errorMessage}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
+				<i class="bi bi-exclamation-triangle me-2"></i> <span
+					th:text="${errorMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+
+			<!-- ファイル選択エリア -->
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="mb-0">
+						<i class="bi bi-upload me-2"></i>帳票ファイル取り込み
+					</h5>
+				</div>
+				<div class="card-body">
+					<form th:action="@{/admin/reports-config/import}"
+						th:object="${reportsConfigForm}" method="post"
+						enctype="multipart/form-data">
+						<div class="row align-items-end">
+							<div class="col-md-8">
+								<label for="file" class="form-label">ファイル選択</label> <input
+									type="file" class="form-control" id="file" th:field="*{file}"
+									accept=".pdf,.doc,.docx,.xls,.xlsx">
+							</div>
+							<div class="col-md-4">
+								<button type="submit" class="btn btn-primary">
+									<i class="bi bi-upload me-2"></i>内容取込
+								</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<!-- 取込済みファイル一覧エリア -->
+			<div class="card">
+				<div class="card-header">
+					<h5 class="mb-0">
+						<i class="bi bi-list-ul me-2"></i>取込済みファイル一覧
+					</h5>
+				</div>
+				<div class="card-body">
+					<div th:if="${#lists.isEmpty(importHistory)}"
+						class="text-muted text-center py-4">
+						<i class="bi bi-inbox display-4 d-block mb-2"></i>
+						取り込み済みファイルはありません。
+					</div>
+
+					<div th:unless="${#lists.isEmpty(importHistory)}">
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead class="table-light">
+									<tr>
+										<th>ID</th>
+										<th>取込日時</th>
+										<th>取込者</th>
+										<th>区分</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="item : ${importHistory}">
+										<td th:text="${item.id}">-</td>
+										<td
+											th:text="${#temporals.format(item.addDt, 'yyyy/MM/dd HH:mm:ss')}">-</td>
+										<td th:text="${item.addUser}">-</td>
+										<td><span class="badge bg-info"
+											th:if="${item.kbn == '1'}">テキスト</span> <span
+											class="badge bg-secondary" th:if="${item.kbn == '2'}">バイナリ</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

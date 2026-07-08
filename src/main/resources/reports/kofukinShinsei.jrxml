@@ -1,0 +1,481 @@
+<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
+<jasperReport name="kofukinShinsei" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fcd438b2-3bc6-4419-aa52-55f415d174fa">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<query language="sql"><![CDATA[]]></query>
+	<field name="jorei" class="java.lang.String"/>
+	<field name="cityName" class="java.lang.String"/>
+	<field name="shisetsuJusho" class="java.lang.String"/>
+	<field name="shisetsuName" class="java.lang.String"/>
+	<field name="hakkoYoshiki" class="java.lang.String"/>
+	<field name="shiteiNo" class="java.lang.String"/>
+	<field name="nonyugaku" class="java.lang.String"/>
+	<field name="kofugaku" class="java.lang.String"/>
+	<field name="kofuJoken" class="java.lang.String"/>
+	<field name="tokuName" class="java.lang.String"/>
+	<background splitType="Stretch"/>
+	<detail>
+		<band height="777" splitType="Stretch">
+			<element kind="textField" uuid="0bd6acf3-f22c-4520-89ce-9f3779a2456f" x="0" y="10" width="160" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{hakkoYoshiki}]]></expression>
+			</element>
+			<element kind="textField" uuid="f1686201-090a-4379-b372-5afd66d817ee" x="80" y="40" width="410" height="20" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{cityName}+"宿泊税特別徴収義務者徴収奨励金交付申請書兼請求書"]]></expression>
+			</element>
+			<element kind="textField" uuid="d1ebd090-fb01-4c63-b1a4-237b4a992932" x="40" y="70" width="180" height="20" fontName="IPAex明朝" hTextAlign="Left" vTextAlign="Middle">
+				<paragraph leftIndent="5"/>
+				<expression><![CDATA[$F{cityName}+"長 様"]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="50feef36-a605-413a-ac93-533a289fd9b2" x="50" y="170" width="440" height="20" fontName="IPAex明朝" vTextAlign="Middle">
+				<paragraph leftIndent="5"/>
+				<expression><![CDATA[$F{jorei}+"の規定により、奨励金の交付を申請します。"]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+			</element>
+			<element kind="staticText" uuid="26fc4ddb-f9c1-45ad-8ec2-b1c8cc5815ef" x="220" y="70" width="300" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph rightIndent="10"/>
+				<text><![CDATA[年　　　月　　　日　]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="9a411ab4-a7b9-40ee-a6a0-3c3325a1d27a" x="220" y="90" width="300" height="35" fontName="IPAex明朝" hTextAlign="Left" vTextAlign="Middle">
+				<paragraph leftIndent="5"/>
+				<text><![CDATA[申請者の氏名(法人にあっては、名称及び代表者名)
+
+　　　　　　　　　　　　　　　　　　　　　　　　　㊞
+]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="397e1cc8-efd8-495f-9539-eed8a9997c7c" x="220" y="125" width="300" height="15" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[電話　　　　　　　ー　　　　　　]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="401741be-2580-4f1d-842b-dd658e372f77" x="40" y="90" width="180" height="25" markup="none" fontName="IPAex明朝" vTextAlign="Middle">
+				<paragraph leftIndent="5"/>
+				<text><![CDATA[申請者の住所(法人にあっては、主たる事務所の所在地)]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="6c7b1762-4672-40d8-b514-1532769b9eea" x="220" y="140" width="60" height="25" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[個人番号又
+は法人番号]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="c4e7d883-3678-4ad0-9418-a26f9d717e26" x="40" y="115" width="180" height="50" fontName="IPAex明朝">
+				<text><![CDATA[]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="8ead1fa8-349a-4e7a-bcb8-a03d86a42bff" x="40" y="210" width="100" height="15" fontName="IPAex明朝" bold="false" vTextAlign="Middle">
+				<text><![CDATA[1.　対象施設]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="staticText" uuid="4d3e14fd-ceb1-4fdb-8201-cc1634c4d104" x="40" y="225" width="100" height="90" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[対象施設]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="0fce2fd5-6e0f-4d75-86b8-5ff20684fb11" x="140" y="225" width="100" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[住　　　　　所]]></text>
+				<box>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="8107517f-2cb0-47cf-9c64-558afa37e834" x="140" y="255" width="100" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[名　　　　　称]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="dcf8b1b8-d689-499d-bdca-c5c9b798f5bf" x="140" y="285" width="100" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[指　定　番　号]]></text>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="8719f37c-bd3d-4e07-b7d1-9cebe8db2542" x="240" y="225" width="280" height="30" fontName="IPAex明朝" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{shisetsuJusho}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="c48caa64-b727-42c3-9b44-cd239eb1b671" x="240" y="255" width="280" height="30" fontName="IPAex明朝" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{shisetsuName}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="d1c93b9e-8865-4b9c-9727-00912ec92034" x="240" y="285" width="280" height="30" fontName="IPAex明朝" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{shiteiNo}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="9a8a4cb0-cb6a-4c50-822b-e5faf40e136c" x="40" y="350" width="100" height="15" fontName="IPAex明朝" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[2.　申請内容]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="staticText" uuid="5cee7f92-8d04-47d2-92dc-0627899f2497" x="40" y="365" width="160" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[申告納入金額]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="d53512dd-9fea-4248-af01-3f9c0420d727" x="40" y="395" width="160" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[交付申請額
+(申告納入金額×交付率)]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="64a3b1d1-8524-466a-8c4c-b96c0fe583d4" x="200" y="365" width="300" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{nonyugaku}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="3d05c7d3-7020-48e5-9e1d-c22469f14dfb" x="200" y="395" width="300" height="30" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{kofugaku}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="f8d5a07d-0174-49ad-9a5a-dfb7acd1bd31" x="50" y="440" width="460" height="100" fontName="IPAex明朝">
+				<paragraph firstLineIndent="0" leftIndent="5" spacingBefore="5"/>
+				<expression><![CDATA[$F{kofuJoken}]]></expression>
+				<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.spacingBefore" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+			</element>
+			<element kind="staticText" uuid="a24fc8e1-6247-4d61-bcff-7621fd57a0d3" x="40" y="560" width="250" height="15" fontName="IPAex明朝" vTextAlign="Middle">
+				<text><![CDATA[3.　請求内容(次の口座への振り込みを依頼します。)]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="staticText" uuid="1e8d50d0-e97a-4900-a214-a468a55bfbad" x="40" y="580" width="80" height="90" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[振込口座]]></text>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="651a3b69-618f-4fa0-b664-0187a9cf8926" x="120" y="580" width="80" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[金融機関名]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="57ea1460-2876-498b-bf1e-4498a2f75d26" x="120" y="610" width="80" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[フリガナ]]></text>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="84f62266-7175-4701-9616-80e6f9da4be0" x="120" y="640" width="80" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[口座名義人]]></text>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="282d1bf5-3155-4fb3-afc6-3bdb49c68a57" x="200" y="580" width="160" height="30" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph rightIndent="5"/>
+				<text><![CDATA[銀行・信用金庫
+信用組合・農協]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="62dd555f-1665-4e8f-a507-a3c3520e80fb" x="360" y="580" width="160" height="30" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph rightIndent="5"/>
+				<text><![CDATA[本店・支店
+出張所　　]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="804841e8-cf1b-4b84-aa0e-c7e6e01897ee" x="360" y="610" width="55" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[預金種目]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="bfaab791-f05e-410a-8a6e-384b9b399888" x="360" y="640" width="55" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[口座番号]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="a8fb73c5-bc17-48d5-b95e-fa1014b7b741" x="415" y="610" width="105" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[普通・当座]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="02491acb-5a25-4584-a6a8-18c7dd928841" x="50" y="680" width="460" height="30" fontName="IPAex明朝" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[※原則、振込口座の口座名義人は、特別徴収義務者のものに限ります。ただし、日本国内に口座をお持ちでない場合、指定した納税管理人名義でも構いません。]]></text>
+			</element>
+			<element kind="rectangle" uuid="00fa4662-f6c2-4d35-bfc8-634873beb97a" x="280" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="4eb5c66c-fc6d-4dcc-8c55-0913d8a6dac4" x="300" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="becbd64e-c27a-41be-9153-5998e169c214" x="320" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="f86265b5-8d38-426e-a6dc-54294673ed7a" x="340" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="6a521af2-3e2c-43e7-ba51-353d980895cf" x="380" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="25a100f9-f242-4d58-b918-e962dff77295" x="360" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="9157a1e3-cbf4-4b65-91c8-62b227a7e600" x="400" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="dd24de99-ac57-437a-a08a-be418b039619" x="420" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="fe002a04-30ff-4bff-9941-d4954eb029b5" x="440" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="161985f6-b7a7-43b0-820a-5d7790f5c330" x="460" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="dfa0bc03-ef6b-4efc-8052-e8c1844cda18" x="480" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="deb4589c-e0b0-45d6-837d-eddd5c980bab" x="500" y="140" width="20" height="25">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="2f8d55eb-57be-408b-a8bf-2868c006f9ec" x="200" y="610" width="160" height="30">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="9336ec32-69e9-483e-adce-9bc71665e7f3" x="200" y="640" width="160" height="30">
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="5fe82f98-2925-4800-847e-3b536eaaad91" x="415" y="640" width="15" height="30">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="3fc6461a-48ba-41ce-8112-07bec7f1d0c3" x="430" y="640" width="15" height="30">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="a02e0ae1-3b2a-4c25-9762-1f52194b641f" x="445" y="640" width="15" height="30">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="ba67f441-950e-43f4-a57a-692c8fcc3f27" x="460" y="640" width="15" height="30">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="9d1c04c1-53ad-4366-83c3-4e9495dfdabb" x="475" y="640" width="15" height="30">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="4aaa9216-9895-41a8-8a79-a3b9d97d5c7f" x="490" y="640" width="15" height="30">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				<property name="com.jaspersoft.studio.unit.y" value="px"/>
+			</element>
+			<element kind="rectangle" uuid="d091e51f-2ebb-465f-a270-1f3981ea2177" x="505" y="640" width="15" height="30">
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="staticText" uuid="73481dbb-4d77-4ae5-9958-bd50468df82e" x="500" y="365" width="20" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph rightIndent="5"/>
+				<text><![CDATA[円]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+			<element kind="staticText" uuid="5e1c2cca-f319-4808-9986-9de9c4133d5b" x="500" y="395" width="20" height="30" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph rightIndent="5"/>
+				<text><![CDATA[円]]></text>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid"/>
+				</box>
+			</element>
+		</band>
+	</detail>
+</jasperReport>

@@ -1,0 +1,100 @@
+package jp.lg.asp.accommodation.dto;
+
+import java.time.LocalDate;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import lombok.Data;
+
+/**
+ * 宿泊税情報登録/編集(照会)画面用 Formクラス
+ */
+@Data
+public class FukaDeclarationForm {
+
+	// ========== 制御用フィールド ==========
+	private boolean edit;
+	private boolean view;
+	private Long declarationId;
+	private String shiteiNo;
+	private String nendo;
+	private Integer kibetsu;
+	private Integer rno;
+	private String fukaKbn;
+
+	// ========== 変更区分 ==========
+	private String modificationCategory;
+	private String modificationReason;
+
+	// ========== 納税額情報エリア ==========
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@NotNull(message = "登録年月日は必須です")
+	private LocalDate torokuDate;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@NotNull(message = "申告年月日は必須です")
+	private LocalDate shinkokuDate;
+
+	private String obligorName;
+	private String facilityName;
+
+	// 賦課情報
+	@Valid
+	private FukaMonthlyDeclarationDto monthlyDetail = new FukaMonthlyDeclarationDto();
+
+	// ========== 加算金額入力エリア ==========
+	private String additionalCategory1;
+	private String additionalRate1;
+	private Long additionalAmount1;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate additionalDueDate1;
+	private String additionalCategory2;
+	private String additionalRate2;
+	private Long additionalAmount2;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate additionalDueDate2;
+	private String additionalCategory3;
+	private String additionalRate3;
+	private Long additionalAmount3;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate additionalDueDate3;
+
+	// 徴収原簿
+	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
+
+	// ========== バリデーション制御用フィールド ==========
+	private boolean taxCheckBypassed = false;
+	private Boolean showTaxWarningModal = false;
+
+	// ========== 相関チェック ==========
+
+	/**
+	 * 加算金額区分が選択されている場合、加算金額の入力を必須とする。
+	 */
+	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid1() {
+		if (additionalCategory1 == null || additionalCategory1.isEmpty()) {
+			return true;
+		}
+		return additionalAmount1 != null && additionalAmount1 > 0;
+	}
+
+	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid2() {
+		if (additionalCategory2 == null || additionalCategory2.isEmpty()) {
+			return true;
+		}
+		return additionalAmount2 != null && additionalAmount2 > 0;
+	}
+
+	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
+	public boolean isAdditionalAmountValid3() {
+		if (additionalCategory3 == null || additionalCategory3.isEmpty()) {
+			return true;
+		}
+		return additionalAmount3 != null && additionalAmount3 > 0;
+	}
+}

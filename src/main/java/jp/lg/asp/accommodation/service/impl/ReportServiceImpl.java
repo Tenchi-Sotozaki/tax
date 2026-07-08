@@ -31,8 +31,7 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     public byte[] generateDeclarationPdf(TaxDeclarationForm form) {
-        log.info("PDF生成開始: obligorId={}, yearMonth={}",
-                form.getObligorId(), form.getTargetYearMonth());
+        log.info("PDF生成開始: obligorId={}", form.getObligorId());
         try {
             InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>交付金振込情報連携</title>
+<link rel="stylesheet" th:href="@{/css/kofukinFurikomi.css}">
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-bank me-2 text-primary"></i>交付金振込情報連携
+			</h5>
+			<span class="text-muted small"> 検索結果: <strong
+				th:text="${#lists.size(items)}">0</strong> 件
+			</span>
+		</div>
+
+		<!-- ========== 検索条件（アコーディオン） ========== -->
+		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
+			<div class="accordion-item border">
+				<h2 class="accordion-header">
+					<button class="accordion-button py-2 fw-semibold" type="button"
+						data-bs-toggle="collapse" data-bs-target="#searchPanel">
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
+					</button>
+				</h2>
+				<div id="searchPanel" class="accordion-collapse collapse show">
+					<div class="accordion-body pt-3 pb-2 px-3">
+						<form th:action="@{/kofukinFurikomi/list}"
+							th:object="${searchForm}" method="get">
+							<!-- SP:1列 / タブレット:2列 / PC:3列 -->
+							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
+								<div class="col">
+									<label for="nendo"
+										class="form-label form-label-sm fw-medium mb-1">対象年度</label> <input
+										type="date"
+										class="form-control form-control-sm year-only-input"
+										id="nendo" name="nendoDate"
+										th:value="*{nendo != null ? nendo + '-01-01' : ''}"
+										placeholder="年度を選択"> <input type="hidden" name="nendo"
+										id="nendoHidden" th:value="*{nendo}">
+								</div>
+								<div class="col">
+									<label for="shiteiNo"
+										class="form-label form-label-sm fw-medium mb-1">指定番号</label> <input
+										type="text" class="form-control form-control-sm" id="shiteiNo"
+										name="shiteiNo" th:value="*{shiteiNo}">
+								</div>
+								<div class="col">
+									<label for="name"
+										class="form-label form-label-sm fw-medium mb-1">氏名/名称</label>
+									<input type="text" class="form-control form-control-sm"
+										id="name" name="name" th:value="*{name}">
+								</div>
+							</div>
+							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+								<a th:href="@{/kofukinFurikomi/list}"
+									class="btn btn-outline-secondary btn-sm"> <i
+									class="bi bi-arrow-counterclockwise me-1"></i>リセット
+								</a>
+								<button type="submit" class="btn btn-primary btn-sm px4">
+									<i class="bi bi-search me-1"></i>検索する
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ボタンエリア -->
+		<div class="card shadow-sm mb-3">
+			<div class="card-body py-2 px-3">
+				<div class="d-flex flex-wrap align-items-center gap-1"
+					style="row-gap: 0.4rem;">
+					<div>
+						<button id="viewBtn" class="btn btn-outline-secondary btn-sm">
+							<i class="bi bi-eye me-1"></i>照会
+						</button>
+						<button id="csvBtn" class="btn btn-outline-primary btn-sm ms-2">
+							<i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV出力
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 一覧エリア -->
+		<div class="table-container">
+			<table
+				class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table"
+				id="kofukinTable">
+				<thead class="table-primary">
+					<tr>
+						<th style="width: 20px;" class="text-center"><input
+							type="checkbox" id="selectAll"></th>
+						<th style="width: 100px;">指定番号</th>
+						<th style="width: 100px;">宛名番号</th>
+						<th style="width: 200px;">氏名/名称</th>
+						<th style="width: 80px;">年度</th>
+						<th style="width: 100px;">交付年月日</th>
+						<th style="width: 120px;">納入税額</th>
+					</tr>
+				</thead>
+				<tbody>
+					<th:block th:if="${items != null and !items.empty}">
+						<tr th:each="item : ${items}">
+							<td class="text-center"><input type="checkbox"
+								name="selectedIds" th:value="${item.shiteiNo}"
+								th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo}" />
+							</td>
+							<td th:text="${item.shiteiNo}">指定番号</td>
+							<td th:text="${item.atenaNo}">宛名番号</td>
+							<td th:text="${item.name}">氏名/名称</td>
+							<td th:text="${item.nendo}">年度</td>
+							<td
+								th:text="${item.kofuYmd != null ? #temporals.format(item.kofuYmd, 'yyyy-MM-dd') : ''}">交付年月日</td>
+							<td class="text-end"
+								th:text="${item.kofuZeigaku != null ? #numbers.formatInteger(item.kofuZeigaku, 3, 'COMMA') : ''}">納入税額</td>
+						</tr>
+					</th:block>
+					<th:block th:if="${items == null or items.empty}">
+						<tr>
+							<td colspan="14" class="text-center py-4 text-muted">該当データがありません</td>
+						</tr>
+					</th:block>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- ページネーション -->
+		<div class="card-footer bg-white py-2 border-top">
+			<nav>
+				<ul class="pagination pagination-sm justify-content-center mb-0">
+					<li class="page-item disabled"><a class="page-link" href="#">前へ</a></li>
+					<li class="page-item active"><a class="page-link" href="#">1</a></li>
+					<li class="page-item"><a class="page-link" href="#">次へ</a></li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/kofukin_furikomi.js}"></script>
+	</th:block>
+</body>
+</html>

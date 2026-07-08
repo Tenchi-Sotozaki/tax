@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+	<title>納入書発行</title>
+	<link th:href="@{/css/nonyusho.css}" rel="stylesheet">
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div
+						class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+						<h5 class="mb-0 fw-bold text-dark">
+							<i class="bi bi-file-earmark-ruled text-primary me-2"></i>納入書発行
+						</h5>
+					</div>
+
+					<form id="nonyushoForm" method="post">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						<input type="hidden" id="tokuYubinNo" th:value="${tokuYubinNo}" />
+
+						<!-- 特別徴収義務者情報エリア -->
+						<div class="card mb-4">
+							<div class="card-header">
+								<h5 class="mb-0">特別徴収義務者情報</h5>
+							</div>
+							<div class="card-body">
+								<div class="row g-3">
+									<div class="col-md-6">
+										<label class="form-label">指定番号</label> <input type="text" class="form-control"
+											id="shiteiNo" name="shiteiNo" th:value="${shiteiNo}" placeholder="例: SH-001"
+											readonly>
+									</div>
+									<div class="col-md-6">
+										<label class="form-label">特別徴収義務者名</label> <input type="text"
+											class="form-control" id="tokuName" name="tokuName" th:value="${tokuName}"
+											readonly>
+									</div>
+								</div>
+								<div class="row g-3 mt-2">
+									<div class="col-md-12">
+										<label class="form-label">特別徴収義務者住所</label> <input type="text"
+											class="form-control" id="tokuJusho" name="tokuJusho" th:value="${tokuJusho}"
+											readonly>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- 納入書情報エリア -->
+						<div class="card mb-4">
+							<div class="card-header">
+								<h5 class="mb-0">納入書情報</h5>
+							</div>
+							<div class="card-body">
+								<div class="row g-3">
+									<div class="col-md-4">
+										<label for="nendo" class="form-label">年度 <span
+												class="text-danger">*</span></label>
+										<div class="nendo-wrapper">
+											<input type="month" class="form-control nendo-input" id="nendo" name="nendo"
+												required>
+											<div class="nendo-display" id="nendoDisplay">年度を選択してください</div>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<label for="taishoYm" class="form-label">対象年月 <span
+												class="text-danger">*</span></label> <input type="month"
+											class="form-control" id="taishoYm" name="taishoYm" required>
+									</div>
+									<div class="col-md-4">
+										<label for="entai" class="form-label">延滞金</label>
+										<div class="input-group">
+											<input type="number" class="form-control" id="entai" name="entai" min="0"
+												step="1" placeholder="0"> <span class="input-group-text">円</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- アクションボタン -->
+						<div class="d-flex gap-2">
+							<button type="button" class="btn btn-primary" onclick="generatePdf()">
+								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
+							</button>
+							<button type="button" class="btn btn-info" onclick="previewReport()">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
+							<button type="button" class="btn btn-secondary" onclick="printReport()">
+								<i class="bi bi-printer me-1"></i> 印刷
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/nonyusho.js}"></script>
+	</th:block>
+</body>
+
+</html>

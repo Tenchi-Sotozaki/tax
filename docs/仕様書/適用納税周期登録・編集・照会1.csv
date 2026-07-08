@@ -1,0 +1,21 @@
+﻿,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,,作成者,亀井
+画面項目一覧表,,画面物理名,tekiyoNozeiShukiConfig,,作成日,2026/7/2
+,,画面論理名,適用納税周期登録/編集/照会,,更新日,
+,,,,,,
+No.,DBテーブル名,カラム名,画面項目名,更新条件,備考,
+1,t_nozei_shuki,jichitai_cd,ー,ー,編集不可,
+2,t_nozei_shuki,shitei_no,ー,ー,セッションに保持されている指定番号,
+3,t_nozei_shuki,rno,ー,ー,指定番号に紐づく最新の履歴番号,
+4,t_nozei_shuki,idx_rno,ー,ー,"納税周期情報内の履歴番号
+shitei_no,rno,idxが同一の場合+1される",
+5,t_nozei_shuki,seq,納税周期,ー,納税周期管理マスタの管理番号,
+6,t_nozei_shuki,tekiyo_st_ymd,適用開始年月日,ー,,
+7,t_nozei_shuki,tekiyo_ed_ymd,適用終了年月日,ー,,
+8,t_nozei_shuki,new_flg,ー,ー,"1が入っている場合に最新レコードであることを表す
+過去履歴には0が入る",
+9,t_nozei_shuki,del_flg,ー,ー,１が入っている場合に論理削除対象レコードであることを表す,
+10,t_nozei_shuki,add_dt,ー,ー,BaseEntity.javaで自動更新,
+11,t_nozei_shuki,add_user,ー,ー,BaseEntity.javaで自動更新,
+12,t_nozei_shuki,upd_dt,ー,ー,BaseEntity.javaで自動更新,
+13,t_nozei_shuki,upd_user,ー,ー,BaseEntity.javaで自動更新,
+14,t_nozei_shuki,version,ー,ー,BaseEntity.javaで自動更新,

@@ -1,0 +1,17 @@
+,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,,作成者,斉藤
+画面項目一覧表,,画面物理名,t_shoreikin_dtl,,作成日,2026/4/30
+,,画面論理名,特別徴収事務交付金照会／登録／編集,,更新日,2026/5/25
+,,,,,,
+No.,DBテーブル名,カラム名,画面項目名,更新条件,備考,
+1,t_shoreikin,jichitai_cd,ー,,自治体コード,
+2,t_shoreikin,shitei_no,指定番号,,,
+3,t_shoreikin,nendo,交付金年度,,,
+4,t_shoreikin,kofu_zeigaku,納入税額,,,
+5,t_shoreikin,kofu_ritsu,交付率,,,
+6,t_shoreikin,kofu_gaku,交付額,,,
+7,t_shoreikin,kofu_ymd,交付年月日,,,
+8,t_shoreikin,add_dt,ー,,システム日付,
+9,t_shoreikin,add_user,ー,,ログインユーザID,
+10,t_shoreikin,upd_dt,ー,,システム日付,
+11,t_shoreikin,upd_user,ー,,ログインユーザID,
+12,t_shoreikin,version,ー,,1を設定,

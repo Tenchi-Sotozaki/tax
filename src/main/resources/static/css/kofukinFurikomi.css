@@ -1,0 +1,191 @@
+/* 年のみ表示するためのスタイル */
+.year-only-input {
+    position: relative;
+    color: transparent;
+    text-shadow: 0 0 0 #495057;
+}
+
+.year-only-input::-webkit-datetime-edit-month-field,
+.year-only-input::-webkit-datetime-edit-day-field,
+.year-only-input::-webkit-datetime-edit-text {
+    visibility: hidden;
+    width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.year-only-input::-webkit-datetime-edit-year-field {
+    visibility: visible;
+    color: #495057;
+}
+
+.year-only-input::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 8px;
+    color: #6c757d;
+}
+
+/* Firefox用 */
+.year-only-input[type="date"]::-moz-focus-inner {
+    border: 0;
+}
+
+/* 年のみ表示のカスタムスタイル */
+.year-display {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.year-display::after {
+    content: attr(data-year);
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #495057;
+    pointer-events: none;
+    font-size: 0.875rem;
+}
+
+.year-display input[type="date"] {
+    color: transparent;
+}
+
+.year-display input[type="date"]:focus {
+    color: transparent;
+}
+
+/* 交付金振込情報連携画面のスタイル */
+
+.table-container {
+    max-height: 600px;
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+}
+
+.sticky-table {
+    position: relative;
+}
+
+.sticky-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--bs-light);
+    color: var(--bs-dark);
+    border-color: var(--bs-border-color);
+}
+
+.sticky-table tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+/* 金額表示の右寄せ */
+.text-end {
+    text-align: right !important;
+}
+
+/* バッジのスタイル調整 */
+.badge {
+    font-size: 0.75em;
+    padding: 0.25em 0.5em;
+}
+
+/* 検索フォームのスタイル */
+.form-label-sm {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.form-control-sm, .form-select-sm {
+    font-size: 0.875rem;
+}
+
+/* アコーディオンのスタイル */
+.accordion-button:not(.collapsed) {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: var(--bs-primary);
+}
+
+/* ボタンエリアのスタイル */
+.card-body {
+    background-color: #f8f9fa;
+}
+
+/* ページネーションのスタイル */
+.pagination-sm .page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .table-container {
+        font-size: 0.8rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .row.row-cols-1.row-cols-sm-2.row-cols-md-4 > .col {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* 振込状況別の色分け */
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-primary {
+    background-color: #0d6efd !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+/* テーブルの固定幅調整 */
+#kofukinTable th,
+#kofukinTable td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 氏名/名称列は少し広めに */
+#kofukinTable th:nth-child(4),
+#kofukinTable td:nth-child(4) {
+    min-width: 150px;
+    max-width: 200px;
+}
+
+/* 銀行名・支店名列 */
+#kofukinTable th:nth-child(12),
+#kofukinTable td:nth-child(12),
+#kofukinTable th:nth-child(13),
+#kofukinTable td:nth-child(13) {
+    min-width: 120px;
+    max-width: 150px;
+}
+
+/* 口座名義列 */
+#kofukinTable th:nth-child(16),
+#kofukinTable td:nth-child(16) {
+    min-width: 150px;
+    max-width: 200px;
+}

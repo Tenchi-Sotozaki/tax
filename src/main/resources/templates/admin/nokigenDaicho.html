@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>納入期限照会</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-calendar-check me-2 text-primary"></i> 納入期限照会
+			</h5>
+		</div>
+
+		<!-- メッセージ表示 -->
+		<div th:if="${successMessage}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- 一覧テーブル -->
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<table class="table table-hover">
+					<thead class="table-light">
+						<tr>
+							<th>年度</th>
+							<th>1期</th>
+							<th>2期</th>
+							<th>3期</th>
+							<th>4期</th>
+							<th>5期</th>
+							<th>6期</th>
+							<th>7期</th>
+							<th>8期</th>
+							<th>9期</th>
+							<th>10期</th>
+							<th>11期</th>
+							<th>12期</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${#lists.isEmpty(nokigenList)}">
+							<td colspan="14" class="text-center">登録された納入期限がありません</td>
+						</tr>
+						<tr th:each="item : ${nokigenList}">
+							<td th:text="${item.nendo}"></td>
+							<td th:text="${item.nokigen1st != null ? #temporals.format(item.nokigen1st, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen2nd != null ? #temporals.format(item.nokigen2nd, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen3rd != null ? #temporals.format(item.nokigen3rd, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen4th != null ? #temporals.format(item.nokigen4th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen5th != null ? #temporals.format(item.nokigen5th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen6th != null ? #temporals.format(item.nokigen6th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen7th != null ? #temporals.format(item.nokigen7th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen8th != null ? #temporals.format(item.nokigen8th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen9th != null ? #temporals.format(item.nokigen9th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen10th != null ? #temporals.format(item.nokigen10th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen11th != null ? #temporals.format(item.nokigen11th, 'yyyy/MM/dd') : ''}"></td>
+							<td th:text="${item.nokigen12th != null ? #temporals.format(item.nokigen12th, 'yyyy/MM/dd') : ''}"></td>
+							<td>
+								<a th:href="@{/admin/nokigen/view/{nendo}(nendo=${item.nendo})}"
+									class="btn btn-sm btn-outline-primary">
+									<i class="bi bi-eye me-1"></i>照会
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
