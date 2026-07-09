@@ -85,4 +85,19 @@ public class TekiyoNozeiShukiController {
 			return FORM_VIEW;
 		}
 	}
+
+	@GetMapping("/delete/{id}")
+	@OpeLog(screenId = SCREEN_ID, operation = "削除")
+	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
+
+		try {
+			tekiyoNozeiShukiService.delete(id);
+			redirectAttributes.addFlashAttribute("successMessage", "適用納税周期情報を削除しました。");
+		} catch (Exception e) {
+			log.warn("適用納税周期削除エラー: {}", e.getMessage());
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		}
+		return "redirect:/tokugimu/list";
+	}
 }

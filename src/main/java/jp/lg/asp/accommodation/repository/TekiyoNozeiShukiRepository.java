@@ -41,4 +41,10 @@ public interface TekiyoNozeiShukiRepository extends JpaRepository<TekiyoNozeiShu
     List<TekiyoNozeiShuki> findActiveByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
+
+    @Query("SELECT t FROM TekiyoNozeiShuki t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.rno < :rno AND t.delFlg = '0' ORDER BY t.rno DESC, t.idxRno DESC")
+    List<TekiyoNozeiShuki> findPreviousRecords(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo,
+            @Param("rno") Integer rno);
 }
