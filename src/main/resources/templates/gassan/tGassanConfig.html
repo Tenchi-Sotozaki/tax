@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>合算申告登録/編集/照会</title>
+	<title>合算申告登録/編雁E照企E/title>
 </head>
 
 <body>
@@ -11,23 +11,23 @@
 		th:with="formAction=${isEdit} ? '/gassan/edit/' + ${editId} : '/gassan/registration'"
 		th:data-is-edit="${isEdit}" th:data-show-shitei-modal="${showShiteiModal}">
 
-		<!-- ページヘッダー -->
+		<!-- ペ�Eジヘッダー -->
 		<div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-file-earmark-text me-2 text-primary"></i> <span
-					th:text="${isView} ? '合算申告 照会' : (${isEdit} ? '合算申告 編集' : '合算申告 新規登録')"></span>
+					th:text="${isView} ? '合算申呁E照企E : (${isEdit} ? '合算申呁E編雁E : '合算申呁E新規登録')"></span>
 			</h5>
 			<th:block th:if="${isView}">
 				<a th:href="@{/gassan/edit/{id}(id=${editId})}" class="btn btn-primary btn-sm"> <i
-						class="bi bi-pencil-square me-2"></i>編集する
+						class="bi bi-pencil-square me-2"></i>編雁E��めE
 				</a>
 			</th:block>
 		</div>
 
-		<!-- 特別徴収義務者情報 -->
+		<!-- 特別徴収義務老E��報 -->
 		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
-		<!-- エラーメッセージ -->
+		<!-- エラーメチE��ージ -->
 		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 			<i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -38,11 +38,11 @@
 				th:field="*{atenaNo}"> <input type="hidden" th:field="*{fromShiteiNo}"> <input th:if="${isEdit}"
 				type="hidden" th:field="*{gassanShiteiNo}">
 
-			<!-- バリデーションエラーサマリー -->
+			<!-- バリチE�Eションエラーサマリー -->
 			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 				class="alert alert-danger alert-dismissible fade show" role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
-					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力�E容に <span
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります、E
 				<ul class="mb-0 mt-1">
 					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 				</ul>
@@ -86,13 +86,13 @@
 								th:errors="*{shinkokuYmd}"></div>
 						</div>
 
-						<!-- 宛名情報（セッションから取得） -->
+						<!-- 宛名惁E���E�セチE��ョンから取得！E-->
 						<div class="col-md-6">
 							<label class="form-label fw-medium">宛名</label>
 							<input type="text" class="form-control bg-light" th:value="*{atenaName}" readonly>
 						</div>
 
-						<!-- 合算指定番号（編集・照会のみ） -->
+						<!-- 合算指定番号�E�編雁E�E照会�Eみ�E�E-->
 						<div th:if="${isEdit or isView}" class="col-md-4">
 							<label class="form-label fw-medium">合算指定番号</label>
 							<input type="text" class="form-control bg-light" th:value="*{gassanShiteiNo}" readonly
@@ -131,17 +131,17 @@
 				</div>
 			</div>
 
-			<!-- ===== 徴収義務者一覧エリア ===== -->
+			<!-- ===== 徴収義務老E��覧エリア ===== -->
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<h5 class="mb-0">
-						<i class="bi bi-building me-2"></i>徴収義務者一覧 <span th:if="!${isView}"
-							class="badge bg-danger ms-2 fs-6">必須（2件以上選択）</span>
+						<i class="bi bi-building me-2"></i>徴収義務老E��覧 <span th:if="!${isView}"
+							class="badge bg-danger ms-2 fs-6">忁E��！E件以上選択！E/span>
 					</h5>
 				</div>
 				<div class="card-body p-0">
 
-					<!-- バリデーションエラー -->
+					<!-- バリチE�Eションエラー -->
 					<div th:if="${#fields.hasErrors('shiteiNoList')}" class="alert alert-danger py-2 mx-3 mt-3 mb-3">
 						<i class="bi bi-exclamation-triangle-fill me-1"></i> <span th:errors="*{shiteiNoList}"></span>
 					</div>
@@ -151,29 +151,29 @@
 							<tr>
 								<th style="width: 60px" class="text-center"></th>
 								<th style="width: 80px" class="text-center">代表施設</th>
-								<th>徴収義務者名</th>
-								<th>施設名</th>
+								<th>徴収義務老E��</th>
+								<th>施設吁E/th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr th:each="facility, stat : *{facilityList}"
 								th:classappend="${facility.checked} ? 'table-primary' : ''">
 								<td class="text-center">
-									<!-- 登録・編集時：チェックボックス --> <input th:if="!${isView}" type="checkbox"
+									<!-- 登録・編雁E���E�チェチE��ボックス --> <input th:if="!${isView}" type="checkbox"
 										class="form-check-input facility-check" th:name="'shiteiNoList'"
 										th:value="${facility.shiteiNo}" th:checked="${facility.checked}"
 										th:disabled="${facility.disabled}">
-									<!-- 照会時：チェック済みアイコン -->
+									<!-- 照会時�E�チェチE��済みアイコン -->
 									<i th:if="${isView} and ${facility.checked}"
 										class="bi bi-check-circle-fill text-primary fs-5"></i> <i
 										th:if="${isView} and !${facility.checked}"
 										class="bi bi-circle text-muted fs-5"></i>
 								</td>
 								<td class="text-center">
-									<!-- 代表施設チェックボックス --> <input th:if="!${isView}" type="radio"
+									<!-- 代表施設チェチE��ボックス --> <input th:if="!${isView}" type="radio"
 										class="form-check-input daihyo-radio" name="daihyoShiteiNo"
 										th:value="${facility.shiteiNo}" th:checked="${facility.daihyo}"
-										th:disabled="${facility.disabled or !facility.checked}"> <!-- 照会時：代表施設アイコン -->
+										th:disabled="${facility.disabled or !facility.checked}"> <!-- 照会時�E�代表施設アイコン -->
 									<i th:if="${isView} and ${facility.daihyo}"
 										class="bi bi-check-circle-fill text-success fs-5"></i>
 								</td>
@@ -181,13 +181,13 @@
 								<td>
 									<span th:text="${facility.shisetsuName}"></span>
 									<span th:if="${facility.disabled}" class="badge bg-warning text-dark ms-2"
-										th:text="'合算指定済(' + ${facility.gassanShiteiNo} + ')'"></span>
+										th:text="'合算指定渁E' + ${facility.gassanShiteiNo} + ')'"></span>
 								</td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(GassanForm.facilityList)}">
 								<td colspan="4" class="text-center text-muted py-4"><i
 										class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-									対象施設が見つかりませんでした。</td>
+									対象施設が見つかりませんでした、E/td>
 							</tr>
 						</tbody>
 					</table>
@@ -204,27 +204,27 @@
 				</th:block>
 
 				<a th:href="@{/gassan/list}" class="btn btn-outline-secondary btn-lg px-4" th:if="${isView ?: false}">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻めE
 				</a> <a th:href="@{/gassan/list}" class="btn btn-outline-secondary btn-lg px-4"
-					th:unless="${isView ?: false}" onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
-						class="bi bi-arrow-left me-2"></i>一覧に戻る
+					th:unless="${isView ?: false}" onclick="return confirm('入力�E容は破棁E��れます。よろしぁE��すか�E�E)"> <i
+						class="bi bi-arrow-left me-2"></i>一覧に戻めE
 				</a>
 			</div>
 		</form>
 
 		<!-- 確認モーダル -->
 		<div th:if="!${isView}"
-			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}">
+			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確誁E : '登録確誁E, ${isEdit} ? 'こ�E冁E��で更新します。よろしぁE��すか�E�E : 'こ�E冁E��で登録します。よろしぁE��すか�E�E, 'gassanForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}">
 		</div>
 
-		<!-- 特別徴収義務者指定モーダル -->
+		<!-- 特別徴収義務老E��定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/shitei_gassan_search.js}"></script>
-		<script th:src="@{/js/t_gassan_config.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
+		<script th:src="@{/js/tGassanConfig.js}"></script>
 	</th:block>
 </body>
 

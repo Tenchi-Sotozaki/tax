@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title th:text="${fukaDeclarationForm.view ? 'å®¿æ³Šç¨Žç´å…¥æƒ…å ±ç…§ä¼š' : (fukaDeclarationForm.edit ? 'å®¿æ³Šç¨Žç´å…¥æƒ…å ±ç·¨é›†' : 'å®¿æ³Šç¨Žç´å…¥æƒ…å ±ç™»éŒ²')}">
-		å®¿æ³Šç¨Žç´å…¥æƒ…å ±</title>
+	<title th:text="${fukaDeclarationForm.view ? 'h”‘Å”[“üî•ñÆ‰ï' : (fukaDeclarationForm.edit ? 'h”‘Å”[“üî•ñ•ÒW' : 'h”‘Å”[“üî•ñ“o˜^')}">
+		h”‘Å”[“üî•ñ</title>
 </head>
 
 <body>
@@ -13,19 +13,19 @@
 		<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-file-earmark-text text-primary me-2"></i> <span
-					th:text="${fukaDeclarationForm.view ? 'å®¿æ³Šç¨Žç´å…¥æƒ…å ±ç…§ä¼š' : (fukaDeclarationForm.edit ? 'å®¿æ³Šç¨Žç´å…¥æƒ…å ±ç·¨é›†' : 'å®¿æ³Šç¨Žç´å…¥æƒ…å ±ç™»éŒ²')}"></span>
+					th:text="${fukaDeclarationForm.view ? 'h”‘Å”[“üî•ñÆ‰ï' : (fukaDeclarationForm.edit ? 'h”‘Å”[“üî•ñ•ÒW' : 'h”‘Å”[“üî•ñ“o˜^')}"></span>
 			</h5>
 
 			<a th:if="${fukaDeclarationForm.view}"
 				th:href="@{/declaration/edit/{shiteiNo}/{nendo}/{kibetsu}(shiteiNo=${fukaDeclarationForm.shiteiNo}, nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
-				class="btn btn-primary btn-sm"> <i class="bi bi-pencil-square me-2"></i>ç·¨é›†ã™ã‚‹
+				class="btn btn-primary btn-sm"> <i class="bi bi-pencil-square me-2"></i>•ÒW‚·‚é
 			</a>
 		</div>
 
-		<!-- ç‰¹åˆ¥å¾´åŽç¾©å‹™è€…æƒ…å ± -->
+		<!-- “Á•Ê’¥Žû‹`–±ŽÒî•ñ -->
 		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
-		<!-- æˆåŠŸãƒ»ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ -->
+		<!-- ¬Œ÷EƒGƒ‰[ƒƒbƒZ[ƒW -->
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -42,8 +42,8 @@
 
 			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 				class="alert alert-danger alert-dismissible fade show" role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i>å…¥åŠ›å†…å®¹ã« <span
-					th:text="${validationErrors.size()}"></span> ä»¶ã®ã‚¨ãƒ©ãƒ¼ãŒã‚ã‚Šã¾ã™ã€‚
+				<i class="bi bi-exclamation-triangle-fill me-2"></i>“ü—Í“à—e‚É <span
+					th:text="${validationErrors.size()}"></span> Œ‚ÌƒGƒ‰[‚ª‚ ‚è‚Ü‚·B
 				<ul class="mb-0 mt-1">
 					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 				</ul>
@@ -54,7 +54,7 @@
 				type="hidden" th:field="*{nendo}" /> <input type="hidden" th:field="*{kibetsu}" />
 			<input type="hidden" th:field="*{edit}" /> <input type="hidden" th:field="*{view}" /> <input type="hidden"
 				th:field="*{fukaKbn}" id="fukaKbnHidden" />
-			<!-- Listå†…ã®è¦ç´ ã‚’å‹•çš„ã«hiddenãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰åŒ– -->
+			<!-- List“à‚Ì—v‘f‚ð“®“I‚ÉhiddenƒtƒB[ƒ‹ƒh‰» -->
 			<th:block th:each="taxDetail, stat : *{monthlyDetail.taxDetails}">
 				<input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].label}" />
 				<input type="hidden" th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
@@ -66,15 +66,15 @@
 			<div class="card shadow-sm mb-4">
 				<div class="card-header bg-primary bg-opacity-10 py-2">
 					<h6 class="mb-0 fw-bold text-primary">
-						<i class="bi bi-calculator me-2"></i>ç´ç¨Žé¡æƒ…å ±
+						<i class="bi bi-calculator me-2"></i>”[ÅŠzî•ñ
 					</h6>
 				</div>
 				<div class="card-body">
 					<div class="row g-3 mb-3">
 
-						<!-- ç™»éŒ²å¹´æœˆæ—¥ -->
+						<!-- “o˜^”NŒŽ“ú -->
 						<div class="col-md-4">
-							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">ç™»éŒ²å¹´æœˆæ—¥
+							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">“o˜^”NŒŽ“ú
 								<span class="text-danger" th:if="${!fukaDeclarationForm.view}">*
 								</span>
 							</label> <input type="date" class="form-control form-control-sm" th:field="*{torokuDate}"
@@ -84,9 +84,9 @@
 								th:errors="*{torokuDate}"></div>
 						</div>
 
-						<!-- ç”³å‘Šå¹´æœˆæ—¥ -->
+						<!-- \”NŒŽ“ú -->
 						<div class="col-md-4">
-							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">ç”³å‘Šå¹´æœˆæ—¥
+							<label id="registrationDateLabel" class="form-label form-label-sm fw-medium mb-1">\”NŒŽ“ú
 								<span class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span>
 							</label> <input type="date" class="form-control form-control-sm" th:field="*{shinkokuDate}"
 								th:readonly="${fukaDeclarationForm.view}" th:errorclass="is-invalid"
@@ -100,42 +100,42 @@
 
 					<div class="row g-3 align-items-start mb-3">
 
-						<!-- ç´å…¥å¹´æœˆ -->
+						<!-- ”[“ü”NŒŽ -->
 						<div class="col-md-3">
-							<label class="form-label fw-medium mb-1 bg-light">ç´å…¥å¹´æœˆ </label> <input type="text"
+							<label class="form-label fw-medium mb-1 bg-light">”[“ü”NŒŽ </label> <input type="text"
 								class="form-control form-control-sm" th:field="*{monthlyDetail.paymentYearMonth}"
 								readOnly th:data-initial-value="*{monthlyDetail.paymentYearMonth}">
 						</div>
 
-						<!-- æœˆè¨ˆè¡¨ -->
+						<!-- ŒŽŒv•\ -->
 						<div class="col-md-3">
 							<div class="mt-2" th:if="${!fukaDeclarationForm.view}">
 								<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
 									data-bs-target="#monthlyTallyModal">
-									<i class="bi bi-calendar3 me-1"></i>æœˆè¨ˆè¡¨ã‹ã‚‰å…¥åŠ›
+									<i class="bi bi-calendar3 me-1"></i>ŒŽŒv•\‚©‚ç“ü—Í
 								</button>
 							</div>
 							<div class="mt-2" th:if="${fukaDeclarationForm.view}">
 								<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
 									data-bs-target="#monthlyTallyModal">
-									<i class="bi bi-eye me-1"></i>æœˆè¨ˆè¡¨ã‚’è¡¨ç¤º
+									<i class="bi bi-eye me-1"></i>ŒŽŒv•\‚ð•\Ž¦
 								</button>
 							</div>
 						</div>
 
-						<!-- å¤‰æ›´åŒºåˆ† -->
+						<!-- •ÏX‹æ•ª -->
 						<div class="col-md-2">
 							<label class="form-label form-label-sm fw-medium mb-1">
-								å¤‰æ›´ã®åŒºåˆ† <span class="badge bg-danger ms-1" th:if="${fukaDeclarationForm.edit}">å¿…é ˆ</span>
+								•ÏX‚Ì‹æ•ª <span class="badge bg-danger ms-1" th:if="${fukaDeclarationForm.edit}">•K{</span>
 							</label> <select id="modificationCategory" class="form-select form-select-sm"
 								th:field="*{modificationCategory}" th:errorclass="is-invalid"
 								th:disabled="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{modificationCategory}">
-								<option value="1">ç”³å‘Š</option>
-								<option value="2">æ›´æ­£</option>
-								<option value="3">æ±ºå®š</option>
-								<option value="4">é‚„ä»˜</option>
-								<option value="5">å…é™¤</option>
+								<option value="1">\</option>
+								<option value="2">X³</option>
+								<option value="3">Œˆ’è</option>
+								<option value="4">ŠÒ•t</option>
+								<option value="5">–Æœ</option>
 							</select>
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('modificationCategory')}"
 								th:errors="*{modificationCategory}"></div>
@@ -143,9 +143,9 @@
 								th:field="*{modificationCategory}" />
 						</div>
 
-						<!-- å¤‰æ›´ç†ç”± -->
+						<!-- •ÏX——R -->
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium mb-1">å¤‰æ›´ç†ç”±</label>
+							<label class="form-label form-label-sm fw-medium mb-1">•ÏX——R</label>
 							<textarea class="form-control form-control-sm" rows="1" th:field="*{modificationReason}"
 								th:readonly="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{modificationReason}"></textarea>
@@ -157,16 +157,16 @@
 							<table class="table table-bordered table-sm align-middle mb-0">
 								<thead class="table-light text-center">
 									<tr>
-										<th style="width: 15%;">åŒºåˆ†</th>
-										<th style="width: 10%;">ç¨ŽçŽ‡</th>
-										<th style="width: 15%;">å®¿æ³Šæ•°</th>
-										<th style="width: 20%;">å®¿æ³Šç¨Žé¡(å††)</th>
-										<th style="width: 20%;">(å†…)å¸‚åŒºç”ºæ‘ç¨Žé¡(å††)</th>
-										<th style="width: 20%;">(å†…)éƒ½é“åºœçœŒç¨Žé¡(å††)</th>
+										<th style="width: 15%;">‹æ•ª</th>
+										<th style="width: 10%;">Å—¦</th>
+										<th style="width: 15%;">h”‘”</th>
+										<th style="width: 20%;">h”‘ÅŠz(‰~)</th>
+										<th style="width: 20%;">(“à)Žs‹æ’¬‘ºÅŠz(‰~)</th>
+										<th style="width: 20%;">(“à)“s“¹•{Œ§ÅŠz(‰~)</th>
 									</tr>
 								</thead>
 								<tbody>
-									<!-- ãƒ†ãƒ¼ãƒ–ãƒ« -->
+									<!-- ƒe[ƒuƒ‹ -->
 									<tr th:each="detail, stat : *{monthlyDetail.taxDetails}" class="tax-detail-row">
 
 										<input type="hidden"
@@ -176,10 +176,10 @@
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
 
 										<td class="text-center fw-medium bg-light"><span
-												th:text="${detail.label}">åŒºåˆ†å</span></td>
+												th:text="${detail.label}">‹æ•ª–¼</span></td>
 
 										<td class="text-center fw-medium bg-light"><span
-												th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA') + ' å††'}">ç¨ŽçŽ‡</span>
+												th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA') + ' ‰~'}">Å—¦</span>
 										</td>
 
 										<td><input type="text"
@@ -201,20 +201,20 @@
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].cityZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">è‡ªå‹•ç®—å‡º</th:block>
+											<th:block th:unless="${fukaDeclarationForm.view}">Ž©“®ŽZo</th:block>
 										</td>
 										<td><input type="text" th:if="${fukaDeclarationForm.view}"
 												th:field="*{monthlyDetail.taxDetails[__${stat.index}__].kenZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].kenZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">è‡ªå‹•ç®—å‡º</th:block>
+											<th:block th:unless="${fukaDeclarationForm.view}">Ž©“®ŽZo</th:block>
 										</td>
 									</tr>
 
-									<!-- èª²ç¨Žå¯¾è±¡å¤–å®¿æ³Šæ•° -->
+									<!-- ‰ÛÅ‘ÎÛŠOh”‘” -->
 									<tr>
-										<td class="text-center fw-medium bg-light">èª²ç¨Žå¯¾è±¡å¤–å®¿æ³Šæ•°</td>
+										<td class="text-center fw-medium bg-light">‰ÛÅ‘ÎÛŠOh”‘”</td>
 										<td class="bg-light"></td>
 										<td><input type="text" th:field="*{monthlyDetail.exemptStayCount}"
 												class="form-control form-control-sm text-end js-comma-format"
@@ -229,9 +229,9 @@
 								</tbody>
 								<tfoot class="table-primary fw-bold">
 
-									<!-- åˆè¨ˆ -->
+									<!-- ‡Œv -->
 									<tr>
-										<td class="text-center">åˆè¨ˆ</td>
+										<td class="text-center">‡Œv</td>
 
 										<td><input type="text" th:field="*{monthlyDetail.totalStayCount}"
 												class="form-control form-control-sm text-end js-comma-format"
@@ -250,14 +250,14 @@
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalCityZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">è‡ªå‹•ç®—å‡º</th:block>
+											<th:block th:unless="${fukaDeclarationForm.view}">Ž©“®ŽZo</th:block>
 										</td>
 										<td><input type="text" th:if="${fukaDeclarationForm.view}"
 												th:field="*{monthlyDetail.totalKenZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalKenZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">è‡ªå‹•ç®—å‡º</th:block>
+											<th:block th:unless="${fukaDeclarationForm.view}">Ž©“®ŽZo</th:block>
 										</td>
 									</tr>
 								</tfoot>
@@ -270,14 +270,14 @@
 							<table class="table table-bordered table-sm align-middle mb-0">
 								<thead class="table-light text-center">
 									<tr>
-										<th style="width: 8%;">åŒºåˆ†</th>
-										<th style="width: 7%;">ç¨ŽçŽ‡</th>
-										<th style="width: 15%;">å®¿æ³Šæ–™é‡‘ç·é¡(å††)</th>
-										<th style="width: 10%;">å®¿æ³Šæ•°</th>
-										<th style="width: 15%;">å®¿æ³Šæ–™é‡‘(å††)</th>
-										<th style="width: 15%;">å®¿æ³Šç¨Žé¡(å††)</th>
-										<th style="width: 15%;">(å†…)å¸‚åŒºç”ºæ‘ç¨Žé¡(å††)</th>
-										<th style="width: 15%;">(å†…)éƒ½é“åºœçœŒç¨Žé¡(å††)</th>
+										<th style="width: 8%;">‹æ•ª</th>
+										<th style="width: 7%;">Å—¦</th>
+										<th style="width: 15%;">h”‘—¿‹à‘Šz(‰~)</th>
+										<th style="width: 10%;">h”‘”</th>
+										<th style="width: 15%;">h”‘—¿‹à(‰~)</th>
+										<th style="width: 15%;">h”‘ÅŠz(‰~)</th>
+										<th style="width: 15%;">(“à)Žs‹æ’¬‘ºÅŠz(‰~)</th>
+										<th style="width: 15%;">(“à)“s“¹•{Œ§ÅŠz(‰~)</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -287,9 +287,9 @@
 										<input type="hidden"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
 										<td class="text-center fw-medium bg-light"><span
-												th:text="${detail.label}">åŒºåˆ†å</span></td>
+												th:text="${detail.label}">‹æ•ª–¼</span></td>
 										<td class="text-center fw-medium bg-light"><span
-												th:text="${detail.taxRate + ' %'}">ç¨ŽçŽ‡</span></td>
+												th:text="${detail.taxRate + ' %'}">Å—¦</span></td>
 										<td><input type="text"
 												th:field="*{monthlyDetail.taxDetails[__${stat.index}__].ryokinSogaku}"
 												class="form-control form-control-sm text-end js-comma-format"
@@ -322,7 +322,7 @@
 										<td class="bg-light"></td>
 									</tr>
 									<tr>
-										<td class="text-center fw-medium bg-light">èª²ç¨Žå¯¾è±¡å¤– (å…é™¤)</td>
+										<td class="text-center fw-medium bg-light">‰ÛÅ‘ÎÛŠO (–Æœ)</td>
 										<td class="bg-light"></td>
 										<td class="bg-light"></td>
 										<td><input type="text" th:field="*{monthlyDetail.exemptStayCount}"
@@ -344,7 +344,7 @@
 								</tbody>
 								<tfoot class="table-primary fw-bold">
 									<tr>
-										<td class="text-center">åˆè¨ˆ</td>
+										<td class="text-center">‡Œv</td>
 										<td></td>
 										<td><input type="text" th:field="*{monthlyDetail.totalSogaku}"
 												class="form-control form-control-sm text-end js-comma-format"
@@ -375,14 +375,14 @@
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalCityZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">è‡ªå‹•ç®—å‡º</th:block>
+											<th:block th:unless="${fukaDeclarationForm.view}">Ž©“®ŽZo</th:block>
 										</td>
 										<td><input type="text" th:if="${fukaDeclarationForm.view}"
 												th:field="*{monthlyDetail.totalKenZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalKenZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">è‡ªå‹•ç®—å‡º</th:block>
+											<th:block th:unless="${fukaDeclarationForm.view}">Ž©“®ŽZo</th:block>
 										</td>
 									</tr>
 								</tfoot>
@@ -395,39 +395,39 @@
 			<div class="card shadow-sm mb-4">
 				<div class="card-header bg-warning bg-opacity-10 py-2">
 					<h6 class="mb-0 fw-bold text-warning-emphasis">
-						<i class="bi bi-plus-slash-minus me-2"></i>åŠ ç®—é‡‘é¡å…¥åŠ›
+						<i class="bi bi-plus-slash-minus me-2"></i>‰ÁŽZ‹àŠz“ü—Í
 					</h6>
 				</div>
 
-				<!-- 1è¡Œç›® -->
+				<!-- 1s–Ú -->
 				<div class="card-body py-3">
 					<div class="row g-3 align-items-end">
 
-						<!-- åŒºåˆ† -->
+						<!-- ‹æ•ª -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">åŒºåˆ†</label>
+							<label class="form-label form-label-sm fw-medium mb-1">‹æ•ª</label>
 							<select class="form-select form-select-sm" th:field="*{additionalCategory1}"
 								th:disabled="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{additionalCategory1}">
-								<option value="">åŒºåˆ†ã‚’é¸æŠžã—ã¦ãã ã•ã„</option>
-								<option value="1">éŽå°‘ç”³å‘ŠåŠ ç®—é‡‘</option>
-								<option value="2">ä¸ç”³å‘ŠåŠ ç®—é‡‘</option>
-								<option value="3">é‡åŠ ç®—é‡‘</option>
+								<option value="">‹æ•ª‚ð‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢</option>
+								<option value="1">‰ß­\‰ÁŽZ‹à</option>
+								<option value="2">•s\‰ÁŽZ‹à</option>
+								<option value="3">d‰ÁŽZ‹à</option>
 							</select>
 						</div>
 
-						<!-- å‰²åˆ -->
+						<!-- Š„‡ -->
 						<div class="col-md-2">
-							<label class="form-label form-label-sm fw-medium mb-1">å‰²åˆ
+							<label class="form-label form-label-sm fw-medium mb-1">Š„‡
 								(%)</label> <input type="text" class="form-control form-control-sm text-end"
 								th:field="*{additionalRate1}" th:readonly="${fukaDeclarationForm.view}"
 								placeholder="0.0" th:data-initial-value="*{additionalRate1}">
 						</div>
 
-						<!-- é‡‘é¡ -->
+						<!-- ‹àŠz -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">é‡‘é¡
-								(å††)</label>
+							<label class="form-label form-label-sm fw-medium mb-1">‹àŠz
+								(‰~)</label>
 							<div class="input-group input-group-sm js-comma-format">
 								<input type="text" class="form-control text-end js-comma-format"
 									th:field="*{additionalAmount1}" th:readonly="${fukaDeclarationForm.view}"
@@ -435,44 +435,44 @@
 							</div>
 						</div>
 
-						<!-- ç´æœŸé™ -->
+						<!-- ”[ŠúŒÀ -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">ç´æœŸé™</label>
+							<label class="form-label form-label-sm fw-medium mb-1">”[ŠúŒÀ</label>
 							<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate1}"
 								th:readonly="${fukaDeclarationForm.view}" th:data-initial-value="*{additionalDueDate1}">
 						</div>
 					</div>
 				</div>
 
-				<!-- 2è¡Œç›® -->
+				<!-- 2s–Ú -->
 				<div class="card-body py-3">
 					<div class="row g-3 align-items-end">
 
-						<!-- åŒºåˆ† -->
+						<!-- ‹æ•ª -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">åŒºåˆ†</label>
+							<label class="form-label form-label-sm fw-medium mb-1">‹æ•ª</label>
 							<select class="form-select form-select-sm" th:field="*{additionalCategory2}"
 								th:disabled="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{additionalCategory2}">
-								<option value="">åŒºåˆ†ã‚’é¸æŠžã—ã¦ãã ã•ã„</option>
-								<option value="1">éŽå°‘ç”³å‘ŠåŠ ç®—é‡‘</option>
-								<option value="2">ä¸ç”³å‘ŠåŠ ç®—é‡‘</option>
-								<option value="3">é‡åŠ ç®—é‡‘</option>
+								<option value="">‹æ•ª‚ð‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢</option>
+								<option value="1">‰ß­\‰ÁŽZ‹à</option>
+								<option value="2">•s\‰ÁŽZ‹à</option>
+								<option value="3">d‰ÁŽZ‹à</option>
 							</select>
 						</div>
 
-						<!-- å‰²åˆ -->
+						<!-- Š„‡ -->
 						<div class="col-md-2">
-							<label class="form-label form-label-sm fw-medium mb-1">å‰²åˆ
+							<label class="form-label form-label-sm fw-medium mb-1">Š„‡
 								(%)</label> <input type="text" class="form-control form-control-sm text-end"
 								th:field="*{additionalRate2}" th:readonly="${fukaDeclarationForm.view}"
 								placeholder="0.0" th:data-initial-value="*{additionalRate2}">
 						</div>
 
-						<!-- é‡‘é¡ -->
+						<!-- ‹àŠz -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">é‡‘é¡
-								(å††)</label>
+							<label class="form-label form-label-sm fw-medium mb-1">‹àŠz
+								(‰~)</label>
 							<div class="input-group input-group-sm js-comma-format">
 								<input type="text" class="form-control text-end js-comma-format"
 									th:field="*{additionalAmount2}" th:readonly="${fukaDeclarationForm.view}"
@@ -480,44 +480,44 @@
 							</div>
 						</div>
 
-						<!-- ç´æœŸé™ -->
+						<!-- ”[ŠúŒÀ -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">ç´æœŸé™</label>
+							<label class="form-label form-label-sm fw-medium mb-1">”[ŠúŒÀ</label>
 							<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate2}"
 								th:readonly="${fukaDeclarationForm.view}" th:data-initial-value="*{additionalDueDate2}">
 						</div>
 					</div>
 				</div>
 
-				<!-- 3è¡Œç›® -->
+				<!-- 3s–Ú -->
 				<div class="card-body py-3">
 					<div class="row g-3 align-items-end">
 
-						<!-- åŒºåˆ† -->
+						<!-- ‹æ•ª -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">åŒºåˆ†</label>
+							<label class="form-label form-label-sm fw-medium mb-1">‹æ•ª</label>
 							<select class="form-select form-select-sm" th:field="*{additionalCategory3}"
 								th:disabled="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{additionalCategory3}">
-								<option value="">åŒºåˆ†ã‚’é¸æŠžã—ã¦ãã ã•ã„</option>
-								<option value="1">éŽå°‘ç”³å‘ŠåŠ ç®—é‡‘</option>
-								<option value="2">ä¸ç”³å‘ŠåŠ ç®—é‡‘</option>
-								<option value="3">é‡åŠ ç®—é‡‘</option>
+								<option value="">‹æ•ª‚ð‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢</option>
+								<option value="1">‰ß­\‰ÁŽZ‹à</option>
+								<option value="2">•s\‰ÁŽZ‹à</option>
+								<option value="3">d‰ÁŽZ‹à</option>
 							</select>
 						</div>
 
-						<!-- å‰²åˆ -->
+						<!-- Š„‡ -->
 						<div class="col-md-2">
-							<label class="form-label form-label-sm fw-medium mb-1">å‰²åˆ
+							<label class="form-label form-label-sm fw-medium mb-1">Š„‡
 								(%)</label> <input type="text" class="form-control form-control-sm text-end"
 								th:field="*{additionalRate3}" th:readonly="${fukaDeclarationForm.view}"
 								placeholder="0.0" th:data-initial-value="*{additionalRate3}">
 						</div>
 
-						<!-- é‡‘é¡ -->
+						<!-- ‹àŠz -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">é‡‘é¡
-								(å††)</label>
+							<label class="form-label form-label-sm fw-medium mb-1">‹àŠz
+								(‰~)</label>
 							<div class="input-group input-group-sm js-comma-format">
 								<input type="text" class="form-control text-end js-comma-format"
 									th:field="*{additionalAmount3}" th:readonly="${fukaDeclarationForm.view}"
@@ -525,9 +525,9 @@
 							</div>
 						</div>
 
-						<!-- ç´æœŸé™ -->
+						<!-- ”[ŠúŒÀ -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">ç´æœŸé™</label>
+							<label class="form-label form-label-sm fw-medium mb-1">”[ŠúŒÀ</label>
 							<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate3}"
 								th:readonly="${fukaDeclarationForm.view}" th:data-initial-value="*{additionalDueDate3}">
 						</div>
@@ -539,19 +539,19 @@
 
 				<button type="submit" class="btn btn-success px-5 shadow-sm" th:unless="${fukaDeclarationForm.view}">
 					<i class="bi bi-save me-2"></i> <span
-						th:text="${fukaDeclarationForm.edit ? 'æ›´æ–°ã™ã‚‹' : 'ç™»éŒ²ã™ã‚‹'}"></span>
+						th:text="${fukaDeclarationForm.edit ? 'XV‚·‚é' : '“o˜^‚·‚é'}"></span>
 				</button>
 
 				<a th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
 					class="btn btn-outline-secondary px-4 shadow-sm" th:if="${fukaDeclarationForm.view}"> <i
-						class="bi bi-arrow-left me-2"></i>ä¸€è¦§ã«æˆ»ã‚‹
+						class="bi bi-arrow-left me-2"></i>ˆê——‚É–ß‚é
 				</a> <a th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
 					class="btn btn-outline-secondary px-4 shadow-sm" th:unless="${fukaDeclarationForm.view}"
-					onclick="return confirm('å…¥åŠ›å†…å®¹ã¯ç ´æ£„ã•ã‚Œã¾ã™ã€‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ')"> <i class="bi bi-arrow-left me-2"></i>ä¸€è¦§ã«æˆ»ã‚‹
+					onclick="return confirm('“ü—Í“à—e‚Í”jŠü‚³‚ê‚Ü‚·B‚æ‚ë‚µ‚¢‚Å‚·‚©H')"> <i class="bi bi-arrow-left me-2"></i>ˆê——‚É–ß‚é
 				</a>
 			</div>
 
-			<!-- æœˆè¨ˆè¡¨ãƒ¢ãƒ¼ãƒ€ãƒ« -->
+			<!-- ŒŽŒv•\ƒ‚[ƒ_ƒ‹ -->
 			<div class="modal fade" id="monthlyTallyModal" tabindex="-1" aria-labelledby="monthlyTallyModalLabel"
 				aria-hidden="true">
 				<div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -559,18 +559,18 @@
 						<div class="modal-header bg-primary text-white">
 							<h5 class="modal-title" id="monthlyTallyModalLabel">
 								<i class="bi bi-table me-2"></i><span
-									th:text="${fukaDeclarationForm.view ? 'æœˆè¨ˆè¡¨ç…§ä¼š' : 'æœˆè¨ˆè¡¨ç™»éŒ²'}"></span>
+									th:text="${fukaDeclarationForm.view ? 'ŒŽŒv•\Æ‰ï' : 'ŒŽŒv•\“o˜^'}"></span>
 							</h5>
 							<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
 								aria-label="Close"></button>
 						</div>
 						<div class="modal-body" style="max-height: 65vh; overflow-y: auto; padding-bottom: 0;">
-							<p class="text-muted small" th:if="*{fukaKbn == '1'}">â€»å„æ—¥ã®å®¿æ³Šæ•°ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚
+							<p class="text-muted small" th:if="*{fukaKbn == '1'}">¦Še“ú‚Ìh”‘”‚ð“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B
 							</p>
-							<p class="text-muted small" th:if="*{fukaKbn == '2'}">â€»å„æ—¥ã®åŒºåˆ†ã”ã¨ã®å®¿æ³Šæ•°ã¨å®¿æ³Šæ–™é‡‘ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„ã€‚</p>
+							<p class="text-muted small" th:if="*{fukaKbn == '2'}">¦Še“ú‚Ì‹æ•ª‚²‚Æ‚Ìh”‘”‚Æh”‘—¿‹à‚ð“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B</p>
 							<div class="alert alert-info py-2 mb-3" style="font-size: 0.85rem;">
 								<i class="bi bi-arrow-left-right me-1"></i>
-								è¡¨ãŒæ¨ªã«é•·ã„å ´åˆã¯ã€å·¦å³ã«ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«ã—ã¦ã”ç¢ºèªãã ã•ã„ã€‚
+								•\‚ª‰¡‚É’·‚¢ê‡‚ÍA¶‰E‚ÉƒXƒNƒ[ƒ‹‚µ‚Ä‚²Šm”F‚­‚¾‚³‚¢B
 							</div>
 
 							<div class="table-responsive position-relative" style="max-height: 45vh;">
@@ -579,15 +579,15 @@
 									id="monthlyTallyTableTeigaku" style="min-width: 800px;" th:if="*{fukaKbn == '1'}">
 									<thead class="table-light">
 										<tr>
-											<th rowspan="2" class="align-middle" style="width: 60px;">æ—¥ä»˜</th>
-											<th th:colspan="*{monthlyDetail.taxDetails.size()+1}">å®¿æ³Šæ•°</th>
-											<th rowspan="2" class="align-middle" style="width: 120px;">ç¨Žé¡(å††)</th>
+											<th rowspan="2" class="align-middle" style="width: 60px;">“ú•t</th>
+											<th th:colspan="*{monthlyDetail.taxDetails.size()+1}">h”‘”</th>
+											<th rowspan="2" class="align-middle" style="width: 120px;">ÅŠz(‰~)</th>
 										</tr>
 										<tr>
 											<th th:each="detail : *{monthlyDetail.taxDetails}" th:text="${detail.label}"
-												style="font-size: 0.85rem; font-weight: normal;">åŒºåˆ†å</th>
+												style="font-size: 0.85rem; font-weight: normal;">‹æ•ª–¼</th>
 											<th style="font-size: 0.85rem; font-weight: normal;">
-												èª²ç¨Žå¯¾è±¡å¤–</th>
+												‰ÛÅ‘ÎÛŠO</th>
 										</tr>
 									</thead>
 
@@ -621,7 +621,7 @@
 									</tbody>
 									<tfoot class="align-middle">
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">åˆè¨ˆ(è¨ˆ)</td>
+											<td class="text-center fw-bold bg-light text-nowrap">‡Œv(Œv)</td>
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input type="text"
 													class="form-control form-control-sm text-end js-comma-format"
 													th:id="|modal-total-count-${stat.index}|" value="0"></td>
@@ -633,11 +633,11 @@
 													id="modal-total-zeigaku" value="0"></td>
 										</tr>
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">ç¨ŽçŽ‡(å††)</td>
+											<td class="text-center fw-bold bg-light text-nowrap">Å—¦(‰~)</td>
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"
 												class="text-end align-middle"><span
 													th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA')}">0</span>
-												å†† <input type="hidden" th:id="|modal-tax-rate-${stat.index}|"
+												‰~ <input type="hidden" th:id="|modal-tax-rate-${stat.index}|"
 													th:value="${detail.taxRate + detail.taxKenRate}" /></td>
 											<td class="bg-light text-center text-muted align-middle"><i
 													class="bi bi-slash-lg"></i></td>
@@ -645,7 +645,7 @@
 													class="bi bi-slash-lg"></i></td>
 										</tr>
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">ç¨Žé¡(å††)</td>
+											<td class="text-center fw-bold bg-light text-nowrap">ÅŠz(‰~)</td>
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input type="text"
 													class="form-control form-control-sm text-end js-comma-format"
 													th:id="|modal-tax-amount-${stat.index}|" value="0"></td>
@@ -661,28 +661,28 @@
 									id="monthlyTallyTableTeiritsu" style="min-width: 800px;" th:if="*{fukaKbn == '2'}">
 									<thead class="table-light">
 										<tr>
-											<th rowspan="2" class="align-middle" style="width: 60px;">æ—¥ä»˜</th>
+											<th rowspan="2" class="align-middle" style="width: 60px;">“ú•t</th>
 											<th colspan="3" th:each="detail : *{monthlyDetail.taxDetails}"><span
-													th:text="${detail.label ?: '(è¨­å®šæœª)'}">åŒºåˆ†</span> (<span
+													th:text="${detail.label ?: '(Ý’è–¢)'}">‹æ•ª</span> (<span
 													th:text="${detail.taxRate ?: '-'}">2</span>%)</th>
-											<th colspan="2">èª²ç¨Žå¯¾è±¡å¤– (å…é™¤)</th>
+											<th colspan="2">‰ÛÅ‘ÎÛŠO (–Æœ)</th>
 											<th rowspan="2" class="align-middle"
 												style="font-size: 0.85rem; font-weight: normal; min-width: 100px;">
-												ç¨Žé¡(å††)</th>
+												ÅŠz(‰~)</th>
 										</tr>
 										<tr>
 											<th:block th:each="detail : *{monthlyDetail.taxDetails}">
 												<th style="font-size: 0.85rem; font-weight: normal; min-width: 100px;">
-													æ–™é‡‘ç·é¡(å††)</th>
+													—¿‹à‘Šz(‰~)</th>
 												<th style="font-size: 0.85rem; font-weight: normal; min-width: 80px;">
-													å®¿æ³Šæ•°</th>
+													h”‘”</th>
 												<th style="font-size: 0.85rem; font-weight: normal; min-width: 100px;">
-													æ–™é‡‘(å††)</th>
+													—¿‹à(‰~)</th>
 											</th:block>
-											<th style="font-size: 0.85rem; font-weight: normal; min-width: 80px;">å®¿æ³Šæ•°
+											<th style="font-size: 0.85rem; font-weight: normal; min-width: 80px;">h”‘”
 											</th>
 											<th style="font-size: 0.85rem; font-weight: normal; min-width: 100px;">
-												å®¿æ³Šæ–™é‡‘(å††)</th>
+												h”‘—¿‹à(‰~)</th>
 										</tr>
 									</thead>
 
@@ -734,7 +734,7 @@
 
 									<tfoot class="align-middle">
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">åˆè¨ˆ(è¨ˆ)</td>
+											<td class="text-center fw-bold bg-light text-nowrap">‡Œv(Œv)</td>
 											<th:block th:each="detail, stat : *{monthlyDetail.taxDetails}">
 												<td><input type="text"
 														class="form-control form-control-sm text-end js-comma-format"
@@ -763,7 +763,7 @@
 											</td>
 										</tr>
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">ç¨ŽçŽ‡(%)</td>
+											<td class="text-center fw-bold bg-light text-nowrap">Å—¦(%)</td>
 											<th:block th:each="detail, stat : *{monthlyDetail.taxDetails}">
 												<td class="bg-light text-center text-muted align-middle"><i
 														class="bi bi-slash-lg"></i></td>
@@ -782,7 +782,7 @@
 													class="bi bi-slash-lg"></i></td>
 										</tr>
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">ç¨Žé¡(å††)</td>
+											<td class="text-center fw-bold bg-light text-nowrap">ÅŠz(‰~)</td>
 											<th:block th:each="detail, stat : *{monthlyDetail.taxDetails}">
 												<td class="bg-light text-center text-muted align-middle"><i
 														class="bi bi-slash-lg"></i></td>
@@ -805,10 +805,10 @@
 							</div>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">é–‰ã˜ã‚‹</button>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">•Â‚¶‚é</button>
 							<button type="button" class="btn btn-success" id="btnApplyTally" data-bs-dismiss="modal"
 								th:if="${!fukaDeclarationForm.view}">
-								<span>å…¥åŠ›å†…å®¹ã‚’ä¿æŒã—ã¦é–‰ã˜ã‚‹</span>
+								<span>“ü—Í“à—e‚ð•ÛŽ‚µ‚Ä•Â‚¶‚é</span>
 							</button>
 						</div>
 					</div>
@@ -822,31 +822,31 @@
 				<div class="modal-content">
 					<div class="modal-header bg-warning-subtle">
 						<h5 class="modal-title text-dark" id="taxWarningModalLabel">
-							<i class="bi bi-exclamation-triangle text-warning me-2"></i>é‡‘é¡ã®ä¸æ•´åˆç¢ºèª
+							<i class="bi bi-exclamation-triangle text-warning me-2"></i>‹àŠz‚Ì•s®‡Šm”F
 						</h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body text-dark">
-						<p class="fw-bold">ä»¥ä¸‹ã®ä¸æ•´åˆãŒæ¤œå‡ºã•ã‚Œã¾ã—ãŸï¼š</p>
+						<p class="fw-bold">ˆÈ‰º‚Ì•s®‡‚ªŒŸo‚³‚ê‚Ü‚µ‚½F</p>
 						<ul class="text-danger small"
 							th:if="${discrepancyMessages != null && !discrepancyMessages.isEmpty()}">
 							<li th:each="msg : ${discrepancyMessages}" th:text="${msg}"></li>
 						</ul>
-						<p class="mb-0 mt-2">ã“ã®ã¾ã¾ç™»éŒ²ã—ã¦ã‚‚ã‚ˆã‚ã—ã„ã§ã™ã‹ï¼Ÿ</p>
+						<p class="mb-0 mt-2">‚±‚Ì‚Ü‚Ü“o˜^‚µ‚Ä‚à‚æ‚ë‚µ‚¢‚Å‚·‚©H</p>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ã‚­ãƒ£ãƒ³ã‚»ãƒ«</button>
-						<button type="button" class="btn btn-primary" id="btnForceSave">ãã®ã¾ã¾ç™»éŒ²ã™ã‚‹</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ƒLƒƒƒ“ƒZƒ‹</button>
+						<button type="button" class="btn btn-primary" id="btnForceSave">‚»‚Ì‚Ü‚Ü“o˜^‚·‚é</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- ç‰¹åˆ¥å¾´åŽç¾©å‹™è€…æŒ‡å®šãƒ¢ãƒ¼ãƒ€ãƒ« -->
+		<!-- “Á•Ê’¥Žû‹`–±ŽÒŽw’èƒ‚[ƒ_ƒ‹ -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/shitei_gassan_search.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 		<script th:src="@{/js/tFukaConfig.js}"></script>
 	</th:block>
 </body>

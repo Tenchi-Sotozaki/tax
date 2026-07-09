@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title th:text="${isView ? '納税管理人照会' : (isEdit ? '納税管理人編集' : '納税管理人登録')}">納税管理人登録/編集</title>
+	<title th:text="${isView ? '納税管琁E��照企E : (isEdit ? '納税管琁E��編雁E : '納税管琁E��登録')}">納税管琁E��登録/編雁E/title>
 </head>
 
 <body>
@@ -14,16 +14,16 @@
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-person-lines-fill me-2 text-primary" th:if="${isView}"></i>
 				<i class="bi bi-person-gear me-2 text-primary" th:unless="${isView}"></i>
-				<span th:text="${isView ? '納税管理人照会' : (isEdit ? '納税管理人編集' : '納税管理人登録')}"></span>
+				<span th:text="${isView ? '納税管琁E��照企E : (isEdit ? '納税管琁E��編雁E : '納税管琁E��登録')}"></span>
 			</h5>
 			<span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
 				<i
 					th:class="${isView ? 'bi bi-eye me-1' : (isEdit ? 'bi bi-pencil-square me-1' : 'bi bi-plus-circle me-1')}"></i>
-				<span th:text="${isView ? '照会' : (isEdit ? '編集' : '新規登録')}"></span>
+				<span th:text="${isView ? '照企E : (isEdit ? '編雁E : '新規登録')}"></span>
 			</span>
 		</div>
 
-		<!-- 成功メッセージ -->
+		<!-- 成功メチE��ージ -->
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i>
 			<span th:text="${successMessage}"></span>
@@ -41,26 +41,26 @@
 			<input type="hidden" th:field="*{collectorId}" />
 
 			<input type="hidden" th:field="*{edit}" />
-			<!-- バリデーションエラーサマリー -->
+			<!-- バリチE�Eションエラーサマリー -->
 			<div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>
-				入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+				入力�E容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各頁E��を確認してください、E
 				<ul class="mb-0 mt-1">
 					<li th:each="err : ${#fields.allErrors()}" th:text="${err}" class="small"></li>
 				</ul>
 			</div>
 
-			<!-- 納税管理人情報 -->
+			<!-- 納税管琁E��惁E�� -->
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
-					<h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管理人情報</h5>
+					<h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>納税管琁E��惁E��</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
 
 						<div class="col-md-4">
 							<label for="registrationDate" class="form-label fw-medium">
-								登録日 <span class="badge bg-danger text-white ms-1">必須</span>
+								登録日 <span class="badge bg-danger text-white ms-1">忁E��E/span>
 							</label>
 							<input type="date" class="form-control" th:field="*{registrationDate}"
 								th:readonly="${isView}">
@@ -78,7 +78,7 @@
 						<div class="col-md-4"></div>
 
 						<div class="col-md-6">
-							<label class="form-label fw-medium">特別徴収義務者</label>
+							<label class="form-label fw-medium">特別徴収義務老E/label>
 							<input type="text" class="form-control" th:field="*{obligorName}" readonly>
 						</div>
 
@@ -88,7 +88,7 @@
 						</div>
 
 						<div class="col-md-12">
-							<label class="form-label fw-medium">住所（所在地）</label>
+							<label class="form-label fw-medium">住所�E�所在地�E�E/label>
 							<input type="text" class="form-control" id="managerAddress" th:field="*{managerAddress}"
 								th:errorclass="is-invalid" th:readonly="${isView}">
 						</div>
@@ -121,12 +121,12 @@
 
 						<div class="col-md-12" id="exemptionReasonArea" style="display: none;">
 							<label for="exemptionReason" class="form-label fw-medium">
-								選任免除理由
-								<span class="badge bg-danger text-white ms-1" th:if="${!isView}">必須</span>
+								選任免除琁E��
+								<span class="badge bg-danger text-white ms-1" th:if="${!isView}">忁E��E/span>
 							</label>
 							<textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}"
 								th:readonly="${isView}" th:errorclass="is-invalid"
-								placeholder="選任免除の理由を入力してください"></textarea>
+								placeholder="選任免除の琁E��を�E力してください"></textarea>
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('exemptionReason')}"
 								th:errors="*{exemptionReason}"></div>
 						</div>
@@ -144,11 +144,11 @@
 
 				<a th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.collectorId})}"
 					class="btn btn-primary btn-lg px-5" th:if="${isView}">
-					<i class="bi bi-pencil-square me-2"></i>編集する
+					<i class="bi bi-pencil-square me-2"></i>編雁E��めE
 				</a>
 
 				<a th:href="@{/collector/list}" class="btn btn-outline-secondary btn-lg px-4">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻めE
 				</a>
 			</div>
 
@@ -175,11 +175,11 @@
 							</div>
 							<div class="col-md-3">
 								<label for="searchName" class="form-label fw-medium">氏名</label>
-								<input type="text" class="form-control" id="searchName" placeholder="氏名を入力">
+								<input type="text" class="form-control" id="searchName" placeholder="氏名を�E劁E>
 							</div>
 							<div class="col-md-4">
 								<label for="searchAddress" class="form-label fw-medium">住所</label>
-								<input type="text" class="form-control" id="searchAddress" placeholder="住所を入力">
+								<input type="text" class="form-control" id="searchAddress" placeholder="住所を�E劁E>
 							</div>
 							<div class="col-md-2 d-flex align-items-end">
 								<button type="button" class="btn btn-primary w-100" id="btnAddressSearch">
@@ -188,7 +188,7 @@
 							</div>
 						</div>
 
-						<!-- 検索結果テーブル -->
+						<!-- 検索結果チE�Eブル -->
 						<div id="searchResultArea" style="display: none;">
 							<hr>
 							<div class="d-flex justify-content-between align-items-center mb-2">
@@ -204,26 +204,26 @@
 											<th style="width: 160px;">ふりがな</th>
 											<th>住所</th>
 											<th style="width: 120px;">電話番号</th>
-											<th style="width: 80px;" class="text-center">選択</th>
+											<th style="width: 80px;" class="text-center">選抁E/th>
 										</tr>
 									</thead>
 									<tbody id="searchResultBody">
-										<!-- Fetch API で動的生成 -->
+										<!-- Fetch API で動的生�E -->
 									</tbody>
 								</table>
 							</div>
 						</div>
 
-						<!-- 検索結果なし -->
+						<!-- 検索結果なぁE-->
 						<div id="searchNoResult" class="text-center text-muted py-4" style="display: none;">
 							<i class="bi bi-inbox fs-3 d-block mb-2"></i>
-							該当する宛名が見つかりませんでした。
+							該当する宛名が見つかりませんでした、E
 						</div>
 
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-							<i class="bi bi-x-lg me-1"></i>閉じる
+							<i class="bi bi-x-lg me-1"></i>閉じめE
 						</button>
 					</div>
 				</div>
@@ -234,7 +234,7 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/t_tax_manager_registration.js}"></script>
+		<script th:src="@{/js/tTaxManagerRegistration.js}"></script>
 	</th:block>
 </body>
 
@@ -244,7 +244,7 @@
 				const exemptionReasonArea = document.getElementById('exemptionReasonArea');
 
 				if (exemptionFlag && exemptionReasonArea) {
-					// 表示・非表示を切り替える関数
+					// 表示・非表示を�Eり替える関数
 					const toggleExemptionArea = () => {
 						if (exemptionFlag.checked) {
 							exemptionReasonArea.style.setProperty('display', 'block', 'important');
@@ -253,10 +253,10 @@
 						}
 					};
 
-					// 1. 画面読み込み時に実行（照会モードやエラー復帰時用）
+					// 1. 画面読み込み時に実行（�E会モードやエラー復帰時用�E�E
 					toggleExemptionArea();
 
-					// 2. チェックボックス操作時に実行
+					// 2. チェチE��ボックス操作時に実衁E
 					exemptionFlag.addEventListener('change', toggleExemptionArea);
 				}
 
@@ -282,12 +282,12 @@
 							renderSearchResults(data);
 						} catch (e) {
 							console.error('宛名検索エラー:', e);
-							alert('検索中にエラーが発生しました。');
+							alert('検索中にエラーが発生しました、E);
 						}
 					});
 				}
 
-				// --- ③ モーダルリセット ---
+				// --- ③ モーダルリセチE�� ---
 				const searchModal = document.getElementById('addressSearchModal');
 				if (searchModal) {
 					searchModal.addEventListener('show.bs.modal', function () {
@@ -299,9 +299,9 @@
 						document.getElementById('searchNoResult').style.display = 'none';
 					});
 				}
-			}); // ★ ここが足りていませんでした！
+			}); // ☁Eここが足りてぁE��せんでした�E�E
 
-			// --- 検索結果の表示（ここはイベントの外でOK） ---
+			// --- 検索結果の表示�E�ここ�Eイベント�E外でOK�E�E---
 			function renderSearchResults(data) {
 				const tbody = document.getElementById('searchResultBody');
 				const resultArea = document.getElementById('searchResultArea');
@@ -329,7 +329,7 @@
 	                    <td>${escHtml(item.phone)}</td>
 	                    <td class="text-center">
 	                        <button type="button" class="btn btn-primary btn-sm btn-select-address">
-	                            <i class="bi bi-check-lg me-1"></i>選択
+	                            <i class="bi bi-check-lg me-1"></i>選抁E
 	                        </button>
 	                    </td>`;
 
