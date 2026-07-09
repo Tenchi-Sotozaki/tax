@@ -9,8 +9,7 @@
 <body>
 	<div layout:fragment="content" class="container-fluid p-4"
 		th:with="formAction=${isEdit} ? '/gassan/edit/' + ${editId} : '/gassan/registration'"
-		th:data-is-edit="${isEdit}"
-		th:data-show-shitei-modal="${showShiteiModal}">
+		th:data-is-edit="${isEdit}" th:data-show-shitei-modal="${showShiteiModal}">
 
 		<!-- ページヘッダー -->
 		<div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -79,7 +78,8 @@
 								申告日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label>
 							<input th:if="!${isView}" type="date" class="form-control" id="shinkokuYmd"
-								th:field="*{shinkokuYmd}" th:errorclass="is-invalid" th:data-initial-value="*{shinkokuYmd}">
+								th:field="*{shinkokuYmd}" th:errorclass="is-invalid"
+								th:data-initial-value="*{shinkokuYmd}">
 							<input th:if="${isView}" type="text" class="form-control" id="shinkokuYmdView" readonly
 								th:value="*{shinkokuYmd}">
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('shinkokuYmd')}"
@@ -105,7 +105,8 @@
 								適用時期(FROM) <span class="text-danger" th:if="!${isView}">*</span>
 							</label>
 							<input th:if="!${isView}" type="date" class="form-control" id="tekiyoStYmd"
-								th:field="*{tekiyoStYmd}" th:errorclass="is-invalid" th:data-initial-value="*{tekiyoStYmd}">
+								th:field="*{tekiyoStYmd}" th:errorclass="is-invalid"
+								th:data-initial-value="*{tekiyoStYmd}">
 							<input th:if="${isView}" type="text" class="form-control" id="tekiyoStYmdView" readonly
 								th:value="*{tekiyoStYmd}">
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('tekiyoStYmd')}"
@@ -196,8 +197,7 @@
 			<!-- ===== アクションボタン ===== -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 				<th:block th:if="!${isView}">
-					<button type="button" id="openConfirmModalBtn" class="btn btn-lg px-5"
-						th:classappend="${isEdit} ? 'btn-success' : 'btn-primary'">
+					<button type="button" id="openConfirmModalBtn" class="btn btn-success btn-lg px-5">
 						<i th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
 					</button>
