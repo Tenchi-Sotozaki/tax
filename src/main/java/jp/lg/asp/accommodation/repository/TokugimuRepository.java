@@ -28,7 +28,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			WHERE t.jichitaiCd = :jichitaiCd AND t.newFlg = '1' AND t.delFlg = '0'
 			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR t.shiteiNo = :shiteiNo)
 			AND (:name IS NULL OR :name = '' OR a.name LIKE :namePattern)
-			AND (:shisetsuName IS NULL OR :shisetsuName = '' OR t.shisetsuName LIKE %:shisetsuName%)
+			AND (:shisetsuName IS NULL OR :shisetsuName = '' OR t.shisetsuName LIKE :shisetsuNamePattern)
 			AND (:kyokaShu IS NULL OR :kyokaShu = '' OR :kyokaShu = '999' OR t.kyokaShu = :kyokaShu)
 			AND (:kojinNo IS NULL OR :kojinNo = '' OR a.kojinNo = :kojinNo)
 			AND (:hojinNo IS NULL OR :hojinNo = '' OR a.hojinNo = :hojinNo)
@@ -40,6 +40,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			@Param("name") String name,
 			@Param("namePattern") String namePattern,
 			@Param("shisetsuName") String shisetsuName,
+			@Param("shisetsuNamePattern") String shisetsuNamePattern,
 			@Param("kyokaShu") String kyokaShu,
 			@Param("kojinNo") String kojinNo,
 			@Param("hojinNo") String hojinNo);

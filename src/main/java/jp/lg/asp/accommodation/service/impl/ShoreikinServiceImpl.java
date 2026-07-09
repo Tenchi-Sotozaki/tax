@@ -56,6 +56,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 					form.getName(),
 					toLikePattern(form.getName(), form.getNameMatchType()),
 					form.getShisetsuName(),
+					toLikePattern(form.getShisetsuName(), form.getShisetsuNameMatchType()),
 					form.getKyokaShu(),
 					form.getKojinNo(),
 					form.getHojinNo());

@@ -77,6 +77,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 					form.getName(),
 					toLikePattern(form.getName(), form.getNameMatchType()),
 					form.getShisetsuName(),
+					toLikePattern(form.getShisetsuName(), form.getShisetsuNameMatchType()),
 					form.getKyokaShu(),
 					form.getKojinNo(),
 					form.getHojinNo());
