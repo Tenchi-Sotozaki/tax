@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,6 +34,11 @@ public interface TekiyoNozeiShukiRepository extends JpaRepository<TekiyoNozeiShu
     @Modifying
     @Query("UPDATE TekiyoNozeiShuki t SET t.newFlg = '0' WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.newFlg = '1'")
     void updateNewFlgToZero(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo);
+
+    @Query("SELECT t FROM TekiyoNozeiShuki t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0'")
+    List<TekiyoNozeiShuki> findActiveByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
 }
