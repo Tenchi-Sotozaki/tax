@@ -2,7 +2,6 @@ let currentMode = 'create';
 
 function updateButtons() {
     const checked = document.querySelectorAll('.role-checkbox:checked');
-    const editBtn = document.getElementById('editBtn');
     const viewBtn = document.getElementById('viewBtn');
     const usersBtn = document.getElementById('usersBtn');
     const deleteBtn = document.getElementById('deleteBtn');
@@ -10,7 +9,6 @@ function updateButtons() {
     const singleSelection = checked.length === 1;
     const anySelection = checked.length >= 1;
 
-    editBtn.disabled = !singleSelection;
     viewBtn.disabled = !singleSelection;
     usersBtn.disabled = !singleSelection;
     deleteBtn.disabled = !anySelection;
@@ -24,7 +22,10 @@ function openRoleModal(mode) {
 
     if (mode === 'create') {
         title.textContent = '\u6a29\u9650\u767b\u9332';
+        saveBtn.textContent = '登録する';
         saveBtn.style.display = 'block';
+        switchToEditBtn.style.display = 'none';
+
         document.getElementById('roleForm').reset();
         document.getElementById('roleId').value = '';
         document.querySelectorAll('#roleForm input').forEach(input => input.disabled = false);
@@ -43,13 +44,16 @@ function openRoleModal(mode) {
 
         if (mode === 'edit') {
             title.textContent = '権限編集';
+            saveBtn.textContent = '更新する';
             saveBtn.style.display = 'block';
 
 
 
+            switchToEditBtn.style.display = 'none';
         } else {
             title.textContent = '権限照会';
             saveBtn.style.display = 'none';
+            switchToEditBtn.style.display = 'block';
         }
 
         loadRoleDetail(roleId, mode === 'view');
@@ -151,6 +155,38 @@ function saveRole() {
             }
         })
         .catch(err => alert('通信エラー: ' + err.message));
+}
+
+function switchToEditMode() {
+	
+    currentMode = 'edit';
+
+    // タイトルとボタンの表示を切り替え
+    document.getElementById('roleModalTitle').textContent = '権限編集';
+    document.getElementById('saveBtn').textContent = '更新する';
+    document.getElementById('saveBtn').style.display = 'block';
+    document.getElementById('switchToEditBtn').style.display = 'none';
+
+    // フォームのロックを解除
+    document.getElementById('roleName').disabled = false;
+    document.querySelectorAll('#screenPermissions input').forEach(input => input.disabled = false);
+
+    // 照会から編集に切り替わった時点の値を、変更検知用の新しい初期値として再セット
+    const roleNameInput = document.getElementById('roleName');
+    if (roleNameInput) {
+
+        roleNameInput.style.removeProperty('border');
+    }
+
+    // ラジオボタンの背景色リセット
+    document.querySelectorAll('#screenPermissions td').forEach(td => td.style.removeProperty('background-color'));
+
+    // モーダルの位置を一番上へリセット
+    const modalEl = document.getElementById('roleModal');
+    if (modalEl) {
+		// 上にスクロールさせる
+        modalEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
 let currentUsersRoleId = null;
