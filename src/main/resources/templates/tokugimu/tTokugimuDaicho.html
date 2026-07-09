@@ -3,23 +3,23 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>特別徴収義務者管理台帳</title>
+	<title>特別徴収義務老E��琁E��帳</title>
 	<link rel="stylesheet" th:href="@{/css/tokugimuDaicho.css}">
 </head>
 
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
 
-		<!-- ページヘッダー -->
+		<!-- ペ�Eジヘッダー -->
 		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-building text-primary me-2"></i>特別徴収義務者管理台帳
+				<i class="bi bi-building text-primary me-2"></i>特別徴収義務老E��琁E��帳
 			</h5>
 			<span class="text-muted small"> 検索結果: <strong th:text="${items.totalElements}">0</strong> 件
 			</span>
 		</div>
 
-		<!-- フラッシュメッセージ -->
+		<!-- フラチE��ュメチE��ージ -->
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
@@ -30,7 +30,7 @@
 			<button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- ========== 抽出条件（アコーディオン） ========== -->
+		<!-- ========== 抽出条件�E�アコーチE��オン�E�E========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
@@ -42,12 +42,12 @@
 				<div id="searchPanel" class="accordion-collapse collapse show">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/tokugimu/list}" th:object="${searchForm}" method="get">
-							<!-- SP:1列 / タブレット:2列 / PC:4列 -->
+							<!-- SP:1刁E/ タブレチE��:2刁E/ PC:4刁E-->
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
+									<label class="form-label form-label-sm fw-medium mb-1">持E��番号</label>
 									<input type="text" class="form-control form-control-sm" th:field="*{shiteiNo}"
-										placeholder="指定番号">
+										placeholder="持E��番号">
 								</div>
 								<div class="col">
 									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
@@ -58,15 +58,15 @@
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
-											<label class="form-check-label small" for="namePartial">部分</label>
+											<label class="form-check-label small" for="namePartial">部刁E/label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
-											<label class="form-check-label small" for="nameExact">完全</label>
+											<label class="form-check-label small" for="nameExact">完�E</label>
 										</div>
 									</div>
 									<input type="text" class="form-control form-control-sm" th:field="*{name}"
-										placeholder="氏名または名称">
+										placeholder="氏名また�E名称">
 								</div>
 								<div class="col">
 									<label class="form-label form-label-sm fw-medium mb-1">施設名称</label>
@@ -78,9 +78,9 @@
 									<select class="form-select form-select-sm" th:field="*{kyokaShu}">
 										<option value="999">すべて</option>
 										<option value="1">ホテル</option>
-										<option value="2">旅館</option>
+										<option value="2">旁E��</option>
 										<option value="3">簡易宿所</option>
-										<option value="4">民泊</option>
+										<option value="4">民況E/option>
 									</select>
 								</div>
 								<div class="col">
@@ -92,12 +92,12 @@
 									</select>
 								</div>
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">ステータス</label>
+									<label class="form-label form-label-sm fw-medium mb-1">スチE�Eタス</label>
 									<select class="form-select form-select-sm" th:field="*{status}">
 										<option value="999">すべて</option>
 										<option value="1">営業中</option>
 										<option value="2">休止</option>
-										<option value="3">廃止</option>
+										<option value="3">廁E��</option>
 									</select>
 								</div>
 								<div class="col">
@@ -113,7 +113,7 @@
 							</div>
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-sm"> <i
-										class="bi bi-arrow-counterclockwise me-1"></i>リセット
+										class="bi bi-arrow-counterclockwise me-1"></i>リセチE��
 								</a>
 								<button type="submit" class="btn btn-primary btn-sm px-4">
 									<i class="bi bi-search me-1"></i>検索する
@@ -125,60 +125,60 @@
 			</div>
 		</div>
 
-		<!-- ========== ツールバー（ボタンエリア） ========== -->
+		<!-- ========== チE�Eルバ�E�E��Eタンエリア�E�E========== -->
 		<div class="card shadow-sm mb-3">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
-					<!-- グループ1: 基本操作 -->
+					<!-- グルーチE: 基本操佁E-->
 					<div class="d-flex flex-wrap gap-1">
 						<a th:href="@{/tokugimu/registration}" class="btn btn-primary btn-sm"> <i
 								class="bi bi-plus-circle me-1"></i>新規登録
 						</a>
 						<button type="button" id="btnView" class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-eye me-1"></i>照会
+							<i class="bi bi-eye me-1"></i>照企E
 						</button>
 						<button type="button" id="btnDelete" class="btn btn-outline-danger btn-sm">
 							<i class="bi bi-trash me-1"></i>削除
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ2: 納税管理人 -->
+					<!-- グルーチE: 納税管琁E�� -->
 					<div class="d-flex flex-wrap gap-1">
 						<button type="button" id="btnTaxManager" class="btn btn-info btn-sm">
-							<i class="bi bi-person-plus me-1"></i>納税管理人登録
+							<i class="bi bi-person-plus me-1"></i>納税管琁E��登録
 						</button>
 						<button type="button" id="btnTaxManagerView" class="btn btn-outline-info btn-sm">
-							<i class="bi bi-person me-1"></i>納税管理人照会
+							<i class="bi bi-person me-1"></i>納税管琁E��照企E
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ3: 納税周期(特例申請) -->
+					<!-- グルーチE: 納税周朁E特例申諁E -->
 					<div class="d-flex flex-wrap gap-1">
 						<button type="button" id="btnNozeiShuki" class="btn btn-success btn-sm">
 							<i class="bi bi-calendar-plus me-1"></i>納税周期登録
 						</button>
 						<button type="button" id="btnNozeiShukiView" class="btn btn-outline-success btn-sm">
-							<i class="bi bi-calendar-check me-1"></i>納税周期照会
+							<i class="bi bi-calendar-check me-1"></i>納税周期�E企E
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ4: 納入台帳 -->
+					<!-- グルーチE: 納�E台帳 -->
 					<button type="button" id="btnPaymentLedger"
 						class="btn btn-outline-secondary btn-sm">
-						<i class="bi bi-currency-yen me-1"></i>納入申告管理台帳
+						<i class="bi bi-currency-yen me-1"></i>納�E申告管琁E��帳
 					</button>
 
-					<!-- グループ5: その他 -->
+					<!-- グルーチE: そ�E仁E-->
 					<div class="d-flex flex-wrap gap-1">
 						<button type="button" id="btnReport" class="btn btn-outline-dark btn-sm">
-							<i class="bi bi-printer me-1"></i>帳票発行
+							<i class="bi bi-printer me-1"></i>帳票発衁E
 						</button>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- 表示件数選択プルダウン -->
+		<!-- 表示件数選択�Eルダウン -->
 		<div class="d-flex justify-content-end align-items-center mb-1">
 			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
@@ -189,7 +189,7 @@
 			</select>
 		</div>
 
-		<!-- ========== 一覧テーブル ========== -->
+		<!-- ========== 一覧チE�Eブル ========== -->
 		<div class="card shadow-sm">
 			<div class="card-body p-0">
 				<div class="table-scroll">
@@ -197,10 +197,10 @@
 						<thead class="table-primary">
 							<tr>
 								<th style="width: 40px" class="text-center"></th>
-								<th style="min-width: 100px">指定番号</th>
+								<th style="min-width: 100px">持E��番号</th>
 								<th style="min-width: 140px">氏名/名称</th>
 								<th style="min-width: 140px">事業所名称</th>
-								<th style="min-width: 80px" class="text-center">ステータス</th>
+								<th style="min-width: 80px" class="text-center">スチE�Eタス</th>
 								<th style="min-width: 80px" class="text-center">合算対象</th>
 							</tr>
 						</thead>
@@ -214,7 +214,7 @@
 								<td class="text-center"><span class="badge bg-success"
 										th:if="${item.status == '1'}">営業中</span> <span
 										class="badge bg-warning text-dark" th:if="${item.status == '2'}">休止</span> <span
-										class="badge bg-secondary" th:if="${item.status == '3'}">廃止</span>
+										class="badge bg-secondary" th:if="${item.status == '3'}">廁E��</span>
 									<span class="text-muted small"
 										th:if="${item.status == null or item.status == ''}">-</span>
 								</td>
@@ -227,7 +227,7 @@
 							<tr th:if="${items.totalElements == 0}">
 								<td colspan="7" class="text-center text-muted py-5"><i
 										class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-									該当するデータが見つかりませんでした。</td>
+									該当するデータが見つかりませんでした、E/td>
 							</tr>
 						</tbody>
 					</table>
@@ -255,18 +255,18 @@
 				<div style="width: 120px;"></div>
 			</div>
 		</div>
-		<!-- 削除フォーム（隠し） -->
+		<!-- 削除フォーム�E�隠し！E-->
 		<form th:each="item : ${items.content}" th:id="'deleteForm-' + ${item.shiteiNo}"
 			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}" method="post" class="d-none"></form>
 
 		<!-- 削除確認モーダル -->
 		<div
-			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確誁E, '選択したデータを削除します。よろしぁE��すか�E�E, 'deleteForm-0', 'btn-danger', '削除する')}">
 		</div>
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/t_tokugimu_daicho.js}"></script>
+		<script th:src="@{/js/tTokugimuDaicho.js}"></script>
 	</th:block>
 </body>
 

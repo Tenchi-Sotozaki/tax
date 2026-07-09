@@ -4,7 +4,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-<title>権限管理台帳</title>
+<title>権限管琁E��帳</title>
 </head>
 
 <body>
@@ -14,7 +14,7 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-shield-lock me-2 text-primary"></i> 権限管理台帳
+				<i class="bi bi-shield-lock me-2 text-primary"></i> 権限管琁E��帳
 			</h5>
 		</div>
 
@@ -33,7 +33,7 @@
 			</button>
 			<button type="button" class="btn btn-primary me-2"
 				onclick="openRoleModal('view')" id="viewBtn" disabled>
-				<i class="bi bi-eye me-1"></i>権限照会
+				<i class="bi bi-eye me-1"></i>権限�E企E
 			</button>
 			<button type="button" class="btn btn-danger me-2"
 				onclick="deleteRoles()" id="deleteBtn" disabled>
@@ -41,12 +41,12 @@
 			</button>
 			<button type="button" class="btn btn-outline-primary"
 				onclick="viewAssignedUsers()" id="usersBtn" disabled>
-				<i class="bi bi-people me-1"></i>付与ユーザー照会
+				<i class="bi bi-people me-1"></i>付与ユーザー照企E
 			</button>
 
 		</div>
 
-		<!-- 権限一覧テーブル -->
+		<!-- 権限一覧チE�Eブル -->
 		<div class="card shadow-sm">
 			<div class="card-body">
 				<table class="table table-hover">
@@ -67,7 +67,7 @@
 							<td th:text="${role.name}"></td>
 							<td><span th:each="detail, iterStat : ${role.roleDetails}"
 								th:if="${detail.screen != null}"
-								th:text="${detail.screen.screenName + (detail.permission == 1 ? '(参照)' : '(更新)') + (!iterStat.last ? ', ' : '')}"></span>
+								th:text="${detail.screen.screenName + (detail.permission == 1 ? '(参�E)' : '(更新)') + (!iterStat.last ? ', ' : '')}"></span>
 							</td>
 						</tr>
 					</tbody>
@@ -90,8 +90,8 @@
 						<table class="table table-sm">
 							<thead class="table-light">
 								<tr>
-									<th>付与</th>
-									<th>ユーザー名</th>
+									<th>付丁E/th>
+									<th>ユーザー吁E/th>
 								</tr>
 							</thead>
 							<tbody id="usersModalBody"></tbody>
@@ -99,7 +99,7 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal">閉じる</button>
+							data-bs-dismiss="modal">閉じめE/button>
 						<button type="button" class="btn btn-success" id="updateUsersBtn"
 							onclick="updateAssignedUsers()">更新する</button>
 					</div>
@@ -118,7 +118,7 @@
 							<button type="button" class="btn btn-primary"
 								id="switchToEditBtn" onclick="switchToEditMode()"
 								style="display: none;">
-								<i class="bi bi-pencil-square me-1"></i>編集する
+								<i class="bi bi-pencil-square me-1"></i>編雁E��めE
 							</button>
 							<button type="button" class="btn-close mt-1" data-bs-dismiss="modal"></button>
 						</div>
@@ -130,8 +130,8 @@
 
 							<div id="roleModalErrors" class="alert alert-danger d-none"
 								role="alert">
-								<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
-									id="roleModalErrorCount"></span> 件のエラーがあります。
+								<i class="bi bi-exclamation-triangle-fill me-2"></i>入力�E容に <span
+									id="roleModalErrorCount"></span> 件のエラーがあります、E
 								<ul class="mb-0 mt-1" id="roleModalErrorList"></ul>
 							</div>
 
@@ -148,9 +148,9 @@
 									<table class="table table-sm">
 										<thead>
 											<tr>
-												<th>画面名</th>
-												<th>権限なし</th>
-												<th>参照</th>
+												<th>画面吁E/th>
+												<th>権限なぁE/th>
+												<th>参�E</th>
 												<th>更新</th>
 											</tr>
 										</thead>
@@ -187,7 +187,7 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/role_management.js}"></script>
+		<script th:src="@{/js/roleManagement.js}"></script>
 	</th:block>
 
 </body>

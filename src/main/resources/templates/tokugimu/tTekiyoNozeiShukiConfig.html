@@ -5,7 +5,7 @@
 
 <head>
 <title
-	th:text="${(isView ?: false) ? '適用納税周期照会' : ((isEdit ?: false) ? '適用納税周期編集' : '適用納税周期登録')}">適用納税周期登録/編集</title>
+	th:text="${(isView ?: false) ? '適用納税周期�E企E : ((isEdit ?: false) ? '適用納税周期編雁E : '適用納税周期登録')}">適用納税周期登録/編雁E/title>
 </head>
 
 <body>
@@ -15,12 +15,12 @@
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-calendar-check me-2 text-success"></i> <span
-					th:text="${(isView ?: false) ? '適用納税周期照会' : ((isEdit ?: false) ? '適用納税周期編集' : '適用納税周期登録')}"></span>
+					th:text="${(isView ?: false) ? '適用納税周期�E企E : ((isEdit ?: false) ? '適用納税周期編雁E : '適用納税周期登録')}"></span>
 			</h5>
 			<a
 				th:href="@{/tekiyo-nozei-shuki/edit/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}"
 				class="btn btn-primary btn-sm" th:if="${isView ?: false}"> <i
-				class="bi bi-pencil-square me-2"></i>編集する
+				class="bi bi-pencil-square me-2"></i>編雁E��めE
 			</a>
 		</div>
 
@@ -62,7 +62,7 @@
 					<div class="row g-3">
 
 						<div class="col-md-4">
-							<label class="form-label fw-medium"> 納税周期 <span
+							<label class="form-label fw-medium"> 納税周朁E<span
 								class="text-danger" th:if="${!(isView ?: false)}">*</span>
 							</label> <select class="form-select" th:field="*{seq}"
 								th:disabled="${isView ?: false}" th:data-initial-value="*{seq}">
@@ -83,7 +83,7 @@
 						</div>
 
 						<div class="col-md-4">
-							<label class="form-label fw-medium">適用終了年月日</label> <input
+							<label class="form-label fw-medium">適用終亁E��月日</label> <input
 								th:if="${!(isView ?: false)}" type="date" class="form-control"
 								th:field="*{tekiyoEdYmd}" th:data-initial-value="*{tekiyoEdYmd}">
 							<input th:if="${isView ?: false}" type="text"
@@ -105,28 +105,28 @@
 				<a th:href="@{/tekiyo-nozei-shuki/delete/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}"
 					class="btn btn-danger btn-lg px-4"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
-					onclick="return confirm('削除してもよろしいですか？')">
+					onclick="return confirm('削除してもよろしぁE��すか�E�E)">
 					<i class="bi bi-trash me-2"></i>削除する
 				</a>
 
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
-					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻めE
 				</a> <a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
 					th:unless="${isView ?: false}"
-					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
+					onclick="return confirm('入力�E容は破棁E��れます。よろしぁE��すか�E�E)"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻めE
 				</a>
 			</div>
 		</form>
 
-		<!-- 特別徴収義務者指定モーダル -->
+		<!-- 特別徴収義務老E��定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/tekiyoNozeiShuki.js}"></script>
-		<script th:src="@{/js/shitei_gassan_search.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
 </body>
 </html>

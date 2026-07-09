@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title th:text="${(isView ?: false) ? '納税管理人照会' : ((isEdit ?: false) ? '納税管理人編集' : '納税管理人登録')}">納税管理人登録/編集</title>
+	<title th:text="${(isView ?: false) ? '納税管琁E��照企E : ((isEdit ?: false) ? '納税管琁E��編雁E : '納税管琁E��登録')}">納税管琁E��登録/編雁E/title>
 </head>
 
 <body>
@@ -14,15 +14,15 @@
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-person-lines-fill me-2 text-primary" th:if="${isView ?: false}"></i> <i
 					class="bi bi-person-gear me-2 text-primary" th:unless="${isView ?: false}"></i> <span
-					th:text="${(isView ?: false) ? '納税管理人照会' : ((isEdit ?: false) ? '納税管理人編集' : '納税管理人登録')}"></span>
+					th:text="${(isView ?: false) ? '納税管琁E��照企E : ((isEdit ?: false) ? '納税管琁E��編雁E : '納税管琁E��登録')}"></span>
 			</h5>
 
 			<a th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.shiteiNo})}" class="btn btn-primary btn-sm"
-				th:if="${isView ?: false}"> <i class="bi bi-pencil-square me-2"></i>編集する
+				th:if="${isView ?: false}"> <i class="bi bi-pencil-square me-2"></i>編雁E��めE
 			</a>
 		</div>
 
-		<!-- 特別徴収義務者情報 -->
+		<!-- 特別徴収義務老E��報 -->
 		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -47,8 +47,8 @@
 
 			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 				class="alert alert-danger alert-dismissible fade show" role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
-					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力�E容に <span
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります、E
 				<ul class="mb-0 mt-1">
 					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 				</ul>
@@ -62,7 +62,7 @@
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<h5 class="mb-0">
-						<i class="bi bi-person-vcard me-2"></i>納税管理人情報
+						<i class="bi bi-person-vcard me-2"></i>納税管琁E��惁E��
 					</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
@@ -115,7 +115,7 @@
 						</div>
 
 						<div class="col-md-6">
-							<label class="form-label fw-medium">住所（所在地）</label> <input type="text" class="form-control"
+							<label class="form-label fw-medium">住所�E�所在地�E�E/label> <input type="text" class="form-control"
 								id="managerAddress" th:field="*{managerAddress}" readonly
 								th:classappend="${#fields.hasErrors('managerAddress')} ? 'is-invalid'"
 								th:data-initial-value="*{managerAddress}">
@@ -160,7 +160,7 @@
 						</div>
 
 						<div class="col-md-12" id="exemptionReasonArea" style="display: none;">
-							<label for="exemptionReason" class="form-label fw-medium">選任免除理由
+							<label for="exemptionReason" class="form-label fw-medium">選任免除琁E��
 								<span class="text-danger" th:if="${!(isView ?: false)}">*</span>
 							</label>
 							<textarea class="form-control" id="exemptionReason" rows="3" th:field="*{exemptionReason}"
@@ -177,7 +177,7 @@
 					<i class="bi bi-save me-2"></i> <span th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
 				</button>
 
-				<!-- 編集時のみ削除ボタンを表示 -->
+				<!-- 編雁E��のみ削除ボタンを表示 -->
 				<button type="button" class="btn btn-danger btn-lg px-5"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}" data-bs-toggle="modal"
 					data-bs-target="#deleteConfirmModal">
@@ -185,23 +185,23 @@
 				</button>
 
 				<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-4" th:if="${isView ?: false}">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻めE
 				</a> <a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-4"
-					th:unless="${isView ?: false}" onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
-						class="bi bi-arrow-left me-2"></i>一覧に戻る
+					th:unless="${isView ?: false}" onclick="return confirm('入力�E容は破棁E��れます。よろしぁE��すか�E�E)"> <i
+						class="bi bi-arrow-left me-2"></i>一覧に戻めE
 
 				</a>
 			</div>
 		</form>
 
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
-		<!-- 特別徴収義務者指定モーダル -->
+		<!-- 特別徴収義務老E��定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/t_tax_manager_config.js}"></script>
-		<script th:src="@{/js/shitei_gassan_search.js}"></script>
+		<script th:src="@{/js/tTaxManagerConfig.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
 </body>
 
