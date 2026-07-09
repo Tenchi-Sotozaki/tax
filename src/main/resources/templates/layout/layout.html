@@ -230,7 +230,7 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nokigen/list}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nokigen/list')} ? 'text-white fw-medium' : ''">
+											th:classappend="${#strings.contains(currentUri, '/admin/nokigen/view')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar-check me-2"></i>納入期限
 										</a></li>
 										<li class="nav-item"><a
@@ -292,7 +292,7 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/nokigen/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nokigen') and !#strings.contains(currentUri, '/admin/nokigen/list')} ? 'text-white fw-medium' : ''">
+											th:classappend="${#strings.contains(currentUri, '/admin/nokigen') and !#strings.contains(currentUri, '/admin/nokigen/view')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-calendar-check me-2"></i>納入期限
 										</a></li>
 										<li class="nav-item"
