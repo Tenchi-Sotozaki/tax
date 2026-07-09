@@ -1,17 +1,15 @@
 ﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-<title>納入金額管理台帳</title>
+	<title>納入金額管理台帳</title>
 </head>
 
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
 
-		<div
-			class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-currency-yen text-primary me-2"></i>納入申告管理台帳
 			</h5>
@@ -19,15 +17,13 @@
 
 		<!-- 特別徴収義務者情報 -->
 		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
-		
+
 		<!-- 成功・エラーメッセージ -->
-		<div th:if="${successMessage}"
-			class="alert alert-success alert-dismissible fade show" role="alert">
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
@@ -40,19 +36,16 @@
 				</h6>
 			</div>
 			<div class="card-body py-3">
-				<form
-					th:action="@{/declaration/payment-ledger/{id}(id=${fukaDaichoForm.shiteiNo})}"
+				<form th:action="@{/declaration/payment-ledger/{id}(id=${fukaDaichoForm.shiteiNo})}"
 					th:object="${fukaDaichoForm}" method="get">
 					<div class="row g-3 align-items-end">
 						<div class="col-md-3">
-							<label for="nendo" class="form-label fw-medium">年度</label> <input
-								type="text" class="form-control" th:field="*{nendo}"
-								maxlength="4" placeholder="例: 2026">
+							<label for="nendo" class="form-label fw-medium">年度</label> <input type="text"
+								class="form-control" th:field="*{nendo}" maxlength="4" placeholder="例: 2026">
 						</div>
 						<div class="col-md-3">
-							<label class="form-label fw-medium">ステータス</label> <select
-								class="form-select" th:field="*{status}"
-								onchange="this.form.submit()">
+							<label class="form-label fw-medium">ステータス</label> <select class="form-select"
+								th:field="*{status}" onchange="this.form.submit()">
 								<option value="999">すべて</option>
 								<option value="1">申告済み</option>
 								<option value="2">未申告</option>
@@ -69,9 +62,7 @@
 		</div>
 
 		<!-- 明細テーブル -->
-		<form
-			th:action="@{/declaration/register/{id}(id=${fukaDaichoForm.shiteiNo})}"
-			method="get">
+		<form th:action="@{/declaration/register/{id}(id=${fukaDaichoForm.shiteiNo})}" method="get">
 
 			<div class="card shadow-sm">
 				<div class="card-body p-0">
@@ -91,34 +82,28 @@
 							<tbody>
 								<tr th:each="item : ${fukaDaichoForm.items}"
 									th:classappend="${item.shinkokuZumi} ? '' : 'table-light'">
-									<td class="text-center"><input type="checkbox" name="month"
-										class="row-select" th:value="${item.targetYearMonth}"
-										th:data-status="${item.shinkokuZumi}"
-										th:data-nendo="${item.nendo}"
-										th:data-kibetsu="${item.kibetsu}"></td>
-									<td class="text-center fw-bold"
-										th:text="${item.displayNengetsu}">-</td>
-									<td class="text-end px-4"><span
-										th:if="${item.totalZeigaku != null}"
-										th:text="${#numbers.formatInteger(item.totalZeigaku, 1, 'COMMA') + ' 円'}">-</span>
-										<span th:unless="${item.totalZeigaku != null}"
-										class="text-muted">-</span></td>
-									<td class="text-end px-4"><span
-										th:if="${item.cityZeigaku != null}"
-										th:text="${#numbers.formatInteger(item.cityZeigaku, 1, 'COMMA') + ' 円'}">-</span>
-										<span th:unless="${item.cityZeigaku != null}"
-										class="text-muted">-</span></td>
-									<td class="text-end px-4"><span
-										th:if="${item.kenZeigaku != null}"
-										th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' 円'}">-</span>
-										<span th:unless="${item.kenZeigaku != null}"
-										class="text-muted">-</span></td>
+									<td class="text-center"><input type="checkbox" name="month" class="row-select"
+											th:value="${item.targetYearMonth}" th:data-status="${item.shinkokuZumi}"
+											th:data-nendo="${item.nendo}" th:data-kibetsu="${item.kibetsu}"></td>
+									<td class="text-center fw-bold" th:text="${item.displayNengetsu}">-</td>
+									<td class="text-end px-4"><span th:if="${item.totalZeigaku != null}"
+											th:text="${#numbers.formatInteger(item.totalZeigaku, 1, 'COMMA') + ' 円'}">-</span>
+										<span th:unless="${item.totalZeigaku != null}" class="text-muted">-</span>
+									</td>
+									<td class="text-end px-4"><span th:if="${item.cityZeigaku != null}"
+											th:text="${#numbers.formatInteger(item.cityZeigaku, 1, 'COMMA') + ' 円'}">-</span>
+										<span th:unless="${item.cityZeigaku != null}" class="text-muted">-</span>
+									</td>
+									<td class="text-end px-4"><span th:if="${item.kenZeigaku != null}"
+											th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' 円'}">-</span>
+										<span th:unless="${item.kenZeigaku != null}" class="text-muted">-</span>
+									</td>
 									<td class="text-center" th:text="${item.displayNoki}">-</td>
 									<td class="text-center"><span th:if="${item.shinkokuZumi}"
-										class="badge bg-success px-3 py-2"> <i
-											class="bi bi-check-circle me-1"></i>申告済み
-									</span> <span th:unless="${item.shinkokuZumi}"
-										class="badge bg-secondary px-3 py-2"> 未申告 </span></td>
+											class="badge bg-success px-3 py-2"> <i
+												class="bi bi-check-circle me-1"></i>申告済み
+										</span> <span th:unless="${item.shinkokuZumi}"
+											class="badge bg-secondary px-3 py-2"> 未申告 </span></td>
 								</tr>
 								<tr th:if="${#lists.isEmpty(fukaDaichoForm.items)}">
 									<td colspan="4" class="text-center py-5 text-muted">
@@ -131,17 +116,15 @@
 			</div>
 
 			<div class="d-flex justify-content-center gap-3 py-4">
-				<button type="submit" class="btn btn-primary btn-lg px-5">
+				<button type="submit" class="btn btn-success btn-lg px-5">
 					<i class="bi bi-plus-circle me-1"></i>新規登録
 				</button>
 
-				<button type="button" id="btnViewDeclaration"
-					class="btn btn-outline-primary btn-lg px-5">
+				<button type="button" id="btnViewDeclaration" class="btn btn-outline-primary btn-lg px-5">
 					<i class="bi bi-eye me-2"></i>照会
 				</button>
-				<a th:href="@{/tokugimu/list}"
-					class="btn btn-outline-secondary btn-lg px-3"> <i
-					class="bi bi-arrow-left me-1"></i>一覧に戻る
+				<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-3"> <i
+						class="bi bi-arrow-left me-1"></i>一覧に戻る
 				</a>
 			</div>
 
