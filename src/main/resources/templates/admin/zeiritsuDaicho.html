@@ -1,13 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
+
 <head>
-<title>賦課方式照会</title>
-<style>
-.sticky-table thead th { position: sticky; top: 0; z-index: 1; }
-.table-scroll { max-height: 55vh; min-height: 200px; overflow-y: auto; overflow-x: auto; }
-</style>
+	<title>賦課方式照会</title>
+	<style>
+		.sticky-table thead th {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
+
+		.table-scroll {
+			max-height: 55vh;
+			min-height: 200px;
+			overflow-y: auto;
+			overflow-x: auto;
+		}
+	</style>
 </head>
+
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
 
@@ -27,8 +39,8 @@
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
-					<button class="accordion-button py-2 fw-semibold" type="button"
-						data-bs-toggle="collapse" data-bs-target="#searchPanel">
+					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
+						data-bs-target="#searchPanel">
 						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
@@ -50,7 +62,8 @@
 									<select class="form-select form-select-sm" th:field="*{fukaKbn}">
 										<option value="">すべて</option>
 										<option th:value="${fukaTeigaku.value}" th:text="${fukaTeigaku.name}"></option>
-										<option th:value="${fukaTeiritsu.value}" th:text="${fukaTeiritsu.name}"></option>
+										<option th:value="${fukaTeiritsu.value}" th:text="${fukaTeiritsu.name}">
+										</option>
 									</select>
 								</div>
 								<div class="col">
@@ -113,8 +126,12 @@
 										th:classappend="${item.fukaKbn == '1'} ? 'bg-primary' : 'bg-success'"
 										th:text="${item.fukaKbnName}"></span>
 								</td>
-								<td th:text="${#strings.substring(item.tekiyoStYm,0,4) + '/' + #strings.substring(item.tekiyoStYm,4,6)}"></td>
-								<td th:text="${item.tekiyoEdYm == null or item.tekiyoEdYm == ''} ? '-' : ${#strings.substring(item.tekiyoEdYm,0,4) + '/' + #strings.substring(item.tekiyoEdYm,4,6)}"></td>
+								<td
+									th:text="${#strings.substring(item.tekiyoStYm,0,4) + '/' + #strings.substring(item.tekiyoStYm,4,6)}">
+								</td>
+								<td
+									th:text="${item.tekiyoEdYm == null or item.tekiyoEdYm == ''} ? '-' : ${#strings.substring(item.tekiyoEdYm,0,4) + '/' + #strings.substring(item.tekiyoEdYm,4,6)}">
+								</td>
 								<td th:text="${item.taishoKbnName}"></td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(items)}">
@@ -148,4 +165,5 @@
 		</script>
 	</th:block>
 </body>
+
 </html>
