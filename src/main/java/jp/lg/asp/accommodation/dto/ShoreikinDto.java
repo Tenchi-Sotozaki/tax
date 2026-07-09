@@ -35,6 +35,7 @@ public class ShoreikinDto {
 
 	/** No.5 施設名称 (t_tokugimu.shisetsu_name) */
 	private String shisetsuName;
+	private String shisetsuNameMatchType = "partial";
 
 	/** No.6 営業種別 (t_tokugimu.kyoka_shu): 1=ホテル/2=旅館/3=簡易宿所/4=民泊/999=すべて */
 	private String kyokaShu = "999";
