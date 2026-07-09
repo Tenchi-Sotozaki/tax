@@ -8,8 +8,9 @@ public class TokugimuSearchForm {
 	/** No.1 \u6307\u5b9a\u756a\u53f7 (t_tokugimu.shitei_no) */
 	private String shiteiNo;
 
-	/** No.2 \u6c0f\u540d/\u540d\u79f0 (m_atena.name) */
+	/** No.2 氏名/名称 (m_atena.name) */
 	private String name;
+	private String nameMatchType = "partial";
 
 	/** No.3 \u65bd\u8a2d\u540d\u79f0 (t_tokugimu.shisetsu_name) */
 	private String shisetsuName;
