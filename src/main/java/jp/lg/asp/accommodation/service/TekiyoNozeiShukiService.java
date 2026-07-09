@@ -12,4 +12,6 @@ public interface TekiyoNozeiShukiService {
     TekiyoNozeiShukiForm getByShiteiNo(String shiteiNo);
 
     void save(String shiteiNo, TekiyoNozeiShukiForm form);
+
+    void delete(String shiteiNo);
 }

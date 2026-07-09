@@ -122,4 +122,27 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
             }
         }
     }
+
+    @Override
+    @Transactional
+    public void delete(String shiteiNo) {
+        TekiyoNozeiShuki latest = tekiyoNozeiShukiRepository
+                .findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .orElseThrow(() -> new IllegalStateException("削除対象のレコードが見つかりません。"));
+
+        latest.setDelFlg(FLG_ON);
+        latest.setNewFlg(FLG_OFF);
+        tekiyoNozeiShukiRepository.save(latest);
+
+        // 1つ前の履歴の最新フラグを戻す
+        List<TekiyoNozeiShuki> previousRecords = tekiyoNozeiShukiRepository
+                .findPreviousRecords(jichitaiCd, shiteiNo, latest.getRno());
+        if (!previousRecords.isEmpty()) {
+            TekiyoNozeiShuki prev = previousRecords.get(0);
+            prev.setNewFlg(FLG_ON);
+            tekiyoNozeiShukiRepository.save(prev);
+        }
+
+        log.info("適用納税周期削除完了: shiteiNo={}, rno={}", shiteiNo, latest.getRno());
+    }
 }

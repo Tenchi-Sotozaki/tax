@@ -102,6 +102,13 @@
 						th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
 				</button>
 
+				<a th:href="@{/tekiyo-nozei-shuki/delete/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}"
+					class="btn btn-danger btn-lg px-4"
+					th:if="${(isEdit ?: false) and !(isView ?: false)}"
+					onclick="return confirm('削除してもよろしいですか？')">
+					<i class="bi bi-trash me-2"></i>削除する
+				</a>
+
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
