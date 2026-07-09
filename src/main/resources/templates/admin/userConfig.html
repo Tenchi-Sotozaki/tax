@@ -162,8 +162,7 @@
 
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<button type="submit" class="btn btn-lg px-5"
-					th:classappend="${isEdit} ? 'btn-success' : 'btn-primary'">
+				<button type="submit" class="btn btn-success btn-lg px-5">
 					<i th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
 				</button>
