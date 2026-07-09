@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-<title th:text="${mode == 'register' ? '納税周期登録' : '納税周期編集'}">納税周期設定</title>
+	<title th:text="${mode == 'register' ? '納税周期登録' : '納税周期編集'}">納税周期設定</title>
 </head>
 
 <body>
-	<div layout:fragment="content" class="container-fluid p-4"
-		th:data-is-edit="${mode != 'register'}">
+	<div layout:fragment="content" class="container-fluid p-4" th:data-is-edit="${mode != 'register'}">
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -19,51 +17,41 @@
 			</h5>
 		</div>
 
-		<div
-			th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 			class="alert alert-danger alert-dismissible fade show" role="alert">
 			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
 				th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 			<ul class="mb-0 mt-1">
-				<li th:each="err : ${validationErrors}" th:text="${err}"
-					class="small"></li>
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
 			</ul>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 
 		<!-- メッセージ表示 -->
-		<div th:if="${successMessage}"
-			class="alert alert-success alert-dismissible fade show" role="alert">
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 		<!-- 入力フォーム -->
-		<form th:action="@{/admin/nozei-shuki/save}" method="post"
-			th:object="${nozeiShuki}">
+		<form th:action="@{/admin/nozei-shuki/save}" method="post" th:object="${nozeiShuki}">
 			<div class="card shadow-sm">
 				<div class="card-body">
 
-					<input type="hidden" th:field="*{seq}"> <input
-						type="hidden" th:field="*{jichitaiCd}"> <input
-						type="hidden" th:field="*{delFlg}"> <input type="hidden"
-						th:field="*{addDt}"> <input type="hidden"
-						th:field="*{addUser}"> <input type="hidden"
-						th:field="*{updDt}"> <input type="hidden"
-						th:field="*{updUser}"> <input type="hidden"
-						th:field="*{version}">
+					<input type="hidden" th:field="*{seq}"> <input type="hidden" th:field="*{jichitaiCd}"> <input
+						type="hidden" th:field="*{delFlg}"> <input type="hidden" th:field="*{addDt}"> <input
+						type="hidden" th:field="*{addUser}"> <input type="hidden" th:field="*{updDt}"> <input
+						type="hidden" th:field="*{updUser}"> <input type="hidden" th:field="*{version}">
 					<div class="row">
 						<div class="col-md-6">
 							<div class="mb-3">
-								<label for="shuki" class="form-label">納税周期 <span
-									class="text-danger">*</span></label> <select class="form-select"
-									th:field="*{shuki}" id="shuki"
+								<label for="shuki" class="form-label">納税周期 <span class="text-danger">*</span></label>
+								<select class="form-select" th:field="*{shuki}" id="shuki"
 									th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'"
 									th:data-initial-value="*{shuki}">
 									<option value="">選択してください</option>
@@ -86,22 +74,19 @@
 
 			<div class="d-flex justify-content-center mt-2">
 				<div>
-					<a th:href="@{/admin/nozei-shuki/list}"
-						class="btn btn-secondary me-2"
-						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
-						class="bi bi-arrow-left me-1"></i>一覧に戻る
+					<a th:href="@{/admin/nozei-shuki/list}" class="btn btn-secondary me-2"
+						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i class="bi bi-arrow-left me-1"></i>一覧に戻る
 					</a>
 				</div>
 				<div>
 					<th:block th:if="${mode == 'edit'}">
-						<button type="button" class="btn btn-danger me-2"
-							onclick="deleteNozeiShuki()">
+						<button type="button" class="btn btn-danger me-2" onclick="deleteNozeiShuki()">
 							<i class="bi bi-trash me-1"></i>削除する
 						</button>
 					</th:block>
-					<button type="submit" class="btn btn-primary">
+					<button type="submit" class="btn btn-success">
 						<i class="bi bi-check-circle me-1"></i> <span
-							th:text="${mode == 'register' ? '登録する' : '更新する'}">保存</span>
+							th:text="${mode == 'register' ? '登録する' : '更新する'}"></span>
 					</button>
 				</div>
 			</div>
@@ -110,13 +95,13 @@
 
 
 		<!-- 削除フォーム（隠し） -->
-		<form id="deleteNozeiShukiForm"
-			th:action="@{/admin/nozei-shuki/delete/{seq}(seq=${nozeiShuki.seq})}"
+		<form id="deleteNozeiShukiForm" th:action="@{/admin/nozei-shuki/delete/{seq}(seq=${nozeiShuki.seq})}"
 			method="post" class="d-none"></form>
 
 		<!-- 削除確認モーダル -->
 		<div
-			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', 'この納税周期を削除します。削除した納税周期は復元できません。よろしいですか？', 'deleteNozeiShukiForm', 'btn-danger', '削除する')}"></div>
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', 'この納税周期を削除します。削除した納税周期は復元できません。よろしいですか？', 'deleteNozeiShukiForm', 'btn-danger', '削除する')}">
+		</div>
 
 	</div>
 
