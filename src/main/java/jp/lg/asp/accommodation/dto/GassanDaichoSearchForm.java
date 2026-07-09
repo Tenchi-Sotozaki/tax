@@ -15,6 +15,7 @@ public class GassanDaichoSearchForm {
 
 	// 氏名/名称
 	private String name;
+	private String nameMatchType = "partial";
 
 	// 現在のページ
 	private int page = 0;

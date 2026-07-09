@@ -48,9 +48,9 @@ public class AdminUserController {
 		model.addAttribute("items", userRepository.search(
 				jichitaiCd,
 				emptyToNull(searchForm.getId()),
-				emptyToNull(searchForm.getName()),
-				emptyToNull(searchForm.getNameKana()),
-				emptyToNull(searchForm.getBusho())));
+				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
+				toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
+				toLikePattern(searchForm.getBusho(), searchForm.getBushoMatchType())));
 		return LIST_VIEW;
 	}
 
@@ -183,5 +183,14 @@ public class AdminUserController {
 
 	private String emptyToNull(String s) {
 		return (s == null || s.isBlank()) ? null : s;
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank()) return null;
+		return switch (matchType) {
+			case "prefix" -> value + "%";
+			case "exact"  -> value;
+			default       -> "%" + value + "%"; // partial
+		};
 	}
 }

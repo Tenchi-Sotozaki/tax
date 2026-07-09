@@ -64,7 +64,21 @@
 
 									<!-- 氏名／名称 -->
 									<div class="col">
-										<label class="form-label form-label-sm fw-medium mb-1">氏名／名称</label>
+										<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+											<label class="form-label form-label-sm fw-medium mb-0">氏名／名称</label>
+											<div class="form-check form-check-inline me-0">
+												<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
+												<label class="form-check-label small" for="namePrefix">前方</label>
+											</div>
+											<div class="form-check form-check-inline me-0">
+												<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
+												<label class="form-check-label small" for="namePartial">部分</label>
+											</div>
+											<div class="form-check form-check-inline me-0">
+												<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
+												<label class="form-check-label small" for="nameExact">完全</label>
+											</div>
+										</div>
 										<input type="text" class="form-control form-control-sm" th:field="*{name}"
 											placeholder="氏名または名称" maxlength="200">
 									</div>

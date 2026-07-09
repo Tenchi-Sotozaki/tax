@@ -48,7 +48,7 @@ public class AtenaController {
 				jichitaiCd,
 				toLikePattern(searchForm.getAtenaNo(), "exact"),
 				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
-				toLikePattern(searchForm.getNameKana(), "exact"),
+				toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
 				toLikePattern(searchForm.getYubinNo(), "exact"),
 				toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
 				toLikePattern(searchForm.getTel(), "exact"),

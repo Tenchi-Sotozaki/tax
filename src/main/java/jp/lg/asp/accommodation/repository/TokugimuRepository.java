@@ -27,7 +27,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			LEFT JOIN Atena a ON t.jichitaiCd = a.jichitaiCd AND t.atenaNo = a.atenaNo
 			WHERE t.jichitaiCd = :jichitaiCd AND t.newFlg = '1' AND t.delFlg = '0'
 			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR t.shiteiNo = :shiteiNo)
-			AND (:name IS NULL OR :name = '' OR a.name LIKE %:name%)
+			AND (:name IS NULL OR :name = '' OR a.name LIKE :namePattern)
 			AND (:shisetsuName IS NULL OR :shisetsuName = '' OR t.shisetsuName LIKE %:shisetsuName%)
 			AND (:kyokaShu IS NULL OR :kyokaShu = '' OR :kyokaShu = '999' OR t.kyokaShu = :kyokaShu)
 			AND (:kojinNo IS NULL OR :kojinNo = '' OR a.kojinNo = :kojinNo)
@@ -38,6 +38,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo,
 			@Param("name") String name,
+			@Param("namePattern") String namePattern,
 			@Param("shisetsuName") String shisetsuName,
 			@Param("kyokaShu") String kyokaShu,
 			@Param("kojinNo") String kojinNo,

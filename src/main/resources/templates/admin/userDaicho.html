@@ -22,13 +22,13 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- ======== 検索条件アコーディオン ======== -->
+		<!-- ======== 抽出条件アコーディオン ======== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button"
 						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2"></i>検索条件
+						<i class="bi bi-funnel me-2"></i>抽出条件
 					</button>
 				</h2>
 			</div>
@@ -43,17 +43,59 @@
 									th:field="*{id}" placeholder="IDを入力">
 							</div>
 							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">氏名</label>
+								<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<label class="form-label form-label-sm fw-medium mb-0">氏名</label>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
+										<label class="form-check-label small" for="namePrefix">前方</label>
+									</div>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
+										<label class="form-check-label small" for="namePartial">部分</label>
+									</div>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
+										<label class="form-check-label small" for="nameExact">完全</label>
+									</div>
+								</div>
 								<input type="text" class="form-control form-control-sm"
 									th:field="*{name}" placeholder="氏名を入力">
 							</div>
 							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">ふりがな</label>
+								<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<label class="form-label form-label-sm fw-medium mb-0">ふりがな</label>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="prefix" id="nameKanaPrefix">
+										<label class="form-check-label small" for="nameKanaPrefix">前方</label>
+									</div>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="partial" id="nameKanaPartial">
+										<label class="form-check-label small" for="nameKanaPartial">部分</label>
+									</div>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="exact" id="nameKanaExact">
+										<label class="form-check-label small" for="nameKanaExact">完全</label>
+									</div>
+								</div>
 								<input type="text" class="form-control form-control-sm"
 									th:field="*{nameKana}" placeholder="ふりがなを入力">
 							</div>
 							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">部署</label>
+								<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<label class="form-label form-label-sm fw-medium mb-0">部署</label>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="prefix" id="bushoPrefix">
+										<label class="form-check-label small" for="bushoPrefix">前方</label>
+									</div>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="partial" id="bushoPartial">
+										<label class="form-check-label small" for="bushoPartial">部分</label>
+									</div>
+									<div class="form-check form-check-inline me-0">
+										<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="exact" id="bushoExact">
+										<label class="form-check-label small" for="bushoExact">完全</label>
+									</div>
+								</div>
 								<input type="text" class="form-control form-control-sm"
 									th:field="*{busho}" placeholder="部署を入力">
 							</div>

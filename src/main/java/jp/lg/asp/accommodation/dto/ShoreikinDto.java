@@ -31,6 +31,7 @@ public class ShoreikinDto {
 
 	/** No.4 氏名／名称 (m_atena.name) */
 	private String name;
+	private String nameMatchType = "partial";
 
 	/** No.5 施設名称 (t_tokugimu.shisetsu_name) */
 	private String shisetsuName;

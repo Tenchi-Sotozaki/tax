@@ -54,6 +54,7 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 					jichitaiCd,
 					form.getShiteiNo(),
 					form.getName(),
+					toLikePattern(form.getName(), form.getNameMatchType()),
 					form.getShisetsuName(),
 					form.getKyokaShu(),
 					form.getKojinNo(),
@@ -161,6 +162,15 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 		List<ShoreikinDto> pageContent = start >= result.size() ? List.of() : result.subList(start, end);
 		return new PageImpl<>(pageContent, pageable, result.size());
 
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank()) return null;
+		return switch (matchType) {
+			case "prefix" -> value + "%";
+			case "exact"  -> value;
+			default       -> "%" + value + "%";
+		};
 	}
 
 	private List<Tokugimu> findTokugimuByGassanShiteiNo(String gassanShiteiNo) {

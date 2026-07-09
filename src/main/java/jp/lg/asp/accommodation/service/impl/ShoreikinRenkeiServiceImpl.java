@@ -37,7 +37,7 @@ public class ShoreikinRenkeiServiceImpl implements ShoreikinRenkeiService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ShoreikinRenkeiDto> search(String jichitaiCd, String nendo, String shiteiNo, String name) {
+    public List<ShoreikinRenkeiDto> search(String jichitaiCd, String nendo, String shiteiNo, String name, String nameMatchType) {
 
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Shoreikin> cq = cb.createQuery(Shoreikin.class);
@@ -56,6 +56,7 @@ public class ShoreikinRenkeiServiceImpl implements ShoreikinRenkeiService {
 
         // 氏名検索条件
         if (name != null && !name.isEmpty()) {
+            String namePattern = toLikePattern(name, nameMatchType);
             jakarta.persistence.criteria.Subquery<Tokugimu> subquery = cq.subquery(Tokugimu.class);
             Root<Tokugimu> t = subquery.from(Tokugimu.class);
             Join<Tokugimu, Atena> atenaJoin = t.join("atena", JoinType.INNER);
@@ -64,7 +65,7 @@ public class ShoreikinRenkeiServiceImpl implements ShoreikinRenkeiService {
                 .where(cb.and(
                     cb.equal(t.get("jichitaiCd"), s.get("jichitaiCd")),
                     cb.equal(t.get("shiteiNo"), s.get("shiteiNo")),
-                    cb.like(atenaJoin.get("name"), cb.literal('%' + name + '%'))
+                    cb.like(atenaJoin.get("name"), cb.literal(namePattern))
                 ));
             
             predicates.add(cb.exists(subquery));
@@ -88,6 +89,15 @@ public class ShoreikinRenkeiServiceImpl implements ShoreikinRenkeiService {
                     .ifPresent(shoreikin -> result.add(toDto(shoreikin)));
         }
         return result;
+    }
+
+    private String toLikePattern(String value, String matchType) {
+        if (value == null || value.isBlank()) return "%";
+        return switch (matchType) {
+            case "prefix" -> value + "%";
+            case "exact"  -> value;
+            default       -> "%" + value + "%";
+        };
     }
 
     private ShoreikinRenkeiDto toDto(Shoreikin s) {

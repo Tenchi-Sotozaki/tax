@@ -8,7 +8,7 @@ import jp.lg.asp.accommodation.dto.ShunoDto;
 public interface ShunoRenkeiService {
 
     List<ShunoDto> search(String jichitaiCd, LocalDate shinkokuFrom, LocalDate shinkokuTo,
-            String taishoMonth, String shiteiNo, String name);
+            String taishoMonth, String shiteiNo, String name, String nameMatchType);
 
     List<ShunoDto> findByKeys(String jichitaiCd, List<ShunoDto.Key> keys);
 

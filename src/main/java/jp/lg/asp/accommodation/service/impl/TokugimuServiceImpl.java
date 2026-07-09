@@ -75,6 +75,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 					jichitaiCd,
 					form.getShiteiNo(),
 					form.getName(),
+					toLikePattern(form.getName(), form.getNameMatchType()),
 					form.getShisetsuName(),
 					form.getKyokaShu(),
 					form.getKojinNo(),
@@ -156,6 +157,15 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.map(j -> j.getGassanStChar() != null ? j.getGassanStChar() : "900")
 				.orElse("900");
 		return shiteiNo.startsWith(gassanPrefix);
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank()) return null;
+		return switch (matchType) {
+			case "prefix" -> value + "%";
+			case "exact"  -> value;
+			default       -> "%" + value + "%"; // partial
+		};
 	}
 
 	private boolean isEmptySearchForm(TokugimuSearchForm form) {

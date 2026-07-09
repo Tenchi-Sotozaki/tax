@@ -48,6 +48,7 @@ public class ShunoRenkeiController {
 			@RequestParam(required = false) String taishoMonth,
 			@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String name,
+			@RequestParam(required = false, defaultValue = "partial") String nameMatchType,
 			Model model) {
 
 		accessChecker.checkAccess(SCREEN_ID);
@@ -55,7 +56,7 @@ public class ShunoRenkeiController {
 				: LocalDate.parse(shinkokuFrom);
 		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
 				: LocalDate.parse(shinkokuTo);
-		List<ShunoDto> items = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name);
+		List<ShunoDto> items = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name, nameMatchType);
 
 		model.addAttribute("items", items);
 		Map<String, Object> searchForm = new HashMap<>();
@@ -64,6 +65,7 @@ public class ShunoRenkeiController {
 		searchForm.put("taishoMonth", taishoMonth);
 		searchForm.put("shiteiNo", shiteiNo);
 		searchForm.put("name", name);
+		searchForm.put("nameMatchType", nameMatchType);
 		model.addAttribute("searchForm", searchForm);
 
 		return "renkei/shunoRenkei";
@@ -77,14 +79,15 @@ public class ShunoRenkeiController {
 			@RequestParam(required = false) String shinkokuTo,
 			@RequestParam(required = false) String taishoMonth,
 			@RequestParam(required = false) String shiteiNo,
-			@RequestParam(required = false) String name) {
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false, defaultValue = "partial") String nameMatchType) {
 
 		accessChecker.checkAccess(SCREEN_ID);
 		LocalDate from = shinkokuFrom == null || shinkokuFrom.isEmpty() ? null
 				: LocalDate.parse(shinkokuFrom);
 		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
 				: LocalDate.parse(shinkokuTo);
-		return shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name);
+		return shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name, nameMatchType);
 	}
 
 	@PostMapping("/download")

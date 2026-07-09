@@ -6,7 +6,7 @@ import jp.lg.asp.accommodation.dto.ShoreikinRenkeiDto;
 
 public interface ShoreikinRenkeiService {
 
-    List<ShoreikinRenkeiDto> search(String jichitaiCd, String nendo, String shiteiNo, String name);
+    List<ShoreikinRenkeiDto> search(String jichitaiCd, String nendo, String shiteiNo, String name, String nameMatchType);
 
     List<ShoreikinRenkeiDto> findByKeys(String jichitaiCd, List<ShoreikinRenkeiDto.Key> keys);
 }

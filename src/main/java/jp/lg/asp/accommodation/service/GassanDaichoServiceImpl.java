@@ -77,7 +77,8 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 				.filter(item -> {
 					// 氏名/名称でのフィルタリング
 					if (searchForm.getName() != null && !searchForm.getName().isEmpty()) {
-						return item.getName() != null && item.getName().contains(searchForm.getName());
+						String pattern = toLikePattern(searchForm.getName(), searchForm.getNameMatchType());
+						return item.getName() != null && item.getName().matches(patternToRegex(pattern));
 					}
 					return true;
 				})
@@ -111,6 +112,23 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 				.orElse(gassanList.get(0));
 
 		return convertToGassanDaichoItem(gassanShiteiNo, daihyo, gassanList);
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank()) return null;
+		return switch (matchType) {
+			case "prefix" -> value + "%";
+			case "exact"  -> value;
+			default       -> "%" + value + "%";
+		};
+	}
+
+	private String patternToRegex(String likePattern) {
+		if (likePattern == null) return ".*";
+		String regex = java.util.regex.Pattern.quote(likePattern)
+				.replace("%", "\\E.*\\Q");
+		return "\\Q" + regex + "\\E"
+				.replace("\\Q\\E", "");
 	}
 
 	private GassanDaichoItem convertToGassanDaichoItem(String gassanShiteiNo, Gassan daihyo, List<Gassan> gassanList) {

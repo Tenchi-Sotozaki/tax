@@ -6,6 +6,9 @@ import lombok.Data;
 public class UserSearchForm {
     private String id;
     private String name;
+    private String nameMatchType = "partial";
     private String nameKana;
+    private String nameKanaMatchType = "partial";
     private String busho;
+    private String bushoMatchType = "partial";
 }
