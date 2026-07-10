@@ -25,6 +25,7 @@
 					<form id="koseiKetteiForm" method="post">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						<input type="hidden" name="shiteiNo" th:value="${dto.shitei_no}" />
+						<input type="hidden" name="henko_kbn" th:value="${dto.henko_kbn}" />
 
 						<!-- 対象施設エリア -->
 						<div class="card mb-4">
