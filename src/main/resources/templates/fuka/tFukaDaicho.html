@@ -1,59 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>”[“ü‹àŠzŠÇ—‘ä’ </title>
+<title>ç´å…¥é‡‘é¡ç®¡ç†å°å¸³</title>
 </head>
 
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
 
-		<div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<div
+			class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-currency-yen text-primary me-2"></i>”[“ü\ŠÇ—‘ä’ 
+				<i class="bi bi-currency-yen text-primary me-2"></i>ç´å…¥ç”³å‘Šç®¡ç†å°å¸³
 			</h5>
 		</div>
 
-		<!-- “Á•Ê’¥Žû‹`–±ŽÒî•ñ -->
+		<!-- ç‰¹åˆ¥å¾´åŽç¾©å‹™è€…æƒ…å ± -->
 		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
-		<!-- ¬Œ÷EƒGƒ‰[ƒƒbƒZ[ƒW -->
-		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+		<!-- æˆåŠŸãƒ»ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ -->
+		<div th:if="${successMessage}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- ’ŠoðŒƒtƒH[ƒ€ -->
+		<!-- æŠ½å‡ºæ¡ä»¶ãƒ•ã‚©ãƒ¼ãƒ  -->
 		<div class="card mb-3 shadow-sm">
 			<div class="card-header bg-light py-2">
 				<h6 class="mb-0">
-					<i class="bi bi-funnel me-2"></i>’ŠoðŒ
+					<i class="bi bi-funnel me-2"></i>æŠ½å‡ºæ¡ä»¶
 				</h6>
 			</div>
 			<div class="card-body py-3">
-				<form th:action="@{/declaration/payment-ledger/{id}(id=${fukaDaichoForm.shiteiNo})}"
+				<form
+					th:action="@{/declaration/payment-ledger/{id}(id=${fukaDaichoForm.shiteiNo})}"
 					th:object="${fukaDaichoForm}" method="get">
 					<div class="row g-3 align-items-end">
 						<div class="col-md-3">
-							<label for="nendo" class="form-label fw-medium">”N“x</label> <input type="text"
-								class="form-control" th:field="*{nendo}" maxlength="4" placeholder="—á: 2026">
+							<label for="nendo" class="form-label fw-medium">å¹´åº¦</label> <input
+								type="text" class="form-control" th:field="*{nendo}"
+								maxlength="4" placeholder="ä¾‹: 2026">
 						</div>
 						<div class="col-md-3">
-							<label class="form-label fw-medium">ƒXƒe[ƒ^ƒX</label> <select class="form-select"
-								th:field="*{status}" onchange="this.form.submit()">
-								<option value="999">‚·‚×‚Ä</option>
-								<option value="1">\Ï‚Ý</option>
-								<option value="2">–¢\</option>
+							<label class="form-label fw-medium">ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹</label> <select
+								class="form-select" th:field="*{status}"
+								onchange="this.form.submit()">
+								<option value="999">ã™ã¹ã¦</option>
+								<option value="1">ç”³å‘Šæ¸ˆã¿</option>
+								<option value="2">æœªç”³å‘Š</option>
 							</select>
 						</div>
 						<div class="col-md-6 text-end">
 							<button type="submit" class="btn btn-primary px-4">
-								<i class="bi bi-search me-1"></i>ŒŸõ
+								<i class="bi bi-search me-1"></i>æ¤œç´¢
 							</button>
 						</div>
 					</div>
@@ -61,8 +68,10 @@
 			</div>
 		</div>
 
-		<!-- –¾×ƒe[ƒuƒ‹ -->
-		<form th:action="@{/declaration/register/{id}(id=${fukaDaichoForm.shiteiNo})}" method="get">
+		<!-- æ˜Žç´°ãƒ†ãƒ¼ãƒ–ãƒ« -->
+		<form
+			th:action="@{/declaration/register/{id}(id=${fukaDaichoForm.shiteiNo})}"
+			method="get">
 
 			<div class="card shadow-sm">
 				<div class="card-body p-0">
@@ -70,44 +79,51 @@
 						<table class="table table-hover table-bordered mb-0 align-middle">
 							<thead class="table-primary text-center">
 								<tr>
-									<th style="width: 50px;">‘I‘ð</th>
-									<th>‘ÎÛ”NŒŽ</th>
-									<th>h”‘ÅŠz</th>
-									<th>Žs‹æ’¬‘ºÅŠz</th>
-									<th>“s“¹•{Œ§ÅŠz</th>
-									<th>”[Šú</th>
-									<th>ƒXƒe[ƒ^ƒX</th>
+									<th style="width: 50px;">é¸æŠž</th>
+									<th>å¯¾è±¡å¹´æœˆ</th>
+									<th>å®¿æ³Šç¨Žé¡</th>
+									<th>å¸‚åŒºç”ºæ‘ç¨Žé¡</th>
+									<th>éƒ½é“åºœçœŒç¨Žé¡</th>
+									<th>ç´æœŸ</th>
+									<th>ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${fukaDaichoForm.items}"
 									th:classappend="${item.shinkokuZumi} ? '' : 'table-light'">
-									<td class="text-center"><input type="checkbox" name="month" class="row-select"
-											th:value="${item.targetYearMonth}" th:data-status="${item.shinkokuZumi}"
-											th:data-nendo="${item.nendo}" th:data-kibetsu="${item.kibetsu}"></td>
-									<td class="text-center fw-bold" th:text="${item.displayNengetsu}">-</td>
-									<td class="text-end px-4"><span th:if="${item.totalZeigaku != null}"
-											th:text="${#numbers.formatInteger(item.totalZeigaku, 1, 'COMMA') + ' ‰~'}">-</span>
-										<span th:unless="${item.totalZeigaku != null}" class="text-muted">-</span>
-									</td>
-									<td class="text-end px-4"><span th:if="${item.cityZeigaku != null}"
-											th:text="${#numbers.formatInteger(item.cityZeigaku, 1, 'COMMA') + ' ‰~'}">-</span>
-										<span th:unless="${item.cityZeigaku != null}" class="text-muted">-</span>
-									</td>
-									<td class="text-end px-4"><span th:if="${item.kenZeigaku != null}"
-											th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' ‰~'}">-</span>
-										<span th:unless="${item.kenZeigaku != null}" class="text-muted">-</span>
-									</td>
+									<td class="text-center"><input type="checkbox"
+										name="month" class="row-select"
+										th:value="${item.targetYearMonth}"
+										th:data-status="${item.shinkokuZumi}"
+										th:data-nendo="${item.nendo}"
+										th:data-kibetsu="${item.kibetsu}"></td>
+									<td class="text-center fw-bold"
+										th:text="${item.displayNengetsu}">-</td>
+									<td class="text-end px-4"><span
+										th:if="${item.totalZeigaku != null}"
+										th:text="${#numbers.formatInteger(item.totalZeigaku, 1, 'COMMA') + ' å††'}">-</span>
+										<span th:unless="${item.totalZeigaku != null}"
+										class="text-muted">-</span></td>
+									<td class="text-end px-4"><span
+										th:if="${item.cityZeigaku != null}"
+										th:text="${#numbers.formatInteger(item.cityZeigaku, 1, 'COMMA') + ' å††'}">-</span>
+										<span th:unless="${item.cityZeigaku != null}"
+										class="text-muted">-</span></td>
+									<td class="text-end px-4"><span
+										th:if="${item.kenZeigaku != null}"
+										th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' å††'}">-</span>
+										<span th:unless="${item.kenZeigaku != null}"
+										class="text-muted">-</span></td>
 									<td class="text-center" th:text="${item.displayNoki}">-</td>
 									<td class="text-center"><span th:if="${item.shinkokuZumi}"
-											class="badge bg-success px-3 py-2"> <i
-												class="bi bi-check-circle me-1"></i>\Ï‚Ý
-										</span> <span th:unless="${item.shinkokuZumi}"
-											class="badge bg-secondary px-3 py-2"> –¢\ </span></td>
+										class="badge bg-success px-3 py-2"> <i
+											class="bi bi-check-circle me-1"></i>ç”³å‘Šæ¸ˆã¿
+									</span> <span th:unless="${item.shinkokuZumi}"
+										class="badge bg-secondary px-3 py-2"> æœªç”³å‘Š </span></td>
 								</tr>
 								<tr th:if="${#lists.isEmpty(fukaDaichoForm.items)}">
 									<td colspan="4" class="text-center py-5 text-muted">
-										•\Ž¦‚Å‚«‚éî•ñ‚ª‚ ‚è‚Ü‚¹‚ñ</td>
+										è¡¨ç¤ºã§ãã‚‹æƒ…å ±ãŒã‚ã‚Šã¾ã›ã‚“</td>
 								</tr>
 							</tbody>
 						</table>
@@ -117,26 +133,28 @@
 
 			<div class="d-flex justify-content-center gap-3 py-4">
 				<button type="submit" class="btn btn-success btn-lg px-5">
-					<i class="bi bi-plus-circle me-1"></i>V‹K“o˜^
+					<i class="bi bi-plus-circle me-1"></i>æ–°è¦ç™»éŒ²
 				</button>
 
-				<button type="button" id="btnViewDeclaration" class="btn btn-outline-primary btn-lg px-5">
-					<i class="bi bi-eye me-2"></i>Æ‰ï
+				<button type="button" id="btnViewDeclaration"
+					class="btn btn-outline-primary btn-lg px-5">
+					<i class="bi bi-eye me-2"></i>ç…§ä¼š
 				</button>
-				<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-3"> <i
-						class="bi bi-arrow-left me-1"></i>ˆê——‚É–ß‚é
+				<a th:href="@{/tokugimu/list}"
+					class="btn btn-outline-secondary btn-lg px-3"> <i
+					class="bi bi-arrow-left me-1"></i>ä¸€è¦§ã«æˆ»ã‚‹
 				</a>
 			</div>
 
 		</form>
-		<!-- “Á•Ê’¥Žû‹`–±ŽÒŽw’èƒ‚[ƒ_ƒ‹ -->
+		<!-- ç‰¹åˆ¥å¾´åŽç¾©å‹™è€…æŒ‡å®šãƒ¢ãƒ¼ãƒ€ãƒ« -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
 		<th:block layout:fragment="scripts">
 			<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 			<script th:inline="javascript">
 				/*<![CDATA[*/
-				// Thymeleaf•Ï”‚ðƒOƒ[ƒoƒ‹ƒXƒR[ƒv‚ÉÝ’è
+				// Thymeleafå¤‰æ•°ã‚’ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¹ã‚³ãƒ¼ãƒ—ã«è¨­å®š
 				window.fukaDaichoFormShiteiNo = /*[[${fukaDaichoForm.shiteiNo}]]*/'';
 				window.declarationViewBaseUrl = /*[[@{/declaration/view/}]]*/'/declaration/view/';
 				/*]]>*/
