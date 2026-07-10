@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
-<title>納税周期�E企E/title>
+<title>納税周期照会</title>
 </head>
 <body>
 	<div layout:fragment="content" class="container-fluid p-4"
@@ -12,11 +12,11 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-calendar-check me-2 text-primary"></i> 納税周期�E企E
+				<i class="bi bi-calendar-check me-2 text-primary"></i> 納税周期照会
 			</h5>
 		</div>
 
-		<!-- メチE��ージ表示 -->
+		<!-- メッセージ表示 -->
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
@@ -33,16 +33,16 @@
 			<div class="card-body">
 				<form id="searchForm" class="row g-3">
 					<div class="col-md-4">
-						<label for="shuki" class="form-label">周朁E/label> <select
+						<label for="shuki" class="form-label">周期</label> <select
 							class="form-select" id="shuki" name="shuki"
 							onchange="searchNozeiShuki()">
 							<option value="">全て</option>
 							<option value="1">毎月</option>
-							<option value="2">2ヶ朁E/option>
-							<option value="3">3ヶ朁E/option>
-							<option value="4">4ヶ朁E/option>
-							<option value="6">6ヶ朁E/option>
-							<option value="12">年1囁E/option>
+							<option value="2">2ヶ月</option>
+							<option value="3">3ヶ月</option>
+							<option value="4">4ヶ月</option>
+							<option value="6">6ヶ月</option>
+							<option value="12">年1回</option>
 						</select>
 					</div>
 				</form>
@@ -53,19 +53,19 @@
 		<div class="mb-3">
 			<button type="button" class="btn btn-primary me-2"
 				onclick="editNozeiShuki()" id="editBtn" disabled>
-				<i class="bi bi-pencil-square me-1"></i>編雁E��めE
+				<i class="bi bi-pencil-square me-1"></i>編集する
 			</button>
 		</div>
 
-		<!-- 納税周期一覧チE�Eブル -->
+		<!-- 納税周期一覧テーブル -->
 		<div class="card shadow-sm">
 			<div class="card-body">
 				<table class="table table-hover" id="nozeiShukiTable">
 					<thead class="table-light">
 						<tr>
 							<th></th>
-							<th>周朁E/th>
-							<th>申告期陁E/th>
+							<th>周期</th>
+							<th>申告期限</th>
 						</tr>
 					</thead>
 					<tbody>
