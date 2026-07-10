@@ -41,5 +41,6 @@ public class User extends BaseEntity {
 	@Column(name = "role_id", nullable = false, precision = 5)
 	private BigDecimal roleId;
 
-
+	@Column(name = "del_flg", nullable = false, length = 1)
+	private String delFlg = "0";
 }

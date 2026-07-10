@@ -109,19 +109,6 @@
 							</div>
 						</div>
 
-						<!-- 現在のパスワード -->
-						<div class="col-md-4" th:if="${isEdit}">
-							<label for="currentPassword" class="form-label fw-medium">
-								現在のパスワード <span class="text-muted small ms-1">(パスワード変更時のみ必須)</span>
-							</label>
-
-							<input type="password" class="form-control" id="currentPassword"
-								th:field="*{currentPassword}" th:errorclass="is-invalid"
-								autocomplete="current-password">
-
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('currentPassword')}"
-								th:errors="*{currentPassword}"></div>
-						</div>
 
 						<!-- 新しいパスワード -->
 						<div class="col-md-4">
