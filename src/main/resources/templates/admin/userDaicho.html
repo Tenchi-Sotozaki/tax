@@ -125,11 +125,18 @@
 					onclick="goToEdit()">
 					<i class="bi bi-pencil-square me-1"></i>ユーザー編集
 				</button>
+				<button type="button" id="deleteBtn" class="btn btn-danger" disabled
+					onclick="confirmDelete()">
+					<i class="bi bi-trash me-1"></i>削除
+				</button>
 			</div>
 			<span class="text-muted small">検索結果：<span
 				th:text="${items.size()}">0</span> 件
 			</span>
 		</div>
+
+		<!-- 削除用フォーム -->
+		<form id="deleteForm" th:action="@{/admin/user-delete-batch}" method="post" style="display:none;"></form>
 
 		<!-- 一覧テーブル -->
 		<div class="card shadow-sm mb-5">
@@ -142,11 +149,12 @@
 							<th style="width: 160px;">氏名</th>
 							<th style="width: 180px;">ふりがな</th>
 							<th>部署</th>
+							<th style="width: 150px;">権限</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr th:if="${items.isEmpty()}">
-							<td colspan="5" class="text-center text-muted py-4">該当するユーザーが見つかりません</td>
+							<td colspan="6" class="text-center text-muted py-4">該当するユーザーが見つかりません</td>
 						</tr>
 						<tr th:each="user : ${items}">
 							<td><input type="checkbox"
@@ -155,6 +163,7 @@
 							<td th:text="${user.name}"></td>
 							<td class="text-muted" th:text="${user.nameKana}"></td>
 							<td th:text="${user.busho}"></td>
+							<td th:text="${roleMap[user.roleId]}"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -169,11 +178,9 @@
 
     document.querySelectorAll('.user-checkbox').forEach(cb => {
         cb.addEventListener('change', function () {
-            document.querySelectorAll('.user-checkbox').forEach(other => {
-                if (other !== this) other.checked = false;
-            });
-            document.getElementById('editBtn').disabled =
-                !document.querySelector('.user-checkbox:checked');
+            const checked = document.querySelectorAll('.user-checkbox:checked');
+            document.getElementById('editBtn').disabled = checked.length !== 1;
+            document.getElementById('deleteBtn').disabled = checked.length === 0;
         });
     });
 
@@ -181,6 +188,22 @@
         const checked = document.querySelector('.user-checkbox:checked');
         if (!checked) return;
         location.href = editBasePath + encodeURIComponent(checked.value);
+    }
+
+    function confirmDelete() {
+        const checked = document.querySelectorAll('.user-checkbox:checked');
+        if (checked.length === 0) return;
+        if (!confirm(checked.length + '件のユーザーを削除しますか？')) return;
+        const form = document.getElementById('deleteForm');
+        form.innerHTML = '';
+        checked.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids';
+            input.value = cb.value;
+            form.appendChild(input);
+        });
+        form.submit();
     }
 </script>
 	</th:block>

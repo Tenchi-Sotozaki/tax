@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -51,6 +54,9 @@ public class AdminUserController {
 				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
 				toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
 				toLikePattern(searchForm.getBusho(), searchForm.getBushoMatchType())));
+		model.addAttribute("roleMap", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd)
+				.stream().collect(java.util.stream.Collectors.toMap(
+						r -> r.getRoleId(), r -> r.getName())));
 		return LIST_VIEW;
 	}
 
@@ -136,11 +142,6 @@ public class AdminUserController {
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
 
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {
-			if (form.getCurrentPassword() == null || form.getCurrentPassword().isBlank()) {
-				bindingResult.rejectValue("currentPassword", "error.currentPassword", "現在のパスワードを入力してください");
-			} else if (!passwordEncoder.matches(form.getCurrentPassword(), user.getPassword())) {
-				bindingResult.rejectValue("currentPassword", "error.currentPassword", "現在のパスワードが正しくありません");
-			}
 			if (!form.getPassword().equals(form.getPasswordConfirm())) {
 				bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
 			}
@@ -171,6 +172,21 @@ public class AdminUserController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
+		return "redirect:/admin/user-search";
+	}
+
+	@PostMapping("/user-delete-batch")
+	@OpeLog(screenId = SCREEN_ID, operation = "一括削除")
+	public String deleteBatch(@RequestParam List<String> ids, RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
+		for (String id : ids) {
+			User user = userRepository.findById(buildUserId(id)).orElse(null);
+			if (user != null) {
+				user.setDelFlg("1");
+				userRepository.save(user);
+			}
+		}
+		redirectAttributes.addFlashAttribute("successMessage", ids.size() + "件のユーザーを削除しました。");
 		return "redirect:/admin/user-search";
 	}
 
