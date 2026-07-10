@@ -1,110 +1,117 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}">
 
 <head>
-	<title>振込先口座照会／登録�E�編雁E/title>
+<title>振込先口座照会／登録／編集</title>
 </head>
 
 <body>
 	<div layout:fragment="content">
 		<div class="container-fluid p-4">
-			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+			<div
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 				th:data-is-edit="${kozaForm.editMode}">
 
 				<h5 class="mb-0 fw-bold text-dark">
 					振込先口座 <span th:if="${kozaForm.viewMode}" class="text-muted">-
-						照企E/span> <span th:if="${kozaForm.editMode}" class="text-muted">-
-						編雁E/span> <span th:if="${kozaForm.createMode}" class="text-muted">-
+						照会</span> <span th:if="${kozaForm.editMode}" class="text-muted">-
+						編集</span> <span th:if="${kozaForm.createMode}" class="text-muted">-
 						登録</span>
 				</h5>
 
 				<div th:if="${kozaForm.viewMode}">
-					<button type="button" class="btn btn-primary btn-sm" onclick="editMode()">
-						<i class="bi bi-pencil"></i> 編雁E��めE
+					<button type="button" class="btn btn-primary btn-sm"
+						onclick="editMode()">
+						<i class="bi bi-pencil"></i> 編集する
 					</button>
 				</div>
 			</div>
 
-			<!-- 特別徴収義務老E��報 -->
+			<!-- 特別徴収義務者情報 -->
 			<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
-			<!-- 成功・エラーメチE��ージ -->
-			<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<!-- 成功・エラーメッセージ -->
+			<div th:if="${successMessage}"
+				class="alert alert-success alert-dismissible fade show" role="alert">
 				<span th:text="${successMessage}"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
-			<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<div th:if="${errorMessage}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
 				<span th:text="${errorMessage}"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
 			<!-- 統合メインフォーム -->
-			<form th:action="@{${kozaForm.createMode ? '/shoreikin/furikomiKoza/create' : ''}}" th:object="${kozaForm}"
-				method="post">
-				<input type="hidden" th:field="*{shiteiNo}"> <input type="hidden" th:field="*{mode}"> <input
-					type="hidden" th:field="*{version}">
+			<form
+				th:action="@{${kozaForm.createMode ? '/shoreikin/furikomiKoza/create' : ''}}"
+				th:object="${kozaForm}" method="post">
+				<input type="hidden" th:field="*{shiteiNo}"> <input
+					type="hidden" th:field="*{mode}"> <input type="hidden"
+					th:field="*{version}">
 
 
-				<!-- 振込先口座惁E��エリア -->
+				<!-- 振込先口座情報エリア -->
 				<div class="card mb-4">
 					<div class="card-header">
-						<h5 class="mb-0">振込先口座惁E��</h5>
+						<h5 class="mb-0">振込先口座情報</h5>
 					</div>
 					<div class="card-body">
 						<div class="row g-3">
 
-							<!-- 金融機関コーチE-->
+							<!-- 金融機関コード -->
 							<div class="col-md-3">
 
-								<label for="bankCd" class="form-label">金融機関コーチE
-									<span class="text-danger">*</span>
-								</label>
-
-								<input type="text" class="form-control" id="bankCd" th:field="*{bankCd}"
-									th:readonly="${kozaForm.viewMode}" maxlength="4"
+								<label for="bankCd" class="form-label">金融機関コード <span
+									class="text-danger">*</span>
+								</label> <input type="text" class="form-control" id="bankCd"
+									th:field="*{bankCd}" th:readonly="${kozaForm.viewMode}"
+									maxlength="4"
 									th:classappend="${#fields.hasErrors('bankCd')} ? 'is-invalid' : ''"
-									pattern="[0-9]{4}" title="4桁�E数字で入力してください" required
+									pattern="[0-9]{4}" title="4桁の数字で入力してください" required
 									th:data-initial-value="*{bankCd}">
 
-								<div th:if="${#fields.hasErrors('bankCd')}" class="invalid-feedback">
+								<div th:if="${#fields.hasErrors('bankCd')}"
+									class="invalid-feedback">
 									<span th:errors="*{bankCd}"></span>
 								</div>
 
 							</div>
 
-							<!-- 金融機関吁E-->
+							<!-- 金融機関名 -->
 							<div class="col-md-3">
 
-								<label for="bankName" class="form-label">
-									金融機関吁E<span class="text-danger">*</span>
-								</label>
+								<label for="bankName" class="form-label"> 金融機関名 <span
+									class="text-danger">*</span>
+								</label> <input type="text" class="form-control" id="bankName"
+									th:field="*{bankName}" th:readonly="${kozaForm.viewMode}"
+									maxlength="30"
+									th:classappend="${#fields.hasErrors('bankName')} ? 'is-invalid' : ''"
+									required th:data-initial-value="*{bankName}">
 
-								<input type="text" class="form-control" id="bankName" th:field="*{bankName}"
-									th:readonly="${kozaForm.viewMode}" maxlength="30"
-									th:classappend="${#fields.hasErrors('bankName')} ? 'is-invalid' : ''" required
-									th:data-initial-value="*{bankName}">
-
-								<div th:if="${#fields.hasErrors('bankName')}" class="invalid-feedback">
+								<div th:if="${#fields.hasErrors('bankName')}"
+									class="invalid-feedback">
 									<span th:errors="*{bankName}"></span>
 								</div>
 
 							</div>
 
-							<!-- 支店コーチE-->
+							<!-- 支店コード -->
 							<div class="col-md-3">
 
-								<label for="branchCd" class="form-label">
-									支店コーチE<span class="text-danger">*</span>
-								</label>
-
-								<input type="text" class="form-control" id="branchCd" th:field="*{branchCd}"
-									th:readonly="${kozaForm.viewMode}" maxlength="3"
+								<label for="branchCd" class="form-label"> 支店コード <span
+									class="text-danger">*</span>
+								</label> <input type="text" class="form-control" id="branchCd"
+									th:field="*{branchCd}" th:readonly="${kozaForm.viewMode}"
+									maxlength="3"
 									th:classappend="${#fields.hasErrors('branchCd')} ? 'is-invalid' : ''"
-									pattern="[0-9]{3}" title="3桁�E数字で入力してください" required
+									pattern="[0-9]{3}" title="3桁の数字で入力してください" required
 									th:data-initial-value="*{branchCd}">
 
-								<div th:if="${#fields.hasErrors('branchCd')}" class="invalid-feedback">
+								<div th:if="${#fields.hasErrors('branchCd')}"
+									class="invalid-feedback">
 									<span th:errors="*{branchCd}"></span>
 								</div>
 
@@ -113,16 +120,16 @@
 							<!-- 支店名 -->
 							<div class="col-md-3">
 
-								<label for="branchName" class="form-label">
-									支店名 <span class="text-danger">*</span>
-								</label>
+								<label for="branchName" class="form-label"> 支店名 <span
+									class="text-danger">*</span>
+								</label> <input type="text" class="form-control" id="branchName"
+									th:field="*{branchName}" th:readonly="${kozaForm.viewMode}"
+									maxlength="30"
+									th:classappend="${#fields.hasErrors('branchName')} ? 'is-invalid' : ''"
+									required th:data-initial-value="*{branchName}">
 
-								<input type="text" class="form-control" id="branchName" th:field="*{branchName}"
-									th:readonly="${kozaForm.viewMode}" maxlength="30"
-									th:classappend="${#fields.hasErrors('branchName')} ? 'is-invalid' : ''" required
-									th:data-initial-value="*{branchName}">
-
-								<div th:if="${#fields.hasErrors('branchName')}" class="invalid-feedback">
+								<div th:if="${#fields.hasErrors('branchName')}"
+									class="invalid-feedback">
 									<span th:errors="*{branchName}"></span>
 								</div>
 
@@ -132,23 +139,22 @@
 
 						<div class="row g-3 mt-2">
 
-							<!-- 預��種目 -->
+							<!-- 預金種目 -->
 							<div class="col-md-3">
 
-								<label for="shumoku" class="form-label">
-									預��種目 <span class="text-danger">*</span>
-								</label>
-
-								<select class="form-select" id="shumoku" th:field="*{shumoku}"
+								<label for="shumoku" class="form-label"> 預金種目 <span
+									class="text-danger">*</span>
+								</label> <select class="form-select" id="shumoku" th:field="*{shumoku}"
 									th:disabled="${kozaForm.viewMode}"
-									th:classappend="${#fields.hasErrors('shumoku')} ? 'is-invalid' : ''" required
-									th:data-initial-value="*{shumoku}">
+									th:classappend="${#fields.hasErrors('shumoku')} ? 'is-invalid' : ''"
+									required th:data-initial-value="*{shumoku}">
 									<option value="">選択してください</option>
-									<option value="1">普送E/option>
+									<option value="1">普通</option>
 									<option value="2">当座</option>
 								</select>
 
-								<div th:if="${#fields.hasErrors('shumoku')}" class="invalid-feedback">
+								<div th:if="${#fields.hasErrors('shumoku')}"
+									class="invalid-feedback">
 									<span th:errors="*{shumoku}"></span>
 								</div>
 							</div>
@@ -156,17 +162,17 @@
 							<!-- 口座番号 -->
 							<div class="col-md-3">
 
-								<label for="kozaNo" class="form-label">
-									口座番号 <span class="text-danger">*</span>
-								</label>
-
-								<input type="text" class="form-control" id="kozaNo" th:field="*{kozaNo}"
-									th:readonly="${kozaForm.viewMode}" maxlength="7"
+								<label for="kozaNo" class="form-label"> 口座番号 <span
+									class="text-danger">*</span>
+								</label> <input type="text" class="form-control" id="kozaNo"
+									th:field="*{kozaNo}" th:readonly="${kozaForm.viewMode}"
+									maxlength="7"
 									th:classappend="${#fields.hasErrors('kozaNo')} ? 'is-invalid' : ''"
-									pattern="[0-9]{7}" title="7桁�E数字で入力してください" required
+									pattern="[0-9]{7}" title="7桁の数字で入力してください" required
 									th:data-initial-value="*{kozaNo}">
 
-								<div th:if="${#fields.hasErrors('kozaNo')}" class="invalid-feedback">
+								<div th:if="${#fields.hasErrors('kozaNo')}"
+									class="invalid-feedback">
 									<span th:errors="*{kozaNo}"></span>
 								</div>
 							</div>
@@ -174,16 +180,16 @@
 							<!-- 口座名義 -->
 							<div class="col-md-6">
 
-								<label for="meigi" class="form-label">
-									口座名義 <span class="text-danger">*</span>
-								</label>
+								<label for="meigi" class="form-label"> 口座名義 <span
+									class="text-danger">*</span>
+								</label> <input type="text" class="form-control" id="meigi"
+									th:field="*{meigi}" th:readonly="${kozaForm.viewMode}"
+									maxlength="30"
+									th:classappend="${#fields.hasErrors('meigi')} ? 'is-invalid' : ''"
+									required th:data-initial-value="*{meigi}">
 
-								<input type="text" class="form-control" id="meigi" th:field="*{meigi}"
-									th:readonly="${kozaForm.viewMode}" maxlength="30"
-									th:classappend="${#fields.hasErrors('meigi')} ? 'is-invalid' : ''" required
-									th:data-initial-value="*{meigi}">
-
-								<div th:if="${#fields.hasErrors('meigi')}" class="invalid-feedback">
+								<div th:if="${#fields.hasErrors('meigi')}"
+									class="invalid-feedback">
 									<span th:errors="*{meigi}"></span>
 								</div>
 							</div>
@@ -195,53 +201,70 @@
 				<!-- アクションボタン -->
 				<div class="d-flex gap-2">
 
-					<!-- 登録モーチE-->
+					<!-- 登録モード -->
 					<div th:if="${kozaForm.createMode}">
-						<button type="submit" class="btn btn-success" onclick="return confirm('振込先口座惁E��を登録しますか�E�E)">
+						<button type="submit" class="btn btn-success"
+							onclick="return confirm('振込先口座情報を登録しますか？')">
 							<i class="bi bi-check-circle"></i> 登録する
 						</button>
 					</div>
 
-					<!-- 編雁E��ーチE-->
+					<!-- 編集モード -->
 					<div th:if="${kozaForm.editMode}">
-						<button type="button" class="btn btn-success" onclick="updateKoza()">
+						<button type="button" class="btn btn-success"
+							onclick="updateKoza()">
 							<i class="bi bi-arrow-repeat"></i> 更新する
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-secondary" th:if="${kozaForm.viewMode}"> <i
-							class="bi bi-arrow-left"></i>
-						戻めE
-					</a> <a th:href="@{/shoreikin/list}" class="btn btn-secondary" th:unless="${kozaForm.viewMode}"
-						onclick="return confirm('入力�E容は破棁E��れます。よろしぁE��すか�E�E)"> <i class="bi bi-arrow-left"></i> 戻めE
+					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+						th:if="${kozaForm.viewMode}"> <i class="bi bi-arrow-left"></i>
+						戻る
+					</a> <a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+						th:unless="${kozaForm.viewMode}"
+						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+						class="bi bi-arrow-left"></i> 戻る
 					</a>
 				</div>
 			</form>
 
-			<!-- 更新用フォーム�E�編雁E��ード！E-->
-			<form th:action="@{/shoreikin/furikomiKoza/update}" th:if="${kozaForm.editMode}" th:object="${kozaForm}"
-				method="post" id="updateForm" style="display: none;">
-				<input type="hidden" th:field="*{shiteiNo}"> <input type="hidden" th:field="*{name}"> <input
-					type="hidden" th:field="*{shisetsuName}"> <input type="hidden" th:field="*{bankCd}"> <input
-					type="hidden" th:field="*{bankName}"> <input type="hidden" th:field="*{branchCd}"> <input
-					type="hidden" th:field="*{branchName}"> <input type="hidden" th:field="*{shumoku}"> <input
-					type="hidden" th:field="*{kozaNo}"> <input type="hidden" th:field="*{meigi}"> <input type="hidden"
-					th:field="*{version}"> <input type="hidden" th:field="*{mode}">
+			<!-- 更新用フォーム（編集モード） -->
+			<form th:action="@{/shoreikin/furikomiKoza/update}"
+				th:if="${kozaForm.editMode}" th:object="${kozaForm}" method="post"
+				id="updateForm" style="display: none;">
+				<input type="hidden" th:field="*{shiteiNo}"> <input
+					type="hidden" th:field="*{name}"> <input type="hidden"
+					th:field="*{shisetsuName}"> <input type="hidden"
+					th:field="*{bankCd}"> <input type="hidden"
+					th:field="*{bankName}"> <input type="hidden"
+					th:field="*{branchCd}"> <input type="hidden"
+					th:field="*{branchName}"> <input type="hidden"
+					th:field="*{shumoku}"> <input type="hidden"
+					th:field="*{kozaNo}"> <input type="hidden"
+					th:field="*{meigi}"> <input type="hidden"
+					th:field="*{version}"> <input type="hidden"
+					th:field="*{mode}">
 			</form>
 
-			<!-- 編雁E��ード�Eり替え用フォーム -->
-			<form th:action="@{/shoreikin/furikomiKoza/edit}" th:object="${kozaForm}" method="post" id="editForm"
+			<!-- 編集モード切り替え用フォーム -->
+			<form th:action="@{/shoreikin/furikomiKoza/edit}"
+				th:object="${kozaForm}" method="post" id="editForm"
 				style="display: none;">
-				<input type="hidden" th:field="*{shiteiNo}"> <input type="hidden" th:field="*{name}"> <input
-					type="hidden" th:field="*{shisetsuName}"> <input type="hidden" th:field="*{bankCd}"> <input
-					type="hidden" th:field="*{bankName}"> <input type="hidden" th:field="*{branchCd}"> <input
-					type="hidden" th:field="*{branchName}"> <input type="hidden" th:field="*{shumoku}"> <input
-					type="hidden" th:field="*{kozaNo}"> <input type="hidden" th:field="*{meigi}"> <input type="hidden"
+				<input type="hidden" th:field="*{shiteiNo}"> <input
+					type="hidden" th:field="*{name}"> <input type="hidden"
+					th:field="*{shisetsuName}"> <input type="hidden"
+					th:field="*{bankCd}"> <input type="hidden"
+					th:field="*{bankName}"> <input type="hidden"
+					th:field="*{branchCd}"> <input type="hidden"
+					th:field="*{branchName}"> <input type="hidden"
+					th:field="*{shumoku}"> <input type="hidden"
+					th:field="*{kozaNo}"> <input type="hidden"
+					th:field="*{meigi}"> <input type="hidden"
 					th:field="*{version}">
 			</form>
 		</div>
 
-		<!-- 特別徴収義務老E��定モーダル -->
+		<!-- 特別徴収義務者指定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
