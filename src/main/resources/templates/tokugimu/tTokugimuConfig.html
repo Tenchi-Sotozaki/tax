@@ -4,7 +4,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-<title>特別徴収義務老E��規登録/編雁E照企E/title>
+<title>特別徴収義務者新規登録/編集/照会</title>
 </head>
 
 <body>
@@ -18,16 +18,16 @@
 				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
 				<h5 class="mb-0 fw-bold text-dark">
 					<i class="bi bi-person-plus me-2 text-primary"></i> <span
-						th:text="${isView} ? '特別徴収義務老E照企E : (${isEdit} ? '特別徴収義務老E編雁E : '特別徴収義務老E新規登録')"></span>
+						th:text="${isView} ? '特別徴収義務者 照会' : (${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録')"></span>
 				</h5>
 				<div class="d-flex gap-2 mr-2">
-					<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務老E��報</a>
-					<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設惁E��</a>
+					<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
+					<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
 					<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
-					<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有老E��報</a>
-					<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付�E惁E��</a>
-					<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業老E��報</a>
-					<a href="#other-info" class="btn btn-outline-primary btn-sm">そ�E他�E惁E��</a>
+					<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
+					<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
+					<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
+					<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
 					<a href="#business-status-info"
 						class="btn btn-outline-warning btn-sm"
 						th:if="${isEdit} or ${isView}">宿泊施設営業状況情報</a>
@@ -35,7 +35,7 @@
 			</div>
 			<div
 				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
-				<!-- 特別徴収義務老E��報 -->
+				<!-- 特別徴収義務者情報 -->
 
 				<div th:if="${isEdit} or ${isView}">
 					<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
@@ -45,13 +45,13 @@
 				<th:block th:if="${isView}">
 					<a th:href="@{/tokugimu/edit/{id}(id=${editId})}"
 						class="btn btn-primary btn-sm mt-2"> <i
-						class="bi bi-pencil-square me-2"></i>編雁E��めE
+						class="bi bi-pencil-square me-2"></i>編集する
 					</a>
 				</th:block>
 			</div>
 		</div>
 
-		<!-- 登録・更新成功メチE��ージ -->
+		<!-- 登録・更新成功メッセージ -->
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show" role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i> <span
@@ -62,17 +62,17 @@
 		<form id="registerForm" th:action="@{${formAction}}"
 			th:object="${TokugimuForm}" method="post">
 
-			<!-- 編雁E��のID保持 -->
+			<!-- 編集時のID保持 -->
 			<input th:if="${isEdit}" type="hidden" th:field="*{id}">
 			<!-- 宛名番号保持 -->
 			<input type="hidden" th:field="*{atenaNo}" id="atenaNo">
 
-			<!-- バリチE�Eションエラーサマリー -->
+			<!-- バリデーションエラーサマリー -->
 			<div
 				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 				class="alert alert-danger alert-dismissible fade show" role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力�E容に <span
-					th:text="${validationErrors.size()}"></span> 件のエラーがあります、E
+				<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 				<ul class="mb-0 mt-1">
 					<li th:each="err : ${validationErrors}" th:text="${err}"
 						class="small"></li>
@@ -80,21 +80,21 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
-			<!-- ===== 特別徴収義務老E��報 ===== -->
+			<!-- ===== 特別徴収義務者情報 ===== -->
 			<div id="tokugimu-info" class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<h5 class="mb-0">
-						<i class="bi bi-person-badge me-2"></i>特別徴収義務老E��報
+						<i class="bi bi-person-badge me-2"></i>特別徴収義務者情報
 					</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
 
-						<!-- 持E��番号 -->
+						<!-- 指定番号 -->
 						<div class="col-md-4">
-							<label for="shiteiNo" class="form-label fw-medium">持E��番号</label> <input
+							<label for="shiteiNo" class="form-label fw-medium">指定番号</label> <input
 								type="text" class="form-control" id="shiteiNo"
-								th:field="*{shiteiNo}" placeholder="自動で設定されまぁE readonly
+								th:field="*{shiteiNo}" placeholder="自動で設定されます" readonly
 								th:data-initial-value="*{shiteiNo}">
 						</div>
 
@@ -130,7 +130,7 @@
 								郵便番号<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="tokugimuAddressNo"
 								th:field="*{tokugimuAddressNo}" th:errorclass="is-invalid"
-								placeholder="自動�E力されまぁE readonly
+								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuAddressNo}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tokugimuAddressNo')}"
@@ -143,7 +143,7 @@
 								住所 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="tokugimuAddress"
 								th:field="*{tokugimuAddress}" th:errorclass="is-invalid"
-								placeholder="自動�E力されまぁE readonly
+								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuAddress}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tokugimuAddress')}"
@@ -156,7 +156,7 @@
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="name"
 								th:field="*{name}" th:errorclass="is-invalid"
-								placeholder="自動�E力されまぁE readonly th:data-initial-value="*{name}">
+								placeholder="自動入力されます" readonly th:data-initial-value="*{name}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
 							</div>
@@ -168,7 +168,7 @@
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="nameKana"
 								th:field="*{nameKana}" th:errorclass="is-invalid"
-								placeholder="自動�E力されまぁE readonly
+								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{nameKana}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('nameKana')}" th:errors="*{nameKana}"></div>
@@ -178,7 +178,7 @@
 						<div class="col-md-6">
 							<label for="corporateNumber" class="form-label fw-medium">法人番号</label>
 							<input type="text" class="form-control" id="corporateNumber"
-								th:field="*{corporateNumber}" placeholder="自動�E力されまぁE readonly
+								th:field="*{corporateNumber}" placeholder="自動入力されます" readonly
 								th:data-initial-value="*{corporateNumber}">
 						</div>
 
@@ -188,7 +188,7 @@
 								電話番号 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="tel" class="form-control" id="tokugimuPhone"
 								th:field="*{tokugimuPhone}" th:errorclass="is-invalid"
-								placeholder="自動�E力されまぁE readonly
+								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuPhone}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tokugimuPhone')}"
@@ -199,17 +199,17 @@
 				</div>
 			</div>
 
-			<!-- ===== 宿泊施設惁E�� ===== -->
+			<!-- ===== 宿泊施設情報 ===== -->
 			<div id="facility-info" class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<div class="d-flex justify-content-between align-items-center">
 						<h5 class="mb-0">
-							<i class="bi bi-building me-2"></i>宿泊施設惁E��
+							<i class="bi bi-building me-2"></i>宿泊施設情報
 						</h5>
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox"
 								id="copyToFacility"> <label class="form-check-label"
-								for="copyToFacility"> 特別徴収義務老E��報と同じ </label>
+								for="copyToFacility"> 特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>
@@ -254,7 +254,7 @@
 								施設名称(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="facilityNameKana"
 								th:field="*{facilityNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入劁E th:readonly="${isView}"
+								placeholder="ひらがなで入力" th:readonly="${isView}"
 								th:data-initial-value="*{facilityNameKana}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityNameKana')}"
@@ -266,14 +266,14 @@
 							<label for="facilityPhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="facilityPhone"
 								th:field="*{facilityPhone}" th:errorclass="is-invalid"
-								placeholder="例！E3-1234-5678" th:readonly="${isView}"
+								placeholder="例）03-1234-5678" th:readonly="${isView}"
 								th:data-initial-value="*{facilityPhone}">
 
 						</div>
 
-						<!-- 延床面穁E-->
+						<!-- 延床面積 -->
 						<div class="col-md-4">
-							<label for="floorArea" class="form-label fw-medium"> 延床面穁E
+							<label for="floorArea" class="form-label fw-medium"> 延床面積
 							</label>
 							<div class="input-group">
 								<input type="number" class="form-control" id="floorArea"
@@ -285,30 +285,30 @@
 
 						</div>
 
-						<!-- 階層(地丁E -->
+						<!-- 階層(地上) -->
 						<div class="col-md-4">
 							<label for="aboveGroundFloor" class="form-label fw-medium">
-								階層(地丁E</label>
+								階層(地上)</label>
 							<div class="input-group">
 								<input type="number" class="form-control" id="floors"
 									th:field="*{aboveGroundFloor}" th:errorclass="is-invalid"
-									placeholder="施設の地上階数を�E力すめE th:readonly="${isView}"
+									placeholder="施設の地上階数を入力する" th:readonly="${isView}"
 									th:data-initial-value="*{aboveGroundFloor}"> <span
-									class="input-group-text">隁E/span>
+									class="input-group-text">階</span>
 							</div>
 
 						</div>
 
-						<!-- 階層(地丁E -->
+						<!-- 階層(地下) -->
 						<div class="col-md-4">
 							<label for="basementFloor" class="form-label fw-medium">
-								階層(地丁E </label>
+								階層(地下) </label>
 							<div class="input-group">
 								<input type="text" class="form-control" id="basementFloor"
 									th:field="*{basementFloor}" th:errorclass="is-invalid"
-									placeholder="施設の地下階数を�E力すめE th:readonly="${isView}"
+									placeholder="施設の地下階数を入力する" th:readonly="${isView}"
 									th:data-initial-value="*{basementFloor}"> <span
-									class="input-group-text">隁E/span>
+									class="input-group-text">階</span>
 							</div>
 						</div>
 
@@ -338,10 +338,10 @@
 							</div>
 						</div>
 
-						<!-- 営業開姁E予宁E日 -->
+						<!-- 営業開始(予定)日 -->
 						<div class="col-md-6">
 							<label for="businessStartDate" class="form-label fw-medium">
-								営業開姁E予宁E日 <span class="text-danger" th:if="!${isView}">*</span>
+								営業開始(予定)日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="businessStartDate" name="businessStartDate"
 								th:errorclass="is-invalid"
@@ -368,7 +368,7 @@
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox"
 								id="copyToLicense"> <label class="form-check-label"
-								for="copyToLicense"> 特別徴収義務老E��報と同じ </label>
+								for="copyToLicense"> 特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>
@@ -411,7 +411,7 @@
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="licenseNameKana"
 								th:field="*{licenseNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入劁E th:readonly="${isView}"
+								placeholder="ひらがなで入力" th:readonly="${isView}"
 								th:data-initial-value="*{licenseNameKana}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseNameKana')}"
@@ -423,7 +423,7 @@
 							<label for="licensePhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="licensePhone"
 								th:field="*{licensePhone}" th:errorclass="is-invalid"
-								placeholder="例！E3-1234-5678" th:readonly="${isView}"
+								placeholder="例）03-1234-5678" th:readonly="${isView}"
 								th:data-initial-value="*{licensePhone}">
 						</div>
 
@@ -435,9 +435,9 @@
 								th:disabled="${isView}" th:data-initial-value="*{businessType}">
 								<option value="">選択してください</option>
 								<option value="1">ホテル</option>
-								<option value="2">旁E��</option>
+								<option value="2">旅館</option>
 								<option value="3">簡易宿所</option>
-								<option value="4">民況E/option>
+								<option value="4">民泊</option>
 							</select>
 						</div>
 
@@ -453,17 +453,17 @@
 				</div>
 			</div>
 
-			<!-- ===== 施設所有老E��報 ===== -->
+			<!-- ===== 施設所有者情報 ===== -->
 			<div id="owner-info" class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<div class="d-flex justify-content-between align-items-center">
 						<h5 class="mb-0">
-							<i class="bi bi-person-check me-2"></i>施設所有老E��報
+							<i class="bi bi-person-check me-2"></i>施設所有者情報
 						</h5>
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox" id="copyToOwner">
 							<label class="form-check-label" for="copyToOwner">
-								特別徴収義務老E��報と同じ </label>
+								特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>
@@ -505,7 +505,7 @@
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="ownerNameKana"
 								th:field="*{ownerNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入劁E th:readonly="${isView}"
+								placeholder="ひらがなで入力" th:readonly="${isView}"
 								th:data-initial-value="*{ownerNameKana}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('ownerNameKana')}"
@@ -517,7 +517,7 @@
 							<label for="ownerPhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="ownerPhone"
 								th:field="*{ownerPhone}" th:errorclass="is-invalid"
-								placeholder="例！E3-1234-5678" th:readonly="${isView}"
+								placeholder="例）03-1234-5678" th:readonly="${isView}"
 								th:data-initial-value="*{ownerPhone}">
 						</div>
 
@@ -525,17 +525,17 @@
 				</div>
 			</div>
 
-			<!-- ===== 書類送付�E惁E�� ===== -->
+			<!-- ===== 書類送付先情報 ===== -->
 			<div id="mail-info" class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<div class="d-flex justify-content-between align-items-center">
 						<h5 class="mb-0">
-							<i class="bi bi-envelope me-2"></i>書類送付�E惁E��
+							<i class="bi bi-envelope me-2"></i>書類送付先情報
 						</h5>
 						<div class="form-check" th:if="!${isView}">
 							<input class="form-check-input" type="checkbox" id="copyToMail">
 							<label class="form-check-label" for="copyToMail">
-								特別徴収義務老E��報と同じ </label>
+								特別徴収義務者情報と同じ </label>
 						</div>
 					</div>
 				</div>
@@ -576,7 +576,7 @@
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="mailNameKana"
 								th:field="*{mailNameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入劁E th:readonly="${isView}"
+								placeholder="ひらがなで入力" th:readonly="${isView}"
 								th:data-initial-value="*{mailNameKana}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailNameKana')}"
@@ -588,19 +588,19 @@
 							<label for="mailPhone" class="form-label fw-medium"> 電話番号
 							</label> <input type="tel" class="form-control" id="mailPhone"
 								th:field="*{mailPhone}" th:errorclass="is-invalid"
-								placeholder="例！E3-1234-5678" th:readonly="${isView}"
+								placeholder="例）03-1234-5678" th:readonly="${isView}"
 								th:data-initial-value="*{mailPhone}">
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- ===== 共同事業老E��報 ===== -->
+			<!-- ===== 共同事業者情報 ===== -->
 			<div id="kyodo-info" class="card mb-4 shadow-sm">
 				<div
 					class="card-header py-3 d-flex justify-content-between align-items-center gap-2">
 					<h5 class="mb-0">
-						<i class="bi bi-people me-2"></i>共同事業老E��報
+						<i class="bi bi-people me-2"></i>共同事業者情報
 					</h5>
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" id="kyodoCheck"
@@ -612,12 +612,12 @@
 				<div id="kyodoBody" class="card-body bg-light-subtle"
 					style="display: none;">
 					<div id="kyodoRows">
-						<!-- 編雁E�E照会時: 保存済みチE�Eタを表示 -->
+						<!-- 編集・照会時: 保存済みデータを表示 -->
 						<th:block th:each="kyodo, stat : *{kyodoList}">
 							<div class="kyodo-row border rounded p-3 mb-3">
 								<div
 									class="d-flex justify-content-between align-items-center mb-2">
-									<span class="fw-medium">共同事業老E<span
+									<span class="fw-medium">共同事業者 <span
 										th:text="${stat.index + 1}"></span></span>
 									<button type="button"
 										class="btn btn-sm btn-outline-danger kyodo-remove-btn"
@@ -661,7 +661,7 @@
 											class="text-danger" th:if="!${isView}">*</span>
 										</label> <input type="text" class="form-control"
 											th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
-											placeholder="ひらがなで入劁E th:readonly="${isView}"
+											placeholder="ひらがなで入力" th:readonly="${isView}"
 											th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoNameKana}">
 									</div>
 
@@ -670,7 +670,7 @@
 										<label class="form-label fw-medium">電話番号</label> <input
 											type="tel" class="form-control"
 											th:field="*{kyodoList[__${stat.index}__].kyodoPhone}"
-											placeholder="例！E3-1234-5678" th:readonly="${isView}"
+											placeholder="例）03-1234-5678" th:readonly="${isView}"
 											th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoPhone}">
 									</div>
 								</div>
@@ -680,38 +680,38 @@
 					<div th:if="!${isView}" class="mt-2">
 						<button type="button" id="kyodoAddBtn"
 							class="btn btn-outline-secondary btn-sm">
-							<i class="bi bi-plus-circle me-1"></i>共同事業老E��追加
+							<i class="bi bi-plus-circle me-1"></i>共同事業者を追加
 						</button>
 					</div>
 				</div>
 			</div>
 
-			<!-- ===== そ�E他�E惁E�� ===== -->
+			<!-- ===== その他の情報 ===== -->
 			<div id="other-info" class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<h5 class="mb-0">
-						<i class="bi bi-gear me-2"></i>そ�E他�E惁E��
+						<i class="bi bi-gear me-2"></i>その他の情報
 					</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
 
-						<!-- eLTAX申諁E-->
+						<!-- eLTAX申請 -->
 						<div class="col-md-6">
-							<label class="form-label fw-medium">eLTAX申諁E/label>
+							<label class="form-label fw-medium">eLTAX申請</label>
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox"
 									th:field="*{eltaxUmu}" id="eltaxUmu" value="1"
 									th:disabled="${isView}" th:data-initial-value="*{eltaxUmu}">
-								<label class="form-check-label" for="eltaxUmu">朁E/label>
+								<label class="form-check-label" for="eltaxUmu">有</label>
 							</div>
 						</div>
 
-						<!-- 備老E-->
+						<!-- 備考 -->
 						<div class="col-md-12">
-							<label for="remarks" class="form-label fw-medium">備老E/label>
+							<label for="remarks" class="form-label fw-medium">備考</label>
 							<textarea class="form-control" id="remarks" rows="3"
-								th:field="*{remarks}" placeholder="特記事頁E��あれば入力してください"
+								th:field="*{remarks}" placeholder="特記事項があれば入力してください"
 								th:readonly="${isView}" th:data-initial-value="*{remarks}"></textarea>
 						</div>
 
@@ -719,28 +719,28 @@
 				</div>
 			</div>
 
-			<!-- ===== 施設営業休止/再開/廁E��惁E���E�編雁E��のみ表示�E�E==== -->
+			<!-- ===== 施設営業休止/再開/廃止情報（編集時のみ表示）===== -->
 			<div id="business-status-info" class="card mb-4 shadow-sm"
 				th:if="${isEdit} or ${isView}">
 				<div
 					class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center gap-2">
 					<h5 class="mb-0">
-						<i class="bi bi-exclamation-triangle me-2"></i>宿泊施設営業惁E��
+						<i class="bi bi-exclamation-triangle me-2"></i>宿泊施設営業情報
 					</h5>
 					<div class="form-check">
-						<input class="form-check-input" type="checkbox" id="businessStatusCheck"
-							name="businessStatusFlg" value="true" th:checked="*{businessStatusFlg}"
-							th:disabled="${isView}"> <label class="form-check-label"
-							for="businessStatusCheck">表示する</label>
+						<input class="form-check-input" type="checkbox"
+							id="businessStatusCheck" name="businessStatusFlg" value="true"
+							th:checked="*{businessStatusFlg}" th:disabled="${isView}">
+						<label class="form-check-label" for="businessStatusCheck">表示する</label>
 					</div>
 				</div>
 				<div id="businessStatusBody" class="card-body bg-light-subtle"
 					style="display: none;">
 					<div class="row g-3">
 
-						<!-- 申告区刁E-->
+						<!-- 申告区分 -->
 						<div class="col-md-12">
-							<label class="form-label fw-medium">申告区刁E/label>
+							<label class="form-label fw-medium">申告区分</label>
 							<div class="mt-1">
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio"
@@ -756,9 +756,9 @@
 								</div>
 								<div class="form-check form-check-inline">
 									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catAbolition" value="廁E��"
+										th:field="*{declarationCategory}" id="catAbolition" value="廃止"
 										th:disabled="${isView}"> <label
-										class="form-check-label" for="catAbolition">廁E��</label>
+										class="form-check-label" for="catAbolition">廃止</label>
 								</div>
 							</div>
 						</div>
@@ -774,9 +774,9 @@
 								readonly th:value="*{suspensionStartDate}">
 						</div>
 
-						<!-- 休止期間(終亁E��) -->
+						<!-- 休止期間(終了日) -->
 						<div class="col-md-4">
-							<label for="suspensionEndDate" class="form-label fw-medium">休止期間(終亁E��)</label>
+							<label for="suspensionEndDate" class="form-label fw-medium">休止期間(終了日)</label>
 							<input th:if="!${isView}" type="date" class="form-control"
 								id="suspensionEndDate" name="suspensionEndDate"
 								th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}"
@@ -791,14 +791,14 @@
 									id="suspensionEndDateUndecided"
 									th:field="*{suspensionEndDateUndecided}"
 									th:disabled="${isView}"> <label
-									class="form-check-label" for="suspensionEndDateUndecided">未宁E/label>
+									class="form-check-label" for="suspensionEndDateUndecided">未定</label>
 							</div>
 						</div>
 
-						<!-- 再開また�E廁E��日 -->
+						<!-- 再開または廃止日 -->
 						<div class="col-md-6">
 							<label for="resumptionOrAbolitionDate"
-								class="form-label fw-medium">再開また�E廁E��日</label> <input
+								class="form-label fw-medium">再開または廃止日</label> <input
 								th:if="!${isView}" type="date" class="form-control"
 								id="resumptionOrAbolitionDate" name="resumptionOrAbolitionDate"
 								th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}"
@@ -807,10 +807,10 @@
 								readonly th:value="*{resumptionOrAbolitionDate}">
 						</div>
 
-						<!-- 休止また�E廁E��琁E�� -->
+						<!-- 休止または廃止理由 -->
 						<div class="col-md-6">
 							<label for="suspensionOrAbolitionReason"
-								class="form-label fw-medium">休止また�E廁E��琁E��</label> <input
+								class="form-label fw-medium">休止または廃止理由</label> <input
 								type="text" class="form-control"
 								id="suspensionOrAbolitionReason"
 								th:field="*{suspensionOrAbolitionReason}"
@@ -836,26 +836,26 @@
 
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
-					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻めE
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-secondary btn-lg px-4"
 					th:unless="${isView ?: false}"
-					onclick="return confirm('入力�E容は破棁E��れます。よろしぁE��すか�E�E)"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻めE
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
 
 				</a>
 			</div>
 		</form>
 
-		<!-- 確認モーダル�E�登録と更新�E�E-->
+		<!-- 確認モーダル（登録と更新） -->
 		<div th:if="!${isView}"
-			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確誁E : '登録確誁E, ${isEdit} ? 'こ�E冁E��で更新します。よろしぁE��すか�E�E : 'こ�E冁E��で登録します。よろしぁE��すか�E�E, 'registerForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}">
+			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'registerForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}">
 		</div>
 
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
 
-		<!-- 特別徴収義務老E��定モーダル -->
+		<!-- 特別徴収義務者指定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
