@@ -60,7 +60,61 @@
 								<h5 class="mb-0">通知書情報</h5>
 							</div>
 							<div class="card-body">
+
 								<div class="row g-3">
+									<!-- 申請の区分 -->
+									<div class="col-md-4">
+										<label class="form-label">申請の区分 <span class="text-danger">*</span></label>
+
+										<div class="d-flex gap-3 mt-1">
+											<div class="form-check">
+												<input class="form-check-input" type="radio" id="shinseiKbn1"
+													th:field="*{shinsei_kbn}" value="1" checked>
+													
+												<label class="form-check-label" for="shinseiKbn1">還付</label>
+											</div>
+
+											<div class="form-check">
+												<input class="form-check-input" type="radio" id="shinseiKbn2"
+													th:field="*{shinsei_kbn}" value="2">
+													
+												<label class="form-check-label" for="shinseiKbn2">納入義務の免除</label>
+											</div>
+										</div>
+									</div>
+
+									<!-- 決定の内容 -->
+									<div class="col-md-4"> 
+										<label class="form-label">決定の内容 
+											<span class="text-danger">*</span>
+										</label>
+										
+										<div class="d-flex gap-3 mt-1">
+											<div class="form-check">
+												<input class="form-check-input" type="radio" id="ketteiNaiyou1"
+													th:field="*{kettei_naiyou}" value="1" checked>
+													
+												<label class="form-check-label" for="ketteiNaiyou1">申請額どおり承認する</label>
+											</div>
+
+											<div class="form-check">
+												<input class="form-check-input" type="radio" id="ketteiNaiyou2"
+													th:field="*{kettei_naiyou}" value="2">
+													
+												<label class="form-check-label" for="ketteiNaiyou2">一部承認する</label>
+											</div>
+
+											<div class="form-check">
+												<input class="form-check-input" type="radio" id="ketteiNaiyou3"
+													th:field="*{kettei_naiyou}" value="3">
+													
+												<label class="form-check-label" for="ketteiNaiyou3">不承認</label>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row g-3 mt-2">
 									<div class="col-md-4">
 										<label for="hakkoYmd" class="form-label">発行日 <span
 												class="text-danger">*</span></label>

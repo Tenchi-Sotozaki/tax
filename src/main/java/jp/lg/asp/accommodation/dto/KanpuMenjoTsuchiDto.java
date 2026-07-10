@@ -12,6 +12,8 @@ public class KanpuMenjoTsuchiDto {
     private LocalDate hakkoYmd;
     private String tokuJusho;
     private String tokuName;
+    private String shinsei_kbn;
+    private String kettei_naiyou;
     private String shisetsuJusho;
     private String shisetsuName;
     private LocalDate juriYmd;
