@@ -28,7 +28,6 @@ import jp.lg.asp.accommodation.entity.ChoshuGenboId;
 import jp.lg.asp.accommodation.entity.ChoshuGenboUchi;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
-import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
@@ -87,25 +86,6 @@ public class FukaServiceImpl implements FukaService {
 		form.setShiteiNo(shiteiNo);
 		form.setNendo(nendo);
 		form.setStatus(status != null ? status : STATUS_ALL);
-
-		tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-				.stream()
-				.findFirst()
-				.ifPresent(tokugimu -> {
-					// 納税周期マスタ取得
-					if (tokugimu.getNokigen() != null) {
-						NozeiShukiId id = new NozeiShukiId();
-						id.setJichitaiCd(jichitaiCd);
-						id.setSeq(tokugimu.getNokigen());
-						nozeiShukiRepository.findById(id)
-								.ifPresentOrElse(s -> {
-									form.setShuki(s.getShuki().intValue());
-								}, () -> form.setShuki(1));
-					} else {
-						form.setShuki(1);
-					}
-					form.setShisetsuName(tokugimu.getShisetsuName());
-				});
 
 		List<Fuka> fukaList = fukaRepository
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
@@ -427,9 +407,9 @@ public class FukaServiceImpl implements FukaService {
 				detail.setCityZeigaku(matched.getCityZeigaku());
 				detail.setKenZeigaku(matched.getKenZeigaku());
 			}
-			   if (detail.getTaxKenRate() == null) {
-			        detail.setTaxKenRate(BigDecimal.ZERO);
-			    }
+			if (detail.getTaxKenRate() == null) {
+				detail.setTaxKenRate(BigDecimal.ZERO);
+			}
 		}
 	}
 
@@ -468,7 +448,7 @@ public class FukaServiceImpl implements FukaService {
 					form.setAdditionalDueDate1(entity.getNokigen1());
 					form.setAdditionalCategory2(entity.getKasanKbn2());
 					if (entity.getKasanRitsu2() != null) {
-					    form.setAdditionalRate2(entity.getKasanRitsu1().toString()); // ← kasan_ritsu1になっている
+						form.setAdditionalRate2(entity.getKasanRitsu1().toString()); // ← kasan_ritsu1になっている
 					}
 					form.setAdditionalAmount2(entity.getKasanGaku2());
 					form.setAdditionalDueDate2(entity.getNokigen2());
