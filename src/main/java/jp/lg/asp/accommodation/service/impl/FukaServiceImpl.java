@@ -91,6 +91,7 @@ public class FukaServiceImpl implements FukaService {
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
 		Map<Integer, Fuka> fukaMap = createFukaMap(fukaList);
 
+		form.setShuki(3); // 納入申告管理台帳が表示できないので暫定(正式にはm_nozei_shukiから持ってくる)
 		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), form.getShuki()));
 		return form;
 	}
@@ -448,7 +449,7 @@ public class FukaServiceImpl implements FukaService {
 					form.setAdditionalDueDate1(entity.getNokigen1());
 					form.setAdditionalCategory2(entity.getKasanKbn2());
 					if (entity.getKasanRitsu2() != null) {
-						form.setAdditionalRate2(entity.getKasanRitsu1().toString()); // ← kasan_ritsu1になっている
+						form.setAdditionalRate2(entity.getKasanRitsu2().toString());
 					}
 					form.setAdditionalAmount2(entity.getKasanGaku2());
 					form.setAdditionalDueDate2(entity.getNokigen2());
