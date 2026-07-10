@@ -3,24 +3,24 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
-<title>合算申告情報管琁E��帳</title>
+<title>合算申告情報管理台帳</title>
 <link rel="stylesheet" th:href="@{/css/gassan-daicho.css}">
 </head>
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
 
-		<!-- ペ�Eジヘッダー -->
+		<!-- ページヘッダー -->
 		<div
 			class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-file-earmark-text text-primary me-2"></i>合算申告情報管琁E��帳
+				<i class="bi bi-file-earmark-text text-primary me-2"></i>合算申告情報管理台帳
 			</h5>
 			<span class="text-muted small"> 検索結果: <strong
 				th:text="${items.totalElements}">0</strong> 件
 			</span>
 		</div>
 
-		<!-- フラチE��ュメチE��ージ -->
+		<!-- フラッシュメッセージ -->
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show py-2 mb-3"
 			role="alert">
@@ -39,7 +39,7 @@
 				data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- 抽出条件�E�アコーチE��オン�E�E-->
+		<!-- 抽出条件（アコーディオン） -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
@@ -59,9 +59,9 @@
 										th:field="*{gassanShiteiNo}" placeholder="合算指定番号">
 								</div>
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">代表持E��番号</label>
+									<label class="form-label form-label-sm fw-medium mb-1">代表指定番号</label>
 									<input type="text" class="form-control form-control-sm"
-										th:field="*{shiteiNo}" placeholder="代表持E��番号">
+										th:field="*{shiteiNo}" placeholder="代表指定番号">
 								</div>
 								<div class="col">
 									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
@@ -72,21 +72,21 @@
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" name="nameMatchType" value="partial" id="namePartial" th:checked="${searchForm.nameMatchType == null or searchForm.nameMatchType == 'partial'}">
-											<label class="form-check-label small" for="namePartial">部刁E/label>
+											<label class="form-check-label small" for="namePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" name="nameMatchType" value="exact" id="nameExact" th:checked="${searchForm.nameMatchType == 'exact'}">
-											<label class="form-check-label small" for="nameExact">完�E</label>
+											<label class="form-check-label small" for="nameExact">完全</label>
 										</div>
 									</div>
 									<input type="text" class="form-control form-control-sm"
-										th:field="*{name}" placeholder="氏名また�E名称">
+										th:field="*{name}" placeholder="氏名または名称">
 								</div>
 							</div>
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/gassan/list}"
 									class="btn btn-outline-secondary btn-sm"> <i
-									class="bi bi-arrow-counterclockwise me-1"></i>リセチE��
+									class="bi bi-arrow-counterclockwise me-1"></i>リセット
 								</a>
 								<button type="submit" class="btn btn-primary btn-sm px-4">
 									<i class="bi bi-search me-1"></i>検索する
@@ -98,7 +98,7 @@
 			</div>
 		</div>
 
-		<!-- チE�Eルバ�E�E��Eタンエリア�E�E-->
+		<!-- ツールバー（ボタンエリア） -->
 		<div class="card shadow-sm mb-3">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex flex-wrap align-items-center gap-1"
@@ -106,14 +106,14 @@
 					<div class="d-flex flex-wrap gap-1">
 						<button type="button" id="btnView"
 							class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-eye me-1"></i>照企E
+							<i class="bi bi-eye me-1"></i>照会
 						</button>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- 表示件数選択�Eルダウン -->
+		<!-- 表示件数選択プルダウン -->
 		<div class="d-flex justify-content-end align-items-center mb-1">
 			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
@@ -124,7 +124,7 @@
 			</select>
 		</div>
 
-		<!-- 一覧チE�Eブル -->
+		<!-- 一覧テーブル -->
 		<div class="card shadow-sm">
 			<div class="card-body p-0">
 				<div class="table-scroll">
@@ -135,7 +135,7 @@
 								<th style="width: 40px" class="text-center"></th>
 								<th style="min-width: 120px">合算指定番号</th>
 								<th style="min-width: 140px">代表施設</th>
-								<th style="min-width: 100px">持E��番号</th>
+								<th style="min-width: 100px">指定番号</th>
 								<th style="min-width: 140px">氏名/名称</th>
 							</tr>
 						</thead>
@@ -152,14 +152,14 @@
 							<tr th:if="${items.totalElements == 0}">
 								<td colspan="5" class="text-center text-muted py-5"><i
 									class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-									該当するデータが見つかりませんでした、E/td>
+									該当するデータが見つかりませんでした。</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 			</div>
 			<div class="card-footer bg-white py-2 border-top">
-				<!-- ペ�Eジ選抁E-->
+				<!-- ページ選択 -->
 				<nav>
 					<ul class="pagination pagination-sm justify-content-center mb-0">
 						<li class="page-item" th:classappend="${items.first} ? 'disabled'">

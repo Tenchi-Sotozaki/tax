@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
-<title>交付��振込惁E��連携</title>
+<title>交付金振込情報連携</title>
 <link rel="stylesheet" th:href="@{/css/kofukin-furikomi.css}">
 </head>
 <body>
@@ -12,14 +12,14 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-bank me-2 text-primary"></i>交付��振込惁E��連携
+				<i class="bi bi-bank me-2 text-primary"></i>交付金振込情報連携
 			</h5>
 			<span class="text-muted small"> 検索結果: <strong
 				th:text="${#lists.size(items)}">0</strong> 件
 			</span>
 		</div>
 
-		<!-- ========== 抽出条件�E�アコーチE��オン�E�E========== -->
+		<!-- ========== 抽出条件（アコーディオン） ========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
@@ -32,7 +32,7 @@
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/kofukinFurikomi/list}"
 							th:object="${searchForm}" method="get">
-							<!-- SP:1刁E/ タブレチE��:2刁E/ PC:3刁E-->
+							<!-- SP:1列 / タブレット:2列 / PC:3列 -->
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
 								<div class="col">
 									<label for="nendo"
@@ -41,12 +41,12 @@
 										class="form-control form-control-sm year-only-input"
 										id="nendo" name="nendoDate"
 										th:value="*{nendo != null ? nendo + '-01-01' : ''}"
-										placeholder="年度を選抁E> <input type="hidden" name="nendo"
+										placeholder="年度を選択"> <input type="hidden" name="nendo"
 										id="nendoHidden" th:value="*{nendo}">
 								</div>
 								<div class="col">
 									<label for="shiteiNo"
-										class="form-label form-label-sm fw-medium mb-1">持E��番号</label> <input
+										class="form-label form-label-sm fw-medium mb-1">指定番号</label> <input
 										type="text" class="form-control form-control-sm" id="shiteiNo"
 										name="shiteiNo" th:value="*{shiteiNo}">
 								</div>
@@ -59,11 +59,11 @@
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" name="nameMatchType" value="partial" id="namePartial" th:checked="${searchForm.nameMatchType == null or searchForm.nameMatchType == 'partial'}">
-											<label class="form-check-label small" for="namePartial">部刁E/label>
+											<label class="form-check-label small" for="namePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" name="nameMatchType" value="exact" id="nameExact" th:checked="${searchForm.nameMatchType == 'exact'}">
-											<label class="form-check-label small" for="nameExact">完�E</label>
+											<label class="form-check-label small" for="nameExact">完全</label>
 										</div>
 									</div>
 									<input type="text" class="form-control form-control-sm"
@@ -73,7 +73,7 @@
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/kofukinFurikomi/list}"
 									class="btn btn-outline-secondary btn-sm"> <i
-									class="bi bi-arrow-counterclockwise me-1"></i>リセチE��
+									class="bi bi-arrow-counterclockwise me-1"></i>リセット
 								</a>
 								<button type="submit" class="btn btn-primary btn-sm px4">
 									<i class="bi bi-search me-1"></i>検索する
@@ -92,10 +92,10 @@
 					style="row-gap: 0.4rem;">
 					<div>
 						<button id="viewBtn" class="btn btn-outline-secondary btn-sm">
-							<i class="bi bi-eye me-1"></i>照企E
+							<i class="bi bi-eye me-1"></i>照会
 						</button>
 						<button id="csvBtn" class="btn btn-outline-primary btn-sm ms-2">
-							<i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV出劁E
+							<i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV出力
 						</button>
 					</div>
 				</div>
@@ -111,12 +111,12 @@
 					<tr>
 						<th style="width: 20px;" class="text-center"><input
 							type="checkbox" id="selectAll"></th>
-						<th style="width: 100px;">持E��番号</th>
+						<th style="width: 100px;">指定番号</th>
 						<th style="width: 100px;">宛名番号</th>
 						<th style="width: 200px;">氏名/名称</th>
 						<th style="width: 80px;">年度</th>
 						<th style="width: 100px;">交付年月日</th>
-						<th style="width: 120px;">納�E税顁E/th>
+						<th style="width: 120px;">納入税額</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -126,14 +126,14 @@
 								name="selectedIds" th:value="${item.shiteiNo}"
 								th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo}" />
 							</td>
-							<td th:text="${item.shiteiNo}">持E��番号</td>
+							<td th:text="${item.shiteiNo}">指定番号</td>
 							<td th:text="${item.atenaNo}">宛名番号</td>
 							<td th:text="${item.name}">氏名/名称</td>
 							<td th:text="${item.nendo}">年度</td>
 							<td
 								th:text="${item.kofuYmd != null ? #temporals.format(item.kofuYmd, 'yyyy-MM-dd') : ''}">交付年月日</td>
 							<td class="text-end"
-								th:text="${item.kofuZeigaku != null ? #numbers.formatInteger(item.kofuZeigaku, 3, 'COMMA') : ''}">納�E税顁E/td>
+								th:text="${item.kofuZeigaku != null ? #numbers.formatInteger(item.kofuZeigaku, 3, 'COMMA') : ''}">納入税額</td>
 						</tr>
 					</th:block>
 					<th:block th:if="${items == null or items.empty}">
@@ -145,7 +145,7 @@
 			</table>
 		</div>
 
-		<!-- ペ�Eジネ�Eション -->
+		<!-- ページネーション -->
 		<div class="card-footer bg-white py-2 border-top">
 			<nav>
 				<ul class="pagination pagination-sm justify-content-center mb-0">

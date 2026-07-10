@@ -3,7 +3,7 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
-<title>収納管琁E��携</title>
+<title>収納管理連携</title>
 <link rel="stylesheet" th:href="@{/css/shuno-renkei.css}">
 </head>
 <body>
@@ -12,14 +12,14 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i>収納管琁E��携
+				<i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i>収納管理連携
 			</h5>
 			<span class="text-muted small"> 検索結果: <strong
 				th:text="${#lists.size(items)}">0</strong> 件
 			</span>
 		</div>
 
-		<!-- ========== 抽出条件�E�アコーチE��オン�E�E========== -->
+		<!-- ========== 抽出条件（アコーディオン） ========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
@@ -32,29 +32,29 @@
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/shunoRenkei/list}" th:object="${searchForm}"
 							method="get">
-							<!-- SP:1刁E/ タブレチE��:2刁E/ PC:4刁E-->
+							<!-- SP:1列 / タブレット:2列 / PC:4列 -->
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
 								<div class="col">
 									<label for="shinkokuFrom"
-										class="form-label form-label-sm fw-medium mb-1">申告日�E�開始！E/label>
+										class="form-label form-label-sm fw-medium mb-1">申告日（開始）</label>
 									<input type="date" class="form-control form-control-sm"
 										id="shinkokuFrom" name="shinkokuFrom" th:value="*{shinkokuFrom}">
 								</div>
 								<div class="col">
 									<label for="shinkokuTo"
-										class="form-label form-label-sm fw-medium mb-1">申告日�E�終亁E��E/label>
+										class="form-label form-label-sm fw-medium mb-1">申告日（終了）</label>
 									<input type="date" class="form-control form-control-sm"
 										id="shinkokuTo" name="shinkokuTo" th:value="*{shinkokuTo}">
 								</div>
 								<div class="col">
 									<label for="taishoMonth"
-										class="form-label form-label-sm fw-medium mb-1">対象朁E/label> <input
+										class="form-label form-label-sm fw-medium mb-1">対象月</label> <input
 										type="month" class="form-control form-control-sm"
 										id="taishoMonth" name="taishoMonth" th:value="*{taishoMonth}">
 								</div>
 								<div class="col">
 									<label for="shiteiNo"
-										class="form-label form-label-sm fw-medium mb-1">持E��番号</label> <input
+										class="form-label form-label-sm fw-medium mb-1">指定番号</label> <input
 										type="text" class="form-control form-control-sm" id="shiteiNo"
 										name="shiteiNo" th:value="*{shiteiNo}">
 								</div>
@@ -67,11 +67,11 @@
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" name="nameMatchType" value="partial" id="namePartial" th:checked="${searchForm.nameMatchType == null or searchForm.nameMatchType == 'partial'}">
-											<label class="form-check-label small" for="namePartial">部刁E/label>
+											<label class="form-check-label small" for="namePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
 											<input class="form-check-input" type="radio" name="nameMatchType" value="exact" id="nameExact" th:checked="${searchForm.nameMatchType == 'exact'}">
-											<label class="form-check-label small" for="nameExact">完�E</label>
+											<label class="form-check-label small" for="nameExact">完全</label>
 										</div>
 									</div>
 									<input type="text" class="form-control form-control-sm"
@@ -81,7 +81,7 @@
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/shunoRenkei/list}"
 									class="btn btn-outline-secondary btn-sm"> <i
-									class="bi bi-arrow-counterclockwise me-1"></i>リセチE��
+									class="bi bi-arrow-counterclockwise me-1"></i>リセット
 								</a>
 								<button type="submit" class="btn btn-primary btn-sm px4">
 									<i class="bi bi-search me-1"></i>検索する
@@ -100,10 +100,10 @@
 					style="row-gap: 0.4rem;">
 					<div>
 						<button id="viewBtn" class="btn btn-outline-secondary btn-sm">
-							<i class="bi bi-eye me-1"></i>照企E
+							<i class="bi bi-eye me-1"></i>照会
 						</button>
 						<button id="csvBtn" class="btn btn-outline-primary btn-sm ms-2">
-							<i class="bi bi-file-earmark-spreadsheet me-1"></i>csv出劁E
+							<i class="bi bi-file-earmark-spreadsheet me-1"></i>csv出力
 						</button>
 					</div>
 				</div>
@@ -119,11 +119,11 @@
 					<tr>
 						<th style="width: 20px;" class="text-center"><input
 							type="checkbox" id="selectAll"></th>
-						<th style="width: 100px;">持E��番号</th>
+						<th style="width: 100px;">指定番号</th>
 						<th style="width: 100px;">宛名番号</th>
 						<th style="width: 200px;">氏名/名称</th>
-						<th style="width: 100px;">対象年朁E/th>
-						<th style="width: 100px;">宿泊税顁E/th>
+						<th style="width: 100px;">対象年月</th>
+						<th style="width: 100px;">宿泊税額</th>
 						<th style="width: 150px;">登録年月日</th>
 						<th style="width: 150px;">申告年月日</th>
 					</tr>
@@ -135,11 +135,11 @@
 								name="selectedIds" th:value="${item.shiteiNo}"
 								th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo},data-kibetsu=${item.kibetsu}" />
 							</td>
-							<td th:text="${item.shiteiNo}">持E��番号</td>
+							<td th:text="${item.shiteiNo}">指定番号</td>
 							<td th:text="${item.atenaNo}">宛名番号</td>
 							<td th:text="${item.name}">氏名/名称</td>
-							<td th:text="${item.taishoYm}">対象年朁E/td>
-							<td th:text="${item.totalZeigaku}">宿泊税顁E/td>
+							<td th:text="${item.taishoYm}">対象年月</td>
+							<td th:text="${item.totalZeigaku}">宿泊税額</td>
 							<td
 								th:text="${item.torokuYmd != null ? #temporals.format(item.torokuYmd, 'yyyy-MM-dd') : ''}">登録年月日</td>
 							<td
@@ -155,7 +155,7 @@
 			</table>
 		</div>
 
-		<!-- ペ�Eジネ�Eション -->
+		<!-- ページネーション -->
 		<div class="card-footer bg-white py-2 border-top">
 			<nav>
 				<ul class="pagination pagination-sm justify-content-center mb-0">
