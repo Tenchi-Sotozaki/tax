@@ -141,16 +141,13 @@ public class Tokugimu extends BaseEntity {
 	@Column(name = "eltax_umu", length = 1)
 	private String eltaxUmu;
 
-	@Column(name = "nokigen", length = 2)
-	private BigDecimal nokigen;
-
 	@Column(name = "new_flg", nullable = false, length = 1)
 	private String newFlg;
 
 	@Column(name = "del_flg", nullable = false, length = 1)
 	private String delFlg;
-	
-	@jakarta.persistence.Transient 
+
+	@jakarta.persistence.Transient
 	public String getStatus() {
 		LocalDate now = LocalDate.now();
 

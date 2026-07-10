@@ -29,7 +29,6 @@ import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto.DiffRow;
 import jp.lg.asp.accommodation.entity.EltaxRenkei;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
-import jp.lg.asp.accommodation.entity.NozeiShuki;
 import jp.lg.asp.accommodation.entity.Shoyusha;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
@@ -582,15 +581,6 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 				atenaNo = prev.getAtenaNo();
 			}
 
-			// 納税周期
-			BigDecimal nokigen;
-			if (isNew) {
-				List<NozeiShuki> nozeiList = nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd);
-				nokigen = nozeiList.isEmpty() ? null : nozeiList.get(0).getSeq();
-			} else {
-				nokigen = prev.getNokigen();
-			}
-
 			// 営業開始終了年月日、休止開始終了年月日
 			LocalDate eigyoStYmd = parseDate(getDataValue(dataRow, eigyoStYmdIdx)) == null
 					? (isNew ? LocalDate.now() : prev.getEigyoStYmd())
@@ -683,7 +673,6 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			entity.setKyushiEdYmd(kyushiEdYmd);
 			entity.setKyuhaishiRiyu(kyuhaishiRiyu);
 			entity.setEltaxUmu("1");
-			entity.setNokigen(nokigen);
 			entity.setNewFlg("1");
 			entity.setDelFlg("0");
 			tokugimuRepository.save(entity);
