@@ -39,6 +39,13 @@
     display: block;
 }
 
+.acomo-logo-login {
+    width: 180px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
 /* ==========================================
    サイドメニュー
 ========================================== */
@@ -151,6 +158,10 @@
 .card-header {
     background-color: var(--acomo-light-blue) !important;
     color: #212529 !important;
+}
+
+.card-header-login {
+    background-color: var(--acomo-navy) !important;
 }
 
 /* ==========================================
