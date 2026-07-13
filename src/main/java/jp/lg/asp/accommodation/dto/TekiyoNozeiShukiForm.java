@@ -1,9 +1,7 @@
 package jp.lg.asp.accommodation.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import org.springframework.format.annotation.DateTimeFormat;
+import java.util.List;
 
 import lombok.Data;
 
@@ -17,9 +15,8 @@ public class TekiyoNozeiShukiForm {
 
     private BigDecimal seq;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate tekiyoStYmd;
+    private String tekiyoStMonth;
+    private String tekiyoEdMonth;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate tekiyoEdYmd;
+    private List<TekiyoNozeiShukiHistoryDto> histories;
 }
