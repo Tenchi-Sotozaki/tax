@@ -66,6 +66,7 @@
 			<input type="hidden" th:field="*{edit}" /> <input type="hidden"
 				th:field="*{view}" /> <input type="hidden" th:field="*{fukaKbn}"
 				id="fukaKbnHidden" />
+			<input type="hidden" th:field="*{monthlyDetail.paymentYearMonth}" />
 			<!-- List内の要素を動的にhiddenフィールド化 -->
 			<th:block th:each="taxDetail, stat : *{monthlyDetail.taxDetails}">
 				<input type="hidden"
@@ -83,7 +84,7 @@
 			<div class="card shadow-sm mb-4">
 				<div class="card-header bg-primary bg-opacity-10 py-2">
 					<h6 class="mb-0 fw-bold text-primary">
-						<i class="bi bi-calculator me-2"></i>納税額情報
+						<i class="bi bi-calculator me-2"></i>申告情報
 					</h6>
 				</div>
 				<div class="card-body">
@@ -124,20 +125,12 @@
 
 					<div class="row g-3 align-items-start mb-3">
 
-						<!-- 納入年月 -->
-						<div class="col-md-3">
-							<label class="form-label fw-medium mb-1 bg-light">納入年月 </label> <input
-								type="text" class="form-control form-control-sm"
-								th:field="*{monthlyDetail.paymentYearMonth}" readOnly
-								th:data-initial-value="*{monthlyDetail.paymentYearMonth}">
-						</div>
-
 						<!-- 月計表 -->
-						<div class="col-md-3">
+						<div class="col-md-2">
 							<div class="mt-2" th:if="${!fukaDeclarationForm.view}">
 								<button type="button" class="btn btn-success btn-sm"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
-									<i class="bi bi-calendar3 me-1"></i>月計表から登録
+									<i class="bi bi-calendar3 me-1"></i>月計表を登録
 								</button>
 							</div>
 							<div class="mt-2" th:if="${fukaDeclarationForm.view}">
@@ -172,7 +165,7 @@
 						</div>
 
 						<!-- 変更理由 -->
-						<div class="col-md-4">
+						<div class="col-md-5">
 							<label class="form-label form-label-sm fw-medium mb-1">変更理由</label>
 							<textarea class="form-control form-control-sm" rows="1"
 								th:field="*{modificationReason}"
@@ -265,6 +258,7 @@
 									<!-- 合計 -->
 									<tr>
 										<td class="text-center">合計</td>
+										<td></td>
 
 										<td><input type="text"
 											th:field="*{monthlyDetail.totalStayCount}"
@@ -593,6 +587,41 @@
 								th:field="*{additionalDueDate3}"
 								th:readonly="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{additionalDueDate3}">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 納入情報 -->
+			<div class="card shadow-sm mb-4">
+				<div
+					class="card-header bg-success bg-opacity-10 py-2 d-flex justify-content-between align-items-center">
+					<h6 class="mb-0 fw-bold text-success">
+						<i class="bi bi-cash-coin me-2"></i>納入情報
+					</h6>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="shunoCheck"
+							name="shunoFlg" value="true" th:checked="*{shunoFlg}"
+							th:disabled="${fukaDeclarationForm.view}"> <label
+							class="form-check-label" for="shunoCheck">表示する</label>
+					</div>
+				</div>
+				<div id="shunoBody" class="card-body py-3" style="display: none;">
+					<div class="row g-3 align-items-end">
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium mb-1">納入年月日
+								<span class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span>
+							</label> <input type="date" class="form-control form-control-sm"
+								th:field="*{shunoYmd}" th:readonly="${fukaDeclarationForm.view}">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium mb-1">納入金額
+								(円) <span class="text-danger"
+								th:if="${!fukaDeclarationForm.view}">*</span>
+							</label> <input type="text"
+								class="form-control form-control-sm text-end js-comma-format"
+								th:field="*{shunoKingaku}"
+								th:readonly="${fukaDeclarationForm.view}" placeholder="0">
 						</div>
 					</div>
 				</div>

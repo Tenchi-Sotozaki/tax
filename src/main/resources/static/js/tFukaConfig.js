@@ -1,5 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    // 納入情報チェックボックスの表示/非表示切り替え
+    const shunoCheck = document.getElementById('shunoCheck');
+    if (shunoCheck) {
+        const shunoBody = document.getElementById('shunoBody');
+        shunoCheck.addEventListener('change', () => {
+            shunoBody.style.display = shunoCheck.checked ? '' : 'none';
+            if (!shunoCheck.checked) {
+                shunoBody.querySelectorAll('input').forEach(el => el.value = '');
+            }
+        });
+        // 初期表示
+        if (shunoCheck.checked) {
+            shunoBody.style.display = '';
+        }
+    }
+
     const fukaKbnEl = document.getElementById('fukaKbnHidden');
     const fukaKbn = fukaKbnEl ? fukaKbnEl.value : '';
 
