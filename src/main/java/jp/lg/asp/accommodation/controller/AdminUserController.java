@@ -56,7 +56,7 @@ public class AdminUserController {
 				toLikePattern(searchForm.getBusho(), searchForm.getBushoMatchType())));
 		model.addAttribute("roleMap", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd)
 				.stream().collect(java.util.stream.Collectors.toMap(
-						r -> r.getRoleId(), r -> r.getName())));
+						r -> String.valueOf(r.getRoleId()), r -> r.getName())));
 		return LIST_VIEW;
 	}
 

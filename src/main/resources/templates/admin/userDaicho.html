@@ -138,6 +138,9 @@
 		<!-- 削除用フォーム -->
 		<form id="deleteForm" th:action="@{/admin/user-delete-batch}" method="post" style="display:none;"></form>
 
+		<!-- 削除確認モーダル -->
+		<div th:replace="~{layout/components :: confirmModal('deleteModal','削除確認','選択したユーザーを削除します。よろしいですか？','deleteForm','btn-danger','削除する')}"></div>
+
 		<!-- 一覧テーブル -->
 		<div class="card shadow-sm mb-5">
 			<div class="table-responsive">
@@ -146,10 +149,10 @@
 						<tr>
 							<th style="width: 40px;"></th>
 							<th style="width: 160px;">ID</th>
-							<th style="width: 160px;">氏名</th>
+							<th style="width: 180px;">氏名</th>
 							<th style="width: 180px;">ふりがな</th>
-							<th>部署</th>
-							<th style="width: 150px;">権限</th>
+							<th style="width: 180px">部署</th>
+							<th style="width: 180px;">権限</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -163,7 +166,7 @@
 							<td th:text="${user.name}"></td>
 							<td class="text-muted" th:text="${user.nameKana}"></td>
 							<td th:text="${user.busho}"></td>
-							<td th:text="${roleMap[user.roleId]}"></td>
+							<td th:text="${roleMap[user.roleId.toString()]}"></td>
 						</tr>
 					</tbody>
 				</table>
@@ -175,37 +178,8 @@
 	<th:block layout:fragment="scripts">
 		<script th:inline="javascript">
     const editBasePath = /*[[@{/admin/user-edit/}]]*/ '/admin/user-edit/';
-
-    document.querySelectorAll('.user-checkbox').forEach(cb => {
-        cb.addEventListener('change', function () {
-            const checked = document.querySelectorAll('.user-checkbox:checked');
-            document.getElementById('editBtn').disabled = checked.length !== 1;
-            document.getElementById('deleteBtn').disabled = checked.length === 0;
-        });
-    });
-
-    function goToEdit() {
-        const checked = document.querySelector('.user-checkbox:checked');
-        if (!checked) return;
-        location.href = editBasePath + encodeURIComponent(checked.value);
-    }
-
-    function confirmDelete() {
-        const checked = document.querySelectorAll('.user-checkbox:checked');
-        if (checked.length === 0) return;
-        if (!confirm(checked.length + '件のユーザーを削除しますか？')) return;
-        const form = document.getElementById('deleteForm');
-        form.innerHTML = '';
-        checked.forEach(cb => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'ids';
-            input.value = cb.value;
-            form.appendChild(input);
-        });
-        form.submit();
-    }
 </script>
+		<script th:src="@{/js/userDaicho.js}"></script>
 	</th:block>
 </body>
 </html>
