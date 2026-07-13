@@ -116,7 +116,7 @@
 
 						<!-- 宛名検索 -->
 						<div class="col-md-4 d-flex align-items-end" th:if="!${isView}">
-							<button type="button" class="btn btn-outline-primary"
+							<button type="button" class="btn btn-primary"
 								data-bs-toggle="modal" data-bs-target="#addressSearchModal">
 								<i class="bi bi-search me-1"></i>宛名検索
 							</button>
@@ -826,8 +826,7 @@
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 				<th:block th:if="!${isView}">
 					<button type="button" id="openConfirmModalBtn"
-						class="btn btn-lg px-5"
-						th:classappend="${isEdit} ? 'btn-success' : 'btn-primary'">
+						class="btn btn-success btn-lg px-5">
 						<i
 							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
@@ -835,10 +834,10 @@
 				</th:block>
 
 				<a th:href="@{/tokugimu/list}"
-					class="btn btn-outline-secondary btn-lg px-4"
+					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:href="@{/tokugimu/list}"
-					class="btn btn-outline-secondary btn-lg px-4"
+					class="btn btn-outline-primary btn-lg px-4"
 					th:unless="${isView ?: false}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る

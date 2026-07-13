@@ -53,15 +53,18 @@
 									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
 										<label class="form-label form-label-sm fw-medium mb-0">氏名/名称</label>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}"
+												value="prefix" id="namePrefix">
 											<label class="form-check-label small" for="namePrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}"
+												value="partial" id="namePartial">
 											<label class="form-check-label small" for="namePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}"
+												value="exact" id="nameExact">
 											<label class="form-check-label small" for="nameExact">完全</label>
 										</div>
 									</div>
@@ -131,23 +134,23 @@
 				<div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
 					<!-- グループ1: 基本操作 -->
 					<div class="d-flex flex-wrap gap-1">
-						<a th:href="@{/tokugimu/registration}" class="btn btn-primary btn-sm"> <i
+						<a th:href="@{/tokugimu/registration}" class="btn btn-success btn-sm"> <i
 								class="bi bi-plus-circle me-1"></i>新規登録
 						</a>
 						<button type="button" id="btnView" class="btn btn-outline-primary btn-sm">
 							<i class="bi bi-eye me-1"></i>照会
 						</button>
-						<button type="button" id="btnDelete" class="btn btn-outline-danger btn-sm">
+						<button type="button" id="btnDelete" class="btn btn-danger btn-sm">
 							<i class="bi bi-trash me-1"></i>削除
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
 					<!-- グループ2: 納税管理人 -->
 					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnTaxManager" class="btn btn-info btn-sm">
+						<button type="button" id="btnTaxManager" class="btn btn-success btn-sm">
 							<i class="bi bi-person-plus me-1"></i>納税管理人登録
 						</button>
-						<button type="button" id="btnTaxManagerView" class="btn btn-outline-info btn-sm">
+						<button type="button" id="btnTaxManagerView" class="btn btn-outline-primary btn-sm">
 							<i class="bi bi-person me-1"></i>納税管理人照会
 						</button>
 					</div>
@@ -157,20 +160,19 @@
 						<button type="button" id="btnNozeiShuki" class="btn btn-success btn-sm">
 							<i class="bi bi-calendar-plus me-1"></i>納税周期登録
 						</button>
-						<button type="button" id="btnNozeiShukiView" class="btn btn-outline-success btn-sm">
+						<button type="button" id="btnNozeiShukiView" class="btn btn-outline-primary btn-sm">
 							<i class="bi bi-calendar-check me-1"></i>納税周期照会
 						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
 					<!-- グループ4: 納入台帳 -->
-					<button type="button" id="btnPaymentLedger"
-						class="btn btn-outline-secondary btn-sm">
+					<button type="button" id="btnPaymentLedger" class="btn btn-outline-primary btn-sm">
 						<i class="bi bi-currency-yen me-1"></i>納入申告管理台帳
 					</button>
 
 					<!-- グループ5: その他 -->
 					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnReport" class="btn btn-outline-dark btn-sm">
+						<button type="button" id="btnReport" class="btn btn-primary btn-sm">
 							<i class="bi bi-printer me-1"></i>帳票発行
 						</button>
 					</div>
