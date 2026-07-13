@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +24,6 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.GassanDaichoItem;
 import jp.lg.asp.accommodation.dto.GassanDaichoSearchForm;
 import jp.lg.asp.accommodation.dto.GassanForm;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.GassanDaichoService;
 import jp.lg.asp.accommodation.service.GassanService;
 import lombok.RequiredArgsConstructor;
@@ -49,36 +46,13 @@ public class GassanController {
 
 	@GetMapping("/registration")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
-	public String showRegistrationForm(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+	public String showRegistrationForm(Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
-		// セッションから特別徴収義務者情報を取得
-		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session
-				.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
-
-		// セッション未設定の場合はモーダルを自動表示させる
-		if (selected == null || selected.getShiteiNo() == null) {
-			model.addAttribute("GassanForm", new GassanForm());
-			model.addAttribute("isEdit", false);
-			model.addAttribute("isView", false);
-			model.addAttribute("showShiteiModal", true);
-			return FORM_VIEW;
-		}
-
-		// 合算指定番号がセッションに保存されている場合はエラー
-		if (selected.getGassanShiteiNo() != null) {
-			model.addAttribute("GassanForm", new GassanForm());
-			model.addAttribute("isEdit", false);
-			model.addAttribute("isView", false);
-			model.addAttribute("showShiteiModal", true);
-			model.addAttribute("errorMessage", "合算申告登録済みの特別徴収義務者です。特別徴収義務者を再度指定してください。");
-			return FORM_VIEW;
-		}
-
-		GassanForm form = gassanService.buildFormByShiteiNo(selected.getShiteiNo());
-		model.addAttribute("GassanForm", form);
+		model.addAttribute("GassanForm", new GassanForm());
 		model.addAttribute("isEdit", false);
 		model.addAttribute("isView", false);
+		model.addAttribute("showAddressModal", true);
 		return FORM_VIEW;
 	}
 
