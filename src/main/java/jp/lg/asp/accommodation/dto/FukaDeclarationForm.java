@@ -65,6 +65,12 @@ public class FukaDeclarationForm {
 	// 徴収原簿
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
 
+	// ========== 納入情報エリア ==========
+	private boolean shunoFlg;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate shunoYmd;
+	private Long shunoKingaku;
+
 	// ========== バリデーション制御用フィールド ==========
 	private boolean taxCheckBypassed = false;
 	private Boolean showTaxWarningModal = false;
@@ -96,5 +102,17 @@ public class FukaDeclarationForm {
 			return true;
 		}
 		return additionalAmount3 != null && additionalAmount3 > 0;
+	}
+
+	@AssertTrue(message = "納入情報を表示する場合、納入年月日は必須です")
+	public boolean isShunoYmdValid() {
+		if (!shunoFlg) return true;
+		return shunoYmd != null;
+	}
+
+	@AssertTrue(message = "納入情報を表示する場合、納入金額は必須です")
+	public boolean isShunoKingakuValid() {
+		if (!shunoFlg) return true;
+		return shunoKingaku != null && shunoKingaku > 0;
 	}
 }

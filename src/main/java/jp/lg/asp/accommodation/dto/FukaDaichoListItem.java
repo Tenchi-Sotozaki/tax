@@ -13,7 +13,7 @@ public class FukaDaichoListItem {
 	private Long cityZeigaku; // 市区町村税額
 	private Long kenZeigaku; // 	都道府県税額
 	private boolean shinkokuZumi; // 申告済・未の判定フラグ
-	private boolean nonyuZumi; // 納入済・未の判定フラグ
+	private String nonyuStatus; // 納入状況 ("paid", "partial", "unpaid")
 	private String displayShinkokuKigen; // 申告期限 (例: "2026年6月末")
 	private String displayNonyuKigen; // 納入期限 (例: "2026年7月末")
 
