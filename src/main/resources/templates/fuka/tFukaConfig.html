@@ -135,9 +135,9 @@
 						<!-- 月計表 -->
 						<div class="col-md-3">
 							<div class="mt-2" th:if="${!fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-outline-primary btn-sm"
+								<button type="button" class="btn btn-success btn-sm"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
-									<i class="bi bi-calendar3 me-1"></i>月計表から入力
+									<i class="bi bi-calendar3 me-1"></i>月計表から登録
 								</button>
 							</div>
 							<div class="mt-2" th:if="${fukaDeclarationForm.view}">
@@ -608,12 +608,12 @@
 
 				<a
 					th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
-					class="btn btn-outline-secondary px-4 shadow-sm"
+					class="btn btn-outline-primary px-4 shadow-sm"
 					th:if="${fukaDeclarationForm.view}"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a
 					th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
-					class="btn btn-outline-secondary px-4 shadow-sm"
+					class="btn btn-outline-primary px-4 shadow-sm"
 					th:unless="${fukaDeclarationForm.view}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -897,11 +897,11 @@
 							</div>
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary"
+							<button type="button" class="btn btn-outline-primary"
 								data-bs-dismiss="modal">閉じる</button>
 							<button type="button" class="btn btn-success" id="btnApplyTally"
 								data-bs-dismiss="modal" th:if="${!fukaDeclarationForm.view}">
-								<span>入力内容を保持して閉じる</span>
+								<span>入力内容を登録</span>
 							</button>
 						</div>
 					</div>
@@ -931,7 +931,7 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary"
 							data-bs-dismiss="modal">キャンセル</button>
-						<button type="button" class="btn btn-primary" id="btnForceSave">そのまま登録する</button>
+						<button type="button" class="btn btn-success" id="btnForceSave">そのまま登録する</button>
 					</div>
 				</div>
 			</div>
