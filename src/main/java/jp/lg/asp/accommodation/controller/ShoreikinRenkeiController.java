@@ -44,16 +44,18 @@ public class ShoreikinRenkeiController {
             @RequestParam(required = false) String nendo,
             @RequestParam(required = false) String shiteiNo,
             @RequestParam(required = false) String name,
+            @RequestParam(required = false, defaultValue = "partial") String nameMatchType,
             Model model) {
 
         accessChecker.checkAccess(SCREEN_ID);
-        List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name);
+        List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
 
         model.addAttribute("items", items);
         Map<String, Object> searchForm = new HashMap<>();
         searchForm.put("nendo", nendo);
         searchForm.put("shiteiNo", shiteiNo);
         searchForm.put("name", name);
+        searchForm.put("nameMatchType", nameMatchType);
         model.addAttribute("searchForm", searchForm);
 
         return "renkei/shoreikinRenkei";
@@ -65,10 +67,11 @@ public class ShoreikinRenkeiController {
     public List<ShoreikinRenkeiDto> search(
             @RequestParam(required = false) String nendo,
             @RequestParam(required = false) String shiteiNo,
-            @RequestParam(required = false) String name) {
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false, defaultValue = "partial") String nameMatchType) {
 
         accessChecker.checkAccess(SCREEN_ID);
-        return shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name);
+        return shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
     }
 
     @PostMapping("/download")

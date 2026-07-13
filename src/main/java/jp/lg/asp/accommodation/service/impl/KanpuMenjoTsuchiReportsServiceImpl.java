@@ -40,6 +40,10 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
             JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
 
             Map<String, Object> parameters = new HashMap<>();
+            // 帳票で丸印の表示に使用するため、データソースとは別に、パラメータマップへ格納
+            parameters.put("shinsei_kbn", dto.getShinsei_kbn() != null ? dto.getShinsei_kbn() : "");
+            parameters.put("kettei_naiyou", dto.getKettei_naiyou() != null ? dto.getKettei_naiyou() : "");
+            
             JRDataSource dataSource = buildParams(dto);
             JasperPrint jasperPrint = JasperFillManager.fillReport(
                     jasperReport, parameters, dataSource);

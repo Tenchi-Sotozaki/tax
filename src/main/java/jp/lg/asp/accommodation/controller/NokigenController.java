@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.entity.Nokigen;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.NokigenService;
 import lombok.RequiredArgsConstructor;
 
@@ -24,10 +25,30 @@ import lombok.RequiredArgsConstructor;
 public class NokigenController {
 
 	private final NokigenService nokigenService;
+	private final JichitaiRepository jichitaiRepository;
 	private final ScreenAccessChecker accessChecker;
+
+	@org.springframework.beans.factory.annotation.Value("${app.jichitai.code}")
+	private String jichitaiCd;
 
 	private static final String SCREEN_ID = ScreenManagement.NOKIGEN;
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.NOKIGEN_CONFIG;
+
+	private void addKiMonthLabels(Model model) {
+		jichitaiRepository.findById(jichitaiCd).ifPresent(j -> {
+			if (j.getNendoStMonth() == null || j.getNendoStMonth().trim().isEmpty()) {
+				model.addAttribute("warnMessage", "年度開始月が未設定です。");
+				return;
+			}
+			int st = Integer.parseInt(j.getNendoStMonth().trim());
+			java.util.List<String> labels = new java.util.ArrayList<>();
+			for (int i = 0; i < 12; i++) {
+				int month = (st + i - 1) % 12 + 1;
+				labels.add(month + "月");
+			}
+			model.addAttribute("kiMonthLabels", labels);
+		});
+	}
 
 	@GetMapping("/list")
 	public String list(RedirectAttributes redirectAttributes) {
@@ -45,6 +66,7 @@ public class NokigenController {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("nokigen", new Nokigen());
 		model.addAttribute("mode", "register");
+		addKiMonthLabels(model);
 		return "admin/nokigenConfig";
 	}
 
@@ -60,6 +82,7 @@ public class NokigenController {
 		model.addAttribute("nokigen", nokigen);
 		model.addAttribute("mode", "view");
 		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
+		addKiMonthLabels(model);
 		return "admin/nokigenConfig";
 	}
 
@@ -74,7 +97,15 @@ public class NokigenController {
 		toHtmlDate(nokigen);
 		model.addAttribute("nokigen", nokigen);
 		model.addAttribute("mode", "edit");
+		addKiMonthLabels(model);
 		return "admin/nokigenConfig";
+	}
+
+	/** 指定年度が登録済みかチェック */
+	@GetMapping("/exists/{nendo}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Boolean>> exists(@PathVariable String nendo) {
+		return ResponseEntity.ok(Map.of("exists", nokigenService.existsByNendo(nendo)));
 	}
 
 	/** 前年度データをJSONで返す（画面への複写用） */
@@ -88,15 +119,15 @@ public class NokigenController {
 			return ResponseEntity.notFound().build();
 		}
 		Map<String, String> result = new java.util.LinkedHashMap<>();
-		result.put("nokigen1st",  toHtml(prev.getNokigen1st()));
-		result.put("nokigen2nd",  toHtml(prev.getNokigen2nd()));
-		result.put("nokigen3rd",  toHtml(prev.getNokigen3rd()));
-		result.put("nokigen4th",  toHtml(prev.getNokigen4th()));
-		result.put("nokigen5th",  toHtml(prev.getNokigen5th()));
-		result.put("nokigen6th",  toHtml(prev.getNokigen6th()));
-		result.put("nokigen7th",  toHtml(prev.getNokigen7th()));
-		result.put("nokigen8th",  toHtml(prev.getNokigen8th()));
-		result.put("nokigen9th",  toHtml(prev.getNokigen9th()));
+		result.put("nokigen1st", toHtml(prev.getNokigen1st()));
+		result.put("nokigen2nd", toHtml(prev.getNokigen2nd()));
+		result.put("nokigen3rd", toHtml(prev.getNokigen3rd()));
+		result.put("nokigen4th", toHtml(prev.getNokigen4th()));
+		result.put("nokigen5th", toHtml(prev.getNokigen5th()));
+		result.put("nokigen6th", toHtml(prev.getNokigen6th()));
+		result.put("nokigen7th", toHtml(prev.getNokigen7th()));
+		result.put("nokigen8th", toHtml(prev.getNokigen8th()));
+		result.put("nokigen9th", toHtml(prev.getNokigen9th()));
 		result.put("nokigen10th", toHtml(prev.getNokigen10th()));
 		result.put("nokigen11th", toHtml(prev.getNokigen11th()));
 		result.put("nokigen12th", toHtml(prev.getNokigen12th()));
@@ -104,30 +135,38 @@ public class NokigenController {
 	}
 
 	@PostMapping("/save")
-	public String save(Nokigen nokigen, Model model, RedirectAttributes redirectAttributes) {
+	public String save(Nokigen nokigen,
+			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "register") String mode, Model model,
+			RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		if (nokigen.getNendo() == null || nokigen.getNendo().isBlank()) {
 			model.addAttribute("nokigen", nokigen);
-			model.addAttribute("mode", "register");
+			model.addAttribute("mode", mode);
 			model.addAttribute("validationErrors", java.util.List.of("年度は必須です"));
+			addKiMonthLabels(model);
 			return "admin/nokigenConfig";
 		}
 
 		try {
-			boolean isNew = !nokigenService.existsByNendo(nokigen.getNendo());
-			if (isNew && nokigenService.existsByNendo(nokigen.getNendo())) {
-				redirectAttributes.addFlashAttribute("errorMessage", "この年度は既に登録されています。");
-				return "redirect:/admin/nokigen/register";
+			if ("register".equals(mode) && nokigenService.existsByNendo(nokigen.getNendo())) {
+				model.addAttribute("nokigen", nokigen);
+				model.addAttribute("mode", "register");
+				model.addAttribute("errorMessage", "登録済みの年度です。編集画面から修正してください。");
+				addKiMonthLabels(model);
+				return "admin/nokigenConfig";
 			}
 			nokigenService.save(nokigen);
-			String message = isNew ? "納入期限を登録しました。" : "納入期限を更新しました。";
+			String message = "register".equals(mode) ? "納入期限を登録しました。" : "納入期限を更新しました。";
 			redirectAttributes.addFlashAttribute("successMessage", message);
 		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
-			return "redirect:/admin/nokigen/register";
+			model.addAttribute("nokigen", nokigen);
+			model.addAttribute("mode", mode);
+			model.addAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+			addKiMonthLabels(model);
+			return "admin/nokigenConfig";
 		}
-		return "redirect:/admin/nokigen/register";
+		return "redirect:/admin/nokigen/view/" + nokigen.getNendo();
 	}
 
 	/** yyyyMMdd → yyyy-MM-dd に変換してHTML date inputに対応 */

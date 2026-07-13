@@ -1,4 +1,12 @@
-document.addEventListener('DOMContentLoaded', function () {
+// 全角英数字・スペースを半角に変換する関数
+function toHalfWidth(str) {
+    if (!str) return '';
+    return str.replace(/[！-～]/g, function(s) {
+        return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+    }).replace(/ /g, ' '); // 全角スペースも半角スペースに変換
+}
+
+document.addEventListener('DOMContentLoaded', function() {
     const isView = document.getElementById('zeiritsuConfigRoot').dataset.isView === 'true';
 
     const displaySt = document.querySelector('input[name="tekiyoStYmDisplay"]');
@@ -14,12 +22,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (displaySt && !isView) {
-        displaySt.addEventListener('change', function () {
+        displaySt.addEventListener('change', function() {
             hiddenSt.value = displaySt.value ? displaySt.value.replace('-', '') : '';
         });
     }
     if (displayEd && !isView) {
-        displayEd.addEventListener('change', function () {
+        displayEd.addEventListener('change', function() {
             hiddenEd.value = displayEd.value ? displayEd.value.replace('-', '') : '';
         });
     }
@@ -40,4 +48,60 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('input[name="fukaKbn"]').forEach(r => r.addEventListener('change', updateLabel));
     updateLabel();
+
+    // 編集モードでなければ処理を行わない
+    const contentContainer = document.querySelector('[data-is-edit]');
+    const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
+    if (!isEdit) return;
+
+    // 編集変更チェック
+    function checkValue(input) {
+
+        // チェックボックスとラジオボタンは対象外
+        if (input.type === 'checkbox' || input.type === 'radio') return;
+
+        const initialValue = input.getAttribute('data-initial-value') || '';
+
+        // nullという文字列になってしまうのを防ぐ
+        let initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
+        let currentStr = String(input.value).trim();
+
+        // input type="month" の場合、YYYYMM を YYYY-MM に変換する
+        if (input.type === 'month' && initialStr.length === 6) {
+            // 最初の4文字 + '-' + 後半の2文字
+            initialStr = initialStr.substring(0, 4) + '-' + initialStr.substring(4, 6);
+        }
+
+        // data-ignore-width="true" が指定されているかチェック
+        const shouldIgnoreWidth = input.getAttribute('data-ignore-width') === 'true';
+        let isChanged;
+
+        if (shouldIgnoreWidth) {
+            // 全角・半角を無視して比較
+            isChanged = (toHalfWidth(currentStr) !== toHalfWidth(initialStr));
+        } else {
+            // 通常の比較
+            isChanged = (currentStr !== initialStr);
+        }
+
+        // 変更があれば黄色い枠を付与
+        if (isChanged) {
+            input.style.border = '3px solid #ffeb3b';
+        } else {
+            input.style.border = '';
+        }
+    }
+
+    // 画面表示時に最初から値が変わっているものを検知、および各イベントへの登録
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    inputs.forEach(input => {
+
+        // 画面を開いた瞬間にズレがあるかチェック
+        checkValue(input);
+
+        // イベント登録
+        input.addEventListener('input', () => checkValue(input));
+        input.addEventListener('change', () => checkValue(input));
+        input.addEventListener('blur', () => checkValue(input));
+    });
 });

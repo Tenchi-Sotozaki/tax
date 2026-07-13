@@ -58,6 +58,8 @@ public class GassanForm {
         private String choshuGimushaName;
         private boolean checked;
         private boolean daihyo;
+        private boolean disabled;
+        private String gassanShiteiNo;
 
         public FacilityItem() {}
 
@@ -67,6 +69,7 @@ public class GassanForm {
             this.choshuGimushaName = choshuGimushaName;
             this.checked = checked;
             this.daihyo = false;
+            this.disabled = false;
         }
     }
 

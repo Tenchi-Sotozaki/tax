@@ -8,11 +8,13 @@ public class TokugimuSearchForm {
 	/** No.1 \u6307\u5b9a\u756a\u53f7 (t_tokugimu.shitei_no) */
 	private String shiteiNo;
 
-	/** No.2 \u6c0f\u540d/\u540d\u79f0 (m_atena.name) */
+	/** No.2 氏名/名称 (m_atena.name) */
 	private String name;
+	private String nameMatchType = "partial";
 
 	/** No.3 \u65bd\u8a2d\u540d\u79f0 (t_tokugimu.shisetsu_name) */
 	private String shisetsuName;
+	private String shisetsuNameMatchType = "partial";
 
 	/** No.4 \u55b6\u696d\u7a2e\u5225 (t_tokugimu.kyoka_shu): 1=\u30db\u30c6\u30eb/2=\u65c5\u9928/3=\u7c21\u6613\u5bbf\u6240/4=\u6c11\u6cca/999=\u3059\u3079\u3066 */
 	private String kyokaShu = "999";

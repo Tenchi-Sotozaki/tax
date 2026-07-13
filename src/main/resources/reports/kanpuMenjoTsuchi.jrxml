@@ -1,6 +1,8 @@
 <!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
 <jasperReport name="kanpuMenjoTsuchi" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="00cdbabf-0f79-41e0-ab00-2f45ec6c6f5a">
 	<property name="com.jaspersoft.studio.report.description" value="徴収不能額等の還付又は納入義務の免除決定通知書"/>
+	<parameter name="shinsei_kbn" class="java.lang.String"/>
+	<parameter name="kettei_naiyou" class="java.lang.String"/>
 	<query language="sql"><![CDATA[]]></query>
 	<field name="hakkoYmd" class="java.lang.String"/>
 	<field name="tokuJusho" class="java.lang.String"/>
@@ -21,7 +23,7 @@
 			<text><![CDATA[徴収不能額等の還付又は納入義務の免除決定通知書]]></text>
 		</element>
 	</title>
-	<columnHeader height="159" splitType="Stretch">
+	<columnHeader height="175" splitType="Stretch">
 		<element kind="textField" uuid="72475534-b742-4dd1-8c06-4debb7ba06d5" x="444" y="0" width="100" height="20" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Center" vTextAlign="Middle">
 			<expression><![CDATA[$F{hakkoYmd}]]></expression>
 		</element>
@@ -276,6 +278,26 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
+			</element>
+			<element kind="ellipse" uuid="75c6874e-3b06-4788-bd98-138bbdb55681" mode="Transparent" x="200" y="0" width="60" height="30">
+				<printWhenExpression><![CDATA[$P{shinsei_kbn}.equals("1")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
+			</element>
+			<element kind="ellipse" uuid="5abe42ef-5416-4b29-a25e-a81fd866a077" mode="Transparent" x="320" y="0" width="123" height="30">
+				<printWhenExpression><![CDATA[$P{shinsei_kbn}.equals("2")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
+			</element>
+			<element kind="ellipse" uuid="4bae974c-cc51-48a2-9f2a-285a36b98905" mode="Transparent" x="200" y="32" width="140" height="25">
+				<printWhenExpression><![CDATA[$P{kettei_naiyou}.equals("1")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
+			</element>
+			<element kind="ellipse" uuid="2b5fa296-1c77-425e-ac12-e8581551fa4d" mode="Transparent" x="350" y="32" width="90" height="25">
+				<printWhenExpression><![CDATA[$P{kettei_naiyou}.equals("2")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
+			</element>
+			<element kind="ellipse" uuid="71911a6b-2806-40a9-9c31-0ddd1d96d62c" mode="Transparent" x="450" y="33" width="50" height="25" printRepeatedValues="false">
+				<printWhenExpression><![CDATA[$P{kettei_naiyou}.equals("3")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
 			</element>
 		</band>
 	</detail>

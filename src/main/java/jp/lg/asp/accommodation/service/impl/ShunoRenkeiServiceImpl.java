@@ -34,19 +34,17 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 
 	@Override
 	public List<ShunoDto> search(String jichitaiCd, LocalDate shinkokuFrom, LocalDate shinkokuTo,
-			String taishoMonth, String shiteiNo, String name) {
+			String taishoMonth, String shiteiNo, String name, String nameMatchType) {
 
-		// 申告日または対象月の条件がある場合はFukaテーブルを基準に検索
 		if ((shinkokuFrom != null) || (shinkokuTo != null) || (taishoMonth != null && !taishoMonth.isEmpty())) {
-			return searchFromFuka(jichitaiCd, shinkokuFrom, shinkokuTo, taishoMonth, shiteiNo, name);
+			return searchFromFuka(jichitaiCd, shinkokuFrom, shinkokuTo, taishoMonth, shiteiNo, name, nameMatchType);
 		} else {
-			// 申告日・対象月の条件がない場合はTokugimuテーブルを基準に検索
-			return searchFromTokugimu(jichitaiCd, shiteiNo, name);
+			return searchFromTokugimu(jichitaiCd, shiteiNo, name, nameMatchType);
 		}
 	}
 
 	private List<ShunoDto> searchFromFuka(String jichitaiCd, LocalDate shinkokuFrom, LocalDate shinkokuTo,
-			String taishoMonth, String shiteiNo, String name) {
+			String taishoMonth, String shiteiNo, String name, String nameMatchType) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Fuka> cq = cb.createQuery(Fuka.class);
@@ -71,6 +69,7 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 
 		// 氏名検索条件
 		if (name != null && !name.isEmpty()) {
+			String namePattern = toLikePattern(name, nameMatchType);
 			jakarta.persistence.criteria.Subquery<Tokugimu> subquery = cq.subquery(Tokugimu.class);
 			Root<Tokugimu> t = subquery.from(Tokugimu.class);
 			Join<Tokugimu, Atena> atenaJoin = t.join("atena", JoinType.INNER);
@@ -79,7 +78,7 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 					.where(cb.and(
 							cb.equal(t.get("jichitaiCd"), f.get("jichitaiCd")),
 							cb.equal(t.get("shiteiNo"), f.get("shiteiNo")),
-							cb.like(atenaJoin.get("name"), cb.literal('%' + name + '%'))));
+							cb.like(atenaJoin.get("name"), cb.literal(namePattern))));
 
 			predicates.add(cb.exists(subquery));
 		}
@@ -100,7 +99,7 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 		}).filter(dto -> dto != null).collect(Collectors.toList());
 	}
 
-	private List<ShunoDto> searchFromTokugimu(String jichitaiCd, String shiteiNo, String name) {
+	private List<ShunoDto> searchFromTokugimu(String jichitaiCd, String shiteiNo, String name, String nameMatchType) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Tokugimu> cq = cb.createQuery(Tokugimu.class);
 		Root<Tokugimu> t = cq.from(Tokugimu.class);
@@ -114,8 +113,9 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 
 		// 氏名検索条件
 		if (name != null && !name.isEmpty()) {
+			String namePattern = toLikePattern(name, nameMatchType);
 			Join<Tokugimu, Atena> atenaJoin = t.join("atena", JoinType.INNER);
-			predicates.add(cb.like(atenaJoin.get("name"), cb.literal('%' + name + '%')));
+			predicates.add(cb.like(atenaJoin.get("name"), cb.literal(namePattern)));
 		}
 
 		cq.where(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
@@ -139,6 +139,15 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 				})
 				.filter(dto -> dto != null)
 				.collect(Collectors.toList());
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank()) return "%";
+		return switch (matchType) {
+			case "prefix" -> value + "%";
+			case "exact"  -> value;
+			default       -> "%" + value + "%";
+		};
 	}
 
 	@Override

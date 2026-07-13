@@ -75,7 +75,9 @@ public class TokugimuServiceImpl implements TokugimuService {
 					jichitaiCd,
 					form.getShiteiNo(),
 					form.getName(),
+					toLikePattern(form.getName(), form.getNameMatchType()),
 					form.getShisetsuName(),
+					toLikePattern(form.getShisetsuName(), form.getShisetsuNameMatchType()),
 					form.getKyokaShu(),
 					form.getKojinNo(),
 					form.getHojinNo());
@@ -156,6 +158,15 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.map(j -> j.getGassanStChar() != null ? j.getGassanStChar() : "900")
 				.orElse("900");
 		return shiteiNo.startsWith(gassanPrefix);
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank()) return null;
+		return switch (matchType) {
+			case "prefix" -> value + "%";
+			case "exact"  -> value;
+			default       -> "%" + value + "%"; // partial
+		};
 	}
 
 	private boolean isEmptySearchForm(TokugimuSearchForm form) {
@@ -404,6 +415,9 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setSuspensionEndDate(t.getKyushiEdYmd());
 		form.setResumptionOrAbolitionDate(t.getEigyoEdYmd());
 		form.setSuspensionOrAbolitionReason(t.getKyuhaishiRiyu());
+		form.setBusinessStatusFlg(
+				t.getKyushiStYmd() != null || t.getKyushiEdYmd() != null
+				|| t.getEigyoEdYmd() != null || t.getKyuhaishiRiyu() != null);
 	}
 
 	private void applyFormToTokugimu(Tokugimu t, TokugimuForm form) {
@@ -436,10 +450,17 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setSoufusakiTel(form.getMailPhone());
 		t.setEltaxUmu(form.getEltaxUmu());
 		t.setBiko(form.getRemarks());
-		t.setKyushiStYmd(form.getSuspensionStartDate());
-		t.setKyushiEdYmd(form.getSuspensionEndDate());
-		t.setEigyoEdYmd(form.getResumptionOrAbolitionDate());
-		t.setKyuhaishiRiyu(form.getSuspensionOrAbolitionReason());
+		if (form.isBusinessStatusFlg()) {
+			t.setKyushiStYmd(form.getSuspensionStartDate());
+			t.setKyushiEdYmd(form.getSuspensionEndDate());
+			t.setEigyoEdYmd(form.getResumptionOrAbolitionDate());
+			t.setKyuhaishiRiyu(form.getSuspensionOrAbolitionReason());
+		} else {
+			t.setKyushiStYmd(null);
+			t.setKyushiEdYmd(null);
+			t.setEigyoEdYmd(null);
+			t.setKyuhaishiRiyu(null);
+		}
 	}
 
 	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {

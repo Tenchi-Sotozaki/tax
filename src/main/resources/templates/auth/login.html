@@ -7,18 +7,17 @@
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 <link rel="stylesheet" th:href="@{/css/bootstrap-icons-complete.css}">
 <link rel="stylesheet" th:href="@{/css/accommodation.css}">
+<link rel="stylesheet" th:href="@{/css/accommodation-custom.css}">
 </head>
 <body
 	class="bg-light d-flex align-items-center justify-content-center vh-100">
 
 	<div class="card shadow-sm" style="width: 100%; max-width: 420px;">
-		<div class="card-header bg-primary text-white text-center py-4">
-			<i class="bi bi-building fs-2 d-block mb-2"></i>
-			<h2 class="h5 mb-0 fw-bold">宿泊税LGWAN-ASPシステム</h2>
+		<div class="card-header-login text-white text-center py-4">
+			<img src="/accommodation-tax/images/logo-acomo.svg?v=2" alt="AcOmO" class="acomo-logo-login">
+			<h6 class="mb-0 fw-bold text-white">宿泊税LGWAN-ASPシステム</h6>
 		</div>
 		<div class="card-body p-4">
-			<h3 class="h6 text-center text-muted mb-4">ログイン</h3>
-
 			<!-- Spring Security ログイン失敗エラー -->
 			<div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>IDまたはパスワードが一致しません
@@ -39,7 +38,7 @@
 				<!-- ID  -->
 				<div class="mb-3">
 					<label for="staffId" class="form-label fw-medium"> ID <span
-						class="badge bg-danger ms-1">必須</span>
+						class="text-danger">*</span>
 					</label> <input type="text" class="form-control" id="staffId"
 						name="username" autocomplete="username" required>
 				</div>
@@ -47,7 +46,7 @@
 				<!-- パスワード -->
 				<div class="mb-4">
 					<label for="password" class="form-label fw-medium"> パスワード<span
-						class="badge bg-danger ms-1">必須</span>
+						class="text-danger">*</span>
 					</label> <input type="password" class="form-control" id="password"
 						name="password" autocomplete="current-password" required>
 				</div>

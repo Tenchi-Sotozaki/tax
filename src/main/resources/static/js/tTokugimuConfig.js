@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
     initSmoothScroll();
     initKyodoSection();
+    initBusinessStatusSection();
 });
 
 // -----------------------------------------------------------------------
@@ -148,17 +149,28 @@ function onDeclarationTypeChange(e) {
     const suspendEnd = document.getElementById('suspensionEndDate');
     const undecided = document.getElementById('suspensionEndDateUndecided');
     const resumeClose = document.getElementById('resumptionOrAbolitionDate');
+    const reason = document.getElementById('suspensionOrAbolitionReason');
+    const today = new Date().toLocaleDateString('sv-SE');
 
-    [suspendStart, suspendEnd, undecided, resumeClose].forEach(el => {
-        if (el) el.disabled = true;
+    // 全て非活性にしてクリア
+    [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
+        if (el) { el.disabled = true; el.value = ''; }
     });
+    if (undecided) { undecided.disabled = true; undecided.checked = false; }
 
     if (value === '休止') {
-        [suspendStart, suspendEnd, undecided].forEach(el => {
+        [suspendStart, suspendEnd, undecided, reason].forEach(el => {
             if (el) el.disabled = false;
         });
-    } else if (value === '再開' || value === '廃止') {
-        if (resumeClose) resumeClose.disabled = false;
+        if (suspendStart && !suspendStart.value) suspendStart.value = today;
+        if (suspendEnd && !suspendEnd.value) suspendEnd.value = today;
+    } else if (value === '再開') {
+        if (resumeClose) { resumeClose.disabled = false; if (!resumeClose.value) resumeClose.value = today; }
+    } else if (value === '廃止') {
+        [resumeClose, reason].forEach(el => {
+            if (el) el.disabled = false;
+        });
+        if (resumeClose && !resumeClose.value) resumeClose.value = today;
     }
 }
 
@@ -220,6 +232,20 @@ function initCopyCheckboxes() {
             kyodoBody.style.display = kyodoCheck.checked ? '' : 'none';
             if (!kyodoCheck.checked) {
                 kyodoBody.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+            }
+        });
+    }
+
+    // 営業状況情報の表示切替
+    const businessStatusCheck = document.getElementById('businessStatusCheck');
+    if (businessStatusCheck) {
+        businessStatusCheck.addEventListener('change', () => {
+            const body = document.getElementById('businessStatusBody');
+            body.style.display = businessStatusCheck.checked ? '' : 'none';
+            if (!businessStatusCheck.checked) {
+                body.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea, select').forEach(el => el.value = '');
+                body.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+                body.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
             }
         });
     }
@@ -330,11 +356,11 @@ function addKyodoRow() {
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoAddress">
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-medium">氏名 <span class="badge bg-danger text-white ms-1">必須</span></label>
+                <label class="form-label fw-medium">氏名 <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoName">
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-medium">氏名(ふりがな) <span class="badge bg-danger text-white ms-1">必須</span></label>
+                <label class="form-label fw-medium">氏名(ふりがな) <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoNameKana" placeholder="ひらがなで入力">
             </div>
             <div class="col-md-6">
@@ -377,6 +403,48 @@ function initKyodoSection() {
 }
 
 // -----------------------------------------------------------------------
+// 営業状況セクション初期化（編集・照会時にデータがあれば表示）
+// -----------------------------------------------------------------------
+function initBusinessStatusSection() {
+    const check = document.getElementById('businessStatusCheck');
+    if (check && check.checked) {
+        document.getElementById('businessStatusBody').style.display = '';
+    }
+    // 初期表示時に申告区分の状態に応じて入力項目を制御
+    applyDeclarationState();
+}
+
+function applyDeclarationState() {
+    const checked = document.querySelector('input[name="declarationCategory"]:checked');
+    const suspendStart = document.getElementById('suspensionStartDate');
+    const suspendEnd = document.getElementById('suspensionEndDate');
+    const undecided = document.getElementById('suspensionEndDateUndecided');
+    const resumeClose = document.getElementById('resumptionOrAbolitionDate');
+    const reason = document.getElementById('suspensionOrAbolitionReason');
+
+    // ラジオ未選択時は全て非活性
+    [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
+        if (el) el.disabled = true;
+    });
+    if (undecided) undecided.disabled = true;
+
+    if (!checked) return;
+    const value = checked.value;
+
+    if (value === '休止') {
+        [suspendStart, suspendEnd, undecided, reason].forEach(el => {
+            if (el) el.disabled = false;
+        });
+    } else if (value === '再開') {
+        if (resumeClose) resumeClose.disabled = false;
+    } else if (value === '廃止') {
+        [resumeClose, reason].forEach(el => {
+            if (el) el.disabled = false;
+        });
+    }
+}
+
+// -----------------------------------------------------------------------
 // スムーズスクロール（フロートヘッダーの高さを考慮）
 // -----------------------------------------------------------------------
 function initSmoothScroll() {
@@ -397,3 +465,62 @@ function initSmoothScroll() {
         });
     });
 }
+
+// -----------------------------------------------------------------------
+// 特別徴収義務者 登録・編集画面用 変更検知スクリプト
+// -----------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 追加：編集モードでなければ処理を行わない
+    const contentContainer = document.querySelector('[data-is-edit]');
+    const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
+    if (!isEdit) return;
+
+    // 対象となる入力要素を取得
+    const inputs = document.querySelectorAll('.form-control, .form-select, .form-check-input');
+
+    /**
+     * 値が変わったかどうかを判定し、枠線を黄色にする
+     */
+    function checkValue(input) {
+
+        // 属性がない場合は空文字にする
+        const initialValue = input.getAttribute('data-initial-value') || '';
+        let isChanged = false;
+
+        // nullという文字列になってしまうのを防ぐ
+        const initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
+
+        // チェックボックスとラジオボタンは枠線を付けない
+        if (input.type != 'checkbox' && input.type != 'radio') {
+
+            const currentStr = String(input.value).trim();
+            isChanged = (currentStr !== initialStr);
+        }
+		
+        if (isChanged) {
+            input.style.border = '3px solid #ffeb3b';
+        } else {
+            input.style.border = '';
+        }
+    }
+
+    // 手入力や選択変更に対するリアルタイムイベントを設定
+    inputs.forEach(input => {
+        input.addEventListener('input', () => checkValue(input));
+        input.addEventListener('change', () => checkValue(input));
+        input.addEventListener('blur', () => checkValue(input));
+    });
+
+    // 画面全体でクリックや変更があった時にすべての項目を一斉再チェック
+    document.addEventListener('click', () => {
+        inputs.forEach(input => checkValue(input));
+    });
+    document.addEventListener('change', () => {
+        inputs.forEach(input => checkValue(input));
+    });
+
+    // 値をコピーした後に、強制的にイベントを発生させて黄色枠をトリガーする
+    targetInput.value = sourceInput.value;
+    targetInput.dispatchEvent(new Event('change'));
+});

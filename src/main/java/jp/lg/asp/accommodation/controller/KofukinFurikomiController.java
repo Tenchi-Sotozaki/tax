@@ -46,13 +46,13 @@ public class KofukinFurikomiController {
 			@RequestParam(required = false) String nendo,
 			@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String name,
+			@RequestParam(required = false, defaultValue = "partial") String nameMatchType,
 			Model model) {
 
 		accessChecker.checkAccess(SCREEN_ID);
 
 		try {
-			// 奨励金連携サービスを使用（交付金振込情報として表示）
-			List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name);
+			List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
 			model.addAttribute("items", items);
 		} catch (Exception e) {
 			System.out.println("Error in service call: " + e.getMessage());
@@ -64,6 +64,7 @@ public class KofukinFurikomiController {
 		searchForm.put("nendo", nendo);
 		searchForm.put("shiteiNo", shiteiNo);
 		searchForm.put("name", name);
+		searchForm.put("nameMatchType", nameMatchType);
 		model.addAttribute("searchForm", searchForm);
 
 		return "renkei/kofukinFurikomi";
@@ -75,10 +76,11 @@ public class KofukinFurikomiController {
 	public List<ShoreikinRenkeiDto> search(
 			@RequestParam(required = false) String nendo,
 			@RequestParam(required = false) String shiteiNo,
-			@RequestParam(required = false) String name) {
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false, defaultValue = "partial") String nameMatchType) {
 
 		accessChecker.checkAccess(SCREEN_ID);
-		return shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name);
+		return shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
 	}
 
 	@PostMapping("/download")

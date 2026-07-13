@@ -10,11 +10,14 @@ document.addEventListener('keydown', function (e) {
 
 /**
  * 全画面共通：type="date" の入力欄が空の場合、当日をデフォルト値としてセット
+ * ※ disabled または businessStatusBody 内の項目は除外
  */
 document.addEventListener('DOMContentLoaded', function () {
     const today = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
     document.querySelectorAll('input[type="date"]').forEach(function (input) {
-        if (!input.value) input.value = today;
+        if (!input.value && !input.disabled && !input.closest('#businessStatusBody')) {
+            input.value = today;
+        }
     });
 });
 
@@ -29,4 +32,66 @@ document.addEventListener('DOMContentLoaded', function () {
         'textarea:not([readonly]):not([disabled])'
     );
     if (first) first.focus();
+});
+
+/**
+ * 全画面共通：テーブルセル・入力項目のオーバーフロー時にカスタムツールチップを表示
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    // ツールチップ要素を作成
+    const tooltip = document.createElement('div');
+    tooltip.id = 'acomo-tooltip';
+    tooltip.style.cssText = 'position:fixed;z-index:9999;padding:6px 12px;background:#1b2d57;color:#fff;border-radius:6px;font-size:13px;max-width:400px;word-break:break-all;pointer-events:none;opacity:0;transition:opacity 0.15s;white-space:pre-wrap;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+    document.body.appendChild(tooltip);
+
+    let showTimer = null;
+
+    function showTooltip(e) {
+        const el = e.currentTarget;
+        const text = el.tagName === 'INPUT' || el.tagName === 'SELECT' ? (el.value || '') : el.textContent.trim();
+        if (!text || el.scrollWidth <= el.clientWidth) {
+            return;
+        }
+        showTimer = setTimeout(function () {
+            tooltip.textContent = text;
+            tooltip.style.opacity = '1';
+            positionTooltip(e);
+        }, 300);
+    }
+
+    function hideTooltip() {
+        clearTimeout(showTimer);
+        tooltip.style.opacity = '0';
+    }
+
+    function positionTooltip(e) {
+        const x = e.clientX + 12;
+        const y = e.clientY + 16;
+        const maxX = window.innerWidth - tooltip.offsetWidth - 8;
+        const maxY = window.innerHeight - tooltip.offsetHeight - 8;
+        tooltip.style.left = Math.min(x, maxX) + 'px';
+        tooltip.style.top = Math.min(y, maxY) + 'px';
+    }
+
+    function attachTooltipListeners(root) {
+        root.querySelectorAll('.table td, .table th, .form-control, .form-select, .tokugimu-info-value').forEach(function (el) {
+            if (el.dataset.tooltipBound) return;
+            el.dataset.tooltipBound = '1';
+            el.addEventListener('mouseenter', showTooltip);
+            el.addEventListener('mousemove', positionTooltip);
+            el.addEventListener('mouseleave', hideTooltip);
+        });
+    }
+
+    attachTooltipListeners(document);
+
+    // 動的に追加される要素にも対応
+    const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (m) {
+            m.addedNodes.forEach(function (node) {
+                if (node.nodeType === 1) attachTooltipListeners(node);
+            });
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 });

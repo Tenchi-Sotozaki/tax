@@ -22,56 +22,103 @@
 			</div>
 		</div>
 
-		<!-- ======= 検索条件 (アコーディオン) ========= -->
+		<!-- ======= 抽出条件 (アコーディオン) ========= -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button"
 						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2"></i>検索条件
+						<i class="bi bi-funnel me-2"></i>抽出条件
 					</button>
 				</h2>
 				<div id="searchPanel" class="accordion-collapse collapse show">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/atena/list}" th:object="${searchForm}"
 							method="get">
-							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
-								<div class="col">
+							<div class="row g-2 mb-2">
+								<!-- 1行目：宛名番号、氏名/名称 -->
+								<div class="col-12 col-sm-6 col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">宛名番号</label>
 									<input type="text" class="form-control form-contorl-sm"
 										th:field="*{atenaNo}" placeholder="宛名番号">
 								</div>
-								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">氏名/名称</label>
+								<div class="col-12 col-sm-6 col-md-8">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">氏名/名称</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
+											<label class="form-check-label small" for="namePrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
+											<label class="form-check-label small" for="namePartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
+											<label class="form-check-label small" for="nameExact">完全</label>
+										</div>
+									</div>
 									<input type="text" class="form-control form-contorl-sm"
 										th:field="*{name}" placeholder="氏名または名称">
 								</div>
-								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">ふりがな</label>
+								<!-- 2行目：ふりがな、郵便番号、住所 -->
+								<div class="w-100"></div>
+								<div class="col-12 col-sm-6 col-md-4">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">ふりがな</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="prefix" id="nameKanaPrefix">
+											<label class="form-check-label small" for="nameKanaPrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="partial" id="nameKanaPartial">
+											<label class="form-check-label small" for="nameKanaPartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="exact" id="nameKanaExact">
+											<label class="form-check-label small" for="nameKanaExact">完全</label>
+										</div>
+									</div>
 									<input type="text" class="form-control form-control-sm"
 										th:field="*{nameKana}" placeholder="ふりがな">
 								</div>
-								<div class="col">
+								<div class="col-12 col-sm-6 col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">郵便番号</label>
 									<input type="text" class="form-control form-control-sm"
 										th:field="*{yubinNo}" placeholder="郵便番号">
 								</div>
-								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">住所</label>
+								<div class="col-12 col-sm-6 col-md-4">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">住所</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="prefix" id="jushoPrefix">
+											<label class="form-check-label small" for="jushoPrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="partial" id="jushoPartial">
+											<label class="form-check-label small" for="jushoPartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="exact" id="jushoExact">
+											<label class="form-check-label small" for="jushoExact">完全</label>
+										</div>
+									</div>
 									<input type="text" class="form-control form-control-sm"
 										th:field="*{jusho}" placeholder="住所">
 								</div>
-								<div class="col">
+								<!-- 3行目：電話番号、個人番号、法人番号 -->
+								<div class="w-100"></div>
+								<div class="col-12 col-sm-6 col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">電話番号</label>
 									<input type="text" class="form-control form-control-sm"
 										th:field="*{tel}" placeholder="電話番号">
 								</div>
-								<div class="col">
+								<div class="col-12 col-sm-6 col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
 									<input type="text" class="form-control form-control-sm"
 										th:field="*{kojinNo}" placeholder="個人番号">
 								</div>
-								<div class="col">
+								<div class="col-12 col-sm-6 col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
 									<input type="text" class="form-control form-control-sm"
 										th:field="*{hojinNo}" placeholder="法人番号">

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jp.lg.asp.accommodation.dto.NozeiShukiDto;
 import jp.lg.asp.accommodation.entity.NozeiShuki;
 import jp.lg.asp.accommodation.entity.NozeiShukiId;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import lombok.RequiredArgsConstructor;
@@ -20,16 +21,24 @@ import lombok.RequiredArgsConstructor;
 public class NozeiShukiServiceImpl implements NozeiShukiService {
 
 	private final NozeiShukiRepository nozeiShukiRepository;
+	private final JichitaiRepository jichitaiRepository;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
+	private int getNendoStMonth() {
+		return jichitaiRepository.findById(jichitaiCd)
+				.map(j -> j.getNendoStMonth() != null ? Integer.parseInt(j.getNendoStMonth().trim()) : 4)
+				.orElse(4);
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public List<NozeiShukiDto> findAll() {
+		int nendoStMonth = getNendoStMonth();
 		return nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd)
 				.stream()
-				.map(n -> new NozeiShukiDto(n.getSeq(), n.getShuki()))
+				.map(n -> new NozeiShukiDto(n.getSeq(), n.getShuki(), nendoStMonth))
 				.toList();
 	}
 
@@ -39,9 +48,10 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 		if (shuki == null) {
 			return findAll();
 		}
+		int nendoStMonth = getNendoStMonth();
 		return nozeiShukiRepository.findActiveByJichitaiCdAndShuki(jichitaiCd, BigDecimal.valueOf(shuki))
 				.stream()
-				.map(n -> new NozeiShukiDto(n.getSeq(), n.getShuki()))
+				.map(n -> new NozeiShukiDto(n.getSeq(), n.getShuki(), nendoStMonth))
 				.toList();
 	}
 

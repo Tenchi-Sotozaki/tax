@@ -4,7 +4,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
 <title>交付金振込情報連携</title>
-<link rel="stylesheet" th:href="@{/css/kofukinFurikomi.css}">
+<link rel="stylesheet" th:href="@{/css/kofukin-furikomi.css}">
 </head>
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
@@ -19,13 +19,13 @@
 			</span>
 		</div>
 
-		<!-- ========== 検索条件（アコーディオン） ========== -->
+		<!-- ========== 抽出条件（アコーディオン） ========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button"
 						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
+						<i class="bi bi-funnel me-2 text-primary"></i>抽出条件
 					</button>
 				</h2>
 				<div id="searchPanel" class="accordion-collapse collapse show">
@@ -51,8 +51,21 @@
 										name="shiteiNo" th:value="*{shiteiNo}">
 								</div>
 								<div class="col">
-									<label for="name"
-										class="form-label form-label-sm fw-medium mb-1">氏名/名称</label>
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">氏名/名称</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" name="nameMatchType" value="prefix" id="namePrefix" th:checked="${searchForm.nameMatchType == 'prefix'}">
+											<label class="form-check-label small" for="namePrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" name="nameMatchType" value="partial" id="namePartial" th:checked="${searchForm.nameMatchType == null or searchForm.nameMatchType == 'partial'}">
+											<label class="form-check-label small" for="namePartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" name="nameMatchType" value="exact" id="nameExact" th:checked="${searchForm.nameMatchType == 'exact'}">
+											<label class="form-check-label small" for="nameExact">完全</label>
+										</div>
+									</div>
 									<input type="text" class="form-control form-control-sm"
 										id="name" name="name" th:value="*{name}">
 								</div>
@@ -145,7 +158,7 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/kofukin_furikomi.js}"></script>
+		<script th:src="@{/js/kofukinFurikomi.js}"></script>
 	</th:block>
 </body>
 </html>

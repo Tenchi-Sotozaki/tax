@@ -26,6 +26,7 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 	BigDecimal findNextRno(@Param("jichitaiCd") String jichitaiCd);
 	@Query("SELECT k.kofuRitsu FROM KofuRitsu k " +
 		       "WHERE k.jichitaiCd = :jichitaiCd " +
+		       "AND k.newFlg = 1 " +
 		       "AND k.tekiyoStYmd <= :nendoMatsubi " +
 		       "AND (k.tekiyoEdYmd IS NULL OR k.tekiyoEdYmd >= :nendoMatsubi)")
 	BigDecimal findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendoMatsubi") LocalDate nendoMatsubi);

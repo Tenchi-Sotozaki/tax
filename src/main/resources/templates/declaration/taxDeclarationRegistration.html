@@ -3,21 +3,21 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}"
       lang="ja">
-<head><title>宿泊税情報登録/編集</title></head>
+<head><title>宿泊税情報登録/編雁E/title></head>
 <body>
 <div layout:fragment="content" class="container-fluid p-4"
      th:with="obligorId=${taxDeclarationForm.obligorId}">
 
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h5 class="mb-0 fw-bold text-dark">
-            <i class="bi bi-pencil-square me-2 text-primary"></i>宿泊税情報登録/編集
+            <i class="bi bi-pencil-square me-2 text-primary"></i>宿泊税情報登録/編雁E
         </h5>
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
             <i class="bi bi-plus-circle me-1"></i>新規登録
         </span>
     </div>
 
-    <!-- 成功メッセージ -->
+    <!-- 成功メチE��ージ -->
     <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>
         <span th:text="${successMessage}"></span>
@@ -28,31 +28,31 @@
 
         <input type="hidden" th:field="*{obligorId}">
 
-        <!-- バリデーションエラーサマリー -->
+        <!-- バリチE�Eションエラーサマリー -->
         <div th:if="${#fields.hasAnyErrors()}" class="alert alert-danger" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            入力内容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各項目を確認してください。
+            入力�E容に <span th:text="${#fields.errors().size()}"></span> 件のエラーがあります。各頁E��を確認してください、E
             <ul class="mb-0 mt-1">
                 <li th:each="err : ${#fields.allErrors()}" th:text="${err}" class="small"></li>
             </ul>
         </div>
 
-        <!-- 基本情報 -->
+        <!-- 基本惁E�� -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>基本情報</h5>
+                <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>基本惁E��</h5>
             </div>
             <div class="card-body bg-light-subtle">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label fw-medium">特別徴収義務者名</label>
+                        <label class="form-label fw-medium">特別徴収義務老E��</label>
                         <input type="text" class="form-control" th:value="${obligorName}" readonly>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3ヶ月分申告エリア -->
+        <!-- 3ヶ月�E申告エリア -->
         <div th:each="month, stat : *{months}" class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0">
@@ -63,7 +63,7 @@
             <div class="card-body bg-light-subtle">
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
-                        <label class="form-label fw-medium">申告年月</label>
+                        <label class="form-label fw-medium">申告年朁E/label>
                         <input type="month" class="form-control"
                                th:field="*{months[__${stat.index}__].targetYearMonth}">
                     </div>
@@ -72,16 +72,16 @@
                     <table class="table table-bordered align-middle mb-0">
                         <thead class="table-primary text-center">
                             <tr>
-                                <th style="width:30%">区分</th>
-                                <th style="width:20%">税率（円/泊）</th>
-                                <th style="width:25%">宿泊数（泊）</th>
-                                <th style="width:25%">税額（円）</th>
+                                <th style="width:30%">区刁E/th>
+                                <th style="width:20%">税率�E��E/泊！E/th>
+                                <th style="width:25%">宿泊数�E�泊！E/th>
+                                <th style="width:25%">税額（�E�E�E/th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="ps-3"><span class="fw-medium">区分1</span><div class="text-muted small">20,000円未満</div></td>
-                                <td class="text-end pe-3 fw-bold">200 円</td>
+                                <td class="ps-3"><span class="fw-medium">区刁E</span><div class="text-muted small">20,000冁E��満</div></td>
+                                <td class="text-end pe-3 fw-bold">200 冁E/td>
                                 <td>
                                     <input type="number" class="form-control text-end tier-count"
                                            th:field="*{months[__${stat.index}__].guestCountTier1}"
@@ -93,8 +93,8 @@
                                        th:field="*{months[__${stat.index}__].taxAmountTier1}">
                             </tr>
                             <tr>
-                                <td class="ps-3"><span class="fw-medium">区分2</span><div class="text-muted small">20,000円以上50,000円未満</div></td>
-                                <td class="text-end pe-3 fw-bold">400 円</td>
+                                <td class="ps-3"><span class="fw-medium">区刁E</span><div class="text-muted small">20,000冁E��丁E0,000冁E��満</div></td>
+                                <td class="text-end pe-3 fw-bold">400 冁E/td>
                                 <td>
                                     <input type="number" class="form-control text-end tier-count"
                                            th:field="*{months[__${stat.index}__].guestCountTier2}"
@@ -106,8 +106,8 @@
                                        th:field="*{months[__${stat.index}__].taxAmountTier2}">
                             </tr>
                             <tr>
-                                <td class="ps-3"><span class="fw-medium">区分3</span><div class="text-muted small">50,000円以上</div></td>
-                                <td class="text-end pe-3 fw-bold">1,000 円</td>
+                                <td class="ps-3"><span class="fw-medium">区刁E</span><div class="text-muted small">50,000冁E��丁E/div></td>
+                                <td class="text-end pe-3 fw-bold">1,000 冁E/td>
                                 <td>
                                     <input type="number" class="form-control text-end tier-count"
                                            th:field="*{months[__${stat.index}__].guestCountTier3}"
@@ -119,7 +119,7 @@
                                        th:field="*{months[__${stat.index}__].taxAmountTier3}">
                             </tr>
                             <tr class="table-light">
-                                <td class="ps-3"><span class="fw-medium">課税対象外</span><div class="text-muted small">免税</div></td>
+                                <td class="ps-3"><span class="fw-medium">課税対象夁E/span><div class="text-muted small">免稁E/div></td>
                                 <td class="text-end pe-3 text-muted">-</td>
                                 <td>
                                     <input type="number" class="form-control text-end exempt-count"
@@ -131,7 +131,7 @@
                         </tbody>
                         <tfoot class="table-light fw-bold">
                             <tr>
-                                <td colspan="2" class="text-end pe-3">合計</td>
+                                <td colspan="2" class="text-end pe-3">合訁E/td>
                                 <td class="text-end pe-3"
                                     th:id="'totalCount_' + ${stat.index}">0</td>
                                 <td class="text-end pe-3 text-primary"
@@ -161,11 +161,11 @@
                     </div>
                     <div class="col-md-12" id="correctionReasonArea" style="display: none;">
                         <label for="correctionReason" class="form-label fw-medium">
-                            更正理由 <span class="badge bg-danger text-white ms-1">必須</span>
+                            更正琁E�� <span class="badge bg-danger text-white ms-1">忁E��E/span>
                         </label>
                         <textarea class="form-control" id="correctionReason" rows="3"
                                   th:field="*{correctionReason}"
-                                  placeholder="更正または修正の理由を入力してください"></textarea>
+                                  placeholder="更正また�E修正の琁E��を�E力してください"></textarea>
                     </div>
                 </div>
             </div>
@@ -183,7 +183,7 @@
                 <i class="bi bi-printer me-2"></i>印刷
             </button>
             <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="history.back()">
-                <i class="bi bi-arrow-left me-2"></i>戻る
+                <i class="bi bi-arrow-left me-2"></i>戻めE
             </button>
         </div>
 
@@ -194,7 +194,7 @@
 </div>
 
 <th:block layout:fragment="scripts">
-    <script th:src="@{/js/t_tax_declaration_registration.js}"></script>
+    <script th:src="@{/js/tTaxDeclarationRegistration.js}"></script>
 </th:block>
 </body>
 </html>

@@ -16,13 +16,17 @@
 			</h5>
 		</div>
 
+		<!-- エラーメッセージ -->
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"
+				aria-label="閉じる"></button>
+		</div>
+
 		<!-- 特別徴収義務者情報 -->
-		<div class="mb-4">
-			<span class="fw-semibold">指定番号：</span> <span
-				th:text="${gassanShiteiNo != null ? gassanShiteiNo : shiteiNo}"
-				class="me-4"></span> <span class="fw-semibold">氏名：</span> <span
-				th:text="${tokugimuName}" class="me-4"></span> <span
-				class="fw-semibold">施設名称：</span> <span th:text="${shisetsuName}"></span>
+		<div>
+			<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 		</div>
 
 		<!-- 帳票ボタン一覧 -->
@@ -56,6 +60,8 @@
 				</div>
 			</div>
 		</div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
 	</div>
 
@@ -63,6 +69,7 @@
 		<!-- 指定番号をJavaScriptで取得できるように隠し要素として配置 -->
 		<span id="shiteiNoData" style="display: none;" th:text="${shiteiNo}"></span>
 		<script th:src="@{/js/tTokugimuReport.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
 
 </body>

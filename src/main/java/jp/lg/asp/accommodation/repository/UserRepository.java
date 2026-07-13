@@ -18,10 +18,11 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 	List<User> findByJichitaiCdAndRoleId(String jichitaiCd, java.math.BigDecimal roleId);
 
 	@Query("SELECT u FROM User u WHERE u.jichitaiCd = :jichitaiCd" +
+			" AND u.delFlg = '0'" +
 			" AND (:id IS NULL OR u.id LIKE %:id%)" +
-			" AND (:name IS NULL OR u.name LIKE %:name%)" +
-			" AND (:nameKana IS NULL OR u.nameKana LIKE %:nameKana%)" +
-			" AND (:busho IS NULL OR u.busho LIKE %:busho%)" +
+			" AND (:name IS NULL OR u.name LIKE :name)" +
+			" AND (:nameKana IS NULL OR u.nameKana LIKE :nameKana)" +
+			" AND (:busho IS NULL OR u.busho LIKE :busho)" +
 			" ORDER BY u.id")
 	List<User> search(
 			@Param("jichitaiCd") String jichitaiCd,
