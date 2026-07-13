@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TekiyoNozeiShukiId implements Serializable {
-    private String jichitaiCd;
-    private String shiteiNo;
-    private Integer rno;
-    private Integer idxRno;
+	private String jichitaiCd;
+	private String shiteiNo;
+	private Integer idx;
 }

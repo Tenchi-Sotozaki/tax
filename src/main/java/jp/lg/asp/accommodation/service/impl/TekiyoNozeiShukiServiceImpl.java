@@ -53,7 +53,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
                 });
 
         tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-                .ifPresent(t -> {
+                .stream().findFirst().ifPresent(t -> {
                     form.setEdit(true);
                     form.setSeq(t.getSeq());
                     form.setTekiyoStYmd(t.getTekiyoStYmd());
@@ -71,28 +71,20 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         }
         checkAndResolveOverlap(shiteiNo, form);
 
-        Integer maxRno = tekiyoNozeiShukiRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-        Integer newRno = maxRno + 1;
-
-        if (maxRno > 0) {
-            tekiyoNozeiShukiRepository.updateNewFlgToZero(jichitaiCd, shiteiNo);
-        }
-
-        Integer idxRno = tekiyoNozeiShukiRepository.findMaxIdxRnoByKey(jichitaiCd, shiteiNo, newRno) + 1;
+        Integer maxIdx = tekiyoNozeiShukiRepository.findMaxIdxByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+        Integer newIdx = maxIdx + 1;
 
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setJichitaiCd(jichitaiCd);
         entity.setShiteiNo(shiteiNo);
-        entity.setRno(newRno);
-        entity.setIdxRno(idxRno);
+        entity.setIdx(newIdx);
         entity.setSeq(form.getSeq());
         entity.setTekiyoStYmd(form.getTekiyoStYmd());
         entity.setTekiyoEdYmd(form.getTekiyoEdYmd());
-        entity.setNewFlg(FLG_ON);
         entity.setDelFlg(FLG_OFF);
 
         tekiyoNozeiShukiRepository.save(entity);
-        log.info("適用納税周期保存完了: shiteiNo={}, rno={}", shiteiNo, newRno);
+        log.info("適用納税周期保存完了: shiteiNo={}, idx={}", shiteiNo, newIdx);
     }
 
     private void checkAndResolveOverlap(String shiteiNo, TekiyoNozeiShukiForm form) {
@@ -128,21 +120,12 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
     public void delete(String shiteiNo) {
         TekiyoNozeiShuki latest = tekiyoNozeiShukiRepository
                 .findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("削除対象のレコードが見つかりません。"));
 
         latest.setDelFlg(FLG_ON);
-        latest.setNewFlg(FLG_OFF);
         tekiyoNozeiShukiRepository.save(latest);
 
-        // 1つ前の履歴の最新フラグを戻す
-        List<TekiyoNozeiShuki> previousRecords = tekiyoNozeiShukiRepository
-                .findPreviousRecords(jichitaiCd, shiteiNo, latest.getRno());
-        if (!previousRecords.isEmpty()) {
-            TekiyoNozeiShuki prev = previousRecords.get(0);
-            prev.setNewFlg(FLG_ON);
-            tekiyoNozeiShukiRepository.save(prev);
-        }
-
-        log.info("適用納税周期削除完了: shiteiNo={}, rno={}", shiteiNo, latest.getRno());
+        log.info("適用納税周期削除完了: shiteiNo={}, idx={}", shiteiNo, latest.getIdx());
     }
 }
