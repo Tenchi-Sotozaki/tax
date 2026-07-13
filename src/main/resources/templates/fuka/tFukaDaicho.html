@@ -84,8 +84,10 @@
 									<th>宿泊税額</th>
 									<th>市区町村税額</th>
 									<th>都道府県税額</th>
-									<th>納期</th>
-									<th>ステータス</th>
+									<th>申告期限</th>
+									<th>納入期限</th>
+									<th>申告状況</th>
+									<th>納入状況</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -114,15 +116,21 @@
 										th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' 円'}">-</span>
 										<span th:unless="${item.kenZeigaku != null}"
 										class="text-muted">-</span></td>
-									<td class="text-center" th:text="${item.displayNoki}">-</td>
+									<td class="text-center" th:text="${item.displayShinkokuKigen}">-</td>
+									<td class="text-center" th:text="${item.displayNonyuKigen}">-</td>
 									<td class="text-center"><span th:if="${item.shinkokuZumi}"
 										class="badge bg-success px-3 py-2"> <i
 											class="bi bi-check-circle me-1"></i>申告済み
 									</span> <span th:unless="${item.shinkokuZumi}"
 										class="badge bg-secondary px-3 py-2"> 未申告 </span></td>
+									<td class="text-center"><span th:if="${item.nonyuZumi}"
+										class="badge bg-success px-3 py-2"> <i
+											class="bi bi-check-circle me-1"></i>納入済み
+									</span> <span th:unless="${item.nonyuZumi}"
+										class="badge bg-secondary px-3 py-2"> 未納入 </span></td>
 								</tr>
 								<tr th:if="${#lists.isEmpty(fukaDaichoForm.items)}">
-									<td colspan="4" class="text-center py-5 text-muted">
+									<td colspan="9" class="text-center py-5 text-muted">
 										表示できる情報がありません</td>
 								</tr>
 							</tbody>

@@ -28,6 +28,10 @@ import jp.lg.asp.accommodation.entity.ChoshuGenboId;
 import jp.lg.asp.accommodation.entity.ChoshuGenboUchi;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
+import jp.lg.asp.accommodation.entity.Nokigen;
+import jp.lg.asp.accommodation.entity.NokigenId;
+import jp.lg.asp.accommodation.entity.NozeiShuki;
+import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
@@ -37,7 +41,10 @@ import jp.lg.asp.accommodation.repository.ChoshuGenboRepository;
 import jp.lg.asp.accommodation.repository.ChoshuGenboUchiRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
+import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
@@ -64,6 +71,9 @@ public class FukaServiceImpl implements FukaService {
 	private final ChoshuGenboUchiRepository choshuGenboUchiRepository;
 	private final AtenaRepository atenaRepository;
 	private final NozeiShukiRepository nozeiShukiRepository;
+	private final NokigenRepository nokigenRepository;
+	private final JichitaiRepository jichitaiRepository;
+	private final TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
 
 	// 定数定義（マジックナンバーの排除）
 	private static final String STATUS_ALL = "999";
@@ -91,8 +101,17 @@ public class FukaServiceImpl implements FukaService {
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
 		Map<Integer, Fuka> fukaMap = createFukaMap(fukaList);
 
-		form.setShuki(3); // 納入申告管理台帳が表示できないので暫定(正式にはm_nozei_shukiから持ってくる)
-		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), form.getShuki()));
+		int shuki = tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream().findFirst()
+				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd, t.getSeq())))
+				.map(n -> n.getShuki().intValue())
+				.orElse(3);
+		form.setShuki(shuki);
+		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
+				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
+				.orElse(3);
+		Nokigen nokigen = nokigenRepository.findById(new NokigenId(jichitaiCd, nendo)).orElse(null);
+		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), form.getShuki(), nokigen, nendoStMonth));
 		return form;
 	}
 
@@ -111,10 +130,10 @@ public class FukaServiceImpl implements FukaService {
 	 * 期別ごとの台帳明細行リストを作成する。
 	 */
 	private List<FukaDaichoListItem> createDaichoItems(String nendo, Map<Integer, Fuka> fukaMap, String filterStatus,
-			Integer shuki) {
+			Integer shuki, Nokigen nokigen, int nendoStMonth) {
 		List<FukaDaichoListItem> items = new ArrayList<>();
 		for (int i = 1; i <= MAX_KIBETSU; i++) {
-			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, shuki);
+			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, shuki, nokigen, nendoStMonth);
 
 			if (STATUS_ZUMI.equals(filterStatus) && !item.isShinkokuZumi()) {
 				continue;
@@ -132,13 +151,14 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 単一の台帳明細行を組み立てる。
 	 */
-	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap, Integer shuki) {
+	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap, Integer shuki, Nokigen nokigen, int nendoStMonth) {
 		FukaDaichoListItem item = new FukaDaichoListItem();
 		item.setNendo(nendo);
 		item.setKibetsu(kibetsu);
 
 		item.setDisplayNengetsu(createTaishoYmLabel(nendo, kibetsu));
-		item.setDisplayNoki(createNokiString(nendo, kibetsu, shuki));
+		item.setDisplayShinkokuKigen(createShinkokuKigenString(nendo, kibetsu, shuki));
+		item.setDisplayNonyuKigen(createNonyuKigenString(nendo, kibetsu, shuki, nokigen, nendoStMonth));
 		item.setTargetYearMonth(createTaishoYmString(nendo, kibetsu));
 
 		if (fukaMap.containsKey(kibetsu)) {
@@ -184,22 +204,80 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	/** 
-	 * 年度、期別、納税周期から納期を作成
+	 * 年度、期別、納税周期から申告期限を作成
 	 * @param  nendo 年度
 	 * @param kibetsu 期別
 	 * @param shuki
-	 * @return 対象納期（例：2026年05月末）
+	 * @return 申告期限（例：2026年6月末）
 	 */
-	private String createNokiString(String nendo, int kibetsu, int shuki) {
+	private String createShinkokuKigenString(String nendo, int kibetsu, int shuki) {
 		int year = (kibetsu + 2) > MAX_KIBETSU ? Integer.parseInt(nendo) + 1 : Integer.parseInt(nendo);
 		int month = (kibetsu + 2) > MAX_KIBETSU ? (kibetsu + 2) - MAX_KIBETSU : (kibetsu + 2);
-		int kasan = kibetsu % shuki == 0 ? 1 : shuki - kibetsu % shuki + 1;
-		month += kasan;
+		// 申告期限は対象月の翌月末
+		month += 1;
 		if (month > 12) {
 			year++;
 			month -= 12;
 		}
 		return String.valueOf(year) + "年" + String.valueOf(month) + "月末";
+	}
+
+	/** 
+	 * 年度、期別、納税周期、納期限マスタから納入期限を作成
+	 * 申告期限の翌月のm_nokigenの納期限を表示する
+	 */
+	private String createNonyuKigenString(String nendo, int kibetsu, int shuki, Nokigen nokigen, int nendoStMonth) {
+		// 申告期限月を算出（対象月+1）
+		int year = (kibetsu + 2) > MAX_KIBETSU ? Integer.parseInt(nendo) + 1 : Integer.parseInt(nendo);
+		int month = (kibetsu + 2) > MAX_KIBETSU ? (kibetsu + 2) - MAX_KIBETSU : (kibetsu + 2);
+		int shinkokuMonth = month + 1;
+		int shinkokuYear = year;
+		if (shinkokuMonth > 12) {
+			shinkokuYear++;
+			shinkokuMonth -= 12;
+		}
+		// 納入期限月 = 申告期限の翌月
+		int nonyuMonth = shinkokuMonth + 1;
+		int nonyuYear = shinkokuYear;
+		if (nonyuMonth > 12) {
+			nonyuYear++;
+			nonyuMonth -= 12;
+		}
+
+		if (nokigen != null) {
+			// nendoStMonthを基準に何番目のフィールドかを算出
+			int ordinal = (nonyuMonth - nendoStMonth + 12) % 12 + 1;
+			String nokigenValue = getNokigenByOrdinal(nokigen, ordinal);
+			if (nokigenValue != null && nokigenValue.length() == 8) {
+				int y = Integer.parseInt(nokigenValue.substring(0, 4));
+				int m = Integer.parseInt(nokigenValue.substring(4, 6));
+				int d = Integer.parseInt(nokigenValue.substring(6, 8));
+				return y + "年" + m + "月" + d + "日";
+			}
+		}
+		// フォールバック
+		return nonyuYear + "年" + nonyuMonth + "月末";
+	}
+
+	/**
+	 * 年度開始月からの順番（1～12）に対応するNokigenの値を取得する
+	 */
+	private String getNokigenByOrdinal(Nokigen nokigen, int ordinal) {
+		return switch (ordinal) {
+			case 1 -> nokigen.getNokigen1st();
+			case 2 -> nokigen.getNokigen2nd();
+			case 3 -> nokigen.getNokigen3rd();
+			case 4 -> nokigen.getNokigen4th();
+			case 5 -> nokigen.getNokigen5th();
+			case 6 -> nokigen.getNokigen6th();
+			case 7 -> nokigen.getNokigen7th();
+			case 8 -> nokigen.getNokigen8th();
+			case 9 -> nokigen.getNokigen9th();
+			case 10 -> nokigen.getNokigen10th();
+			case 11 -> nokigen.getNokigen11th();
+			case 12 -> nokigen.getNokigen12th();
+			default -> null;
+		};
 	}
 
 	/** 
