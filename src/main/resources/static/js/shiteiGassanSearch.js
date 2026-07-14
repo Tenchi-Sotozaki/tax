@@ -59,6 +59,7 @@ async function executeShiteiGassanSearch() {
     try {
         const res = await fetch(`${SG_SEARCH_API}?${params}`);
         const data = await res.json();
+        data.sort((a, b) => (a.shiteiNo ?? '').localeCompare(b.shiteiNo ?? ''));
         renderShiteiGassanResults(data);
     } catch (err) {
         document.getElementById('sgSearchResult').innerHTML =
@@ -75,7 +76,7 @@ function renderShiteiGassanResults(data) {
     _sgSearchResults = data;
     const rows = data.map((d, i) => `
         <tr style="cursor:pointer" data-idx="${i}">
-            <td>${d.shiteiNo ?? ''}</td>
+            <td>${d.gassanShiteiNo ? '' : (d.shiteiNo ?? '')}</td>
             <td>${d.gassanShiteiNo ?? ''}</td>
             <td>${d.name ?? ''}</td>
             <td>${d.shisetsuName ?? ''}</td>
