@@ -217,10 +217,10 @@
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:if="${kozaForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+					</a> <a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:unless="${kozaForm.viewMode}"
 						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 						class="bi bi-arrow-left"></i> 戻る

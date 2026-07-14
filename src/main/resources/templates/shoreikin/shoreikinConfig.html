@@ -175,7 +175,7 @@
 						<!-- 算出ボタン（編集・登録モードのみ） -->
 						<div th:if="${configForm.editable}" class="row mt-3">
 							<div class="col-12">
-								<button type="button" class="btn btn-info"
+								<button type="button" class="btn btn-primary"
 									onclick="calculateShoreikin()">
 									<i class="bi bi-calculator"></i> 算出
 								</button>
@@ -205,10 +205,10 @@
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a th:href="@{/shoreikin/list}" class="btn btn-secondary"
+					</a> <a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:unless="${configForm.viewMode}"
 						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 						class="bi bi-arrow-left"></i> 戻る
