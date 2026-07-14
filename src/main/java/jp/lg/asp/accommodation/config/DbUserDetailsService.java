@@ -68,9 +68,11 @@ public class DbUserDetailsService implements UserDetailsService {
 				.orElse(false);
 		String role = isAdmin ? "ROLE_ADMIN" : "ROLE_USER";
 
-		return new org.springframework.security.core.userdetails.User(
+		boolean mustChangePassword = "1".equals(user.getInitialPasswordFlg());
+		return new AppUserDetails(
 		        user.getId(),
 		        password,
-		        List.of(new SimpleGrantedAuthority(role)));
+		        List.of(new SimpleGrantedAuthority(role)),
+		        mustChangePassword);
 	}
 }

@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -13,8 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.List;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -124,6 +124,7 @@ public class AdminUserController {
 		model.addAttribute("userForm", form);
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", true);
+		model.addAttribute("isDefaultUser", InitialPasswordController.ADMIN_ID.equals(user.getId()));
 		return FORM_VIEW;
 	}
 
@@ -140,6 +141,12 @@ public class AdminUserController {
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
 
+		// デフォルトユーザーは権限変更不可のため、送信値に関わらず現在のロールを維持する
+		boolean isDefaultUser = InitialPasswordController.ADMIN_ID.equals(user.getId());
+		if (isDefaultUser) {
+			form.setRoleId(user.getRoleId());
+		}
+
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {
 			if (!form.getPassword().equals(form.getPasswordConfirm())) {
 				bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
@@ -148,12 +155,13 @@ public class AdminUserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", true);
+			model.addAttribute("isDefaultUser", isDefaultUser);
 			model.addAttribute("validationErrors", UserForm.validate(form, false).values());
 			return FORM_VIEW;
 		}
 
 		user.setName(form.getName());
-		user.setNameKana(user.getNameKana());
+		user.setNameKana(form.getNameKana());
 		user.setBusho(form.getBusho());
 		user.setRoleId(form.getRoleId());
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {

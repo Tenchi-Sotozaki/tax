@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.controller;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,11 +32,13 @@ public class InitialPasswordController {
     private String jichitaiCd;
 
     private static final String FORM_VIEW = "auth/initialPassword";
-    private static final String ADMIN_ID = "管理者";
+
+    /** デフォルトユーザーのID（AdminUserControllerの権限変更不可判定でも使用） */
+    public static final String ADMIN_ID = "admin";
 
     @GetMapping
-    public String showForm(Model model) {
-        model.addAttribute("adminId", ADMIN_ID);
+    public String showForm(Authentication authentication, Model model) {
+        model.addAttribute("adminId", authentication.getName());
         return FORM_VIEW;
     }
 
@@ -43,11 +46,12 @@ public class InitialPasswordController {
     public String changePassword(
             @RequestParam String newPassword,
             @RequestParam String newPasswordConfirm,
+            Authentication authentication,
             Model model,
             HttpServletRequest request,
             RedirectAttributes redirectAttributes) {
 
-        model.addAttribute("adminId", ADMIN_ID);
+        model.addAttribute("adminId", authentication.getName());
 
         if (newPassword == null || newPassword.isBlank()) {
             model.addAttribute("error", "新しいパスワードを入力してください");
@@ -60,15 +64,21 @@ public class InitialPasswordController {
 
         UserId pk = new UserId();
         pk.setJichitaiCd(jichitaiCd);
-        pk.setId(ADMIN_ID);
+        pk.setId(authentication.getName());
         User user = userRepository.findById(pk)
-                .orElseThrow(() -> new RuntimeException("管理者アカウントが見つかりません"));
+                .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+
+        // 初期パスワード状態でなければ受け付けない（設定済みパスワードの上書き防止）
+        if (!"1".equals(user.getInitialPasswordFlg())) {
+            model.addAttribute("error", "パスワードは設定済みです。");
+            return FORM_VIEW;
+        }
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setInitialPasswordFlg("0");
         userRepository.save(user);
 
-        log.info("初回パスワード変更が完了しました: userId={}", ADMIN_ID);
+        log.info("初回パスワード変更が完了しました: userId={}", authentication.getName());
 
         request.getSession().invalidate();
         redirectAttributes.addFlashAttribute("successMessage", "パスワードを設定しました。設定したパスワードでログインしてください。");

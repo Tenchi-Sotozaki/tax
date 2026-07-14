@@ -45,5 +45,5 @@ public class User extends BaseEntity {
 	private String delFlg = "0";
 
 	@Column(name = "initial_password_flg", length = 1, nullable = false)
-	private String initialPasswordFlg;
+	private String initialPasswordFlg = "0";
 }
