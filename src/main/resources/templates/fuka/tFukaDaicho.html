@@ -84,8 +84,7 @@
 									<th>宿泊税額</th>
 									<th>市区町村税額</th>
 									<th>都道府県税額</th>
-									<th>申告期限</th>
-									<th>納入期限</th>
+									<th>申告・納入期限</th>
 									<th>申告状況</th>
 									<th>納入状況</th>
 								</tr>
@@ -116,8 +115,7 @@
 										th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' 円'}">-</span>
 										<span th:unless="${item.kenZeigaku != null}"
 										class="text-muted">-</span></td>
-									<td class="text-center" th:text="${item.displayShinkokuKigen}">-</td>
-									<td class="text-center" th:text="${item.displayNonyuKigen}">-</td>
+									<td class="text-center" th:text="${item.displayKigen}">-</td>
 									<td class="text-center"><span th:if="${item.shinkokuZumi}"
 										class="badge bg-success px-3 py-2"> <i
 											class="bi bi-check-circle me-1"></i>申告済み
@@ -136,7 +134,7 @@
 									</td>
 								</tr>
 								<tr th:if="${#lists.isEmpty(fukaDaichoForm.items)}">
-									<td colspan="9" class="text-center py-5 text-muted">
+									<td colspan="8" class="text-center py-5 text-muted">
 										表示できる情報がありません</td>
 								</tr>
 							</tbody>
