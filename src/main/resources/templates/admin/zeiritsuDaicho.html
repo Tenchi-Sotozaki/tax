@@ -3,10 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
 <title>賦課方式照会</title>
-<style>
-.sticky-table thead th { position: sticky; top: 0; z-index: 1; }
-.table-scroll { max-height: 55vh; min-height: 200px; overflow-y: auto; overflow-x: auto; }
-</style>
+<link rel="stylesheet" th:href="@{/css/zeiritsu-daicho.css}">
 </head>
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
@@ -81,7 +78,7 @@
 		<div class="card shadow-sm mb-2">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex gap-2">
-					<button type="button" id="btnView" class="btn btn-outline-primary btn-sm">
+					<button type="button" id="btnView" class="btn btn-outline-primary btn-sm" th:data-view-base="@{/admin/zeiritsu/view/}">
 						<i class="bi bi-eye me-1"></i>照会
 					</button>
 				</div>
@@ -132,20 +129,7 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:inline="javascript">
-			/*<![CDATA[*/
-			const viewBase = /*[[@{/admin/zeiritsu/view/}]]*/ '/admin/zeiritsu/view/';
-
-			document.getElementById('btnView').addEventListener('click', function () {
-				const selected = document.querySelector('input[name="selectedRow"]:checked');
-				if (!selected) {
-					alert('照会するデータを選択してください。');
-					return;
-				}
-				location.href = viewBase + selected.value;
-			});
-			/*]]>*/
-		</script>
+		<script th:src="@{/js/zeiritsuDaicho.js}"></script>
 	</th:block>
 </body>
 </html>
