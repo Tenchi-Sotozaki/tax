@@ -105,16 +105,11 @@
 							<label class="form-label fw-medium">宛名</label>
 							<div class="input-group">
 								<input type="text" id="atenaNameDisplay"
-<<<<<<< HEAD
-								class="form-control bg-light" th:value="*{atenaName}" readonly>
-								<button th:if="!${isView}" type="button" class="btn btn-primary btn-sm"
-									data-bs-toggle="modal" data-bs-target="#addressSearchModal">
-=======
 									class="form-control bg-light" th:value="*{atenaName}" readonly>
 								<button th:if="!${isView}" type="button"
 									class="btn btn-primary btn-sm" data-bs-toggle="modal"
 									data-bs-target="#addressSearchModal">
->>>>>>> shusei_kamei
+
 									<i class="bi bi-search me-1"></i>宛名検索
 								</button>
 							</div>
@@ -187,8 +182,8 @@
 							<tr>
 								<th style="width: 60px" class="text-center"></th>
 								<th style="width: 80px" class="text-center">代表指定</th>
-								<th style="width: calc((100% - 140px) / 2)" class="text-center">特別徴収義務者名</th>
-								<th style="width: calc((100% - 140px) / 2)" class="text-center">施設名称</th>
+								<th style="width: calc(( 100% - 140px)/2)" class="text-center">特別徴収義務者名</th>
+								<th style="width: calc(( 100% - 140px)/2)" class="text-center">施設名称</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -241,17 +236,21 @@
 					</button>
 				</th:block>
 
-				<a th:href="@{/gassan/list}" class="btn btn-outline-primary btn-lg px-4" th:if="${isView ?: false}"> <i
-						class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a th:href="@{/gassan/list}" class="btn btn-outline-primary btn-lg px-4"
-					th:unless="${isView ?: false}" onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+				<a th:href="@{/gassan/list}"
+					class="btn btn-outline-primary btn-lg px-4"
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a> <a th:href="@{/gassan/list}"
+					class="btn btn-outline-primary btn-lg px-4"
+					th:unless="${isView ?: false}"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>
 		</form>
 
 		<!-- 確認モーダル -->
-		<div th:if="!${isView}" th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', 
+		<div th:if="!${isView}"
+			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', 
 			${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', 
 			'btn-success', ${isEdit} ? '更新する' : '登録する')}">
 		</div>
