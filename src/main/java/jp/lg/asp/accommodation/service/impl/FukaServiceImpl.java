@@ -33,6 +33,7 @@ import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.NozeiShuki;
 import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
+import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
@@ -104,17 +105,12 @@ public class FukaServiceImpl implements FukaService {
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
 		Map<Integer, Fuka> fukaMap = createFukaMap(fukaList);
 
-		int shuki = tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-				.stream().findFirst()
-				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd, t.getSeq())))
-				.map(n -> n.getShuki().intValue())
-				.orElse(3);
-		form.setShuki(shuki);
+		List<TekiyoNozeiShuki> tekiyoList = tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
 				.orElse(3);
 		Nokigen nokigen = nokigenRepository.findById(new NokigenId(jichitaiCd, nendo)).orElse(null);
-		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), form.getShuki(), nokigen, nendoStMonth, shiteiNo));
+		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), tekiyoList, nokigen, nendoStMonth, shiteiNo));
 		return form;
 	}
 
@@ -133,10 +129,10 @@ public class FukaServiceImpl implements FukaService {
 	 * 期別ごとの台帳明細行リストを作成する。
 	 */
 	private List<FukaDaichoListItem> createDaichoItems(String nendo, Map<Integer, Fuka> fukaMap, String filterStatus,
-			Integer shuki, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
+			List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
 		List<FukaDaichoListItem> items = new ArrayList<>();
 		for (int i = 1; i <= MAX_KIBETSU; i++) {
-			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, shuki, nokigen, nendoStMonth, shiteiNo);
+			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, shiteiNo);
 
 			if (STATUS_ZUMI.equals(filterStatus) && !item.isShinkokuZumi()) {
 				continue;
@@ -154,15 +150,22 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 単一の台帳明細行を組み立てる。
 	 */
-	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap, Integer shuki, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
+	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap, List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
 		FukaDaichoListItem item = new FukaDaichoListItem();
 		item.setNendo(nendo);
 		item.setKibetsu(kibetsu);
 
+		// 対象年月の1日を算出し、適用納税周期を判定
+		String taishoYm = createTaishoYmString(nendo, kibetsu);
+		int taishoYear = Integer.parseInt(taishoYm.substring(0, 4));
+		int taishoMonth = Integer.parseInt(taishoYm.substring(4, 6));
+		LocalDate taishoDate = LocalDate.of(taishoYear, taishoMonth, 1);
+
+		int shuki = resolveShuki(tekiyoList, taishoDate);
+
 		item.setDisplayNengetsu(createTaishoYmLabel(nendo, kibetsu));
-		item.setDisplayShinkokuKigen(createShinkokuKigenString(nendo, kibetsu, shuki));
-		item.setDisplayNonyuKigen(createNonyuKigenString(nendo, kibetsu, shuki, nokigen, nendoStMonth));
-		item.setTargetYearMonth(createTaishoYmString(nendo, kibetsu));
+		item.setDisplayKigen(createNonyuKigenString(nendo, kibetsu, shuki, nokigen, nendoStMonth));
+		item.setTargetYearMonth(taishoYm);
 
 		if (fukaMap.containsKey(kibetsu)) {
 			Fuka dbData = fukaMap.get(kibetsu);
@@ -218,60 +221,42 @@ public class FukaServiceImpl implements FukaService {
 		return String.valueOf(year) + String.format("%02d", month);
 	}
 
-	/** 
-	 * 年度、期別、納税周期から申告期限を作成
-	 * @param  nendo 年度
-	 * @param kibetsu 期別
-	 * @param shuki
-	 * @return 申告期限（例：2026年6月末）
-	 */
-	private String createShinkokuKigenString(String nendo, int kibetsu, int shuki) {
-		int year = (kibetsu + 2) > MAX_KIBETSU ? Integer.parseInt(nendo) + 1 : Integer.parseInt(nendo);
-		int month = (kibetsu + 2) > MAX_KIBETSU ? (kibetsu + 2) - MAX_KIBETSU : (kibetsu + 2);
-		// 申告期限は対象月の翌月末
-		month += 1;
-		if (month > 12) {
-			year++;
-			month -= 12;
-		}
-		return String.valueOf(year) + "年" + String.valueOf(month) + "月末";
-	}
 
 	/** 
 	 * 年度、期別、納税周期、納期限マスタから納入期限を作成
 	 * 申告期限の翌月のm_nokigenの納期限を表示する
 	 */
 	private String createNonyuKigenString(String nendo, int kibetsu, int shuki, Nokigen nokigen, int nendoStMonth) {
-		// 申告期限月を算出（対象月+1）
-		int year = (kibetsu + 2) > MAX_KIBETSU ? Integer.parseInt(nendo) + 1 : Integer.parseInt(nendo);
-		int month = (kibetsu + 2) > MAX_KIBETSU ? (kibetsu + 2) - MAX_KIBETSU : (kibetsu + 2);
-		int shinkokuMonth = month + 1;
-		int shinkokuYear = year;
-		if (shinkokuMonth > 12) {
-			shinkokuYear++;
-			shinkokuMonth -= 12;
+		if (nokigen == null || shuki <= 0) {
+			return "";
 		}
-		// 納入期限月 = 申告期限の翌月
-		int nonyuMonth = shinkokuMonth + 1;
-		int nonyuYear = shinkokuYear;
-		if (nonyuMonth > 12) {
-			nonyuYear++;
-			nonyuMonth -= 12;
+		// kibetsuが属するグループの末尾の期を算出
+		// 例: shuki=3の場合、kibetsu 1,2,3 → ordinal=3、kibetsu 4,5,6 → ordinal=6
+		int ordinal = ((kibetsu - 1) / shuki + 1) * shuki;
+		if (ordinal > MAX_KIBETSU) {
+			ordinal = MAX_KIBETSU;
 		}
+		String nokigenValue = getNokigenByOrdinal(nokigen, ordinal);
+		if (nokigenValue != null && nokigenValue.trim().length() == 8) {
+			int y = Integer.parseInt(nokigenValue.trim().substring(0, 4));
+			int m = Integer.parseInt(nokigenValue.trim().substring(4, 6));
+			int d = Integer.parseInt(nokigenValue.trim().substring(6, 8));
+			return y + "年" + m + "月" + d + "日";
+		}
+		return "";
+	}
 
-		if (nokigen != null) {
-			// nendoStMonthを基準に何番目のフィールドかを算出
-			int ordinal = (nonyuMonth - nendoStMonth + 12) % 12 + 1;
-			String nokigenValue = getNokigenByOrdinal(nokigen, ordinal);
-			if (nokigenValue != null && nokigenValue.length() == 8) {
-				int y = Integer.parseInt(nokigenValue.substring(0, 4));
-				int m = Integer.parseInt(nokigenValue.substring(4, 6));
-				int d = Integer.parseInt(nokigenValue.substring(6, 8));
-				return y + "年" + m + "月" + d + "日";
-			}
-		}
-		// フォールバック
-		return nonyuYear + "年" + nonyuMonth + "月末";
+	/**
+	 * 対象日に適用される納税周期を判定する
+	 */
+	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, LocalDate targetDate) {
+		return tekiyoList.stream()
+				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
+				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
+				.findFirst()
+				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd, t.getSeq())))
+				.map(n -> n.getShuki().intValue())
+				.orElse(3);
 	}
 
 	/**
