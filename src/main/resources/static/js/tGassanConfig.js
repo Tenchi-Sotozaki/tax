@@ -1,12 +1,24 @@
 'use strict';
 
+const ADDR_API = '/accommodation-tax/api/address/search';
+const FACILITIES_API = '/accommodation-tax/gassan/facilities-by-atena';
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    // 宛名検索モーダル初期化
+    initAddressSearchModal();
+
+    // showAddressModalフラグがtrueの場合、モーダルを自動オープン
+    const container = document.querySelector('[data-show-address-modal]');
+    if (container && container.dataset.showAddressModal === 'true') {
+        const modal = document.getElementById('addressSearchModal');
+        if (modal) new bootstrap.Modal(modal).show();
+    }
 
     // 代表施設ラジオボタン制御
     document.querySelectorAll('.daihyo-radio').forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.checked) {
-                // 対応するチェックボックスも自動でチェック
                 const checkbox = this.closest('tr').querySelector('.facility-check');
                 if (checkbox && !checkbox.disabled) {
                     checkbox.checked = true;
@@ -15,29 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-    // 適用時期セレクト変更時の遷移
-    const tekiyoSelect = document.getElementById('tekiyoSelect');
-    const fromShiteiNoVal = document.getElementById('fromShiteiNoVal');
-    if (tekiyoSelect && fromShiteiNoVal) {
-        tekiyoSelect.addEventListener('change', function() {
-            location.href = '/accommodation-tax/gassan/view-by-shitei/'
-                + fromShiteiNoVal.value + '?gassanShiteiNo=' + this.value;
-        });
-    }
-
-    // 適用時期（年月）選択時に hidden inputへ yyyy-MM-01 をセット
-    function syncMonthToDate(monthInputId, hiddenInputId) {
-        const monthInput = document.getElementById(monthInputId);
-        const hiddenInput = document.getElementById(hiddenInputId);
-        if (!monthInput || !hiddenInput) return;
-        const sync = () => {
-            hiddenInput.value = monthInput.value ? monthInput.value + '-01' : '';
-        };
-        sync();
-        monthInput.addEventListener('change', sync);
-    }
-    syncMonthToDate('tekiyoStYmdMonth', 'tekiyoStYmd');
 
     // チェックされた行をハイライト
     setupFacilityEventListeners();
@@ -58,66 +47,166 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('gassanForm')?.submit();
     });
 
-    // 編集モードでなければ処理を行わない
+    // 編集モードでなければ変更検知処理を行わない
     const contentContainer = document.querySelector('[data-is-edit]');
     const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
     if (!isEdit) return;
 
     // 編集変更チェック
     function checkValue(input) {
-
-        // チェックボックスとラジオボタンは対象外
         if (input.type === 'checkbox' || input.type === 'radio') return;
-
-		// モーダル内は処理しない
         if (input.closest('.modal')) return;
-
         const initialValue = input.getAttribute('data-initial-value') || '';
-
-        // nullという文字列になってしまうのを防ぐ
         let initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
         let currentStr = String(input.value).trim();
-
-        // 変更があったか判定
-        const isChanged = (currentStr !== initialStr);
-
-        if (isChanged) {
+        if (currentStr !== initialStr) {
             input.style.border = '3px solid #ffeb3b';
         } else {
             input.style.border = '';
         }
     }
 
-    // 画面表示時に最初から値が変わっているものを検知、および各イベントへの登録
     const inputs = document.querySelectorAll('.form-control, .form-select');
     inputs.forEach(input => {
-        // 画面を開いた瞬間にズレがあるかチェック
         checkValue(input);
-
-        // イベント登録
         input.addEventListener('input', () => checkValue(input));
         input.addEventListener('change', () => checkValue(input));
         input.addEventListener('blur', () => checkValue(input));
     });
 });
 
+// 宛名検索モーダル
+function initAddressSearchModal() {
+    const searchBtn = document.getElementById('addrSearchBtn');
+    if (!searchBtn) return;
+
+    searchBtn.addEventListener('click', async () => {
+        const params = new URLSearchParams();
+        const val = (id) => document.getElementById(id)?.value.trim() || '';
+        if (val('addrSearchNo')) params.set('addressNumber', val('addrSearchNo'));
+        if (val('addrSearchName')) params.set('name', val('addrSearchName'));
+        if (val('addrSearchAddress')) params.set('address', val('addrSearchAddress'));
+        if (val('addrSearchPhone')) params.set('phone', val('addrSearchPhone'));
+        if (val('addrSearchKojinNo')) params.set('kojinNo', val('addrSearchKojinNo'));
+        if (val('addrSearchHojinNo')) params.set('hojinNo', val('addrSearchHojinNo'));
+
+        try {
+            const res = await fetch(`${ADDR_API}?${params}`);
+            const data = await res.json();
+            renderAddressResults(data);
+        } catch (err) {
+            document.getElementById('addrSearchResult').innerHTML =
+                '<p class="text-danger small">通信エラーが発生しました。</p>';
+        }
+    });
+
+    ['addrSearchNo', 'addrSearchName', 'addrSearchAddress', 'addrSearchPhone', 'addrSearchKojinNo', 'addrSearchHojinNo'].forEach(id => {
+        document.getElementById(id)?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); searchBtn.click(); }
+        });
+    });
+}
+
+function renderAddressResults(data) {
+    const container = document.getElementById('addrSearchResult');
+    if (!data.length) {
+        container.innerHTML = '<p class="text-muted text-center small">該当する宛名が見つかりませんでした。</p>';
+        return;
+    }
+    const rows = data.map((d, i) => `
+        <tr style="cursor:pointer" data-idx="${i}">
+            <td>${d.addressNumber ?? ''}</td>
+            <td>${d.name ?? ''}</td>
+            <td>${d.nameKana ?? ''}</td>
+            <td>${d.address ?? ''}</td>
+        </tr>`).join('');
+    container.innerHTML = `
+        <p class="small text-muted mb-1">行をクリックすると選択されます。</p>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover table-bordered mb-0">
+                <thead class="table-primary">
+                    <tr><th>宛名番号</th><th>氏名</th><th>ふりがな</th><th>住所</th></tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+    container.querySelectorAll('tbody tr').forEach(tr => {
+        tr.addEventListener('click', () => selectAddress(data[+tr.dataset.idx]));
+    });
+}
+
+async function selectAddress(d) {
+    // 宛名番号と宛名名をフォームにセット
+    const atenaNoInput = document.getElementById('atenaNo');
+    const atenaNameDisplay = document.getElementById('atenaNameDisplay');
+    if (atenaNoInput) atenaNoInput.value = d.addressNumber;
+    if (atenaNameDisplay) atenaNameDisplay.value = d.name ?? '';
+
+    // モーダルを閉じる
+    bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
+
+    // 宛名に紐づく特別徴収義務者一覧を取得
+    await loadFacilitiesByAtena(d.addressNumber);
+}
+
+async function loadFacilitiesByAtena(atenaNo) {
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const headers = { 'Content-Type': 'application/json' };
+    if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+    try {
+        const res = await fetch(FACILITIES_API, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ atenaNo: atenaNo })
+        });
+        const facilities = await res.json();
+        renderFacilityTable(facilities);
+    } catch (err) {
+        console.error('施設一覧取得エラー:', err);
+    }
+}
+
+function renderFacilityTable(facilities) {
+    const tbody = document.querySelector('#gassanForm table tbody');
+    if (!tbody) return;
+
+    if (!facilities.length) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">
+            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>対象施設が見つかりませんでした。</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = facilities.map(f => `
+        <tr>
+            <td class="text-center">
+                <input type="checkbox" class="form-check-input facility-check"
+                    name="shiteiNoList" value="${f.shiteiNo}">
+            </td>
+            <td class="text-center">
+                <input type="radio" class="form-check-input daihyo-radio"
+                    name="daihyoShiteiNo" value="${f.shiteiNo}">
+            </td>
+            <td>${f.choshuGimushaName ?? ''}</td>
+            <td>${f.shisetsuName ?? ''}</td>
+        </tr>`).join('');
+
+    setupFacilityEventListeners();
+}
+
 // 施設チェックボックスとラジオボタンのイベントリスナーを設定
 function setupFacilityEventListeners() {
     document.querySelectorAll('.facility-check').forEach(cb => {
         cb.addEventListener('change', function() {
             this.closest('tr').classList.toggle('table-primary', this.checked);
-
-            // チェックボックスが外された時、代表施設ラジオボタンもクリア
             if (!this.checked) {
                 const radio = this.closest('tr').querySelector('.daihyo-radio');
-                if (radio) {
-                    radio.checked = false;
-                }
+                if (radio) radio.checked = false;
             }
         });
     });
 
-    // 代表施設ラジオボタン制御
     document.querySelectorAll('.daihyo-radio').forEach(radio => {
         radio.addEventListener('change', function() {
             if (this.checked) {

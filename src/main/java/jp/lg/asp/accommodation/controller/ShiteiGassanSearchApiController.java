@@ -1,7 +1,9 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
@@ -101,31 +103,37 @@ public class ShiteiGassanSearchApiController {
         // 合算指定番号なしのレコード
         results.add(new ShiteiGassanSearchDto(t.getAtenaNo().toPlainString(), t.getShiteiNo(), null, atenaName, t.getShisetsuName()));
 
-        // 合算指定番号ありのレコード
+        // 合算指定番号ありのレコード（同じ合算指定番号は1つにまとめ、代表指定番号の情報を表示）
         List<GassanUchi> uchiList = gassanUchiRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         for (GassanUchi uchi : uchiList) {
             List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, uchi.getGassanShiteiNo());
             if (!gassanList.isEmpty()) {
-                results.add(new ShiteiGassanSearchDto(t.getAtenaNo().toPlainString(), t.getShiteiNo(), uchi.getGassanShiteiNo(), atenaName, t.getShisetsuName()));
+                Gassan representative = gassanList.get(0);
+                String repShiteiNo = representative.getShiteiNo();
+                String repName = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, representative.getAtenaNo())
+                        .map(Atena::getName).orElse("");
+                String repShisetsuName = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, repShiteiNo)
+                        .stream().findFirst().map(Tokugimu::getShisetsuName).orElse("");
+                results.add(new ShiteiGassanSearchDto(representative.getAtenaNo().toPlainString(), repShiteiNo, uchi.getGassanShiteiNo(), repName, repShisetsuName));
             }
         }
         return results;
     }
 
     private List<ShiteiGassanSearchDto> searchByGassanShiteiNo(String gassanShiteiNo) {
-        List<GassanUchi> uchiList = gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        if (gassanList.isEmpty()) return List.of();
+
+        // 代表指定番号の情報を取得し、合算指定番号は1行にまとめて表示
+        Gassan representative = gassanList.get(0);
+        String repShiteiNo = representative.getShiteiNo();
+        String repName = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, representative.getAtenaNo())
+                .map(Atena::getName).orElse("");
+        String repShisetsuName = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, repShiteiNo)
+                .stream().findFirst().map(Tokugimu::getShisetsuName).orElse("");
+
         List<ShiteiGassanSearchDto> results = new ArrayList<>();
-        for (GassanUchi uchi : uchiList) {
-            List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, uchi.getShiteiNo());
-            for (Tokugimu t : tokugimuList) {
-                String atenaName = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
-                        .map(Atena::getName).orElse("");
-                // 合算指定番号なし
-                results.add(new ShiteiGassanSearchDto(t.getAtenaNo().toPlainString(), t.getShiteiNo(), null, atenaName, t.getShisetsuName()));
-                // 合算指定番号あり
-                results.add(new ShiteiGassanSearchDto(t.getAtenaNo().toPlainString(), t.getShiteiNo(), gassanShiteiNo, atenaName, t.getShisetsuName()));
-            }
-        }
+        results.add(new ShiteiGassanSearchDto(representative.getAtenaNo().toPlainString(), repShiteiNo, gassanShiteiNo, repName, repShisetsuName));
         return results;
     }
 
@@ -164,6 +172,7 @@ public class ShiteiGassanSearchApiController {
 
     private List<ShiteiGassanSearchDto> toDtoWithGassan(List<Tokugimu> tokugimuList) {
         List<ShiteiGassanSearchDto> results = new ArrayList<>();
+        Set<String> addedGassanShiteiNos = new HashSet<>();
         for (Tokugimu t : tokugimuList) {
             String atenaName = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
                     .map(Atena::getName).orElse("");
@@ -171,24 +180,22 @@ public class ShiteiGassanSearchApiController {
             // 合算指定番号なしのレコード
             results.add(new ShiteiGassanSearchDto(t.getAtenaNo().toPlainString(), t.getShiteiNo(), null, atenaName, t.getShisetsuName()));
 
-            // 合算指定番号ありのレコード
+            // 合算指定番号ありのレコード（同じ合算指定番号は1つにまとめ、代表指定番号の情報を表示）
             List<GassanUchi> uchiList = gassanUchiRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, t.getShiteiNo());
             for (GassanUchi uchi : uchiList) {
+                if (addedGassanShiteiNos.contains(uchi.getGassanShiteiNo())) continue;
                 List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, uchi.getGassanShiteiNo());
                 if (!gassanList.isEmpty()) {
-                    results.add(new ShiteiGassanSearchDto(t.getAtenaNo().toPlainString(), t.getShiteiNo(), uchi.getGassanShiteiNo(), atenaName, t.getShisetsuName()));
+                    Gassan representative = gassanList.get(0);
+                    String repShiteiNo = representative.getShiteiNo();
+                    String repName = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, representative.getAtenaNo())
+                            .map(Atena::getName).orElse("");
+                    String repShisetsuName = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, repShiteiNo)
+                            .stream().findFirst().map(Tokugimu::getShisetsuName).orElse("");
+                    results.add(new ShiteiGassanSearchDto(representative.getAtenaNo().toPlainString(), repShiteiNo, uchi.getGassanShiteiNo(), repName, repShisetsuName));
+                    addedGassanShiteiNos.add(uchi.getGassanShiteiNo());
                 }
             }
-        }
-        return results;
-    }
-
-    private List<ShiteiGassanSearchDto> toDto(List<Tokugimu> tokugimuList, String gassanNo) {
-        List<ShiteiGassanSearchDto> results = new ArrayList<>();
-        for (Tokugimu t : tokugimuList) {
-            String atenaName = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
-                    .map(Atena::getName).orElse("");
-            results.add(new ShiteiGassanSearchDto(t.getAtenaNo().toPlainString(), t.getShiteiNo(), gassanNo, atenaName, t.getShisetsuName()));
         }
         return results;
     }

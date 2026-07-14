@@ -34,7 +34,7 @@
 							<div class="card-body">
 								<div class="row g-3">
 									<div class="col-md-6">
-										<label class="form-label">持E��番号</label>
+										<label class="form-label">持E��番号</label>
 										<input type="text" class="form-control" th:value="${dto.shitei_no}" readonly>
 									</div>
 									<div class="col-md-6">
@@ -61,10 +61,10 @@
 							<div class="card-body">
 								<div class="row g-3 align-items-end">
 
-									<!-- 対象月１（忁E��！E-->
+									<!-- 対象月１（忁E��！E-->
 									<div class="col-md-3">
 										<label class="form-label fw-bold">
-											対象月！Espan class="badge bg-danger ms-1">忁E��E/span>
+											対象月！Espan class="badge bg-danger ms-1">忁E��E/span>
 										</label>
 										<select id="b1Ym" name="b1Ym" class="form-select" required>
 											<option value="">--- 選択してください ---</option>
@@ -74,7 +74,7 @@
 										</select>
 									</div>
 
-									<!-- 対象月２（任意�EチェチE��で有効化！E-->
+									<!-- 対象月２（任意�EチェチE��で有効化！E-->
 									<div class="col-md-3" id="b2Container" style="display:none;">
 										<div class="form-check mb-1">
 											<input class="form-check-input" type="checkbox" id="b2Check" checked>
@@ -88,7 +88,7 @@
 										<input type="hidden" id="b2Ym" name="b2Ym" />
 									</div>
 
-									<!-- 対象月３（任意�E対象月２チェチE��時�Eみ選択可�E�E-->
+									<!-- 対象月３（任意�E対象月２チェチE��時�Eみ選択可�E�E-->
 									<div class="col-md-3" id="b3Container" style="display:none;">
 										<div class="form-check mb-1">
 											<input class="form-check-input" type="checkbox" id="b3Check" checked>
@@ -111,10 +111,10 @@
 							<button type="button" class="btn btn-primary" onclick="generatePdf()">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
 							</button>
-							<button type="button" class="btn btn-info" onclick="previewPdf()">
+							<button type="button" class="btn btn-outline-primary" onclick="preview()">
 								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
-							<button type="button" class="btn btn-secondary" onclick="print()">
+							<button type="button" class="btn btn-primary" onclick="printReport()">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
 						</div>

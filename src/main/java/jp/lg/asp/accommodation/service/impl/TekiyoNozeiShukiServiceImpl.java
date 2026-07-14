@@ -1,7 +1,11 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.dto.NozeiShukiDto;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
+import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiHistoryDto;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
@@ -52,24 +57,58 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
                     form.setFacilityName(t.getShisetsuName());
                 });
 
-        tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-                .stream().findFirst().ifPresent(t -> {
-                    form.setEdit(true);
-                    form.setSeq(t.getSeq());
-                    form.setTekiyoStYmd(t.getTekiyoStYmd());
-                    form.setTekiyoEdYmd(t.getTekiyoEdYmd());
-                });
+        List<TekiyoNozeiShuki> allRecords = tekiyoNozeiShukiRepository
+                .findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+
+        if (!allRecords.isEmpty()) {
+            TekiyoNozeiShuki latest = allRecords.get(0);
+            form.setEdit(true);
+            form.setSeq(latest.getSeq());
+            if (latest.getTekiyoStYmd() != null) {
+                form.setTekiyoStMonth(latest.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy-MM")));
+            }
+            if (latest.getTekiyoEdYmd() != null) {
+                form.setTekiyoEdMonth(latest.getTekiyoEdYmd().format(DateTimeFormatter.ofPattern("yyyy-MM")));
+            }
+
+            Map<String, String> shukiLabelMap = nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd)
+                    .stream().collect(Collectors.toMap(
+                            n -> n.getSeq().toPlainString(),
+                            n -> new NozeiShukiDto(n.getSeq(), n.getShuki()).getLabel(),
+                            (a, b) -> a));
+
+            form.setHistories(allRecords.stream()
+                    .map(t -> new TekiyoNozeiShukiHistoryDto(
+                            t.getIdx(),
+                            shukiLabelMap.getOrDefault(t.getSeq().toPlainString(), ""),
+                            t.getTekiyoStYmd() != null ? t.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : "",
+                            t.getTekiyoEdYmd() != null ? t.getTekiyoEdYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : ""))
+                    .toList());
+        }
 
         return form;
+    }
+
+    private LocalDate toFirstDay(String yearMonth) {
+        if (yearMonth == null || yearMonth.isBlank()) return null;
+        return YearMonth.parse(yearMonth).atDay(1);
+    }
+
+    private LocalDate toLastDay(String yearMonth) {
+        if (yearMonth == null || yearMonth.isBlank()) return null;
+        return YearMonth.parse(yearMonth).atEndOfMonth();
     }
 
     @Override
     @Transactional
     public void save(String shiteiNo, TekiyoNozeiShukiForm form) {
-        if (form.getTekiyoEdYmd() != null && form.getTekiyoStYmd().isAfter(form.getTekiyoEdYmd())) {
-            throw new IllegalStateException("適用開始年月日が適用終了年月日より後になっています。");
+        LocalDate stYmd = toFirstDay(form.getTekiyoStMonth());
+        LocalDate edYmd = toLastDay(form.getTekiyoEdMonth());
+
+        if (edYmd != null && stYmd.isAfter(edYmd)) {
+            throw new IllegalStateException("適用開始年月が適用終了年月より後になっています。");
         }
-        checkAndResolveOverlap(shiteiNo, form);
+        checkAndResolveOverlap(shiteiNo, stYmd, edYmd);
 
         Integer maxIdx = tekiyoNozeiShukiRepository.findMaxIdxByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         Integer newIdx = maxIdx + 1;
@@ -79,17 +118,15 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         entity.setShiteiNo(shiteiNo);
         entity.setIdx(newIdx);
         entity.setSeq(form.getSeq());
-        entity.setTekiyoStYmd(form.getTekiyoStYmd());
-        entity.setTekiyoEdYmd(form.getTekiyoEdYmd());
+        entity.setTekiyoStYmd(stYmd);
+        entity.setTekiyoEdYmd(edYmd);
         entity.setDelFlg(FLG_OFF);
 
         tekiyoNozeiShukiRepository.save(entity);
         log.info("適用納税周期保存完了: shiteiNo={}, idx={}", shiteiNo, newIdx);
     }
 
-    private void checkAndResolveOverlap(String shiteiNo, TekiyoNozeiShukiForm form) {
-        LocalDate newStYmd = form.getTekiyoStYmd();
-        LocalDate newEdYmd = form.getTekiyoEdYmd();
+    private void checkAndResolveOverlap(String shiteiNo, LocalDate newStYmd, LocalDate newEdYmd) {
 
         List<TekiyoNozeiShuki> existingRecords = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
