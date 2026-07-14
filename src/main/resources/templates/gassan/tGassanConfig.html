@@ -105,9 +105,16 @@
 							<label class="form-label fw-medium">宛名</label>
 							<div class="input-group">
 								<input type="text" id="atenaNameDisplay"
+<<<<<<< HEAD
 								class="form-control bg-light" th:value="*{atenaName}" readonly>
 								<button th:if="!${isView}" type="button" class="btn btn-primary btn-sm"
 									data-bs-toggle="modal" data-bs-target="#addressSearchModal">
+=======
+									class="form-control bg-light" th:value="*{atenaName}" readonly>
+								<button th:if="!${isView}" type="button"
+									class="btn btn-primary btn-sm" data-bs-toggle="modal"
+									data-bs-target="#addressSearchModal">
+>>>>>>> shusei_kamei
 									<i class="bi bi-search me-1"></i>宛名検索
 								</button>
 							</div>
@@ -160,8 +167,8 @@
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<h5 class="mb-0">
-						<i class="bi bi-building me-2"></i>徴収義務者一覧 <span
-							th:if="!${isView}" class="badge bg-danger ms-2 fs-6">必須（2件以上選択）</span>
+						<i class="bi bi-building me-2"></i>特別徴収義務者一覧 <span
+							th:if="!${isView}" class="badge bg-danger ms-2 fs-6">2件以上選択必須</span>
 					</h5>
 				</div>
 				<div class="card-body p-0">
@@ -174,13 +181,14 @@
 					</div>
 
 					<table
-						class="table table-bordered table-hover table-sm align-middle mb-0">
+						class="table table-bordered table-hover table-sm align-middle mb-0"
+						style="table-layout: fixed;">
 						<thead class="table-light">
 							<tr>
 								<th style="width: 60px" class="text-center"></th>
-								<th style="width: 80px" class="text-center">代表施設</th>
-								<th>徴収義務者名</th>
-								<th>施設名</th>
+								<th style="width: 80px" class="text-center">代表指定</th>
+								<th style="width: calc((100% - 140px) / 2)" class="text-center">特別徴収義務者名</th>
+								<th style="width: calc((100% - 140px) / 2)" class="text-center">施設名称</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -198,11 +206,11 @@
 									class="bi bi-circle text-muted fs-5"></i>
 								</td>
 								<td class="text-center">
-									<!-- 代表施設チェックボックス --> <input th:if="!${isView}" type="radio"
+									<!-- 代表指定チェックボックス --> <input th:if="!${isView}" type="radio"
 									class="form-check-input daihyo-radio" name="daihyoShiteiNo"
 									th:value="${facility.shiteiNo}" th:checked="${facility.daihyo}"
 									th:disabled="${facility.disabled or !facility.checked}">
-									<!-- 照会時：代表施設アイコン --> <i
+									<!-- 照会時：代表指定アイコン --> <i
 									th:if="${isView} and ${facility.daihyo}"
 									class="bi bi-check-circle-fill text-success fs-5"></i>
 								</td>
