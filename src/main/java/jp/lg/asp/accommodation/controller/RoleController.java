@@ -62,11 +62,6 @@ public class RoleController {
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
-		if (form.getRoleId() != null && (form.getRoleId() == 1L || form.getRoleId() == 2L)) {
-		    result.put("success", false);
-		    result.put("errors", java.util.List.of("システム標準ロール（デフォルト権限・権限なし）は編集できません"));
-		    return result;
-		}
 		if (form.getName() == null || form.getName().isBlank()) {
 			result.put("success", false);
 			result.put("errors", java.util.List.of("権限名は必須です"));
@@ -154,10 +149,10 @@ public class RoleController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 		
-		if (roleId == 1L || roleId == 2L) {
-		    result.put("success", false);
-		    result.put("message", "システム標準ロール（デフォルト権限・権限なし）のため削除できません");
-		    return result;
+		if (roleId == 1L) {
+			result.put("success", false);
+			result.put("message", "デフォルト権限のため削除できません");
+			return result;
 		}
 		
 		try {

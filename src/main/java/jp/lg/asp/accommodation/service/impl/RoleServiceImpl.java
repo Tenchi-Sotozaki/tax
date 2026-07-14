@@ -30,8 +30,6 @@ public class RoleServiceImpl implements RoleService {
 	private final RoleRepository roleRepository;
 	private final ScreenRepository screenRepository;
 	private final UserRepository userRepository;
-	
-	private static final BigDecimal NO_PERMISSION_ROLE_ID = BigDecimal.valueOf(2);
 
 	@Override
 	public List<Role> findAllRoles(String jichitaiCd) {
@@ -135,7 +133,7 @@ public class RoleServiceImpl implements RoleService {
 	public void resetUsersToDefaultRole(String jichitaiCd, Long roleId, String updUser) {
 		List<User> users = userRepository.findByJichitaiCdAndRoleId(jichitaiCd, BigDecimal.valueOf(roleId));
 		for (User u : users) {
-			u.setRoleId(NO_PERMISSION_ROLE_ID);
+			u.setRoleId(BigDecimal.ONE);
 		}
 		userRepository.saveAll(users);
 	}

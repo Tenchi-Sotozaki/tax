@@ -2,7 +2,6 @@ let currentMode = 'create';
 
 function updateButtons() {
     const checked = document.querySelectorAll('.role-checkbox:checked');
-    const editBtn = document.getElementById('editBtn');
     const viewBtn = document.getElementById('viewBtn');
     const usersBtn = document.getElementById('usersBtn');
     const deleteBtn = document.getElementById('deleteBtn');
@@ -10,12 +9,9 @@ function updateButtons() {
     const singleSelection = checked.length === 1;
     const anySelection = checked.length >= 1;
 
-	const includesAdminRole = Array.from(checked).some(cb => cb.value === '1' || cb.value === '2');
-
-	editBtn.disabled = !singleSelection || includesAdminRole;
     viewBtn.disabled = !singleSelection;
     usersBtn.disabled = !singleSelection;
-	deleteBtn.disabled = !anySelection || includesAdminRole;
+    deleteBtn.disabled = !anySelection;
 }
 
 function openRoleModal(mode) {
@@ -247,7 +243,7 @@ function deleteRoles() {
     const checked = document.querySelectorAll('.role-checkbox:checked');
     if (checked.length === 0) return;
 
-    if (!confirm(`チェックした${checked.length}件の権限を削除します。\n対象権限のユーザーは権限なしに変更されます。\nよろしいですか？`)) return;
+    if (!confirm(`チェックした${checked.length}件の権限を削除します。\n対象権限のユーザーはデフォルト権限に変更されます。\nよろしいですか？`)) return;
 
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
