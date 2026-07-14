@@ -44,8 +44,7 @@ body {
 
 /* メインコンテンツ */
 main {
-    margin-top: 56px;
-    padding-top: 1rem;
+    padding-top: 0;
 }
 
 /* カード */
@@ -180,10 +179,6 @@ main {
         padding-top: 0;
     }
     
-    main {
-        margin-top: 5rem;
-    }
-    
     .btn-lg {
         padding: 0.5rem 1.5rem;
         font-size: 1rem;
@@ -206,16 +201,6 @@ body {
 }
 main {
     flex: 1;
-}
-
-/* カード */
-.card {
-    border: none;
-    border-radius: 0.75rem;
-    overflow: hidden;
-}
-.card-header {
-    border-bottom: none;
 }
 
 /* テーブル数値右寄せ */
