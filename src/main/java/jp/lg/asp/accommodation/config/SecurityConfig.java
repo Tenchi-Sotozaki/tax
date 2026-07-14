@@ -15,10 +15,9 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http,
-			PasswordChangeRequiredFilter passwordChangeRequiredFilter,
-			InitialAdminPasswordFilter initialAdminPasswordFilter) throws Exception { // ★引数を追加
-		http
-				.authorizeHttpRequests(auth -> auth
+	        InitialAdminPasswordFilter initialAdminPasswordFilter) throws Exception {
+	    http
+	            .authorizeHttpRequests(auth -> auth
 						// 静的リソースとログイン画面は誰でもアクセス可
 						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**",
 								"/login", "/error", "/*.html")
@@ -39,9 +38,7 @@ public class SecurityConfig {
 				.logout(logout -> logout
 						.logoutSuccessUrl("/login?logout")
 						.permitAll())
-				// ★追加：ログイン前に、初期パスワードのままなら誘導するフィルター
-				.addFilterBefore(initialAdminPasswordFilter, UsernamePasswordAuthenticationFilter.class)
-				.addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(initialAdminPasswordFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 
