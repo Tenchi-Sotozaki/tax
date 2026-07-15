@@ -52,7 +52,8 @@ public class ZeiritsuController {
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
-	private static final String SCREEN_ID = ScreenManagement.ZEIRITSU_CONFIG;
+	private static final String SCREEN_ID = ScreenManagement.ZEIRITSU_DAICHO;
+	private static final String SCREEN_ID_CONFIG = ScreenManagement.ZEIRITSU_CONFIG;
 	private static final String LIST_VIEW = "admin/zeiritsuDaicho";
 	private static final String FORM_VIEW = "admin/zeiritsuConfig";
 
@@ -73,7 +74,7 @@ public class ZeiritsuController {
 	// ========== 照会 ==========
 
 	@GetMapping("/view/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "照会")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会")
 	public String view(@PathVariable("seq") Long seq,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -89,7 +90,7 @@ public class ZeiritsuController {
 	// ========== 編集画面 ==========
 
 	@GetMapping("/edit/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String edit(@PathVariable("seq") Long seq,
 			Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
@@ -105,7 +106,7 @@ public class ZeiritsuController {
 	// ========== 更新処理 ==========
 
 	@PostMapping("/edit/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String update(@PathVariable("seq") Long seq,
 			@Validated @ModelAttribute("zeiritsuForm") ZeiritsuForm form,
 			BindingResult bindingResult,
@@ -201,7 +202,7 @@ public class ZeiritsuController {
 	// ========== 削除処理 ==========
 
 	@PostMapping("/delete/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "削除")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "削除")
 	public String delete(@PathVariable("seq") Long seq,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
@@ -237,7 +238,7 @@ public class ZeiritsuController {
 	// ========== 新規登録画面 ==========
 
 	@GetMapping("/register")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録画面表示")
 	public String showForm(Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		model.addAttribute("zeiritsuForm", new ZeiritsuForm());
@@ -250,7 +251,7 @@ public class ZeiritsuController {
 	// ========== 登録処理 ==========
 
 	@PostMapping("/register")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String save(@Validated @ModelAttribute("zeiritsuForm") ZeiritsuForm form,
 			BindingResult bindingResult,
 			Model model,
