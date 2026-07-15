@@ -33,8 +33,11 @@ public final class ScreenManagement {
 	// 納税管理人登録/編集/照会
 	public static final String TAXMANAGER_CONFIG = "ms00000003";
 
-	// ユーザー管理
+	// ユーザー管理台帳
 	public static final String USER_MANAGEMENT = "ss00000002";
+
+	// ユーザー登録/編集/削除
+	public static final String USER_CONFIG = "ss00000001";
 
 	// 権限管理
 	public static final String ROLE_MANAGEMENT = "sc00000004";
@@ -111,7 +114,7 @@ public final class ScreenManagement {
 	// 合算申告納入承認通知書
 	public static final String GASSAN_NONYU_TSUCHI = "ms00000021";
 
-	//　宿泊税更生・決定通知書
+	// 宿泊税更生・決定通知書
 	public static final String KOSEI_KETTEI_TSUCHI = "ms00000023";
 
 	// 交付率設定
