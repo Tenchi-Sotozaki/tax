@@ -71,6 +71,10 @@ function loadRoleDetail(roleId, readonly) {
             document.getElementById('roleName').value = data.role.name;
             document.getElementById('version').value = data.role.version;
 
+            if (readonly && !data.editable) {
+                switchToEditBtn.style.display = 'none';
+            }
+
             // パーミッションをリセットしてから設定
             document.querySelectorAll('input[name^="permission_"][value="0"]').forEach(r => r.checked = true);
             if (data.permissions) {
@@ -200,6 +204,10 @@ function viewAssignedUsers() {
     fetch(`${ctx}/admin/role/users/${currentUsersRoleId}`)
         .then(response => response.json())
         .then(data => {
+            if (data.error) {
+                alert(data.message);
+                return;
+            }
             document.getElementById('usersModalRoleName').textContent = data.roleName;
             const tbody = document.getElementById('usersModalBody');
             tbody.innerHTML = '';
@@ -239,12 +247,25 @@ function updateAssignedUsers() {
 }
 
 function deleteRoles() {
-    const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
     const checked = document.querySelectorAll('.role-checkbox:checked');
     if (checked.length === 0) return;
 
-    if (!confirm(`チェックした${checked.length}件の権限を削除します。\n対象権限のユーザーはデフォルト権限に変更されます。\nよろしいですか？`)) return;
+    const protectedIds = ['1', '2'];
+    const hasProtected = Array.from(checked).some(cb => protectedIds.includes(cb.value));
+    if (hasProtected) {
+        alert('デフォルト権限は削除できません');
+        return;
+    }
 
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('deleteConfirmModal')).show();
+}
+
+document.getElementById('deleteForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+
+    const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
+    const checked = document.querySelectorAll('.role-checkbox:checked');
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
@@ -264,14 +285,7 @@ function deleteRoles() {
             location.reload();
         })
         .catch(err => alert('通信エラー: ' + err.message));
-
-    const msg = sessionStorage.getItem('flashMessage');
-    if (msg) {
-        document.getElementById('flashMessageText').textContent = msg;
-        document.getElementById('flashMessage').classList.remove('d-none');
-        sessionStorage.removeItem('flashMessage');
-    }
-}
+});
 
 document.addEventListener('DOMContentLoaded', function() {
 
