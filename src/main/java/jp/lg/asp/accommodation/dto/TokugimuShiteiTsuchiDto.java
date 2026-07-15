@@ -11,6 +11,9 @@ import lombok.Data;
  */
 @Data
 public class TokugimuShiteiTsuchiDto {
+	
+	/** 自治体コード */
+	private String jichitaiCd;
 
 	/** 指定番号 */
 	private String shiteiNo;
@@ -42,4 +45,7 @@ public class TokugimuShiteiTsuchiDto {
 
 	/** 市区町村 */
 	private String city;
+	
+	/** 公印画像ファイル */
+	private byte[] koin;
 }

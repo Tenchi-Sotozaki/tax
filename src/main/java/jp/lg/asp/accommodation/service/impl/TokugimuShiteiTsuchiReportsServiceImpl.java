@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiDto;
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiReportsDto;
+import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.service.TokugimuShiteiTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.view.JasperViewer;
 
 /**
  * 特別徴収義務者指定通知帳票 Service 実装
@@ -33,14 +33,20 @@ import net.sf.jasperreports.view.JasperViewer;
 public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsuchiReportsService {
 
 	private static final String JRXML_PATH = "reports/tokugimuShiteiTsuchi.jrxml";
+	private final ReportsDefRepository reportsDefRepository;
 
 	@Override
 	public byte[] generateTsuchiPdf(TokugimuShiteiTsuchiDto dto) {
 		try {
 			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
-
+		
+			// 公印の画像ファイルを取得
+            byte[] koin = reportsDefRepository.findDefDataByJichitaiCd(dto.getJichitaiCd());
+            dto.setKoin(koin);
+			
 			Map<String, Object> parameters = new HashMap<>();
+			
 			JRDataSource dataSource = buildParams(dto);
 			JasperPrint jasperPrint = JasperFillManager.fillReport(
 					jasperReport, parameters, dataSource);
@@ -68,6 +74,7 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setCity(dto.getCity() != null ? dto.getCity() : "");
+		reportsDto.setKoin(dto.getKoin());
 
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
