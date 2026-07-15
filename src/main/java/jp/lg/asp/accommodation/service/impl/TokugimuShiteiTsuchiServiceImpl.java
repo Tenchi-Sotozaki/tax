@@ -75,6 +75,7 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 
 		// DTOに設定
 		TokugimuShiteiTsuchiDto dto = new TokugimuShiteiTsuchiDto();
+		dto.setJichitaiCd(tokugimu.getJichitaiCd());
 		dto.setShiteiNo(tokugimu.getShiteiNo());
 		dto.setTokuName(atena.getName());
 
