@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.User;
 public class AppUserDetails extends User {
 
     private final boolean mustChangePassword;
+    private String displayName;
 
     public AppUserDetails(String username, String password,
                            Collection<? extends GrantedAuthority> authorities,
@@ -18,5 +19,13 @@ public class AppUserDetails extends User {
 
     public boolean isMustChangePassword() {
         return mustChangePassword;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 }

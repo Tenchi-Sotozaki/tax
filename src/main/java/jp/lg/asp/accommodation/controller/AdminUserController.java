@@ -3,8 +3,12 @@ package jp.lg.asp.accommodation.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import jp.lg.asp.accommodation.config.AppUserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -179,6 +183,10 @@ public class AdminUserController {
 		}
 		userRepository.save(user);
 
+		if (isLoginUser(id)) {
+			updateSessionAuthentication(user);
+		}
+
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザー情報を更新しました。");
 		return "redirect:/admin/user-search";
 	}
@@ -221,6 +229,19 @@ public class AdminUserController {
 
 	private String getLoginUserId() {
 		return SecurityContextHolder.getContext().getAuthentication().getName();
+	}
+
+	private void updateSessionAuthentication(User user) {
+		Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+		AppUserDetails updatedDetails = new AppUserDetails(
+				user.getId(),
+				user.getPassword(),
+				currentAuth.getAuthorities(),
+				"1".equals(user.getInitialPasswordFlg()));
+		updatedDetails.setDisplayName(user.getName());
+		Authentication newAuth = new UsernamePasswordAuthenticationToken(
+				updatedDetails, updatedDetails.getPassword(), updatedDetails.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(newAuth);
 	}
 
 	private UserId buildUserId(String id) {

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.config.AppUserDetails;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
@@ -39,11 +40,10 @@ public class GlobalModelAdvice {
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
             return "";
         }
-        UserId pk = new UserId();
-        pk.setJichitaiCd(jichitaiCd);
-        pk.setId(auth.getName());
-        User user = userRepository.findById(pk).orElse(null);
-        return user != null ? user.getName() : auth.getName();
+        if (auth.getPrincipal() instanceof AppUserDetails details) {
+            return details.getDisplayName() != null ? details.getDisplayName() : auth.getName();
+        }
+        return auth.getName();
     }
 
     @ModelAttribute("currentUri")
