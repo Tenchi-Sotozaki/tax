@@ -134,4 +134,10 @@ public final class ScreenManagement {
 
 	// 操作ログ照会
 	public static final String OPE_LOG_VIEW = "ss00000008";
+
+	// 帳票ログ照会
+	public static final String RPT_LOG_VIEW = "ms00000025";
+
+	// 特別徴収義務者状況照会
+	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";
 }

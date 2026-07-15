@@ -81,6 +81,14 @@
 											<i class="bi bi-cash-coin me-2"></i>特別徴収義務者交付金
 									</a>
 									</li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000025')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/log/rpt-log}"
+										th:classappend="${#strings.contains(currentUri, '/log/rpt-log')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-file-earmark-text me-2"></i>帳票ログ照会
+									</a>
+									</li>
 								</ul>
 							</div>
 						</div>
