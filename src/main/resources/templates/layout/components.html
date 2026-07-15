@@ -49,7 +49,7 @@
 							const formId = this.dataset.formId;
 							const form = document.getElementById(formId);
 							if (form) {
-								form.submit();
+								form.requestSubmit();
 							} else {
 								console.error('フォームが見つかりません:', formId);
 							}

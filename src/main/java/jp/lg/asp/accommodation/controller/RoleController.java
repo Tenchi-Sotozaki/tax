@@ -62,6 +62,11 @@ public class RoleController {
 	public Map<String, Object> saveRole(@RequestBody RoleForm form) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
+		if (form.getRoleId() != null && form.getRoleId() == 1L) {
+			result.put("success", false);
+			result.put("message", "この権限は編集できません");
+			return result;
+		}
 		if (form.getName() == null || form.getName().isBlank()) {
 			result.put("success", false);
 			result.put("errors", java.util.List.of("権限名は必須です"));
@@ -93,6 +98,7 @@ public class RoleController {
 		roleMap.put("name", role.getName());
 		roleMap.put("version", role.getVersion());
 		result.put("role", roleMap);
+		result.put("editable", roleId != 1L && roleId != 2L);
 
 		if (role.getRoleDetails() != null) {
 			Map<String, String> permissions = role.getRoleDetails().stream()
@@ -110,19 +116,25 @@ public class RoleController {
 	@OpeLog(screenId = SCREEN_ID, operation = "権限付与ユーザー照会")
 	public Map<String, Object> getAssignedUsers(@PathVariable Long roleId) {
 		accessChecker.checkAccess(SCREEN_ID);
+		Map<String, Object> result = new HashMap<>();
+		if (roleId == 1L) {
+			result.put("error", true);
+			result.put("message", "この権限のユーザー付与は変更できません");
+			return result;
+		}
 		Role role = roleService.findById(jichitaiCd, roleId);
 		List<User> allUsers = roleService.findAllUsers(jichitaiCd);
 
-		Map<String, Object> result = new HashMap<>();
-		result.put("roleName", role != null ? role.getName() : "");
-		result.put("users", allUsers.stream().map(u -> {
+		Map<String, Object> result1 = new HashMap<>();
+		result1.put("roleName", role != null ? role.getName() : "");
+		result1.put("users", allUsers.stream().map(u -> {
 			Map<String, Object> m = new HashMap<>();
 			m.put("id", u.getId());
 			m.put("name", u.getName());
 			m.put("assigned", u.getRoleId() != null && u.getRoleId().longValue() == roleId);
 			return m;
 		}).collect(Collectors.toList()));
-		return result;
+		return result1;
 	}
 
 	@PostMapping("/users/{roleId}")
@@ -132,6 +144,14 @@ public class RoleController {
 			@RequestBody Map<String, List<String>> body) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
+		if (roleId == 1L) {
+			List<String> userIds = body.get("userIds");
+			if (userIds == null || userIds.size() != 1 || !"admin".equals(userIds.get(0))) {
+				result.put("success", false);
+				result.put("message", "この権限はadminユーザーのみに付与できます");
+				return result;
+			}
+		}
 		try {
 			roleService.updateUserRole(jichitaiCd, roleId, body.get("userIds"), "admin");
 			result.put("success", true);
@@ -148,17 +168,17 @@ public class RoleController {
 	public Map<String, Object> deleteRole(@PathVariable Long roleId) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
-		
-		if (roleId == 1L) {
+
+		if (roleId == 1L || roleId == 2L) {
 			result.put("success", false);
 			result.put("message", "デフォルト権限のため削除できません");
 			return result;
 		}
-		
+
 		try {
 			// 削除対象の権限が付与されているユーザーをデフォルト権限に変更
 			roleService.resetUsersToDefaultRole(jichitaiCd, roleId, "admin");
-			
+
 			roleService.deleteRole(jichitaiCd, roleId);
 			result.put("success", true);
 		} catch (Exception e) {
