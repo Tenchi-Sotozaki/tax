@@ -297,13 +297,32 @@ public class TokugimuServiceImpl implements TokugimuService {
 		LocalDateTime now = LocalDateTime.now();
 		String systemUser = getCurrentUser();
 
-		// 1. Tokugimuを取得
-		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+		// 1. 既存レコードを取得し、new_flgを0にする
+		Tokugimu old = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
 				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + shiteiNo));
+		old.setNewFlg("0");
+		tokugimuRepository.save(old);
 
-		// 2. Atena（事業者情報）を更新
-		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
+		// 2. rno+1で新レコードをINSERT
+		BigDecimal newRno = BigDecimal.valueOf(
+				tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(0) + 1);
+
+		Tokugimu t = new Tokugimu();
+		t.setJichitaiCd(jichitaiCd);
+		t.setShiteiNo(shiteiNo);
+		t.setRno(newRno);
+		t.setAtenaNo(old.getAtenaNo());
+		t.setTorokuYmd(old.getTorokuYmd());
+		t.setShinkokuYmd(old.getShinkokuYmd());
+		t.setHenkoYmd(form.getRegistrationDate());
+		applyFormToTokugimu(t, form);
+		t.setNewFlg("1");
+		t.setDelFlg("0");
+		tokugimuRepository.save(t);
+
+		// 3. Atena（事業者情報）を更新
+		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, old.getAtenaNo())
 				.orElseThrow(() -> new RuntimeException("宛名情報が見つかりません"));
 		atena.setName(form.getName());
 		atena.setNameKana(form.getNameKana());
@@ -312,20 +331,13 @@ public class TokugimuServiceImpl implements TokugimuService {
 		atena.setTel1(form.getTokugimuPhone());
 		atenaRepository.save(atena);
 
-		// 3. Tokugimu（宿泊施設情報）を更新
-		t.setHenkoYmd(form.getRegistrationDate());
-		applyFormToTokugimu(t, form);
-		tokugimuRepository.save(t);
+		// 4. 所有者情報の追加
+		saveShoyusha(shiteiNo, newRno, form, now, systemUser);
 
-		// 4. 所有者情報の更新
-		shoyushaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-		saveShoyusha(shiteiNo, t.getRno(), form, now, systemUser);
+		// 5. 共同事業者情報の追加
+		saveKyodoJigyosha(shiteiNo, newRno, form);
 
-		// 5. 共同事業者情報の更新
-		kyodoJigyoshaRepository.deleteByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-		saveKyodoJigyosha(shiteiNo, t.getRno(), form);
-
-		log.info("特別徴収義務者更新完了: shiteiNo={}, name={}", shiteiNo, form.getName());
+		log.info("特別徴収義務者更新完了: shiteiNo={}, rno={}", shiteiNo, newRno);
 	}
 
 	/**
