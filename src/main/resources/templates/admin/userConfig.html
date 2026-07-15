@@ -99,11 +99,13 @@
 							</label>
 
 							<select class="form-select" id="roleId" th:field="*{roleId}" th:errorclass="is-invalid"
-								th:data-initial-value="*{roleId}">
+								th:data-initial-value="*{roleId}"
+								th:disabled="${isDefaultUser}">
 								<option value="">選択してください</option>
 								<option th:each="role : ${roles}" th:value="${role.roleId}" th:text="${role.name}">
 								</option>
 							</select>
+							<div th:if="${isDefaultUser}" class="form-text text-muted">デフォルトユーザーの権限は変更できません。</div>
 
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}">
 							</div>

@@ -4,24 +4,28 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import jp.lg.asp.accommodation.controller.InitialPasswordController;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-				.authorizeHttpRequests(auth -> auth
-						// 静的リソース・ログインは誰でもアクセス可
-						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**", "/login", "/*.html")
+	public SecurityFilterChain filterChain(HttpSecurity http,
+			PasswordChangeRequiredFilter passwordChangeRequiredFilter) throws Exception {
+	    http
+	            .authorizeHttpRequests(auth -> auth
+						// 静的リソースとログイン画面は誰でもアクセス可
+						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**",
+								"/login", "/error", "/*.html")
 						.permitAll()
+						// 初回パスワード設定画面はログイン済みユーザーのみアクセス可
+						.requestMatchers("/admin/password-change").authenticated()
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可
@@ -29,38 +33,22 @@ public class SecurityConfig {
 						.hasAnyRole("USER", "ADMIN")
 						// その他は認証済みであればアクセス可
 						.anyRequest().authenticated())
-				.formLogin(form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/tokugimu/list", true)
-						.permitAll())
+	            .formLogin(form -> form
+	                    .loginPage("/login")
+	                    // 初期ユーザーはユーザー検索画面へ、それ以外は業務トップへ
+	                    .successHandler((request, response, authentication) -> {
+	                        String target = InitialPasswordController.ADMIN_ID.equals(authentication.getName())
+	                                ? "/admin/user-search"
+	                                : "/tokugimu/list";
+	                        response.sendRedirect(request.getContextPath() + target);
+	                    })
+	                    .permitAll())
 				.logout(logout -> logout
 						.logoutSuccessUrl("/login?logout")
-						.permitAll());
-		return http.build();
-	}
-
-	/**
-	 * モックユーザー定義（開発用）
-	 * 本番では DB 連携の UserDetailsService に差し替えること。
-	 *
-	 * admin / admin123 → ROLE_ADMIN（管理者）
-	 * user  / user123  → ROLE_USER（一般ユーザー）
-	 */
-
-	public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-		var admin = User.builder()
-				.username("admin")
-				.password(encoder.encode("admin123"))
-				.roles("ADMIN")
-				.build();
-
-		var user = User.builder()
-				.username("user")
-				.password(encoder.encode("user123"))
-				.roles("USER")
-				.build();
-
-		return new InMemoryUserDetailsManager(admin, user);
+						.permitAll())
+				// 初期パスワードのままのユーザーを初回パスワード設定画面へ強制誘導
+	            .addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class);
+	    return http.build();
 	}
 
 	@Bean
