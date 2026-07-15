@@ -27,7 +27,7 @@ public class InitialPasswordController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JichitaiContext jichitaiContext; // ★変更: @Value フィールドを削除し、これを追加
+    private final JichitaiContext jichitaiContext; 
 
     private static final String FORM_VIEW = "auth/initialPassword";
 

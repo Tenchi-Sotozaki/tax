@@ -1,6 +1,4 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.FukaConstants;
 import jp.lg.asp.accommodation.constant.ZeiritsuConstants;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
@@ -30,7 +29,6 @@ import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
-import jp.lg.asp.accommodation.entity.NozeiShuki;
 import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -174,6 +172,7 @@ public class FukaServiceImpl implements FukaService {
 			item.setShinkokuZumi(true);
 			// 納入状況判定
 			long totalZeigaku = dbData.getTotalZeigaku() != null ? dbData.getTotalZeigaku() : 0L;
+			String jichitaiCd = jichitaiContext.getJichitaiCd();
 			long totalNonyu = shunoRirekiRepository.sumNonyugaku(jichitaiCd, shiteiNo, nendo, kibetsu);
 			long remaining = totalZeigaku - totalNonyu;
 			if (remaining <= 0) {
