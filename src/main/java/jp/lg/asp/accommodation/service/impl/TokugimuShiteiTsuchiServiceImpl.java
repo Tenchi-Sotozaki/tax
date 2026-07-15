@@ -37,6 +37,7 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 	private String city;
 	private String jichitaiName;
 	private String jorei;
+	private byte[] koin;
 
 	@PostConstruct
 	public void init() {
@@ -46,6 +47,7 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 			city = jichitaiInfo.getKbnName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_SHITEI_JOREI);
+		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
 	}
 
 	@Override
@@ -105,7 +107,8 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 		dto.setCityName(jichitaiName);
 		dto.setCity(city);
 		dto.setJorei(jorei);
-
+		dto.setKoin(koin);
+		
 		return dto;
 	}
 }

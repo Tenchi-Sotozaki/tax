@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiDto;
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiReportsDto;
-import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.service.TokugimuShiteiTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +32,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsuchiReportsService {
 
 	private static final String JRXML_PATH = "reports/tokugimuShiteiTsuchi.jrxml";
-	private final ReportsDefRepository reportsDefRepository;
 
 	@Override
 	public byte[] generateTsuchiPdf(TokugimuShiteiTsuchiDto dto) {
@@ -41,10 +39,6 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
 		
-			// 公印の画像ファイルを取得
-            byte[] koin = reportsDefRepository.findDefDataByJichitaiCd(dto.getJichitaiCd());
-            dto.setKoin(koin);
-			
 			Map<String, Object> parameters = new HashMap<>();
 			
 			JRDataSource dataSource = buildParams(dto);
