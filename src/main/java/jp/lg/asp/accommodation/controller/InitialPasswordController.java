@@ -34,7 +34,7 @@ public class InitialPasswordController {
     private static final String FORM_VIEW = "auth/initialPassword";
 
     /** デフォルトユーザーのID（AdminUserControllerの権限変更不可判定でも使用） */
-    public static final String ADMIN_ID = "admin";
+    public static final String ADMIN_ID = "admin_user";
 
     @GetMapping
     public String showForm(Authentication authentication, Model model) {
