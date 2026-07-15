@@ -7,41 +7,41 @@ CREATE TABLE IF NOT EXISTS t_tokugimu (
   shinkoku_ymd date NOT NULL,
   henko_ymd date NOT NULL,
   atena_no numeric(15) NOT NULL,
-  shisetsu_name varchar(200) NOT NULL,
-  shisetsu_name_kana varchar(200) NOT NULL,
-  shisetsu_yubin_no varchar(10),
-  shisetsu_jusho varchar(200),
-  shisetsu_tel varchar(20),
+  shisetsu_name text NOT NULL,
+  shisetsu_name_kana text NOT NULL,
+  shisetsu_yubin_no text,
+  shisetsu_jusho text,
+  shisetsu_tel text,
   yuka_menseki numeric(9, 2),
   chijo_kai numeric(3),
   chika_kai numeric(2),
   kyakushitsu_su numeric(5),
   shuyo_su numeric(7),
-  kyoka_name varchar(200) NOT NULL,
-  kyoka_name_kana varchar(200) NOT NULL,
-  kyoka_yubin_no varchar(10),
-  kyoka_jusho varchar(200),
-  kyoka_tel varchar(20),
+  kyoka_name text NOT NULL,
+  kyoka_name_kana text NOT NULL,
+  kyoka_yubin_no text,
+  kyoka_jusho text,
+  kyoka_tel text,
   kyoka_shu char(1),
-  kyoka_no varchar(200),
-  soufusaki_name varchar(200) NOT NULL,
-  soufusaki_name_kana varchar(200) NOT NULL,
-  soufusaki_yubin_no varchar(10),
-  soufusaki_jusho varchar(200),
-  soufusaki_tel varchar(20),
-  biko varchar(400),
+  kyoka_no text,
+  soufusaki_name text NOT NULL,
+  soufusaki_name_kana text NOT NULL,
+  soufusaki_yubin_no text,
+  soufusaki_jusho text,
+  soufusaki_tel text,
+  biko text,
   eigyo_st_ymd date NOT NULL,
   eigyo_ed_ymd date,
   kyushi_st_ymd date,
   kyushi_ed_ymd date,
-  kyuhaishi_riyu varchar(400),
+  kyuhaishi_riyu text,
   eltax_umu char(1),
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_tokugimu_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno)
 );
@@ -96,15 +96,15 @@ CREATE TABLE IF NOT EXISTS t_shoyusha (
   shitei_no char(8) NOT NULL,
   rno numeric(3) NOT NULL,
   idx numeric(3) NOT NULL,
-  shoyusha_name varchar(200) NOT NULL,
-  shoyusha_name_kana varchar(200) NOT NULL,
-  shoyusha_yubin_no varchar(10),
-  shoyusha_jusho varchar(200),
-  shoyusha_tel varchar(20),
+  shoyusha_name text NOT NULL,
+  shoyusha_name_kana text NOT NULL,
+  shoyusha_yubin_no text,
+  shoyusha_jusho text,
+  shoyusha_tel text,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_shoyusha_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, idx)
 );
@@ -130,15 +130,15 @@ CREATE TABLE IF NOT EXISTS t_kyodo_jigyosha (
   shitei_no char(8) NOT NULL,
   rno numeric(3) NOT NULL,
   idx numeric(3) NOT NULL,
-  kyodo_jigyosha_name varchar(200) NOT NULL,
-  kyodo_jigyosha_name_kana varchar(200) NOT NULL,
-  kyodo_jigyosha_yubin_no varchar(10),
-  kyodo_jigyosha_jusho varchar(200),
-  kyodo_jigyosha_tel varchar(20),
+  kyodo_jigyosha_name text NOT NULL,
+  kyodo_jigyosha_name_kana text NOT NULL,
+  kyodo_jigyosha_yubin_no text,
+  kyodo_jigyosha_jusho text,
+  kyodo_jigyosha_tel text,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_kyodo_jigyosha_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, idx)
 );
@@ -162,29 +162,25 @@ COMMENT ON COLUMN t_kyodo_jigyosha.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS t_nozei_shuki (
   jichitai_cd char(5) NOT NULL,
   shitei_no char(8) NOT NULL,
-  rno numeric(3) NOT NULL,
-  idx_rno numeric(3),
+  idx numeric(3),
   seq numeric(3) NOT NULL,
   tekiyo_st_ymd date,
   tekiyo_ed_ymd date,
-  new_flg char(1),
   del_flg char(1),
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT t_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno)
+  CONSTRAINT t_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, shitei_no)
 );
 COMMENT ON TABLE t_nozei_shuki IS '納税周期情報';
 COMMENT ON COLUMN t_nozei_shuki.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN t_nozei_shuki.shitei_no IS '指定番号';
-COMMENT ON COLUMN t_nozei_shuki.rno IS '特別徴収義務者履歴番号';
-COMMENT ON COLUMN t_nozei_shuki.idx_rno IS '履歴番号';
+COMMENT ON COLUMN t_nozei_shuki.idx IS '適用周期連番';
 COMMENT ON COLUMN t_nozei_shuki.seq IS '管理番号';
 COMMENT ON COLUMN t_nozei_shuki.tekiyo_st_ymd IS '適用開始年月日';
 COMMENT ON COLUMN t_nozei_shuki.tekiyo_ed_ymd IS '適用終了年月日';
-COMMENT ON COLUMN t_nozei_shuki.new_flg IS '最新フラグ';
 COMMENT ON COLUMN t_nozei_shuki.del_flg IS '削除フラグ';
 COMMENT ON COLUMN t_nozei_shuki.add_dt IS '作成日時';
 COMMENT ON COLUMN t_nozei_shuki.add_user IS '作成者';
@@ -201,18 +197,18 @@ CREATE TABLE IF NOT EXISTS t_nokan (
   toroku_ymd date NOT NULL,
   shinkoku_ymd date NOT NULL,
   atena_no char(15),
-  name varchar(200),
-  name_kana varchar(200),
-  yubin_no varchar(10),
-  jusho varchar(200),
-  tel varchar(20),
-  menjo_riyu varchar(400),
+  name text,
+  name_kana text,
+  yubin_no text,
+  jusho text,
+  tel text,
+  menjo_riyu text,
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_nokan_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno)
 );
@@ -252,9 +248,9 @@ CREATE TABLE IF NOT EXISTS t_gassan (
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_gassan_pkey PRIMARY KEY (jichitai_cd, gassan_shitei_no, rno)
 );
@@ -283,9 +279,9 @@ CREATE TABLE IF NOT EXISTS t_gassan_uchi (
   rno numeric(3) NOT NULL,
   shitei_no char(8) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_gassan_uchi_pkey PRIMARY KEY (jichitai_cd, gassan_shitei_no, rno, shitei_no)
 );
@@ -312,7 +308,7 @@ CREATE TABLE IF NOT EXISTS t_fuka (
   taisho_ym char(6) NOT NULL,
   fuka_kbn char(1) NOT NULL,
   henko_kbn char(1) NOT NULL,
-  henko_riyu varchar(400),
+  henko_riyu text,
   sogaku numeric(14),
   kazei_hakusu numeric(9),
   kazei_ryokin numeric(14),
@@ -338,9 +334,9 @@ CREATE TABLE IF NOT EXISTS t_fuka (
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_fuka_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, nendo, kibetsu)
 );
@@ -404,9 +400,9 @@ CREATE TABLE IF NOT EXISTS t_fuka_uchi (
   city_zeigaku numeric(13),
   ken_zeigaku numeric(13),
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_fuka_uchi_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, nendo, kibetsu, kazei_kbn)
 );
@@ -431,6 +427,36 @@ COMMENT ON COLUMN t_fuka_uchi.add_user IS '作成者';
 COMMENT ON COLUMN t_fuka_uchi.upd_dt IS '更新日時';
 COMMENT ON COLUMN t_fuka_uchi.upd_user IS '更新者';
 COMMENT ON COLUMN t_fuka_uchi.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_shuno_rireki (
+  jichitai_cd char(5) NOT NULL,
+  shitei_no char(8),
+  nendo char(4) NOT NULL,
+  kibetsu numeric(2) NOT NULL,
+  rno numeric(3) NOT NULL,
+  nonyugaku numeric(14) NOT NULL,
+  nonyu_ymd date NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user text NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user text NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_shuno_rireki_pkey PRIMARY KEY (jichitai_cd, nendo, kibetsu, rno)
+);
+COMMENT ON TABLE t_shuno_rireki IS '収納履歴情報';
+COMMENT ON COLUMN t_shuno_rireki.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_shuno_rireki.shitei_no IS '指定番号';
+COMMENT ON COLUMN t_shuno_rireki.nendo IS '賦課年度';
+COMMENT ON COLUMN t_shuno_rireki.kibetsu IS '期別';
+COMMENT ON COLUMN t_shuno_rireki.rno IS '履歴番号';
+COMMENT ON COLUMN t_shuno_rireki.nonyugaku IS '納入金額';
+COMMENT ON COLUMN t_shuno_rireki.nonyu_ymd IS '納入年月日';
+COMMENT ON COLUMN t_shuno_rireki.add_dt IS '作成日時';
+COMMENT ON COLUMN t_shuno_rireki.add_user IS '作成者';
+COMMENT ON COLUMN t_shuno_rireki.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_shuno_rireki.upd_user IS '更新者';
+COMMENT ON COLUMN t_shuno_rireki.version IS 'バージョン';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_choshu_genbo (
@@ -471,9 +497,9 @@ CREATE TABLE IF NOT EXISTS t_choshu_genbo (
   uchi_idx_30 numeric(8),
   uchi_idx_31 numeric(8),
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_choshu_genbo_pkey PRIMARY KEY (jichitai_cd, shitei_no, rno, nendo, kibetsu)
 );
@@ -558,9 +584,9 @@ CREATE TABLE IF NOT EXISTS t_choshu_genbo_uchi (
   menjo_ryokin numeric(13),
   zeigaku numeric(13),
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_choshu_genbo_uchi_pkey PRIMARY KEY (jichitai_cd, uchi_idx)
 );
@@ -616,9 +642,9 @@ CREATE TABLE IF NOT EXISTS t_shoreikin (
   kofu_gaku numeric(13) NOT NULL,
   kofu_ymd date,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_shoreikin_pkey PRIMARY KEY (jichitai_cd, shitei_no, nendo)
 );
@@ -641,16 +667,16 @@ CREATE TABLE IF NOT EXISTS t_furikomi_koza (
   jichitai_cd char(5) NOT NULL,
   shitei_no char(8) NOT NULL,
   bank_cd char(4) NOT NULL,
-  bank_name varchar(30) NOT NULL,
+  bank_name text NOT NULL,
   branch_cd char(3) NOT NULL,
-  branch_name varchar(30) NOT NULL,
+  branch_name text NOT NULL,
   shumoku char(1) NOT NULL,
   koza_no char(7) NOT NULL,
-  meigi varchar(30) NOT NULL,
+  meigi text NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_furikomi_koza_pkey PRIMARY KEY (jichitai_cd, shitei_no)
 );
@@ -674,15 +700,15 @@ COMMENT ON COLUMN t_furikomi_koza.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS t_eltax_renkei (
   jichitai_cd char(5) NOT NULL,
   seq numeric(8) NOT NULL,
-  file_name varchar(256) NOT NULL,
+  file_name text NOT NULL,
   shubetsu char(2),
   shori_dt timestamp,
   shori_kekka char(1),
   log bytea,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_eltax_renkei_pkey PRIMARY KEY (jichitai_cd, seq)
 );
@@ -707,9 +733,9 @@ CREATE TABLE IF NOT EXISTS m_nozei_shuki (
   shuki numeric(2) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, seq)
 );
@@ -734,9 +760,9 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu (
   fuka_kbn char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_zeiritsu_pkey PRIMARY KEY (jichitai_cd, seq)
 );
@@ -764,9 +790,9 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu_teigaku (
   zeigaku numeric(13) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_zeiritsu_teigaku_pkey PRIMARY KEY (jichitai_cd, seq, teigaku_seq)
 );
@@ -793,9 +819,9 @@ CREATE TABLE IF NOT EXISTS m_zeiritsu_teiritsu (
   zei_ritsu numeric(5, 2) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_zeiritsu_teiritsu_pkey PRIMARY KEY (jichitai_cd, seq, teiritsu_seq)
 );
@@ -815,16 +841,17 @@ COMMENT ON COLUMN m_zeiritsu_teiritsu.version IS 'バージョン';
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_user (
   jichitai_cd char(5) NOT NULL,
-  id varchar(100) NOT NULL,
+  id text NOT NULL,
   password char(64) NOT NULL,
-  name varchar(200) NOT NULL,
-  name_kana varchar(200) NOT NULL,
-  busho varchar(200) NOT NULL,
+  name text NOT NULL,
+  name_kana text NOT NULL,
+  busho text NOT NULL,
   role_id numeric(5) NOT NULL,
+  del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_user_pkey PRIMARY KEY (jichitai_cd, id)
 );
@@ -836,6 +863,7 @@ COMMENT ON COLUMN m_user.name IS '氏名';
 COMMENT ON COLUMN m_user.name_kana IS '氏名かな';
 COMMENT ON COLUMN m_user.busho IS '部署';
 COMMENT ON COLUMN m_user.role_id IS '権限ロールＩＤ';
+COMMENT ON COLUMN m_user.del_flg IS '削除フラグ';
 COMMENT ON COLUMN m_user.add_dt IS '作成日時';
 COMMENT ON COLUMN m_user.add_user IS '作成者';
 COMMENT ON COLUMN m_user.upd_dt IS '更新日時';
@@ -846,11 +874,11 @@ COMMENT ON COLUMN m_user.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS m_role (
   jichitai_cd char(5) NOT NULL,
   role_id numeric(5) NOT NULL,
-  name varchar(200) NOT NULL,
+  name text NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_role_pkey PRIMARY KEY (jichitai_cd, role_id)
 );
@@ -871,9 +899,9 @@ CREATE TABLE IF NOT EXISTS m_role_dtl (
   screen_id char(10) NOT NULL,
   permission char(1) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_role_dtl_pkey PRIMARY KEY (jichitai_cd, role_id, screen_id)
 );
@@ -892,11 +920,11 @@ COMMENT ON COLUMN m_role_dtl.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS m_screen (
   jichitai_cd char(5) NOT NULL,
   screen_id char(10) NOT NULL,
-  screen_name varchar(100) NOT NULL,
+  screen_name text NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_screen_pkey PRIMARY KEY (jichitai_cd, screen_id)
 );
@@ -917,16 +945,16 @@ CREATE TABLE IF NOT EXISTS m_atena (
   kbn char(1) NOT NULL,
   kojin_no char(64),
   hojin_no char(13),
-  name varchar(200) NOT NULL,
-  name_kana varchar(200),
-  yubin_no varchar(10),
-  jusho varchar(200),
-  tel1 varchar(20),
-  tel2 varchar(20),
+  name text NOT NULL,
+  name_kana text,
+  yubin_no text,
+  jusho text,
+  tel1 text,
+  tel2 text,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_atena_pkey PRIMARY KEY (jichitai_cd, atena_no)
 );
@@ -952,16 +980,15 @@ COMMENT ON COLUMN m_atena.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS t_atena_renkei (
   jichitai_cd char(5) NOT NULL,
   seq numeric(8) NOT NULL,
-  file_name varchar(256) NOT NULL,
-  shubetsu char(2),
+  file_name text NOT NULL,
   shori_dt timestamp NOT NULL,
   shori_kensu numeric(10),
   shinki_kensu numeric(10),
   koshin_kensu numeric(10),
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_atena_renkei_pkey PRIMARY KEY (jichitai_cd, seq)
 );
@@ -969,7 +996,6 @@ COMMENT ON TABLE t_atena_renkei IS '宛名連携管理';
 COMMENT ON COLUMN t_atena_renkei.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN t_atena_renkei.seq IS '管理番号';
 COMMENT ON COLUMN t_atena_renkei.file_name IS 'ファイル名';
-COMMENT ON COLUMN t_atena_renkei.shubetsu IS 'ファイル種別';
 COMMENT ON COLUMN t_atena_renkei.shori_dt IS '処理日時';
 COMMENT ON COLUMN t_atena_renkei.shori_kensu IS '処理件数';
 COMMENT ON COLUMN t_atena_renkei.shinki_kensu IS '新規件数';
@@ -983,15 +1009,16 @@ COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_jichitai (
   jichitai_cd char(5) NOT NULL,
-  name varchar(20) NOT NULL,
-  kbn_name varchar(10) NOT NULL,
+  name text NOT NULL,
+  kbn_name text NOT NULL,
   nendo_st_month char(2),
   shitei_st_char char(3),
   gassan_st_char char(3),
+  atena_st_no numeric(15),
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_jichitai_pkey PRIMARY KEY (jichitai_cd)
 );
@@ -1002,6 +1029,7 @@ COMMENT ON COLUMN m_jichitai.kbn_name IS '自治体種別名';
 COMMENT ON COLUMN m_jichitai.nendo_st_month IS '年度開始月';
 COMMENT ON COLUMN m_jichitai.shitei_st_char IS '指定番号';
 COMMENT ON COLUMN m_jichitai.gassan_st_char IS '合算指定番号';
+COMMENT ON COLUMN m_jichitai.atena_st_no IS '宛名採番番号';
 COMMENT ON COLUMN m_jichitai.add_dt IS '作成日時';
 COMMENT ON COLUMN m_jichitai.add_user IS '作成者';
 COMMENT ON COLUMN m_jichitai.upd_dt IS '更新日時';
@@ -1025,11 +1053,11 @@ CREATE TABLE IF NOT EXISTS m_nokigen (
   nokigen_11th char(8) NOT NULL,
   nokigen_12th char(8) NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT m_nokigen_pkey PRIMARY KEY (jichitai_cd,nendo)
+  CONSTRAINT m_nokigen_pkey PRIMARY KEY (jichitai_cd)
 );
 COMMENT ON TABLE m_nokigen IS '納入期限マスタ';
 COMMENT ON COLUMN m_nokigen.jichitai_cd IS '自治体コード';
@@ -1057,15 +1085,15 @@ CREATE TABLE IF NOT EXISTS m_kofu_ritsu (
   jichitai_cd char(5) NOT NULL,
   rno numeric(3) NOT NULL,
   kofu_ritsu numeric(5, 2) NOT NULL,
-  tekiyo_st_ymd date NOT NULL,
+  tekiyo_st_ymd date,
   tekiyo_ed_ymd date,
   new_flg numeric(1),
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT m_kofu_ritsu_pkey PRIMARY KEY (jichitai_cd,rno)
+  CONSTRAINT m_kofu_ritsu_pkey PRIMARY KEY (jichitai_cd)
 );
 COMMENT ON TABLE m_kofu_ritsu IS '交付率情報マスタ';
 COMMENT ON COLUMN m_kofu_ritsu.jichitai_cd IS '自治体コード';
@@ -1085,12 +1113,12 @@ CREATE TABLE IF NOT EXISTS m_reports_def (
   jichitai_cd char(5) NOT NULL,
   id char(10) NOT NULL,
   kbn char(1) NOT NULL,
-  def_text varchar(1000),
+  def_text text,
   def_data bytea,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_reports_def_pkey PRIMARY KEY (jichitai_cd, id)
 );
@@ -1110,11 +1138,11 @@ COMMENT ON COLUMN m_reports_def.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS m_reports (
   jichitai_cd char(5) NOT NULL,
   rpt_id char(10) NOT NULL,
-  rpt_name varchar(100) NOT NULL,
+  rpt_name text NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT m_reports_pkey PRIMARY KEY (jichitai_cd, rpt_id)
 );
@@ -1133,14 +1161,14 @@ CREATE TABLE IF NOT EXISTS t_operation_log (
   jichitai_cd char(5) NOT NULL,
   seq numeric(8) NOT NULL,
   screen_id char(10) NOT NULL,
-  sousa varchar(100) NOT NULL,
-  param varchar(2000),
-  ope_user varchar(20) NOT NULL,
+  sousa text NOT NULL,
+  param text,
+  ope_user text NOT NULL,
   ope_dt timestamp NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_operation_log_pkey PRIMARY KEY (jichitai_cd, seq)
 );
