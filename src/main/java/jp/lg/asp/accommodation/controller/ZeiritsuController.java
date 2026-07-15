@@ -77,7 +77,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会")
 	public String view(@PathVariable("seq") Long seq,
 			Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		Zeiritsu z = findOrThrow(jichitaiCd, BigDecimal.valueOf(seq));
 		model.addAttribute("zeiritsuForm", toForm(z, jichitaiCd));
 		model.addAttribute("isView", true);
@@ -93,7 +93,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String edit(@PathVariable("seq") Long seq,
 			Model model) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Zeiritsu z = findOrThrow(jichitaiCd, BigDecimal.valueOf(seq));
 		model.addAttribute("zeiritsuForm", toForm(z, jichitaiCd));
 		model.addAttribute("isView", false);
@@ -112,7 +112,7 @@ public class ZeiritsuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		validateDetails(form, bindingResult);
 
@@ -205,7 +205,7 @@ public class ZeiritsuController {
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "削除")
 	public String delete(@PathVariable("seq") Long seq,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		BigDecimal seqDec = BigDecimal.valueOf(seq);
 
@@ -240,7 +240,7 @@ public class ZeiritsuController {
 	@GetMapping("/register")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録画面表示")
 	public String showForm(Model model) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("zeiritsuForm", new ZeiritsuForm());
 		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", false);
@@ -256,7 +256,7 @@ public class ZeiritsuController {
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		validateDetails(form, bindingResult);
 

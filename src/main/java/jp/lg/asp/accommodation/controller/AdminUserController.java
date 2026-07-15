@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-@Slf4j 
+@Slf4j
 public class AdminUserController {
 
 	private final UserRepository userRepository;
@@ -43,6 +44,7 @@ public class AdminUserController {
 	private String jichitaiCd;
 
 	private static final String SCREEN_ID = ScreenManagement.USER_MANAGEMENT;
+	private static final String SCREEN_ID_CONFIG = ScreenManagement.USER_CONFIG;
 	private static final String LIST_VIEW = "admin/userDaicho";
 	private static final String FORM_VIEW = "admin/userConfig";
 
@@ -63,53 +65,61 @@ public class AdminUserController {
 	}
 
 	@GetMapping("/user-registration")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録画面表示")
 	public String showRegistrationForm(Model model) {
-	    accessChecker.checkWriteAccess(SCREEN_ID);
-	    model.addAttribute("userForm", new UserForm());
-	    model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
-	    model.addAttribute("isEdit", false);
-	    return FORM_VIEW;
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+		model.addAttribute("userForm", new UserForm());
+		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+		model.addAttribute("isEdit", false);
+		return FORM_VIEW;
 	}
 
 	@PostMapping("/user-registration")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String register(
-	        @Validated(UserForm.OnCreate.class) @ModelAttribute("userForm") UserForm form,
-	        BindingResult bindingResult,
-	        Model model,
-	        RedirectAttributes redirectAttributes) {
-	    accessChecker.checkWriteAccess(SCREEN_ID);
-	    if (!form.getPassword().equals(form.getPasswordConfirm())) {
-	        bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
-	    }
-	    if (bindingResult.hasErrors()) {
-	        model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
-	        model.addAttribute("isEdit", false);
-	        model.addAttribute("validationErrors", UserForm.validate(form, true).values());
-	        return FORM_VIEW;
-	    }
-	    User user = userRepository.findById(buildUserId(form.getId()))
-	            .orElse(new User());
-	    boolean isNew = user.getId() == null;
-	    if (isNew) {
-	        user.setJichitaiCd(jichitaiCd);
-	        user.setId(form.getId());
-	    }
-	    user.setPassword(passwordEncoder.encode(form.getPassword()));
-	    user.setName(form.getName());
-	    user.setNameKana(form.getNameKana());
-	    user.setBusho(form.getBusho());
-	    user.setRoleId(form.getRoleId());
-	    userRepository.save(user);
-	    redirectAttributes.addFlashAttribute("successMessage", isNew ? "ユーザーを登録しました。" : "ユーザー情報を更新しました。");
-	    return "redirect:/admin/user-search";
+			@Validated(UserForm.OnCreate.class) @ModelAttribute("userForm") UserForm form,
+			BindingResult bindingResult,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+		if (!form.getPassword().equals(form.getPasswordConfirm())) {
+			bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
+		}
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+			model.addAttribute("isEdit", false);
+			model.addAttribute("validationErrors", UserForm.validate(form, true).values());
+			return FORM_VIEW;
+		}
+		User user = userRepository.findById(buildUserId(form.getId()))
+				.orElse(null);
+		if (user != null && "0".equals(user.getDelFlg())) {
+			bindingResult.rejectValue("id", "error.id", "このIDは既に登録済みです");
+			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+			model.addAttribute("isEdit", false);
+			return FORM_VIEW;
+		}
+		if (user == null) {
+			user = new User();
+			user.setJichitaiCd(jichitaiCd);
+			user.setId(form.getId());
+		} else {
+			user.setDelFlg("0");
+		}
+		user.setPassword(passwordEncoder.encode(form.getPassword()));
+		user.setName(form.getName());
+		user.setNameKana(form.getNameKana());
+		user.setBusho(form.getBusho());
+		user.setRoleId(form.getRoleId());
+		userRepository.save(user);
+		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを登録しました。");
+		return "redirect:/admin/user-search";
 	}
 
 	@GetMapping("/user-edit/{id}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String showEditForm(@PathVariable String id, Model model) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
 
@@ -129,14 +139,14 @@ public class AdminUserController {
 	}
 
 	@PostMapping("/user-edit/{id}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String update(
 			@PathVariable String id,
 			@Validated(UserForm.OnUpdate.class) @ModelAttribute("userForm") UserForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		User user = userRepository.findById(buildUserId(id))
 				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
@@ -174,18 +184,26 @@ public class AdminUserController {
 	}
 
 	@PostMapping("/user-delete/{id}")
-	@OpeLog(screenId = SCREEN_ID, operation = "削除")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "削除")
 	public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+		if (isLoginUser(id)) {
+			redirectAttributes.addFlashAttribute("errorMessage", "ログイン中のユーザーは削除できません。");
+			return "redirect:/admin/user-search";
+		}
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
 		return "redirect:/admin/user-search";
 	}
 
 	@PostMapping("/user-delete-batch")
-	@OpeLog(screenId = SCREEN_ID, operation = "一括削除")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "一括削除")
 	public String deleteBatch(@RequestParam List<String> ids, RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+		if (ids.contains(getLoginUserId())) {
+			redirectAttributes.addFlashAttribute("errorMessage", "ログイン中のユーザーは削除できません。");
+			return "redirect:/admin/user-search";
+		}
 		for (String id : ids) {
 			User user = userRepository.findById(buildUserId(id)).orElse(null);
 			if (user != null) {
@@ -195,6 +213,14 @@ public class AdminUserController {
 		}
 		redirectAttributes.addFlashAttribute("successMessage", ids.size() + "件のユーザーを削除しました。");
 		return "redirect:/admin/user-search";
+	}
+
+	private boolean isLoginUser(String id) {
+		return getLoginUserId().equals(id);
+	}
+
+	private String getLoginUserId() {
+		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 
 	private UserId buildUserId(String id) {
@@ -209,11 +235,12 @@ public class AdminUserController {
 	}
 
 	private String toLikePattern(String value, String matchType) {
-		if (value == null || value.isBlank()) return null;
+		if (value == null || value.isBlank())
+			return null;
 		return switch (matchType) {
-			case "prefix" -> value + "%";
-			case "exact"  -> value;
-			default       -> "%" + value + "%"; // partial
+		case "prefix" -> value + "%";
+		case "exact" -> value;
+		default -> "%" + value + "%"; // partial
 		};
 	}
 }
