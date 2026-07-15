@@ -124,8 +124,16 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 		TypedQuery<Tokugimu> q = em.createQuery(cq);
 		List<Tokugimu> tokugimuList = q.getResultList();
 
+		// 同一指定番号の重複を排除（rno違いで複数件取得されるため）
 		// 賦課情報がある場合のみ表示
 		return tokugimuList.stream()
+				.filter(new java.util.function.Predicate<Tokugimu>() {
+					private final java.util.Set<String> seen = new java.util.HashSet<>();
+					@Override
+					public boolean test(Tokugimu t) {
+						return seen.add(t.getShiteiNo());
+					}
+				})
 				.map(tokugimu -> {
 					List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd,
 							tokugimu.getShiteiNo());
