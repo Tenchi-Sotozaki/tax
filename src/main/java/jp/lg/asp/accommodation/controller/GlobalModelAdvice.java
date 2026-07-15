@@ -33,6 +33,19 @@ public class GlobalModelAdvice {
     @Value("${app.jichitai.code}")
     private String jichitaiCd;
 
+    @ModelAttribute("loginUserName")
+    public String loginUserName() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return "";
+        }
+        UserId pk = new UserId();
+        pk.setJichitaiCd(jichitaiCd);
+        pk.setId(auth.getName());
+        User user = userRepository.findById(pk).orElse(null);
+        return user != null ? user.getName() : auth.getName();
+    }
+
     @ModelAttribute("currentUri")
     public String currentUri(HttpServletRequest request) {
         return request.getRequestURI();
