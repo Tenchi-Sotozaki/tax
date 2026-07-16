@@ -12,7 +12,7 @@
 	<field name="tokuJusho" class="java.lang.String"/>
 	<field name="riyu" class="java.lang.String"/>
 	<field name="city" class="java.lang.String"/>
-	<field name="koin" class="java.io.InputStream"/>
+	<field name="koin" class="java.lang.Object"/>
 	<background splitType="Stretch"/>
 	<title height="79" splitType="Stretch">
 		<element kind="staticText" uuid="40292224-3b8e-46bb-b3dd-8dca7dd795df" x="20" y="9" width="500" height="60" fontName="IPAex明朝" fontSize="16.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
