@@ -12,6 +12,7 @@
 	<field name="kofugaku" class="java.lang.String"/>
 	<field name="kofuJoken" class="java.lang.String"/>
 	<field name="tokuName" class="java.lang.String"/>
+	<field name="koin" class="java.lang.Object"/>
 	<background splitType="Stretch"/>
 	<detail>
 		<band height="777" splitType="Stretch">
@@ -54,7 +55,7 @@
 				<paragraph leftIndent="5"/>
 				<text><![CDATA[申請者の氏名(法人にあっては、名称及び代表者名)
 
-　　　　　　　　　　　　　　　　　　　　　　　　　㊞
+　　　　　　　　　　　　　　　　　　　　　　　　　
 ]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -475,6 +476,11 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
+			</element>
+			<element kind="image" uuid="2769c6f8-6a9b-4461-98a7-16d8a1067bc8" x="467" y="96" width="40" height="40" onErrorType="Blank">
+				<expression><![CDATA[$F{koin}]]></expression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
 		</band>
 	</detail>

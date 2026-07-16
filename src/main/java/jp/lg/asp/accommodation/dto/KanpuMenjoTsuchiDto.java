@@ -22,4 +22,5 @@ public class KanpuMenjoTsuchiDto {
     private String kanpuMenjoGaku;
     private String riyu;
     private String biko;
+    private byte[] koin;
 }

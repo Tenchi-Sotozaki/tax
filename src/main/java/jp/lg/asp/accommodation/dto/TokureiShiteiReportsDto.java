@@ -25,4 +25,7 @@ public class TokureiShiteiReportsDto {
 
 	/** 申請備考 */
 	private String biko;
+	
+	/** 公印 */
+	private byte[] koin;
 }

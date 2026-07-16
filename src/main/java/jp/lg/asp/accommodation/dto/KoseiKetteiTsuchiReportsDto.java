@@ -208,4 +208,6 @@ public class KoseiKetteiTsuchiReportsDto {
     private String kbn_name4;
     private String kbn_name5;
     
+    // ── 帳票フィールド ────────────────
+    private byte[] koin;
 }

@@ -62,6 +62,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     private String todoufuken;
     private String horeiInyou1;
     private String horeiInyou2;
+    private byte[] koin;
 
     /** 課税区分最大数 */
     private static final int MAX_KBN = 5;
@@ -83,6 +84,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         todoufuken   = jichitai.getKbnName();
         horeiInyou1  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
         horeiInyou2  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
+        koin         = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
     }
 
     /**
@@ -143,7 +145,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     public KoseiKetteiTsuchiReportsDto buildDtoForDisplay(String shiteiNo) {
         KoseiKetteiTsuchiReportsDto dto = new KoseiKetteiTsuchiReportsDto();
         dto.setShitei_no(shiteiNo);
-
+        
         tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
                 jichitaiCd, shiteiNo, "1", "0")
                 .ifPresent(toku -> {
@@ -221,6 +223,9 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 
         // 都道府県名（m_jichitai.kbn_name）
         dto.setTodoufuken(todoufuken);
+        
+        // 公印
+        dto.setKoin(koin != null && koin.length > 0 ? koin : null);
 
         return dto;
     }

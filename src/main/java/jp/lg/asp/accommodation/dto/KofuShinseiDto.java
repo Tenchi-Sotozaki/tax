@@ -40,4 +40,7 @@ public class KofuShinseiDto {
 
 	/** 特別徴収義務者名 */
 	private String tokuName;
+	
+	/** 公印 */
+	private byte[] koin;
 }

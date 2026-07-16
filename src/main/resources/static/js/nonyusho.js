@@ -151,7 +151,7 @@ async function generatePdf() {
 /**
  * プレビュー表示処理
  */
-async function previewReport() {
+async function preview() {
     console.log('プレビュー開始');
     
     if (!validateForm()) {

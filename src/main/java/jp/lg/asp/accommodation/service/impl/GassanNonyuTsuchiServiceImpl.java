@@ -97,6 +97,7 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 
 		dto.setCity(cityName);
 		dto.setJorei(jorei);
+		dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));;
 
 		return dto;
 	}

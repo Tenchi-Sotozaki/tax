@@ -12,6 +12,7 @@
 	<field name="shiteiNo" class="java.lang.String"/>
 	<field name="kofugaku" class="java.lang.String"/>
 	<field name="kofuYmd" class="java.lang.String"/>
+	<field name="koin" class="java.lang.Object"/>
 	<background splitType="Stretch"/>
 	<detail>
 		<band height="616" splitType="Stretch">
@@ -141,6 +142,9 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
+			</element>
+			<element kind="image" uuid="5e2acd50-774f-490c-9120-a25d7c9b2efd" x="490" y="90" width="50" height="50" onErrorType="Blank">
+				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>
 	</detail>

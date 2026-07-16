@@ -72,6 +72,7 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setNozeiKanriJusho(dto.getNozeiKanriJusho() != null ? dto.getNozeiKanriJusho() : "");
 		reportsDto.setNozeiKanriName(dto.getNozeiKanriName() != null ? dto.getNozeiKanriName() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
+		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
 		// 発行日
 		if (dto.getHakkoYmd() != null) {

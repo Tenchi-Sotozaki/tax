@@ -43,6 +43,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 
 	private String jichitaiName;
 	private String jorei;
+	private byte[] koin;
 
 	@PostConstruct
 	public void init() {
@@ -51,6 +52,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 			jichitaiName = jichitaiInfo.getName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.SHOREIKIN_KOFU_JOREI);
+		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
 	}
 
 	@Override
@@ -141,6 +143,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 			dto.setJorei(jorei);
 			dto.setHakkoYoshiki(hakkoYoshiki);
 			dto.setKofuJoken(kofuJoken);
+			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
 
 			log.info("交付申請書データ取得完了: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 			return dto;

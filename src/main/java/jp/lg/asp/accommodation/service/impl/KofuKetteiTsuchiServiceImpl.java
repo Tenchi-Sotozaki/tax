@@ -43,6 +43,7 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 
 	private String jichitaiName;
 	private String jorei;
+	private byte[] koin;
 
 	@PostConstruct
 	public void init() {
@@ -51,6 +52,7 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 			jichitaiName = jichitaiInfo.getName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.SHOREIKIN_KOFU_JOREI);
+		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
 	}
 
 	@Override
@@ -103,6 +105,7 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 			dto.setHakkoJorei(jorei);
 			dto.setShisetsuName(tokugimu.getShisetsuName());
 			dto.setShiteiNo(tokugimu.getShiteiNo());
+			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
 
 			// 施設住所を郵便番号と住所で連結
 			StringBuilder shisetsuJusho = new StringBuilder();

@@ -17,6 +17,7 @@
 	<field name="riyu" class="java.lang.String"/>
 	<field name="biko" class="java.lang.String"/>
 	<field name="jorei" class="java.lang.String"/>
+	<field name="koin" class="java.lang.Object"/>
 	<background splitType="Stretch"/>
 	<title height="79" splitType="Stretch">
 		<element kind="staticText" uuid="853c7af8-0f74-4836-8a3d-0f748437fb68" x="2" y="20" width="550" height="50" fontName="IPAex明朝" fontSize="16.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
@@ -50,6 +51,9 @@
 		</element>
 		<element kind="textField" uuid="c4482dab-d238-499b-8fa0-4f420f7eadfd" x="0" y="120" width="550" height="32" fontName="IPAex明朝" fontSize="12.0">
 			<expression><![CDATA["　申請のありました宿泊税額に相当する額の還付又は宿泊税額の納入義務の免除について決定したので、"+$F{cityName}+"宿泊税条例施行規則"+$F{jorei}+"の規程により通知します。"]]></expression>
+		</element>
+		<element kind="image" uuid="c80cdc36-efa4-4a39-b377-a6bc75f5cae0" x="506" y="64" width="50" height="50" onErrorType="Blank">
+			<expression><![CDATA[$F{koin}]]></expression>
 		</element>
 	</columnHeader>
 	<detail>

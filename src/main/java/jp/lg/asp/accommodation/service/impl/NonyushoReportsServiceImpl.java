@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -250,7 +249,6 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		reportsDto.setNonyuBasho(dto.getNonyuBasho() != null ? dto.getNonyuBasho() : "");
 		reportsDto.setShiteiKinyuName(dto.getShiteiKinyuName() != null ? dto.getShiteiKinyuName() : "");
 		reportsDto.setTorimatome(dto.getTorimatome() != null ? dto.getTorimatome() : "");
-		reportsDto.setJichitaiKoin(dto.getJichitaiKoin());
 
 		// 申告年月
 		if (dto.getShinkokuYmd() != null) {
