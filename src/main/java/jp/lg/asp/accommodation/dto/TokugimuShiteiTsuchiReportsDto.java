@@ -37,4 +37,7 @@ public class TokugimuShiteiTsuchiReportsDto {
 
 	/** 市区町村 */
 	private String city;
+	
+	/** 公印画像ファイル */
+	private byte[] koin;
 }

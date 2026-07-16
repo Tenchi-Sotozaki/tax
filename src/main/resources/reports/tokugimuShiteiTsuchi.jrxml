@@ -12,6 +12,7 @@
 	<field name="tokuJusho" class="java.lang.String"/>
 	<field name="riyu" class="java.lang.String"/>
 	<field name="city" class="java.lang.String"/>
+	<field name="koin" class="java.lang.Object"/>
 	<background splitType="Stretch"/>
 	<title height="79" splitType="Stretch">
 		<element kind="staticText" uuid="40292224-3b8e-46bb-b3dd-8dca7dd795df" x="20" y="9" width="500" height="60" fontName="IPAex明朝" fontSize="16.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
@@ -136,6 +137,9 @@
 			</element>
 			<element kind="textField" uuid="ea21e6d2-f202-494a-b2a8-e8c697bf32f1" x="40" y="469" width="480" height="190" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA["※この通知書に記載された事項について不服がある場合には、この通知書により処分があったことを知った日の翌日から起算して3か月以内に、"+$F{city}+"長に対して審査請求することができます。\r\n　また、処分の取り消しを求める訴えは、前記の審査請求に対する採決があったことを知った翌日から起算して6か月以内に、"+$F{city}+"を被告として（"+$F{city}+"長が被告の代表となります）提起することができます。\r\n　処分の取消しの訴えは、前記の審査請求に対する裁決を経た後でなければ提起することができないこととされていますが、①審査請求があった日の翌日から3か月を経過しても裁決がないとき、②処分、 処分の執行又は手続きの続行により生ずる著しい損害を避けるための緊急の必要があるとき、③その他裁決を経ないことにつき正当な理由があるときのいずれかに該当するときは、裁決を経ないでも処分の取消しの訴えを提起することができます。\r\n　なお、前記の期間が経過する前に、この処分があった日の翌日から起算して1年を経過した場合は、 審査請求をすることができなくなり、また、審査請求に対する裁決のあった日の翌日から起算して1年を経過した場合は、処分の取消しの訴えを提起することができなくなります。"]]></expression>
+			</element>
+			<element kind="image" uuid="60961af2-26c7-42c2-be8a-ae6f8311449f" x="450" y="40" width="50" height="50">
+				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>
 	</detail>

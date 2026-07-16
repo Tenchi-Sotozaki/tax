@@ -20,5 +20,4 @@ public interface ReportsDefRepository extends JpaRepository<ReportsDef, ReportsD
 	 * IDと自治体コードで検索
 	 */
 	Optional<ReportsDef> findByIdAndJichitaiCd(String id, String jichitaiCd);
-
 }

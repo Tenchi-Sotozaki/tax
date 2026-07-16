@@ -22,7 +22,6 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.view.JasperViewer;
 
 /**
  * 特別徴収義務者指定通知帳票 Service 実装
@@ -39,8 +38,9 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 		try {
 			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
-
+		
 			Map<String, Object> parameters = new HashMap<>();
+			
 			JRDataSource dataSource = buildParams(dto);
 			JasperPrint jasperPrint = JasperFillManager.fillReport(
 					jasperReport, parameters, dataSource);
@@ -68,6 +68,7 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setCity(dto.getCity() != null ? dto.getCity() : "");
+		reportsDto.setKoin(dto.getKoin());
 
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
