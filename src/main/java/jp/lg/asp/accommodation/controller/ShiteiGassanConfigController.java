@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShiteiGassanConfigDto;
@@ -38,6 +39,7 @@ public class ShiteiGassanConfigController {
 
 	/** 設定メニューからの遷移：登録済みなら照会へ、未登録なら登録画面へ */
 	@GetMapping("/register")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String register(Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
@@ -52,6 +54,7 @@ public class ShiteiGassanConfigController {
 
 	/** 照会メニューからの遷移 */
 	@GetMapping("/view")
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String view(Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
@@ -67,6 +70,7 @@ public class ShiteiGassanConfigController {
 
 	/** 照会画面の編集ボタンから遷移 */
 	@GetMapping("/edit")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String edit(Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
@@ -77,6 +81,7 @@ public class ShiteiGassanConfigController {
 
 	/** 登録・更新処理 */
 	@PostMapping("/save")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録・更新")
 	public String save(@Valid @ModelAttribute("configDto") ShiteiGassanConfigDto dto,
 			BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);

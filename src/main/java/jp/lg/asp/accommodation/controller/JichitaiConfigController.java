@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.validation.Valid;
+import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.JichitaiConfigDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -24,12 +28,17 @@ import lombok.extern.slf4j.Slf4j;
 public class JichitaiConfigController {
 
 	private final JichitaiRepository jichitaiRepository;
+	private final ScreenAccessChecker accessChecker;
 
 	@Value("${app.jichitai.code}")
 	private String jichitaiCd;
 
+	private static final String SCREEN_ID_CONFIG = ScreenManagement.JICHITAI_CONFIG;
+
 	@GetMapping
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期遷移")
 	public String index(Model model) {
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 		JichitaiConfigDto form = new JichitaiConfigDto();
 		form.setNendoStMonth(jichitai.getNendoStMonth());
@@ -39,9 +48,11 @@ public class JichitaiConfigController {
 	}
 
 	@PostMapping("/save")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String save(@Valid @ModelAttribute("configForm") JichitaiConfigDto configForm,
 			BindingResult bindingResult, Model model,
 			RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		if (bindingResult.hasErrors()) {
 			Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 			model.addAttribute("jichitai", jichitai);
