@@ -68,6 +68,7 @@ public class TokugimuJuriTsuchiReportsServiceImpl implements TokugimuJuriTsuchiR
 		reportsDto.setTokuJushoWithoutYubin(
 				dto.getTokuJushoWithoutYubin() != null ? dto.getTokuJushoWithoutYubin() : "");
 		reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
+		reportsDto.setKoin(dto.getKoin());
 
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
