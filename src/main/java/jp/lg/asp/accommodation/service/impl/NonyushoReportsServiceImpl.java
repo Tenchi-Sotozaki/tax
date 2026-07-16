@@ -249,7 +249,6 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		reportsDto.setNonyuBasho(dto.getNonyuBasho() != null ? dto.getNonyuBasho() : "");
 		reportsDto.setShiteiKinyuName(dto.getShiteiKinyuName() != null ? dto.getShiteiKinyuName() : "");
 		reportsDto.setTorimatome(dto.getTorimatome() != null ? dto.getTorimatome() : "");
-		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
 		// 申告年月
 		if (dto.getShinkokuYmd() != null) {

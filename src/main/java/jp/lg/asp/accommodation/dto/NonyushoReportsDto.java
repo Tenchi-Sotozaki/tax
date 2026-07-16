@@ -58,7 +58,4 @@ public class NonyushoReportsDto {
     
     /** 取りまとめ店 */
     private String torimatome;
-    
-    /** 公印 */
-    private byte[] koin;
 }

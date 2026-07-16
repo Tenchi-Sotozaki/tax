@@ -2,7 +2,6 @@
 <jasperReport name="nonyusho" language="java" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="b3e81a05-acaf-401e-a7d3-0cd1857cc3bb">
 	<property name="com.jaspersoft.studio.report.description" value="宿泊税納入書"/>
 	<query language="sql"><![CDATA[]]></query>
-	<field name="koin" class="java.lang.Object"/>
 	<field name="cityName" class="java.lang.String"/>
 	<field name="jichitaiCd" class="java.lang.String"/>
 	<field name="kozaNo" class="java.lang.String"/>
@@ -88,7 +87,7 @@
 				</box>
 			</element>
 			<element kind="staticText" uuid="c2b6c9c1-4c02-4265-b15d-f89f6be0d299" x="380" y="2" width="140" height="60" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
-				<text><![CDATA[　宿泊税納入済通知書]]></text>
+				<text><![CDATA[ 宿泊税納入済通知書]]></text>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1278,14 +1277,26 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="image" uuid="81cb8974-94ef-44f9-ae31-b5b0943f6199" x="198" y="7" width="50" height="50" onErrorType="Blank">
-				<expression><![CDATA[$F{koin}]]></expression>
+			<element kind="ellipse" uuid="bce9b8d1-f23f-47cb-84e3-2a3892c0c012" mode="Transparent" x="196" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="image" uuid="0d0bfcf6-7004-4774-9093-c9d368d40ec3" x="465" y="7" width="50" height="50" onErrorType="Blank">
-				<expression><![CDATA[$F{koin}]]></expression>
+			<element kind="textField" uuid="4c070568-f7af-46e1-890f-9a1ea19ca485" x="191" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[公]]></expression>
 			</element>
-			<element kind="image" uuid="2c05c8b0-50c0-4ff2-ac77-01d3c5ff1cdc" x="740" y="7" width="50" height="50" onErrorType="Blank">
-				<expression><![CDATA[$F{koin}]]></expression>
+			<element kind="textField" uuid="f5a3fb0c-cd9f-4256-975d-e5668d8f4730" x="488" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[公]]></expression>
+			</element>
+			<element kind="ellipse" uuid="8efa501e-e138-494e-8c14-b659e2592430" mode="Opaque" x="493" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="textField" uuid="4862a085-a8f9-4356-aae2-ff3d0becaa5f" x="745" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[公]]></expression>
+			</element>
+			<element kind="ellipse" uuid="52207071-5074-4f00-80c2-7b7f324d0851" mode="Transparent" x="750" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
 		</band>
 	</detail>
