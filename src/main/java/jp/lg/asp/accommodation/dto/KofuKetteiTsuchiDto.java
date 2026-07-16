@@ -37,4 +37,7 @@ public class KofuKetteiTsuchiDto {
 
 	/** 交付年月日 */
 	private String kofuYmd;
+	
+	/** 公印 */
+	private byte[] koin;
 }

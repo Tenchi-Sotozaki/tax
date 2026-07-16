@@ -1,4 +1,4 @@
-<!-- Created with Jaspersoft Studio version 7.0.3.final using JasperReports Library version 7.0.3-41034ca841d452f3305ba55b9042260aaa1ab5dd  -->
+<!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
 <jasperReport name="kouseiKetteiTsuchisho_teiritsu" language="java" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="71865adf-8ab3-4981-80dd-46fbe1037222">
 	<parameter name="city" class="java.lang.String"/>
 	<parameter name="horei_inyou1" class="java.lang.String"/>
@@ -118,6 +118,7 @@
 	<field name="kasan_kbn1" class="java.lang.String"/>
 	<field name="kasan_kbn2" class="java.lang.String"/>
 	<field name="kasan_kbn3" class="java.lang.String"/>
+	<field name="koin" class="java.lang.Object"/>
 	<background splitType="Stretch"/>
 	<detail>
 		<band height="802" splitType="Stretch">
@@ -646,6 +647,9 @@
 			</element>
 			<element kind="line" uuid="c9fceffe-529d-4ddf-b117-99afaedfaa4f" x="90" y="320" width="71" height="1">
 				<pen lineWidth="0.5"/>
+			</element>
+			<element kind="image" uuid="e501b29c-961b-4741-8669-d5c526775400" x="473" y="72" width="50" height="50">
+				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 		</band>

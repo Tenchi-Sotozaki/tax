@@ -46,4 +46,7 @@ public class KanpuMenjoTsuchiReportsDto {
 
     /** 備考 */
     private String biko;
+    
+    /** 公印 */
+    private byte[] koin;
 }

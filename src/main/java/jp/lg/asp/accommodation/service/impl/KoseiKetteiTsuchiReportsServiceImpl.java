@@ -62,6 +62,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     private String todoufuken;
     private String horeiInyou1;
     private String horeiInyou2;
+    private byte[] koin;
 
     /** 課税区分最大数 */
     private static final int MAX_KBN = 5;
@@ -83,6 +84,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         todoufuken   = jichitai.getKbnName();
         horeiInyou1  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
         horeiInyou2  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
+        koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
     }
 
     /**
@@ -94,6 +96,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         KoseiKetteiTsuchiReportsDto dto = null;
         try {
             dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym);
+            dto.setKoin(koin);;
             log.info("PDF生成開始 - 指定番号: {}, b1Ym: {}, b2Ym: {}, b3Ym: {}", shiteiNo, b1Ym, b2Ym, b3Ym);
 
             String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(dto.getFukaKbn())
@@ -143,7 +146,8 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     public KoseiKetteiTsuchiReportsDto buildDtoForDisplay(String shiteiNo) {
         KoseiKetteiTsuchiReportsDto dto = new KoseiKetteiTsuchiReportsDto();
         dto.setShitei_no(shiteiNo);
-
+        dto.setKoin(koin);
+        
         tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
                 jichitaiCd, shiteiNo, "1", "0")
                 .ifPresent(toku -> {

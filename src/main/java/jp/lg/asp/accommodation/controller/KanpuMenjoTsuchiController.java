@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.KanpuMenjoTsuchiReportsService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.TokugimuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,7 @@ public class KanpuMenjoTsuchiController {
     private final TokugimuService tokugimuService;
     private final KanpuMenjoTsuchiReportsService kanpuMenjoTsuchiReportsService;
     private final JichitaiRepository jichitaiRepository;
+    private final ReportsCommonService reportsCommonService;
 
     @Value("${app.jichitai.code}")
     private String jichitaiCode;
@@ -71,7 +74,8 @@ public class KanpuMenjoTsuchiController {
             dto.setCityName(cityName);
             dto.setJorei(jorei);
             dto.setHakkoYmd(LocalDate.now());
-
+            dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
+            
             // 特別徴収義務者情報設定
             if (tokugimuForm != null) {
                 dto.setTokuName(tokugimuForm.getName());

@@ -13,7 +13,7 @@ function generatePdf() {
     form.submit();
 }
 
-function previewPdf() {
+function preview() {
     if (!document.getElementById('b1Ym').value) {
         alert('対象月１を選択してください。');
         return;
