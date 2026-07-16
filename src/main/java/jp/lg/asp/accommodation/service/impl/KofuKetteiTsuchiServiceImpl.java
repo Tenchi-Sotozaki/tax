@@ -1,11 +1,10 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.constant.ReportsConstants;
@@ -38,15 +37,13 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 	private final ReportsDefRepository reportsDefRepository;
 	private final ReportsCommonService reportsCommonService;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCode;
+	private final JichitaiContext jichitaiContext;
 
 	private String jichitaiName;
 	private String jorei;
 	private byte[] koin;
 
-	@PostConstruct
-	public void init() {
+	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
 			jichitaiName = jichitaiInfo.getName();
@@ -57,6 +54,8 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 
 	@Override
 	public KofuKetteiTsuchiDto getReportData(String shiteiNo) {
+		init();
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
 			log.info("交付決定通知書データ取得開始 - 指定番号: {}", shiteiNo);
 
@@ -146,6 +145,7 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 	 * 帳票定義からテキストを取得する
 	 */
 	private String getReportsDefText(String id) {
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
 			Optional<ReportsDef> reportsDefOpt = reportsDefRepository
 					.findByIdAndJichitaiCd(id, jichitaiCode);

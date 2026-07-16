@@ -1,11 +1,10 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.time.LocalDate;
 import java.util.Optional;
 
-import jakarta.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.constant.ReportsConstants;
@@ -38,15 +37,13 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 	private final ReportsDefRepository reportsDefRepository;
 	private final ReportsCommonService reportsCommonService;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCode;
+	private final JichitaiContext jichitaiContext;
 
 	private String jichitaiName;
 	private String jorei;
 	private byte[] koin;
 
-	@PostConstruct
-	public void init() {
+	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
 			jichitaiName = jichitaiInfo.getName();
@@ -57,6 +54,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 
 	@Override
 	public KofuShinseiDto getReportData(String shiteiNo) {
+		init();
 		// デフォルト年度（現在年度）で取得
 		LocalDate now = LocalDate.now();
 		String currentNendo = String.valueOf(
@@ -66,6 +64,8 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 
 	@Override
 	public KofuShinseiDto getReportData(String shiteiNo, String nendo) {
+		init();
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
 			log.info("交付申請書データ取得開始 - 指定番号: {}, 年度: {}", shiteiNo, nendo);
 
@@ -158,6 +158,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 	 * 帳票定義からテキストを取得する
 	 */
 	private String getReportsDefText(String id) {
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
 			Optional<ReportsDef> reportsDefOpt = reportsDefRepository
 					.findByIdAndJichitaiCd(id, jichitaiCode);

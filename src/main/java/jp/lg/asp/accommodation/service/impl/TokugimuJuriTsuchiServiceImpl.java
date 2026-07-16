@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.Optional;
 
@@ -31,25 +32,23 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 	private final AtenaRepository atenaRepository;
 	private final ReportsCommonService reportsCommonService;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCode;
+	private final JichitaiContext jichitaiContext;
 
 	private String jichitaiName;
 	private String jorei;
-	private byte[] koin;
- 
-	@PostConstruct
-	public void init() {
+
+	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
 			jichitaiName = jichitaiInfo.getName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
-		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
 	}
 
 	@Override
 	public TokugimuJuriTsuchiDto getTokugimuInfo(String shiteiNo) {
+		init();
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		// 特別徴収義務者情報取得（最新・未削除）
 		Optional<Tokugimu> tokugimuOpt = tokugimuRepository
 				.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
@@ -107,8 +106,7 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 		// application.ymlから取得する値
 		dto.setCityName(jichitaiName);
 		dto.setJorei(jorei);
-		dto.setKoin(koin);
-		
+
 		return dto;
 	}
 }

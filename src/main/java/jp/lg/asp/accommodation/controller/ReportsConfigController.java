@@ -2,7 +2,6 @@ package jp.lg.asp.accommodation.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ReportsConfigForm;
@@ -27,8 +27,7 @@ public class ReportsConfigController {
 	private final ReportsConfigService reportsConfigService;
 	private final ScreenAccessChecker accessChecker;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.REPORTS_CONFIG;
 
@@ -68,7 +67,7 @@ public class ReportsConfigController {
 
 			String userId = authentication.getName();
 
-			reportsConfigService.importReportFile(form.getFile(), jichitaiCd, userId);
+			reportsConfigService.importReportFile(form.getFile(), jichitaiContext.getJichitaiCd(), userId);
 			redirectAttributes.addFlashAttribute("successMessage", "帳票ファイルの取り込みが完了しました。");
 		} catch (Exception e) {
 			e.printStackTrace(); // コンソールにエラーを出力

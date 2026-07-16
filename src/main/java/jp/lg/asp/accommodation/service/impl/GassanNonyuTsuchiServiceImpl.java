@@ -1,11 +1,10 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.constant.ReportsConstants;
@@ -35,14 +34,12 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 	private final GassanRepository gassanRepository;
 	private final ReportsCommonService reportsCommonService;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCode;
+	private final JichitaiContext jichitaiContext;
 
 	private String cityName;
 	private String jorei;
 
-	@PostConstruct
-	public void init() {
+	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
 			cityName = jichitaiInfo.getName();
@@ -52,6 +49,8 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 
 	@Override
 	public GassanNonyuTsuchiDto getGassanNonyuTsuchiInfo(String shiteiNo) {
+		init();
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		Optional<Tokugimu> tokugimuOpt = tokugimuRepository
 				.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
 						jichitaiCode, shiteiNo, "1", "0");

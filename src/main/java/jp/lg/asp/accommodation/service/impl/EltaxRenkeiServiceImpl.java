@@ -1,9 +1,9 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +20,12 @@ public class EltaxRenkeiServiceImpl implements EltaxRenkeiService {
 
 	private final EltaxRenkeiRepository eltaxRenkeiRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<EltaxRenkeiDto> findAll() {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return eltaxRenkeiRepository.findByJichitaiCd(jichitaiCd)
 				.stream()
 				.map(e -> new EltaxRenkeiDto(e.getSeq(), e.getFileName(), e.getShubetsu(), e.getShoriDt(),
@@ -36,6 +36,7 @@ public class EltaxRenkeiServiceImpl implements EltaxRenkeiService {
 	@Override
 	@Transactional(readOnly = true)
 	public EltaxRenkei findBySeq(BigDecimal seq) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return eltaxRenkeiRepository.findById(new EltaxRenkeiId(jichitaiCd, seq)).orElse(null);
 	}
 }

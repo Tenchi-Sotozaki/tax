@@ -1,10 +1,10 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,8 +31,7 @@ public class GlobalModelAdvice {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     @ModelAttribute("loginUserName")
     public String loginUserName() {
@@ -65,6 +64,7 @@ public class GlobalModelAdvice {
      */
     @ModelAttribute("accessibleScreens")
     public Set<String> accessibleScreens() {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {

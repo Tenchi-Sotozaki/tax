@@ -1,9 +1,9 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +43,7 @@ public class KanpuMenjoTsuchiController {
     private final JichitaiRepository jichitaiRepository;
     private final ReportsCommonService reportsCommonService;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCode;
+    private final JichitaiContext jichitaiContext;
 
     /**
      * 徴収不能額の還付又は納入義務の免除決定通知書画面表示
@@ -53,6 +52,7 @@ public class KanpuMenjoTsuchiController {
     public String index(@RequestParam String shiteiNo,
                        @AuthenticationPrincipal User userDetails,
                        Model model) {
+    	String jichitaiCode = jichitaiContext.getJichitaiCd();
         try {
             log.info("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
 

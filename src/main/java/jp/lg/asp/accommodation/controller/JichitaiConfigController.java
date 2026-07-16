@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.controller;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import jakarta.validation.Valid;
 
@@ -29,9 +30,7 @@ public class JichitaiConfigController {
 
 	private final JichitaiRepository jichitaiRepository;
 	private final ScreenAccessChecker accessChecker;
-
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.JICHITAI_CONFIG;
 
@@ -39,6 +38,7 @@ public class JichitaiConfigController {
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期遷移")
 	public String index(Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 		JichitaiConfigDto form = new JichitaiConfigDto();
 		form.setNendoStMonth(jichitai.getNendoStMonth());
@@ -53,6 +53,7 @@ public class JichitaiConfigController {
 			BindingResult bindingResult, Model model,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		if (bindingResult.hasErrors()) {
 			Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
 			model.addAttribute("jichitai", jichitai);

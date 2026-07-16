@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.aspect;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -35,8 +35,7 @@ public class OpeLogAspect {
 	private final OperationLogRepository operationLogRepository;
 	private final ObjectMapper objectMapper;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	/**
 	 * @OpeLogが付与されたメソッドの前後で操作ログをDBに保存
@@ -54,6 +53,7 @@ public class OpeLogAspect {
 	}
 
 	private void saveLog(OpeLog opeLog) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		try {
 			HttpServletRequest request = getCurrentRequest();
 			String param = request != null ? getRequestParameters(request) : null;

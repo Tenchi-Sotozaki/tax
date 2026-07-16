@@ -1,11 +1,11 @@
 package jp.lg.asp.accommodation.service;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,11 +33,11 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 	private final AtenaRepository atenaRepository;
 	private final GassanUchiRepository gassanUchiRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	public Page<GassanDaichoItem> search(GassanDaichoSearchForm searchForm) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		log.info("合算申告情報管理台帳検索開始: {}", searchForm);
 
 		List<Gassan> gassanList = gassanRepository.findAllByJichitaiCd(jichitaiCd);
@@ -97,6 +97,7 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 
 	@Override
 	public GassanDaichoItem getByGassanShiteiNo(String gassanShiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		log.info("合算申告情報詳細取得: {}", gassanShiteiNo);
 
 		List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
@@ -132,6 +133,7 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 	}
 
 	private GassanDaichoItem convertToGassanDaichoItem(String gassanShiteiNo, Gassan daihyo, List<Gassan> gassanList) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		GassanDaichoItem item = new GassanDaichoItem();
 		item.setGassanShiteiNo(gassanShiteiNo);
 

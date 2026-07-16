@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,12 +59,12 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	private final ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository;
 	private final JichitaiRepository jichitaiRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public EltaxRenkeiKakuninDto preview(MultipartFile file) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		try {
 			String[] dataRow = parseCsv(file);
 
@@ -284,6 +284,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	}
 
 	private List<DiffRow> buildDiffRowsTokugimu(String[] dataRow, Map<Integer, String> yoshikiMap, String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		List<DiffRow> diffRows = new ArrayList<>();
 
 		List<Tokugimu> existingTokugimu = new ArrayList<>();
@@ -343,6 +344,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 
 	private List<DiffRow> buildDiffRowsFuka(String[] dataRow, Map<Integer, String> yoshikiMap, String shiteiNo,
 			String shubetsu) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		List<DiffRow> diffRows = new ArrayList<>();
 
 		List<Fuka> prevFukaList = new ArrayList<>();
@@ -498,6 +500,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	 * 特別徴収義務者登録申請書（種別01）のDB更新
 	 */
 	private void saveTokugimu(byte[] fileBytes, BigDecimal atenaNoFromSession) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		try {
 			String tetsuzukiId = extractTetsuzukiId(fileBytes);
 			Map<Integer, String> yoshikiMap = loadYoshikiMap(tetsuzukiId);
@@ -817,6 +820,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	 * eLTAX連携管理を更新する
 	 */
 	private void saveEltaxRenkei(byte[] fileBytes, String fileName) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		try {
 			BigDecimal nextSeq = eltaxRenkeiRepository.findNextSeq(jichitaiCd);
 			String tetsuzukiId = fileBytes.length > 0 ? extractTetsuzukiId(fileBytes) : "";
@@ -841,6 +845,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	private void saveFuka(String shiteiNo, String taishoYm, String teishutsuYmd,
 			FukaConstants fukaKbn, String[] dataRow, Map<Integer, String> yoshikiMap,
 			String taishoYmPrefix) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		String nendo = toNendo(taishoYm);
 		Integer kibetsu = toKibetsu(taishoYm);
@@ -991,6 +996,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	}
 
 	private long getKenZeigaku(Long shukuhakuRyokin, String taishoYm) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Optional<ZeiritsuTeigaku> teigakuOp = zeiritsuTeigakuRepository
 				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm,
 						shukuhakuRyokin);

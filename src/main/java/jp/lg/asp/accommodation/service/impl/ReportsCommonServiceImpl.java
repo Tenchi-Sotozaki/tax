@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.constant.ReportsConstants;
@@ -19,16 +19,17 @@ public class ReportsCommonServiceImpl implements ReportsCommonService {
 	private final JichitaiRepository jichitaiRepository;
 	private final ReportsDefRepository reportsDefRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	public Jichitai getJichitaiInfo() {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return jichitaiRepository.findById(jichitaiCd).orElse(null);
 	}
 
 	@Override
 	public String getReportsDefText(String Id) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		if (Id.isEmpty()) {
 			return "";
 		}
@@ -45,6 +46,7 @@ public class ReportsCommonServiceImpl implements ReportsCommonService {
 
 	@Override
 	public byte[] getReportsDefData(String Id) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		if (Id.isEmpty()) {
 			return new byte[0];
 		}

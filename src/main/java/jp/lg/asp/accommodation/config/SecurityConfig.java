@@ -17,7 +17,8 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http,
-			PasswordChangeRequiredFilter passwordChangeRequiredFilter) throws Exception {
+			PasswordChangeRequiredFilter passwordChangeRequiredFilter,
+			JichitaiCodeFilter jichitaiCodeFilter) throws Exception {
 	    http
 	            .authorizeHttpRequests(auth -> auth
 						// 静的リソースとログイン画面は誰でもアクセス可
@@ -44,11 +45,27 @@ public class SecurityConfig {
 	                    })
 	                    .permitAll())
 				.logout(logout -> logout
-						.logoutSuccessUrl("/login?logout")
+						// セッション破棄前に自治体コードを退避する（破棄後の再ログインを可能にするため）
+						.addLogoutHandler((req, res, auth) -> {
+							var session = req.getSession(false);
+							if (session != null) {
+								req.setAttribute("jichitaiCd", session.getAttribute("jichitaiCd"));
+							}
+						})
+						// 退避した自治体コードを新しいセッションに引き継いでからログイン画面へ
+						.logoutSuccessHandler((req, res, auth) -> {
+							Object jichitaiCd = req.getAttribute("jichitaiCd");
+							if (jichitaiCd != null) {
+								req.getSession(true).setAttribute("jichitaiCd", jichitaiCd.toString());
+							}
+							res.sendRedirect(req.getContextPath() + "/login?logout");
+						})
 						.permitAll())
+				// クエリパラメータの自治体コードをセッションに保存するフィルター
+				.addFilterBefore(jichitaiCodeFilter, UsernamePasswordAuthenticationFilter.class)
 				// 初期パスワードのままのユーザーを初回パスワード設定画面へ強制誘導
-	            .addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class);
-	    return http.build();
+				.addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class);
+		return http.build();
 	}
 
 	@Bean

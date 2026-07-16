@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -26,8 +25,7 @@ public class ScreenAccessChecker {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     /**
      * ログイン中ユーザーが指定画面にアクセス可能か検証する。
@@ -36,6 +34,7 @@ public class ScreenAccessChecker {
      * @param screenId 画面ID（m_screen.screen_id）
      */
     public void checkAccess(String screenId) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userId = auth.getName();
 
@@ -65,6 +64,7 @@ public class ScreenAccessChecker {
      * @param screenId 画面ID（m_screen.screen_id）
      */
     public void checkWriteAccess(String screenId) {
+    	String jichitaiCd = jichitaiContext.getJichitaiCd();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userId = auth.getName();
 

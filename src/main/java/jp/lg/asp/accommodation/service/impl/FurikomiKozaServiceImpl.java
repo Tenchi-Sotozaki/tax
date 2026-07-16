@@ -1,8 +1,8 @@
 package jp.lg.asp.accommodation.service.impl;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,12 +31,12 @@ public class FurikomiKozaServiceImpl implements FurikomiKozaService {
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public FurikomiKozaDto getFurikomiKoza(String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		FurikomiKozaDto dto = new FurikomiKozaDto();
 		dto.setShiteiNo(shiteiNo);
 
@@ -85,6 +85,7 @@ public class FurikomiKozaServiceImpl implements FurikomiKozaService {
 	@Override
 	@Transactional
 	public FurikomiKozaDto createFurikomiKoza(FurikomiKozaDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 振込先口座情報を新規登録
 		FurikomiKoza furikomiKoza = new FurikomiKoza();
 		furikomiKoza.setJichitaiCd(jichitaiCd);
@@ -110,6 +111,7 @@ public class FurikomiKozaServiceImpl implements FurikomiKozaService {
 	@Override
 	@Transactional
 	public FurikomiKozaDto updateFurikomiKoza(FurikomiKozaDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		FurikomiKozaId id = new FurikomiKozaId(jichitaiCd, dto.getShiteiNo());
 		Optional<FurikomiKoza> furikomiKozaOpt = furikomiKozaRepository.findById(id);
 

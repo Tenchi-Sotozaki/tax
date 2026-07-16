@@ -1,5 +1,4 @@
 package jp.lg.asp.accommodation.service.impl;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -8,11 +7,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.FukaConstants;
 import jp.lg.asp.accommodation.constant.ZeiritsuConstants;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
@@ -30,7 +29,6 @@ import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
-import jp.lg.asp.accommodation.entity.NozeiShuki;
 import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
@@ -88,14 +86,14 @@ public class FukaServiceImpl implements FukaService {
 	private static final String DEFAULT_NEW_FLG = "1";
 	private static final String DEFAULT_DEL_FLG = "0";
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	/**
 	 * 納入金額管理台帳のデータを取得する。
 	 */
 	@Transactional(readOnly = true)
 	public FukaDaichoForm getDaichoData(String shiteiNo, String nendo, String status) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		FukaDaichoForm form = new FukaDaichoForm();
 		form.setShiteiNo(shiteiNo);
 		form.setNendo(nendo);
@@ -177,6 +175,7 @@ public class FukaServiceImpl implements FukaService {
 			item.setShinkokuZumi(true);
 			// 納入状況判定
 			long totalZeigaku = dbData.getTotalZeigaku() != null ? dbData.getTotalZeigaku() : 0L;
+			String jichitaiCd = jichitaiContext.getJichitaiCd();
 			long totalNonyu = shunoRirekiRepository.sumNonyugaku(jichitaiCd, shiteiNo, nendo, kibetsu);
 			long remaining = totalZeigaku - totalNonyu;
 			if (remaining <= 0) {
@@ -250,6 +249,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 対象日に適用される納税周期を判定する
 	 */
 	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, LocalDate targetDate) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return tekiyoList.stream()
 				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
 				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
@@ -312,6 +312,7 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	@Transactional(readOnly = true)
 	public FukaDeclarationForm getDeclarationFormForRegister(String shiteiNo, String taishoYm) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		FukaDeclarationForm form = new FukaDeclarationForm();
 		form.setShiteiNo(shiteiNo);
 		form.setTorokuDate(LocalDate.now());
@@ -379,6 +380,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 特別徴収義務者情報を取得しフォームにセットする。
 	 */
 	private void setupObligorInfo(FukaDeclarationForm form, String shiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		List<Tokugimu> result = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 		result.stream()
 				.findFirst()
@@ -497,6 +499,7 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	@Transactional(readOnly = true)
 	public FukaDeclarationForm getDeclarationFormForEdit(String shiteiNo, String nendo, Integer kibetsu) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		String taishoYm = createTaishoYmString(nendo, kibetsu);
 		FukaDeclarationForm form = getDeclarationFormForRegister(shiteiNo, taishoYm);
@@ -563,6 +566,7 @@ public class FukaServiceImpl implements FukaService {
 	public FukaDeclarationForm getDeclarationFormForView(String shiteiNo, String nendo, Integer kibetsu) {
 		FukaDeclarationForm form = getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
 		form.setView(true);
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		form.setMaxRno(fukaRepository.findMaxRno(jichitaiCd, shiteiNo, nendo, kibetsu).orElse(1));
 		form.setMinRno(fukaRepository.findMinRno(jichitaiCd, shiteiNo, nendo, kibetsu).orElse(1));
 		return form;
@@ -576,6 +580,7 @@ public class FukaServiceImpl implements FukaService {
 		String taishoYm = createTaishoYmString(nendo, kibetsu);
 		FukaDeclarationForm form = getDeclarationFormForRegister(shiteiNo, taishoYm);
 
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		fukaRepository.findByRno(jichitaiCd, shiteiNo, nendo, kibetsu, rno)
 				.ifPresent(entity -> {
 					form.setTorokuDate(entity.getTorokuYmd());
@@ -620,6 +625,7 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	@Transactional
 	public void saveDeclaration(FukaDeclarationForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		// 既存履歴の最新フラグをクリアする
 		List<Fuka> oldEntityList = fukaRepository
@@ -678,6 +684,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 次の履歴番号を決定する。
 	 */
 	private Integer determineNextRno(String shiteiNo, String nendo, Integer kibetsu) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return fukaRepository
 				.findMaxRno(jichitaiCd, shiteiNo, nendo, kibetsu)
 				.map(r -> r + 1)
@@ -746,6 +753,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 指定された年度・期別に該当する申告データが存在するか判定する。
 	 */
 	public boolean isAlreadyRegisteredByKibetsu(String shiteiNo, String nendo, Integer kibetsu) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return !fukaRepository.findLatestByNendoAndKibetsu(jichitaiCd, shiteiNo, nendo, kibetsu).isEmpty();
 	}
 
@@ -753,6 +761,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 親エンティティを生成する。
 	 */
 	private Fuka createParentFuka(FukaDeclarationForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
 		String taishoYm = dto.getPaymentYearMonth().replace("年", "").replace("月", "");
 		Fuka parentFuka = new Fuka();
@@ -858,6 +867,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 都道府県税額を取得する
 	 */
 	private long getKenZeigaku(Long shukuhakuRyokin, String taishoYm) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Optional<ZeiritsuTeigaku> teigakuOp = zeiritsuTeigakuRepository
 				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm,
 						shukuhakuRyokin);
@@ -868,6 +878,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 賦課情報を設定する（照会・編集画面用）
 	 */
 	private void setMonthlyDetail(Fuka entity, FukaDeclarationForm form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		FukaMonthlyDeclarationDto monthDto = form.getMonthlyDetail();
 		monthDto.setExemptStayCount(entity.getMenjoHakusu());
 		monthDto.setExemptRyokin(entity.getMenjoRyokin());
@@ -1122,6 +1133,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 徴収原簿を設定する
 	 */
 	private void setMonthlyTally(FukaDeclarationForm form, Fuka parentFuka) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		ChoshuGenboId genboId = new ChoshuGenboId(jichitaiCd, parentFuka.getShiteiNo(), parentFuka.getRno(),
 				parentFuka.getNendo(), parentFuka.getKibetsu());
 
