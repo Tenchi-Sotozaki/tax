@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -28,13 +29,13 @@ public class NokigenController {
 	private final JichitaiRepository jichitaiRepository;
 	private final ScreenAccessChecker accessChecker;
 
-	@org.springframework.beans.factory.annotation.Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.NOKIGEN;
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.NOKIGEN_CONFIG;
 
 	private void addKiMonthLabels(Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		jichitaiRepository.findById(jichitaiCd).ifPresent(j -> {
 			if (j.getNendoStMonth() == null || j.getNendoStMonth().trim().isEmpty()) {
 				model.addAttribute("warnMessage", "年度開始月が未設定です。");

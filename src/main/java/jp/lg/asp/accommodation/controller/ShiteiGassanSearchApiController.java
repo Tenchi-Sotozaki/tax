@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Gassan;
@@ -38,8 +38,7 @@ public class ShiteiGassanSearchApiController {
 
     public static final String SESSION_KEY = "selectedShiteiGassan";
 
-    @Value("${app.jichitai.code}")
-    private String jichitaiCd;
+    private final JichitaiContext jichitaiContext;
 
     @GetMapping("/search")
     public List<ShiteiGassanSearchDto> search(
@@ -92,6 +91,7 @@ public class ShiteiGassanSearchApiController {
     }
 
     private List<ShiteiGassanSearchDto> searchByShiteiNo(String shiteiNo) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         if (tokugimuList.isEmpty()) return List.of();
 
@@ -121,6 +121,7 @@ public class ShiteiGassanSearchApiController {
     }
 
     private List<ShiteiGassanSearchDto> searchByGassanShiteiNo(String gassanShiteiNo) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
         if (gassanList.isEmpty()) return List.of();
 
@@ -138,12 +139,14 @@ public class ShiteiGassanSearchApiController {
     }
 
     private List<ShiteiGassanSearchDto> searchByName(String name, String matchType) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         String namePattern = applyMatchPattern(name, matchType);
         List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", namePattern, "%", "%", "%", "%", "%", "%");
         return searchTokugimuByAtenaList(atenaList);
     }
 
     private List<ShiteiGassanSearchDto> searchByShisetsuName(String shisetsuName, String matchType) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Tokugimu> allTokugimu = tokugimuRepository.findAllByJichitaiCd(jichitaiCd);
         List<Tokugimu> filtered = allTokugimu.stream()
                 .filter(t -> matchesName(t.getShisetsuName(), shisetsuName, matchType))
@@ -152,16 +155,19 @@ public class ShiteiGassanSearchApiController {
     }
 
     private List<ShiteiGassanSearchDto> searchByKojinNo(String kojinNo) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", "%", "%", "%", "%", "%", kojinNo, "%");
         return searchTokugimuByAtenaList(atenaList);
     }
 
     private List<ShiteiGassanSearchDto> searchByHojinNo(String hojinNo) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", "%", "%", "%", "%", "%", "%", hojinNo);
         return searchTokugimuByAtenaList(atenaList);
     }
 
     private List<ShiteiGassanSearchDto> searchTokugimuByAtenaList(List<Atena> atenaList) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<ShiteiGassanSearchDto> results = new ArrayList<>();
         for (Atena atena : atenaList) {
             List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atena.getAtenaNo());
@@ -171,6 +177,7 @@ public class ShiteiGassanSearchApiController {
     }
 
     private List<ShiteiGassanSearchDto> toDtoWithGassan(List<Tokugimu> tokugimuList) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<ShiteiGassanSearchDto> results = new ArrayList<>();
         Set<String> addedGassanShiteiNos = new HashSet<>();
         for (Tokugimu t : tokugimuList) {
