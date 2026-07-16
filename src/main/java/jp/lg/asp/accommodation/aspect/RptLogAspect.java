@@ -6,7 +6,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -15,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import jp.lg.asp.accommodation.annotation.RptLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.ReportsLog;
 import jp.lg.asp.accommodation.repository.ReportsLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RptLogAspect {
 
 	private final ReportsLogRepository reportsLogRepository;
-
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	/**
 	 * @RptLogが付与されたメソッドの前後で帳票ログをDBに保存
@@ -51,6 +49,7 @@ public class RptLogAspect {
 
 	private void saveLog(RptLog rptLog, ProceedingJoinPoint joinPoint) {
 		try {
+			String jichitaiCd = jichitaiContext.getJichitaiCd();
 			ReportsLog entity = new ReportsLog();
 			entity.setJichitaiCd(jichitaiCd);
 			entity.setSeq(reportsLogRepository.findNextSeq(jichitaiCd));
