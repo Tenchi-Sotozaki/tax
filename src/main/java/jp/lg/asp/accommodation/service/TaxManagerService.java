@@ -51,6 +51,51 @@ public class TaxManagerService {
 	}
 
 	/**
+	 * 指定番号（shiteiNo）・履歴番号（rno）からデータを取得し、画面表示用のFormを作成する
+	 */
+	@Transactional(readOnly = true)
+	public TaxManagerForm getByShiteiNoAndRno(String shiteiNo, Integer rno) {
+		TaxManagerForm form = new TaxManagerForm();
+		form.setCollectorId(null);
+		form.setShiteiNo(shiteiNo);
+		form.setRegistrationDate(LocalDate.now());
+		form.setDeclarationDate(LocalDate.now());
+
+		try {
+			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+					.stream().findFirst().ifPresent(tokugimu -> {
+						form.setObligorName(tokugimu.getKyokaName());
+						form.setFacilityName(tokugimu.getShisetsuName());
+						form.setObligorAtenaNo(tokugimu.getAtenaNo().toString());
+					});
+
+			taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(jichitaiCd, shiteiNo, rno).ifPresent(nokan -> {
+				form.setEdit(true);
+				form.setRno(nokan.getRno());
+				form.setRegistrationDate(nokan.getTorokuYmd());
+				form.setDeclarationDate(nokan.getShinkokuYmd());
+				form.setAtenaNo(nokan.getAtenaNo());
+				form.setManagerName(nokan.getName());
+				form.setManagerNameKana(nokan.getNameKana());
+				form.setManagerYubinNo(nokan.getYubinNo());
+				form.setManagerAddress(nokan.getJusho());
+				form.setManagerPhone(nokan.getTel());
+				form.setExemptionFlag(FLG_ON.equals(nokan.getMenjoKbn()));
+				form.setExemptionReason(nokan.getMenjoRiyu());
+			});
+
+			Integer maxRno = taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+			Integer minRno = taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+			form.setMaxRno(maxRno);
+			form.setMinRno(minRno);
+		} catch (Exception e) {
+			log.warn("データの取得中にエラーが発生しました: {}", e.getMessage());
+		}
+
+		return form;
+	}
+
+	/**
 	 * 指定番号（shiteiNo）からデータを取得し、画面表示用のFormを作成する
 	 */
 	@Transactional(readOnly = true)
@@ -75,6 +120,7 @@ public class TaxManagerService {
 			// 2. 最新の納税管理人情報を取得（newFlg = '1'）
 			taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).ifPresent(nokan -> {
 				form.setEdit(true);
+				form.setRno(nokan.getRno());
 				form.setRegistrationDate(nokan.getTorokuYmd());
 				form.setDeclarationDate(nokan.getShinkokuYmd());
 				form.setAtenaNo(nokan.getAtenaNo());
@@ -88,6 +134,11 @@ public class TaxManagerService {
 				form.setExemptionFlag(FLG_ON.equals(nokan.getMenjoKbn()));
 				form.setExemptionReason(nokan.getMenjoRiyu());
 			});
+
+			Integer maxRno = taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+			Integer minRno = taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+			form.setMaxRno(maxRno);
+			form.setMinRno(minRno);
 		} catch (Exception e) {
 			log.warn("データの取得中にエラーが発生しました。新規登録として処理します: {}", e.getMessage());
 		}

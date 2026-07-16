@@ -79,4 +79,24 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
             ORDER BY g.rno
             """)
     List<Gassan> findByGassanShiteiNoOrderByRno(@Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Query("""
+            SELECT g FROM Gassan g
+            WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo
+            AND g.rno = :rno AND g.delFlg = '0'
+            """)
+    Optional<Gassan> findByJichitaiCdAndGassanShiteiNoAndRno(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
+    @Query("SELECT COALESCE(MAX(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.delFlg = '0'")
+    BigDecimal findMaxRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Query("SELECT COALESCE(MIN(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.delFlg = '0'")
+    BigDecimal findMinRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo);
 }

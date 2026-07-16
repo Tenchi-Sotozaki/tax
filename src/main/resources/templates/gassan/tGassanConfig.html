@@ -28,6 +28,22 @@
 			</th:block>
 		</div>
 
+		<!-- 履歴ナビゲーション（照会画面のみ） -->
+		<div th:if="${isView and GassanForm.maxRno != null and GassanForm.maxRno > 1}"
+			class="d-flex align-items-center gap-2 mb-3">
+			<a th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno - 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${GassanForm.rno <= GassanForm.minRno} ? ' disabled'">
+				<i class="bi bi-chevron-left"></i> 前の履歴
+			</a>
+			<span class="text-muted small">履歴 <span th:text="${GassanForm.rno}"></span> / <span th:text="${GassanForm.maxRno}"></span></span>
+			<a th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno + 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${GassanForm.rno >= GassanForm.maxRno} ? ' disabled'">
+				次の履歴 <i class="bi bi-chevron-right"></i>
+			</a>
+		</div>
+
 
 
 		<!-- エラーメッセージ -->

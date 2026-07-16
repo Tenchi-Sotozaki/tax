@@ -17,6 +17,9 @@ public interface TokugimuService {
 	// 指定番号で1件取得してフォームに変換する
 	TokugimuForm getTokugimuByShiteiNo(String shiteiNo);
 
+	// 指定番号・履歴番号で1件取得してフォームに変換する
+	TokugimuForm getTokugimuByShiteiNoAndRno(String shiteiNo, int rno);
+
 	// 義務者名を取得する
 	String getTokugimuName(String obligorId);
 

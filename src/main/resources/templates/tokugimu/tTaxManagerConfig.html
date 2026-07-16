@@ -22,6 +22,22 @@
 			</a>
 		</div>
 
+		<!-- 履歴ナビゲーション（照会画面のみ） -->
+		<div th:if="${(isView ?: false) and taxManagerForm.maxRno != null and taxManagerForm.maxRno > 1}"
+			class="d-flex align-items-center gap-2 mb-3">
+			<a th:href="@{/tax-manager/view/{id}(id=${taxManagerForm.shiteiNo}, rno=${taxManagerForm.rno - 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${taxManagerForm.rno <= taxManagerForm.minRno} ? ' disabled'">
+				<i class="bi bi-chevron-left"></i> 前の履歴
+			</a>
+			<span class="text-muted small">履歴 <span th:text="${taxManagerForm.rno}"></span> / <span th:text="${taxManagerForm.maxRno}"></span></span>
+			<a th:href="@{/tax-manager/view/{id}(id=${taxManagerForm.shiteiNo}, rno=${taxManagerForm.rno + 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${taxManagerForm.rno >= taxManagerForm.maxRno} ? ' disabled'">
+				次の履歴 <i class="bi bi-chevron-right"></i>
+			</a>
+		</div>
+
 		<!-- 特別徴収義務者情報 -->
 		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 

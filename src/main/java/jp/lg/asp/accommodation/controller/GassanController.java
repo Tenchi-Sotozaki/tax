@@ -85,11 +85,15 @@ public class GassanController {
 
 	@GetMapping("/view-form/{gassanShiteiNo}")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会")
-	public String showViewForm(@PathVariable String gassanShiteiNo, Model model) {
+	public String showViewForm(@PathVariable String gassanShiteiNo,
+			@org.springframework.web.bind.annotation.RequestParam(required = false) java.math.BigDecimal rno,
+			Model model) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 
 		try {
-			GassanForm form = gassanService.getByGassanShiteiNo(gassanShiteiNo);
+			GassanForm form = (rno != null)
+					? gassanService.getByGassanShiteiNoAndRno(gassanShiteiNo, rno)
+					: gassanService.getByGassanShiteiNo(gassanShiteiNo);
 			model.addAttribute("GassanForm", form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", true);

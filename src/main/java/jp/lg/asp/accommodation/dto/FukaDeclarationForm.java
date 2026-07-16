@@ -24,6 +24,8 @@ public class FukaDeclarationForm {
 	private String nendo;
 	private Integer kibetsu;
 	private Integer rno;
+	private Integer maxRno;
+	private Integer minRno;
 	private String fukaKbn;
 
 	// ========== 変更区分 ==========

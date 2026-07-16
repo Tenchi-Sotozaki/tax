@@ -41,6 +41,10 @@ public class GassanForm {
 
     private String daihyoShiteiNo;
 
+    private BigDecimal rno;
+    private BigDecimal maxRno;
+    private BigDecimal minRno;
+
     public static Map<String, String> validate(GassanForm f) {
         Map<String, String> errors = new LinkedHashMap<>();
         if (f.getTorokuYmd() == null) errors.put("torokuYmd", "登録年月日は必須です");

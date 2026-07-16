@@ -14,6 +14,9 @@ public interface GassanService {
     /** 合算指定番号で1件取得してフォームに変換する */
     GassanForm getByGassanShiteiNo(String gassanShiteiNo);
 
+    /** 合算指定番号・履歴番号でフォームに変換する */
+    GassanForm getByGassanShiteiNoAndRno(String gassanShiteiNo, BigDecimal rno);
+
     /** 指定番号から登録フォームの初期値を生成する */
     GassanForm buildFormByShiteiNo(String shiteiNo);
 

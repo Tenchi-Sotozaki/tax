@@ -227,8 +227,34 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setAtenaNo(t.getAtenaNo().longValue());
 		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(t.getTorokuYmd());
+		form.setRno(t.getRno().intValue());
+		form.setMaxRno(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
+		form.setMinRno(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
 
 		// EntityからFormへのマッピングロジック
+		mapEntityToForm(form, t, atena);
+
+		return form;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public TokugimuForm getTokugimuByShiteiNoAndRno(String shiteiNo, int rno) {
+		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNoAndRno(
+					jichitaiCd, shiteiNo, BigDecimal.valueOf(rno))
+				.orElseThrow(() -> new RuntimeException("宿泊施設が見つかりません: " + shiteiNo + "/rno=" + rno));
+
+		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
+				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + t.getAtenaNo()));
+
+		TokugimuForm form = new TokugimuForm();
+		form.setAtenaNo(t.getAtenaNo().longValue());
+		form.setShiteiNo(shiteiNo);
+		form.setRegistrationDate(t.getTorokuYmd());
+		form.setRno(t.getRno().intValue());
+		form.setMaxRno(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
+		form.setMinRno(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
+
 		mapEntityToForm(form, t, atena);
 
 		return form;

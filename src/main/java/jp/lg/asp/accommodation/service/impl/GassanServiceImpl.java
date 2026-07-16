@@ -97,6 +97,56 @@ public class GassanServiceImpl implements GassanService {
         form.setFacilityList(facilityList);
         form.setShiteiNoList(checkedShiteiNos);
         form.setDaihyoShiteiNo(daihyoShiteiNo);
+        form.setRno(gassan.getRno());
+        BigDecimal maxRno = gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        BigDecimal minRno = gassanRepository.findMinRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        form.setMaxRno(maxRno);
+        form.setMinRno(minRno);
+        return form;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GassanForm getByGassanShiteiNoAndRno(String gassanShiteiNo, BigDecimal rno) {
+        Gassan gassan = gassanRepository.findByJichitaiCdAndGassanShiteiNoAndRno(jichitaiCd, gassanShiteiNo, rno)
+                .orElseThrow(() -> new RuntimeException("合算申告が見つかりません: " + gassanShiteiNo + "/rno=" + rno));
+
+        List<String> checkedShiteiNos = gassanUchiRepository
+                .findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
+                .stream().map(GassanUchi::getShiteiNo).toList();
+
+        List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, gassan.getAtenaNo());
+        Set<String> checkedSet = Set.copyOf(checkedShiteiNos);
+        String daihyoShiteiNo = checkedShiteiNos.isEmpty() ? null : checkedShiteiNos.get(0);
+
+        List<FacilityItem> facilityList = tokugimuList.stream()
+                .map(t -> {
+                    boolean isChecked = checkedSet.contains(t.getShiteiNo());
+                    boolean isDaihyo = t.getShiteiNo().equals(daihyoShiteiNo);
+                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), isChecked);
+                    item.setDaihyo(isDaihyo);
+                    return item;
+                })
+                .toList();
+
+        Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, gassan.getAtenaNo()).orElse(null);
+
+        GassanForm form = new GassanForm();
+        form.setGassanShiteiNo(gassan.getGassanShiteiNo());
+        form.setAtenaNo(gassan.getAtenaNo());
+        form.setAtenaName(atena != null ? atena.getName() : "");
+        form.setTekiyoStYmd(gassan.getTekiyoStYmd());
+        form.setTekiyoEdYmd(gassan.getTekiyoEdYmd());
+        form.setTorokuYmd(gassan.getTorokuYmd());
+        form.setShinkokuYmd(gassan.getShinkokuYmd());
+        form.setFacilityList(facilityList);
+        form.setShiteiNoList(checkedShiteiNos);
+        form.setDaihyoShiteiNo(daihyoShiteiNo);
+        form.setRno(gassan.getRno());
+        BigDecimal maxRno = gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        BigDecimal minRno = gassanRepository.findMinRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        form.setMaxRno(maxRno);
+        form.setMinRno(minRno);
         return form;
     }
 
