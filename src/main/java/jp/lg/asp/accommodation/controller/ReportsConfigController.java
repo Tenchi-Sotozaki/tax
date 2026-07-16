@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/reports-config")
 public class ReportsConfigController {
 
-	private ReportsConfigService reportsConfigService;
+	private final ReportsConfigService reportsConfigService;
 	private final ScreenAccessChecker accessChecker;
 
 	@Value("${app.jichitai.code}")
