@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiDto;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiReportsService;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiService;
@@ -70,10 +72,11 @@ public class KofuKetteiTsuchiController {
 	 */
 	@PostMapping("/kofuKetteiTsuchi/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	@RptLog(rptId = ReportsConstants.KOFU_KETTEI_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(KofuKetteiTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			KofuKetteiTsuchiDto reportData = kofuKetteiTsuchiService.getReportData(dto.getShiteiNo());
 			if (reportData == null) {
 				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
@@ -85,9 +88,9 @@ public class KofuKetteiTsuchiController {
 				// yyyy-MM-dd 形式から yyyy年MM月dd日 形式に変換
 				try {
 					java.time.LocalDate date = java.time.LocalDate.parse(dto.getHakkoYmd());
-					String formattedDate = String.format("%d年%d月%d日", 
-							date.getYear(), 
-							date.getMonthValue(), 
+					String formattedDate = String.format("%d年%d月%d日",
+							date.getYear(),
+							date.getMonthValue(),
 							date.getDayOfMonth());
 					reportData.setHakkoYmd(formattedDate);
 				} catch (Exception e) {
@@ -114,10 +117,11 @@ public class KofuKetteiTsuchiController {
 	 */
 	@PostMapping("/kofuKetteiTsuchi/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
+	@RptLog(rptId = ReportsConstants.KOFU_KETTEI_TSUCHI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(KofuKetteiTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			KofuKetteiTsuchiDto reportData = kofuKetteiTsuchiService.getReportData(dto.getShiteiNo());
 			if (reportData == null) {
 				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
@@ -129,9 +133,9 @@ public class KofuKetteiTsuchiController {
 				// yyyy-MM-dd 形式から yyyy年MM月dd日 形式に変換
 				try {
 					java.time.LocalDate date = java.time.LocalDate.parse(dto.getHakkoYmd());
-					String formattedDate = String.format("%d年%d月%d日", 
-							date.getYear(), 
-							date.getMonthValue(), 
+					String formattedDate = String.format("%d年%d月%d日",
+							date.getYear(),
+							date.getMonthValue(),
 							date.getDayOfMonth());
 					reportData.setHakkoYmd(formattedDate);
 				} catch (Exception e) {
@@ -159,10 +163,11 @@ public class KofuKetteiTsuchiController {
 	 */
 	@PostMapping("/kofuKetteiTsuchi/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
+	@RptLog(rptId = ReportsConstants.KOFU_KETTEI_TSUCHI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(KofuKetteiTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			KofuKetteiTsuchiDto reportData = kofuKetteiTsuchiService.getReportData(dto.getShiteiNo());
 			if (reportData == null) {
 				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
@@ -174,9 +179,9 @@ public class KofuKetteiTsuchiController {
 				// yyyy-MM-dd 形式から yyyy年MM月dd日 形式に変換
 				try {
 					java.time.LocalDate date = java.time.LocalDate.parse(dto.getHakkoYmd());
-					String formattedDate = String.format("%d年%d月%d日", 
-							date.getYear(), 
-							date.getMonthValue(), 
+					String formattedDate = String.format("%d年%d月%d日",
+							date.getYear(),
+							date.getMonthValue(),
 							date.getDayOfMonth());
 					reportData.setHakkoYmd(formattedDate);
 				} catch (Exception e) {

@@ -31,6 +31,11 @@ public final class ReportsConstants {
 	// 宿泊税特別徴収事務交付金交付決定通知書
 	public static final String KOFU_KETTEI_TSUCHI = "0000000012";
 
+	// 帳票操作
+	public static final String SOUSA_PDF = "1";
+	public static final String SOUSA_PREVIEW = "2";
+	public static final String SOUSA_PRINT = "3";
+
 	// 区分
 	public static final String KBN_TEXT = "1";
 	public static final String KBN_DATA = "2";
@@ -50,4 +55,20 @@ public final class ReportsConstants {
 	public static final String KOSEI_KETTEI_HOREI_INYOU1 = "RPT0000007";
 	// 更正・決定通知書 法令引用文2
 	public static final String KOSEI_KETTEI_HOREI_INYOU2 = "RPT0000008";
+
+	/* 
+	 * 操作名変換
+	 * @param sousa 操作
+	 * @return 操作名
+	 */
+	public static String resolveSousaName(String sousa) {
+		if (sousa == null)
+			return "";
+		return switch (sousa.strip()) {
+		case SOUSA_PDF -> "PDF";
+		case SOUSA_PREVIEW -> "プレビュー";
+		case SOUSA_PRINT -> "印刷";
+		default -> sousa;
+		};
+	}
 }

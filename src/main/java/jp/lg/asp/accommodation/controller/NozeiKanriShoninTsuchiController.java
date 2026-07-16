@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiService;
@@ -48,7 +50,8 @@ public class NozeiKanriShoninTsuchiController {
 			if (shiteiNo != null && !shiteiNo.isEmpty()) {
 				try {
 					log.info("納税管理人情報取得開始: shiteiNo={}", shiteiNo);
-					NozeiKanriShoninTsuchiDto nozeiKanriInfo = nozeiKanriShoninTsuchiService.getNozeiKanriInfo(shiteiNo);
+					NozeiKanriShoninTsuchiDto nozeiKanriInfo = nozeiKanriShoninTsuchiService
+							.getNozeiKanriInfo(shiteiNo);
 					if (nozeiKanriInfo != null) {
 						dto = nozeiKanriInfo;
 						log.info("納税管理人情報取得成功");
@@ -82,16 +85,17 @@ public class NozeiKanriShoninTsuchiController {
 	 */
 	@PostMapping("/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	@RptLog(rptId = ReportsConstants.NOZEI_KANRININ_SHONIN_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(NozeiKanriShoninTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 入力チェック
 			if (dto.getHakkoYmd() == null) {
 				log.error("PDF生成エラー: 発行日が未入力です");
 				return ResponseEntity.badRequest().build();
 			}
-			
+
 			log.info("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 			byte[] pdfData = reportsService.generateTsuchiPdf(dto);
 
@@ -111,16 +115,17 @@ public class NozeiKanriShoninTsuchiController {
 	 */
 	@PostMapping("/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
+	@RptLog(rptId = ReportsConstants.NOZEI_KANRININ_SHONIN_TSUCHI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(NozeiKanriShoninTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 入力チェック
 			if (dto.getHakkoYmd() == null) {
 				log.error("プレビューエラー: 発行日が未入力です");
 				return ResponseEntity.badRequest().build();
 			}
-			
+
 			log.info("プレビュー開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 			byte[] pdfData = reportsService.generateTsuchiPdf(dto);
 
@@ -145,16 +150,17 @@ public class NozeiKanriShoninTsuchiController {
 	 */
 	@PostMapping("/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
+	@RptLog(rptId = ReportsConstants.NOZEI_KANRININ_SHONIN_TSUCHI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(NozeiKanriShoninTsuchiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 入力チェック
 			if (dto.getHakkoYmd() == null) {
 				log.error("印刷エラー: 発行日が未入力です");
 				return ResponseEntity.badRequest().build();
 			}
-			
+
 			log.info("印刷開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 			byte[] pdfData = reportsService.generateTsuchiPdf(dto);
 

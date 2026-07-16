@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jp.lg.asp.accommodation.annotation.RptLog;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
@@ -86,6 +88,7 @@ public class NonyushoController {
      * 納入書PDF生成
      */
     @PostMapping("/pdf")
+    @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
     public ResponseEntity<byte[]> generatePdf(@RequestBody NonyushoDto dto) {
         try {
             log.info("納入書PDF生成開始: shiteiNo={}", dto.getShiteiNo());
