@@ -39,6 +39,7 @@ public class ShunoRenkeiController {
 	private String jichitaiCd;
 
 	private static final String SCREEN_ID = ScreenManagement.SHUNO_RENKEI;
+	private static final String SCREEN_ID_KAKUNIN = ScreenManagement.SHUNO_RENKEI_KAKUNIN;
 
 	@GetMapping("/list")
 	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
@@ -56,7 +57,8 @@ public class ShunoRenkeiController {
 				: LocalDate.parse(shinkokuFrom);
 		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
 				: LocalDate.parse(shinkokuTo);
-		List<ShunoDto> items = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name, nameMatchType);
+		List<ShunoDto> items = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name,
+				nameMatchType);
 
 		model.addAttribute("items", items);
 		Map<String, Object> searchForm = new HashMap<>();
@@ -142,7 +144,7 @@ public class ShunoRenkeiController {
 			sb.append('\n');
 		}
 
-		byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}; // UTF-8 BOM
+		byte[] bom = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF }; // UTF-8 BOM
 		byte[] csvData = sb.toString().getBytes(StandardCharsets.UTF_8);
 		byte[] body = new byte[bom.length + csvData.length];
 		System.arraycopy(bom, 0, body, 0, bom.length);
@@ -154,11 +156,11 @@ public class ShunoRenkeiController {
 	}
 
 	@PostMapping("/kakunin")
-	@OpeLog(screenId = SCREEN_ID, operation = "確認")
+	@OpeLog(screenId = SCREEN_ID_KAKUNIN, operation = "確認")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
 		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
-			accessChecker.checkAccess(SCREEN_ID);
+			accessChecker.checkAccess(SCREEN_ID_KAKUNIN);
 			List<ShunoDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShunoDto.Key.class));
 			List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
