@@ -33,7 +33,7 @@ public final class ScreenManagement {
 	// 納税管理人登録/編集/照会
 	public static final String TAXMANAGER_CONFIG = "ms00000003";
 
-	// ユーザー管理台帳
+	// ユーザー検索
 	public static final String USER_MANAGEMENT = "ss00000002";
 
 	// ユーザー登録/編集/削除
@@ -63,8 +63,14 @@ public final class ScreenManagement {
 	// 収納管理情報連携
 	public static final String SHUNO_RENKEI = "mo00000001";
 
+	// 収納管理情報確認
+	public static final String SHUNO_RENKEI_KAKUNIN = "mo00000002";
+
 	// 交付金振込情報連携
 	public static final String KOFUKIN_FURIKOMI = "mo00000003";
+
+	// 交付金振込確認
+	public static final String KOFUKIN_FURIKOMI_KAKUNIN = "mo00000004";
 
 	// 賦課方式設定（税率管理マスタ）
 	public static final String ZEIRITSU_CONFIG = "sc00000002";
@@ -84,7 +90,7 @@ public final class ScreenManagement {
 	// 振込先口座照会/登録/編集
 	public static final String FURIKOMI_KOZA = "ms00000012";
 
-	// 帳票出力
+	// 帳票発行
 	public static final String TOKUGIMU_REPORT = "ms00000007";
 
 	// 特別徴収義務者指定通知書
@@ -143,6 +149,12 @@ public final class ScreenManagement {
 
 	// 帳票ログ照会
 	public static final String RPT_LOG_VIEW = "ms00000025";
+
+	// 帳票出力設定
+	public static final String REPORTS_CONFIG = "sc00000001";
+
+	// 自治体情報設定
+	public static final String JICHITAI_CONFIG = "sc00000008";
 
 	// 特別徴収義務者状況照会
 	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";

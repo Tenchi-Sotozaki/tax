@@ -39,6 +39,7 @@ public class KofukinFurikomiController {
 	private String jichitaiCd;
 
 	private static final String SCREEN_ID = ScreenManagement.KOFUKIN_FURIKOMI;
+	private static final String SCREEN_ID_KAKUNIN = ScreenManagement.KOFUKIN_FURIKOMI_KAKUNIN;
 
 	@GetMapping("/list")
 	@OpeLog(screenId = SCREEN_ID, operation = "一覧")
@@ -52,7 +53,8 @@ public class KofukinFurikomiController {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		try {
-			List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
+			List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name,
+					nameMatchType);
 			model.addAttribute("items", items);
 		} catch (Exception e) {
 			System.out.println("Error in service call: " + e.getMessage());
@@ -127,7 +129,7 @@ public class KofukinFurikomiController {
 			sb.append('\n');
 		}
 
-		byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF}; // UTF-8 BOM
+		byte[] bom = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF }; // UTF-8 BOM
 		byte[] csvData = sb.toString().getBytes(StandardCharsets.UTF_8);
 		byte[] body = new byte[bom.length + csvData.length];
 		System.arraycopy(bom, 0, body, 0, bom.length);
@@ -139,11 +141,11 @@ public class KofukinFurikomiController {
 	}
 
 	@PostMapping("/kakunin")
-	@OpeLog(screenId = SCREEN_ID, operation = "確認")
+	@OpeLog(screenId = SCREEN_ID_KAKUNIN, operation = "確認")
 	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
 		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
-			accessChecker.checkAccess(SCREEN_ID);
+			accessChecker.checkAccess(SCREEN_ID_KAKUNIN);
 			List<ShoreikinRenkeiDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShoreikinRenkeiDto.Key.class));
 			List<ShoreikinRenkeiDto> rows = shoreikinRenkeiService.findByKeys(jichitaiCd, keys);
