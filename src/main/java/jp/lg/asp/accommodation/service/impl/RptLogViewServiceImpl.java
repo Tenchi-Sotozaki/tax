@@ -3,7 +3,7 @@ package jp.lg.asp.accommodation.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,12 +26,12 @@ public class RptLogViewServiceImpl implements RptLogViewService {
 	private final ReportsRepository reportsRepository;
 	private final ReportsLogRepository reportsLogRepository;
 
-	@Value("${app.jichitai.code}")
-	private String jichitaiCd;
+	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<RptLogViewDto> search(RptLogViewDto form) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		List<ReportsLog> logList = reportsLogRepository.findByConditions(
 				jichitaiCd,
 				form.getRptId(),
@@ -62,6 +62,7 @@ public class RptLogViewServiceImpl implements RptLogViewService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Reports> findAllReports() {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return reportsRepository.findAll().stream()
 				.filter(r -> jichitaiCd.equals(r.getJichitaiCd()))
 				.toList();

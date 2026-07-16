@@ -249,6 +249,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 対象日に適用される納税周期を判定する
 	 */
 	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, LocalDate targetDate) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return tekiyoList.stream()
 				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
 				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
