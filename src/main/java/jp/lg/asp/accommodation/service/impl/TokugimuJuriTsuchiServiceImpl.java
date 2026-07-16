@@ -36,7 +36,8 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 
 	private String jichitaiName;
 	private String jorei;
-
+	private byte[] koin;
+ 
 	@PostConstruct
 	public void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
@@ -44,6 +45,7 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 			jichitaiName = jichitaiInfo.getName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
+		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
 	}
 
 	@Override
@@ -105,7 +107,8 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 		// application.ymlから取得する値
 		dto.setCityName(jichitaiName);
 		dto.setJorei(jorei);
-
+		dto.setKoin(koin);
+		
 		return dto;
 	}
 }
