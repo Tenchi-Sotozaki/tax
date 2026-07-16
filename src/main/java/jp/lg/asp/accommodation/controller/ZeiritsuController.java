@@ -1,10 +1,10 @@
 package jp.lg.asp.accommodation.controller;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -51,7 +51,8 @@ public class ZeiritsuController {
 
 	private final JichitaiContext jichitaiContext;
 
-	private static final String SCREEN_ID = ScreenManagement.ZEIRITSU_CONFIG;
+	private static final String SCREEN_ID = ScreenManagement.ZEIRITSU_DAICHO;
+	private static final String SCREEN_ID_CONFIG = ScreenManagement.ZEIRITSU_CONFIG;
 	private static final String LIST_VIEW = "admin/zeiritsuDaicho";
 	private static final String FORM_VIEW = "admin/zeiritsuConfig";
 
@@ -73,11 +74,11 @@ public class ZeiritsuController {
 	// ========== 照会 ==========
 
 	@GetMapping("/view/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "照会")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会")
 	public String view(@PathVariable("seq") Long seq,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		Zeiritsu z = findOrThrow(jichitaiCd, BigDecimal.valueOf(seq));
 		model.addAttribute("zeiritsuForm", toForm(z, jichitaiCd));
 		model.addAttribute("isView", true);
@@ -90,11 +91,11 @@ public class ZeiritsuController {
 	// ========== 編集画面 ==========
 
 	@GetMapping("/edit/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String edit(@PathVariable("seq") Long seq,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		Zeiritsu z = findOrThrow(jichitaiCd, BigDecimal.valueOf(seq));
 		model.addAttribute("zeiritsuForm", toForm(z, jichitaiCd));
 		model.addAttribute("isView", false);
@@ -107,14 +108,14 @@ public class ZeiritsuController {
 	// ========== 更新処理 ==========
 
 	@PostMapping("/edit/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String update(@PathVariable("seq") Long seq,
 			@Validated @ModelAttribute("zeiritsuForm") ZeiritsuForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		validateDetails(form, bindingResult);
 
@@ -204,11 +205,11 @@ public class ZeiritsuController {
 	// ========== 削除処理 ==========
 
 	@PostMapping("/delete/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "削除")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "削除")
 	public String delete(@PathVariable("seq") Long seq,
 			RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		BigDecimal seqDec = BigDecimal.valueOf(seq);
 
@@ -241,9 +242,9 @@ public class ZeiritsuController {
 	// ========== 新規登録画面 ==========
 
 	@GetMapping("/register")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録画面表示")
 	public String showForm(Model model) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("zeiritsuForm", new ZeiritsuForm());
 		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", false);
@@ -254,13 +255,13 @@ public class ZeiritsuController {
 	// ========== 登録処理 ==========
 
 	@PostMapping("/register")
-	@OpeLog(screenId = SCREEN_ID, operation = "登録")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String save(@Validated @ModelAttribute("zeiritsuForm") ZeiritsuForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		validateDetails(form, bindingResult);
 

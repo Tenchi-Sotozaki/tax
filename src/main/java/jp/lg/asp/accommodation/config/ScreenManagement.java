@@ -70,7 +70,7 @@ public final class ScreenManagement {
 	public static final String ZEIRITSU_CONFIG = "sc00000002";
 
 	// 賦課方式照会
-	public static final String ZEIRITAU_DAICHO = "ss00000004";
+	public static final String ZEIRITSU_DAICHO = "ss00000004";
 
 	// 特別徴収事務交付金
 	public static final String SHOREIKIN = "ms00000009";

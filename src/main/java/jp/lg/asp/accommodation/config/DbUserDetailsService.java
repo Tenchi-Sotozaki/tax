@@ -64,10 +64,12 @@ public class DbUserDetailsService implements UserDetailsService {
 		String role = isAdmin ? "ROLE_ADMIN" : "ROLE_USER";
 
 		boolean mustChangePassword = "1".equals(user.getInitialPasswordFlg());
-		return new AppUserDetails(
+		AppUserDetails details = new AppUserDetails(
 		        user.getId(),
 		        password,
 		        List.of(new SimpleGrantedAuthority(role)),
 		        mustChangePassword);
+		details.setDisplayName(user.getName());
+		return details;
 	}
 }
