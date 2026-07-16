@@ -71,7 +71,7 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
         reportsDto.setKanpuMenjoGaku(dto.getKanpuMenjoGaku() != null ? dto.getKanpuMenjoGaku() : "");
         reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
         reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
-        reportsDto.setKoin(dto.getKoin());
+        reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
         // 申請の年月をyyyy年M月形式に変換
         if (dto.getShinseiYm() != null && !dto.getShinseiYm().isEmpty()) {

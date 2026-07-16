@@ -641,7 +641,7 @@
 				<printWhenExpression><![CDATA[$F{henko_kbn}.equals("3")]]></printWhenExpression>
 				<pen lineWidth="1.5"/>
 			</element>
-			<element kind="image" uuid="7ad005ca-59b4-459b-a734-19f749a4ad53" x="475" y="77" width="30" height="30">
+			<element kind="image" uuid="7ad005ca-59b4-459b-a734-19f749a4ad53" x="475" y="77" width="30" height="30" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>

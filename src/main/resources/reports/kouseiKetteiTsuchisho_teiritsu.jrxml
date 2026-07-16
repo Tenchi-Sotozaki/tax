@@ -648,7 +648,7 @@
 			<element kind="line" uuid="c9fceffe-529d-4ddf-b117-99afaedfaa4f" x="90" y="320" width="71" height="1">
 				<pen lineWidth="0.5"/>
 			</element>
-			<element kind="image" uuid="e501b29c-961b-4741-8669-d5c526775400" x="473" y="72" width="50" height="50">
+			<element kind="image" uuid="e501b29c-961b-4741-8669-d5c526775400" x="473" y="72" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>

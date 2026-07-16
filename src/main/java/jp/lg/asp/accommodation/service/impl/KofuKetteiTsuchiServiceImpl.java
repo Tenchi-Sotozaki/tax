@@ -105,7 +105,7 @@ public class KofuKetteiTsuchiServiceImpl implements KofuKetteiTsuchiService {
 			dto.setHakkoJorei(jorei);
 			dto.setShisetsuName(tokugimu.getShisetsuName());
 			dto.setShiteiNo(tokugimu.getShiteiNo());
-			dto.setKoin(koin);;
+			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
 
 			// 施設住所を郵便番号と住所で連結
 			StringBuilder shisetsuJusho = new StringBuilder();

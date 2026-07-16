@@ -225,7 +225,7 @@ and tkg.atena_no = at.atena_no ]]></query>
 			<element kind="textField" uuid="03be05e0-09eb-470c-868c-1a73d8e1b57f" x="390" y="130" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$P{city} + "長"]]></expression>
 			</element>
-			<element kind="image" uuid="02009659-a234-49be-a557-049e0beef967" x="480" y="110" width="50" height="50">
+			<element kind="image" uuid="02009659-a234-49be-a557-049e0beef967" x="480" y="110" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>

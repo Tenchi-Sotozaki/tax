@@ -160,7 +160,7 @@
 			<element kind="staticText" uuid="7c4f31df-90ae-4e54-a10e-67e647f3f525" x="40" y="549" width="480" height="50" fontName="IPAex明朝" fontSize="12.0">
 				<text><![CDATA[※特別徴収義務者などの登録事項に変更があった場合には、変更の届出をしてください。]]></text>
 			</element>
-			<element kind="image" uuid="91ce8082-6d9e-4e8a-8be8-83a11fb87033" x="450" y="90" width="50" height="50">
+			<element kind="image" uuid="91ce8082-6d9e-4e8a-8be8-83a11fb87033" x="450" y="90" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>

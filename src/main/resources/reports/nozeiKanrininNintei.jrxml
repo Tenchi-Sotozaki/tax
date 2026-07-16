@@ -203,7 +203,7 @@ FROM t_tokugimu tkg
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="image" uuid="6276b85c-f50c-4ac4-84d1-c68c80e64c73" x="400" y="190" width="50" height="50">
+			<element kind="image" uuid="6276b85c-f50c-4ac4-84d1-c68c80e64c73" x="400" y="190" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>

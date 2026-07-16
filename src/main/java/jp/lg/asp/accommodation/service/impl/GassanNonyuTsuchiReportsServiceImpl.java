@@ -70,7 +70,7 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 		reportsDto.setGassan_shitei_no(dto.getGassanShiteiNo() != null ? dto.getGassanShiteiNo() : "");
 		reportsDto.setTekiyo_st_ymd(dto.getTekiyoStYmd() != null
 				? Date.valueOf(dto.getTekiyoStYmd()) : null);
-		reportsDto.setKoin(dto.getKoin());
+		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
 		List<GassanNonyuTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		return new JRBeanCollectionDataSource(dataSourceList, false);

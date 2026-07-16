@@ -1278,13 +1278,13 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="image" uuid="81cb8974-94ef-44f9-ae31-b5b0943f6199" x="198" y="7" width="50" height="50">
+			<element kind="image" uuid="81cb8974-94ef-44f9-ae31-b5b0943f6199" x="198" y="7" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
-			<element kind="image" uuid="0d0bfcf6-7004-4774-9093-c9d368d40ec3" x="465" y="7" width="50" height="50">
+			<element kind="image" uuid="0d0bfcf6-7004-4774-9093-c9d368d40ec3" x="465" y="7" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
-			<element kind="image" uuid="2c05c8b0-50c0-4ff2-ac77-01d3c5ff1cdc" x="740" y="7" width="50" height="50">
+			<element kind="image" uuid="2c05c8b0-50c0-4ff2-ac77-01d3c5ff1cdc" x="740" y="7" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>

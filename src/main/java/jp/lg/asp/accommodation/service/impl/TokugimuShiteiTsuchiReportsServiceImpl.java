@@ -32,7 +32,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsuchiReportsService {
 
 	private static final String JRXML_PATH = "reports/tokugimuShiteiTsuchi.jrxml";
-
+	
 	@Override
 	public byte[] generateTsuchiPdf(TokugimuShiteiTsuchiDto dto) {
 		try {
@@ -68,7 +68,7 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setCity(dto.getCity() != null ? dto.getCity() : "");
-		reportsDto.setKoin(dto.getKoin());
+		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
