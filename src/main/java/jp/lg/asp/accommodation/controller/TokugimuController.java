@@ -101,9 +101,14 @@ public class TokugimuController {
 
 	@GetMapping("/view/{id}")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "照会")
-	public String showView(@PathVariable("id") String id, Model model) {
+	public String showView(@PathVariable("id") String id,
+			@RequestParam(required = false) Integer rno,
+			Model model) {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
-		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
+		TokugimuForm form = (rno != null)
+				? tokugimuService.getTokugimuByShiteiNoAndRno(id, rno)
+				: tokugimuService.getTokugimuByShiteiNo(id);
+		model.addAttribute("TokugimuForm", form);
 		model.addAttribute("isView", true);
 		model.addAttribute("isEdit", false);
 		model.addAttribute("editId", id);

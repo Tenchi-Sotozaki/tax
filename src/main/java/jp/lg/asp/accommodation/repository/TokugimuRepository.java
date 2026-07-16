@@ -77,4 +77,19 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 	Optional<Integer> findMaxRnoByJichitaiCdAndShiteiNo(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
+
+	@Query(value = "SELECT COALESCE(MIN(rno), 0) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no = :shiteiNo AND del_flg = '0'", nativeQuery = true)
+	Optional<Integer> findMinRnoByJichitaiCdAndShiteiNo(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo);
+
+	@Query("""
+			SELECT t FROM Tokugimu t
+			WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo
+			AND t.rno = :rno AND t.delFlg = '0'
+			""")
+	Optional<Tokugimu> findByJichitaiCdAndShiteiNoAndRno(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo,
+			@Param("rno") BigDecimal rno);
 }

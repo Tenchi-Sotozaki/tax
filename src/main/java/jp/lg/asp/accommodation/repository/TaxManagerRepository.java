@@ -53,4 +53,16 @@ public interface TaxManagerRepository extends JpaRepository<TaxManager, TaxManag
      */
     @Query("SELECT t FROM TaxManager t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo ORDER BY t.rno DESC")
     List<TaxManager> findAllByJichitaiCdAndShiteiNoOrderByRnoDesc(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNo") String shiteiNo);
+
+    /**
+     * 指定番号・履歴番号でデータを取得
+     */
+    @Query("SELECT t FROM TaxManager t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.rno = :rno")
+    Optional<TaxManager> findByJichitaiCdAndShiteiNoAndRno(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNo") String shiteiNo, @Param("rno") Integer rno);
+
+    /**
+     * 指定番号の最小履歴番号を取得
+     */
+    @Query("SELECT COALESCE(MIN(t.rno), 0) FROM TaxManager t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo")
+    Integer findMinRnoByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNo") String shiteiNo);
 }

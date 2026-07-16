@@ -116,6 +116,9 @@ public class TokugimuForm {
 	private String suspensionOrAbolitionReason;
 
 	private String shiteiNo;
+	private Integer rno;
+	private Integer maxRno;
+	private Integer minRno;
 
 	public String getTokugimuYubinNo() {
 		return mailAddressNo != null && !mailAddressNo.isBlank() ? mailAddressNo : tokugimuAddressNo;

@@ -44,6 +44,9 @@ public class TaxManagerForm {
 
 	private boolean edit;
 	private String shiteiNo;
+	private Integer rno;
+	private Integer maxRno;
+	private Integer minRno;
 
 	// ===== カスタムバリデーションアノテーション =====
 

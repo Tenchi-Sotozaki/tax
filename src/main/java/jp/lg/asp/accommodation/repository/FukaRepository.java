@@ -56,6 +56,21 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 			@Param("nendo") String nendo,
 			@Param("kibetsu") Integer kibetsu);
 
+	@Query("SELECT MIN(f.rno) FROM Fuka f WHERE f.jichitaiCd = :jichitaiCd AND f.shiteiNo = :shiteiNo AND f.nendo = :nendo AND f.kibetsu = :kibetsu AND f.delFlg = '0'")
+	Optional<Integer> findMinRno(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo,
+			@Param("nendo") String nendo,
+			@Param("kibetsu") Integer kibetsu);
+
+	@Query("SELECT f FROM Fuka f WHERE f.jichitaiCd = :jichitaiCd AND f.shiteiNo = :shiteiNo AND f.nendo = :nendo AND f.kibetsu = :kibetsu AND f.rno = :rno AND f.delFlg = '0'")
+	Optional<Fuka> findByRno(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo,
+			@Param("nendo") String nendo,
+			@Param("kibetsu") Integer kibetsu,
+			@Param("rno") Integer rno);
+
 	/**
 	 * 指定年度の賦課情報を取得（一括算出用）
 	 */

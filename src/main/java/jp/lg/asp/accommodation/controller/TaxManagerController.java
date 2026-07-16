@@ -90,15 +90,17 @@ public class TaxManagerController {
 
 	@GetMapping("/view/{id}")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
-	public String view(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
+	public String view(@PathVariable("id") String id, @RequestParam(required = false) String from,
+			@RequestParam(required = false) Integer rno, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		TaxManagerForm form = taxManagerService.getByShiteiNo(id);
-		
-		// 納税管理人登録ボタンからの遷移の場合はメッセージを表示
+		TaxManagerForm form = (rno != null)
+				? taxManagerService.getByShiteiNoAndRno(id, rno)
+				: taxManagerService.getByShiteiNo(id);
+
 		if ("register".equals(from)) {
 			model.addAttribute("infoMessage", "この特別徴収義務者には既に納税管理人が登録されています。");
 		}
-		
+
 		model.addAttribute("taxManagerForm", form);
 		model.addAttribute("isEdit", false);
 		model.addAttribute("isView", true);

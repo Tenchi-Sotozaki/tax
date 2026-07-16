@@ -514,6 +514,7 @@ public class FukaServiceImpl implements FukaService {
 					form.setShinkokuDate(entity.getShinkokuYmd());
 					form.setNendo(entity.getNendo());
 					form.setKibetsu(entity.getKibetsu());
+					form.setRno(entity.getRno());
 					form.setFukaKbn(entity.getFukaKbn());
 					form.setModificationCategory(entity.getHenkoKbn());
 					form.setModificationReason(entity.getHenkoRiyu());
@@ -562,6 +563,55 @@ public class FukaServiceImpl implements FukaService {
 	public FukaDeclarationForm getDeclarationFormForView(String shiteiNo, String nendo, Integer kibetsu) {
 		FukaDeclarationForm form = getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
 		form.setView(true);
+		form.setMaxRno(fukaRepository.findMaxRno(jichitaiCd, shiteiNo, nendo, kibetsu).orElse(1));
+		form.setMinRno(fukaRepository.findMinRno(jichitaiCd, shiteiNo, nendo, kibetsu).orElse(1));
+		return form;
+	}
+
+	/**
+	 * rno指定で照会用の表示データを取得する。
+	 */
+	@Transactional(readOnly = true)
+	public FukaDeclarationForm getDeclarationFormForViewByRno(String shiteiNo, String nendo, Integer kibetsu, Integer rno) {
+		String taishoYm = createTaishoYmString(nendo, kibetsu);
+		FukaDeclarationForm form = getDeclarationFormForRegister(shiteiNo, taishoYm);
+
+		fukaRepository.findByRno(jichitaiCd, shiteiNo, nendo, kibetsu, rno)
+				.ifPresent(entity -> {
+					form.setTorokuDate(entity.getTorokuYmd());
+					form.setShinkokuDate(entity.getShinkokuYmd());
+					form.setNendo(entity.getNendo());
+					form.setKibetsu(entity.getKibetsu());
+					form.setRno(entity.getRno());
+					form.setFukaKbn(entity.getFukaKbn());
+					form.setModificationCategory(entity.getHenkoKbn());
+					form.setModificationReason(entity.getHenkoRiyu());
+					form.setAdditionalCategory1(entity.getKasanKbn1());
+					if (entity.getKasanRitsu1() != null) form.setAdditionalRate1(entity.getKasanRitsu1().toString());
+					form.setAdditionalAmount1(entity.getKasanGaku1());
+					form.setAdditionalDueDate1(entity.getNokigen1());
+					form.setAdditionalCategory2(entity.getKasanKbn2());
+					if (entity.getKasanRitsu2() != null) form.setAdditionalRate2(entity.getKasanRitsu2().toString());
+					form.setAdditionalAmount2(entity.getKasanGaku2());
+					form.setAdditionalDueDate2(entity.getNokigen2());
+					form.setAdditionalCategory3(entity.getKasanKbn3());
+					if (entity.getKasanRitsu3() != null) form.setAdditionalRate3(entity.getKasanRitsu3().toString());
+					form.setAdditionalAmount3(entity.getKasanGaku3());
+					form.setAdditionalDueDate3(entity.getNokigen3());
+					setMonthlyDetail(entity, form);
+					setMonthlyTally(form, entity);
+				});
+
+		shunoRirekiRepository.findLatest(jichitaiCd, shiteiNo, nendo, kibetsu)
+				.ifPresent(shuno -> {
+					form.setShunoFlg(true);
+					form.setShunoYmd(shuno.getNonyuYmd());
+					form.setShunoKingaku(shuno.getNonyugaku() != null ? shuno.getNonyugaku().longValue() : null);
+				});
+
+		form.setView(true);
+		form.setMaxRno(fukaRepository.findMaxRno(jichitaiCd, shiteiNo, nendo, kibetsu).orElse(1));
+		form.setMinRno(fukaRepository.findMinRno(jichitaiCd, shiteiNo, nendo, kibetsu).orElse(1));
 		return form;
 	}
 

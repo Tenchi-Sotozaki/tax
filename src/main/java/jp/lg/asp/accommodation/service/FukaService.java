@@ -31,6 +31,11 @@ public interface FukaService {
 	FukaDeclarationForm getDeclarationFormForView(String shiteiNo, String nendo, Integer kibetsu);
 
 	/**
+	 * rno指定で照会用の表示データを取得する。
+	 */
+	FukaDeclarationForm getDeclarationFormForViewByRno(String shiteiNo, String nendo, Integer kibetsu, Integer rno);
+
+	/**
 	 * 宿泊税情報の保存処理を実行する。
 	 */
 	void saveDeclaration(FukaDeclarationForm form);

@@ -162,17 +162,19 @@ public class FukaController {
 			@PathVariable String shiteiNo,
 			@PathVariable String nendo,
 			@PathVariable Integer kibetsu,
+			@RequestParam(required = false) Integer rno,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
-		// 未申告データに対する照会アクセス制限
 		if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
 			redirectAttributes.addFlashAttribute("errorMessage", "未申告のデータです。「新規登録」ボタンから登録してください。");
 			return "redirect:/declaration/payment-ledger/" + shiteiNo;
 		}
 
-		FukaDeclarationForm form = fukaService.getDeclarationFormForView(shiteiNo, nendo, kibetsu);
+		FukaDeclarationForm form = (rno != null)
+				? fukaService.getDeclarationFormForViewByRno(shiteiNo, nendo, kibetsu, rno)
+				: fukaService.getDeclarationFormForView(shiteiNo, nendo, kibetsu);
 		form.setView(true);
 		form.setEdit(false);
 		model.addAttribute("fukaDeclarationForm", form);
