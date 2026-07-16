@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import jp.lg.asp.accommodation.dto.NonyushoDto;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
+import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.service.NonyushoReportsService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.TokugimuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ public class NonyushoController {
 
     private final NonyushoReportsService nonyushoReportsService;
     private final TokugimuService tokugimuService;
+    private final ReportsCommonService reportsCommonService;
 
     /**
      * 納入書発行画面表示
@@ -50,6 +53,7 @@ public class NonyushoController {
                 model.addAttribute("tokuJusho", tokugimuForm.getTokugimuAddress());
                 model.addAttribute("tokuYubinNo", tokugimuForm.getTokugimuYubinNo());
                 model.addAttribute("shisetsuJusho", tokugimuForm.getFacilityAddress());
+                model.addAttribute("koin", reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
             } catch (Exception e) {
                 log.warn("特別徴収義務者情報の取得に失敗: shiteiNo={}", shiteiNo, e);
                 model.addAttribute("shiteiNo", shiteiNo);

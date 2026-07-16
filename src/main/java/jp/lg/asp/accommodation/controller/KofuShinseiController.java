@@ -16,6 +16,7 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.KofuShinseiDto;
 import jp.lg.asp.accommodation.service.KofuShinseiReportsService;
 import jp.lg.asp.accommodation.service.KofuShinseiService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +32,7 @@ public class KofuShinseiController {
 	private final KofuShinseiService kofuShinseiService;
 	private final KofuShinseiReportsService reportsService;
 	private final ScreenAccessChecker accessChecker;
+	private final ReportsCommonService reportsCommonService;
 	private static final String SCREEN_ID = ScreenManagement.KOFU_SHINSEI;
 
 	/**
@@ -84,7 +86,7 @@ public class KofuShinseiController {
 			int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
 			dto.setNendo(currentYear + "-04");
 		}
-
+		
 		model.addAttribute("dto", dto);
 		return "reports/kofuShinsei";
 	}

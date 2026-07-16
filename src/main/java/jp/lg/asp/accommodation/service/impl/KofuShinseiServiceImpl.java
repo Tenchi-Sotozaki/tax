@@ -141,6 +141,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 			dto.setJorei(jorei);
 			dto.setHakkoYoshiki(hakkoYoshiki);
 			dto.setKofuJoken(kofuJoken);
+			dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
 
 			log.info("交付申請書データ取得完了: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 			return dto;

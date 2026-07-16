@@ -59,6 +59,6 @@ public class NonyushoReportsDto {
     /** 取りまとめ店 */
     private String torimatome;
     
-    /** 自治体コイン(画像) */
-    private java.io.InputStream jichitaiKoin;
+    /** 公印 */
+    private byte[] koin;
 }

@@ -4,16 +4,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
-import jp.lg.asp.accommodation.entity.Nokan;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,7 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
     private final AtenaRepository atenaRepository;
     private final NokanRepository nokanRepository;
     private final JichitaiRepository jichitaiRepository;
+    private final ReportsCommonService reportsCommonService;
 
     @Value("${app.jichitai.code}")
     private String jichitaiCd;
@@ -47,6 +49,7 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
         dto.setShiteiNo(shiteiNo);
         dto.setCityName(cityName);
         dto.setJorei(jorei);
+        dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
 
         // 特別徴収義務者情報を取得
         Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)

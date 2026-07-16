@@ -36,6 +36,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 
 	private String cityName;
 	private String jorei;
+	private byte[] koin;
 
 	@PostConstruct
 	public void init() {
@@ -44,6 +45,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 			cityName = jichitaiInfo.getName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_SHITEI_JOREI);
+		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
 	}
 
 	@Override
@@ -95,6 +97,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 
 		dto.setCity(cityName);
 		dto.setJorei(jorei);
+		dto.setKoin(koin);
 
 		return dto;
 	}

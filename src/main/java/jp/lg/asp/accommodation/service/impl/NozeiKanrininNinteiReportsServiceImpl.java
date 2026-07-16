@@ -60,6 +60,7 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 			row.put("name", dto.getTokuName() != null ? dto.getTokuName() : "");
 			row.put("shisetsu_jusho", dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 			row.put("shisetsu_name", dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
+			row.put("koin", dto.getKoin());
 
 			List<Map<String, ?>> dataSourceList = Arrays.asList(row);
 			JRDataSource dataSource = new JRMapCollectionDataSource(dataSourceList);

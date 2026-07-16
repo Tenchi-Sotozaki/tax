@@ -42,4 +42,7 @@ public class NozeiKanriShoninTsuchiDto {
 
     /** 指定番号（内部処理用） */
     private String shiteiNo;
+    
+    /** 公印 */
+    private byte[] koin;
 }

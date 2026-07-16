@@ -37,4 +37,7 @@ public class NozeiKanriShoninTsuchiReportsDto {
 
     /** 理由 */
     private String riyu;
+    
+    /** 公印 */
+    private byte[] koin;
 }

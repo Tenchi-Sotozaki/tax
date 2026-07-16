@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanrininNinteiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
@@ -12,6 +13,7 @@ import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.NozeiKanrininNinteiService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +28,7 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
     private final TokugimuRepository tokugimuRepository;
     private final AtenaRepository atenaRepository;
     private final JichitaiRepository jichitaiRepository;
+    private final ReportsCommonService reportsCommonService;
 
     @Value("${app.jichitai.code}")
     private String jichitaiCd;
@@ -44,6 +47,7 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         dto.setCityName(cityName);
         dto.setJorei(jorei);
         dto.setNintei("認定");
+        dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
 
         // 特別徴収義務者情報を取得
         Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)

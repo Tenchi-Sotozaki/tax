@@ -40,4 +40,7 @@ public class GassanNonyuTsuchiDto {
 
 	/** 条令 */
 	private String jorei;
+	
+	/** 公印 */
+	private byte[] koin;
 }

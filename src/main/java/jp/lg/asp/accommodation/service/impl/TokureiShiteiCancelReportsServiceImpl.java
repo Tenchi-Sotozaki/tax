@@ -72,7 +72,8 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 		reportsDto.setShisetsu_name(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
 		reportsDto.setShitei_no(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
 		reportsDto.setBiko("");
-
+		reportsDto.setKoin(dto.getKoin());)
+		
 		List<TokureiShiteiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		return new JRBeanCollectionDataSource(dataSourceList, false);
 	}

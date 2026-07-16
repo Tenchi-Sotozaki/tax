@@ -11,6 +11,7 @@
 	<field name="nozeiKanriJusho" class="java.lang.String"/>
 	<field name="nozeiKanriName" class="java.lang.String"/>
 	<field name="riyu" class="java.lang.String"/>
+	<field name="koin" class="java.lang.Object"/>
 	<background splitType="Stretch"/>
 	<pageHeader height="70" splitType="Stretch">
 		<element kind="staticText" uuid="8010567e-b9c9-4abd-bb05-8934c9779ea1" x="80" y="5" width="400" height="50" markup="none" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
@@ -43,6 +44,9 @@
 		</element>
 		<element kind="textField" uuid="c35f0ea1-6fa0-4bac-ab7d-6dc86e9c9d20" x="-10" y="120" width="560" height="25" fontName="IPAex明朝" fontSize="10.0">
 			<expression><![CDATA["　"+$F{cityName}+"宿泊税条令施行規則"+$F{jorei}+"の規定により、宿泊税の納税管理人として次のとおり（ 承認  不承認 ）することを決定しましたので通知します。"]]></expression>
+		</element>
+		<element kind="image" uuid="41c1e8c1-28a3-4cb1-b94e-5943bbf97d6e" x="495" y="60" width="50" height="50">
+			<expression><![CDATA[$F{koin}]]></expression>
 		</element>
 	</columnHeader>
 	<detail>

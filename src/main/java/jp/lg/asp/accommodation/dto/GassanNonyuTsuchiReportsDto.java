@@ -21,4 +21,7 @@ public class GassanNonyuTsuchiReportsDto {
 
 	/** 適用開始年月日 */
 	private Date tekiyo_st_ymd;
+	
+	/** 公印 */
+	private byte[] koin;
 }
