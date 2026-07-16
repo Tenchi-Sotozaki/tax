@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/accommodation_tax_db
+    username: postgres
+    password: ${ACOMO_DB_PASSWORD:GEpassword}
+    driver-class-name: org.postgresql.Driver
+
+server:
+  address: localhost

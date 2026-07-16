@@ -1,9 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/accommodation_tax_db
-    username: postgres
-    password: GEpassword
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
@@ -24,7 +19,6 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-
 
 server:
   port: 8080
