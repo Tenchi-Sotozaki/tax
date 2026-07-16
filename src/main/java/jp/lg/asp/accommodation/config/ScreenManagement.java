@@ -27,14 +27,17 @@ public final class ScreenManagement {
 	// 納入申告登録
 	public static final String FUKA_CONFIG = "ms00000005";
 
-	// 納入金額管理台帳
+	// 納入申告管理台帳
 	public static final String FUKA_DAICHO = "ms00000004";
 
 	// 納税管理人登録/編集/照会
 	public static final String TAXMANAGER_CONFIG = "ms00000003";
 
-	// ユーザー管理
+	// ユーザー管理台帳
 	public static final String USER_MANAGEMENT = "ss00000002";
+
+	// ユーザー登録/編集/削除
+	public static final String USER_CONFIG = "ss00000001";
 
 	// 権限管理
 	public static final String ROLE_MANAGEMENT = "sc00000004";
@@ -51,10 +54,10 @@ public final class ScreenManagement {
 	// 電子申告情報取込確認
 	public static final String ELTAX_RENKEI_KAKUNIN = "mt00000003";
 
-	// 合算申告登録/編集/照会
+	// 合算申請登録/編集/照会
 	public static final String GASSAN_CONFIG = "mi00000001";
 
-	// 合算申告情報管理台帳
+	// 合算申請管理台帳
 	public static final String GASSAN_LIST = "ms00000006";
 
 	// 収納管理情報連携
@@ -65,6 +68,9 @@ public final class ScreenManagement {
 
 	// 賦課方式設定（税率管理マスタ）
 	public static final String ZEIRITSU_CONFIG = "sc00000002";
+
+	// 賦課方式照会
+	public static final String ZEIRITAU_DAICHO = "ss00000004";
 
 	// 特別徴収事務交付金
 	public static final String SHOREIKIN = "ms00000009";
@@ -111,7 +117,7 @@ public final class ScreenManagement {
 	// 合算申告納入承認通知書
 	public static final String GASSAN_NONYU_TSUCHI = "ms00000021";
 
-	//　宿泊税更生・決定通知書
+	// 宿泊税更生・決定通知書
 	public static final String KOSEI_KETTEI_TSUCHI = "ms00000023";
 
 	// 交付率設定
@@ -134,4 +140,10 @@ public final class ScreenManagement {
 
 	// 操作ログ照会
 	public static final String OPE_LOG_VIEW = "ss00000008";
+
+	// 帳票ログ照会
+	public static final String RPT_LOG_VIEW = "ms00000025";
+
+	// 特別徴収義務者状況照会
+	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";
 }

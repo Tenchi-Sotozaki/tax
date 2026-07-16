@@ -106,8 +106,10 @@
 							<div class="input-group">
 								<input type="text" id="atenaNameDisplay"
 									class="form-control bg-light" th:value="*{atenaName}" readonly>
-								<button th:if="!${isView}" type="button" class="btn btn-primary btn-sm"
-									data-bs-toggle="modal" data-bs-target="#addressSearchModal">
+								<button th:if="!${isView}" type="button"
+									class="btn btn-primary btn-sm" data-bs-toggle="modal"
+									data-bs-target="#addressSearchModal">
+
 									<i class="bi bi-search me-1"></i>宛名検索
 								</button>
 							</div>
@@ -160,8 +162,8 @@
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
 					<h5 class="mb-0">
-						<i class="bi bi-building me-2"></i>徴収義務者一覧 <span
-							th:if="!${isView}" class="badge bg-danger ms-2 fs-6">必須（2件以上選択）</span>
+						<i class="bi bi-building me-2"></i>特別徴収義務者一覧 <span
+							th:if="!${isView}" class="badge bg-danger ms-2 fs-6">2件以上選択必須</span>
 					</h5>
 				</div>
 				<div class="card-body p-0">
@@ -174,13 +176,14 @@
 					</div>
 
 					<table
-						class="table table-bordered table-hover table-sm align-middle mb-0">
+						class="table table-bordered table-hover table-sm align-middle mb-0"
+						style="table-layout: fixed;">
 						<thead class="table-light">
 							<tr>
 								<th style="width: 60px" class="text-center"></th>
-								<th style="width: 80px" class="text-center">代表施設</th>
-								<th>徴収義務者名</th>
-								<th>施設名</th>
+								<th style="width: 80px" class="text-center">代表指定</th>
+								<th style="width: calc(( 100% - 140px)/2)" class="text-center">特別徴収義務者名</th>
+								<th style="width: calc(( 100% - 140px)/2)" class="text-center">施設名称</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -198,11 +201,11 @@
 									class="bi bi-circle text-muted fs-5"></i>
 								</td>
 								<td class="text-center">
-									<!-- 代表施設チェックボックス --> <input th:if="!${isView}" type="radio"
+									<!-- 代表指定チェックボックス --> <input th:if="!${isView}" type="radio"
 									class="form-check-input daihyo-radio" name="daihyoShiteiNo"
 									th:value="${facility.shiteiNo}" th:checked="${facility.daihyo}"
 									th:disabled="${facility.disabled or !facility.checked}">
-									<!-- 照会時：代表施設アイコン --> <i
+									<!-- 照会時：代表指定アイコン --> <i
 									th:if="${isView} and ${facility.daihyo}"
 									class="bi bi-check-circle-fill text-success fs-5"></i>
 								</td>
@@ -234,10 +237,10 @@
 				</th:block>
 
 				<a th:href="@{/gassan/list}"
-					class="btn btn-outline-secondary btn-lg px-4"
+					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:href="@{/gassan/list}"
-					class="btn btn-outline-secondary btn-lg px-4"
+					class="btn btn-outline-primary btn-lg px-4"
 					th:unless="${isView ?: false}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -247,7 +250,9 @@
 
 		<!-- 確認モーダル -->
 		<div th:if="!${isView}"
-			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}">
+			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', 
+			${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', 
+			'btn-success', ${isEdit} ? '更新する' : '登録する')}">
 		</div>
 
 		<!-- 宛名検索モーダル -->

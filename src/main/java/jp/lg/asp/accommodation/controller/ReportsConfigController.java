@@ -46,10 +46,8 @@ public class ReportsConfigController {
             
             // ファイルタイプチェック
             String contentType = form.getFile().getContentType();
-            if (contentType == null || (!contentType.equals("application/pdf") && 
-                !contentType.startsWith("application/vnd.openxmlformats-officedocument") &&
-                !contentType.startsWith("application/vnd.ms-"))) {
-                redirectAttributes.addFlashAttribute("errorMessage", "PDF、Word、Excelファイルのみアップロード可能です。");
+            if (contentType == null || !contentType.equals("image/png")) {
+                redirectAttributes.addFlashAttribute("errorMessage", "PNG画像ファイルのみアップロード可能です。");
                 return "redirect:/admin/reports-config";
             }
             

@@ -184,6 +184,10 @@
 			</div>
 		</div>
 
+		<!-- 削除確認モーダル -->
+		<form id="deleteForm"></form>
+		<div th:replace="~{layout/components :: confirmModal('deleteConfirmModal','削除確認','削除します。よろしいですか？','deleteForm','btn-danger','削除する')}"></div>
+
 	</div>
 
 	<th:block layout:fragment="scripts">
