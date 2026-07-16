@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiDto;
 import jp.lg.asp.accommodation.service.TokugimuShiteiTsuchiReportsService;
 import jp.lg.asp.accommodation.service.TokugimuShiteiTsuchiService;
@@ -65,6 +67,7 @@ public class TokugimuShiteiTsuchiController {
 	 */
 	@PostMapping("/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	@RptLog(rptId = ReportsConstants.TOKUGIMU_SHITEI_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(TokugimuShiteiTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -81,6 +84,7 @@ public class TokugimuShiteiTsuchiController {
 	 */
 	@PostMapping("/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
+	@RptLog(rptId = ReportsConstants.TOKUGIMU_SHITEI_TSUCHI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(TokugimuShiteiTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -102,6 +106,7 @@ public class TokugimuShiteiTsuchiController {
 	 */
 	@PostMapping("/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
+	@RptLog(rptId = ReportsConstants.TOKUGIMU_SHITEI_TSUCHI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(TokugimuShiteiTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);

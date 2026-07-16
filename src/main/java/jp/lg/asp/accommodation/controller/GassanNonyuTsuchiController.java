@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.GassanNonyuTsuchiDto;
 import jp.lg.asp.accommodation.service.GassanNonyuTsuchiReportsService;
 import jp.lg.asp.accommodation.service.GassanNonyuTsuchiService;
@@ -64,6 +66,7 @@ public class GassanNonyuTsuchiController {
 	 */
 	@PostMapping("/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	@RptLog(rptId = ReportsConstants.GASSAN_NONYU_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(GassanNonyuTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -80,6 +83,7 @@ public class GassanNonyuTsuchiController {
 	 */
 	@PostMapping("/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
+	@RptLog(rptId = ReportsConstants.GASSAN_NONYU_TSUCHI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(GassanNonyuTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -99,6 +103,7 @@ public class GassanNonyuTsuchiController {
 	 */
 	@PostMapping("/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
+	@RptLog(rptId = ReportsConstants.GASSAN_NONYU_TSUCHI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(GassanNonyuTsuchiDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);

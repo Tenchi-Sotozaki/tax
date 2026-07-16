@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.RptLogViewDto;
 import jp.lg.asp.accommodation.entity.Reports;
 import jp.lg.asp.accommodation.entity.ReportsLog;
@@ -18,10 +19,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class RptLogViewServiceImpl implements RptLogViewService {
-
-	private static final String SOUSA_PDF = "1";
-	private static final String SOUSA_PREVIEW = "2";
-	private static final String SOUSA_PRINT = "3";
 
 	private final ReportsRepository reportsRepository;
 	private final ReportsLogRepository reportsLogRepository;
@@ -50,7 +47,7 @@ public class RptLogViewServiceImpl implements RptLogViewService {
 			dto.setRptId(log.getRptId());
 			dto.setRptName(resolveRptName(reportsList, log.getRptId()));
 			dto.setSousa(log.getSousa());
-			dto.setSousaName(resolveSousaName(log.getSousa()));
+			dto.setSousaName(ReportsConstants.resolveSousaName(log.getSousa()));
 			dto.setOpeUser(log.getOpeUser());
 			dto.setOpeDt(log.getOpeDt());
 			dto.setShiteiNo(log.getShiteiNo());
@@ -68,21 +65,12 @@ public class RptLogViewServiceImpl implements RptLogViewService {
 	}
 
 	private String resolveRptName(List<Reports> reportsList, String rptId) {
-		if (rptId == null) return "";
+		if (rptId == null)
+			return "";
 		return reportsList.stream()
 				.filter(r -> rptId.strip().equals(r.getRptId().strip()))
 				.map(Reports::getRptName)
 				.findFirst()
 				.orElse(rptId);
-	}
-
-	private String resolveSousaName(String sousa) {
-		if (sousa == null) return "";
-		return switch (sousa.strip()) {
-			case SOUSA_PDF -> "PDF";
-			case SOUSA_PREVIEW -> "プレビュー";
-			case SOUSA_PRINT -> "印刷";
-			default -> sousa;
-		};
 	}
 }

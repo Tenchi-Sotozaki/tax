@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuShinseiDto;
 import jp.lg.asp.accommodation.service.KofuShinseiReportsService;
 import jp.lg.asp.accommodation.service.KofuShinseiService;
@@ -77,7 +79,7 @@ public class KofuShinseiController {
 				}
 			}
 		}
-		
+
 		// 年度が設定されていない場合、デフォルト年度を設定（yyyy-MM形式）
 		if (dto.getNendo() == null || dto.getNendo().isEmpty()) {
 			java.time.LocalDate now = java.time.LocalDate.now();
@@ -123,10 +125,11 @@ public class KofuShinseiController {
 	 */
 	@PostMapping("/kofuShinsei/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 年度が指定されている場合はその年度で取得
 			KofuShinseiDto reportData;
 			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
@@ -159,10 +162,11 @@ public class KofuShinseiController {
 	 */
 	@PostMapping("/kofuShinsei/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
+	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 年度が指定されている場合はその年度で取得
 			KofuShinseiDto reportData;
 			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
@@ -196,10 +200,11 @@ public class KofuShinseiController {
 	 */
 	@PostMapping("/kofuShinsei/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
+	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(KofuShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 年度が指定されている場合はその年度で取得
 			KofuShinseiDto reportData;
 			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {

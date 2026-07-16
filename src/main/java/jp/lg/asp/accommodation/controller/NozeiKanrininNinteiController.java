@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanrininNinteiDto;
 import jp.lg.asp.accommodation.service.NozeiKanrininNinteiReportsService;
 import jp.lg.asp.accommodation.service.NozeiKanrininNinteiService;
@@ -83,6 +85,7 @@ public class NozeiKanrininNinteiController {
 	 */
 	@PostMapping("/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	@RptLog(rptId = ReportsConstants.NOZEI_KANRININ_NINTEI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(NozeiKanrininNinteiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
@@ -110,6 +113,7 @@ public class NozeiKanrininNinteiController {
 	 */
 	@PostMapping("/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
+	@RptLog(rptId = ReportsConstants.NOZEI_KANRININ_NINTEI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(NozeiKanrininNinteiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
@@ -139,6 +143,7 @@ public class NozeiKanrininNinteiController {
 	 */
 	@PostMapping("/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
+	@RptLog(rptId = ReportsConstants.NOZEI_KANRININ_NINTEI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(NozeiKanrininNinteiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);

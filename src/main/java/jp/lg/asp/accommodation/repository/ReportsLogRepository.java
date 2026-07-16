@@ -13,6 +13,9 @@ import jp.lg.asp.accommodation.entity.ReportsLogId;
 @Repository
 public interface ReportsLogRepository extends JpaRepository<ReportsLog, ReportsLogId> {
 
+	@Query("SELECT COALESCE(MAX(r.seq), 0) + 1 FROM ReportsLog r WHERE r.jichitaiCd = :jichitaiCd")
+	Long findNextSeq(@Param("jichitaiCd") String jichitaiCd);
+
 	@Query("""
 			SELECT r FROM ReportsLog r
 			WHERE r.jichitaiCd = :jichitaiCd

@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.TokureiShiteiCancelDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.service.TokureiShiteiCancelReportsService;
@@ -65,6 +67,7 @@ public class TokureiShiteiCancelController {
 	 */
 	@PostMapping("/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+	@RptLog(rptId = ReportsConstants.TOKUREI_SHITEI_CANCEL, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(TokureiShiteiCancelDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -81,6 +84,7 @@ public class TokureiShiteiCancelController {
 	 */
 	@PostMapping("/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
+	@RptLog(rptId = ReportsConstants.TOKUREI_SHITEI_CANCEL, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(TokureiShiteiCancelDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
@@ -100,6 +104,7 @@ public class TokureiShiteiCancelController {
 	 */
 	@PostMapping("/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
+	@RptLog(rptId = ReportsConstants.TOKUREI_SHITEI_CANCEL, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(TokureiShiteiCancelDto dto) {
 		accessChecker.checkAccess(SCREEN_ID);
 		byte[] pdfData = reportsService.generateTsuchiPdf(dto);
