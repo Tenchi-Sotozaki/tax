@@ -2,6 +2,7 @@ package jp.lg.asp.accommodation.controller;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,9 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +52,8 @@ public class ShunoRenkeiController {
 			@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false, defaultValue = "partial") String nameMatchType,
+			@RequestParam(required = false, defaultValue = "0") int page,
+			@RequestParam(required = false, defaultValue = "10") int pageSize,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
@@ -56,10 +62,23 @@ public class ShunoRenkeiController {
 				: LocalDate.parse(shinkokuFrom);
 		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
 				: LocalDate.parse(shinkokuTo);
-		List<ShunoDto> items = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name,
+		List<ShunoDto> allItems = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name,
 				nameMatchType);
 
+		int size = pageSize > 0 ? pageSize : 10;
+		int total = allItems.size();
+		int totalPages = (int) Math.ceil((double) total / size);
+		int current = page < 0 ? 0 : page;
+		if (totalPages > 0 && current >= totalPages) {
+			current = totalPages - 1;
+		}
+		int fromIdx = Math.min(current * size, total);
+		int toIdx = Math.min(fromIdx + size, total);
+		Page<ShunoDto> items = new PageImpl<>(new ArrayList<>(allItems.subList(fromIdx, toIdx)),
+				PageRequest.of(current, size), total);
+
 		model.addAttribute("items", items);
+		model.addAttribute("pageWindow", buildPageWindow(current, items.getTotalPages()));
 		Map<String, Object> searchForm = new HashMap<>();
 		searchForm.put("shinkokuFrom", shinkokuFrom);
 		searchForm.put("shinkokuTo", shinkokuTo);
@@ -67,6 +86,7 @@ public class ShunoRenkeiController {
 		searchForm.put("shiteiNo", shiteiNo);
 		searchForm.put("name", name);
 		searchForm.put("nameMatchType", nameMatchType);
+		searchForm.put("pageSize", size);
 		model.addAttribute("searchForm", searchForm);
 
 		return "renkei/shunoRenkei";
@@ -100,8 +120,7 @@ public class ShunoRenkeiController {
 		List<ShunoDto> rows = shunoRenkeiService.findByKeys(jichitaiCd, keys);
 
 		String[] csvHeaders = { "宛名番号", "賦課年度", "期別", "登録年月日", "申告年月日", "対象年月", "合計税額", "市区町村税額", "都道府県税額",
-				"加算金額区分1", "加算割合1", "加算金額1", "納期限1", "加算金額区分2", "加算割合2", "加算金額2", "納期限2", "加算金額区分3", "加算割合3", "加算金額3",
-				"納期限3" };
+				"加算金額区分", "加算割合", "加算金額", "納期限" };
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < csvHeaders.length; i++) {
 			if (i > 0)
@@ -111,10 +130,7 @@ public class ShunoRenkeiController {
 		sb.append('\n');
 
 		for (ShunoDto r : rows) {
-			String kasanKbnName1 = convertKasanKbn(r.getKasanKbn1());
-			String kasanKbnName2 = convertKasanKbn(r.getKasanKbn2());
-			String kasanKbnName3 = convertKasanKbn(r.getKasanKbn3());
-			String[] cols = new String[] {
+			String[] base = new String[] {
 					r.getAtenaNo() != null ? r.getAtenaNo() : "",
 					r.getNendo() != null ? r.getNendo() : "",
 					r.getKibetsu() != null ? String.valueOf(r.getKibetsu()) : "",
@@ -123,26 +139,40 @@ public class ShunoRenkeiController {
 					r.getTaishoYm() != null ? formatTaishoYm(r.getTaishoYm()) : "",
 					r.getTotalZeigaku() != null ? String.valueOf(r.getTotalZeigaku()) : "",
 					r.getCityZeigaku() != null ? String.valueOf(r.getCityZeigaku()) : "",
-					r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "",
-					kasanKbnName1,
-					r.getKasanRitsu1() != null ? r.getKasanRitsu1().toString() : "",
-					r.getKasanGaku1() != null ? String.valueOf(r.getKasanGaku1()) : "",
-					r.getNokigen1() != null ? r.getNokigen1().toString() : "",
-					kasanKbnName2,
-					r.getKasanRitsu2() != null ? r.getKasanRitsu2().toString() : "",
-					r.getKasanGaku2() != null ? String.valueOf(r.getKasanGaku2()) : "",
-					r.getNokigen2() != null ? r.getNokigen2().toString() : "",
-					kasanKbnName3,
-					r.getKasanRitsu3() != null ? r.getKasanRitsu3().toString() : "",
-					r.getKasanGaku3() != null ? String.valueOf(r.getKasanGaku3()) : "",
-					r.getNokigen3() != null ? r.getNokigen3().toString() : "",
-			};
-			for (int i = 0; i < cols.length; i++) {
-				if (i > 0)
-					sb.append(',');
-				sb.append('"').append(cols[i].replace("\"", "\"\"")).append('"');
+					r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "" };
+			List<String[]> kasanSets = new ArrayList<>();
+			if (r.getKasanKbn1() != null && !r.getKasanKbn1().isBlank()) {
+				kasanSets.add(new String[] { convertKasanKbn(r.getKasanKbn1()),
+						r.getKasanRitsu1() != null ? r.getKasanRitsu1().toString() : "",
+						r.getKasanGaku1() != null ? String.valueOf(r.getKasanGaku1()) : "",
+						r.getNokigen1() != null ? r.getNokigen1().toString() : "" });
 			}
-			sb.append('\n');
+			if (r.getKasanKbn2() != null && !r.getKasanKbn2().isBlank()) {
+				kasanSets.add(new String[] { convertKasanKbn(r.getKasanKbn2()),
+						r.getKasanRitsu2() != null ? r.getKasanRitsu2().toString() : "",
+						r.getKasanGaku2() != null ? String.valueOf(r.getKasanGaku2()) : "",
+						r.getNokigen2() != null ? r.getNokigen2().toString() : "" });
+			}
+			if (r.getKasanKbn3() != null && !r.getKasanKbn3().isBlank()) {
+				kasanSets.add(new String[] { convertKasanKbn(r.getKasanKbn3()),
+						r.getKasanRitsu3() != null ? r.getKasanRitsu3().toString() : "",
+						r.getKasanGaku3() != null ? String.valueOf(r.getKasanGaku3()) : "",
+						r.getNokigen3() != null ? r.getNokigen3().toString() : "" });
+			}
+			if (kasanSets.isEmpty()) {
+				kasanSets.add(new String[] { "", "", "", "" });
+			}
+			for (String[] kasan : kasanSets) {
+				String[] cols = new String[base.length + kasan.length];
+				System.arraycopy(base, 0, cols, 0, base.length);
+				System.arraycopy(kasan, 0, cols, base.length, kasan.length);
+				for (int i = 0; i < cols.length; i++) {
+					if (i > 0)
+						sb.append(',');
+					sb.append('"').append(cols[i].replace("\"", "\"\"")).append('"');
+				}
+				sb.append('\n');
+			}
 		}
 
 		byte[] bom = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF }; // UTF-8 BOM
@@ -172,6 +202,30 @@ public class ShunoRenkeiController {
 			model.addAttribute("rows", java.util.Collections.emptyList());
 		}
 		return "renkei/shunoRenkeiKakunin";
+	}
+
+	private java.util.List<Integer> buildPageWindow(int current, int totalPages) {
+		java.util.List<Integer> pages = new ArrayList<>();
+		if (totalPages <= 0) {
+			return pages;
+		}
+		java.util.TreeSet<Integer> show = new java.util.TreeSet<>();
+		show.add(0);
+		show.add(totalPages - 1);
+		for (int i = current - 1; i <= current + 1; i++) {
+			if (i >= 0 && i < totalPages) {
+				show.add(i);
+			}
+		}
+		int prev = -2;
+		for (int pIdx : show) {
+			if (prev != -2 && pIdx - prev > 1) {
+				pages.add(-1);
+			}
+			pages.add(pIdx);
+			prev = pIdx;
+		}
+		return pages;
 	}
 
 	private String formatTaishoYm(String taishoYm) {
