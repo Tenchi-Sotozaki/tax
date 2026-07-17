@@ -40,12 +40,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 照会ボタン
-    document.getElementById('btnView')?.addEventListener('click', () => {
-        const gassanShiteiNo = requireSelected('照会する合算申告情報を選択してください。');
-        if (gassanShiteiNo) {
-            location.href = '/accommodation-tax/gassan/view-form/' + gassanShiteiNo;
-        }
-    });
+	// 検索条件初期化
+    const resetBtn = document.getElementById('btn-reset');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            // テキスト入力欄をクリア
+            document.getElementById('gassanShiteiNo').value = '';
+            document.getElementById('shiteiNo').value = '';
+            document.getElementById('name').value = '';
 
+            // ラジオボタンを「部分」（デフォルト）にチェックを入れる
+            const partialRadio = document.getElementById('namePartial');
+            if (partialRadio) {
+                partialRadio.checked = true;
+            }
+        });
+    }
 });
