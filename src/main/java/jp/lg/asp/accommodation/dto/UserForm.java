@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import lombok.Data;
@@ -36,7 +37,7 @@ public class UserForm {
 	@Size(max = 200)
 	private String busho;
 
-	@NotBlank(groups = { OnCreate.class, OnUpdate.class }, message = "権限は必須です")
+	@NotNull(groups = { OnCreate.class, OnUpdate.class }, message = "権限は必須です")
 	private BigDecimal roleId;
 
 	private String currentPassword;
