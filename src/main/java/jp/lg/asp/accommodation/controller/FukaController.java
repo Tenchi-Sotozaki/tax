@@ -227,13 +227,6 @@ public class FukaController {
 			return CONFIG_VIEW;
 		}
 
-		// TODO:後回し
-		//		// 2.6. 月計表と親画面の突合チェック
-		//		fukaValidatorService.validateTallyVsParent(form, bindingResult);
-		//		if (bindingResult.hasErrors()) {
-		//			return CONFIG_VIEW;
-		//		}
-
 		// 3. 金額と宿泊数のソフトバリデーション（Soft Validation）
 		if (!form.isTaxCheckBypassed()) {
 			List<String> discrepancyMessages = fukaValidatorService.getDiscrepancyMessages(form);

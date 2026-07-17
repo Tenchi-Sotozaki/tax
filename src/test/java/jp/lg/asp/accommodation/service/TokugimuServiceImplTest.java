@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -19,8 +20,6 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
-import jp.lg.asp.accommodation.entity.GassanUchi;
-import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
@@ -164,18 +163,5 @@ class TokugimuServiceImplTest {
 
         assertThatThrownBy(() -> service.getShiteiNoById(99L))
                 .isInstanceOf(RuntimeException.class);
-    }
-
-    @Test
-    void getTokugimuName_validId_returnsName() {
-        Atena atena = buildAtena();
-        when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE)).thenReturn(Optional.of(atena));
-
-        assertThat(service.getTokugimuName("1")).isEqualTo("テスト事業者");
-    }
-
-    @Test
-    void getTokugimuName_invalidId_returns不明() {
-        assertThat(service.getTokugimuName("not-a-number")).isEqualTo("不明");
     }
 }

@@ -28,8 +28,8 @@ public class KofuKetteiTsuchiReportsServiceImpl implements KofuKetteiTsuchiRepor
     @Override
     public byte[] generateKofuKetteiTsuchiPdf(KofuKetteiTsuchiDto dto) {
         try {
-            log.info("PDF生成開始 - 指定番号: {}", dto.getShiteiNo());
-            log.info("交付決定額: {}", dto.getKofugaku());
+            log.debug("PDF生成開始 - 指定番号: {}", dto.getShiteiNo());
+            log.debug("交付決定額: {}", dto.getKofugaku());
             
             // JasperReportsのIPAex明朝フォント設定
             System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
@@ -42,22 +42,22 @@ public class KofuKetteiTsuchiReportsServiceImpl implements KofuKetteiTsuchiRepor
             }
             
             JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
-            log.info("JRXMLファイルのコンパイル完了");
+            log.debug("JRXMLファイルのコンパイル完了");
 
             // パラメータ設定
             Map<String, Object> parameters = new HashMap<>();
             
             // データソース作成
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(java.util.Arrays.asList(dto));
-            log.info("データソース作成完了 - データ件数: 1");
+            log.debug("データソース作成完了 - データ件数: 1");
 
             // レポート生成
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
-            log.info("レポート生成完了");
+            log.debug("レポート生成完了");
 
             // PDF出力（IPAex明朝フォント使用）
             byte[] pdfData = JasperExportManager.exportReportToPdf(jasperPrint);
-            log.info("PDF出力完了 - サイズ: {} bytes", pdfData.length);
+            log.debug("PDF出力完了 - サイズ: {} bytes", pdfData.length);
             
             return pdfData;
 

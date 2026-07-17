@@ -225,7 +225,7 @@ public class GassanServiceImpl implements GassanService {
             gassanRepository.save(gassan);
 
             saveGassanUchi(gassanShiteiNo, BigDecimal.ONE, form.getShiteiNoList());
-            log.info("合算申告登録完了: gassanShiteiNo={}", gassanShiteiNo);
+            log.debug("合算申告登録完了: gassanShiteiNo={}", gassanShiteiNo);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -283,7 +283,7 @@ public class GassanServiceImpl implements GassanService {
                 gassanUchiRepository.saveAll(newUchiList);
             }
             
-            log.info("合算申告更新完了: gassanShiteiNo={}", gassanShiteiNo);
+            log.debug("合算申告更新完了: gassanShiteiNo={}", gassanShiteiNo);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -297,7 +297,7 @@ public class GassanServiceImpl implements GassanService {
     public void deleteByGassanShiteiNo(String gassanShiteiNo) {
     	String jichitaiCd = jichitaiContext.getJichitaiCd();
         gassanRepository.deleteLogicallyByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
-        log.info("合算申告論理削除完了: gassanShiteiNo={}", gassanShiteiNo);
+        log.debug("合算申告論理削除完了: gassanShiteiNo={}", gassanShiteiNo);
     }
 
     @Override

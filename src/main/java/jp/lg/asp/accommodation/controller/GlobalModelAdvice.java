@@ -1,9 +1,10 @@
 package jp.lg.asp.accommodation.controller;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,9 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.config.AppUserDetails;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
@@ -90,7 +90,7 @@ public class GlobalModelAdvice {
                                     .collect(Collectors.toSet()))
                     .orElse(Collections.emptySet());
         } catch (Exception e) {
-            log.warn("accessibleScreens取得エラー: {}", e.getMessage());
+            log.error("accessibleScreens取得エラー: {}", e.getMessage());
             return Collections.emptySet();
         }
     }
