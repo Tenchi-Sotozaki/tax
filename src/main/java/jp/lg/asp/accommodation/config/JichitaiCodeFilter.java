@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -15,6 +16,7 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
 
     private static final String PARAM_NAME = "jichitaiCd";
     private static final String SESSION_KEY = "jichitaiCd";
+    public static final String COOKIE_NAME = "jichitaiCd";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -24,6 +26,10 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
 
         if (jichitaiCd != null && !jichitaiCd.isBlank()) {
             request.getSession().setAttribute(SESSION_KEY, jichitaiCd);
+            Cookie cookie = new Cookie(COOKIE_NAME, jichitaiCd);
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            response.addCookie(cookie);
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }

@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.InvalidSessionStrategy;
 
 import jp.lg.asp.accommodation.controller.InitialPasswordController;
 
@@ -64,8 +65,29 @@ public class SecurityConfig {
 				// クエリパラメータの自治体コードをセッションに保存するフィルター
 				.addFilterBefore(jichitaiCodeFilter, UsernamePasswordAuthenticationFilter.class)
 				// 初期パスワードのままのユーザーを初回パスワード設定画面へ強制誘導
-				.addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class);
+				.addFilterAfter(passwordChangeRequiredFilter, UsernamePasswordAuthenticationFilter.class)
+				.sessionManagement(session -> session
+						.invalidSessionStrategy(invalidSessionStrategy()));
 		return http.build();
+	}
+
+	@Bean
+	public InvalidSessionStrategy invalidSessionStrategy() {
+		return (request, response) -> {
+			String jichitaiCd = null;
+			if (request.getCookies() != null) {
+				for (var cookie : request.getCookies()) {
+					if (JichitaiCodeFilter.COOKIE_NAME.equals(cookie.getName())) {
+						jichitaiCd = cookie.getValue();
+						break;
+					}
+				}
+			}
+			if (jichitaiCd != null) {
+				request.getSession(true).setAttribute("jichitaiCd", jichitaiCd);
+			}
+			response.sendRedirect(request.getContextPath() + "/login?expired");
+		};
 	}
 
 	@Bean
