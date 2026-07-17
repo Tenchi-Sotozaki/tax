@@ -52,7 +52,7 @@
 		</div>
 
 		<!-- 履歴ナビゲーション（照会画面のみ） -->
-		<div th:if="${isView and TokugimuForm.maxRno != null and TokugimuForm.maxRno > 1}"
+		<div th:if="${(isView ?: false) and TokugimuForm.maxRno != null and TokugimuForm.maxRno > 1}"
 			class="d-flex align-items-center gap-2 mb-3">
 			<a th:href="@{/tokugimu/view/{id}(id=${editId}, rno=${TokugimuForm.rno - 1})}"
 				class="btn btn-outline-secondary btn-sm"
