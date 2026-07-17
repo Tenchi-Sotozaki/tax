@@ -30,6 +30,12 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
+			<!-- セッションタイムアウトメッセージ -->
+			<div th:if="${param.expired}" class="alert alert-warning alert-dismissible fade show" role="alert">
+				<i class="bi bi-clock-history me-2"></i>セッションがタイムアウトしました。再度ログインしてください。
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+
 			<form th:action="@{/login}" method="post">
 				<!-- CSRFトークン（CSRF保護が有効な場合のみ） -->
 				<input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}"
