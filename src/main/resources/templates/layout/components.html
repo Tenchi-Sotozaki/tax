@@ -145,16 +145,25 @@
 -->
 	<div th:fragment="selectedTokugimuInfo"
 		class="mt-2 mb-2 ps-3 d-flex align-items-center">
-		<span class="fw-semibold">指定番号：</span> <span
-			class="tokugimu-info-value me-4"
+		<span class="fw-semibold flex-shrink-0">指定番号：</span>
+		<span class="tokugimu-info-value me-4"
+			style="display:inline-block; width:5em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+			data-bs-toggle="tooltip" data-bs-placement="bottom"
+			th:attr="title=${selectedShiteiGassan?.gassanShiteiNo != null ? selectedShiteiGassan.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}"
 			th:text="${selectedShiteiGassan?.gassanShiteiNo != null ? selectedShiteiGassan.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}"></span>
-		<span class="fw-semibold">氏名：</span> <span
-			class="tokugimu-info-value me-4"
+		<span class="fw-semibold flex-shrink-0">氏名：</span>
+		<span class="tokugimu-info-value me-4"
+			style="display:inline-block; width:12em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+			data-bs-toggle="tooltip" data-bs-placement="bottom"
+			th:attr="title=${selectedShiteiGassan?.name}"
 			th:text="${selectedShiteiGassan?.name}"></span>
-		<span class="fw-semibold">施設名称：</span> <span
-			class="tokugimu-info-value me-2"
+		<span class="fw-semibold flex-shrink-0">施設名称：</span>
+		<span class="tokugimu-info-value me-2"
+			style="display:inline-block; width:20em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+			data-bs-toggle="tooltip" data-bs-placement="bottom"
+			th:attr="title=${selectedShiteiGassan?.shisetsuName}"
 			th:text="${selectedShiteiGassan?.shisetsuName}"></span>
-		<button type="button" class="btn btn-outline-primary btn-sm"
+		<button type="button" class="btn btn-outline-primary btn-sm flex-shrink-0"
 			data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal">
 			<i class="bi bi-search me-1"></i>特別徴収義務者指定
 		</button>
