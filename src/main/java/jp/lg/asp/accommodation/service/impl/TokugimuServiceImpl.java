@@ -263,19 +263,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		return form;
 	}
 
-	@Override
-	public String getTokugimuName(String obligorId) {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		try {
-			BigDecimal atenaNo = BigDecimal.valueOf(Long.parseLong(obligorId));
-			Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo).orElse(null);
-			return atena != null ? atena.getName() : "不明";
-		} catch (NumberFormatException e) {
-			log.warn("無効なID形式: {}", obligorId);
-			return "不明";
-		}
-	}
-
 	private String generateShiteiNo() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		String prefix = jichitaiRepository.findById(jichitaiCd)
@@ -317,7 +304,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		saveShoyusha(shiteiNo, BigDecimal.ONE, form, now, systemUser);
 		saveKyodoJigyosha(shiteiNo, BigDecimal.ONE, form);
 
-		log.info("特別徴収義務者登録完了: shiteiNo={}", shiteiNo);
+		log.debug("特別徴収義務者登録完了: shiteiNo={}", shiteiNo);
 	}
 
 	/**
@@ -370,7 +357,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		// 5. 共同事業者情報の追加
 		saveKyodoJigyosha(shiteiNo, newRno, form);
 
-		log.info("特別徴収義務者更新完了: shiteiNo={}, rno={}", shiteiNo, newRno);
+		log.debug("特別徴収義務者更新完了: shiteiNo={}, rno={}", shiteiNo, newRno);
 	}
 
 	/**
@@ -386,7 +373,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 		t.setDelFlg("1");
 		tokugimuRepository.save(t);
-		log.info("特別徴収義務者論理削除完了: shiteiNo={}", shiteiNo);
+		log.debug("特別徴収義務者論理削除完了: shiteiNo={}", shiteiNo);
 	}
 
 	// ========== ヘルパーメソッド ==========

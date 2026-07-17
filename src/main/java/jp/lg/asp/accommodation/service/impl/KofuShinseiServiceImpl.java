@@ -1,12 +1,10 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.time.LocalDate;
 import java.util.Optional;
 
-
 import org.springframework.stereotype.Service;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuShinseiDto;
 import jp.lg.asp.accommodation.entity.Atena;
@@ -67,7 +65,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 		init();
 		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
-			log.info("交付申請書データ取得開始 - 指定番号: {}, 年度: {}", shiteiNo, nendo);
+			log.debug("交付申請書データ取得開始 - 指定番号: {}, 年度: {}", shiteiNo, nendo);
 
 			// 特別徴収義務者情報取得（最新・未削除）
 			Optional<Tokugimu> tokugimuOpt = tokugimuRepository
@@ -75,24 +73,24 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 							jichitaiCode, shiteiNo, "1", "0");
 
 			if (tokugimuOpt.isEmpty()) {
-				log.warn("特別徴収義務者が見つかりません: shiteiNo={}", shiteiNo);
+				log.error("特別徴収義務者が見つかりません: shiteiNo={}", shiteiNo);
 				return null;
 			}
 
 			Tokugimu tokugimu = tokugimuOpt.get();
-			log.info("特別徴収義務者情報取得: {}", tokugimu.getShiteiNo());
+			log.debug("特別徴収義務者情報取得: {}", tokugimu.getShiteiNo());
 
 			// 宛名情報取得
 			Optional<Atena> atenaOpt = atenaRepository
 					.findByJichitaiCdAndAtenaNo(jichitaiCode, tokugimu.getAtenaNo());
 
 			if (atenaOpt.isEmpty()) {
-				log.warn("宛名情報が見つかりません: atenaNo={}", tokugimu.getAtenaNo());
+				log.error("宛名情報が見つかりません: atenaNo={}", tokugimu.getAtenaNo());
 				return null;
 			}
 
 			Atena atena = atenaOpt.get();
-			log.info("宛名情報取得: {}", atena.getName());
+			log.debug("宛名情報取得: {}", atena.getName());
 
 			// 奨励金情報取得
 			Optional<Shoreikin> shoreikinOpt = shoreikinRepository
@@ -130,12 +128,12 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 				dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
 				dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
 
-				log.info("奨励金情報設定: 納入額={}, 交付額={}", dto.getNonyugaku(), dto.getKofugaku());
+				log.debug("奨励金情報設定: 納入額={}, 交付額={}", dto.getNonyugaku(), dto.getKofugaku());
 			} else {
 				// 奨励金情報が存在しない場合はデフォルト値
 				dto.setNonyugaku("0");
 				dto.setKofugaku("0");
-				log.warn("奨励金情報が見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);
+				log.error("奨励金情報が見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);
 			}
 
 			// 固定値設定
@@ -145,7 +143,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 			dto.setKofuJoken(kofuJoken);
 			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
 
-			log.info("交付申請書データ取得完了: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
+			log.debug("交付申請書データ取得完了: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 			return dto;
 
 		} catch (Exception e) {
@@ -167,7 +165,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 				String defText = reportsDefOpt.get().getDefText();
 				return defText != null ? defText : "";
 			} else {
-				log.warn("帳票定義が見つかりません: id={}", id);
+				log.error("帳票定義が見つかりません: id={}", id);
 				return "";
 			}
 		} catch (Exception e) {

@@ -1,6 +1,4 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.FukaConstants;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KoseiKetteiTsuchiReportsDto;
@@ -94,7 +92,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         KoseiKetteiTsuchiReportsDto dto = null;
         try {
             dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym);
-            log.info("PDF生成開始 - 指定番号: {}, b1Ym: {}, b2Ym: {}, b3Ym: {}", shiteiNo, b1Ym, b2Ym, b3Ym);
+            log.debug("PDF生成開始 - 指定番号: {}, b1Ym: {}, b2Ym: {}, b3Ym: {}", shiteiNo, b1Ym, b2Ym, b3Ym);
 
             String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(dto.getFukaKbn())
                     ? JRXML_TEIRITSU
@@ -116,7 +114,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
             byte[] pdfData = JasperExportManager.exportReportToPdf(jasperPrint);
-            log.info("PDF出力完了 - サイズ: {} bytes", pdfData.length);
+            log.debug("PDF出力完了 - サイズ: {} bytes", pdfData.length);
 
             return pdfData;
 
@@ -240,7 +238,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         if (tokugimuList.isEmpty()) {
-            log.warn("t_tokugimuが見つかりません: shiteiNo={}", shiteiNo);
+            log.error("t_tokugimuが見つかりません: shiteiNo={}", shiteiNo);
             dto.setShitei_no(shiteiNo);
             return;
         }
@@ -462,7 +460,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             f.setAccessible(true);
             f.set(dto, value);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.warn("フィールドが見つかりません: {}", field);
+            log.error("フィールドが見つかりません: {}", field);
         }
     }
 

@@ -49,7 +49,7 @@ public class NozeiKanrininNinteiController {
 
 			if (shiteiNo != null && !shiteiNo.isEmpty()) {
 				try {
-					log.info("納税管理人選任免除認定情報取得開始: shiteiNo={}", shiteiNo);
+					log.debug("納税管理人選任免除認定情報取得開始: shiteiNo={}", shiteiNo);
 					NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(shiteiNo);
 					if (info != null) {
 						dto = info;
@@ -94,7 +94,7 @@ public class NozeiKanrininNinteiController {
 				return ResponseEntity.badRequest().build();
 			}
 
-			log.info("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
+			log.debug("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 			byte[] pdfData = reportsService.generatePdf(dto);
 
 			HttpHeaders headers = new HttpHeaders();

@@ -86,7 +86,7 @@ public class TaxManagerService {
 			form.setMaxRno(maxRno);
 			form.setMinRno(minRno);
 		} catch (Exception e) {
-			log.warn("データの取得中にエラーが発生しました: {}", e.getMessage());
+			log.error("データの取得中にエラーが発生しました: {}", e.getMessage());
 		}
 
 		return form;
@@ -138,7 +138,7 @@ public class TaxManagerService {
 			form.setMaxRno(maxRno);
 			form.setMinRno(minRno);
 		} catch (Exception e) {
-			log.warn("データの取得中にエラーが発生しました。新規登録として処理します: {}", e.getMessage());
+			log.error("データの取得中にエラーが発生しました。新規登録として処理します: {}", e.getMessage());
 		}
 
 		return form;
@@ -150,7 +150,7 @@ public class TaxManagerService {
 	@Transactional
 	public void saveByShiteiNo(String shiteiNo, TaxManagerForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		log.info("納税管理人保存処理開始: shiteiNo={}, atenaNo={}", shiteiNo, form.getAtenaNo());
+		log.debug("納税管理人保存処理開始: shiteiNo={}, atenaNo={}", shiteiNo, form.getAtenaNo());
 		
 		// 選任免除が有効でない場合のみ特別徴収義務者との同一人物チェック
 		if (!form.isExemptionFlag() && form.getAtenaNo() != null && !form.getAtenaNo().trim().isEmpty()) {
@@ -168,7 +168,7 @@ public class TaxManagerService {
 		// 2. 既存の最新フラグを0に更新（更新時のみ）
 		if (maxRno > 0) {
 			taxManagerRepository.updateNewFlgToZero(jichitaiCd, shiteiNo);
-			log.info("既存レコードの最新フラグを0に更新: shiteiNo={}", shiteiNo);
+			log.debug("既存レコードの最新フラグを0に更新: shiteiNo={}", shiteiNo);
 		}
 
 		// 3. 新しいレコードを作成（必ずインサート）
@@ -204,7 +204,7 @@ public class TaxManagerService {
 		newEntity.setDelFlg(FLG_OFF);
 
 		taxManagerRepository.save(newEntity);
-		log.info("納税管理人履歴保存完了: shiteiNo={}, rno={}, 種別={}", 
+		log.debug("納税管理人履歴保存完了: shiteiNo={}, rno={}, 種別={}", 
 				shiteiNo, newRno, maxRno > 0 ? "更新" : "新規登録");
 	}
 
@@ -214,7 +214,7 @@ public class TaxManagerService {
 	@Transactional
 	public void deleteByShiteiNo(String shiteiNo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		log.info("納税管理人削除処理開始: shiteiNo={}", shiteiNo);
+		log.debug("納税管理人削除処理開始: shiteiNo={}", shiteiNo);
 		
 		// 1. 最新の納税管理人情報を取得
 		TaxManager currentRecord = taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
@@ -224,15 +224,15 @@ public class TaxManagerService {
 		
 		// 2. 現在のレコードの削除フラグを1に更新
 		taxManagerRepository.updateDelFlgToOne(jichitaiCd, shiteiNo, currentRno);
-		log.info("現在レコードの削除フラグを更新: shiteiNo={}, rno={}", shiteiNo, currentRno);
+		log.debug("現在レコードの削除フラグを更新: shiteiNo={}, rno={}", shiteiNo, currentRno);
 		
 		// 3. 履歴番号-1のレコードが存在する場合、最新フラグを1に変更
 		if (currentRno > 1) {
 			Integer previousRno = currentRno - 1;
 			taxManagerRepository.updateNewFlgToOneByRno(jichitaiCd, shiteiNo, previousRno);
-			log.info("前履歴レコードの最新フラグを更新: shiteiNo={}, rno={}", shiteiNo, previousRno);
+			log.debug("前履歴レコードの最新フラグを更新: shiteiNo={}, rno={}", shiteiNo, previousRno);
 		}
 		
-		log.info("納税管理人削除完了: shiteiNo={}", shiteiNo);
+		log.debug("納税管理人削除完了: shiteiNo={}", shiteiNo);
 	}
 }

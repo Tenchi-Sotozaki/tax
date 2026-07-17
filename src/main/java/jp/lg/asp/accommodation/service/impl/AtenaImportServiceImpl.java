@@ -136,10 +136,10 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 			throw new RuntimeException("ヘッダー行が空です。");
 		}
 		
-		log.info("ヘッダー行の検証開始: [{}]", headerLine);
+		log.debug("ヘッダー行の検証開始: [{}]", headerLine);
 		
 		String[] headers = headerLine.split(",", -1);
-		log.info("ヘッダー項目数: {}", headers.length);
+		log.debug("ヘッダー項目数: {}", headers.length);
 		
 		if (headers.length < 8) {
 			throw new RuntimeException(
@@ -158,7 +158,7 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 			String actual = normalizeHeader(headers[i]);
 			String expected = normalizeHeader(expectedHeaders[i]);
 			
-			log.info("ヘッダー検証[{}]: 期待値=[{}], 実際の値=[{}]", i + 1, expected, actual);
+			log.debug("ヘッダー検証[{}]: 期待値=[{}], 実際の値=[{}]", i + 1, expected, actual);
 			
 			if (!actual.equals(expected)) {
 				log.error("ヘッダー不一致: 位置={}, 期待=[{}](長さ:{}), 実際=[{}](長さ:{})", 
@@ -182,7 +182,7 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 			}
 		}
 		
-		log.info("ヘッダー検証成功");
+		log.debug("ヘッダー検証成功");
 	}
 	
 	/**
@@ -265,7 +265,7 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 		
 		// UTF-8 BOM (\ufeff) を除去
 		if (text.charAt(0) == '\ufeff') {
-			log.info("BOMを検出しました。除去します。");
+			log.debug("BOMを検出しました。除去します。");
 			return text.substring(1);
 		}
 		

@@ -77,7 +77,7 @@ public class TekiyoNozeiShukiController {
 			redirectAttributes.addFlashAttribute("successMessage", "適用納税周期情報を保存しました。");
 			return "redirect:/tokugimu/list";
 		} catch (Exception e) {
-			log.warn("適用納税周期保存エラー: {}", e.getMessage());
+			log.error("適用納税周期保存エラー: {}", e.getMessage());
 			model.addAttribute("errorMessage", e.getMessage());
 			model.addAttribute("nozeiShukiOptions", tekiyoNozeiShukiService.getNozeiShukiOptions());
 			model.addAttribute("isEdit", form.isEdit());
@@ -95,7 +95,7 @@ public class TekiyoNozeiShukiController {
 			tekiyoNozeiShukiService.delete(id);
 			redirectAttributes.addFlashAttribute("successMessage", "適用納税周期情報を削除しました。");
 		} catch (Exception e) {
-			log.warn("適用納税周期削除エラー: {}", e.getMessage());
+			log.error("適用納税周期削除エラー: {}", e.getMessage());
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
 		return "redirect:/tokugimu/list";

@@ -993,7 +993,7 @@ public class FukaServiceImpl implements FukaService {
 			String methodName = "setSogaku" + index;
 			uchi.getClass().getMethod(methodName, Long.class).invoke(uchi, value);
 		} catch (Exception e) {
-			log.warn("setSogaku{} failed: {}", index, e.getMessage());
+			log.error("setSogaku{} failed: {}", index, e.getMessage());
 		}
 	}
 
@@ -1012,7 +1012,7 @@ public class FukaServiceImpl implements FukaService {
 			String methodName = "setHakusu" + index;
 			uchi.getClass().getMethod(methodName, Integer.class).invoke(uchi, value);
 		} catch (Exception e) {
-			log.warn("setHakusu{} failed: {}", index, e.getMessage());
+			log.error("setHakusu{} failed: {}", index, e.getMessage());
 		}
 	}
 
@@ -1031,7 +1031,7 @@ public class FukaServiceImpl implements FukaService {
 			String methodName = "setRyokin" + index;
 			uchi.getClass().getMethod(methodName, Long.class).invoke(uchi, value);
 		} catch (Exception e) {
-			log.warn("setRyokin{} failed: {}", index, e.getMessage());
+			log.error("setRyokin{} failed: {}", index, e.getMessage());
 		}
 	}
 

@@ -1,6 +1,4 @@
 package jp.lg.asp.accommodation.controller;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.RptLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
@@ -54,7 +53,7 @@ public class KanpuMenjoTsuchiController {
                        Model model) {
     	String jichitaiCode = jichitaiContext.getJichitaiCd();
         try {
-            log.info("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
+            log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
 
             // 特別徴収義務者情報取得
             TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
@@ -95,7 +94,7 @@ public class KanpuMenjoTsuchiController {
 
             model.addAttribute("dto", dto);
             
-            log.info("徴収不能額の還付又は納入義務の免除決定通知書画面表示成功");
+            log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示成功");
             return "reports/kanpuMenjoTsuchi";
 
         } catch (Exception e) {
@@ -113,7 +112,7 @@ public class KanpuMenjoTsuchiController {
     public ResponseEntity<byte[]> generatePdf(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                              @AuthenticationPrincipal User userDetails) {
         try {
-            log.info("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
+            log.debug("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 
             byte[] pdfData = kanpuMenjoTsuchiReportsService.generateTsuchiPdf(dto);
 
@@ -143,7 +142,7 @@ public class KanpuMenjoTsuchiController {
     public ResponseEntity<byte[]> preview(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                          @AuthenticationPrincipal User userDetails) {
         try {
-            log.info("プレビュー開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
+            log.debug("プレビュー開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 
             byte[] pdfData = kanpuMenjoTsuchiReportsService.generateTsuchiPdf(dto);
 
@@ -170,7 +169,7 @@ public class KanpuMenjoTsuchiController {
     public ResponseEntity<byte[]> print(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                        @AuthenticationPrincipal User userDetails) {
         try {
-            log.info("印刷開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
+            log.debug("印刷開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 
             byte[] pdfData = kanpuMenjoTsuchiReportsService.generateTsuchiPdf(dto);
 

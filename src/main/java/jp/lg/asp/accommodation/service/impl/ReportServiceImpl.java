@@ -1,5 +1,12 @@
 package jp.lg.asp.accommodation.service.impl;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+
 import jp.lg.asp.accommodation.dto.TaxDeclarationForm;
 import jp.lg.asp.accommodation.service.ReportService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,12 +16,6 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -31,7 +32,7 @@ public class ReportServiceImpl implements ReportService {
      */
     @Override
     public byte[] generateDeclarationPdf(TaxDeclarationForm form) {
-        log.info("PDF生成開始: obligorId={}", form.getObligorId());
+        log.debug("PDF生成開始: obligorId={}", form.getObligorId());
         try {
             InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
             JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
@@ -42,7 +43,7 @@ public class ReportServiceImpl implements ReportService {
                     jasperReport, params, new JREmptyDataSource());
 
             byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
-            log.info("PDF生成完了: size={}bytes", pdf.length);
+            log.debug("PDF生成完了: size={}bytes", pdf.length);
             return pdf;
 
         } catch (Exception e) {
