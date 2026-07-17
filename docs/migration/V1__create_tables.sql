@@ -162,9 +162,9 @@ COMMENT ON COLUMN t_kyodo_jigyosha.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS t_nozei_shuki (
   jichitai_cd char(5) NOT NULL,
   shitei_no char(8) NOT NULL,
-  idx numeric(3),
+  idx numeric(3) NOT NULL,
   seq numeric(3) NOT NULL,
-  tekiyo_st_ymd date,
+  tekiyo_st_ymd date NOT NULL,
   tekiyo_ed_ymd date,
   del_flg char(1),
   add_dt timestamp NOT NULL,
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS t_nozei_shuki (
   upd_dt timestamp NOT NULL,
   upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT t_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, shitei_no)
+  CONSTRAINT t_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, shitei_no, idx)
 );
 COMMENT ON TABLE t_nozei_shuki IS '納税周期情報';
 COMMENT ON COLUMN t_nozei_shuki.jichitai_cd IS '自治体コード';
@@ -431,7 +431,7 @@ COMMENT ON COLUMN t_fuka_uchi.version IS 'バージョン';
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS t_shuno_rireki (
   jichitai_cd char(5) NOT NULL,
-  shitei_no char(8),
+  shitei_no char(8) NOT NULL,
   nendo char(4) NOT NULL,
   kibetsu numeric(2) NOT NULL,
   rno numeric(3) NOT NULL,
@@ -442,7 +442,7 @@ CREATE TABLE IF NOT EXISTS t_shuno_rireki (
   upd_dt timestamp NOT NULL,
   upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT t_shuno_rireki_pkey PRIMARY KEY (jichitai_cd, nendo, kibetsu, rno)
+  CONSTRAINT t_shuno_rireki_pkey PRIMARY KEY (jichitai_cd, shitei_no, nendo, kibetsu, rno)
 );
 COMMENT ON TABLE t_shuno_rireki IS '収納履歴情報';
 COMMENT ON COLUMN t_shuno_rireki.jichitai_cd IS '自治体コード';
@@ -848,6 +848,7 @@ CREATE TABLE IF NOT EXISTS m_user (
   busho text NOT NULL,
   role_id numeric(5) NOT NULL,
   del_flg char(1) NOT NULL,
+  initial_password_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
   add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
@@ -864,6 +865,7 @@ COMMENT ON COLUMN m_user.name_kana IS '氏名かな';
 COMMENT ON COLUMN m_user.busho IS '部署';
 COMMENT ON COLUMN m_user.role_id IS '権限ロールＩＤ';
 COMMENT ON COLUMN m_user.del_flg IS '削除フラグ';
+COMMENT ON COLUMN m_user.initial_password_flg IS 'パスワード変更フラグ';
 COMMENT ON COLUMN m_user.add_dt IS '作成日時';
 COMMENT ON COLUMN m_user.add_user IS '作成者';
 COMMENT ON COLUMN m_user.upd_dt IS '更新日時';
@@ -1057,7 +1059,7 @@ CREATE TABLE IF NOT EXISTS m_nokigen (
   upd_dt timestamp NOT NULL,
   upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT m_nokigen_pkey PRIMARY KEY (jichitai_cd)
+  CONSTRAINT m_nokigen_pkey PRIMARY KEY (jichitai_cd, nendo)
 );
 COMMENT ON TABLE m_nokigen IS '納入期限マスタ';
 COMMENT ON COLUMN m_nokigen.jichitai_cd IS '自治体コード';
@@ -1085,7 +1087,7 @@ CREATE TABLE IF NOT EXISTS m_kofu_ritsu (
   jichitai_cd char(5) NOT NULL,
   rno numeric(3) NOT NULL,
   kofu_ritsu numeric(5, 2) NOT NULL,
-  tekiyo_st_ymd date,
+  tekiyo_st_ymd date NOT NULL,
   tekiyo_ed_ymd date,
   new_flg numeric(1),
   add_dt timestamp NOT NULL,
@@ -1093,7 +1095,7 @@ CREATE TABLE IF NOT EXISTS m_kofu_ritsu (
   upd_dt timestamp NOT NULL,
   upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT m_kofu_ritsu_pkey PRIMARY KEY (jichitai_cd)
+  CONSTRAINT m_kofu_ritsu_pkey PRIMARY KEY (jichitai_cd, rno)
 );
 COMMENT ON TABLE m_kofu_ritsu IS '交付率情報マスタ';
 COMMENT ON COLUMN m_kofu_ritsu.jichitai_cd IS '自治体コード';
@@ -1193,12 +1195,12 @@ CREATE TABLE IF NOT EXISTS t_reports_log (
   rpt_id char(10) NOT NULL,
   sousa char(1) NOT NULL,
   shitei_no char(8),
-  ope_user varchar(20) NOT NULL,
+  ope_user text NOT NULL,
   ope_dt timestamp NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_reports_log_pkey PRIMARY KEY (jichitai_cd, seq)
 );
@@ -1223,9 +1225,9 @@ CREATE TABLE IF NOT EXISTS t_rpt_status (
   rpt_id char(10) NOT NULL,
   create_dt timestamp NOT NULL,
   add_dt timestamp NOT NULL,
-  add_user varchar(20) NOT NULL,
+  add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
-  upd_user varchar(20) NOT NULL,
+  upd_user text NOT NULL,
   version integer NOT NULL,
   CONSTRAINT t_rpt_status_pkey PRIMARY KEY (jichitai_cd, shitei_no, rpt_id)
 );

@@ -126,10 +126,13 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 
 	private String patternToRegex(String likePattern) {
 		if (likePattern == null) return ".*";
-		String regex = java.util.regex.Pattern.quote(likePattern)
-				.replace("%", "\\E.*\\Q");
-		return "\\Q" + regex + "\\E"
-				.replace("\\Q\\E", "");
+		String[] parts = likePattern.split("%", -1);
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < parts.length; i++) {
+			if (i > 0) sb.append(".*");
+			if (!parts[i].isEmpty()) sb.append(java.util.regex.Pattern.quote(parts[i]));
+		}
+		return sb.toString();
 	}
 
 	private GassanDaichoItem convertToGassanDaichoItem(String gassanShiteiNo, Gassan daihyo, List<Gassan> gassanList) {
