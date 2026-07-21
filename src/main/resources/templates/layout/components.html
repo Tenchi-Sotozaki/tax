@@ -87,17 +87,51 @@
 					<!-- 検索条件 -->
 					<div class="row g-2 mb-3">
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">宛名番号</label> <input
+							<label class="form-label form-label-sm fw-medium mb-1 d-block">宛名番号</label>
+							<div class="mb-1" aria-hidden="true" style="visibility:hidden">
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio" disabled>
+									<label class="form-check-label small">前方</label>
+								</div>
+							</div> <input
 								type="text" id="addrSearchNo"
 								class="form-control form-control-sm" placeholder="宛名番号">
 						</div>
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">氏名/名称</label> <input
+							<label class="form-label form-label-sm fw-medium mb-1 d-block">氏名/名称</label>
+							<div class="mb-1">
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio" name="addrSearchNameMatchType" id="addrNamePrefix" value="prefix">
+									<label class="form-check-label small" for="addrNamePrefix">前方</label>
+								</div>
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio" name="addrSearchNameMatchType" id="addrNamePartial" value="partial" checked>
+									<label class="form-check-label small" for="addrNamePartial">部分</label>
+								</div>
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio" name="addrSearchNameMatchType" id="addrNameExact" value="exact">
+									<label class="form-check-label small" for="addrNameExact">完全</label>
+								</div>
+							</div> <input
 								type="text" id="addrSearchName"
 								class="form-control form-control-sm" placeholder="氏名/名称">
 						</div>
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">住所</label> <input
+							<label class="form-label form-label-sm fw-medium mb-1 d-block">住所</label>
+							<div class="mb-1">
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio" name="addrSearchAddressMatchType" id="addrAddressPrefix" value="prefix">
+									<label class="form-check-label small" for="addrAddressPrefix">前方</label>
+								</div>
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio" name="addrSearchAddressMatchType" id="addrAddressPartial" value="partial" checked>
+									<label class="form-check-label small" for="addrAddressPartial">部分</label>
+								</div>
+								<div class="form-check form-check-inline mb-0">
+									<input class="form-check-input" type="radio" name="addrSearchAddressMatchType" id="addrAddressExact" value="exact">
+									<label class="form-check-label small" for="addrAddressExact">完全</label>
+								</div>
+							</div> <input
 								type="text" id="addrSearchAddress"
 								class="form-control form-control-sm" placeholder="住所">
 						</div>
