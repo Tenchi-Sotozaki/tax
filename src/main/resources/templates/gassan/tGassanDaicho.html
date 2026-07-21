@@ -8,9 +8,19 @@
 	<link rel="stylesheet" th:href="@{/css/gassan-daicho.css}">
 
 	<style>
-		table {
-			table-layout: fixed;
-			width: 100%;
+		.card {
+		    min-height: auto !important;
+		    height: auto !important;
+		}
+
+		.table-scroll {
+		    min-height: auto !important;
+		    height: auto !important;
+		}
+
+		/* 3. テーブル自体の余計なマージンを排除 */
+		.table-scroll table {
+		    margin-bottom: 0 !important;
 		}
 	</style>
 </head>
