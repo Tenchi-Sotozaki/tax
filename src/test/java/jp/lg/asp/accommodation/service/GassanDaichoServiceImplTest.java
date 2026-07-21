@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -128,10 +129,8 @@ class GassanDaichoServiceImplTest {
         Gassan g2 = createGassan("G002", BigDecimal.ONE);
         when(gassanRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(g1, g2));
         GassanUchi uchi = createGassanUchi("G001", "S001", BigDecimal.ONE);
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S001"))
-                .thenReturn(List.of(uchi));
-        when(gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, "G001"))
-                .thenReturn(List.of(uchi));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoOrGassanShiteiNo(JICHITAI_CD, "S001", null))
+        .thenReturn(List.of(uchi));
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S001"))
                 .thenReturn(List.of(createTokugimu("S001")));
         when(atenaRepository.findByJichitaiCdAndAtenaNo(any(), any())).thenReturn(Optional.empty());
