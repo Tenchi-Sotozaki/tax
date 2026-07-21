@@ -21,5 +21,5 @@ public class GassanDaichoSearchForm {
 	private int page = 0;
 
 	// 1ページあたりの表示件数
-	private int pageSize = 5;
+	private int pageSize = 10;
 }

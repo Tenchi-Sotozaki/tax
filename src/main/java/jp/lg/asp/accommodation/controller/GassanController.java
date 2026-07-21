@@ -65,6 +65,20 @@ public class GassanController {
 
 		Page<GassanDaichoItem> items = gassanDaichoService.search(searchForm);
 		model.addAttribute("items", items);
+		
+		int currentPage = items.getNumber();
+		int totalPages = items.getTotalPages();
+
+		// 画面に表示するページ番号の範囲
+		int windowSize = 1;
+		int startPage = Math.max(0, currentPage - windowSize);
+		int endPage = Math.min(totalPages - 1, currentPage + windowSize);
+
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
+
 		return DAICHO_VIEW;
 	}
 

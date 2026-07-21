@@ -1,4 +1,6 @@
-package jp.lg.asp.accommodation.service;
+
+package jp.lg.asp.accommodation.service.impl;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
+import jp.lg.asp.accommodation.service.GassanDaichoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,7 +53,8 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 
 		if (searchForm.getShiteiNo() != null && !searchForm.getShiteiNo().isEmpty()) {
 			List<String> matchedGassanShiteiNos = gassanUchiRepository
-					.findByJichitaiCdAndShiteiNo(jichitaiCd, searchForm.getShiteiNo())
+					.findByJichitaiCdAndShiteiNoOrGassanShiteiNo(jichitaiCd, searchForm.getShiteiNo(),
+							searchForm.getGassanShiteiNo())
 					.stream().map(GassanUchi::getGassanShiteiNo).collect(Collectors.toList());
 			gassanList = gassanList.stream()
 					.filter(g -> matchedGassanShiteiNos.contains(g.getGassanShiteiNo()))
@@ -115,21 +119,25 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 	}
 
 	private String toLikePattern(String value, String matchType) {
-		if (value == null || value.isBlank()) return null;
+		if (value == null || value.isBlank())
+			return null;
 		return switch (matchType) {
-			case "prefix" -> value + "%";
-			case "exact"  -> value;
-			default       -> "%" + value + "%";
+		case "prefix" -> value + "%";
+		case "exact" -> value;
+		default -> "%" + value + "%";
 		};
 	}
 
 	private String patternToRegex(String likePattern) {
-		if (likePattern == null) return ".*";
+		if (likePattern == null)
+			return ".*";
 		String[] parts = likePattern.split("%", -1);
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < parts.length; i++) {
-			if (i > 0) sb.append(".*");
-			if (!parts[i].isEmpty()) sb.append(java.util.regex.Pattern.quote(parts[i]));
+			if (i > 0)
+				sb.append(".*");
+			if (!parts[i].isEmpty())
+				sb.append(java.util.regex.Pattern.quote(parts[i]));
 		}
 		return sb.toString();
 	}
@@ -142,7 +150,7 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 		// 合算内訳テーブルから施設情報を取得
 		List<GassanUchi> gassanUchiList = gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd,
 				gassanShiteiNo);
-		
+
 		if (!gassanUchiList.isEmpty()) {
 			// rno=1の代表施設を優先、なければ先頭レコード
 			GassanUchi daihyoUchi = gassanUchiList.stream()
@@ -154,7 +162,7 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 			// 代表施設情報を取得
 			List<Tokugimu> daihyoTokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd,
 					daihyoShiteiNo);
-			
+
 			if (!daihyoTokugimuList.isEmpty()) {
 				Tokugimu daihyoTokugimu = daihyoTokugimuList.get(0);
 				item.setDaihyoShisetsuName(daihyoTokugimu.getShisetsuName());

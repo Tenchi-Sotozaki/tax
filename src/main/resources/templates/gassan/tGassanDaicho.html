@@ -2,18 +2,37 @@
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
+
 <head>
-<title>合算申告情報管理台帳</title>
-<link rel="stylesheet" th:href="@{/css/gassan-daicho.css}">
+	<title>合算申請管理台帳</title>
+	<link rel="stylesheet" th:href="@{/css/gassan-daicho.css}">
+
+	<style>
+		.card {
+		    min-height: auto !important;
+		    height: auto !important;
+		}
+
+		.table-scroll {
+		    min-height: auto !important;
+		    height: auto !important;
+		}
+
+		.table-scroll table {
+		    margin-bottom: 0 !important;
+		}
+	</style>
 </head>
+
 <body>
-	<div layout:fragment="content" class="container-fluid px-4 py-3">
+	<div layout:fragment="content" class="container-fluid px-4 py-3"
+		th:with="isSearched=${param.gassanShiteiNo != null or param.shiteiNo != null or param.name != null or param.page != null}">
 
 		<!-- ページヘッダー -->
 		<div
 			class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-file-earmark-text text-primary me-2"></i>合算申告情報管理台帳
+				<i class="bi bi-file-earmark-text text-primary me-2"></i>合算申請管理台帳
 			</h5>
 			<span class="text-muted small"> 検索結果: <strong
 				th:text="${items.totalElements}">0</strong> 件
@@ -43,12 +62,13 @@
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
-					<button class="accordion-button py-2 fw-semibold" type="button"
-						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2 text-primary"></i>抽出条件
+					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
+						data-bs-target="#searchPanel" th:classappend="${isSearched} ? 'collapsed' : ''"
+						th:aria-expanded="${!isSearched} ? 'true' : 'false'">
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
-				<div id="searchPanel" class="accordion-collapse collapse show">
+				<div id="searchPanel" class="accordion-collapse collapse" th:classappend="${!isSearched} ? 'show' : ''">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/gassan/list}" th:object="${searchForm}"
 							method="get">
@@ -59,9 +79,9 @@
 										th:field="*{gassanShiteiNo}" placeholder="合算指定番号">
 								</div>
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">代表指定番号</label>
-									<input type="text" class="form-control form-control-sm"
-										th:field="*{shiteiNo}" placeholder="代表指定番号">
+									<label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
+									<input type="text" class="form-control form-control-sm" th:field="*{shiteiNo}"
+										placeholder="指定番号">
 								</div>
 								<div class="col">
 									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
@@ -84,10 +104,9 @@
 								</div>
 							</div>
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-								<a th:href="@{/gassan/list}"
-									class="btn btn-outline-secondary btn-sm"> <i
-									class="bi bi-arrow-counterclockwise me-1"></i>リセット
-								</a>
+								<button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm"> <i
+										class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
+								</button>
 								<button type="submit" class="btn btn-primary btn-sm px-4">
 									<i class="bi bi-search me-1"></i>検索する
 								</button>
@@ -98,99 +117,79 @@
 			</div>
 		</div>
 
-		<!-- ツールバー（ボタンエリア） -->
-		<div class="card shadow-sm mb-3">
-			<div class="card-body py-2 px-3">
-				<div class="d-flex flex-wrap align-items-center gap-1"
-					style="row-gap: 0.4rem;">
-					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnView"
-							class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-eye me-1"></i>照会
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<!-- 検索結果エリア -->
+		<div th:if="${isSearched}">
 
-		<!-- 表示件数選択プルダウン -->
-		<div class="d-flex justify-content-end align-items-center mb-1">
-			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-				<option th:each="s : ${#arrays.toArray({5, 10, 20})}"
-					th:value="@{/gassan/list(page=0, pageSize=${s}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}"
-					th:text="${s}" th:selected="${s == searchForm.pageSize}">
-				</option>
-			</select>
-		</div>
+			<div class="d-flex justify-content-center align-items-center mb-1 position-relative">
 
-		<!-- 一覧テーブル -->
-		<div class="card shadow-sm">
-			<div class="card-body p-0">
-				<div class="table-scroll">
-					<table
-						class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
-						<thead class="table-primary">
-							<tr>
-								<th style="width: 40px" class="text-center"></th>
-								<th style="min-width: 120px">合算指定番号</th>
-								<th style="min-width: 140px">代表施設</th>
-								<th style="min-width: 100px">指定番号</th>
-								<th style="min-width: 140px">氏名/名称</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="item : ${items.content}">
-								<td class="text-center"><input type="checkbox"
-									class="form-check-input row-select"
-									th:data-gassan-shitei-no="${item.gassanShiteiNo}"></td>
-								<td class="fw-bold text-primary" th:text="${item.gassanShiteiNo}"></td>
-								<td th:text="${item.daihyoShisetsuName}"></td>
-								<td th:text="${item.shiteiNo}"></td>
-								<td th:text="${item.name}"></td>
-							</tr>
-							<tr th:if="${items.totalElements == 0}">
-								<td colspan="5" class="text-center text-muted py-5"><i
-									class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-									該当するデータが見つかりませんでした。</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="card-footer bg-white py-2 border-top">
 				<!-- ページ選択 -->
-				<nav>
+				<nav th:with="
+					curr=${currentPage != null ? currentPage : 0}, 
+					total=${totalPages != null and totalPages > 0 ? totalPages : 1}, 
+					start=${startPage != null ? startPage : 0}, 
+					end=${endPage != null ? endPage : 0}" class="pagination-container">
+
 					<ul class="pagination pagination-sm justify-content-center mb-0">
-						<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-							<a class="page-link"
-								th:href="@{/gassan/list(page=${items.number - 1}, 
-								pageSize=${searchForm.pageSize}, 
+
+						<!-- 前へボタン -->
+						<li class="page-item" th:classappend="${items.first or total <= 1} ? 'disabled'">
+							<a class="page-link" th:href="@{/gassan/list(page=${items.number - 1}, 
+								pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, 
 								gassanShiteiNo=${searchForm.gassanShiteiNo}, 
 								shiteiNo=${searchForm.shiteiNo}, 
 								name=${searchForm.name})}">
 								前へ
 							</a>
 						</li>
-						<li class="page-item active" th:if="${items.totalPages == 0}">
-							<a class="page-link" href="#">1</a>
-						</li>
-						<li class="page-item" th:if="${items.totalPages > 0}" th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
-							th:classappend="${i == items.number} ? 'active'">
+
+						<!-- 最初のページ -->
+						<li class="page-item" th:classappend="${curr == 0} ? 'active'"
+							th:if="${total > 1 and start > 0}">
 							<a class="page-link"
-								th:href="@{/gassan/list(page=${i}, 
-								pageSize=${searchForm.pageSize}, 
-								gassanShiteiNo=${searchForm.gassanShiteiNo}, 
-								shiteiNo=${searchForm.shiteiNo}, 
-								name=${searchForm.name})}"
-								th:text="${i + 1}">
-								1
+								th:href="@{/gassan/list(page=0, pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}">1</a>
+						</li>
+
+						<!-- 中間の省略記号 -->
+						<li class="page-item disabled" th:if="${total > 1 and start > 1}">
+							<span class="page-link">...</span>
+						</li>
+
+						<!-- ページ番号 -->
+						<th:block th:if="${total <= 1}">
+							<li class="page-item active">
+								<span class="page-link">1</span>
+							</li>
+						</th:block>
+						<th:block th:if="${total > 1}">
+							<li class="page-item" th:each="i : ${#numbers.sequence(start, end)}"
+								th:classappend="${i == curr} ? 'active'">
+								<a class="page-link"
+									th:href="@{/gassan/list(page=${i}, pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}"
+									th:text="${i + 1}">
+									1
+								</a>
+							</li>
+						</th:block>
+
+						<!-- 末尾の省略記号 -->
+						<li class="page-item disabled" th:if="${total > 1 and end < total - 2}">
+							<span class="page-link">...</span>
+						</li>
+
+						<!-- 最終ページ -->
+						<li class="page-item" th:classappend="${curr == total - 1} ? 'active'"
+							th:if="${total > 1 and end < total - 1}">
+							<a class="page-link"
+								th:href="@{/gassan/list(page=${total - 1}, pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}"
+								th:text="${total}">
+								20
 							</a>
 						</li>
-						<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-							<a class="page-link"
-								th:href="@{/gassan/list(page=${items.number + 1}, 
-								pageSize=${searchForm.pageSize}, 
+
+						<!-- 次へボタン -->
+						<li class="page-item" th:classappend="${items.last or total <= 1} ? 'disabled'">
+							<a class="page-link" th:href="@{/gassan/list(page=${items.number + 1}, 
+								pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, 
 								gassanShiteiNo=${searchForm.gassanShiteiNo}, 
 								shiteiNo=${searchForm.shiteiNo}, 
 								name=${searchForm.name})}">
@@ -199,12 +198,59 @@
 						</li>
 					</ul>
 				</nav>
+
+				<!-- 表示件数選択プルダウン -->
+				<div class="d-flex align-items-center position-absolute end-0">
+					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
+					<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
+						<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
+							th:value="@{/gassan/list(page=0, pageSize=${s}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}"
+							th:text="${s}" th:selected="${s == searchForm.pageSize}">
+						</option>
+					</select>
+				</div>
+
+			</div>
+
+			<!-- 一覧テーブル -->
+			<div class="card shadow-sm">
+				<div class="card-body p-0">
+					<div class="table-scroll">
+						<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
+							<thead class="table-primary">
+								<tr>
+									<th style="min-width: 120px">合算指定番号</th>
+									<th style="min-width: 140px">代表施設</th>
+									<th style="min-width: 100px">代表指定番号</th>
+									<th style="min-width: 140px">氏名/名称</th>
+									<th style="width: 50px" class="text-center"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item : ${items.content}">
+									<td th:text="${item.gassanShiteiNo}"></td>
+									<td th:text="${item.daihyoShisetsuName}"></td>
+									<td th:text="${item.shiteiNo}"></td>
+									<td th:text="${item.name}"></td>
+									<td>
+										<a th:href="@{/gassan/view-form/{id}(id=${item.gassanShiteiNo})}">詳細</a>
+									</td>
+								</tr>
+								<tr th:if="${items.totalElements == 0}">
+									<td colspan="5" class="text-center text-muted py-5"><i
+											class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+										該当するデータが見つかりませんでした。</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
-	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/tGassanDaicho.js}"></script>
 	</th:block>
 </body>
+
 </html>
