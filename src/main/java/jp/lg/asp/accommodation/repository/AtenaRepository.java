@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 
 @Repository
@@ -71,5 +73,27 @@ public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
         @Param("tel")              String tel,
         @Param("kojinNo")          String kojinNo,
         @Param("hojinNo")          String hojinNo
+    );
+
+    @Query("SELECT a FROM Atena a WHERE a.jichitaiCd = :jichitaiCd"
+        + " AND (:atenaNo      = '%' OR CAST(a.atenaNo AS string) = :atenaNo)"
+        + " AND a.name                           LIKE :namePattern"
+        + " AND COALESCE(a.nameKana, '')          LIKE :nameKanaPattern"
+        + " AND (:yubinNo      = '%' OR COALESCE(a.yubinNo, '')  = :yubinNo)"
+        + " AND COALESCE(a.jusho, '')            LIKE :jushoPattern"
+        + " AND (:tel          = '%' OR a.tel1 = :tel OR COALESCE(a.tel2, '') = :tel)"
+        + " AND (:kojinNo      = '%' OR COALESCE(a.kojinNo, '')  = :kojinNo)"
+        + " AND (:hojinNo      = '%' OR COALESCE(a.hojinNo, '')  = :hojinNo)")
+    Page<Atena> searchPage(
+        @Param("jichitaiCd")       String jichitaiCd,
+        @Param("atenaNo")          String atenaNo,
+        @Param("namePattern")      String namePattern,
+        @Param("nameKanaPattern")  String nameKanaPattern,
+        @Param("yubinNo")          String yubinNo,
+        @Param("jushoPattern")     String jushoPattern,
+        @Param("tel")              String tel,
+        @Param("kojinNo")          String kojinNo,
+        @Param("hojinNo")          String hojinNo,
+        Pageable pageable
     );
 }
