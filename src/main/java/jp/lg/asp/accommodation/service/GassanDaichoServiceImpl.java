@@ -1,6 +1,4 @@
 package jp.lg.asp.accommodation.service;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.GassanDaichoItem;
 import jp.lg.asp.accommodation.dto.GassanDaichoSearchForm;
 import jp.lg.asp.accommodation.entity.Gassan;
@@ -51,7 +50,7 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 
 		if (searchForm.getShiteiNo() != null && !searchForm.getShiteiNo().isEmpty()) {
 			List<String> matchedGassanShiteiNos = gassanUchiRepository
-					.findByJichitaiCdAndShiteiNo(jichitaiCd, searchForm.getShiteiNo())
+					.findByJichitaiCdAndShiteiNoOrGassanShiteiNo(jichitaiCd, searchForm.getShiteiNo(), searchForm.getShiteiNo())
 					.stream().map(GassanUchi::getGassanShiteiNo).collect(Collectors.toList());
 			gassanList = gassanList.stream()
 					.filter(g -> matchedGassanShiteiNos.contains(g.getGassanShiteiNo()))
