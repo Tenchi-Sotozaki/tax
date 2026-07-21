@@ -50,7 +50,7 @@ public class GassanDaichoServiceImpl implements GassanDaichoService {
 
 		if (searchForm.getShiteiNo() != null && !searchForm.getShiteiNo().isEmpty()) {
 			List<String> matchedGassanShiteiNos = gassanUchiRepository
-					.findByJichitaiCdAndShiteiNoOrGassanShiteiNo(jichitaiCd, searchForm.getShiteiNo(), searchForm.getShiteiNo())
+					.findByJichitaiCdAndShiteiNoOrGassanShiteiNo(jichitaiCd, searchForm.getShiteiNo(), searchForm.getGassanShiteiNo())
 					.stream().map(GassanUchi::getGassanShiteiNo).collect(Collectors.toList());
 			gassanList = gassanList.stream()
 					.filter(g -> matchedGassanShiteiNos.contains(g.getGassanShiteiNo()))
