@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
@@ -55,4 +56,8 @@ public interface FukaService {
 	 */
 	long calculateTax(String fukaKbn, long baseValue, BigDecimal cityRate, BigDecimal kenRate);
 
+	/**
+	 * 指定された指定番号に該当するデータが存在する年度の一覧を取得する。
+	 */
+	List<Integer> getExistingNendoList(String shiteiNo);
 }
