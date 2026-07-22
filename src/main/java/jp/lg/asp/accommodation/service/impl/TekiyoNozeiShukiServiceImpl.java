@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.NozeiShukiDto;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiHistoryDto;
@@ -125,7 +125,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         entity.setDelFlg(FLG_OFF);
 
         tekiyoNozeiShukiRepository.save(entity);
-        log.info("適用納税周期保存完了: shiteiNo={}, idx={}", shiteiNo, newIdx);
+        log.debug("適用納税周期保存完了: shiteiNo={}, idx={}", shiteiNo, newIdx);
     }
 
     private void checkAndResolveOverlap(String shiteiNo, LocalDate newStYmd, LocalDate newEdYmd) {
@@ -167,6 +167,6 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         latest.setDelFlg(FLG_ON);
         tekiyoNozeiShukiRepository.save(latest);
 
-        log.info("適用納税周期削除完了: shiteiNo={}, idx={}", shiteiNo, latest.getIdx());
+        log.debug("適用納税周期削除完了: shiteiNo={}, idx={}", shiteiNo, latest.getIdx());
     }
 }

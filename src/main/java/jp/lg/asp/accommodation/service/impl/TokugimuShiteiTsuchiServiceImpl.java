@@ -1,11 +1,9 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.util.Optional;
-
 
 import org.springframework.stereotype.Service;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
@@ -57,7 +55,7 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 						jichitaiCode, shiteiNo, "1", "0");
 
 		if (tokugimuOpt.isEmpty()) {
-			log.warn("特別徴収義務者が見つかりません: shiteiNo={}", shiteiNo);
+			log.error("特別徴収義務者が見つかりません: shiteiNo={}", shiteiNo);
 			return null;
 		}
 
@@ -68,7 +66,7 @@ public class TokugimuShiteiTsuchiServiceImpl implements TokugimuShiteiTsuchiServ
 				.findByJichitaiCdAndAtenaNo(jichitaiCode, tokugimu.getAtenaNo());
 
 		if (atenaOpt.isEmpty()) {
-			log.warn("宛名情報が見つかりません: atenaNo={}", tokugimu.getAtenaNo());
+			log.error("宛名情報が見つかりません: atenaNo={}", tokugimu.getAtenaNo());
 			return null;
 		}
 

@@ -1,6 +1,4 @@
 package jp.lg.asp.accommodation.controller;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShiteiGassanConfigDto;
@@ -111,7 +110,7 @@ public class ShiteiGassanConfigController {
 		jichitai.setShiteiStChar(dto.getShiteiStChar());
 		jichitai.setGassanStChar(dto.getGassanStChar());
 		jichitaiRepository.save(jichitai);
-		log.info("指定番号・合算指定番号を{}しました。jichitaiCd: {}", isNew ? "登録" : "更新", jichitaiCd);
+		log.debug("指定番号・合算指定番号を{}しました。jichitaiCd: {}", isNew ? "登録" : "更新", jichitaiCd);
 		redirectAttributes.addFlashAttribute("successMessage",
 				"指定番号・合算指定番号を" + (isNew ? "登録" : "更新") + "しました。");
 		return "redirect:/admin/shitei-gassan/view";

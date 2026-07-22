@@ -49,7 +49,7 @@ public class DbUserDetailsService implements UserDetailsService {
 
 		User user = userRepository.findById(pk)
 				.orElseThrow(() -> {
-					log.warn("ユーザー見つからず: username={}, jichitaiCd={}", username, jichitaiCd);
+					log.info("ユーザー見つからず: username={}, jichitaiCd={}", username, jichitaiCd);
 					return new UsernameNotFoundException("ユーザーが見つかりません: " + username);
 				});
 

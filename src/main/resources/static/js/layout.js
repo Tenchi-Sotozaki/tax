@@ -12,3 +12,11 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
 document.getElementById('sidebarToggle')?.addEventListener('click', function () {
     document.getElementById('sidebar').classList.toggle('d-none');
 });
+// Bootstrapツールチップ初期化（省略表示時のみ）
+document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    if (el.scrollWidth > el.clientWidth) {
+        new bootstrap.Tooltip(el);
+    } else {
+        el.removeAttribute('data-bs-toggle');
+    }
+});

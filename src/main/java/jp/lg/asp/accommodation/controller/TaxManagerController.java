@@ -117,7 +117,7 @@ public class TaxManagerController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		// デバッグ情報を出力
-		log.info("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, exemptionFlag={}", 
+		log.debug("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, exemptionFlag={}", 
 				id, form.getAtenaNo(), form.getManagerName(), form.isExemptionFlag());
 
 		if (bindingResult.hasErrors()) {
@@ -129,11 +129,11 @@ public class TaxManagerController {
 
 		try {
 			taxManagerService.saveByShiteiNo(id, form);
-			log.info("納税管理人情報を保存しました。collectorId: {}", id);
+			log.debug("納税管理人情報を保存しました。collectorId: {}", id);
 			redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");
 			return "redirect:/tokugimu/list";
-		} catch (IllegalArgumentException e) {
-			log.warn("納税管理人登録エラー: {}", e.getMessage());
+		} catch (Exception e) {
+			log.error("納税管理人登録エラー: {}", e.getMessage());
 			model.addAttribute("errorMessage", e.getMessage());
 			model.addAttribute("isEdit", form.isEdit());
 			model.addAttribute("isView", false);
@@ -145,15 +145,15 @@ public class TaxManagerController {
 	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
-		log.info("納税管理人削除処理: shiteiNo={}", id);
+		log.debug("納税管理人削除処理: shiteiNo={}", id);
 
 		try {
 			taxManagerService.deleteByShiteiNo(id);
-			log.info("納税管理人を削除しました。shiteiNo: {}", id);
+			log.debug("納税管理人を削除しました。shiteiNo: {}", id);
 			redirectAttributes.addFlashAttribute("successMessage", "納税管理人を削除しました。");
 			return "redirect:/tokugimu/list";
-		} catch (IllegalArgumentException e) {
-			log.warn("納税管理人削除エラー: {}", e.getMessage());
+		} catch (Exception e) {
+			log.error("納税管理人削除エラー: {}", e.getMessage());
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 			return "redirect:/tax-manager/edit/" + id;
 		}

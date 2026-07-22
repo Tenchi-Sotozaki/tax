@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.FukaConstants;
@@ -197,7 +197,7 @@ public class ZeiritsuController {
 			detailSeq++;
 		}
 
-		log.info("税率管理マスタを更新しました。jichitaiCd: {}, seq: {}", jichitaiCd, seq);
+		log.debug("税率管理マスタを更新しました。jichitaiCd: {}, seq: {}", jichitaiCd, seq);
 		redirectAttributes.addFlashAttribute("successMessage", "税率管理マスタを更新しました。");
 		return "redirect:/admin/zeiritsu/view/" + seq;
 	}
@@ -234,7 +234,7 @@ public class ZeiritsuController {
 					});
 		}
 
-		log.info("税率管理マスタを削除しました。jichitaiCd: {}, seq: {}", jichitaiCd, seq);
+		log.debug("税率管理マスタを削除しました。jichitaiCd: {}, seq: {}", jichitaiCd, seq);
 		redirectAttributes.addFlashAttribute("successMessage", "税率管理マスタを削除しました。");
 		return "redirect:/admin/zeiritsu/list";
 	}
@@ -333,7 +333,7 @@ public class ZeiritsuController {
 			detailSeq++;
 		}
 
-		log.info("税率管理マスタを登録しました。jichitaiCd: {}, seq: {}", jichitaiCd, nextSeq);
+		log.debug("税率管理マスタを登録しました。jichitaiCd: {}, seq: {}", jichitaiCd, nextSeq);
 		redirectAttributes.addFlashAttribute("successMessage", "税率管理マスタを登録しました。");
 		return "redirect:/admin/zeiritsu/list";
 	}
@@ -466,7 +466,7 @@ public class ZeiritsuController {
 			String fukaKbnName = FukaConstants.TEIGAKU.getValue().equals(existing.getFukaKbn())
 					? FukaConstants.TEIGAKU.getName()
 					: FukaConstants.TEIRITSU.getName();
-			log.info("既存の賦課方式設定の適用終了時期を自動更新しました。seq: {}, 賦課方式: {}, 新終了時期: {}",
+			log.debug("既存の賦課方式設定の適用終了時期を自動更新しました。seq: {}, 賦課方式: {}, 新終了時期: {}",
 					existing.getSeq(), fukaKbnName, newEdYm);
 		}
 	}

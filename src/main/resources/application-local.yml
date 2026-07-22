@@ -7,3 +7,5 @@ spring:
 
 server:
   address: localhost
+
+
