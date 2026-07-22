@@ -74,7 +74,7 @@
 		data-bs-keyboard="false" aria-labelledby="addressSearchModalLabel"
 		aria-hidden="true">
 		<div
-			class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" style="max-width: 940px;">
 			<div class="modal-content shadow">
 				<div class="modal-header bg-primary text-white">
 					<h5 class="modal-title" id="addressSearchModalLabel">
@@ -87,34 +87,56 @@
 					<!-- 検索条件 -->
 					<div class="row g-2 mb-3">
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">宛名番号</label> <input
-								type="text" id="addrSearchNo"
-								class="form-control form-control-sm" placeholder="宛名番号">
+							<label class="form-label form-label-sm fw-medium mb-1">宛名番号</label>
+							<input type="text" id="addrSearchNo" class="form-control form-control-sm" placeholder="宛名番号">
 						</div>
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">氏名/名称</label> <input
-								type="text" id="addrSearchName"
-								class="form-control form-control-sm" placeholder="氏名/名称">
+							<div class="d-flex align-items-center mb-1">
+								<label class="form-label form-label-sm fw-medium me-1 mb-0">氏名/名称</label>
+								<div class="form-check form-check-inline mb-0 me-2">
+									<input class="form-check-input" type="radio" name="addrSearchNameMatchType" id="addrNamePrefix" value="prefix">
+									<label class="form-check-label small" for="addrNamePrefix">前方</label>
+								</div>
+								<div class="form-check form-check-inline mb-0 me-2">
+									<input class="form-check-input" type="radio" name="addrSearchNameMatchType" id="addrNamePartial" value="partial" checked>
+									<label class="form-check-label small" for="addrNamePartial">部分</label>
+								</div>
+								<div class="form-check form-check-inline mb-0 me-2">
+									<input class="form-check-input" type="radio" name="addrSearchNameMatchType" id="addrNameExact" value="exact">
+									<label class="form-check-label small" for="addrNameExact">完全</label>
+								</div>
+							</div>
+							<input type="text" id="addrSearchName" class="form-control form-control-sm" placeholder="氏名/名称">
 						</div>
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">住所</label> <input
-								type="text" id="addrSearchAddress"
-								class="form-control form-control-sm" placeholder="住所">
+							<div class="d-flex align-items-center mb-1">
+								<label class="form-label form-label-sm fw-medium me-1 mb-0">住所</label>
+								<div class="form-check form-check-inline mb-0 me-2">
+									<input class="form-check-input" type="radio" name="addrSearchAddressMatchType" id="addrAddressPrefix" value="prefix">
+									<label class="form-check-label small" for="addrAddressPrefix">前方</label>
+								</div>
+								<div class="form-check form-check-inline mb-0 me-2">
+									<input class="form-check-input" type="radio" name="addrSearchAddressMatchType" id="addrAddressPartial" value="partial" checked>
+									<label class="form-check-label small" for="addrAddressPartial">部分</label>
+								</div>
+								<div class="form-check form-check-inline mb-0 me-2">
+									<input class="form-check-input" type="radio" name="addrSearchAddressMatchType" id="addrAddressExact" value="exact">
+									<label class="form-check-label small" for="addrAddressExact">完全</label>
+								</div>
+							</div>
+							<input type="text" id="addrSearchAddress" class="form-control form-control-sm" placeholder="住所">
 						</div>
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">電話番号</label> <input
-								type="tel" id="addrSearchPhone"
-								class="form-control form-control-sm" placeholder="電話番号">
+							<label class="form-label form-label-sm fw-medium mb-1">電話番号</label>
+							<input type="tel" id="addrSearchPhone" class="form-control form-control-sm" placeholder="電話番号">
 						</div>
 						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium">個人番号</label> <input
-								type="text" id="addrSearchKojinNo"
-								class="form-control form-control-sm" placeholder="個人番号">
+							<label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
+							<input type="text" id="addrSearchKojinNo" class="form-control form-control-sm" placeholder="個人番号">
 						</div>
 						<div class="col-md-4">
-							<label class="form-label form-lable-sm fw-medium">法人番号</label> <input
-								type="text" id="addrSearchHojinNo"
-								class="form-control form-control-sm" placeholder="法人番号">
+							<label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
+							<input type="text" id="addrSearchHojinNo" class="form-control form-control-sm" placeholder="法人番号">
 						</div>
 					</div>
 					<div class="d-flex justify-content-end mb-3">
@@ -129,7 +151,7 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-secondary"
+					<button type="button" class="btn btn-outline-secondary btn-sm px-4"
 						data-bs-dismiss="modal">
 						<i class="bi bi-x-lg me-1"></i>閉じる
 					</button>
