@@ -1,5 +1,4 @@
 package jp.lg.asp.accommodation.aspect;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -18,6 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.OperationLog;
 import jp.lg.asp.accommodation.repository.OperationLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -61,11 +61,17 @@ public class OpeLogAspect {
 				param = param.substring(0, 2000);
 			}
 
+			String path = request != null ? request.getRequestURI() : null;
+			String method = request != null ? request.getMethod() : null;
+
 			OperationLog entity = new OperationLog();
 			entity.setJichitaiCd(jichitaiCd);
 			entity.setSeq(operationLogRepository.findNextSeq(jichitaiCd));
 			entity.setScreenId(opeLog.screenId());
 			entity.setSousa(opeLog.operation());
+			entity.setMethod(method);
+			entity.setPath(path);
+			entity.setStatus("200");
 			entity.setParam(param);
 			entity.setOpeUser(getCurrentUserId());
 			entity.setOpeDt(LocalDateTime.now());
@@ -89,7 +95,6 @@ public class OpeLogAspect {
 	private String getRequestParameters(HttpServletRequest request) {
 		try {
 			Map<String, Object> parameterMap = new java.util.LinkedHashMap<>();
-			parameterMap.put("path", request.getRequestURI());
 			request.getParameterMap().entrySet().stream()
 					.filter(e -> !e.getKey().equalsIgnoreCase("_csrf"))
 					.forEach(e -> parameterMap.put(e.getKey(), e.getValue()));

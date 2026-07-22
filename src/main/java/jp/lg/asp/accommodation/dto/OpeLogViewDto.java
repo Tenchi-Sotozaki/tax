@@ -38,6 +38,15 @@ public class OpeLogViewDto {
 	/** 画面名 */
 	private String screenName;
 
+	/** メソッド */
+	private String method;
+
+	/** PATH */
+	private String path;
+
+	/** ステータス */
+	private String status;
+
 	/** 操作日時 */
 	private LocalDateTime opeDt;
 }
