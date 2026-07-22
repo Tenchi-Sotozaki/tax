@@ -541,6 +541,8 @@ public class FukaServiceImpl implements FukaService {
 					}
 					form.setAdditionalAmount3(entity.getKasanGaku3());
 					form.setAdditionalDueDate3(entity.getNokigen3());
+					form.setEntaikin(entity.getEntaikin());
+					form.setNokigen(entity.getNokigen());
 
 					// 賦課情報設定
 					setMonthlyDetail(entity, form);
@@ -603,6 +605,8 @@ public class FukaServiceImpl implements FukaService {
 					if (entity.getKasanRitsu3() != null) form.setAdditionalRate3(entity.getKasanRitsu3().toString());
 					form.setAdditionalAmount3(entity.getKasanGaku3());
 					form.setAdditionalDueDate3(entity.getNokigen3());
+					form.setEntaikin(entity.getEntaikin());
+					form.setNokigen(entity.getNokigen());
 					setMonthlyDetail(entity, form);
 					setMonthlyTally(form, entity);
 				});
@@ -860,6 +864,8 @@ public class FukaServiceImpl implements FukaService {
 			parentFuka.setKasanGaku3(form.getAdditionalAmount3());
 			parentFuka.setNokigen3(form.getAdditionalDueDate3());
 		}
+		parentFuka.setEntaikin(form.getEntaikin());
+		parentFuka.setNokigen(form.getNokigen());
 		return parentFuka;
 	}
 

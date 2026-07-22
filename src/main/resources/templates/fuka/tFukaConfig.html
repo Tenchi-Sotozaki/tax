@@ -452,13 +452,14 @@
 									placeholder="0" th:data-initial-value="*{additionalAmount1}">
 							</div>
 						</div>
-
-						<!-- 納期限 -->
-						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">納期限</label>
-							<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate1}"
-								th:readonly="${fukaDeclarationForm.view}" th:data-initial-value="*{additionalDueDate1}">
+						<!-- 延滞金 -->
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium mb-1">延滞金 (円)</label>
+							<div class="input-group input-group-sm js-comma-format">
+								<input type="text" class="form-control text-end js-comma-format" th:field="*{entaikin}" th:readonly="${fukaDeclarationForm.view}" placeholder="0" th:data-initial-value="*{entaikin}">
+							</div>
 						</div>
+
 					</div>
 				</div>
 
@@ -497,13 +498,12 @@
 									placeholder="0" th:data-initial-value="*{additionalAmount2}">
 							</div>
 						</div>
-
-						<!-- 納期限 -->
-						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">納期限</label>
-							<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate2}"
-								th:readonly="${fukaDeclarationForm.view}" th:data-initial-value="*{additionalDueDate2}">
+						<!-- 納入期限 -->
+						<div class="col-md-4">
+							<label class="form-label form-label-sm fw-medium mb-1">納入期限</label>
+							<input type="date" class="form-control form-control-sm" th:field="*{nokigen}" th:readonly="${fukaDeclarationForm.view}" th:data-initial-value="*{nokigen}">
 						</div>
+
 					</div>
 				</div>
 
@@ -543,12 +543,6 @@
 							</div>
 						</div>
 
-						<!-- 納期限 -->
-						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">納期限</label>
-							<input type="date" class="form-control form-control-sm" th:field="*{additionalDueDate3}"
-								th:readonly="${fukaDeclarationForm.view}" th:data-initial-value="*{additionalDueDate3}">
-						</div>
 					</div>
 				</div>
 			</div>

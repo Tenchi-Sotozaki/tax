@@ -64,6 +64,11 @@ public class FukaDeclarationForm {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate3;
 
+	// 延滞金・納入期限（テーブル定義書2026-06-18：加算の納期限を1本化）
+	private Long entaikin;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate nokigen;
+
 	// 徴収原簿
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
 
