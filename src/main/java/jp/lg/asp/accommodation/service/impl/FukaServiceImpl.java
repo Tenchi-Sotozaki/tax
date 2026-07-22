@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -1195,5 +1196,25 @@ public class FukaServiceImpl implements FukaService {
 			long rate = cityRate.longValue() + kenRate.longValue();
 			return baseValue * rate;
 		}
+	}
+	
+	@Override
+	public List<Integer> getExistingNendoList(String shiteiNo) {
+		// 既存メソッドで対象事業者の全データを取得
+	    List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNo(jichitaiContext.getJichitaiCd(), shiteiNo);
+
+	    if (fukaList == null || fukaList.isEmpty()) {
+	        return List.of();
+	    }
+
+	    // 年度を取り出してInteger型のリストにする
+	    return fukaList.stream()
+	            .filter(f -> "1".equals(f.getNewFlg()) && "0".equals(f.getDelFlg())) // 有効データのみ
+	            .map(Fuka::getNendo)
+	            .filter(Objects::nonNull)
+	            .map(Integer::parseInt)
+	            .distinct()
+	            .sorted()
+	            .toList();
 	}
 }

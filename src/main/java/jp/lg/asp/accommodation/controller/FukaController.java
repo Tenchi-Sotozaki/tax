@@ -1,7 +1,11 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -60,13 +64,33 @@ public class FukaController {
 			@RequestParam(required = false) String status,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		
+		// 今年度と前年度を計算
+	    LocalDate now = LocalDate.now();
+	    int thisNendo = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+	    int prevNendo = thisNendo - 1;
 
-		// 年度指定がない場合のデフォルト年度設定
-		if (nendo == null || nendo.isEmpty()) {
-			LocalDate now = LocalDate.now();
-			int nendoInt = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-			nendo = String.valueOf(nendoInt);
-		}
+	    // パラメータ指定がない場合のデフォルト年度設定
+	    if (nendo == null || nendo.isEmpty()) {
+	        nendo = String.valueOf(thisNendo);
+	    }
+	    int currentNendo = Integer.parseInt(nendo);
+
+	    // DBからデータが存在する年度リストを取得
+	    List<Integer> existingNendoList = fukaService.getExistingNendoList(shiteiNo);
+
+	    // 最古年度と最新年度を特定
+	    Set<Integer> baseSet = new TreeSet<>(existingNendoList);
+	    baseSet.add(prevNendo);
+	    baseSet.add(thisNendo);
+
+	    int minNendo = Collections.min(baseSet);
+	    int maxNendo = Collections.max(baseSet);
+
+	    // 最小年度から最大年度まで連番のリストを作成
+	    List<Integer> nendoList = IntStream.rangeClosed(minNendo, maxNendo)
+	                                       .boxed()
+	                                       .toList();
 
 		// サービスを呼び出して表示用データを生成
 		FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo, status);
@@ -76,6 +100,9 @@ public class FukaController {
 		model.addAttribute("items", form.getItems());
 		model.addAttribute("totalAmount", form.getTotalAmount());
 		model.addAttribute("obligorId", shiteiNo);
+	    model.addAttribute("selectedNendo", currentNendo);
+	    model.addAttribute("nendoList", nendoList);
+	    model.addAttribute("currentStatus", status);
 
 		return DAICHO_VIEW;
 	}
