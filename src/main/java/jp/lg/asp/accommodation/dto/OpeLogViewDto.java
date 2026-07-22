@@ -2,8 +2,6 @@ package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDateTime;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import lombok.Data;
 
 /**
@@ -24,11 +22,9 @@ public class OpeLogViewDto {
 	private String opeUser;
 
 	/** 操作日時 FROM */
-	@DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
 	private String opeDtFrom;
 
 	/** 操作日時 TO */
-	@DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
 	private String opeDtTo;
 
 	/** 任意項目／パラメータ（部分一致） */
