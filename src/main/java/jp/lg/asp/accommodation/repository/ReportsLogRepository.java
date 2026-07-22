@@ -22,8 +22,8 @@ public interface ReportsLogRepository extends JpaRepository<ReportsLog, ReportsL
 			AND (:rptId IS NULL OR :rptId = '' OR r.rptId = :rptId)
 			AND (:sousa IS NULL OR :sousa = '' OR r.sousa = :sousa)
 			AND (:opeUser IS NULL OR :opeUser = '' OR r.opeUser LIKE CONCAT(:opeUser, '%'))
-			AND (:opeDtFrom IS NULL OR :opeDtFrom = '' OR r.opeDt >= TO_DATE(:opeDtFrom, 'yyyy/MM/dd HH:mm:ss'))
-			AND (:opeDtTo IS NULL OR :opeDtTo = '' OR r.opeDt <= TO_DATE(:opeDtTo, 'yyyy/MM/dd HH:mm:ss'))
+			AND (:opeDtFrom IS NULL OR :opeDtFrom = '' OR r.opeDt >= TO_TIMESTAMP(:opeDtFrom, 'YYYY-MM-DD"T"HH24:MI'))
+			AND (:opeDtTo IS NULL OR :opeDtTo = '' OR r.opeDt <= TO_TIMESTAMP(:opeDtTo, 'YYYY-MM-DD"T"HH24:MI'))
 			AND (:shiteiNo IS NULL OR :shiteiNo = '' OR r.shiteiNo = :shiteiNo)
 			ORDER BY r.opeDt DESC
 			""")

@@ -2,19 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // datetime-local の値は "yyyy-MM-ddTHH:mm" 形式で送信されるが
-    // サーバー側は "yyyy-MM-dd HH:mm" を期待するため、submit前に変換する
     const searchForm = document.getElementById('searchForm');
-    if (searchForm) {
-        searchForm.addEventListener('submit', () => {
-            ['opeDtFrom', 'opeDtTo'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el && el.value) {
-                    el.value = el.value.replace('T', ' ');
-                }
-            });
-        });
-    }
 
     // リセットボタン：検索条件フォームを初期化
     document.getElementById('resetBtn')?.addEventListener('click', () => {

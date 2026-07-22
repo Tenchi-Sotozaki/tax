@@ -3,16 +3,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const searchForm = document.getElementById('searchForm');
-    if (searchForm) {
-        searchForm.addEventListener('submit', () => {
-            ['opeDtFrom', 'opeDtTo'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el && el.value) {
-                    el.value = el.value.replace('T', ' ');
-                }
-            });
-        });
-    }
 
     document.getElementById('resetBtn')?.addEventListener('click', () => {
         searchForm?.reset();
