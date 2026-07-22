@@ -15,4 +15,6 @@ public class AtenaSearchForm {
     private String tel;
     private String kojinNo;
     private String hojinNo;
+    private int page = 0;
+    private int pageSize = 10;
 }
