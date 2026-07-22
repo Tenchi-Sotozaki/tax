@@ -123,7 +123,7 @@ public class ShunoRenkeiController {
 				"加算金額区分1", "加算割合1", "加算金額1",
 				"加算金額区分2", "加算割合2", "加算金額2",
 				"加算金額区分3", "加算割合3", "加算金額3",
-				"納期限" };
+				"延滞金", "納入期限" };
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < csvHeaders.length; i++) {
 			if (i > 0)
@@ -155,8 +155,10 @@ public class ShunoRenkeiController {
 				convertKasanKbn(r.getKasanKbn3()),
 				r.getKasanRitsu3() != null ? r.getKasanRitsu3().toString() : "",
 				r.getKasanGaku3() != null ? String.valueOf(r.getKasanGaku3()) : "",
-				// 納期限（3件は1つに統合し nokigen1 を出力）
-				r.getNokigen1() != null ? r.getNokigen1().toString() : "" };
+				// 延滞金
+				r.getEntaikin() != null ? String.valueOf(r.getEntaikin()) : "",
+				// 納入期限（定義書の単一 nokigen を出力）
+				r.getNokigen() != null ? r.getNokigen().toString() : "" };
 			for (int i = 0; i < cols.length; i++) {
 				if (i > 0)
 					sb.append(',');

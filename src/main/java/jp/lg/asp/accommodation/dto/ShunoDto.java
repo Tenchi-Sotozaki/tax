@@ -34,6 +34,8 @@ public class ShunoDto {
 	private BigDecimal kasanRitsu3;
 	private Long kasanGaku3;
 	private LocalDate nokigen3;
+	private Long entaikin;
+	private LocalDate nokigen;
 	private Long cityZeigaku;
 	private Long kenZeigaku;
 

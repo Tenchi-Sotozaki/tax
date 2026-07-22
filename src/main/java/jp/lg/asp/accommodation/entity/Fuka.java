@@ -123,6 +123,12 @@ public class Fuka extends BaseEntity {
 	@Column(name = "nokigen3")
 	private LocalDate nokigen3;
 
+	@Column(name = "entaikin")
+	private Long entaikin;
+
+	@Column(name = "nokigen")
+	private LocalDate nokigen;
+
 	@Column(name = "new_flg", length = 1)
 	private String newFlg;
 

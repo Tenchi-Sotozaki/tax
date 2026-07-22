@@ -206,6 +206,8 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 		dto.setKasanRitsu3(f.getKasanRitsu3());
 		dto.setKasanGaku3(f.getKasanGaku3());
 		dto.setNokigen3(f.getNokigen3());
+		dto.setEntaikin(f.getEntaikin());
+		dto.setNokigen(f.getNokigen());
 		dto.setCityZeigaku(f.getCityZeigaku());
 		dto.setKenZeigaku(f.getKenZeigaku());
 		return dto;
