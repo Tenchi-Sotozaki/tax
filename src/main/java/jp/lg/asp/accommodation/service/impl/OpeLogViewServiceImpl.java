@@ -1,5 +1,4 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.OpeLogViewDto;
 import jp.lg.asp.accommodation.entity.OperationLog;
 import jp.lg.asp.accommodation.entity.Screen;
@@ -48,6 +48,9 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 			dto.setScreenId(log.getScreenId());
 			dto.setScreenName(resolveScreenName(screens, log.getScreenId()));
 			dto.setSousa(log.getSousa());
+			dto.setMethod(log.getMethod());
+			dto.setPath(log.getPath());
+			dto.setStatus(log.getStatus());
 			dto.setOpeUser(log.getOpeUser());
 			dto.setOpeDt(log.getOpeDt());
 			dto.setParam(log.getParam());

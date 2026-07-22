@@ -116,6 +116,9 @@
 							<th style="width: 80px;">No.</th>
 							<th style="width: 180px;">画面名</th>
 							<th style="width: 200px;">操作</th>
+							<th style="width: 80px;">メソッド</th>
+							<th style="width: 80px;">ステータス</th>
+							<th>PATH</th>
 							<th style="width: 120px;">操作者</th>
 							<th style="width: 170px;">操作日時</th>
 							<th>パラメータ</th>
@@ -123,12 +126,15 @@
 					</thead>
 					<tbody>
 						<tr th:if="${items.isEmpty()}">
-							<td colspan="6" class="text-center text-muted py-4">該当するログが見つかりません</td>
+							<td colspan="9" class="text-center text-muted py-4">該当するログが見つかりません</td>
 						</tr>
 						<tr class="log-row" th:each="item, stat : ${items}">
 							<td th:text="${stat.count}"></td>
 							<td th:text="${item.screenName}"></td>
 							<td th:text="${item.sousa}"></td>
+							<td th:text="${item.method}"></td>
+							<td th:text="${item.status}"></td>
+							<td th:text="${item.path}"></td>
 							<td th:text="${item.opeUser}"></td>
 							<td th:text="${#temporals.format(item.opeDt, 'yyyy/MM/dd HH:mm:ss')}"></td>
 							<td>
