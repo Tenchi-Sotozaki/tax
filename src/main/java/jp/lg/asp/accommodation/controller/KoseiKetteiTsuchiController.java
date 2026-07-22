@@ -63,11 +63,12 @@ public class KoseiKetteiTsuchiController {
 			@RequestParam String shiteiNo,
 			@RequestParam String b1Ym,
 			@RequestParam(required = false) String b2Ym,
-			@RequestParam(required = false) String b3Ym) {
+			@RequestParam(required = false) String b3Ym,
+			@RequestParam(required = false, defaultValue = "2") String henkoKbn) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
-			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
@@ -90,11 +91,12 @@ public class KoseiKetteiTsuchiController {
 			@RequestParam String shiteiNo,
 			@RequestParam String b1Ym,
 			@RequestParam(required = false) String b2Ym,
-			@RequestParam(required = false) String b3Ym) {
+			@RequestParam(required = false) String b3Ym,
+			@RequestParam(required = false, defaultValue = "2") String henkoKbn) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
-			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
@@ -118,11 +120,12 @@ public class KoseiKetteiTsuchiController {
 			@RequestParam String shiteiNo,
 			@RequestParam String b1Ym,
 			@RequestParam(required = false) String b2Ym,
-			@RequestParam(required = false) String b3Ym) {
+			@RequestParam(required = false) String b3Ym,
+			@RequestParam(required = false, defaultValue = "2") String henkoKbn) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
-			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
