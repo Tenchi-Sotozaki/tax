@@ -31,7 +31,10 @@ public class ErrorPageController implements ErrorController {
 		Object statusAttr = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
 		int statusCode = statusAttr != null ? Integer.parseInt(statusAttr.toString()) : 500;
 
-		saveLog(request, statusCode);
+		String uri = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
+		if (uri == null || !uri.endsWith(".map")) {
+			saveLog(request, statusCode);
+		}
 
 		if (statusCode == HttpStatus.NOT_FOUND.value()) {
 			return "error/404";
