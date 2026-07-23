@@ -146,15 +146,22 @@
 			</table>
 		</div>
 
-		<!-- ページネーション -->
-		<div class="card-footer bg-white py-2 border-top">
-			<nav>
-				<ul class="pagination pagination-sm justify-content-center mb-0">
-					<li class="page-item disabled"><a class="page-link" href="#">前へ</a></li>
-					<li class="page-item active"><a class="page-link" href="#">1</a></li>
-					<li class="page-item"><a class="page-link" href="#">次へ</a></li>
-				</ul>
-			</nav>
+		<!-- ページネーション & 表示件数 -->
+		<div class="d-flex align-items-center justify-content-center position-relative mt-3 mb-3">
+		    <!-- ページネーション -->
+		    <nav class="pagination-container">
+		        <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+		    </nav>
+
+		    <!-- 表示件数 -->
+		    <div class="d-flex align-items-center gap-2 position-absolute end-0">
+		        <label for="pageSizeSelect" class="form-label form-label-sm fw-medium mb-0 text-nowrap">表示件数</label>
+		        <select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+		            <option value="10" selected>10件</option>
+		            <option value="50">50件</option>
+		            <option value="100">100件</option>
+		        </select>
+		    </div>
 		</div>
 	</div>
 
