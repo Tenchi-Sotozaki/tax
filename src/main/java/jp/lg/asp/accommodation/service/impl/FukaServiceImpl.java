@@ -529,19 +529,17 @@ public class FukaServiceImpl implements FukaService {
 						form.setAdditionalRate1(entity.getKasanRitsu1().toString());
 					}
 					form.setAdditionalAmount1(entity.getKasanGaku1());
-					form.setAdditionalDueDate1(entity.getNokigen1());
+					form.setAdditionalDueDate1(entity.getNokigen());
 					form.setAdditionalCategory2(entity.getKasanKbn2());
 					if (entity.getKasanRitsu2() != null) {
 						form.setAdditionalRate2(entity.getKasanRitsu2().toString());
 					}
 					form.setAdditionalAmount2(entity.getKasanGaku2());
-					form.setAdditionalDueDate2(entity.getNokigen2());
 					form.setAdditionalCategory3(entity.getKasanKbn3());
 					if (entity.getKasanRitsu3() != null) {
 						form.setAdditionalRate3(entity.getKasanRitsu3().toString());
 					}
 					form.setAdditionalAmount3(entity.getKasanGaku3());
-					form.setAdditionalDueDate3(entity.getNokigen3());
 
 					// 賦課情報設定
 					setMonthlyDetail(entity, form);
@@ -595,15 +593,13 @@ public class FukaServiceImpl implements FukaService {
 					form.setAdditionalCategory1(entity.getKasanKbn1());
 					if (entity.getKasanRitsu1() != null) form.setAdditionalRate1(entity.getKasanRitsu1().toString());
 					form.setAdditionalAmount1(entity.getKasanGaku1());
-					form.setAdditionalDueDate1(entity.getNokigen1());
+					form.setAdditionalDueDate1(entity.getNokigen());
 					form.setAdditionalCategory2(entity.getKasanKbn2());
 					if (entity.getKasanRitsu2() != null) form.setAdditionalRate2(entity.getKasanRitsu2().toString());
 					form.setAdditionalAmount2(entity.getKasanGaku2());
-					form.setAdditionalDueDate2(entity.getNokigen2());
 					form.setAdditionalCategory3(entity.getKasanKbn3());
 					if (entity.getKasanRitsu3() != null) form.setAdditionalRate3(entity.getKasanRitsu3().toString());
 					form.setAdditionalAmount3(entity.getKasanGaku3());
-					form.setAdditionalDueDate3(entity.getNokigen3());
 					setMonthlyDetail(entity, form);
 					setMonthlyTally(form, entity);
 				});
@@ -827,7 +823,7 @@ public class FukaServiceImpl implements FukaService {
 				parentFuka.setKasanRitsu1(null);
 			}
 			parentFuka.setKasanGaku1(form.getAdditionalAmount1());
-			parentFuka.setNokigen1(form.getAdditionalDueDate1());
+			parentFuka.setNokigen(form.getAdditionalDueDate1());
 		}
 
 		if (!form.getAdditionalCategory2().isEmpty()) {
@@ -843,7 +839,6 @@ public class FukaServiceImpl implements FukaService {
 				parentFuka.setKasanRitsu2(null);
 			}
 			parentFuka.setKasanGaku2(form.getAdditionalAmount2());
-			parentFuka.setNokigen2(form.getAdditionalDueDate2());
 		}
 
 		if (!form.getAdditionalCategory3().isEmpty()) {
@@ -859,7 +854,6 @@ public class FukaServiceImpl implements FukaService {
 				parentFuka.setKasanRitsu3(null);
 			}
 			parentFuka.setKasanGaku3(form.getAdditionalAmount3());
-			parentFuka.setNokigen3(form.getAdditionalDueDate3());
 		}
 		return parentFuka;
 	}

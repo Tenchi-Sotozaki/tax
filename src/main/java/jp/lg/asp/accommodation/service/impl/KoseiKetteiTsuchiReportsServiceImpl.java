@@ -300,10 +300,10 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         
         
 
-        if (firstFuka.getNokigen1() != null) {
-            dto.setNofu_kigen_nen(String.valueOf(firstFuka.getNokigen1().getYear()));
-            dto.setNofu_kigen_tsuki(String.valueOf(firstFuka.getNokigen1().getMonthValue()));
-            dto.setNofu_kigen_hi(String.valueOf(firstFuka.getNokigen1().getDayOfMonth()));
+        if (firstFuka.getNokigen() != null) {
+            dto.setNofu_kigen_nen(String.valueOf(firstFuka.getNokigen().getYear()));
+            dto.setNofu_kigen_tsuki(String.valueOf(firstFuka.getNokigen().getMonthValue()));
+            dto.setNofu_kigen_hi(String.valueOf(firstFuka.getNokigen().getDayOfMonth()));
         } else {
             dto.setNofu_kigen_nen("");
             dto.setNofu_kigen_tsuki("");

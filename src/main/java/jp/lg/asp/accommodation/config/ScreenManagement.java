@@ -34,10 +34,10 @@ public final class ScreenManagement {
 	public static final String TAXMANAGER_CONFIG = "ms00000003";
 
 	// ユーザー検索
-	public static final String USER_MANAGEMENT = "ss00000002";
+	public static final String USER_MANAGEMENT = "ss00000001";
 
-	// ユーザー登録/編集/削除
-	public static final String USER_CONFIG = "ss00000001";
+    // ユーザー登録/編集/削除
+	public static final String USER_CONFIG = "ss00000002";
 
 	// 権限管理
 	public static final String ROLE_MANAGEMENT = "sc00000004";
