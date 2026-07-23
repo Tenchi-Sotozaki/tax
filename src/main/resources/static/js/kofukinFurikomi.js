@@ -154,4 +154,32 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+	
+	// 検索条件初期化
+	const resetBtn = document.getElementById('btn-reset');
+	
+	if (resetBtn) {
+		resetBtn.addEventListener('click', function() {
+			
+			const today = new Date();
+			let nendo = today.getFullYear();
+
+			// 1月〜3月の場合は前年度にする
+			if (today.getMonth() + 1 < 4) {
+			    nendo--;
+			}
+			
+			// テキスト入力欄をクリア
+			document.getElementById('nendoHidden').value = nendo;
+			document.getElementById('shiteiNo').value = ''
+			document.getElementById('name').value = '';
+			
+			// ラジオボタンを「部分」（デフォルト）にチェックを入れる
+			const partialRadio = document.getElementById('namePartial');
+			
+			if (partialRadio) {
+				partialRadio.checked = true;
+			}
+		});
+	}
 });
