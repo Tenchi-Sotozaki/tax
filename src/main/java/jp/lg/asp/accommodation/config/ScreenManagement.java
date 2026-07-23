@@ -21,6 +21,9 @@ public final class ScreenManagement {
 	// 宛名取込
 	public static final String ATENA_INSERT = "mt00000001";
 
+	// 宛名登録/編集/照会
+	public static final String ATENA_CONFIG = "mi00000002";
+
 	//特別徴収義務者登録/編集/照会
 	public static final String TOKUGIMU_CONFIG = "ms00000002";
 
@@ -149,6 +152,18 @@ public final class ScreenManagement {
 
 	// 帳票ログ照会
 	public static final String RPT_LOG_VIEW = "ms00000025";
+
+	// 交付金帳票一括発行
+	public static final String KOFUKIN_BULK_PRINT = "ms00000028";
+
+	// 休業日設定照会/編集
+	public static final String HOLIDAY_CONFIG = "sc00000009";
+
+	// トップページ
+	public static final String TOP_PAGE = "ms00000029";
+
+	// トップページ編集
+	public static final String TOP_PAGE_CONFIG = "sc00000010";
 
 	// 帳票出力設定
 	public static final String REPORTS_CONFIG = "sc00000001";

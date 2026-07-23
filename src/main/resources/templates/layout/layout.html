@@ -37,6 +37,13 @@
 				<div
 					class="text-uppercase text-secondary small fw-semibold px-2 pt-3 pb-1">メイン</div>
 
+				<!-- トップページ -->
+				<a class="nav-link text-white-50 py-2 px-2 rounded sidebar-link"
+					th:href="@{/top}"
+					th:classappend="${#strings.contains(currentUri, '/top')} ? 'text-white fw-medium' : ''">
+					<i class="bi bi-house me-2 text-info"></i>トップページ
+				</a>
+
 				<!-- 照会 -->
 				<div class="accordion accordion-flush" id="mainQueryAccordion">
 					<div class="accordion-item bg-transparent border-0">
@@ -89,6 +96,14 @@
 											<i class="bi bi-file-earmark-text me-2"></i>帳票ログ照会
 									</a>
 									</li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000027')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/reports/kofukinBulkPrint}"
+										th:classappend="${#strings.contains(currentUri, '/reports/kofukinBulkPrint')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-printer me-2"></i>交付金帳票一括発行
+									</a>
+									</li>
 								</ul>
 							</div>
 						</div>
@@ -109,6 +124,12 @@
 						<div id="mainInsert" class="accordion-collapse collapse">
 							<div class="accordion-body py-1 px-0">
 								<ul class="nav flex-column ms-3">
+									<li class="nav-item">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/atena/register}"
+										th:classappend="${#strings.contains(currentUri, '/atena/register')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-person-lines-fill me-2"></i>宛名情報
+									</a></li>
 									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('mi00000001')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
@@ -316,6 +337,18 @@
 											th:href="@{/admin/jichitai-config}"
 											th:classappend="${#strings.contains(currentUri, '/admin/jichitai-config')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-building me-2"></i>自治体情報
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/holiday}"
+											th:classappend="${#strings.contains(currentUri, '/admin/holiday')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-calendar-x me-2"></i>休業日設定
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/top/config}"
+											th:classappend="${#strings.contains(currentUri, '/top/config')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-pencil-square me-2"></i>トップページ編集
 										</a></li>
 									</ul>
 								</div>

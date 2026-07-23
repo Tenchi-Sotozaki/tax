@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title th:text="${mode == 'edit'} ? '休業日設定編集' : '休業日設定照会'">休業日設定</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+		<form id="holidayForm" th:action="@{/admin/holiday/save}"
+			th:object="${form}" method="post">
+			<input type="hidden" th:field="*{nendo}">
+			<div
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+				<h5 class="mb-0 fw-bold text-dark">
+					<i class="bi bi-calendar-x me-2 text-primary"></i> <span
+						th:text="${mode == 'edit'} ? '休業日設定編集' : '休業日設定照会'">休業日設定</span>
+				</h5>
+				<div class="d-flex align-items-center gap-2">
+					<select class="form-select form-select-sm" id="nendoSelect"
+						onchange="changeNendo(this)"
+						th:data-base-url="@{/admin/holiday/view/}">
+						<option th:each="n : ${nendoList}" th:value="${n}"
+							th:text="${n + '年度'}" th:selected="${n == form.nendo}"></option>
+					</select>
+					<div th:if="${mode == 'view'}">
+						<a th:href="@{/admin/holiday/edit/{nendo}(nendo=${form.nendo})}"
+							class="btn btn-sm btn-primary text-nowrap"> <i
+							class="bi bi-pencil-square me-1"></i>編集する
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div th:if="${successMessage}"
+				class="alert alert-success alert-dismissible fade show" role="alert">
+				<span th:text="${successMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${errorMessage}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
+				<span th:text="${errorMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+
+
+
+			<!-- <div class="card shadow-sm mb-4">
+				<div class="card-header py-3">
+					<h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>対象年度</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div class="row g-3 align-items-end">
+						<div class="col-md-3">
+							<label for="nendoDisp" class="form-label fw-medium">対象年度</label>
+							<input type="text" class="form-control" id="nendoDisp"
+								th:value="${form.nendo}" readonly>
+						</div>
+					</div>
+				</div>
+			</div> -->
+
+			<!-- カレンダーエリア -->
+			<div class="card shadow-sm mb-4">
+				<div
+					class="card-header py-3 d-flex justify-content-between align-items-center">
+					<h5 class="mb-0">
+						<i class="bi bi-calendar-month me-2"></i>カレンダー
+					</h5>
+					<div class="d-flex align-items-center gap-2">
+						<button type="button" class="btn btn-sm btn-outline-secondary"
+							id="prevMonth">
+							<i class="bi bi-chevron-left"></i>
+						</button>
+						<span class="fw-medium" id="calendarTitle"></span>
+						<button type="button" class="btn btn-sm btn-outline-secondary"
+							id="nextMonth">
+							<i class="bi bi-chevron-right"></i>
+						</button>
+					</div>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div id="calendarGrid"></div>
+					<div class="mt-2 small text-muted">
+						<span class="badge bg-danger me-1">&nbsp;</span>日曜 <span
+							class="badge bg-primary ms-2 me-1">&nbsp;</span>土曜 <span
+							class="badge bg-warning text-dark ms-2 me-1">&nbsp;</span>選択中の休業日
+					</div>
+				</div>
+			</div>
+
+			<!-- 休業日一覧（土・日を除く） -->
+			<div class="card shadow-sm mb-4">
+				<div class="card-header py-3">
+					<h5 class="mb-0">
+						<i class="bi bi-list-check me-2"></i>休業日一覧（土・日を除く）
+					</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div id="holidayList" class="d-flex flex-wrap gap-2">
+						<span
+							th:if="${form.holidayDts == null or form.holidayDts.isEmpty()}"
+							class="text-muted small">休業日が設定されていません。</span> <span
+							th:each="dt : ${form.holidayDts}"
+							class="badge bg-warning text-dark fs-6 holiday-badge"
+							th:data-dt="${dt}"
+							th:text="${#strings.substring(dt,0,4) + '/' + #strings.substring(dt,4,6) + '/' + #strings.substring(dt,6,8)}">
+						</span>
+					</div>
+					<!-- hidden inputs for form submission -->
+					<div id="hiddenInputs">
+						<input th:each="dt : ${form.holidayDts}" type="hidden"
+							name="holidayDts" th:value="${dt}">
+					</div>
+				</div>
+			</div>
+
+			<!-- アクションボタン -->
+			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+
+				<button type="button" class="btn btn-outline-secondary btn-lg px-4"
+					id="initBtn" th:if="${mode == 'edit'}" onclick="initHolidays()">
+					<i class="bi bi-arrow-counterclockwise me-2"></i>初期化
+				</button>
+
+				<button type="submit" form="holidayForm"
+					class="btn btn-success btn-lg px-5" th:if="${mode == 'edit'}">
+					<i class="bi bi-check-circle me-2"></i>更新
+				</button>
+
+				<a th:href="@{/admin/nokigen/list}"
+					class="btn btn-outline-secondary btn-lg px-4"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+
+			</div>
+
+		</form>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:inline="javascript">
+			const NENDO = /*[[${form.nendo}]]*/'';
+			const IS_EDIT = /*[[${mode == 'edit'}]]*/false;
+			const INITIAL_HOLIDAYS = /*[[${form.holidayDts}]]*/[];
+		</script>
+		<script th:src="@{/js/holidayConfig.js}"></script>
+	</th:block>
+</body>
+</html>

@@ -1,6 +1,8 @@
 package jp.lg.asp.accommodation.controller;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,8 +21,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.AtenaConfigForm;
 import jp.lg.asp.accommodation.dto.AtenaSearchForm;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.service.AtenaConfigService;
 import jp.lg.asp.accommodation.service.AtenaImportService;
 import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +38,7 @@ public class AtenaController {
 
 	private final AtenaRepository atenaRepository;
 	private final AtenaImportService atenaImportService;
+	private final AtenaConfigService atenaConfigService;
 	private final ScreenAccessChecker accessChecker;
 	private final HashUtil hashUtil;
 
@@ -40,6 +46,8 @@ public class AtenaController {
 
 	private static final String ATENA_DAICHO = ScreenManagement.ATENA_DAICHO;
 	private static final String ATENA_INSERT = ScreenManagement.ATENA_INSERT;
+	private static final String ATENA_CONFIG = ScreenManagement.ATENA_CONFIG;
+	private static final String CONFIG_VIEW = "atena/atenaConfig";
 
 	@GetMapping("/list")
 	@OpeLog(screenId = ATENA_DAICHO, operation = "照会")
@@ -65,6 +73,80 @@ public class AtenaController {
 		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
 		return "atena/atenaDaicho";
+	}
+
+	@GetMapping("/register")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "登録画面表示")
+	public String showRegister(Model model) {
+		accessChecker.checkWriteAccess(ATENA_CONFIG);
+		model.addAttribute("form", new AtenaConfigForm());
+		model.addAttribute("mode", "register");
+		return CONFIG_VIEW;
+	}
+
+	@PostMapping("/register")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "登録")
+	public String register(@ModelAttribute("form") AtenaConfigForm form,
+			Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(ATENA_CONFIG);
+		try {
+			atenaConfigService.register(form);
+			redirectAttributes.addFlashAttribute("successMessage", "宛名情報を登録しました。");
+			return "redirect:/atena/list";
+		} catch (Exception e) {
+			log.error("宛名登録エラー", e);
+			model.addAttribute("form", form);
+			model.addAttribute("mode", "register");
+			model.addAttribute("errorMessage", e.getMessage());
+			return CONFIG_VIEW;
+		}
+	}
+
+	@GetMapping("/view/{atenaNo}")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "照会")
+	public String showView(@PathVariable BigDecimal atenaNo, Model model) {
+		accessChecker.checkAccess(ATENA_CONFIG);
+		try {
+			model.addAttribute("form", atenaConfigService.findByAtenaNo(atenaNo));
+			model.addAttribute("mode", "view");
+			return CONFIG_VIEW;
+		} catch (Exception e) {
+			log.error("宛名照会エラー", e);
+			return "redirect:/atena/list";
+		}
+	}
+
+	@GetMapping("/edit/{atenaNo}")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "編集画面表示")
+	public String showEdit(@PathVariable BigDecimal atenaNo, Model model) {
+		accessChecker.checkWriteAccess(ATENA_CONFIG);
+		try {
+			model.addAttribute("form", atenaConfigService.findByAtenaNo(atenaNo));
+			model.addAttribute("mode", "edit");
+			return CONFIG_VIEW;
+		} catch (Exception e) {
+			log.error("宛名編集画面表示エラー", e);
+			return "redirect:/atena/list";
+		}
+	}
+
+	@PostMapping("/edit/{atenaNo}")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "編集")
+	public String update(@PathVariable BigDecimal atenaNo,
+			@ModelAttribute("form") AtenaConfigForm form,
+			Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(ATENA_CONFIG);
+		try {
+			atenaConfigService.update(atenaNo, form);
+			redirectAttributes.addFlashAttribute("successMessage", "宛名情報を更新しました。");
+			return "redirect:/atena/list";
+		} catch (Exception e) {
+			log.error("宛名更新エラー", e);
+			model.addAttribute("form", form);
+			model.addAttribute("mode", "edit");
+			model.addAttribute("errorMessage", e.getMessage());
+			return CONFIG_VIEW;
+		}
 	}
 
 	@GetMapping("/import")

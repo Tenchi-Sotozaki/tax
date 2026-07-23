@@ -40,7 +40,12 @@ public class KofuShinseiDto {
 
 	/** 特別徴収義務者名 */
 	private String tokuName;
-	
+
 	/** 公印 */
 	private byte[] koin;
+
+	public void setHakkoYmd(String hakkoYmd) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
 }
