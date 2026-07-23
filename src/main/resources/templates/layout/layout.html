@@ -217,6 +217,12 @@
 										</li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/kofu-ritsu/list}"
+											th:classappend="${#strings.contains(currentUri, '/admin/kofu-ritsu/list')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-cash-coin me-2"></i>交付率
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/zeiritsu/list}"
 											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/list')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-sliders me-2"></i>賦課方式
@@ -276,7 +282,7 @@
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"
 											th:href="@{/admin/kofu-ritsu}"
-											th:classappend="${#strings.contains(currentUri, '/admin/kofu-ritsu')} ? 'text-white fw-medium' : ''">
+											th:classappend="${#strings.contains(currentUri, '/admin/kofu-ritsu') and !#strings.contains(currentUri, '/admin/kofu-ritsu/list')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-cash-coin me-2"></i>交付率
 										</a></li>
 										<li class="nav-item"><a
