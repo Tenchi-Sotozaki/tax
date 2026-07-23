@@ -27,31 +27,11 @@
 					<form id="koseiKetteiForm" method="post">
 
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-						<input type="hidden" name="shiteiNo" th:value="${dto.shitei_no}" />
+						<input type="hidden" name="shiteiNo" th:value="${selectedShiteiGassan?.shiteiNo}" />
 						<input type="hidden" name="koin" th:value="${dto.koin}">
 
 						<!-- 特別徴収義務者情報エリア -->
-						<div class="card mb-4">
-							<div class="card-header">
-								<h5 class="mb-0">特別徴収義務者情報</h5>
-							</div>
-							<div class="card-body">
-								<div class="row g-3">
-									<div class="col-md-4">
-										<label class="form-label">指定番号</label>
-										<input type="text" class="form-control" th:value="${dto.shitei_no}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">施設名称</label>
-										<input type="text" class="form-control" th:value="${dto.shisetsu_name}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">特別徴収義務者名</label>
-										<input type="text" class="form-control" th:value="${dto.name}" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
+						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
 						<!-- 発行区分エリア -->
 						<div class="card mb-4">
@@ -141,7 +121,7 @@
 								onclick="printReport()">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
-							<a th:href="@{/tokugimu/report/{id}(id=${dto.shitei_no})}" class="btn btn-outline-secondary">
+							<a th:href="@{/tokugimu/report/{id}(id=${selectedShiteiGassan?.shiteiNo})}" class="btn btn-outline-secondary">
 								<i class="bi bi-arrow-left me-1"></i> 戻る
 							</a>
 						</div>
@@ -149,10 +129,13 @@
 				</div>
 			</div>
 		</div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/koseiKetteiTsuchi.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
 </body>
 

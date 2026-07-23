@@ -190,16 +190,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // 宿泊税更正・決定通知書ボタンのクリックイベント
     const btnKosei = document.getElementById('btnReportKosei');
     if (btnKosei) {
-        btnKosei.addEventListener('click', function() {
+        btnKosei.addEventListener('click', async function() {
             if (shiteiNo) {
-                const url = '/accommodation-tax/reports/koseiKetteiTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
-                window.location.href = url;
+                await selectShiteiGassanByShiteiNo(shiteiNo);
+                window.location.href = '/accommodation-tax/reports/koseiKetteiTsuchi';
             } else {
                 alert('指定番号が取得できませんでした。');
             }
         });
     }
 });
+
+/**
+ * 指定番号で特別徴収義務者を検索してセッションに保存する
+ */
+async function selectShiteiGassanByShiteiNo(shiteiNo) {
+    try {
+        const res = await fetch('/accommodation-tax/api/shitei-gassan/search?shiteiNo=' + encodeURIComponent(shiteiNo));
+        const data = await res.json();
+        if (!data.length) return;
+
+        const d = data[0];
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+        await fetch('/accommodation-tax/api/shitei-gassan/select', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(d)
+        });
+    } catch (err) {
+        console.error('セッション保存エラー:', err);
+    }
+}
 
 /**
  * 納税管理人の登録状況をチェックする関数
