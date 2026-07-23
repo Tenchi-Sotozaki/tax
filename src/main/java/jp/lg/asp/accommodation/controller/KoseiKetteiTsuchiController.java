@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KoseiKetteiTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,17 +39,16 @@ public class KoseiKetteiTsuchiController {
 	 */
 	@GetMapping("/koseiKetteiTsuchi")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(
-			@RequestParam(required = false) String shiteiNo,
-			Model model) {
+	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
-		String safeShiteiNo = shiteiNo != null ? shiteiNo : "";
+		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		String shiteiNo = (selected != null && selected.getShiteiNo() != null) ? selected.getShiteiNo() : "";
 
-		model.addAttribute("dto", reportsService.buildDtoForDisplay(safeShiteiNo));
+		model.addAttribute("dto", reportsService.buildDtoForDisplay(shiteiNo));
 		model.addAttribute("taishoYmList",
-				!safeShiteiNo.isEmpty()
-						? reportsService.findTaishoYmList(safeShiteiNo)
+				!shiteiNo.isEmpty()
+						? reportsService.findTaishoYmList(shiteiNo)
 						: java.util.Collections.emptyList());
 
 		return "reports/koseiKetteiTsuchi";
@@ -63,11 +64,12 @@ public class KoseiKetteiTsuchiController {
 			@RequestParam String shiteiNo,
 			@RequestParam String b1Ym,
 			@RequestParam(required = false) String b2Ym,
-			@RequestParam(required = false) String b3Ym) {
+			@RequestParam(required = false) String b3Ym,
+			@RequestParam(required = false, defaultValue = "2") String henkoKbn) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
-			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
@@ -90,11 +92,12 @@ public class KoseiKetteiTsuchiController {
 			@RequestParam String shiteiNo,
 			@RequestParam String b1Ym,
 			@RequestParam(required = false) String b2Ym,
-			@RequestParam(required = false) String b3Ym) {
+			@RequestParam(required = false) String b3Ym,
+			@RequestParam(required = false, defaultValue = "2") String henkoKbn) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
-			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
@@ -118,11 +121,12 @@ public class KoseiKetteiTsuchiController {
 			@RequestParam String shiteiNo,
 			@RequestParam String b1Ym,
 			@RequestParam(required = false) String b2Ym,
-			@RequestParam(required = false) String b3Ym) {
+			@RequestParam(required = false) String b3Ym,
+			@RequestParam(required = false, defaultValue = "2") String henkoKbn) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
-			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym);
+			byte[] pdfData = reportsService.generatePdf(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
