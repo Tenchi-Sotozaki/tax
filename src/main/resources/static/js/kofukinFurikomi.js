@@ -154,40 +154,37 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-	
-	// 検索条件初期化
-	const resetBtn = document.getElementById('btn-reset');
-	
-	if (resetBtn) {
-		resetBtn.addEventListener('click', function() {
-			
-			const today = new Date();
-			let nendo = today.getFullYear();
 
-			// 1月〜3月の場合は前年度にする
-			if (today.getMonth() + 1 < 4) {
-			    nendo--;
-			}
-			
-			// テキスト入力欄をクリア
-			document.getElementById('nendoHidden').value = nendo;
-			document.getElementById('shiteiNo').value = ''
-			document.getElementById('name').value = '';
-			
-			// ラジオボタンを「部分」（デフォルト）にチェックを入れる
-			const partialRadio = document.getElementById('namePartial');
-			
-			if (partialRadio) {
-				partialRadio.checked = true;
-			}
-		});
-	}
+    // 検索条件初期化
+    const resetBtn = document.getElementById('btn-reset');
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+
+            const today = new Date();
+            let nendo = today.getFullYear();
+
+            // 1月〜3月の場合は前年度にする
+            if (today.getMonth() + 1 < 4) {
+                nendo--;
+            }
+
+            // テキスト入力欄をクリア
+            document.getElementById('nendoHidden').value = nendo;
+            document.getElementById('shiteiNo').value = ''
+            document.getElementById('name').value = '';
+
+            // ラジオボタンを「部分」（デフォルト）にチェックを入れる
+            const partialRadio = document.getElementById('namePartial');
+
+            if (partialRadio) {
+                partialRadio.checked = true;
+            }
+        });
+    }
 
     // ページネーション
-    const rows = Array.from(document.querySelectorAll('#kofukinTable tbody tr')).filter(tr => {
-        return !tr.querySelector('td[colspan]');
-    });
-
+    const rows = Array.from(document.querySelectorAll('input[name="selectedIds"]')).map(cb => cb.closest('tr'));
     const pageSizeSelect = document.getElementById('pageSizeSelect');
     const pagination = document.getElementById('pagination');
     let currentPage = 1;
@@ -214,8 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!pagination) return;
         pagination.innerHTML = '';
 
-        if (totalPages <= 1) return;
-
         const addBtn = (label, page, active) => {
             const li = document.createElement('li');
             li.className = 'page-item' + (active ? ' active' : '');
@@ -223,10 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
             a.className = 'page-link';
             a.href = '#';
             a.textContent = label;
-            a.addEventListener('click', e => {
-                e.preventDefault();
-                renderPage(page);
-            });
+            a.addEventListener('click', e => { e.preventDefault(); renderPage(page); });
             li.appendChild(a);
             pagination.appendChild(li);
         };
@@ -234,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const addDisabled = (label, visible = true) => {
             const li = document.createElement('li');
             li.className = 'page-item disabled';
-            if (!visible) li.style.display = 'none';
+            if (!visible) li.style.visibility = 'hidden';
             li.innerHTML = `<span class="page-link">${label}</span>`;
             pagination.appendChild(li);
         };
@@ -242,11 +234,40 @@ document.addEventListener('DOMContentLoaded', function() {
         // 前へ
         if (currentPage > 1) addBtn('前へ', currentPage - 1, false);
         else addDisabled('前へ');
+		
+		const half = 1;
+        const leftDots = currentPage - half > 2;
+        const rightDots = currentPage + half < totalPages - 1;
 
-        // ページ番号ボタンの動的生成
-        for (let p = 1;p <= totalPages;p++) {
-            addBtn(String(p), p, p === currentPage);
+        const winStart = currentPage - half;
+        const winEnd = currentPage + half;
+
+		// 先頭ページ
+        if (winStart > 1) addBtn('1', 1, currentPage === 1);
+        else addDisabled('1', false);
+
+        // 省略記号
+        if (leftDots) addDisabled('…');
+        else addDisabled('…', false);
+
+        // 現在のページと前後1ページ
+        for (let offset = -half;offset <= half;offset++) {
+            const p = currentPage + offset;
+            if (p >= 1 && p <= totalPages)
+                addBtn(String(p), p, p === currentPage);
+            else
+                addDisabled('0', false);
         }
+
+        // 省略記号
+        if (rightDots) addDisabled('…');
+        else addDisabled('…', false);
+
+        // 最後尾ページ
+        if (totalPages > 1 && winEnd < totalPages)
+            addBtn(String(totalPages), totalPages, currentPage === totalPages);
+        else
+            addDisabled(String(totalPages), false);
 
         // 次へ
         if (currentPage < totalPages) addBtn('次へ', currentPage + 1, false);
@@ -256,10 +277,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (rows.length > 0) {
         renderPage(1);
         pageSizeSelect?.addEventListener('change', () => renderPage(1));
-
-        const searchPanel = document.getElementById('searchPanel');
-        if (searchPanel && typeof bootstrap !== 'undefined') {
-            bootstrap.Collapse.getOrCreateInstance(searchPanel).hide();
-        }
+        bootstrap.Collapse.getOrCreateInstance(document.getElementById('searchPanel')).hide();
     }
 });

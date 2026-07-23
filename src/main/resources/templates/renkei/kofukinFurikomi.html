@@ -15,7 +15,7 @@
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-bank me-2 text-primary"></i>交付金振込情報連携
 			</h5>
-			<span class="text-muted small"> 検索結果: <strong
+			<span class="text-muted small" th:if="${isSearched}"> 検索結果: <strong
 				th:text="${#lists.size(items)}">0</strong> 件
 			</span>
 		</div>
@@ -25,12 +25,11 @@
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
-						data-bs-target="#searchPanel" th:classappend="${isSearched} ? 'collapsed' : ''"
-						th:aria-expanded="${!isSearched} ? 'true' : 'false'">
+						data-bs-target="#searchPanel" aria-expanded="true">
 						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
-				<div id="searchPanel" class="accordion-collapse collapse" th:classappend="${!isSearched} ? 'show' : ''">
+				<div id="searchPanel" class="accordion-collapse collapse show">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/kofukinFurikomi/list}"
 							th:object="${searchForm}" method="get">
@@ -86,83 +85,85 @@
 			</div>
 		</div>
 
-		<!-- ボタンエリア -->
-		<div class="card shadow-sm mb-3">
-			<div class="card-body py-2 px-3">
-				<div class="d-flex flex-wrap align-items-center gap-1"
-					style="row-gap: 0.4rem;">
-					<div>
-						<button id="viewBtn" class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-eye me-1"></i>照会
-						</button>
-						<button id="csvBtn" class="btn btn-primary btn-sm ms-2">
-							<i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV出力
-						</button>
+		<th:block th:if="${isSearched}">
+			<!-- ボタンエリア --> 
+			<div class="card shadow-sm mb-3">
+				<div class="card-body py-2 px-3">
+					<div class="d-flex flex-wrap align-items-center gap-1"
+						style="row-gap: 0.4rem;">
+						<div>
+							<button id="viewBtn" class="btn btn-outline-primary btn-sm">
+								<i class="bi bi-eye me-1"></i>照会
+							</button>
+							<button id="csvBtn" class="btn btn-primary btn-sm ms-2">
+								<i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV出力
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<!-- 一覧エリア -->
-		<div class="table-container">
-			<table
-				class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table"
-				id="kofukinTable">
-				<thead class="table-primary">
-					<tr>
-						<th style="width: 20px;" class="text-center"><input
-							type="checkbox" id="selectAll"></th>
-						<th style="width: 100px;">指定番号</th>
-						<th style="width: 100px;">宛名番号</th>
-						<th style="width: 200px;">氏名/名称</th>
-						<th style="width: 80px;">年度</th>
-						<th style="width: 100px;">交付年月日</th>
-						<th style="width: 120px;">納入税額</th>
-					</tr>
-				</thead>
-				<tbody>
-					<th:block th:if="${items != null and !items.empty}">
-						<tr th:each="item : ${items}">
-							<td class="text-center"><input type="checkbox"
-								name="selectedIds" th:value="${item.shiteiNo}"
-								th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo}" />
-							</td>
-							<td th:text="${item.shiteiNo}">指定番号</td>
-							<td th:text="${item.atenaNo}">宛名番号</td>
-							<td th:text="${item.name}">氏名/名称</td>
-							<td th:text="${item.nendo}">年度</td>
-							<td
-								th:text="${item.kofuYmd != null ? #temporals.format(item.kofuYmd, 'yyyy-MM-dd') : ''}">交付年月日</td>
-							<td class="text-end"
-								th:text="${item.kofuZeigaku != null ? #numbers.formatInteger(item.kofuZeigaku, 3, 'COMMA') : ''}">納入税額</td>
-						</tr>
-					</th:block>
-					<th:block th:if="${items == null or items.empty}">
+			
+			<!-- ページネーション & 表示件数 -->
+			<div class="d-flex align-items-center justify-content-center position-relative mt-3 mb-3">
+				<!-- ページネーション -->
+				<nav class="pagination-container">
+					<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+				</nav>
+				
+				<!-- 表示件数 -->
+				<div class="d-flex align-items-center gap-2 position-absolute end-0">
+					<label for="pageSizeSelect" class="form-label form-label-sm fw-medium mb-0 text-nowrap">表示件数</label>
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+						<option value="10" selected>10件</option>
+						<option value="50">50件</option>
+						<option value="100">100件</option>
+					</select>
+				</div>
+			</div>
+			
+			<!-- 一覧エリア -->
+			<div class="table-container">
+				<table
+					class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table"
+					id="kofukinTable">
+					<thead class="table-primary">
 						<tr>
-							<td colspan="14" class="text-center py-4 text-muted">該当データがありません</td>
+							<th style="width: 20px;" class="text-center"><input
+								type="checkbox" id="selectAll"></th>
+							<th style="width: 100px;">指定番号</th>
+							<th style="width: 100px;">宛名番号</th>
+							<th style="width: 200px;">氏名/名称</th>
+							<th style="width: 80px;">年度</th>
+							<th style="width: 100px;">交付年月日</th>
+							<th style="width: 120px;">納入税額</th>
 						</tr>
-					</th:block>
-				</tbody>
-			</table>
-		</div>
-
-		<!-- ページネーション & 表示件数 -->
-		<div class="d-flex align-items-center justify-content-center position-relative mt-3 mb-3">
-		    <!-- ページネーション -->
-		    <nav class="pagination-container">
-		        <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
-		    </nav>
-
-		    <!-- 表示件数 -->
-		    <div class="d-flex align-items-center gap-2 position-absolute end-0">
-		        <label for="pageSizeSelect" class="form-label form-label-sm fw-medium mb-0 text-nowrap">表示件数</label>
-		        <select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-		            <option value="10" selected>10件</option>
-		            <option value="50">50件</option>
-		            <option value="100">100件</option>
-		        </select>
-		    </div>
-		</div>
+					</thead>
+					<tbody>
+						<th:block th:if="${items != null and !items.empty}">
+							<tr th:each="item : ${items}" class="log-row">
+								<td class="text-center"><input type="checkbox"
+									name="selectedIds" th:value="${item.shiteiNo}"
+									th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo}" />
+								</td>
+								<td th:text="${item.shiteiNo}">指定番号</td>
+								<td th:text="${item.atenaNo}">宛名番号</td>
+								<td th:text="${item.name}">氏名/名称</td>
+								<td th:text="${item.nendo}">年度</td>
+								<td
+									th:text="${item.kofuYmd != null ? #temporals.format(item.kofuYmd, 'yyyy-MM-dd') : ''}">交付年月日</td>
+								<td class="text-end"
+									th:text="${item.kofuZeigaku != null ? #numbers.formatInteger(item.kofuZeigaku, 3, 'COMMA') : ''}">納入税額</td>
+							</tr>
+						</th:block>
+						<th:block th:if="${items == null or items.empty}">
+							<tr>
+								<td colspan="7" class="text-center py-4 text-muted">該当データがありません</td>
+							</tr>
+						</th:block>
+					</tbody>
+				</table>
+			</div>
+		</th:block>
 	</div>
 
 	<th:block layout:fragment="scripts">
