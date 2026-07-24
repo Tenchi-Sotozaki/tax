@@ -10,7 +10,7 @@ build_job:
   stage: build
   script:
     - chmod +x ./gradlew
-    - ./gradlew clean build -x test -x spotbugsMain -Dorg.gradle.java.home=$JAVA_HOME
+    - ./gradlew clean build -x test -Dorg.gradle.java.home=$JAVA_HOME
   artifacts:
     paths:
       - build/libs/*.jar

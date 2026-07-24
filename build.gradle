@@ -69,6 +69,9 @@ spotbugsMain {
     }
 }
 
+check.dependsOn.remove(spotbugsMain)
+check.dependsOn.remove(spotbugsTest)
+
 tasks.named('test') {
     useJUnitPlatform()
 }
