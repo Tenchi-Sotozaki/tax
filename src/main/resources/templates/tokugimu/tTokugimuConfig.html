@@ -5,6 +5,7 @@
 
 <head>
 <title>特別徴収義務者新規登録/編集/照会</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -102,7 +103,7 @@
 				<!-- カードヘッダー -->
 				<div class="card-header py-3">
 					<h5 class="mb-0">
-						<i class="bi bi-person-badge me-2"></i>日付情報
+						<i class="bi bi-calendar-date me-2"></i>日付情報
 					</h5>
 				</div>
 				
@@ -110,7 +111,7 @@
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
 						<!-- 登録日 -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="registrationDate" class="form-label fw-medium">
 								登録日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label>
@@ -126,7 +127,7 @@
 						</div>
 
 						<!-- 変更日 -->
-						<div th:if="${isEdit}" class="col-md-4">
+						<div th:if="${isEdit}" class="col-md-2">
 							<label for="henkoDate" class="form-label fw-medium">
 								変更日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label>
@@ -142,7 +143,7 @@
 						</div>
 
 						<!-- 申請日 -->
-						<div th:if="!${isEdit}" class="col-md-4">
+						<div th:if="!${isEdit}" class="col-md-2">
 							<label for="shinseiDate" class="form-label fw-medium">
 								申請日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label>
@@ -171,24 +172,22 @@
 					<div class="row g-3">
 
 						<!-- 指定番号 -->
-						<div class="col-md-4">
+						<div class="col-md-auto">
 							<label for="shiteiNo" class="form-label fw-medium">指定番号</label> <input type="text"
 								class="form-control" id="shiteiNo" th:field="*{shiteiNo}" placeholder="自動で設定されます"
 								readonly th:data-initial-value="*{shiteiNo}">
 						</div>
 
 						<!-- 宛名検索 -->
-						<div class="col-md-4 d-flex align-items-end" th:if="!${isView}">
+						<div class="col-md-auto d-flex align-items-end" th:if="!${isView}">
 							<button type="button" class="btn btn-primary"
 								data-bs-toggle="modal" data-bs-target="#addressSearchModal">
 								<i class="bi bi-search me-1"></i>宛名検索
 							</button>
 						</div>
 
-						<div class="col-md-4" th:if="${isView}"></div>
-
 						<!-- 郵便番号 -->
-						<div class="col-md-4">
+						<div class="col-md-auto">
 							<label for="tokugimuAddressNo" class="form-label fw-medium">
 								郵便番号<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="tokugimuAddressNo"
@@ -201,7 +200,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="tokugimuAddress" class="form-label fw-medium">
 								住所 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="tokugimuAddress"
@@ -212,9 +211,12 @@
 								th:if="${#fields.hasErrors('tokugimuAddress')}"
 								th:errors="*{tokugimuAddress}"></div>
 						</div>
-
+						
+						<!-- 改行 -->
+						<div class="w-100"></div>
+						
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="name" class="form-label fw-medium"> 氏名 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="name"
@@ -226,7 +228,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="nameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="nameKana"
@@ -238,7 +240,7 @@
 						</div>
 
 						<!-- 法人番号 -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="corporateNumber" class="form-label fw-medium">法人番号</label>
 							<input type="text" class="form-control" id="corporateNumber"
 								th:field="*{corporateNumber}" placeholder="自動入力されます" readonly
@@ -246,7 +248,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="tokugimuPhone" class="form-label fw-medium">
 								電話番号 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="tel" class="form-control" id="tokugimuPhone"
@@ -280,7 +282,7 @@
 					<div class="row g-3">
 
 						<!-- 所在地 -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="facilityAddressNo" class="form-label fw-medium">
 								所在地(郵便番号) </label> <input type="text" class="form-control"
 								id="facilityAddressNo" th:field="*{facilityAddressNo}"
@@ -290,7 +292,7 @@
 						</div>
 
 						<!-- 所在地(住所) -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="facilityAddress" class="form-label fw-medium">
 								所在地(住所) </label> <input type="text" class="form-control"
 								id="facilityAddress" th:field="*{facilityAddress}"
@@ -325,7 +327,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="facilityPhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="facilityPhone"
 								th:field="*{facilityPhone}" th:errorclass="is-invalid"
@@ -335,7 +337,7 @@
 						</div>
 
 						<!-- 延床面積 -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="floorArea" class="form-label fw-medium"> 延床面積
 							</label>
 							<div class="input-group">
@@ -349,7 +351,7 @@
 						</div>
 
 						<!-- 階層(地上) -->
-						<div class="col-md-4">
+						<div class="col-md-1">
 							<label for="aboveGroundFloor" class="form-label fw-medium">
 								階層(地上)</label>
 							<div class="input-group">
@@ -363,7 +365,7 @@
 						</div>
 
 						<!-- 階層(地下) -->
-						<div class="col-md-4">
+						<div class="col-md-1">
 							<label for="basementFloor" class="form-label fw-medium">
 								階層(地下) </label>
 							<div class="input-group">
@@ -376,7 +378,7 @@
 						</div>
 
 						<!-- 客室数 -->
-						<div class="col-md-4">
+						<div class="col-md-1">
 							<label for="roomCount" class="form-label fw-medium"> 客室数
 							</label>
 							<div class="input-group">
@@ -389,7 +391,7 @@
 						</div>
 
 						<!-- 収容人数 -->
-						<div class="col-md-6">
+						<div class="col-md-1">
 							<label for="capacity" class="form-label fw-medium"> 収容人数
 							</label>
 							<div class="input-group">
@@ -402,7 +404,7 @@
 						</div>
 
 						<!-- 営業開始(予定)日 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="businessStartDate" class="form-label fw-medium">
 								営業開始(予定)日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
@@ -439,7 +441,7 @@
 					<div class="row g-3">
 
 						<!-- 住所(郵便番号) -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="licenseAddressNo" class="form-label fw-medium">
 								住所(郵便番号) </label> <input type="text" class="form-control"
 								id="licenseAddressNo" th:field="*{licenseAddressNo}"
@@ -448,7 +450,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="licenseAddress" class="form-label fw-medium">住所
 							</label> <input type="text" class="form-control" id="licenseAddress"
 								th:field="*{licenseAddress}" th:errorclass="is-invalid"
@@ -457,7 +459,7 @@
 						</div>
 
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licenseName" class="form-label fw-medium"> 氏名
 								<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="licenseName"
@@ -469,7 +471,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licenseNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="licenseNameKana"
@@ -482,7 +484,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licensePhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="licensePhone"
 								th:field="*{licensePhone}" th:errorclass="is-invalid"
@@ -491,7 +493,7 @@
 						</div>
 
 						<!-- 営業種別 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="businessType" class="form-label fw-medium">
 								営業種別 </label> <select class="form-select" id="businessType"
 								th:field="*{businessType}" th:errorclass="is-invalid"
@@ -505,7 +507,7 @@
 						</div>
 
 						<!-- 許可番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licenseNumber" class="form-label fw-medium">
 								許可番号 </label> <input type="text" class="form-control" id="licenseNumber"
 								th:field="*{licenseNumber}" th:errorclass="is-invalid"
@@ -534,7 +536,7 @@
 					<div class="row g-3">
 
 						<!-- 住所(郵便番号) -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="ownerAddressNo" class="form-label fw-medium">住所(郵便番号)
 							</label> <input type="text" class="form-control" id="ownerAddressNo"
 								th:field="*{ownerAddressNo}" th:errorclass="is-invalid"
@@ -543,7 +545,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="ownerAddress" class="form-label fw-medium">住所
 							</label> <input type="text" class="form-control" id="ownerAddress"
 								th:field="*{ownerAddress}" th:errorclass="is-invalid"
@@ -551,7 +553,7 @@
 						</div>
 
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="ownerName" class="form-label fw-medium"> 氏名 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="ownerName"
@@ -563,7 +565,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="ownerNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="ownerNameKana"
@@ -576,7 +578,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="ownerPhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="ownerPhone"
 								th:field="*{ownerPhone}" th:errorclass="is-invalid"
@@ -606,7 +608,7 @@
 					<div class="row g-3">
 
 						<!-- 住所(郵便番号) -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="mailAddressNo" class="form-label fw-medium">
 								住所(郵便番号) </label> <input type="text" class="form-control"
 								id="mailAddressNo" th:field="*{mailAddressNo}"
@@ -615,7 +617,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="mailAddress" class="form-label fw-medium"> 住所
 							</label> <input type="text" class="form-control" id="mailAddress"
 								th:field="*{mailAddress}" th:errorclass="is-invalid"
@@ -623,7 +625,7 @@
 						</div>
 
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="mailName" class="form-label fw-medium"> 氏名 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="mailName"
@@ -634,7 +636,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="mailNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="mailNameKana"
@@ -647,7 +649,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="mailPhone" class="form-label fw-medium"> 電話番号
 							</label> <input type="tel" class="form-control" id="mailPhone"
 								th:field="*{mailPhone}" th:errorclass="is-invalid"
@@ -695,7 +697,7 @@
 										<div class="row g-3">
 
 											<!-- 郵便番号 -->
-											<div class="col-md-4">
+											<div class="col-md-2">
 												<label class="form-label fw-medium">郵便番号</label>
 												<input type="text" class="form-control"
 													th:field="*{kyodoList[__${stat.index}__].kyodoAddressNo}"
@@ -704,7 +706,7 @@
 											</div>
 
 											<!-- 住所 -->
-											<div class="col-md-8">
+											<div class="col-md-5">
 												<label class="form-label fw-medium">住所</label>
 												<input type="text" class="form-control"
 													th:field="*{kyodoList[__${stat.index}__].kyodoAddress}"
@@ -713,7 +715,7 @@
 											</div>
 
 											<!-- 氏名 -->
-											<div class="col-md-6">
+											<div class="col-md-2">
 												<label class="form-label fw-medium">氏名 <span class="text-danger" th:if="!${isView}">*</span></label>
 												<input type="text" class="form-control"
 													th:field="*{kyodoList[__${stat.index}__].kyodoName}"
@@ -722,7 +724,7 @@
 											</div>
 
 											<!-- 氏名(ふりがな) -->
-											<div class="col-md-6">
+											<div class="col-md-2">
 												<label class="form-label fw-medium">氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span></label>
 												<input type="text" class="form-control"
 													th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
@@ -731,7 +733,7 @@
 											</div>
 
 											<!-- 電話番号 -->
-											<div class="col-md-6">
+											<div class="col-md-2">
 												<label class="form-label fw-medium">電話番号</label>
 												<input type="tel" class="form-control"
 													th:field="*{kyodoList[__${stat.index}__].kyodoPhone}"
