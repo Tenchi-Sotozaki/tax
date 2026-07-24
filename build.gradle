@@ -69,8 +69,9 @@ spotbugsMain {
     }
 }
 
-check.dependsOn.remove(spotbugsMain)
-check.dependsOn.remove(spotbugsTest)
+tasks.named('check') {
+    setDependsOn(dependsOn.findAll { it != spotbugsMain && it != spotbugsTest })
+}
 
 tasks.named('test') {
     useJUnitPlatform()
