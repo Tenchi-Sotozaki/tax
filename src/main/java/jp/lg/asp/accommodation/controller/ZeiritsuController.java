@@ -84,6 +84,8 @@ public class ZeiritsuController {
 		model.addAttribute("isView", true);
 		model.addAttribute("isEdit", false);
 		model.addAttribute("seq", seq);
+		model.addAttribute("isDetailEditable", false);
+		model.addAttribute("isHeaderEditable", false);
 		addConstants(model);
 		return FORM_VIEW;
 	}
@@ -102,7 +104,9 @@ public class ZeiritsuController {
 		model.addAttribute("isEdit", true);
 		model.addAttribute("seq", seq);
 		model.addAttribute("isLatest", isLatestRecord(jichitaiCd, z));
-		model.addAttribute("isDetailEditable", isFutureStartYm(z.getTekiyoStYm()));
+		boolean futureStart = isFutureStartYm(z.getTekiyoStYm());
+		model.addAttribute("isDetailEditable", futureStart);
+		model.addAttribute("isHeaderEditable", futureStart);
 		addConstants(model);
 		return FORM_VIEW;
 	}
@@ -123,9 +127,10 @@ public class ZeiritsuController {
 		Zeiritsu entity = findOrThrow(jichitaiCd, seqDec);
 		boolean latest = isLatestRecord(jichitaiCd, entity);
 		boolean detailEditable = isFutureStartYm(entity.getTekiyoStYm());
+		boolean headerEditable = detailEditable;
 
-		// 最新でない場合は開始年月・賦課方式・区分をDBの値で上書き
-		if (!latest) {
+		// 適用開始年月が未来でない場合は開始年月・賦課方式・区分をDBの値で上書き
+		if (!headerEditable) {
 			form.setFukaKbn(entity.getFukaKbn());
 			form.setTekiyoStYm(entity.getTekiyoStYm());
 			form.setTaishoKbn(entity.getTaishoKbn());
@@ -145,6 +150,7 @@ public class ZeiritsuController {
 			model.addAttribute("seq", seq);
 			model.addAttribute("isLatest", latest);
 			model.addAttribute("isDetailEditable", detailEditable);
+			model.addAttribute("isHeaderEditable", headerEditable);
 			addConstants(model);
 			model.addAttribute("validationErrors", ZeiritsuForm.validate(form).values());
 			return FORM_VIEW;
@@ -272,6 +278,8 @@ public class ZeiritsuController {
 		model.addAttribute("zeiritsuForm", new ZeiritsuForm());
 		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", false);
+		model.addAttribute("isDetailEditable", true);
+		model.addAttribute("isHeaderEditable", true);
 		addConstants(model);
 		return FORM_VIEW;
 	}
@@ -299,6 +307,8 @@ public class ZeiritsuController {
 				if (!bindingResult.hasErrors()) {
 					model.addAttribute("isView", false);
 					model.addAttribute("isEdit", false);
+					model.addAttribute("isDetailEditable", true);
+					model.addAttribute("isHeaderEditable", true);
 					model.addAttribute("autoUpdateTarget", autoUpdateTarget);
 					model.addAttribute("autoUpdateNewEdYm",
 							formatYm(getPreviousMonth(form.getTekiyoStYm().replace("-", ""))));
@@ -315,6 +325,8 @@ public class ZeiritsuController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isView", false);
 			model.addAttribute("isEdit", false);
+			model.addAttribute("isDetailEditable", true);
+			model.addAttribute("isHeaderEditable", true);
 			addConstants(model);
 			model.addAttribute("validationErrors", ZeiritsuForm.validate(form).values());
 			return FORM_VIEW;

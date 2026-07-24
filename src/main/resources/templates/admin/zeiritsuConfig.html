@@ -73,20 +73,20 @@
 						<div class="col-12">
 							<label class="form-label fw-medium">賦課方式 <span
 								class="text-danger"
-								th:unless="${isView or (isEdit and !isLatest)}">*</span>
+								th:unless="${isView or (isEdit and !isHeaderEditable)}">*</span>
 							</label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="fukaTeigaku"
 										th:field="*{fukaKbn}" th:value="${fukaTeigaku.value}"
-										th:disabled="${isView or (isEdit and !isLatest)}"> <label
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
 										class="form-check-label" for="fukaTeigaku"
 										th:text="${fukaTeigaku.name}"></label>
 								</div>
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="fukaTeiritsu"
 										th:field="*{fukaKbn}" th:value="${fukaTeiritsu.value}"
-										th:disabled="${isView or (isEdit and !isLatest)}"> <label
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
 										class="form-check-label" for="fukaTeiritsu"
 										th:text="${fukaTeiritsu.name}"></label>
 								</div>
@@ -95,17 +95,17 @@
 								th:if="${#fields.hasErrors('fukaKbn')}" th:errors="*{fukaKbn}"></div>
 						</div>
 
-						<!-- 適用開始時期・適用終了時期 -->
+						<!-- 適用開始年月・適用終了年月 -->
 						<div class="col-12">
 							<div class="row g-2">
 								<div class="col-6">
-									<label for="tekiyoStYm" class="form-label fw-medium">適用開始時期
+									<label for="tekiyoStYm" class="form-label fw-medium">適用開始年月
 										<span class="text-danger"
-										th:unless="${isView or (isEdit and !isLatest)}">*</span>
+										th:unless="${isView or (isEdit and !isHeaderEditable)}">*</span>
 									</label> <input type="month" id="tekiyoStYm" name="tekiyoStYmDisplay"
 										class="form-control"
 										th:classappend="${#fields.hasErrors('tekiyoStYm')} ? 'is-invalid'"
-										th:readonly="${isView or (isEdit and !isLatest)}"
+										th:readonly="${isView or (isEdit and !isHeaderEditable)}"
 										th:data-initial-value="*{tekiyoStYm}"> <input
 										type="hidden" th:field="*{tekiyoStYm}" id="tekiyoStYmHidden">
 									<div class="invalid-feedback"
@@ -115,7 +115,7 @@
 									</div>
 								</div>
 								<div class="col-6">
-									<label for="tekiyoEdYm" class="form-label fw-medium">適用終了時期
+									<label for="tekiyoEdYm" class="form-label fw-medium">適用終了年月
 										<small class="text-muted">(省略可)</small>
 									</label> <input type="month" id="tekiyoEdYm" name="tekiyoEdYmDisplay"
 										class="form-control"
@@ -136,19 +136,19 @@
 						<div class="col-12">
 							<label class="form-label fw-medium">区分 <span
 								class="text-danger"
-								th:unless="${isView or (isEdit and !isLatest)}">*</span></label>
+								th:unless="${isView or (isEdit and !isHeaderEditable)}">*</span></label>
 							<div class="d-flex gap-4">
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="taishoCity"
 										th:field="*{taishoKbn}" th:value="${taishoCity.value}"
-										th:disabled="${isView or (isEdit and !isLatest)}"> <label
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
 										class="form-check-label" for="taishoCity"
 										th:text="${taishoCity.name}"></label>
 								</div>
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="taishoKen"
 										th:field="*{taishoKbn}" th:value="${taishoKen.value}"
-										th:disabled="${isView or (isEdit and !isLatest)}"> <label
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
 										class="form-check-label" for="taishoKen"
 										th:text="${taishoKen.name}"></label>
 								</div>

@@ -61,10 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const isTeiritsu = checked && checked.value === '2';
         zeiValueLabel.textContent = (checked && checked.value === '1') ? '税額(円)' : '税率(%)';
         conditionLabel.textContent = isTeiritsu ? '区分名(更生・決定通知書等の区分に相当)' : '条件';
-        zeiValueHint.classList.toggle('d-none', !isTeiritsu);
         document.querySelectorAll('.teigaku-condition').forEach(el => el.style.display = isTeiritsu ? 'none' : '');
         document.querySelectorAll('.teiritsu-condition').forEach(el => el.style.display = isTeiritsu ? '' : 'none');
-        document.querySelectorAll('[id^="details"][id$=".zeiValue"]').forEach(el => {
+        document.querySelectorAll('[name$=".zeiValue"]').forEach(el => {
             el.placeholder = isTeiritsu ? '0.00～99.99' : '';
         });
     }
