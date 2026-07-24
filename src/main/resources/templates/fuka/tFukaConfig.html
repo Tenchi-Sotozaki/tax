@@ -115,33 +115,36 @@
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('shinkokuDate')}"
 								th:errors="*{shinkokuDate}"></div>
 						</div>
+
+						<!-- 月計表 -->
+						<div class="col-md-4 d-flex justify-content-end align-items-end">
+							<div th:if="${fukaDeclarationForm.view}">
+								<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+									data-bs-target="#monthlyTallyModal">
+									<i class="bi bi-eye me-1"></i>月計表を表示
+								</button>
+							</div>
+							<div th:if="${fukaDeclarationForm.edit}">
+								<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+									data-bs-target="#monthlyTallyModal">
+									<i class="bi bi-pencil-square me-1"></i>月計表を編集
+								</button>
+							</div>
+							<div th:if="${!fukaDeclarationForm.view and !fukaDeclarationForm.edit}">
+								<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+									data-bs-target="#monthlyTallyModal">
+									<i class="bi bi-calendar3 me-1"></i>月計表を登録
+								</button>
+							</div>
+						</div>
 					</div>
 
 					<hr class="my-3">
 
 					<div class="row g-3 align-items-start mb-3">
 
-
-						<!-- 月計表 -->
-						<div class="col-md-2">
-							<div class="mt-2" th:if="${!fukaDeclarationForm.view}">
-
-								<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-									data-bs-target="#monthlyTallyModal">
-									<i class="bi bi-calendar3 me-1"></i>月計表を登録
-
-								</button>
-							</div>
-							<div class="mt-2" th:if="${fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
-									data-bs-target="#monthlyTallyModal">
-									<i class="bi bi-eye me-1"></i>月計表を表示
-								</button>
-							</div>
-						</div>
-
 						<!-- 変更区分 -->
-						<div class="col-md-2">
+						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">
 								変更の区分 <span class="badge bg-danger ms-1" th:if="${fukaDeclarationForm.edit}">必須</span>
 							</label> <select id="modificationCategory" class="form-select form-select-sm"
@@ -161,7 +164,7 @@
 						</div>
 
 						<!-- 変更理由 -->
-						<div class="col-md-5">
+						<div class="col-md-9">
 							<label class="form-label form-label-sm fw-medium mb-1">変更理由</label>
 							<textarea class="form-control form-control-sm" rows="1" th:field="*{modificationReason}"
 								th:readonly="${fukaDeclarationForm.view}"
@@ -175,7 +178,7 @@
 								<thead class="table-light text-center">
 									<tr>
 										<th style="width: 15%;">区分</th>
-										<th style="width: 10%;">税率</th>
+										<th style="width: 10%;">税率／税額</th>
 										<th style="width: 15%;">宿泊数</th>
 										<th style="width: 20%;">宿泊税額(円)</th>
 										<th style="width: 20%;">(内)市区町村税額(円)</th>
@@ -362,7 +365,7 @@
 								</tbody>
 								<tfoot class="table-primary fw-bold">
 									<tr>
-										<td class="text-center">合計</td>
+										<td class="text-center">合計<span class="text-danger">*</span></td>
 										<td></td>
 										<td><input type="text" th:field="*{monthlyDetail.totalSogaku}"
 												class="form-control form-control-sm text-end js-comma-format"
@@ -410,7 +413,7 @@
 				</div>
 			</div>
 
-			<div class="card shadow-sm mb-4">
+             <div class="card shadow-sm mb-4">
 				<div class="card-header bg-warning bg-opacity-10 py-2" role="button" data-bs-toggle="collapse" data-bs-target="#kasanCollapse" aria-expanded="false" aria-controls="kasanCollapse" style="cursor:pointer;">
 					<h6 class="mb-0 fw-bold text-warning-emphasis">
 						<i class="bi bi-plus-slash-minus me-2"></i>加算金額入力
@@ -425,7 +428,7 @@
 
 						<!-- 区分 -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">区分</label>
+							<label class="form-label form-label-sm fw-medium mb-1">区分 <span class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
 							<select class="form-select form-select-sm" th:field="*{additionalCategory1}"
 								th:disabled="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{additionalCategory1}">
@@ -471,7 +474,7 @@
 
 						<!-- 区分 -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">区分</label>
+							<label class="form-label form-label-sm fw-medium mb-1">区分 <span class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
 							<select class="form-select form-select-sm" th:field="*{additionalCategory2}"
 								th:disabled="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{additionalCategory2}">
@@ -515,7 +518,7 @@
 
 						<!-- 区分 -->
 						<div class="col-md-3">
-							<label class="form-label form-label-sm fw-medium mb-1">区分</label>
+							<label class="form-label form-label-sm fw-medium mb-1">区分 <span class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
 							<select class="form-select form-select-sm" th:field="*{additionalCategory3}"
 								th:disabled="${fukaDeclarationForm.view}"
 								th:data-initial-value="*{additionalCategory3}">
@@ -552,34 +555,30 @@
 
 			<!-- 納入情報 -->
 			<div class="card shadow-sm mb-4">
-				<div
-					class="card-header bg-success bg-opacity-10 py-2 d-flex justify-content-between align-items-center">
+				<div class="card-header bg-success bg-opacity-10 py-2" role="button" data-bs-toggle="collapse" data-bs-target="#shunoCollapse" aria-expanded="false" aria-controls="shunoCollapse" style="cursor:pointer;">
 					<h6 class="mb-0 fw-bold text-success">
 						<i class="bi bi-cash-coin me-2"></i>納入情報
+						<i class="bi bi-chevron-down ms-2 small"></i>
 					</h6>
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox" id="shunoCheck"
-							name="shunoFlg" value="true" th:checked="*{shunoFlg}"
-							th:disabled="${fukaDeclarationForm.view}"> <label
-							class="form-check-label" for="shunoCheck">表示する</label>
-					</div>
 				</div>
-				<div id="shunoBody" class="card-body py-3" style="display: none;">
-					<div class="row g-3 align-items-end">
-						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium mb-1">納入年月日
-								<span class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span>
-							</label> <input type="date" class="form-control form-control-sm"
-								th:field="*{shunoYmd}" th:readonly="${fukaDeclarationForm.view}">
-						</div>
-						<div class="col-md-4">
-							<label class="form-label form-label-sm fw-medium mb-1">納入金額
-								(円) <span class="text-danger"
-								th:if="${!fukaDeclarationForm.view}">*</span>
-							</label> <input type="text"
-								class="form-control form-control-sm text-end js-comma-format"
-								th:field="*{shunoKingaku}"
-								th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+				<div id="shunoCollapse" class="collapse">
+					<div class="card-body py-3">
+						<input class="form-check-input d-none" type="checkbox" id="shunoCheck"
+							name="shunoFlg" value="true" th:checked="*{shunoFlg}"
+							th:disabled="${fukaDeclarationForm.view}">
+						<div class="row g-3 align-items-end">
+							<div class="col-md-4">
+								<label class="form-label form-label-sm fw-medium mb-1">納入年月日</label> 
+								<input type="date" class="form-control form-control-sm"
+									th:field="*{shunoYmd}" th:readonly="${fukaDeclarationForm.view}">
+							</div>
+							<div class="col-md-4">
+								<label class="form-label form-label-sm fw-medium mb-1">納入金額 (円)</label> 
+								<input type="text"
+									class="form-control form-control-sm text-end js-comma-format"
+									th:field="*{shunoKingaku}"
+									th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+							</div>
 						</div>
 					</div>
 				</div>
