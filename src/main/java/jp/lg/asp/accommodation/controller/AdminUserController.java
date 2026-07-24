@@ -1,7 +1,5 @@
 package jp.lg.asp.accommodation.controller;
 
-import java.util.List;
-
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -244,25 +242,6 @@ public class AdminUserController {
 		}
 		userRepository.deleteById(buildUserId(id));
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
-		return "redirect:/admin/user-search";
-	}
-
-	@PostMapping("/user-delete-batch")
-	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "一括削除")
-	public String deleteBatch(@RequestParam List<String> ids, RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
-		if (ids.contains(getLoginUserId())) {
-			redirectAttributes.addFlashAttribute("errorMessage", "ログイン中のユーザーは削除できません。");
-			return "redirect:/admin/user-search";
-		}
-		for (String id : ids) {
-			User user = userRepository.findById(buildUserId(id)).orElse(null);
-			if (user != null) {
-				user.setDelFlg("1");
-				userRepository.save(user);
-			}
-		}
-		redirectAttributes.addFlashAttribute("successMessage", ids.size() + "件のユーザーを削除しました。");
 		return "redirect:/admin/user-search";
 	}
 

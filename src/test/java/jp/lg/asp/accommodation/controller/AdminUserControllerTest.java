@@ -137,17 +137,4 @@ class AdminUserControllerTest {
         verify(userRepository).deleteById(any(UserId.class));
     }
 
-    @Test
-    void deleteBatch_ログイン中ユーザー含む場合はエラー() {
-        Authentication auth = mock(Authentication.class);
-        when(auth.getName()).thenReturn("user01");
-        SecurityContext ctx = mock(SecurityContext.class);
-        when(ctx.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(ctx);
-
-        String view = controller.deleteBatch(List.of("user01", "user02"), new RedirectAttributesModelMap());
-
-        assertThat(view).isEqualTo("redirect:/admin/user-search");
-        verify(userRepository, never()).save(any());
-    }
 }
