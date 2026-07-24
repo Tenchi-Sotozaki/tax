@@ -341,7 +341,7 @@
 							<label for="floorArea" class="form-label fw-medium"> 延床面積
 							</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="floorArea"
+								<input type="text" class="form-control" id="floorArea"
 									th:readonly="${isView}" th:field="*{floorArea}"
 									th:errorclass="is-invalid" step="0.01"
 									th:data-initial-value="*{floorArea}"> <span
@@ -355,7 +355,7 @@
 							<label for="aboveGroundFloor" class="form-label fw-medium">
 								階層(地上)</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="floors"
+								<input type="text" class="form-control" id="floors"
 									th:field="*{aboveGroundFloor}" th:errorclass="is-invalid"
 									placeholder="施設の地上階数を入力する" th:readonly="${isView}"
 									th:data-initial-value="*{aboveGroundFloor}"> <span
@@ -382,7 +382,7 @@
 							<label for="roomCount" class="form-label fw-medium"> 客室数
 							</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="roomCount"
+								<input type="text" class="form-control" id="roomCount"
 									th:readonly="${isView}" th:field="*{roomCount}"
 									th:errorclass="is-invalid" min="1"
 									th:data-initial-value="*{roomCount}"> <span
@@ -395,7 +395,7 @@
 							<label for="capacity" class="form-label fw-medium"> 収容人数
 							</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="capacity"
+								<input type="text" class="form-control" id="capacity"
 									th:readonly="${isView}" th:field="*{capacity}"
 									th:errorclass="is-invalid" min="1"
 									th:data-initial-value="*{capacity}"> <span
@@ -788,104 +788,97 @@
 			</div>
 
 			<!-- ===== 施設営業休止/再開/廃止情報（編集時のみ表示）===== -->
-			<div id="business-status-info" class="card mb-4 shadow-sm"
-				th:if="${isEdit} or ${isView}">
-				<div
-					class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center gap-2">
-					<h5 class="mb-0">
-						<i class="bi bi-exclamation-triangle me-2"></i>宿泊施設営業情報
-					</h5>
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox"
-							id="businessStatusCheck" name="businessStatusFlg" value="true"
-							th:checked="*{businessStatusFlg}" th:disabled="${isView}">
-						<label class="form-check-label" for="businessStatusCheck">表示する</label>
-					</div>
-				</div>
-				<div id="businessStatusBody" class="card-body bg-light-subtle"
-					style="display: none;">
-					<div class="row g-3">
-
-						<!-- 申告区分 -->
-						<div class="col-md-12">
-							<label class="form-label fw-medium">申告区分</label>
-							<div class="mt-1">
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catSuspension"
-										value="休止" th:disabled="${isView}"> <label
-										class="form-check-label" for="catSuspension">休止</label>
+			<div id="business-status-info" class="accordion mb-4 shadow-sm" th:if="${isEdit} or ${isView}">
+				<div class="accordion-item">
+					
+					<!-- ヘッダー（クリックで開閉） -->
+					<h2 class="accordion-header" id="headingBusinessStatus">
+						<button class="accordion-button collapsed text-dark py-3 fw-bold" type="button"
+							data-bs-toggle="collapse" data-bs-target="#collapseBusinessStatus" aria-expanded="false"
+							aria-controls="collapseBusinessStatus">
+							<i class="bi bi-exclamation-triangle me-2"></i>宿泊施設営業情報
+						</button>
+					</h2>
+			
+					<!-- コンテンツ部分（アコーディオン本体） -->
+					<div id="collapseBusinessStatus" class="accordion-collapse collapse" aria-labelledby="headingBusinessStatus"
+						data-bs-parent="#business-status-info">
+						<div class="accordion-body bg-light-subtle">
+							<div class="row g-3">
+			
+								<!-- 申告区分 -->
+								<div class="col-md-auto">
+									<label class="form-label fw-medium">申告区分</label>
+									<div class="mt-1">
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" th:field="*{declarationCategory}"
+												id="catSuspension" value="休止" th:disabled="${isView}">
+											<label class="form-check-label" for="catSuspension">休止</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" th:field="*{declarationCategory}"
+												id="catResumption" value="再開" th:disabled="${isView}">
+											<label class="form-check-label" for="catResumption">再開</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" th:field="*{declarationCategory}"
+												id="catAbolition" value="廃止" th:disabled="${isView}">
+											<label class="form-check-label" for="catAbolition">廃止</label>
+										</div>
+									</div>
 								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catResumption"
-										value="再開" th:disabled="${isView}"> <label
-										class="form-check-label" for="catResumption">再開</label>
+			
+								<!-- 休止期間(開始日) -->
+								<div class="col-md-2">
+									<label for="suspensionStartDate" class="form-label fw-medium">休止期間(開始日)</label>
+									<input th:if="!${isView}" type="date" class="form-control" id="suspensionStartDate"
+										name="suspensionStartDate"
+										th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}"
+										th:data-initial-value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
+									<input th:if="${isView}" type="text" class="form-control" readonly
+										th:value="*{suspensionStartDate}">
 								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catAbolition" value="廃止"
-										th:disabled="${isView}"> <label
-										class="form-check-label" for="catAbolition">廃止</label>
+			
+								<!-- 休止期間(終了日) -->
+								<div class="col-md-2">
+									<label for="suspensionEndDate" class="form-label fw-medium">休止期間(終了日)</label>
+									<input th:if="!${isView}" type="date" class="form-control" id="suspensionEndDate"
+										name="suspensionEndDate"
+										th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}"
+										th:data-initial-value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
+									<input th:if="${isView}" type="text" class="form-control" readonly
+										th:value="*{suspensionEndDate}">
 								</div>
+			
+								<div class="col-md-auto d-flex align-items-end">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" id="suspensionEndDateUndecided"
+											th:field="*{suspensionEndDateUndecided}" th:disabled="${isView}">
+										<label class="form-check-label" for="suspensionEndDateUndecided">未定</label>
+									</div>
+								</div>
+			
+								<!-- 再開または廃止日 -->
+								<div class="col-md-2">
+									<label for="resumptionOrAbolitionDate" class="form-label fw-medium">再開または廃止日</label>
+									<input th:if="!${isView}" type="date" class="form-control" id="resumptionOrAbolitionDate"
+										name="resumptionOrAbolitionDate"
+										th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}"
+										th:data-initial-value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
+									<input th:if="${isView}" type="text" class="form-control" readonly
+										th:value="*{resumptionOrAbolitionDate}">
+								</div>
+			
+								<!-- 休止または廃止理由 -->
+								<div class="col-md-12">
+									<label for="suspensionOrAbolitionReason" class="form-label fw-medium">休止または廃止理由</label>
+									<input type="text" class="form-control" id="suspensionOrAbolitionReason"
+										th:field="*{suspensionOrAbolitionReason}" th:readonly="${isView}"
+										th:data-initial-value="*{suspensionOrAbolitionReason}">
+								</div>
+			
 							</div>
 						</div>
-
-						<!-- 休止期間(開始日) -->
-						<div class="col-md-4">
-							<label for="suspensionStartDate" class="form-label fw-medium">休止期間(開始日)</label>
-							<input th:if="!${isView}" type="date" class="form-control"
-								id="suspensionStartDate" name="suspensionStartDate"
-								th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{suspensionStartDate}">
-						</div>
-
-						<!-- 休止期間(終了日) -->
-						<div class="col-md-4">
-							<label for="suspensionEndDate" class="form-label fw-medium">休止期間(終了日)</label>
-							<input th:if="!${isView}" type="date" class="form-control"
-								id="suspensionEndDate" name="suspensionEndDate"
-								th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{suspensionEndDate}">
-						</div>
-
-						<div class="col-md-4 d-flex align-items-end">
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox"
-									id="suspensionEndDateUndecided"
-									th:field="*{suspensionEndDateUndecided}"
-									th:disabled="${isView}"> <label
-									class="form-check-label" for="suspensionEndDateUndecided">未定</label>
-							</div>
-						</div>
-
-						<!-- 再開または廃止日 -->
-						<div class="col-md-6">
-							<label for="resumptionOrAbolitionDate"
-								class="form-label fw-medium">再開または廃止日</label> <input
-								th:if="!${isView}" type="date" class="form-control"
-								id="resumptionOrAbolitionDate" name="resumptionOrAbolitionDate"
-								th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{resumptionOrAbolitionDate}">
-						</div>
-
-						<!-- 休止または廃止理由 -->
-						<div class="col-md-6">
-							<label for="suspensionOrAbolitionReason"
-								class="form-label fw-medium">休止または廃止理由</label> <input
-								type="text" class="form-control"
-								id="suspensionOrAbolitionReason"
-								th:field="*{suspensionOrAbolitionReason}"
-								th:readonly="${isView}"
-								th:data-initial-value="*{suspensionOrAbolitionReason}">
-						</div>
-
 					</div>
 				</div>
 			</div>
