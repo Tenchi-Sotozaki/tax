@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
@@ -25,6 +28,7 @@ import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
+import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
 import lombok.RequiredArgsConstructor;
@@ -276,6 +280,33 @@ public class FukaController {
 			log.error("保存処理中に予期せぬエラーが発生しました", e);
 			model.addAttribute("errorMessage", "保存に失敗しました：" + e.getMessage());
 			return CONFIG_VIEW;
+		}
+	}
+
+	/**
+	 * 入力中の申告内容から、市区町村税額・都道府県税額の内訳を試算する（内訳試算ボタン）。
+	 * 保存は行わず、計算結果のみを返す。
+	 * @param fukaKbn 賦課区分コード（"1"=定額, "2"=定率）
+	 * @param monthlyDetail 画面入力中の申告情報
+	 * @return 内訳を設定した申告情報
+	 */
+	@PostMapping("/estimate-breakdown")
+	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "内訳試算")
+	public ResponseEntity<?> estimateBreakdown(
+			@RequestParam("fukaKbn") String fukaKbn,
+			@RequestBody FukaMonthlyDeclarationDto monthlyDetail) {
+
+		try {
+			accessChecker.checkWriteAccess(SCREEN_ID);
+			return ResponseEntity.ok(fukaService.estimateBreakdown(fukaKbn, monthlyDetail));
+		} catch (RuntimeException e) {
+			// FukaControllerは@Controllerのため、GlobalExceptionHandler（@RestController限定）の対象外。
+			// ここで捕捉しないとHTMLエラーページが返り、画面側のfetchでJSONとして解釈できず
+			// 「内訳試算に失敗しました」という不明瞭なエラーになってしまう。
+			log.error("内訳試算に失敗しました", e);
+			return ResponseEntity.internalServerError()
+					.body(Collections.singletonMap("message", "内訳試算に失敗しました：" + e.getMessage()));
 		}
 	}
 }

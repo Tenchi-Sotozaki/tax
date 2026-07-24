@@ -216,19 +216,17 @@
 												th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 												th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].zeigaku}">
 										</td>
-										<td><input type="text" th:if="${fukaDeclarationForm.view}"
+										<td><input type="text"
 												th:field="*{monthlyDetail.taxDetails[__${stat.index}__].cityZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].cityZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
 										</td>
-										<td><input type="text" th:if="${fukaDeclarationForm.view}"
+										<td><input type="text"
 												th:field="*{monthlyDetail.taxDetails[__${stat.index}__].kenZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.taxDetails[__${stat.index}__].kenZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
 										</td>
 									</tr>
 
@@ -266,23 +264,26 @@
 												th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalPaymentAmount}">
 										</td>
-										<td><input type="text" th:if="${fukaDeclarationForm.view}"
+										<td><input type="text"
 												th:field="*{monthlyDetail.totalCityZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalCityZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
 										</td>
-										<td><input type="text" th:if="${fukaDeclarationForm.view}"
+										<td><input type="text"
 												th:field="*{monthlyDetail.totalKenZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalKenZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
 										</td>
 									</tr>
 								</tfoot>
 							</table>
+							<div class="d-flex justify-content-end mt-2" th:unless="${fukaDeclarationForm.view}">
+								<button type="button" class="btn btn-primary btn-sm" id="btnEstimateBreakdownTeigaku">
+									<i class="bi bi-calculator me-1"></i>内訳試算
+								</button>
+							</div>
 						</div>
 					</th:block>
 
@@ -391,23 +392,26 @@
 												th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalPaymentAmount}">
 										</td>
-										<td><input type="text" th:if="${fukaDeclarationForm.view}"
+										<td><input type="text"
 												th:field="*{monthlyDetail.totalCityZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalCityZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
 										</td>
-										<td><input type="text" th:if="${fukaDeclarationForm.view}"
+										<td><input type="text"
 												th:field="*{monthlyDetail.totalKenZeigaku}"
 												class="form-control form-control-sm text-end bg-light js-comma-format"
 												readonly placeholder="0"
 												th:data-initial-value="*{monthlyDetail.totalKenZeigaku}">
-											<th:block th:unless="${fukaDeclarationForm.view}">自動算出</th:block>
 										</td>
 									</tr>
 								</tfoot>
 							</table>
+							<div class="d-flex justify-content-end mt-2" th:unless="${fukaDeclarationForm.view}">
+								<button type="button" class="btn btn-primary btn-sm" id="btnEstimateBreakdownTeiritsu">
+									<i class="bi bi-calculator me-1"></i>内訳試算
+								</button>
+							</div>
 						</div>
 					</th:block>
 				</div>
@@ -563,9 +567,6 @@
 				</div>
 				<div id="shunoCollapse" class="collapse">
 					<div class="card-body py-3">
-						<input class="form-check-input d-none" type="checkbox" id="shunoCheck"
-							name="shunoFlg" value="true" th:checked="*{shunoFlg}"
-							th:disabled="${fukaDeclarationForm.view}">
 						<div class="row g-3 align-items-end">
 							<div class="col-md-4">
 								<label class="form-label form-label-sm fw-medium mb-1">納入年月日</label> 
