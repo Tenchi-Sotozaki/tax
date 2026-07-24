@@ -1,6 +1,8 @@
 package jp.lg.asp.accommodation.controller;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -41,10 +43,15 @@ public class AtenaController {
 
 	@GetMapping("/list")
 	@OpeLog(screenId = ATENA_DAICHO, operation = "照会")
-	public String list(@ModelAttribute AtenaSearchForm searchForm, Model model) {
+	public String list(@ModelAttribute AtenaSearchForm searchForm,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int pageSize,
+			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_DAICHO);
-		model.addAttribute("items", atenaRepository.search(
+		searchForm.setPage(page);
+		searchForm.setPageSize(pageSize);
+		Page<jp.lg.asp.accommodation.entity.Atena> items = atenaRepository.searchPage(
 				jichitaiCd,
 				toLikePattern(searchForm.getAtenaNo(), "exact"),
 				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
@@ -53,7 +60,9 @@ public class AtenaController {
 				toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
 				toLikePattern(searchForm.getTel(), "exact"),
 				toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
-				toLikePattern(searchForm.getHojinNo(), "exact")));
+				toLikePattern(searchForm.getHojinNo(), "exact"),
+				PageRequest.of(page, pageSize));
+		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
 		return "atena/atenaDaicho";
 	}

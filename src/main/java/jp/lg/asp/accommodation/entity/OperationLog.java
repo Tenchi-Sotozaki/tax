@@ -36,15 +36,27 @@ public class OperationLog extends BaseEntity {
 	private String screenId;
 
 	/** 操作 */
-	@Column(name = "sousa", nullable = false, length = 100)
+	@Column(name = "sousa", nullable = false)
 	private String sousa;
 
+	/** メソッド */
+	@Column(name = "method")
+	private String method;
+
+	/** PATH */
+	@Column(name = "path")
+	private String path;
+
+	/** ステータス */
+	@Column(name = "status")
+	private String status;
+
 	/** リクエストパラメータ */
-	@Column(name = "param", length = 2000)
+	@Column(name = "param")
 	private String param;
 
 	/** 操作者 */
-	@Column(name = "ope_user", nullable = false, length = 20)
+	@Column(name = "ope_user", nullable = false)
 	private String opeUser;
 
 	/** 操作日時 */

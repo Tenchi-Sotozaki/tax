@@ -25,15 +25,12 @@ public class ShunoDto {
 	private String kasanKbn1;
 	private BigDecimal kasanRitsu1;
 	private Long kasanGaku1;
-	private LocalDate nokigen1;
 	private String kasanKbn2;
 	private BigDecimal kasanRitsu2;
 	private Long kasanGaku2;
-	private LocalDate nokigen2;
 	private String kasanKbn3;
 	private BigDecimal kasanRitsu3;
 	private Long kasanGaku3;
-	private LocalDate nokigen3;
 	private Long entaikin;
 	private LocalDate nokigen;
 	private Long cityZeigaku;

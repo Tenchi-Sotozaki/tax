@@ -125,9 +125,7 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 				// nokigenの設定（null値を除外して処理）
 				List<LocalDate> dates = Arrays.asList(
-						fuka.getNokigen1(),
-						fuka.getNokigen2(),
-						fuka.getNokigen3())
+						fuka.getNokigen())
 						.stream()
 						.filter(date -> date != null) // null値を除外
 						.collect(java.util.stream.Collectors.toList());

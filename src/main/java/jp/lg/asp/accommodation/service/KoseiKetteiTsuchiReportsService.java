@@ -21,5 +21,5 @@ public interface KoseiKetteiTsuchiReportsService {
      * @param b3Ym 対象月b3（YYYYMM、任意）
      * @return PDFデータ
      */
-    byte[] generatePdf(String shiteiNo, String b1Ym, String b2Ym, String b3Ym);
+    byte[] generatePdf(String shiteiNo, String b1Ym, String b2Ym, String b3Ym, String henkoKbn);
 }
