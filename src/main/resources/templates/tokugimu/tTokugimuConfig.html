@@ -21,6 +21,7 @@
 						th:text="${isView} ? '特別徴収義務者 照会' : (${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録')"></span>
 				</h5>
 				<div class="d-flex gap-2 mr-2">
+					<a href="#hiduke-info" class="btn btn-outline-primary btn-sm">日付情報</a>
 					<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
 					<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
 					<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
@@ -28,8 +29,7 @@
 					<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
 					<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
 					<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
-					<a href="#business-status-info"
-						class="btn btn-outline-warning btn-sm"
+					<a href="#business-status-info" class="btn btn-outline-primary btn-sm"
 						th:if="${isEdit} or ${isView}">宿泊施設営業状況情報</a>
 				</div>
 			</div>
@@ -96,6 +96,70 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
+			<!-- ===== 日付情報 ===== -->
+			<div id="hiduke-info" class="card mb-4 shadow-sm">
+				
+				<!-- カードヘッダー -->
+				<div class="card-header py-3">
+					<h5 class="mb-0">
+						<i class="bi bi-person-badge me-2"></i>日付情報
+					</h5>
+				</div>
+				
+				<!-- カードボディ -->
+				<div class="card-body bg-light-subtle">
+					<div class="row g-3">
+						<!-- 登録日 -->
+						<div class="col-md-4">
+							<label for="registrationDate" class="form-label fw-medium">
+								登録日 <span class="text-danger" th:if="!${isView}">*</span>
+							</label>
+							<input th:if="!${isView}" type="date" class="form-control" id="registrationDate"
+								name="registrationDate" th:errorclass="is-invalid"
+								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}"
+								th:data-initial-value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{registrationDate}">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}"
+								th:errors="*{registrationDate}">
+							</div>
+						</div>
+
+						<!-- 変更日 -->
+						<div th:if="${isEdit}" class="col-md-4">
+							<label for="henkoDate" class="form-label fw-medium">
+								変更日 <span class="text-danger" th:if="!${isView}">*</span>
+							</label>
+							<input th:if="!${isView}" type="date" class="form-control" id="henkoDate"
+								name="henkoDate" th:errorclass="is-invalid"
+								th:value="*{henkoDate != null ? #temporals.format(henkoDate, 'yyyy-MM-dd') : ''}"
+								th:data-initial-value="*{henkoDate != null ? #temporals.format(henkoDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{henkoDate}">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('henkoDate')}"
+								th:errors="*{henkoDate}">
+							</div>
+						</div>
+
+						<!-- 申請日 -->
+						<div th:if="!${isEdit}" class="col-md-4">
+							<label for="shinseiDate" class="form-label fw-medium">
+								申請日 <span class="text-danger" th:if="!${isView}">*</span>
+							</label>
+							<input th:if="!${isView}" type="date" class="form-control" id="shinseiDate"
+								name="shinseiDate" th:errorclass="is-invalid"
+								th:value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}"
+								th:data-initial-value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{shinseiDate}">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('shinseiDate')}"
+								th:errors="*{shinseiDate}">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- ===== 特別徴収義務者情報 ===== -->
 			<div id="tokugimu-info" class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
@@ -108,26 +172,9 @@
 
 						<!-- 指定番号 -->
 						<div class="col-md-4">
-							<label for="shiteiNo" class="form-label fw-medium">指定番号</label> <input
-								type="text" class="form-control" id="shiteiNo"
-								th:field="*{shiteiNo}" placeholder="自動で設定されます" readonly
-								th:data-initial-value="*{shiteiNo}">
-						</div>
-
-						<!-- 登録日 -->
-						<div class="col-md-4">
-							<label for="registrationDate" class="form-label fw-medium">
-								登録日 <span class="text-danger" th:if="!${isView}">*</span>
-							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="registrationDate" name="registrationDate"
-								th:errorclass="is-invalid"
-								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{registrationDate}">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('registrationDate')}"
-								th:errors="*{registrationDate}"></div>
+							<label for="shiteiNo" class="form-label fw-medium">指定番号</label> <input type="text"
+								class="form-control" id="shiteiNo" th:field="*{shiteiNo}" placeholder="自動で設定されます"
+								readonly th:data-initial-value="*{shiteiNo}">
 						</div>
 
 						<!-- 宛名検索 -->
