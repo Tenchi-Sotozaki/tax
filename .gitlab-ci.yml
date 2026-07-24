@@ -31,6 +31,18 @@ test_job:
   except:
     - master
 
+spotbugs_job:
+  stage: test
+  allow_failure: true
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew spotbugsMain -PrunSpotbugs -Dorg.gradle.java.home=$JAVA_HOME
+  artifacts:
+    when: always
+    paths:
+      - build/reports/spotbugs/
+    expire_in: 1 week
+
 deploy_local_job:
   stage: deploy
   script:
