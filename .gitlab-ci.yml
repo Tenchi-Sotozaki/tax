@@ -35,7 +35,7 @@ spotbugs_job:
   stage: test
   script:
     - chmod +x ./gradlew
-    - ./gradlew spotbugsMain -Dorg.gradle.java.home=$JAVA_HOME
+    - ./gradlew spotbugsMain -PrunSpotbugs -Dorg.gradle.java.home=$JAVA_HOME
   artifacts:
     when: always
     paths:

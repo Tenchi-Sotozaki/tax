@@ -70,11 +70,7 @@ spotbugsMain {
 }
 
 tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
-    enabled = false
-}
-
-spotbugsMain {
-    enabled = true
+    enabled = project.hasProperty('runSpotbugs')
 }
 
 tasks.named('test') {
