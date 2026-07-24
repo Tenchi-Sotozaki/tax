@@ -347,23 +347,23 @@ function addKyodoRow() {
             <button type="button" class="btn btn-sm btn-outline-danger kyodo-remove-btn"><i class="bi bi-trash"></i></button>
         </div>
         <div class="row g-3">
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <label class="form-label fw-medium">郵便番号</label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoAddressNo">
             </div>
-            <div class="col-md-8">
+            <div class="col-md-5">
                 <label class="form-label fw-medium">住所</label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoAddress">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-2">
                 <label class="form-label fw-medium">氏名 <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoName">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-2">
                 <label class="form-label fw-medium">氏名(ふりがな) <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="kyodoList[${idx}].kyodoNameKana" placeholder="ひらがなで入力">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-2">
                 <label class="form-label fw-medium">電話番号</label>
                 <input type="tel" class="form-control" name="kyodoList[${idx}].kyodoPhone" placeholder="例）03-1234-5678">
             </div>
