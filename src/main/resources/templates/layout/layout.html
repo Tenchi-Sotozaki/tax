@@ -117,14 +117,6 @@
 											<i class="bi bi-people me-2"></i>合算申告情報
 									</a>
 									</li>
-									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ss00000002')}">
-										<a class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/admin/user-registration}"
-										th:classappend="${#strings.contains(currentUri, '/admin/user-registration')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-person-plus me-2"></i>ユーザー登録
-									</a>
-									</li>
 								</ul>
 							</div>
 						</div>
