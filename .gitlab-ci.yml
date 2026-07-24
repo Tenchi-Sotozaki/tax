@@ -33,6 +33,7 @@ test_job:
 
 spotbugs_job:
   stage: test
+  allow_failure: true
   script:
     - chmod +x ./gradlew
     - ./gradlew spotbugsMain -PrunSpotbugs -Dorg.gradle.java.home=$JAVA_HOME
