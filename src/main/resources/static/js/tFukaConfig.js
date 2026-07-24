@@ -1,21 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // 納入情報チェックボックスの表示/非表示切り替え
-    const shunoCheck = document.getElementById('shunoCheck');
-    if (shunoCheck) {
-        const shunoBody = document.getElementById('shunoBody');
-        shunoCheck.addEventListener('change', () => {
-            shunoBody.style.display = shunoCheck.checked ? '' : 'none';
-            if (!shunoCheck.checked) {
-                shunoBody.querySelectorAll('input').forEach(el => el.value = '');
-            }
-        });
-        // 初期表示
-        if (shunoCheck.checked) {
-            shunoBody.style.display = '';
-        }
-    }
-
     const fukaKbnEl = document.getElementById('fukaKbnHidden');
     const fukaKbn = fukaKbnEl ? fukaKbnEl.value : '';
 
@@ -185,6 +169,114 @@ document.addEventListener('DOMContentLoaded', function() {
         monthlyTallyModal.addEventListener('shown.bs.modal', function() {
             if (fukaKbn === '1') calculateTeigaku();
             else if (fukaKbn === '2') calculateTeiritsu();
+        });
+    }
+
+    // ===== 内訳試算（市区町村税額・都道府県税額） =====
+    const ESTIMATE_BREAKDOWN_API = '/accommodation-tax/declaration/estimate-breakdown';
+
+    function getFieldValue(name) {
+        const els = document.getElementsByName(name);
+        return els.length ? els[0].value : '';
+    }
+
+    function setFieldValue(name, value) {
+        const num = (value === null || value === undefined) ? 0 : value;
+        document.getElementsByName(name).forEach(el => {
+            el.value = Number(num).toLocaleString();
+        });
+    }
+
+    function toNumberOrNull(value) {
+        if (value === null || value === undefined) return null;
+        const cleaned = String(value).replace(/,/g, '').trim();
+        if (cleaned === '') return null;
+        const num = Number(cleaned);
+        return isNaN(num) ? null : num;
+    }
+
+    async function callEstimateBreakdown(fukaKbnValue, monthlyDetailPayload) {
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+        const res = await fetch(`${ESTIMATE_BREAKDOWN_API}?fukaKbn=${encodeURIComponent(fukaKbnValue)}`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(monthlyDetailPayload)
+        });
+        if (!res.ok) {
+            // サーバー側のエラーメッセージがあれば取得して表示する（デバッグしやすくするため）
+            let serverMessage = '';
+            try {
+                const errorBody = await res.json();
+                serverMessage = errorBody && errorBody.message ? errorBody.message : '';
+            } catch (parseErr) {
+                // レスポンスがJSONでない場合（HTMLのエラーページ等）は無視する
+            }
+            throw new Error(serverMessage || `内訳試算に失敗しました（HTTP ${res.status}）`);
+        }
+        return res.json();
+    }
+
+    // 【定額制】内訳試算ボタン：区分ごとの宿泊数・税額から市区町村/都道府県税額を試算
+    const btnEstimateTeigaku = document.getElementById('btnEstimateBreakdownTeigaku');
+    if (btnEstimateTeigaku) {
+        btnEstimateTeigaku.addEventListener('click', async () => {
+            const rows = document.querySelectorAll('.tax-detail-row');
+            const taxDetails = [];
+            rows.forEach((row, i) => {
+                taxDetails.push({
+                    zeiritsuSeq: toNumberOrNull(getFieldValue(`monthlyDetail.taxDetails[${i}].zeiritsuSeq`)),
+                    taxRate: toNumberOrNull(getFieldValue(`monthlyDetail.taxDetails[${i}].taxRate`)),
+                    taxKenRate: toNumberOrNull(getFieldValue(`monthlyDetail.taxDetails[${i}].taxKenRate`)),
+                    hakusu: toNumberOrNull(getFieldValue(`monthlyDetail.taxDetails[${i}].hakusu`)),
+                    zeigaku: toNumberOrNull(getFieldValue(`monthlyDetail.taxDetails[${i}].zeigaku`))
+                });
+            });
+
+            btnEstimateTeigaku.disabled = true;
+            try {
+                const result = await callEstimateBreakdown('1', { taxDetails: taxDetails });
+                (result.taxDetails || []).forEach((detail, i) => {
+                    setFieldValue(`monthlyDetail.taxDetails[${i}].cityZeigaku`, detail.cityZeigaku);
+                    setFieldValue(`monthlyDetail.taxDetails[${i}].kenZeigaku`, detail.kenZeigaku);
+                });
+                setFieldValue('monthlyDetail.totalCityZeigaku', result.totalCityZeigaku);
+                setFieldValue('monthlyDetail.totalKenZeigaku', result.totalKenZeigaku);
+            } catch (err) {
+                console.error(err);
+                alert(err.message || '内訳試算に失敗しました。入力内容をご確認ください。');
+            } finally {
+                btnEstimateTeigaku.disabled = false;
+            }
+        });
+    }
+
+    // 【定率制】内訳試算ボタン：合計の課税対象料金からレート表を参照して市区町村/都道府県税額を試算
+    const btnEstimateTeiritsu = document.getElementById('btnEstimateBreakdownTeiritsu');
+    if (btnEstimateTeiritsu) {
+        btnEstimateTeiritsu.addEventListener('click', async () => {
+            const payload = {
+                paymentYearMonth: getFieldValue('monthlyDetail.paymentYearMonth'),
+                totalStayCount: toNumberOrNull(getFieldValue('monthlyDetail.totalStayCount')),
+                exemptStayCount: toNumberOrNull(getFieldValue('monthlyDetail.exemptStayCount')),
+                kazeiRyokin: toNumberOrNull(getFieldValue('monthlyDetail.kazeiRyokin')),
+                totalPaymentAmount: toNumberOrNull(getFieldValue('monthlyDetail.totalPaymentAmount'))
+            };
+
+            btnEstimateTeiritsu.disabled = true;
+            try {
+                const result = await callEstimateBreakdown('2', payload);
+                setFieldValue('monthlyDetail.totalCityZeigaku', result.totalCityZeigaku);
+                setFieldValue('monthlyDetail.totalKenZeigaku', result.totalKenZeigaku);
+            } catch (err) {
+                console.error(err);
+                alert(err.message || '内訳試算に失敗しました。入力内容をご確認ください。');
+            } finally {
+                btnEstimateTeiritsu.disabled = false;
+            }
         });
     }
 

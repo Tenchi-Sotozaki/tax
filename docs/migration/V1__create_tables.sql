@@ -322,15 +322,14 @@ CREATE TABLE IF NOT EXISTS t_fuka (
   kasan_kbn1 char(1),
   kasan_ritsu1 numeric(5, 2),
   kasan_gaku1 numeric(13),
-  nokigen1 date,
   kasan_kbn2 char(1),
   kasan_ritsu2 numeric(5, 2),
   kasan_gaku2 numeric(13),
-  nokigen2 date,
   kasan_kbn3 char(1),
   kasan_ritsu3 numeric(5, 2),
   kasan_gaku3 numeric(13),
-  nokigen3 date,
+  entaikin numeric(13),
+  nokigen date,
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
@@ -365,15 +364,14 @@ COMMENT ON COLUMN t_fuka.ken_zeigaku IS '都道府県税額';
 COMMENT ON COLUMN t_fuka.kasan_kbn1 IS '加算金額区分1';
 COMMENT ON COLUMN t_fuka.kasan_ritsu1 IS '加算割合1';
 COMMENT ON COLUMN t_fuka.kasan_gaku1 IS '加算金額1';
-COMMENT ON COLUMN t_fuka.nokigen1 IS '納期限1';
 COMMENT ON COLUMN t_fuka.kasan_kbn2 IS '加算金額区分2';
 COMMENT ON COLUMN t_fuka.kasan_ritsu2 IS '加算割合2';
 COMMENT ON COLUMN t_fuka.kasan_gaku2 IS '加算金額2';
-COMMENT ON COLUMN t_fuka.nokigen2 IS '納期限2';
 COMMENT ON COLUMN t_fuka.kasan_kbn3 IS '加算金額区分3';
 COMMENT ON COLUMN t_fuka.kasan_ritsu3 IS '加算割合3';
 COMMENT ON COLUMN t_fuka.kasan_gaku3 IS '加算金額3';
-COMMENT ON COLUMN t_fuka.nokigen3 IS '納期限3';
+COMMENT ON COLUMN t_fuka.entaikin IS '延滞金';
+COMMENT ON COLUMN t_fuka.nokigen IS '納入期限';
 COMMENT ON COLUMN t_fuka.new_flg IS '最新フラグ';
 COMMENT ON COLUMN t_fuka.del_flg IS '削除フラグ';
 COMMENT ON COLUMN t_fuka.add_dt IS '作成日時';
@@ -1164,6 +1162,9 @@ CREATE TABLE IF NOT EXISTS t_operation_log (
   seq numeric(8) NOT NULL,
   screen_id char(10) NOT NULL,
   sousa text NOT NULL,
+  method text,
+  path text,
+  status text,
   param text,
   ope_user text NOT NULL,
   ope_dt timestamp NOT NULL,
@@ -1179,6 +1180,9 @@ COMMENT ON COLUMN t_operation_log.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN t_operation_log.seq IS '管理番号';
 COMMENT ON COLUMN t_operation_log.screen_id IS '画面ＩＤ';
 COMMENT ON COLUMN t_operation_log.sousa IS '操作';
+COMMENT ON COLUMN t_operation_log.method IS 'メソッド';
+COMMENT ON COLUMN t_operation_log.path IS 'PATH';
+COMMENT ON COLUMN t_operation_log.status IS 'ステータスコード';
 COMMENT ON COLUMN t_operation_log.param IS 'リクエストパラメータ';
 COMMENT ON COLUMN t_operation_log.ope_user IS '操作者';
 COMMENT ON COLUMN t_operation_log.ope_dt IS '操作日時';
