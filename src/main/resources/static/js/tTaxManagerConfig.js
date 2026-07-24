@@ -62,15 +62,17 @@ function initAddressSearchModal() {
     searchBtn.addEventListener('click', async () => {
         const no = document.getElementById('addrSearchNo').value.trim();
         const name = document.getElementById('addrSearchName').value.trim();
+        const nameMatchType = document.querySelector('input[name="addrSearchNameMatchType"]:checked')?.value ?? 'partial';
         const address = document.getElementById('addrSearchAddress').value.trim();
+        const addressMatchType = document.querySelector('input[name="addrSearchAddressMatchType"]:checked')?.value ?? 'partial';
         const phone = document.getElementById('addrSearchPhone').value.trim();
         const kojinNo = document.getElementById('addrSearchKojinNo').value.trim();
         const hojinNo = document.getElementById('addrSearchHojinNo').value.trim();
 
         const params = new URLSearchParams();
         if (no) params.set('addressNumber', no);
-        if (name) params.set('name', name);
-        if (address) params.set('address', address);
+        if (name) { params.set('name', name); params.set('nameMatchType', nameMatchType); }
+        if (address) { params.set('address', address); params.set('addressMatchType', addressMatchType); }
         if (phone) params.set('phone', phone);
         if (kojinNo) params.set('kojinNo', kojinNo);
         if (hojinNo) params.set('hojinNo', hojinNo);
@@ -142,8 +144,6 @@ function selectAddress(d) {
     // 宛名番号をhiddenフィールドに設定
     setByName('atenaNo', d.addressNumber);
     
-    console.log('選択された宛名番号:', d.addressNumber); // デバッグ用
-    
     // 前回のエラーメッセージをクリア
     hideCheckMessage();
     
@@ -155,7 +155,7 @@ function selectAddress(d) {
     
     // モーダルが完全に閉じた後に同一人物チェックを実行
     setTimeout(() => {
-        checkSamePerson();
+        checkSamePerson(d.addressNumber);
     }, 300); // モーダルのアニメーション完了を待つ
 }
 
@@ -165,52 +165,26 @@ function selectAddress(d) {
 function initSamePersonCheck() {
     // 画面初期表示時にチェック実行（既存データがある場合）
     const atenaNo = document.querySelector('input[name="atenaNo"]')?.value;
-    const obligorAtenaNo = document.querySelector('input[name="obligorAtenaNo"]')?.value;
-    
-    if (atenaNo && obligorAtenaNo) {
-        checkSamePerson();
+    const sessionObligorAtenaNo = document.getElementById('sessionObligorAtenaNo')?.value;
+
+    if (atenaNo && sessionObligorAtenaNo) {
+        checkSamePerson(atenaNo);
     }
 }
 
-function checkSamePerson() {
-    const taxManagerAtenaNo = document.querySelector('input[name="atenaNo"]')?.value?.trim();
-    const obligorAtenaNo = document.querySelector('input[name="obligorAtenaNo"]')?.value?.trim();
-    
-    console.log('同一人物チェック:', { taxManagerAtenaNo, obligorAtenaNo }); // デバッグ用
-    
-    if (!taxManagerAtenaNo || !obligorAtenaNo) {
+function checkSamePerson(selectedAtenaNo) {
+    const sessionObligorAtenaNo = document.getElementById('sessionObligorAtenaNo')?.value?.trim();
+
+    if (!selectedAtenaNo || !sessionObligorAtenaNo) {
         hideCheckMessage();
         return;
     }
-    
-    // 同じ宛名番号の場合は即座にエラー表示
-    if (taxManagerAtenaNo === obligorAtenaNo) {
+
+    if (selectedAtenaNo.trim() === sessionObligorAtenaNo) {
         showCheckMessage('特別徴収義務者と同一人物のため、納税管理人として登録できません。', true);
-        return;
+    } else {
+        showCheckMessage('登録可能です。', false);
     }
-    
-    // 異なる宛名番号の場合は成功メッセージ表示
-    showCheckMessage('登録可能です。', false);
-    
-    // APIで詳細チェック（将来の拡張用）
-    $.ajax({
-        url: '/tax-manager/check-atena-duplicate',
-        type: 'POST',
-        data: {
-            taxManagerAtenaNo: taxManagerAtenaNo,
-            obligorAtenaNo: obligorAtenaNo
-        },
-        success: function(response) {
-            if (response.isDuplicate) {
-                showCheckMessage(response.message, true);
-            } else {
-                showCheckMessage(response.message, false);
-            }
-        },
-        error: function() {
-            showCheckMessage('チェック中にエラーが発生しました。', true);
-        }
-    });
 }
 
 function showCheckMessage(message, isError) {

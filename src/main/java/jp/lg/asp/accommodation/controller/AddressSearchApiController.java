@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -26,7 +25,9 @@ public class AddressSearchApiController {
     public List<AddressDto> search(
             @RequestParam(required = false) String addressNumber,
             @RequestParam(required = false) String name,
+            @RequestParam(required = false, defaultValue = "partial") String nameMatchType,
             @RequestParam(required = false) String address,
+            @RequestParam(required = false, defaultValue = "partial") String addressMatchType,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String kojinNo,
             @RequestParam(required = false) String hojinNo) {
@@ -37,23 +38,16 @@ public class AddressSearchApiController {
             return List.of();
         }
 
-        BigDecimal addressNumberDecimal = null;
-        if (StringUtils.hasText(addressNumber)) {
-            try {
-                addressNumberDecimal = new BigDecimal(addressNumber);
-            } catch (NumberFormatException e) {
-                return List.of();
-            }
-        }
-
-        return atenaRepository.searchByAnyField(
+        return atenaRepository.search(
                 jichitaiCd,
-                addressNumberDecimal,
-                StringUtils.hasText(name)    ? name    : null,
-                StringUtils.hasText(address) ? address : null,
-                StringUtils.hasText(phone)   ? phone   : null,
-                StringUtils.hasText(kojinNo) ? kojinNo : null,
-                StringUtils.hasText(hojinNo) ? hojinNo : null
+                StringUtils.hasText(addressNumber) ? addressNumber : "%",
+                StringUtils.hasText(name)    ? toPattern(name, nameMatchType)       : "%",
+                "%",
+                "%",
+                StringUtils.hasText(address) ? toPattern(address, addressMatchType) : "%",
+                StringUtils.hasText(phone)   ? phone   : "%",
+                StringUtils.hasText(kojinNo) ? kojinNo : "%",
+                StringUtils.hasText(hojinNo) ? hojinNo : "%"
         ).stream().map(a -> new AddressDto(
                 a.getAtenaNo().toPlainString(),
                 a.getName(),
@@ -64,5 +58,13 @@ public class AddressSearchApiController {
                 a.getKojinNo(),
                 a.getHojinNo()
         )).toList();
+    }
+
+    private String toPattern(String value, String matchType) {
+        return switch (matchType) {
+            case "prefix"  -> value + "%";
+            case "exact"   -> value;
+            default        -> "%" + value + "%";
+        };
     }
 }
