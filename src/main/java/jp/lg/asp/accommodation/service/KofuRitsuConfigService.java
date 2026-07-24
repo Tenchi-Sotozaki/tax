@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jp.lg.asp.accommodation.dto.KofuRitsuConfigDto;
@@ -11,5 +12,9 @@ public interface KofuRitsuConfigService {
 
 	List<KofuRitsu> findAll();
 
+	KofuRitsu findByRno(BigDecimal rno);
+
 	void register(KofuRitsuConfigDto dto);
+
+	void update(BigDecimal rno, KofuRitsuConfigDto dto);
 }

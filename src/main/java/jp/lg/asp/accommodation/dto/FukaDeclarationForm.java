@@ -64,11 +64,16 @@ public class FukaDeclarationForm {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate3;
 
+	// 延滞金・納入期限（テーブル定義書2026-06-18：加算の納期限を1本化）
+	private Long entaikin;
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	private LocalDate nokigen;
+
 	// 徴収原簿
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
 
 	// ========== 納入情報エリア ==========
-	private boolean shunoFlg;
+	// 必須項目ではない。納入年月日・納入金額の両方に入力がある場合のみ登録処理を行う。
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate shunoYmd;
 	private Long shunoKingaku;
@@ -104,17 +109,5 @@ public class FukaDeclarationForm {
 			return true;
 		}
 		return additionalAmount3 != null && additionalAmount3 > 0;
-	}
-
-	@AssertTrue(message = "納入情報を表示する場合、納入年月日は必須です")
-	public boolean isShunoYmdValid() {
-		if (!shunoFlg) return true;
-		return shunoYmd != null;
-	}
-
-	@AssertTrue(message = "納入情報を表示する場合、納入金額は必須です")
-	public boolean isShunoKingakuValid() {
-		if (!shunoFlg) return true;
-		return shunoKingaku != null && shunoKingaku > 0;
 	}
 }

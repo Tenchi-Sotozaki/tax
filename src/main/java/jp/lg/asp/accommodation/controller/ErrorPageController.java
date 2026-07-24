@@ -39,6 +39,12 @@ public class ErrorPageController implements ErrorController {
 		if (statusCode == HttpStatus.NOT_FOUND.value()) {
 			return "error/404";
 		}
+		Throwable ex = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+		if (ex != null) {
+			log.error("500エラーが発生しました URI={}", uri, ex);
+		} else {
+			log.error("500エラーが発生しました URI={}", uri);
+		}
 		return "error/500";
 	}
 

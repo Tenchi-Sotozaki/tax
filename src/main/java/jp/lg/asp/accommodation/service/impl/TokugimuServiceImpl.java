@@ -229,6 +229,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setAtenaNo(t.getAtenaNo().longValue());
 		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(t.getTorokuYmd());
+		form.setShinseiDate(t.getShinkokuYmd());
+		form.setHenkoDate(t.getHenkoYmd());
 		form.setRno(t.getRno().intValue());
 		form.setMaxRno(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
 		form.setMinRno(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
@@ -254,6 +256,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setAtenaNo(t.getAtenaNo().longValue());
 		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(t.getTorokuYmd());
+		form.setShinseiDate(t.getShinkokuYmd());
+		form.setHenkoDate(t.getHenkoYmd());
 		form.setRno(t.getRno().intValue());
 		form.setMaxRno(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
 		form.setMinRno(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));

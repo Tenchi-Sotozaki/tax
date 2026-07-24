@@ -1,8 +1,10 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.List;
+
+import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.entity.KofuRitsuId;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,24 @@ public class KofuRitsuConfigServiceImpl implements KofuRitsuConfigService {
 	public List<KofuRitsu> findAll() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return kofuRitsuRepository.findAllByJichitaiCd(jichitaiCd);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public KofuRitsu findByRno(BigDecimal rno) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return kofuRitsuRepository.findById(new KofuRitsuId(jichitaiCd, rno)).orElseThrow();
+	}
+
+	@Override
+	@Transactional
+	public void update(BigDecimal rno, KofuRitsuConfigDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		KofuRitsu entity = kofuRitsuRepository.findById(new KofuRitsuId(jichitaiCd, rno)).orElseThrow();
+		entity.setKofuRitsu(dto.getKofuRitsu());
+		entity.setTekiyoStYmd(dto.getTekiyoStYmd());
+		entity.setTekiyoEdYmd(dto.getTekiyoEdYmd());
+		kofuRitsuRepository.save(entity);
 	}
 
 	@Override

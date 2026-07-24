@@ -540,6 +540,8 @@ public class FukaServiceImpl implements FukaService {
 						form.setAdditionalRate3(entity.getKasanRitsu3().toString());
 					}
 					form.setAdditionalAmount3(entity.getKasanGaku3());
+					form.setEntaikin(entity.getEntaikin());
+					form.setNokigen(entity.getNokigen());
 
 					// 賦課情報設定
 					setMonthlyDetail(entity, form);
@@ -550,7 +552,6 @@ public class FukaServiceImpl implements FukaService {
 		// 納入情報の取得
 		shunoRirekiRepository.findLatest(jichitaiCd, shiteiNo, nendo, kibetsu)
 				.ifPresent(shuno -> {
-					form.setShunoFlg(true);
 					form.setShunoYmd(shuno.getNonyuYmd());
 					form.setShunoKingaku(shuno.getNonyugaku() != null ? shuno.getNonyugaku().longValue() : null);
 				});
@@ -600,13 +601,13 @@ public class FukaServiceImpl implements FukaService {
 					form.setAdditionalCategory3(entity.getKasanKbn3());
 					if (entity.getKasanRitsu3() != null) form.setAdditionalRate3(entity.getKasanRitsu3().toString());
 					form.setAdditionalAmount3(entity.getKasanGaku3());
+					form.setEntaikin(entity.getEntaikin());
+					form.setNokigen(entity.getNokigen());
 					setMonthlyDetail(entity, form);
-					setMonthlyTally(form, entity);
 				});
 
 		shunoRirekiRepository.findLatest(jichitaiCd, shiteiNo, nendo, kibetsu)
 				.ifPresent(shuno -> {
-					form.setShunoFlg(true);
 					form.setShunoYmd(shuno.getNonyuYmd());
 					form.setShunoKingaku(shuno.getNonyugaku() != null ? shuno.getNonyugaku().longValue() : null);
 				});
@@ -661,8 +662,8 @@ public class FukaServiceImpl implements FukaService {
 			saveChoshuGenboDataWithRno(form, parentFuka, jichitaiCd, targetRno);
 		}
 
-		// 納入情報の保存
-		if (form.isShunoFlg()) {
+		// 納入情報の保存（納入年月日・納入金額の両方に入力がある場合のみ登録処理を行う）
+		if (form.getShunoYmd() != null && form.getShunoKingaku() != null) {
 			Integer shunoRno = shunoRirekiRepository.findMaxRno(jichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
 					.map(r -> r + 1).orElse(1);
 			ShunoRireki shuno = new ShunoRireki();
@@ -675,6 +676,50 @@ public class FukaServiceImpl implements FukaService {
 			shuno.setNonyugaku(form.getShunoKingaku() != null ? form.getShunoKingaku().intValue() : null);
 			shunoRirekiRepository.save(shuno);
 		}
+	}
+
+	/**
+	 * 保存前に、入力中の内容から市区町村税額・都道府県税額の内訳を試算する（内訳試算ボタン用）。
+	 * 保存処理（createFukaUchiList / createParentFuka）と同じロジックを使用し、DBへの書き込みは行わない。
+	 */
+	@Override
+	public FukaMonthlyDeclarationDto estimateBreakdown(String fukaKbn, FukaMonthlyDeclarationDto monthlyDetail) {
+
+		if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
+			// 定率制：課税対象料金の単価帯から都道府県税額をレート表で算出し、残りを市区町村税額とする
+			String taishoYm = StringUtils.hasText(monthlyDetail.getPaymentYearMonth())
+					? monthlyDetail.getPaymentYearMonth().replace("年", "").replace("月", "")
+					: "";
+			long totalZeigaku = getLongValue(monthlyDetail.getTotalPaymentAmount());
+			long kazeiHakusu = getLongValue(monthlyDetail.getTotalStayCount())
+					- getLongValue(monthlyDetail.getExemptStayCount());
+			long totalRyokin = getLongValue(monthlyDetail.getKazeiRyokin());
+			long ryokinTanka = kazeiHakusu > 0 ? totalRyokin / kazeiHakusu : 0;
+			long kenZeigaku = getKenZeigaku(ryokinTanka, taishoYm) * kazeiHakusu;
+			long cityZeigaku = totalZeigaku - kenZeigaku >= 0 ? totalZeigaku - kenZeigaku : 0L;
+			kenZeigaku = totalZeigaku - cityZeigaku;
+			monthlyDetail.setTotalCityZeigaku(cityZeigaku);
+			monthlyDetail.setTotalKenZeigaku(kenZeigaku);
+		} else {
+			// 定額制：区分ごとに都道府県税額（宿泊数×都道府県税率）を算出し、残りを市区町村税額とする
+			long totalCity = 0L;
+			long totalKen = 0L;
+			for (FukaTaxDetailDto detail : monthlyDetail.getTaxDetails()) {
+				long hakusu = getLongValue(detail.getHakusu());
+				BigDecimal taxKenRate = detail.getTaxKenRate() != null ? detail.getTaxKenRate() : BigDecimal.ZERO;
+				long kenZeigaku = taxKenRate.longValue() * hakusu;
+				long zeigaku = getLongValue(detail.getZeigaku());
+				long cityZeigaku = zeigaku - kenZeigaku >= 0L ? zeigaku - kenZeigaku : 0L;
+				kenZeigaku = zeigaku - cityZeigaku;
+				detail.setCityZeigaku(cityZeigaku);
+				detail.setKenZeigaku(kenZeigaku);
+				totalCity += cityZeigaku;
+				totalKen += kenZeigaku;
+			}
+			monthlyDetail.setTotalCityZeigaku(totalCity);
+			monthlyDetail.setTotalKenZeigaku(totalKen);
+		}
+		return monthlyDetail;
 	}
 
 	/**
@@ -855,6 +900,8 @@ public class FukaServiceImpl implements FukaService {
 			}
 			parentFuka.setKasanGaku3(form.getAdditionalAmount3());
 		}
+		parentFuka.setEntaikin(form.getEntaikin());
+		parentFuka.setNokigen(form.getNokigen());
 		return parentFuka;
 	}
 
