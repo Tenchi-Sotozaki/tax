@@ -9,6 +9,27 @@ function toHalfWidth(str) {
 document.addEventListener('DOMContentLoaded', function() {
     const isView = document.getElementById('zeiritsuConfigRoot').dataset.isView === 'true';
 
+    // 自動更新確認モーダル制御
+    const autoUpdateModal = document.getElementById('autoUpdateConfirmModal');
+    if (autoUpdateModal) {
+        document.getElementById('autoUpdateConfirmBtn').addEventListener('click', function() {
+            document.getElementById('confirmAutoUpdate').value = 'true';
+            document.getElementById('zeiritsuForm').submit();
+        });
+    }
+
+    // 登録ボタン（type=button）からのsubmit
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', function() {
+            if (autoUpdateModal) {
+                new bootstrap.Modal(autoUpdateModal, { backdrop: 'static' }).show();
+            } else {
+                document.getElementById('zeiritsuForm').submit();
+            }
+        });
+    }
+
     const displaySt = document.querySelector('input[name="tekiyoStYmDisplay"]');
     const hiddenSt = document.getElementById('tekiyoStYmHidden');
     const displayEd = document.querySelector('input[name="tekiyoEdYmDisplay"]');
@@ -34,16 +55,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const zeiValueLabel = document.getElementById('zeiValueLabel');
     const conditionLabel = document.getElementById('conditionLabel');
-    const zeiValueHint = document.getElementById('zeiValueHint');
 
     function updateLabel() {
         const checked = document.querySelector('input[name="fukaKbn"]:checked');
         const isTeiritsu = checked && checked.value === '2';
-        zeiValueLabel.textContent = (checked && checked.value === '1') ? '税額' : '税率';
-        conditionLabel.textContent = isTeiritsu ? '区分名' : '条件';
+        zeiValueLabel.textContent = (checked && checked.value === '1') ? '税額(円)' : '税率(%)';
+        conditionLabel.textContent = isTeiritsu ? '区分名(更生・決定通知書等の区分に相当)' : '条件';
         zeiValueHint.classList.toggle('d-none', !isTeiritsu);
         document.querySelectorAll('.teigaku-condition').forEach(el => el.style.display = isTeiritsu ? 'none' : '');
         document.querySelectorAll('.teiritsu-condition').forEach(el => el.style.display = isTeiritsu ? '' : 'none');
+        document.querySelectorAll('[id^="details"][id$=".zeiValue"]').forEach(el => {
+            el.placeholder = isTeiritsu ? '0.00～99.99' : '';
+        });
     }
 
     document.querySelectorAll('input[name="fukaKbn"]').forEach(r => r.addEventListener('change', updateLabel));
