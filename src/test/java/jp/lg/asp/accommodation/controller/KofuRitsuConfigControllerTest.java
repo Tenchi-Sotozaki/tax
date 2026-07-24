@@ -67,10 +67,21 @@ class KofuRitsuConfigControllerTest {
         when(kofuRitsuConfigService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(model);
+        String view = controller.list(model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("admin/kofuRitsuList");
         assertThat(model.asMap()).containsKey("historyList");
+    }
+
+    @Test
+    void list_例外発生() {
+        when(kofuRitsuConfigService.findAll()).thenThrow(new RuntimeException("DB error"));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("admin/kofuRitsuList");
+        assertThat(model.asMap()).containsKey("errorMessage");
     }
 
     @Test
@@ -82,10 +93,23 @@ class KofuRitsuConfigControllerTest {
         when(kofuRitsuConfigService.findByRno(rno)).thenReturn(entity);
         Model model = new ExtendedModelMap();
 
-        String view = controller.editForm(rno, model);
+        String view = controller.editForm(rno, model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("admin/kofuRitsuEdit");
         assertThat(model.asMap()).containsKeys("configForm", "rno");
+    }
+
+    @Test
+    void editForm_例外発生() {
+        BigDecimal rno = BigDecimal.ONE;
+        when(kofuRitsuConfigService.findByRno(rno)).thenThrow(new RuntimeException("not found"));
+        Model model = new ExtendedModelMap();
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String view = controller.editForm(rno, model, redirectAttributes);
+
+        assertThat(view).isEqualTo("redirect:/admin/kofu-ritsu/list");
+        assertThat(redirectAttributes.getFlashAttributes()).containsKey("errorMessage");
     }
 
     @Test

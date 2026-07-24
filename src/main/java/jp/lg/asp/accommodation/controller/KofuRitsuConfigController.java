@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,20 +53,32 @@ public class KofuRitsuConfigController {
 	}
 
 	@GetMapping("/list")
-	public String list(Model model) {
-		model.addAttribute("historyList", kofuRitsuConfigService.findAll());
+	public String list(Model model, RedirectAttributes redirectAttributes) {
+		try {
+			model.addAttribute("historyList", kofuRitsuConfigService.findAll());
+		} catch (Exception e) {
+			log.error("交付率一覧取得エラー", e);
+			model.addAttribute("errorMessage", "交付率履歴の取得に失敗しました: " + e.getMessage());
+			model.addAttribute("historyList", List.of());
+		}
 		return "admin/kofuRitsuList";
 	}
 
 	@GetMapping("/edit/{rno}")
-	public String editForm(@PathVariable BigDecimal rno, Model model) {
-		KofuRitsu entity = kofuRitsuConfigService.findByRno(rno);
-		KofuRitsuConfigDto form = new KofuRitsuConfigDto();
-		form.setKofuRitsu(entity.getKofuRitsu());
-		form.setTekiyoStYmd(entity.getTekiyoStYmd());
-		form.setTekiyoEdYmd(entity.getTekiyoEdYmd());
-		model.addAttribute("configForm", form);
-		model.addAttribute("rno", rno);
+	public String editForm(@PathVariable BigDecimal rno, Model model, RedirectAttributes redirectAttributes) {
+		try {
+			KofuRitsu entity = kofuRitsuConfigService.findByRno(rno);
+			KofuRitsuConfigDto form = new KofuRitsuConfigDto();
+			form.setKofuRitsu(entity.getKofuRitsu());
+			form.setTekiyoStYmd(entity.getTekiyoStYmd());
+			form.setTekiyoEdYmd(entity.getTekiyoEdYmd());
+			model.addAttribute("configForm", form);
+			model.addAttribute("rno", rno);
+		} catch (Exception e) {
+			log.error("交付率取得エラー", e);
+			redirectAttributes.addFlashAttribute("errorMessage", "交付率の取得に失敗しました: " + e.getMessage());
+			return "redirect:/admin/kofu-ritsu/list";
+		}
 		return "admin/kofuRitsuEdit";
 	}
 
