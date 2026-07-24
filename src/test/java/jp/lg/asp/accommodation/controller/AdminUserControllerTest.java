@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,7 +51,8 @@ class AdminUserControllerTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(userRepository.search(any(), any(), any(), any(), any())).thenReturn(List.of());
+        when(userRepository.searchPage(any(), any(), any(), any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
         when(roleRepository.findByJichitaiCdOrderByRoleId("011002")).thenReturn(List.of());
 
         Authentication auth = mock(Authentication.class);
@@ -63,10 +66,11 @@ class AdminUserControllerTest {
     void list_一覧画面を返す() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new UserSearchForm(), model);
+        String view = controller.list(new UserSearchForm(), 0, 10, model);
 
         assertThat(view).isEqualTo("admin/userDaicho");
         assertThat(model.asMap()).containsKey("items");
+        assertThat(model.asMap().get("items")).isInstanceOf(Page.class);
     }
 
     @Test
