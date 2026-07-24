@@ -168,6 +168,9 @@ public final class ScreenManagement {
 	// 帳票出力設定
 	public static final String REPORTS_CONFIG = "sc00000001";
 
+	// 帳票出力項目編集/照会
+	public static final String REPORTS_OUTPUT_CONFIG = "sc00000011";
+
 	// 自治体情報設定
 	public static final String JICHITAI_CONFIG = "sc00000008";
 

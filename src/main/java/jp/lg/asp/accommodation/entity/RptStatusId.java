@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class RptStatusId implements Serializable {
 	private String jichitaiCd;
 	private String shiteiNo;
+	private String nendo;
 	private String rptId;
 }

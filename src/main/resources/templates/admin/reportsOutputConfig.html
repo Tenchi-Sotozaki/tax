@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title>帳票出力項目編集・照会</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-file-earmark-text me-2 text-primary"></i>帳票出力項目<span th:text="${mode == 'edit' ? '編集' : '照会'}">照会</span>
+			</h5>
+			<div th:if="${mode == 'view'}">
+				<a th:href="@{/admin/reports-output-config/edit}" class="btn btn-sm btn-primary">
+					<i class="bi bi-pencil-square me-1"></i>編集する
+				</a>
+			</div>
+		</div>
+
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="bi bi-check-circle me-2"></i><span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle me-2"></i><span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<form th:if="${mode == 'edit'}" th:action="@{/admin/reports-output-config/save}" method="post">
+			<div class="card shadow-sm">
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover mb-0">
+						<thead class="table-light">
+							<tr>
+								<th style="width: 30%;">定義名</th>
+								<th>出力値</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="entry : ${defTextMap}">
+								<td class="align-middle fw-semibold" th:text="${entry.key.name}"></td>
+								<td>
+									<input th:if="${entry.key.kbn == 1}" type="text" class="form-control"
+										th:name="${entry.key.id}" th:value="${entry.value}">
+									<textarea th:if="${entry.key.kbn == 2}" class="form-control" rows="4"
+										th:name="${entry.key.id}" th:text="${entry.value}"></textarea>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="text-center mt-4">
+				<button type="submit" class="btn btn-success btn-lg">
+					<i class="bi bi-check-circle me-1"></i>登録する
+				</button>
+			</div>
+		</form>
+
+		<div th:if="${mode == 'view'}" class="card shadow-sm">
+			<div class="table-responsive">
+				<table class="table table-bordered table-hover mb-0">
+					<thead class="table-light">
+						<tr>
+							<th style="width: 30%;">定義名</th>
+							<th>出力値</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="entry : ${defTextMap}">
+							<td class="align-middle fw-semibold" th:text="${entry.key.name}"></td>
+							<td class="align-middle" style="white-space: pre-wrap;" th:text="${entry.value}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

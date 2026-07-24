@@ -89,6 +89,14 @@
 									</a>
 									</li>
 									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000026')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/tokugimu/reports-status}"
+										th:classappend="${#strings.contains(currentUri, '/tokugimu/reports-status')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-clipboard-check me-2"></i>特別徴収義務者状況照会
+									</a>
+									</li>
+									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000025')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/log/rpt-log}"
@@ -293,6 +301,12 @@
 											th:href="@{/admin/reports-config}"
 											th:classappend="${#strings.contains(currentUri, '/admin/reports-config')} ? 'text-white fw-medium' : ''">
 												<i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
+										</a></li>
+										<li class="nav-item"><a
+											class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{/admin/reports-output-config/view}"
+											th:classappend="${#strings.contains(currentUri, '/admin/reports-output-config')} ? 'text-white fw-medium' : ''">
+												<i class="bi bi-file-earmark-text me-2"></i>帳票出力項目
 										</a></li>
 										<li class="nav-item"><a
 											class="nav-link text-white-50 py-1 sidebar-link"

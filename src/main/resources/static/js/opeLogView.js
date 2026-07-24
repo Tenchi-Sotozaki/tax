@@ -32,72 +32,101 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('\n');
     }
 
-    // ページネーション
-    const rows = Array.from(document.querySelectorAll('.log-row'));
-    const pageSizeSelect = document.getElementById('pageSizeSelect');
-    const pagination = document.getElementById('pagination');
-    let currentPage = 1;
+	    // ページネーション
+	    const rows = Array.from(document.querySelectorAll('.log-row'));
+	    const pageSizeSelect = document.getElementById('pageSizeSelect');
+	    const pagination = document.getElementById('pagination');
+	    let currentPage = 1;
 
-    function getPageSize() {
-        return parseInt(pageSizeSelect?.value ?? '10', 10);
-    }
+	    function getPageSize() {
+	        return parseInt(pageSizeSelect?.value ?? '10', 10);
+	    }
 
-    function renderPage(page) {
-        const size = getPageSize();
-        const totalPages = Math.max(1, Math.ceil(rows.length / size));
-        currentPage = Math.min(page, totalPages);
-        const start = (currentPage - 1) * size;
-        const end = start + size;
+	    function renderPage(page) {
+	        const size = getPageSize();
+	        const totalPages = Math.max(1, Math.ceil(rows.length / size));
+	        currentPage = Math.min(page, totalPages);
+	        const start = (currentPage - 1) * size;
+	        const end = start + size;
 
-        rows.forEach((row, i) => {
-            row.style.display = (i >= start && i < end) ? '' : 'none';
-        });
+	        rows.forEach((row, i) => {
+	            row.style.display = (i >= start && i < end) ? '' : 'none';
+	        });
 
-        renderPagination(totalPages);
-    }
+	        renderPagination(totalPages);
+	    }
 
-    function renderPagination(totalPages) {
-        if (!pagination) return;
-        pagination.innerHTML = '';
+	    function renderPagination(totalPages) {
+	        if (!pagination) return;
+	        pagination.innerHTML = '';
 
-        const addItem = (label, page, disabled, active) => {
-            const li = document.createElement('li');
-            li.className = 'page-item' + (disabled ? ' disabled' : '') + (active ? ' active' : '');
-            const a = document.createElement('a');
-            a.className = 'page-link';
-            a.href = '#';
-            a.textContent = label;
-            if (!disabled) {
-                a.addEventListener('click', e => { e.preventDefault(); renderPage(page); });
-            }
-            li.appendChild(a);
-            pagination.appendChild(li);
-        };
+	        const addBtn = (label, page, active) => {
+	            const li = document.createElement('li');
+	            li.className = 'page-item' + (active ? ' active' : '');
+	            const a = document.createElement('a');
+	            a.className = 'page-link';
+	            a.href = '#';
+	            a.textContent = label;
+	            a.addEventListener('click', e => { e.preventDefault(); renderPage(page); });
+	            li.appendChild(a);
+	            pagination.appendChild(li);
+	        };
 
-        addItem('前へ', currentPage - 1, currentPage === 1, false);
+	        const addDisabled = (label, visible = true) => {
+	            const li = document.createElement('li');
+	            li.className = 'page-item disabled';
+	            if (!visible) li.style.visibility = 'hidden';
+	            li.innerHTML = `<span class="page-link">${label}</span>`;
+	            pagination.appendChild(li);
+	        };
 
-        const pages = new Set([1, totalPages]);
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-            if (i >= 1 && i <= totalPages) pages.add(i);
-        }
-        const sorted = Array.from(pages).sort((a, b) => a - b);
-        let prev = 0;
-        for (const p of sorted) {
-            if (p - prev > 1) {
-                const li = document.createElement('li');
-                li.className = 'page-item disabled';
-                li.innerHTML = '<span class="page-link">…</span>';
-                pagination.appendChild(li);
-            }
-            addItem(String(p), p, false, p === currentPage);
-            prev = p;
-        }
+	        // 前へ
+	        if (currentPage > 1) addBtn('前へ', currentPage - 1, false);
+	        else addDisabled('前へ');
 
-        addItem('次へ', currentPage + 1, currentPage === totalPages, false);
-    }
+	        // 9スロット固定: [1][左…][c-2][c-1][c][c+1][c+2][右…][last]
+	        const half = 2;
+	        const leftDots  = currentPage - half > 2;
+	        const rightDots = currentPage + half < totalPages - 1;
 
-    if (rows.length > 0) {
-        renderPage(1);
-        pageSizeSelect?.addEventListener('change', () => renderPage(1));
-    }
-});
+	        const winStart = currentPage - half;
+	        const winEnd   = currentPage + half;
+
+	        // スロット0: 1（中央ウィンドウに含まれない場合のみ表示）
+	        if (winStart > 1) addBtn('1', 1, currentPage === 1);
+	        else              addDisabled('1', false);
+
+	        // スロット1: 左…
+	        if (leftDots) addDisabled('…');
+	        else          addDisabled('…', false);
+
+	        // スロット2〜6: c-2〜c+2
+	        for (let offset = -half; offset <= half; offset++) {
+	            const p = currentPage + offset;
+	            if (p >= 1 && p <= totalPages)
+	                addBtn(String(p), p, p === currentPage);
+	            else
+	                addDisabled('0', false);
+	        }
+
+	        // スロット7: 右…
+	        if (rightDots) addDisabled('…');
+	        else           addDisabled('…', false);
+
+	        // スロット8: last（中央ウィンドウに含まれない場合のみ表示）
+	        if (totalPages > 1 && winEnd < totalPages)
+	            addBtn(String(totalPages), totalPages, currentPage === totalPages);
+	        else
+	            addDisabled(String(totalPages), false);
+
+	        // 次へ
+	        if (currentPage < totalPages) addBtn('次へ', currentPage + 1, false);
+	        else addDisabled('次へ');
+	    }
+
+	    if (rows.length > 0) {
+	        renderPage(1);
+	        pageSizeSelect?.addEventListener('change', () => renderPage(1));
+	        bootstrap.Collapse.getOrCreateInstance(document.getElementById('searchPanel')).hide();
+	    }
+	});
