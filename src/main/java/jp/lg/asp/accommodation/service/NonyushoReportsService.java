@@ -1,7 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
-import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
+import jp.lg.asp.accommodation.dto.NonyushoDto;
 
 /**
  * 納入書レポート Service
@@ -33,4 +33,11 @@ public interface NonyushoReportsService {
     default NonyushoDataResponse getNonyushoData(String shiteiNo, String nendo) {
         return getNonyushoData(shiteiNo, nendo, null);
     }
+    
+    /**
+	 * 条件に合致するデータが存在するかのチェック
+	 * @param dto
+	 * @return 検索結果(true or false)
+	 */
+    public boolean dataCheck(NonyushoDto dto);
 }

@@ -269,4 +269,14 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 		return params;
 	}
+	
+	public boolean dataCheck(NonyushoDto dto) {
+		
+		// 最新の賆課データを取得
+		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(
+				jichitaiContext.getJichitaiCd(), dto.getShiteiNo(), dto.getNendo());
+		
+		// データが存在するかどうかを返す
+		return fukaList.isEmpty();
+	}
 }

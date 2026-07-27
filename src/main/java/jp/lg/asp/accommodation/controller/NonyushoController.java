@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
@@ -96,9 +97,16 @@ public class NonyushoController {
     @PostMapping("/pdf")
     @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "PDF")
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-    public ResponseEntity<byte[]> generatePdf(@ModelAttribute NonyushoDto dto) {
+    public Object generatePdf(RedirectAttributes redirectAttributes, @ModelAttribute NonyushoDto dto) {
         try {
             byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
+            
+            // データ無しの場合
+            if (nonyushoReportsService.dataCheck(dto)) {
+            	redirectAttributes.addAttribute("error", "pdf_not_found");
+                redirectAttributes.addAttribute("shiteiNo", dto.getShiteiNo());
+                return "redirect:/nonyusho";
+            }
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -120,10 +128,15 @@ public class NonyushoController {
     @PostMapping("/preview")
     @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "プレビュー")
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-    public ResponseEntity<byte[]> previewPdf(@ModelAttribute NonyushoDto dto) {
+    public Object previewPdf(@ModelAttribute NonyushoDto dto) {
         try {
         	byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
-            
+        	
+        	// データ無しの場合
+            if (nonyushoReportsService.dataCheck(dto)) {
+                return buildErrorScriptResponse("対象データが見つかりませんでした。");
+            }
+        	
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.inline()
@@ -161,4 +174,19 @@ public class NonyushoController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 	}
+	
+	/**
+     * エラー時にアラートを表示して新しいタブを閉じるHTMLレスポンスを生成
+     */
+    private ResponseEntity<String> buildErrorScriptResponse(String message) {
+        String html = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head><body><script>"
+                + "alert('" + message + "');"
+                + "window.close();"
+                + "</script></body></html>";
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8));
+        
+        return new ResponseEntity<>(html, headers, HttpStatus.OK);
+    }
 }

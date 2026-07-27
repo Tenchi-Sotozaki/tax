@@ -106,6 +106,18 @@ function loadTokugimuInfo(shiteiNo) {
         });
 }
 
+// URLパラメータのerrorをチェックしてアラートを出す
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+
+    if (error === 'pdf_not_found') {
+        alert('対象データが見つかりませんでした。');
+    } else if (error === 'server_error') {
+        alert('PDFの生成中にエラーが発生しました。');
+    }
+});
+
 /**
  * 印刷処理
  */
@@ -280,7 +292,7 @@ function validateForm() {
     }
     
     if (!nendoValue) {
-        showErrorMessage('年度を選択してください。');
+        showErrorMessage('年度を入力してください。');
         return false;
     }
     
