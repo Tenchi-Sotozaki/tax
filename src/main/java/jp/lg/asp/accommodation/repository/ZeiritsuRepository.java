@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,16 @@ public interface ZeiritsuRepository extends JpaRepository<Zeiritsu, ZeiritsuId> 
 
 	@Query("SELECT z FROM Zeiritsu z WHERE z.jichitaiCd = :jichitaiCd AND z.delFlg = '0' ORDER BY z.tekiyoStYm")
 	List<Zeiritsu> findActiveByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+
+	@Query("SELECT z FROM Zeiritsu z WHERE z.jichitaiCd = :jichitaiCd AND z.taishoKbn = :taishoKbn AND z.delFlg = '0' ORDER BY z.seq ASC")
+	List<Zeiritsu> findActiveByJichitaiCdAndTaishoKbn(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("taishoKbn") String taishoKbn);
+
+	@Query("SELECT MAX(z.seq) FROM Zeiritsu z WHERE z.jichitaiCd = :jichitaiCd AND z.taishoKbn = :taishoKbn AND z.delFlg = '0'")
+	BigDecimal findMaxSeqByJichitaiCdAndTaishoKbn(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("taishoKbn") String taishoKbn);
 
 	@Query("SELECT z FROM Zeiritsu z WHERE z.jichitaiCd = :jichitaiCd"
 			+ " AND z.delFlg = '0'"
