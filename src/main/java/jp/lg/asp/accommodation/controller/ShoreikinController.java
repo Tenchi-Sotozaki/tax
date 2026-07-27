@@ -33,9 +33,12 @@ public class ShoreikinController {
 
 	@GetMapping("/list")
 	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
-	public String list(@ModelAttribute ShoreikinDto searchForm, Model model) {
+	public String list(@ModelAttribute ShoreikinDto searchForm, Model model,
+			@RequestParam(required = false) String searched) {
 		accessChecker.checkAccess(SCREEN_ID);
-		model.addAttribute("items", shoreikinService.search(searchForm));
+		if (searched != null) {
+			model.addAttribute("items", shoreikinService.search(searchForm));
+		}
 		model.addAttribute("searchForm", searchForm);
 		return LIST_VIEW;
 	}
