@@ -60,6 +60,7 @@ spotbugs {
     ignoreFailures = false
     effort = 'max'
     reportLevel = 'medium'
+    excludeFilter = file("${rootProject.projectDir}/spotbugs-exclude.xml")
 }
 
 spotbugsMain {
