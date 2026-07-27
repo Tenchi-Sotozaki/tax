@@ -299,6 +299,9 @@ public class ZeiritsuController {
 		validateDetails(form, bindingResult);
 
 		boolean confirmed = "true".equals(confirmAutoUpdate);
+		log.debug("save: fukaKbn={}, tekiyoStYm={}, taishoKbn={}, confirmed={}, hasErrors={}, errors={}",
+				form.getFukaKbn(), form.getTekiyoStYm(), form.getTaishoKbn(), confirmed,
+				bindingResult.hasErrors(), bindingResult.getAllErrors());
 		Zeiritsu autoUpdateTarget = null;
 		if (!confirmed) {
 			autoUpdateTarget = findAutoUpdateTarget(form, jichitaiCd, null);
@@ -327,6 +330,7 @@ public class ZeiritsuController {
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isDetailEditable", true);
 			model.addAttribute("isHeaderEditable", true);
+			model.addAttribute("autoUpdateTarget", null);
 			addConstants(model);
 			model.addAttribute("validationErrors", ZeiritsuForm.validate(form).values());
 			return FORM_VIEW;

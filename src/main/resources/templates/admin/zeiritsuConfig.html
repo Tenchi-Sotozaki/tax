@@ -79,15 +79,15 @@
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="fukaTeigaku"
 										th:field="*{fukaKbn}" th:value="${fukaTeigaku.value}"
-										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
-										class="form-check-label" for="fukaTeigaku"
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}">
+									<label class="form-check-label" for="fukaTeigaku"
 										th:text="${fukaTeigaku.name}"></label>
 								</div>
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="fukaTeiritsu"
 										th:field="*{fukaKbn}" th:value="${fukaTeiritsu.value}"
-										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
-										class="form-check-label" for="fukaTeiritsu"
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}">
+									<label class="form-check-label" for="fukaTeiritsu"
 										th:text="${fukaTeiritsu.name}"></label>
 								</div>
 							</div>
@@ -141,15 +141,15 @@
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="taishoCity"
 										th:field="*{taishoKbn}" th:value="${taishoCity.value}"
-										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
-										class="form-check-label" for="taishoCity"
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}">
+									<label class="form-check-label" for="taishoCity"
 										th:text="${taishoCity.name}"></label>
 								</div>
 								<div class="form-check">
 									<input class="form-check-input" type="radio" id="taishoKen"
 										th:field="*{taishoKbn}" th:value="${taishoKen.value}"
-										th:disabled="${isView or (isEdit and !isHeaderEditable)}"> <label
-										class="form-check-label" for="taishoKen"
+										th:disabled="${isView or (isEdit and !isHeaderEditable)}">
+									<label class="form-check-label" for="taishoKen"
 										th:text="${taishoKen.name}"></label>
 								</div>
 							</div>
@@ -418,11 +418,12 @@
 					<i class="bi bi-trash me-2"></i>削除する
 				</button>
 				<!-- 新規登録モード -->
-				<button th:unless="${isView or isEdit}" type="button" id="registerBtn"
-					class="btn btn-success btn-lg px-5">
+				<button th:unless="${isView or isEdit}" type="button"
+					id="registerBtn" class="btn btn-success btn-lg px-5">
 					<i class="bi bi-save me-2"></i>登録する
 				</button>
-				<input type="hidden" name="confirmAutoUpdate" id="confirmAutoUpdate" value="false">
+				<input type="hidden" name="confirmAutoUpdate" id="confirmAutoUpdate"
+					value="false">
 				<!-- 編集モード -->
 				<button th:if="${isEdit}" type="submit"
 					class="btn btn-success btn-lg px-5">
@@ -442,23 +443,32 @@
 		</div>
 
 		<!-- 自動更新確認モーダル -->
-		<div th:if="${autoUpdateTarget != null}" class="modal fade" id="autoUpdateConfirmModal" tabindex="-1">
+		<div th:if="${autoUpdateTarget != null}" class="modal fade"
+			id="autoUpdateConfirmModal" tabindex="-1">
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>適用終了年月の自動更新確認</h5>
+						<h5 class="modal-title">
+							<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>適用終了年月の自動更新確認
+						</h5>
 					</div>
 					<div class="modal-body">
 						<p>以下の既存レコードの適用終了年月が未登録のため、自動更新が必要です。</p>
 						<ul class="mb-2">
-							<li>適用開始年月：<span th:text="${#strings.substring(autoUpdateTarget.tekiyoStYm,0,4) + '年' + #strings.substring(autoUpdateTarget.tekiyoStYm,4,6) + '月'}"></span></li>
-							<li>適用終了年月：未登録 → <strong th:text="${autoUpdateNewEdYm}"></strong> に更新</li>
+							<li>適用開始年月：<span
+								th:text="${#strings.substring(autoUpdateTarget.tekiyoStYm,0,4) + '年' + #strings.substring(autoUpdateTarget.tekiyoStYm,4,6) + '月'}"></span></li>
+							<li>適用終了年月：未登録 → <strong th:text="${autoUpdateNewEdYm}"></strong>
+								に更新
+							</li>
 						</ul>
 						<p class="mb-0">自動更新してよろしいですか？</p>
+						<p class="mb-0">自動更新しない場合、先に既存レコードの適用終了年月を手動で登録した後、再度登録を行ってください。</p>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">いいえ</button>
-						<button type="button" class="btn btn-primary" id="autoUpdateConfirmBtn">はい</button>
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">いいえ</button>
+						<button type="button" class="btn btn-primary"
+							id="autoUpdateConfirmBtn">はい</button>
 					</div>
 				</div>
 			</div>
