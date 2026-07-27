@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 @Data
@@ -22,6 +24,7 @@ public class NonyushoDto {
     private String nendo;
     
     /** 申告年月 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate shinkokuYmd;
     
     /** 指定番号 */
@@ -40,6 +43,7 @@ public class NonyushoDto {
     private String gokei;
     
     /** 納期限 */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate nokigen;
     
     /** 特別徴収義務者住所(所在地) */

@@ -86,7 +86,7 @@ function updateNendoDisplay() {
  * 指定番号に基づいて特別徴収義務者情報を読み込む
  */
 function loadTokugimuInfo(shiteiNo) {
-    fetch(`/accommodation-tax/api/tokugimu/info?shiteiNo=${encodeURIComponent(shiteiNo)}`)
+    fetch(`/api/tokugimu/info?shiteiNo=${encodeURIComponent(shiteiNo)}`)
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -118,8 +118,8 @@ async function printReport() {
     
     const formData = await collectFormData();
     const csrfToken = document.querySelector('input[name="_csrf"]').value;
-    
-    fetch('/accommodation-tax/nonyusho/pdf', {
+
+    fetch('/accommodation-tax/nonyusho/print', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -127,27 +127,27 @@ async function printReport() {
         },
         body: JSON.stringify(formData)
     })
-    .then(response => {
-        if (response.ok) {
-            return response.blob();
-        }
-        throw new Error('印刷用PDF生成に失敗しました');
-    })
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = url;
-        document.body.appendChild(iframe);
-        iframe.onload = function() {
-            iframe.contentWindow.print();
-        };
-        console.log('印刷処理完了');
-    })
-    .catch(error => {
-        console.error('印刷エラー:', error);
-        showErrorMessage('印刷用PDF生成に失敗しました: ' + error.message);
-    });
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error('印刷用PDF生成に失敗しました');
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            iframe.onload = function() {
+                iframe.contentWindow.print();
+            };
+            console.log('印刷処理完了');
+        })
+        .catch(error => {
+            console.error('印刷エラー:', error);
+            showErrorMessage('印刷用PDF生成に失敗しました: ' + error.message);
+        });
 }
 
 /**
@@ -209,7 +209,7 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
             throw new Error('指定番号と年度が必要です');
         }
         
-        const url = `/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}&shinkokuYm=${encodeURIComponent(taishoYmValue || '')}`;
+        const url = `/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}&shinkokuYm=${encodeURIComponent(taishoYmValue || '')}`;
         console.log('リクエストURL:', url);
         
         const response = await fetch(url);
