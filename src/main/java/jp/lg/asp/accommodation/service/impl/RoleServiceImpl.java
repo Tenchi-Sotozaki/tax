@@ -74,6 +74,7 @@ public class RoleServiceImpl implements RoleService {
 				}
 			}
 			role.getRoleDetails().clear();
+			roleRepository.saveAndFlush(role);
 			role.getRoleDetails().addAll(updatedDetails);
 			roleRepository.save(role);
 		} else {

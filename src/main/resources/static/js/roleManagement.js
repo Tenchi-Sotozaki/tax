@@ -153,6 +153,8 @@ function saveRole() {
         })
         .then(result => {
             if (result.success) {
+                const msg = (currentMode === 'create') ? '権限を登録しました。' : '権限を更新しました。';
+                sessionStorage.setItem('flashMessage', msg);
                 location.reload();
             } else {
                 alert('保存に失敗しました: ' + result.message);
@@ -288,6 +290,13 @@ document.getElementById('deleteForm').addEventListener('submit', function(e) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    const flash = sessionStorage.getItem('flashMessage');
+    if (flash) {
+        document.getElementById('flashMessageText').textContent = flash;
+        document.getElementById('flashMessage').classList.remove('d-none');
+        sessionStorage.removeItem('flashMessage');
+    }
 
     // 画面表示時の初期状態を記憶するためのマップ
     const initialValues = {};
