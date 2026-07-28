@@ -117,8 +117,8 @@ public class TaxManagerController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
 		// デバッグ情報を出力
-		log.debug("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, exemptionFlag={}", 
-				id, form.getAtenaNo(), form.getManagerName(), form.isExemptionFlag());
+		log.debug("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, kbn={}", 
+				id, form.getAtenaNo(), form.getManagerName(), form.getKbn());
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", form.isEdit());
