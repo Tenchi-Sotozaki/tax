@@ -143,7 +143,7 @@ async function printReport() {
             if (response.ok) {
                 return response.blob();
             }
-            throw new Error('印刷用PDF生成に失敗しました');
+            throw new Error('対象データが見つかりませんでした');
         })
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
@@ -158,7 +158,7 @@ async function printReport() {
         })
         .catch(error => {
             console.error('印刷エラー:', error);
-            showErrorMessage('印刷用PDF生成に失敗しました: ' + error.message);
+            showErrorMessage('error.message');
         });
 }
 
@@ -190,12 +190,12 @@ async function collectFormData() {
     return {
         shiteiNo: shiteiNo,
         nendo: nendo,
-        shinkokuYmd: shinkokuYmd,
+        shinkokuYmd: shinkokuYmd ? shinkokuYmd : null,
         entai: entai,
         zeigaku: dynamicData.zeigaku,
         kasan: dynamicData.kasan,
         gokei: gokei,
-        nokigen: dynamicData.nokigen,
+        nokigen: dynamicData.nokigen ? dynamicData.nokigen : null,
         tokuName: document.getElementById('tokuName')?.value || '',
         tokuJusho: document.getElementById('tokuJusho')?.value || '',
         tokuYubinNo: document.getElementById('tokuYubinNo')?.value || '',
@@ -221,7 +221,7 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
             throw new Error('指定番号と年度が必要です');
         }
         
-        const url = `/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}&shinkokuYm=${encodeURIComponent(taishoYmValue || '')}`;
+        const url = `/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}&shinkokuYm=${encodeURIComponent(taishoYmValue || '')}`;
         console.log('リクエストURL:', url);
         
         const response = await fetch(url);

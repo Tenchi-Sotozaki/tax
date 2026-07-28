@@ -24,6 +24,7 @@
 						<input type="hidden" id="tokuName" name="tokuName" th:value="${tokuName}">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						<input type="hidden" id="tokuYubinNo" name="tokuYubinNo" th:value="${tokuYubinNo}" />
+						<input type="hidden" id="tokuJusho" name="tokuJusho" th:value="${tokuJusho}" />
 						
 						<!-- 特別徴収義務者情報 -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>

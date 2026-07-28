@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -156,10 +157,17 @@ public class NonyushoController {
      */
     @PostMapping("/print")
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-    public ResponseEntity<byte[]> printPDF(NonyushoDto dto) {
+    public Object printPDF(@RequestBody NonyushoDto dto) {
     	try {
             log.debug("納入書PDF生成開始: shiteiNo={}", dto.getShiteiNo());
             
+            // データ無しの場合
+            if (nonyushoReportsService.dataCheck(dto)) {
+            	return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("対象データが見つかりませんでした。");
+            }
+        
             byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
 			
             HttpHeaders headers = new HttpHeaders();

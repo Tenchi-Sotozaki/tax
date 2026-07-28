@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -213,15 +212,15 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 		// 基本情報
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
-		reportsDto.setJichitaiCd(dto.getJichitaiCd() != null ? dto.getJichitaiCd() : "");
+		reportsDto.setJichitaiCd(jichitaiContext.getJichitaiCd());
 		reportsDto.setKozaNo(dto.getKozaNo() != null ? dto.getKozaNo() : "");
 		reportsDto.setKozaName(dto.getKozaName() != null ? dto.getKozaName() : "");
 		reportsDto.setNendo(dto.getNendo() != null ? dto.getNendo() : "");
 		reportsDto.setShiteiNo(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
-		reportsDto.setZeigaku(dto.getZeigaku() != null ? dto.getZeigaku() : "");
-		reportsDto.setEntai(dto.getEntai() != null ? dto.getEntai() : "");
-		reportsDto.setKasan(dto.getKasan() != null ? dto.getKasan() : "");
-		reportsDto.setGokei(dto.getGokei() != null ? dto.getGokei() : "");
+		reportsDto.setZeigaku(dto.getZeigaku() != null ? dto.getZeigaku() : "0");
+		reportsDto.setEntai(dto.getEntai() != null ? dto.getEntai() : "0");
+		reportsDto.setKasan(dto.getKasan() != null ? dto.getKasan() : "0");
+		reportsDto.setGokei(dto.getGokei() != null ? dto.getGokei() : "0");
 
 		// 住所に郵便番号を連結
 		String tokuJusho = dto.getTokuJusho() != null ? dto.getTokuJusho().trim() : "";
@@ -250,16 +249,14 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 		// 申告年月
 		if (dto.getShinkokuYmd() != null) {
-			String strDate = dto.getShinkokuYmd().format(DateTimeFormatter.ofPattern("yyyy年M月"));
-			reportsDto.setShinkokuYm(strDate);
+			reportsDto.setShinkokuYm(dto.getShinkokuYmd());
 		} else {
 			reportsDto.setShinkokuYm("");
 		}
 
 		// 納期限
 		if (dto.getNokigen() != null) {
-			String strDate = dto.getNokigen().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
-			reportsDto.setNokigen(strDate);
+			reportsDto.setNokigen(dto.getNokigen());
 		} else {
 			reportsDto.setNokigen("");
 		}
