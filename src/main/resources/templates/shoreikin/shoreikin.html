@@ -30,10 +30,10 @@
 					<h2 class="accordion-header">
 						<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
 							data-bs-target="#searchPanel">
-							<i class="bi bi-funnel me-2 text-primary"></i>抽出条件
+							<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 						</button>
 					</h2>
-					<div id="searchPanel" class="accordion-collapse collapse show">
+					<div id="searchPanel" class="accordion-collapse collapse" th:classappend="${items == null} ? 'show'">
 						<div class="accordion-body pt-3 pb-2 px-3">
 							<form th:action="@{/shoreikin/search}" th:object="${searchForm}" method="post">
 								<!-- SP:1列 / タブレット:2列 / PC:4列 -->
@@ -158,6 +158,7 @@
 									<button type="submit" class="btn btn-primary btn-sm px-4">
 										<i class="bi bi-search me-1"></i>検索する
 									</button>
+									<input type="hidden" name="searched" value="true">
 								</div>
 							</form>
 						</div>
@@ -194,17 +195,17 @@
 			</div>
 
 			<!-- 表示件数選択プルダウン -->
-			<div class="d-flex justify-content-end align-items-center mb-1">
+			<div th:if="${items != null}" class="d-flex justify-content-end align-items-center mb-1">
 				<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 				<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-					<option th:each="s : ${#arrays.toArray({5, 10, 20})}"
-						th:value="@{/shoreikin/list(page=0, pageSize=${s}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+					<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
+						th:value="@{/shoreikin/list(searched=true, page=0, pageSize=${s}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
 						th:text="${s}" th:selected="${s == searchForm.pageSize}">
 					</option>
 				</select>
 			</div>
 
-			<form id="listForm">
+			<form th:if="${items != null}" id="listForm">
 
 				<!-- ========== 一覧テーブル ========== -->
 				<div class="card shadow-sm">
@@ -262,21 +263,54 @@
 								<ul class="pagination pagination-sm justify-content-center mb-0">
 									<li class="page-item" th:classappend="${items.first} ? 'disabled'">
 										<a class="page-link"
-											th:href="@{/shoreikin/list(page=${items.number - 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
+											th:href="@{/shoreikin/list(searched=true, page=${items.number - 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
 									</li>
-									<li class="page-item active" th:if="${items.totalPages == 0}">
-										<a class="page-link" href="#">1</a>
-									</li>
-									<li class="page-item" th:if="${items.totalPages > 0}"
-										th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
-										th:classappend="${i == items.number} ? 'active'">
-										<a class="page-link"
-											th:href="@{/shoreikin/list(page=${i}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-											th:text="${i + 1}">1</a>
-									</li>
+									<!-- 省略なし（6ページ以下） -->
+									<th:block th:if="${items.totalPages <= 6}">
+										<li class="page-item active" th:if="${items.totalPages == 0}">
+											<a class="page-link" href="#">1</a>
+										</li>
+										<li class="page-item" th:if="${items.totalPages > 0}"
+											th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
+											th:classappend="${i == items.number} ? 'active'">
+											<a class="page-link"
+												th:href="@{/shoreikin/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+												th:text="${i + 1}">1</a>
+										</li>
+									</th:block>
+									<!-- 省略あり（7ページ以上） -->
+									<th:block th:if="${items.totalPages > 6}">
+										<!-- 先頭ページ -->
+										<li class="page-item" th:classappend="${0 == items.number} ? 'active'">
+											<a class="page-link"
+												th:href="@{/shoreikin/list(searched=true, page=0, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">1</a>
+										</li>
+										<!-- 先頭省略 -->
+										<li class="page-item disabled" th:if="${items.number > 3}">
+											<span class="page-link">...</span>
+										</li>
+										<!-- 中間ページ（先頭・末尾を除く） -->
+										<th:block th:each="i : ${#numbers.sequence(1, items.totalPages - 2)}">
+											<li class="page-item" th:if="${i >= items.number - 1 and i <= items.number + 1}" th:classappend="${i == items.number} ? 'active'">
+												<a class="page-link"
+													th:href="@{/shoreikin/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+													th:text="${i + 1}">2</a>
+											</li>
+										</th:block>
+										<!-- 末尾省略 -->
+										<li class="page-item disabled" th:if="${items.number < items.totalPages - 4}">
+											<span class="page-link">...</span>
+										</li>
+										<!-- 末尾ページ -->
+										<li class="page-item" th:classappend="${items.totalPages - 1 == items.number} ? 'active'">
+											<a class="page-link"
+												th:href="@{/shoreikin/list(searched=true, page=${items.totalPages - 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+												th:text="${items.totalPages}">最後</a>
+										</li>
+									</th:block>
 									<li class="page-item" th:classappend="${items.last} ? 'disabled'">
 										<a class="page-link"
-											th:href="@{/shoreikin/list(page=${items.number + 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
+											th:href="@{/shoreikin/list(searched=true, page=${items.number + 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gassanTaisho=${searchForm.gassanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
 									</li>
 								</ul>
 							</nav>

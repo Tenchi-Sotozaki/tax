@@ -189,7 +189,16 @@
 				<!-- アクションボタン -->
 				<div class="d-flex gap-2">
 
-					<!-- 登録モード -->
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
+						戻る
+					</a> <a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+						th:unless="${configForm.viewMode}"
+						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+						class="bi bi-arrow-left"></i> 戻る
+					</a>
+
+										<!-- 登録モード -->
 					<div th:if="${configForm.createMode}">
 						<button type="submit" class="btn btn-success"
 							onclick="return confirm('交付金情報を登録しますか？')">
@@ -205,14 +214,6 @@
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
-						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
-						戻る
-					</a> <a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
-						th:unless="${configForm.viewMode}"
-						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
-						class="bi bi-arrow-left"></i> 戻る
-					</a>
 				</div>
 			</form>
 
