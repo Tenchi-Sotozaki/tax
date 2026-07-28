@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 <head>
-	<title>ユーザー登録/編集</title>
+<title>ユーザー登録/編集</title>
 </head>
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
 
-		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 			th:data-is-edit="${isEdit}">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i th:class="${isView} ? 'bi bi-person-lines-fill me-2 text-primary' : (${isEdit} ? 'bi bi-pencil-square me-2 text-primary' : 'bi bi-person-plus me-2 text-primary')"></i>
@@ -15,15 +17,18 @@
 			</h5>
 		</div>
 
-		<form th:action="${isEdit} ? @{/admin/user-edit/{id}(id=${userForm.originalId})} : @{/admin/user-registration}"
+		<form
+			th:action="${isEdit} ? @{/admin/user-edit/{id}(id=${userForm.originalId})} : @{/admin/user-registration}"
 			th:object="${userForm}" method="post">
 
-			<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+			<div
+				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 				class="alert alert-danger alert-dismissible fade show" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>
 				入力内容にエラーがあります。各項目を確認してください。
 				<ul class="mb-0 mt-1">
-					<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+					<li th:each="err : ${validationErrors}" th:text="${err}"
+						class="small"></li>
 				</ul>
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
@@ -42,27 +47,30 @@
 						<!-- ID -->
 						<div class="col-md-4">
 
-							<label for="id" class="form-label fw-medium"> ID
-								<span class="text-danger">*</span>
-							</label>
+							<label for="id" class="form-label fw-medium"> ID <span
+								class="text-danger">*</span>
+							</label> <input type="text" class="form-control" id="id" th:field="*{id}"
+								th:errorclass="is-invalid" th:readonly="${isEdit}"
+								th:data-initial-value="*{id}">
 
-							<input type="text" class="form-control" id="id" th:field="*{id}" th:errorclass="is-invalid"
-								th:readonly="${isEdit}" th:data-initial-value="*{id}">
-
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('id')}" th:errors="*{id}"></div>
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('id')}"
+								th:errors="*{id}"></div>
 						</div>
+
+						<div class="col-md-4"></div>
+						<div class="col-md-4"></div>
 
 						<!-- 氏名 -->
 						<div class="col-md-4">
 
-							<label for="name" class="form-label fw-medium">
-								氏名 <span class="text-danger">*</span>
-							</label>
+							<label for="name" class="form-label fw-medium"> 氏名 <span
+								class="text-danger">*</span>
+							</label> <input type="text" class="form-control" id="name"
+								th:field="*{name}" th:errorclass="is-invalid"
+								th:readonly="${isView}" th:data-initial-value="*{name}">
 
-							<input type="text" class="form-control" id="name" th:field="*{name}"
-								th:errorclass="is-invalid" th:readonly="${isView}" th:data-initial-value="*{name}">
-
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
 							</div>
 						</div>
 
@@ -70,83 +78,80 @@
 						<div class="col-md-4">
 							<label for="nameKana" class="form-label fw-medium"> ふりがな
 								<span class="text-danger">*</span>
-							</label>
+							</label> <input type="text" class="form-control" id="nameKana"
+								th:field="*{nameKana}" th:errorclass="is-invalid"
+								placeholder="ひらがなで入力" th:readonly="${isView}"
+								th:data-initial-value="*{nameKana}">
 
-							<input type="text" class="form-control" id="nameKana" th:field="*{nameKana}"
-								th:errorclass="is-invalid" placeholder="ひらがなで入力" th:readonly="${isView}" th:data-initial-value="*{nameKana}">
-
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('nameKana')}"
-								th:errors="*{nameKana}"></div>
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('nameKana')}" th:errors="*{nameKana}"></div>
 						</div>
+
+						<div class="col-md-4"></div>
 
 						<!-- 部署 -->
 						<div class="col-md-4">
-							<label for="busho" class="form-label fw-medium">
-								部署 <span class="text-danger">*</span>
-							</label>
+							<label for="busho" class="form-label fw-medium"> 部署 <span
+								class="text-danger">*</span>
+							</label> <input type="text" class="form-control" id="busho"
+								th:field="*{busho}" th:errorclass="is-invalid"
+								th:readonly="${isView}" th:data-initial-value="*{busho}">
 
-							<input type="text" class="form-control" id="busho" th:field="*{busho}"
-								th:errorclass="is-invalid" th:readonly="${isView}" th:data-initial-value="*{busho}">
-
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('busho')}" th:errors="*{busho}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('busho')}" th:errors="*{busho}">
 							</div>
 						</div>
 
 						<!-- 権限 -->
 						<div class="col-md-4">
-							<label for="roleId" class="form-label fw-medium">
-								権限 <span class="text-danger">*</span>
-							</label>
-
-							<select class="form-select" id="roleId" th:field="*{roleId}" th:errorclass="is-invalid"
-								th:data-initial-value="*{roleId}"
+							<label for="roleId" class="form-label fw-medium"> 権限 <span
+								class="text-danger">*</span>
+							</label> <select class="form-select" id="roleId" th:field="*{roleId}"
+								th:errorclass="is-invalid" th:data-initial-value="*{roleId}"
 								th:disabled="${isView == true or isDefaultUser == true}">
 								<option value="">選択してください</option>
-								<option th:each="role : ${roles}" th:value="${role.roleId}" th:text="${role.name}">
-								</option>
+								<option th:each="role : ${roles}" th:value="${role.roleId}"
+									th:text="${role.name}"></option>
 							</select>
 							<div th:if="${isDefaultUser}" class="form-text text-muted">デフォルトユーザーの権限は変更できません。</div>
 
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}">
 							</div>
 						</div>
 
-						<!-- 部署・権限の行はここまで。パスワードは次の行(3行目)に配置する -->
+						<div class="col-md-4"></div>
+
+						<!-- パスワード関連は照会画面では表示しない -->
 						<th:block th:unless="${isView}">
-							<div class="w-100"></div>
 
 							<!-- 新しいパスワード -->
 							<div class="col-md-4">
-								<label for="password" class="form-label fw-medium">
-									<span th:if="${isEdit}">新しいパスワード</span>
-
-									<span th:if="!${isEdit}">パスワード
+								<label for="password" class="form-label fw-medium"> <span
+									th:if="${isEdit}">新しいパスワード</span> <span th:if="!${isEdit}">パスワード
 										<span class="text-danger">*</span>
-									</span>
+								</span> <span th:if="${isEdit}" class="text-muted small ms-1">(変更する場合のみ入力)</span>
+								</label> <input type="password" class="form-control" id="password"
+									th:field="*{password}" th:errorclass="is-invalid"
+									autocomplete="new-password" th:data-initial-value="*{password}">
 
-									<span th:if="${isEdit}" class="text-muted small ms-1">(変更する場合のみ入力)</span>
-								</label>
-
-								<input type="password" class="form-control" id="password" th:field="*{password}"
-									th:errorclass="is-invalid" autocomplete="new-password"
-									th:data-initial-value="*{password}">
-
-								<div class="invalid-feedback" th:if="${#fields.hasErrors('password')}"
-									th:errors="*{password}"></div>
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
 							</div>
 
 							<!-- パスワード(確認用) -->
 							<div class="col-md-4">
 								<label for="passwordConfirm" class="form-label fw-medium">
 									パスワード(確認用) <span class="text-danger" th:if="!${isEdit}">*</span>
-								</label>
+								</label> <input type="password" class="form-control" id="passwordConfirm"
+									name="passwordConfirm" th:errorclass="is-invalid"
+									autocomplete="new-password">
 
-								<input type="text" class="form-control" id="passwordConfirm" name="passwordConfirm"
-									th:errorclass="is-invalid" autocomplete="new-password">
-
-								<div class="invalid-feedback" th:if="${#fields.hasErrors('passwordConfirm')}"
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('passwordConfirm')}"
 									th:errors="*{passwordConfirm}"></div>
 							</div>
+
 						</th:block>
 
 					</div>
@@ -155,28 +160,40 @@
 
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<button type="submit" class="btn btn-success btn-lg px-5" th:unless="${isView}">
-					<i th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
-					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
-				</button>
 
-				<a th:if="${isView}" th:href="@{/admin/user-edit/{id}(id=${userForm.originalId})}"
-					class="btn btn-primary btn-lg px-5">
-					<i class="bi bi-pencil-square me-2"></i>編集する
+				<!-- 一覧に戻る（照会画面は入力破棄の確認を出さない） -->
+				<a th:if="${isView != true}" th:href="@{/admin/user-search}"
+					class="btn btn-outline-primary btn-lg px-4"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<a th:if="${isView}" th:href="@{/admin/user-search}"
+					class="btn btn-outline-primary btn-lg px-4"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 
+				<!-- 削除する（編集画面のみ） -->
 				<button type="button" class="btn btn-danger btn-lg px-4"
 					th:if="${isEdit == true and isView != true}"
 					onclick="confirmUserDelete()">
 					<i class="bi bi-trash me-2"></i>削除する
 				</button>
 
-				<a th:if="${isView != true}" th:href="@{/admin/user-search}" class="btn btn-outline-primary btn-lg px-4"
-					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				<!-- 編集する（照会画面のみ） -->
+				<a th:if="${isView}"
+					th:href="@{/admin/user-edit/{id}(id=${userForm.originalId})}"
+					class="btn btn-primary btn-lg px-5"> <i
+					class="bi bi-pencil-square me-2"></i>編集する
 				</a>
-				<a th:if="${isView}" th:href="@{/admin/user-search}" class="btn btn-outline-primary btn-lg px-4">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
+
+				<!-- 登録する／更新する -->
+				<button type="submit" class="btn btn-success btn-lg px-5"
+					th:unless="${isView}">
+					<i
+						th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+				</button>
+
 			</div>
 		</form>
 

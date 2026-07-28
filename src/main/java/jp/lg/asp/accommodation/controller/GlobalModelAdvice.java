@@ -3,6 +3,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -96,8 +97,11 @@ public class GlobalModelAdvice {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public String handleAccessDenied(AccessDeniedException ex) {
+    public String handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
         log.warn("アクセス拒否: screenId={}, userId={}", ex.getScreenId(), ex.getUserId());
-        return "error/403";
+        request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, 403);
+        request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, request.getRequestURI());
+        request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ex);
+        return "forward:/error";
     }
 }
