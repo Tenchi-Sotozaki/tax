@@ -11,4 +11,6 @@ public class UserSearchForm {
     private String nameKanaMatchType = "partial";
     private String busho;
     private String bushoMatchType = "partial";
+    private int page = 0;
+    private int pageSize = 10;
 }

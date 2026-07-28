@@ -1,8 +1,8 @@
 package jp.lg.asp.accommodation.controller;
 
-import java.util.List;
-
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,15 +53,22 @@ public class AdminUserController {
 
 	@GetMapping("/user-search")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
-	public String list(@ModelAttribute UserSearchForm searchForm, Model model) {
+	public String list(@ModelAttribute UserSearchForm searchForm,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int pageSize,
+			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
-		model.addAttribute("items", userRepository.search(
+		searchForm.setPage(page);
+		searchForm.setPageSize(pageSize);
+		Page<User> items = userRepository.searchPage(
 				jichitaiCd,
 				emptyToNull(searchForm.getId()),
 				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
 				toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
-				toLikePattern(searchForm.getBusho(), searchForm.getBushoMatchType())));
+				toLikePattern(searchForm.getBusho(), searchForm.getBushoMatchType()),
+				PageRequest.of(page, pageSize));
+		model.addAttribute("items", items);
 		model.addAttribute("roleMap", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd)
 				.stream().collect(java.util.stream.Collectors.toMap(
 						r -> String.valueOf(r.getRoleId()), r -> r.getName())));
@@ -76,6 +83,8 @@ public class AdminUserController {
 		model.addAttribute("userForm", new UserForm());
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", false);
+		model.addAttribute("isView", false);
+		model.addAttribute("isDefaultUser", false);
 		return FORM_VIEW;
 	}
 
@@ -94,6 +103,8 @@ public class AdminUserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
+			model.addAttribute("isDefaultUser", false);
 			model.addAttribute("validationErrors", UserForm.validate(form, true).values());
 			return FORM_VIEW;
 		}
@@ -103,6 +114,8 @@ public class AdminUserController {
 			bindingResult.rejectValue("id", "error.id", "このIDは既に登録済みです");
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
+			model.addAttribute("isDefaultUser", false);
 			return FORM_VIEW;
 		}
 		if (user == null) {
@@ -141,6 +154,31 @@ public class AdminUserController {
 		model.addAttribute("userForm", form);
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", true);
+		model.addAttribute("isView", false);
+		model.addAttribute("isDefaultUser", InitialPasswordController.ADMIN_ID.equals(user.getId()));
+		return FORM_VIEW;
+	}
+
+	@GetMapping("/user-view/{id}")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会画面表示")
+	public String showViewForm(@PathVariable String id, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		User user = userRepository.findById(buildUserId(id))
+				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
+
+		UserForm form = new UserForm();
+		form.setOriginalId(user.getId());
+		form.setId(user.getId());
+		form.setName(user.getName());
+		form.setNameKana(user.getNameKana());
+		form.setBusho(user.getBusho());
+		form.setRoleId(user.getRoleId());
+
+		model.addAttribute("userForm", form);
+		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+		model.addAttribute("isEdit", true);
+		model.addAttribute("isView", true);
 		model.addAttribute("isDefaultUser", InitialPasswordController.ADMIN_ID.equals(user.getId()));
 		return FORM_VIEW;
 	}
@@ -173,6 +211,7 @@ public class AdminUserController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", true);
+			model.addAttribute("isView", false);
 			model.addAttribute("isDefaultUser", isDefaultUser);
 			model.addAttribute("validationErrors", UserForm.validate(form, false).values());
 			return FORM_VIEW;
@@ -203,27 +242,12 @@ public class AdminUserController {
 			redirectAttributes.addFlashAttribute("errorMessage", "ログイン中のユーザーは削除できません。");
 			return "redirect:/admin/user-search";
 		}
-		userRepository.deleteById(buildUserId(id));
+		// 論理削除（削除フラグを立てる。同一IDでの再登録時に復活させるため物理削除はしない）
+		User user = userRepository.findById(buildUserId(id))
+				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
+		user.setDelFlg("1");
+		userRepository.save(user);
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
-		return "redirect:/admin/user-search";
-	}
-
-	@PostMapping("/user-delete-batch")
-	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "一括削除")
-	public String deleteBatch(@RequestParam List<String> ids, RedirectAttributes redirectAttributes) {
-		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
-		if (ids.contains(getLoginUserId())) {
-			redirectAttributes.addFlashAttribute("errorMessage", "ログイン中のユーザーは削除できません。");
-			return "redirect:/admin/user-search";
-		}
-		for (String id : ids) {
-			User user = userRepository.findById(buildUserId(id)).orElse(null);
-			if (user != null) {
-				user.setDelFlg("1");
-				userRepository.save(user);
-			}
-		}
-		redirectAttributes.addFlashAttribute("successMessage", ids.size() + "件のユーザーを削除しました。");
 		return "redirect:/admin/user-search";
 	}
 

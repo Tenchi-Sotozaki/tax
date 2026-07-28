@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,11 +26,12 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 			" AND (:nameKana IS NULL OR u.nameKana LIKE :nameKana)" +
 			" AND (:busho IS NULL OR u.busho LIKE :busho)" +
 			" ORDER BY u.id")
-	List<User> search(
+	Page<User> searchPage(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("id") String id,
 			@Param("name") String name,
 			@Param("nameKana") String nameKana,
-			@Param("busho") String busho);
-	
+			@Param("busho") String busho,
+			Pageable pageable);
+
 }
