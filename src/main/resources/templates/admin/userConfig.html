@@ -15,6 +15,11 @@
 				<i th:class="${isView} ? 'bi bi-person-lines-fill me-2 text-primary' : (${isEdit} ? 'bi bi-pencil-square me-2 text-primary' : 'bi bi-person-plus me-2 text-primary')"></i>
 				<span th:text="${isView} ? 'ユーザー照会' : (${isEdit} ? 'ユーザー編集' : 'ユーザー登録')"></span>
 			</h5>
+
+			<a th:href="@{/admin/user-edit/{id}(id=${userForm.originalId})}"
+				class="btn btn-primary btn-sm" th:if="${isView}"> <i
+				class="bi bi-pencil-square me-2"></i>編集する
+			</a>
 		</div>
 
 		<form
@@ -161,6 +166,21 @@
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
+				<!-- 登録する／更新する -->
+				<button type="submit" class="btn btn-success btn-lg px-5"
+					th:unless="${isView}">
+					<i
+						th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+				</button>
+
+				<!-- 編集時のみ削除ボタンを表示 -->
+				<button type="button" class="btn btn-danger btn-lg px-5"
+					th:if="${isEdit == true and isView != true}"
+					onclick="confirmUserDelete()">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
+
 				<!-- 一覧に戻る（照会画面は入力破棄の確認を出さない） -->
 				<a th:if="${isView != true}" th:href="@{/admin/user-search}"
 					class="btn btn-outline-primary btn-lg px-4"
@@ -171,28 +191,6 @@
 					class="btn btn-outline-primary btn-lg px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
-
-				<!-- 削除する（編集画面のみ） -->
-				<button type="button" class="btn btn-danger btn-lg px-4"
-					th:if="${isEdit == true and isView != true}"
-					onclick="confirmUserDelete()">
-					<i class="bi bi-trash me-2"></i>削除する
-				</button>
-
-				<!-- 編集する（照会画面のみ） -->
-				<a th:if="${isView}"
-					th:href="@{/admin/user-edit/{id}(id=${userForm.originalId})}"
-					class="btn btn-primary btn-lg px-5"> <i
-					class="bi bi-pencil-square me-2"></i>編集する
-				</a>
-
-				<!-- 登録する／更新する -->
-				<button type="submit" class="btn btn-success btn-lg px-5"
-					th:unless="${isView}">
-					<i
-						th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
-					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
-				</button>
 
 			</div>
 		</form>
