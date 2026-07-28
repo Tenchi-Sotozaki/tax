@@ -85,6 +85,7 @@ public class AdminUserController {
 		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 		model.addAttribute("isEdit", false);
 		model.addAttribute("isView", false);
+		model.addAttribute("isDefaultUser", false);
 		return FORM_VIEW;
 	}
 
@@ -104,6 +105,7 @@ public class AdminUserController {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
+			model.addAttribute("isDefaultUser", false);
 			model.addAttribute("validationErrors", UserForm.validate(form, true).values());
 			return FORM_VIEW;
 		}
@@ -114,6 +116,7 @@ public class AdminUserController {
 			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
+			model.addAttribute("isDefaultUser", false);
 			return FORM_VIEW;
 		}
 		if (user == null) {
