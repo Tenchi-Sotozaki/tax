@@ -72,11 +72,11 @@
 			th:action="@{/tax-manager/save/{id}(id=${taxManagerForm.shiteiNo})}"
 			th:object="${taxManagerForm}" method="post">
 
-			<input type="hidden" th:field="*{collectorId}" /> <input
-				type="hidden" th:field="*{edit}" /> <input type="hidden"
-				th:field="*{shiteiNo}" /> <input type="hidden"
-				th:field="*{atenaNo}" /> <input type="hidden"
-				th:field="*{obligorAtenaNo}" />
+			<input type="hidden" th:field="*{collectorId}" /> 
+			<input type="hidden" th:field="*{edit}" />
+			<input type="hidden" th:field="*{shiteiNo}" />
+			<input type="hidden" th:field="*{atenaNo}" />
+			<input type="hidden" th:field="*{obligorAtenaNo}" />
 			<input type="hidden" id="sessionObligorAtenaNo" th:value="${selectedShiteiGassan?.atenaNo}" />
 
 			<div
@@ -104,7 +104,7 @@
 				</div>
 				<div class="card-body bg-light-subtle">
 					<div class="row g-3">
-						<div class="col-md-4" th:if="${!(isView ?: false)}">
+						<div class="col-md-2" th:if="${!(isView ?: false)}">
 							<label for="registrationDate" class="form-label fw-medium">
 								登録日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
@@ -116,7 +116,7 @@
 								th:errors="*{registrationDate}"></div>
 						</div>
 
-						<div class="col-md-4" th:if="${!(isView ?: false)}">
+						<div class="col-md-2" th:if="${!(isView ?: false)}">
 							<label for="declarationDate" class="form-label fw-medium">
 								申告日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
@@ -129,16 +129,26 @@
 						</div>
 
 						<!-- 照会画面での表示 -->
-						<div class="col-md-4" th:if="${isView ?: false}">
+						<div class="col-md-2" th:if="${isView ?: false}">
 							<label class="form-label fw-medium">登録日</label> <input
 								type="text" class="form-control" readonly
 								th:value="*{registrationDate}">
 						</div>
 
-						<div class="col-md-4" th:if="${isView ?: false}">
+						<div class="col-md-2" th:if="${isView ?: false}">
 							<label class="form-label fw-medium">申告日</label> <input
 								type="text" class="form-control" readonly
 								th:value="*{declarationDate}">
+						</div>
+						
+						<div class="col-md-2">
+							<label class="form-label fw-medium">区分</label> 
+							<select class="form-select" th:field="*{kbn}" id="kbn"
+								th:disabled="${isView ?: false}" th:data-initial-value="*{kbn}"> 
+								<option value="1">承認</option>
+								<option value="2">不承認</option>
+								<option value="3">選任免除</option>
+							</select>
 						</div>
 
 						<div class="col-md-4 d-flex align-items-end"
@@ -148,8 +158,10 @@
 								<i class="bi bi-search me-1"></i>宛名検索
 							</button>
 						</div>
+						
+						<div class="col-md-2"></div>
 
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label class="form-label fw-medium">住所(郵便番号)</label> <input
 								type="text" class="form-control" id="managerYubinNo"
 								th:field="*{managerYubinNo}" readonly
@@ -172,8 +184,10 @@
 								th:if="${#fields.hasErrors('managerAddress')}"
 								th:errors="*{managerAddress}"></div>
 						</div>
+						
+						<div class="col-md-4"></div>
 
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<label class="form-label fw-medium">氏名</label> <input type="text"
 								class="form-control" id="managerName" th:field="*{managerName}"
 								readonly th:data-initial-value="*{managerName}"
@@ -184,7 +198,7 @@
 								th:errors="*{managerName}"></div>
 						</div>
 
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<label class="form-label fw-medium">ふりがな</label> <input
 								type="text" class="form-control" id="managerNameKana"
 								th:field="*{managerNameKana}" readonly
@@ -196,7 +210,7 @@
 								th:errors="*{managerNameKana}"></div>
 						</div>
 
-						<div class="col-md-6">
+						<div class="col-md-4">
 							<label class="form-label fw-medium">電話番号</label> <input
 								type="tel" class="form-control" id="managerPhone"
 								th:field="*{managerPhone}" readonly
@@ -208,27 +222,17 @@
 								th:errors="*{managerPhone}"></div>
 						</div>
 
-						<div class="col-md-6 d-flex align-items-end">
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox"
-									th:field="*{exemptionFlag}" id="exemptionFlag"
-									th:disabled="${isView ?: false}"
-									th:data-initial-value="*{exemptionFlag}"> <label
-									class="form-check-label fw-medium" for="exemptionFlag">選任免除</label>
-							</div>
-						</div>
-
-						<div class="col-md-12" id="exemptionReasonArea"
+						<div class="col-md-12" id="reasonArea"
 							style="display: none;">
-							<label for="exemptionReason" class="form-label fw-medium">選任免除理由
+							<label for="reason" class="form-label fw-medium">理由
 								<span class="text-danger" th:if="${!(isView ?: false)}">*</span>
 							</label>
-							<textarea class="form-control" id="exemptionReason" rows="3"
-								th:field="*{exemptionReason}" th:readonly="${isView ?: false}"
-								th:data-initial-value="*{exemptionReason}"></textarea>
+							<textarea class="form-control" id="reason" rows="3"
+								th:field="*{reason}" th:readonly="${isView ?: false}"
+								th:data-initial-value="*{reason}"></textarea>
 							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('exemptionReason')}"
-								th:errors="*{exemptionReason}"></div>
+								th:if="${#fields.hasErrors('reason')}"
+								th:errors="*{reason}"></div>
 						</div>
 					</div>
 				</div>

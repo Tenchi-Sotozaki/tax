@@ -67,8 +67,8 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 				form.setManagerYubinNo(nokan.getYubinNo());
 				form.setManagerAddress(nokan.getJusho());
 				form.setManagerPhone(nokan.getTel());
-				form.setExemptionFlag(FLG_ON.equals(nokan.getMenjoKbn()));
-				form.setExemptionReason(nokan.getMenjoRiyu());
+				form.setKbn(nokan.getKbn());
+				form.setReason(nokan.getRiyu());
 			});
 
 			form.setMaxRno(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
@@ -109,8 +109,8 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 				form.setManagerYubinNo(nokan.getYubinNo());
 				form.setManagerAddress(nokan.getJusho());
 				form.setManagerPhone(nokan.getTel());
-				form.setExemptionFlag(FLG_ON.equals(nokan.getMenjoKbn()));
-				form.setExemptionReason(nokan.getMenjoRiyu());
+				form.setKbn(nokan.getKbn());
+				form.setReason(nokan.getRiyu());
 			});
 
 			form.setMaxRno(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
@@ -128,7 +128,8 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		log.debug("納税管理人保存処理開始: shiteiNo={}, atenaNo={}", shiteiNo, form.getAtenaNo());
 
-		if (!form.isExemptionFlag() && form.getAtenaNo() != null && !form.getAtenaNo().trim().isEmpty()) {
+		boolean isExemption = "3".equals(form.getKbn());
+		if (!isExemption && form.getAtenaNo() != null && !form.getAtenaNo().trim().isEmpty()) {
 			if (isSamePerson(form.getAtenaNo(), form.getObligorAtenaNo())) {
 				log.warn("特別徴収義務者と同一人物のため登録拒否: 納税管理人宛名番号={}, 特徴宛名番号={}",
 					form.getAtenaNo(), form.getObligorAtenaNo());
@@ -148,11 +149,11 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 		newEntity.setJichitaiCd(jichitaiCd);
 		newEntity.setShiteiNo(shiteiNo);
 		newEntity.setRno(newRno);
-		newEntity.setMenjoKbn(form.isExemptionFlag() ? FLG_ON : FLG_OFF);
+		newEntity.setKbn(form.getKbn());
 		newEntity.setTorokuYmd(form.getRegistrationDate());
 		newEntity.setShinkokuYmd(form.getDeclarationDate());
 
-		if (!form.isExemptionFlag()) {
+		if (!isExemption) {
 			newEntity.setAtenaNo(form.getAtenaNo());
 			newEntity.setName(form.getManagerName());
 			newEntity.setNameKana(form.getManagerNameKana());
@@ -167,7 +168,7 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 			newEntity.setJusho(null);
 			newEntity.setTel(null);
 		}
-		newEntity.setMenjoRiyu(form.getExemptionReason());
+		newEntity.setRiyu(form.getReason());
 		newEntity.setNewFlg(FLG_ON);
 		newEntity.setDelFlg(FLG_OFF);
 
