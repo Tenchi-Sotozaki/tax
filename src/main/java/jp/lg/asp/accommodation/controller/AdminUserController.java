@@ -69,7 +69,6 @@ public class AdminUserController {
 				toLikePattern(searchForm.getBusho(), searchForm.getBushoMatchType()),
 				PageRequest.of(page, pageSize));
 		model.addAttribute("items", items);
-		model.addAttribute("searchForm", searchForm);
 		model.addAttribute("roleMap", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd)
 				.stream().collect(java.util.stream.Collectors.toMap(
 						r -> String.valueOf(r.getRoleId()), r -> r.getName())));
@@ -243,7 +242,11 @@ public class AdminUserController {
 			redirectAttributes.addFlashAttribute("errorMessage", "ログイン中のユーザーは削除できません。");
 			return "redirect:/admin/user-search";
 		}
-		userRepository.deleteById(buildUserId(id));
+		// 論理削除（削除フラグを立てる。同一IDでの再登録時に復活させるため物理削除はしない）
+		User user = userRepository.findById(buildUserId(id))
+				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません: " + id));
+		user.setDelFlg("1");
+		userRepository.save(user);
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを削除しました。");
 		return "redirect:/admin/user-search";
 	}

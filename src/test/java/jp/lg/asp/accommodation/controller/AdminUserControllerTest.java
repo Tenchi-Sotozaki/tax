@@ -126,15 +126,23 @@ class AdminUserControllerTest {
         String view = controller.delete("user01", new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/user-search");
-        verify(userRepository, never()).deleteById(any());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
-    void delete_他ユーザーは削除可能() {
+    void delete_他ユーザーは論理削除される() {
+        User user = new User();
+        user.setId("other_user2");
+        user.setDelFlg("0");
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
         String view = controller.delete("other_user2", new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/user-search");
-        verify(userRepository).deleteById(any(UserId.class));
+        assertThat(user.getDelFlg()).isEqualTo("1");
+        verify(userRepository).save(any(User.class));
+        verify(userRepository, never()).deleteById(any());
     }
 
 }
