@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShoreikinDto;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -127,23 +128,24 @@ class ShoreikinServiceImplTest {
     }
 
     @Test
-    void search_合算対象フィルタ_対象のみ() {
+    void search_合算指定番号で検索() {
         ShoreikinDto form = new ShoreikinDto();
         form.setNendo(NENDO);
-        form.setGassanTaisho("2"); // 合算対象のみ
+        form.setGassanShiteiNo("90000001");
 
-        Tokugimu tokugimu = buildTokugimu(SHITEI_NO);
-        when(tokugimuRepository.findBySearchConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(List.of(tokugimu));
-        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of(buildAtena()));
-
-        // 合算対象として登録
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(eq(JICHITAI_CD), eq("90000001")))
+                .thenReturn(List.of(new Gassan()));
         GassanUchi gassanUchi = new GassanUchi();
         gassanUchi.setShiteiNo(SHITEI_NO);
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
+        when(gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(eq(JICHITAI_CD), eq("90000001")))
                 .thenReturn(List.of(gassanUchi));
-        when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(eq(JICHITAI_CD), eq(SHITEI_NO)))
+                .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
+                .thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
+                .thenReturn(List.of());
+        when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), any()))
                 .thenReturn(List.of());
 
         Page<ShoreikinDto> result = service.search(form);
