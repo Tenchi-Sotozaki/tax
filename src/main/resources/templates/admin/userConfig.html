@@ -166,21 +166,6 @@
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
-				<!-- 登録する／更新する -->
-				<button type="submit" class="btn btn-success btn-lg px-5"
-					th:unless="${isView}">
-					<i
-						th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
-					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
-				</button>
-
-				<!-- 編集時のみ削除ボタンを表示 -->
-				<button type="button" class="btn btn-danger btn-lg px-5"
-					th:if="${isEdit == true and isView != true}"
-					onclick="confirmUserDelete()">
-					<i class="bi bi-trash me-2"></i>削除する
-				</button>
-
 				<!-- 一覧に戻る（照会画面は入力破棄の確認を出さない） -->
 				<a th:if="${isView != true}" th:href="@{/admin/user-search}"
 					class="btn btn-outline-primary btn-lg px-4"
@@ -191,6 +176,21 @@
 					class="btn btn-outline-primary btn-lg px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
+
+				<!-- 編集時のみ削除ボタンを表示 -->
+				<button type="button" class="btn btn-danger btn-lg px-5"
+					th:if="${isEdit == true and isView != true}"
+					onclick="confirmUserDelete()">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
+
+				<!-- 登録する／更新する -->
+				<button type="submit" class="btn btn-success btn-lg px-5"
+					th:unless="${isView}">
+					<i
+						th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+				</button>
 
 			</div>
 		</form>
