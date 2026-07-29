@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btnTokugimuShitei.addEventListener('click', function() {
             console.log('特別徴収義務者指定通知書ボタンがクリックされました。指定番号:', shiteiNo);
             if (shiteiNo) {
-                const url = '/accommodation-tax/reports/tokugimuShiteiTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                // 指定番号はパラメータではなくセッションの選択状態を利用する
+                const url = '/accommodation-tax/reports/tokugimuShiteiTsuchi';
                 console.log('開くURL:', url);
                 window.location.href = url;
             } else {
@@ -40,7 +41,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btnTokugimuJuri.addEventListener('click', function() {
             console.log('特別徴収義務者申請受理通知書ボタンがクリックされました。指定番号:', shiteiNo);
             if (shiteiNo) {
-                const url = '/accommodation-tax/reports/tokugimuJuriTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                // 指定番号はパラメータではなくセッションの選択状態を利用する
+                const url = '/accommodation-tax/reports/tokugimuJuriTsuchi';
                 console.log('開くURL:', url);
                 window.location.href = url;
             } else {
