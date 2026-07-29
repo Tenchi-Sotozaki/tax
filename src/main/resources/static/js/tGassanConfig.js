@@ -150,18 +150,8 @@ async function selectAddress(d) {
 }
 
 async function loadFacilitiesByAtena(atenaNo) {
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-    const headers = { 'Content-Type': 'application/json' };
-    if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
-
     try {
-        const res = await fetch(FACILITIES_API, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({ atenaNo: atenaNo })
-        });
-        const facilities = await res.json();
+        const facilities = await SessionManager.save(FACILITIES_API, { atenaNo: atenaNo });
         renderFacilityTable(facilities);
     } catch (err) {
         console.error('施設一覧取得エラー:', err);
