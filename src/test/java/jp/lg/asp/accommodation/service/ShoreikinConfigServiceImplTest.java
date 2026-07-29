@@ -77,7 +77,7 @@ class ShoreikinConfigServiceImplTest {
                 .thenReturn(Optional.empty());
         when(shoreikinRepository.findById(any())).thenReturn(Optional.empty());
         when(kofuRitsuRepository.findKofuRitsuByJichitaiCd(eq(JICHITAI_CD), any(LocalDate.class)))
-                .thenReturn(BigDecimal.valueOf(10));
+                .thenReturn(List.of(BigDecimal.valueOf(10)));
 
         ShoreikinConfigDto result = service.getShoreikin(SHITEI_NO, NENDO);
 
