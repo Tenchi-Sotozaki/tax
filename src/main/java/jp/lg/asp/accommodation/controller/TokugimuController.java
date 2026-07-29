@@ -24,6 +24,7 @@ import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -176,7 +177,7 @@ public class TokugimuController {
 	public String showGassanReport(@PathVariable("id") String id, HttpSession session,
 			Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
 		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isEmpty()) {
 			redirectAttributes.addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
 			return "redirect:/tokugimu/report/" + id;

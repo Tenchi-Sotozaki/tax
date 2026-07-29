@@ -206,21 +206,9 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 async function selectShiteiGassanByShiteiNo(shiteiNo) {
     try {
-        const res = await fetch('/accommodation-tax/api/shitei-gassan/search?shiteiNo=' + encodeURIComponent(shiteiNo));
-        const data = await res.json();
+        const data = await SessionManager.get('/accommodation-tax/api/shitei-gassan/search?shiteiNo=' + encodeURIComponent(shiteiNo));
         if (!data.length) return;
-
-        const d = data[0];
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-        const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
-        const headers = { 'Content-Type': 'application/json' };
-        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
-
-        await fetch('/accommodation-tax/api/shitei-gassan/select', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(d)
-        });
+        await SessionManager.save('/accommodation-tax/api/shitei-gassan/select', data[0]);
     } catch (err) {
         console.error('セッション保存エラー:', err);
     }

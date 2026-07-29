@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
@@ -36,7 +37,9 @@ public class ShiteiGassanSearchApiController {
     private final GassanRepository gassanRepository;
     private final AtenaRepository atenaRepository;
 
-    public static final String SESSION_KEY = "selectedShiteiGassan";
+    /** @deprecated {@link SessionHelper#SHITEI_GASSAN_KEY} を使用してください */
+    @Deprecated
+    public static final String SESSION_KEY = SessionHelper.SHITEI_GASSAN_KEY;
 
     private final JichitaiContext jichitaiContext;
 
@@ -80,13 +83,13 @@ public class ShiteiGassanSearchApiController {
 
     @PostMapping("/select")
     public ShiteiGassanSearchDto select(@RequestBody ShiteiGassanSearchDto dto, HttpSession session) {
-        session.setAttribute(SESSION_KEY, dto);
+        SessionHelper.saveShiteiGassan(session, dto);
         return dto;
     }
 
     @GetMapping("/selected")
     public ShiteiGassanSearchDto getSelected(HttpSession session) {
-        ShiteiGassanSearchDto dto = (ShiteiGassanSearchDto) session.getAttribute(SESSION_KEY);
+        ShiteiGassanSearchDto dto = SessionHelper.getShiteiGassan(session);
         return dto != null ? dto : new ShiteiGassanSearchDto();
     }
 

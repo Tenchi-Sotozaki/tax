@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +20,7 @@ import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.exception.AccessDeniedException;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,9 +53,7 @@ public class GlobalModelAdvice {
 
     @ModelAttribute("selectedShiteiGassan")
     public ShiteiGassanSearchDto selectedShiteiGassan(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null) return null;
-        return (ShiteiGassanSearchDto) session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+        return SessionHelper.getShiteiGassan(request);
     }
 
     /**

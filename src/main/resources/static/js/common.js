@@ -1,4 +1,31 @@
 /**
+ * セッション情報の取得・保存を管理するクラス
+ */
+class SessionManager {
+    static #csrfHeaders() {
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+        return headers;
+    }
+
+    static async save(url, data) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: this.#csrfHeaders(),
+            body: JSON.stringify(data)
+        });
+        if (res.headers.get('content-type')?.includes('application/json')) return res.json();
+    }
+
+    static async get(url) {
+        const res = await fetch(url, { headers: this.#csrfHeaders() });
+        return res.json();
+    }
+}
+
+/**
  * 全画面共通：Enterキーはボタンまたはセレクトにフォーカスがある場合のみ有効
  */
 document.addEventListener('keydown', function (e) {
