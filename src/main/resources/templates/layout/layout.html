@@ -33,305 +33,69 @@
 
 			<div class="px-2 py-2 flex-grow-1">
 
-				<!-- ===== メイン ===== -->
-				<div
-					class="text-uppercase text-secondary small fw-semibold px-2 pt-3 pb-1">メイン</div>
+				<!-- ===== 動的サイドメニュー ===== -->
+				<th:block th:each="lv1 : ${sideMenuTree}">
+					<!-- level=1: ラベル -->
+					<div class="text-uppercase text-secondary small fw-semibold px-2 pt-3 pb-1"
+						th:classappend="${lv1Stat.index} > 0 ? 'border-top border-secondary' : ''"
+						th:text="${lv1.name}"></div>
 
-				<!-- 照会 -->
-				<div class="accordion accordion-flush" id="mainQueryAccordion">
-					<div class="accordion-item bg-transparent border-0">
-						<h2 class="accordion-header">
-							<button
-								class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
-								type="button" data-bs-toggle="collapse"
-								data-bs-target="#mainQuery">
-								<i class="bi bi-search me-2 text-info"></i>照会
-							</button>
-						</h2>
-						<div id="mainQuery" class="accordion-collapse collapse">
-							<div class="accordion-body py-1 px-0">
-								<ul class="nav flex-column ms-3">
-									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000001')}">
-										<a class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/tokugimu/list}"
-										th:classappend="${#strings.contains(currentUri, '/tokugimu')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-people me-2"></i>特別徴収義務者管理台帳
-									</a>
-									</li>
-									<li class="nav-item"><a
-										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/atena/list}"
-										th:classappend="${#strings.contains(currentUri, '/atena/list')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-person-lines-fill me-2"></i>宛名情報
-									</a></li>
-									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000006')}">
-										<a class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/gassan/list}"
-										th:classappend="${#strings.contains(currentUri, '/gassan/list')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-file-earmark-text me-2"></i>合算申告管理台帳
-									</a>
-									</li>
-									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000009')}">
-										<a class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/shoreikin/list}"
-										th:classappend="${#strings.contains(currentUri, '/shoreikin')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-cash-coin me-2"></i>特別徴収義務者交付金
-									</a>
-									</li>
-									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000025')}">
-										<a class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/log/rpt-log}"
-										th:classappend="${#strings.contains(currentUri, '/log/rpt-log')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-file-earmark-text me-2"></i>帳票ログ照会
-									</a>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
+					<!-- level=2: アコーディオンまたは直接リンク -->
+					<th:block th:each="lv2 : ${lv1.children}">
+						<th:block
+							th:if="${accessibleScreens.contains('*') or lv2.screenId == null or accessibleScreens.contains(lv2.screenId.strip())}">
 
-				<!-- 登録 -->
-				<div class="accordion accordion-flush" id="mainInsertAccordion">
-					<div class="accordion-item bg-transparent border-0">
-						<h2 class="accordion-header">
-							<button
-								class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
-								type="button" data-bs-toggle="collapse"
-								data-bs-target="#mainInsert">
-								<i class="bi bi-save me-2 text-info"></i>登録
-							</button>
-						</h2>
-						<div id="mainInsert" class="accordion-collapse collapse">
-							<div class="accordion-body py-1 px-0">
-								<ul class="nav flex-column ms-3">
-									<li class="nav-item"
-										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('mi00000001')}">
-										<a class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/gassan/registration}"
-										th:classappend="${#strings.contains(currentUri, '/gassan/registration')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-people me-2"></i>合算申告情報
-									</a>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-
-
-				<!-- 取り込み -->
-				<div class="accordion accordion-flush" id="mainImportAccordion">
-					<div class="accordion-item bg-transparent border-0">
-						<h2 class="accordion-header">
-							<button
-								class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
-								type="button" data-bs-toggle="collapse"
-								data-bs-target="#mainImport">
-								<i class="bi bi-download me-2 text-info"></i>取り込み
-							</button>
-						</h2>
-						<div id="mainImport" class="accordion-collapse collapse">
-							<div class="accordion-body py-1 px-0">
-								<ul class="nav flex-column ms-3">
-									<li class="nav-item"><a
-										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/atena/import}"
-										th:classappend="${#strings.contains(currentUri, '/atena/import')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-person-lines-fill me-2"></i>宛名情報
-									</a></li>
-									<li class="nav-item"><a
-										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/eltax-renkei}"
-										th:classappend="${#strings.contains(currentUri, '/eltax-renkei')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-file-earmark-arrow-down me-2"></i>電子申告情報
-									</a></li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- csv出力 -->
-				<div class="accordion accordion-flush" id="mainOutputAccordion">
-					<div class="accordion-item bg-transparent border-0">
-						<h2 class="accordion-header">
-							<button
-								class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
-								type="button" data-bs-toggle="collapse"
-								data-bs-target="#mainOutput">
-								<i class="bi bi-upload me-2 text-info"></i>csv出力
-							</button>
-						</h2>
-						<div id="mainOutput" class="accordion-collapse collapse">
-							<div class="accordion-body py-1 px-0">
-								<ul class="nav flex-column ms-3">
-									<li class="nav-item"><a
-										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/shunoRenkei/list}"
-										th:classappend="${#strings.contains(currentUri, '/shunoRenkei')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-piggy-bank me-2"></i>収納管理情報
-									</a></li>
-									<li class="nav-item"><a
-										class="nav-link text-white-50 py-1 sidebar-link"
-										th:href="@{/kofukinFurikomi/list}"
-										th:classappend="${#strings.contains(currentUri, '/kofukinFurikomi')} ? 'text-white fw-medium' : ''">
-											<i class="bi bi-bank me-2"></i>交付金振込情報
-									</a></li>
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- ===== システム管理（ADMIN のみ表示） ===== -->
-				<div sec:authorize="hasRole('ADMIN')">
-					<div
-						class="text-uppercase text-secondary small fw-semibold px-2 pt-3 pb-1 mt-2 border-top border-secondary">システム管理</div>
-
-					<!-- 照会（管理者） -->
-					<div class="accordion accordion-flush" id="adminQueryAccordion">
-						<div class="accordion-item bg-transparent border-0">
-							<h2 class="accordion-header">
-								<button
-									class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
-									type="button" data-bs-toggle="collapse"
-									data-bs-target="#adminQuery">
-									<i class="bi bi-search me-2 text-warning"></i>照会
-								</button>
-							</h2>
-							<div id="adminQuery" class="accordion-collapse collapse">
-								<div class="accordion-body py-1 px-0">
-									<ul class="nav flex-column ms-3">
-										<li class="nav-item"
-											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ss00000002')}">
-											<a class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/user-search}"
-											th:classappend="${#strings.contains(currentUri, '/admin/user')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-person-search me-2"></i>ユーザー検索
-										</a>
-										</li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/kofu-ritsu/list}"
-											th:classappend="${#strings.contains(currentUri, '/admin/kofu-ritsu/list')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-cash-coin me-2"></i>交付率
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/zeiritsu/list}"
-											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/list')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-sliders me-2"></i>賦課方式
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/shitei-gassan/view}"
-											th:classappend="${#strings.contains(currentUri, '/admin/shitei-gassan/view')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-sliders me-2"></i>指定番号・合算指定番号設定
-										</a></li>
-										<li class="nav-item"
-											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ss00000005')}">
-											<a class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/nozei-shuki/list}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-calendar me-2"></i>納税周期
-										</a>
-										</li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/nokigen/list}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nokigen/view')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-calendar-check me-2"></i>納入期限
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/log/ope-log}"
-											th:classappend="${#strings.contains(currentUri, '/log/ope-log')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-journal-text me-2"></i>操作ログ照会
-										</a></li>
-									</ul>
+							<!-- level=2 子メニューあり：アコーディオン -->
+							<th:block th:if="${not #lists.isEmpty(lv2.children)}">
+								<div class="accordion accordion-flush">
+									<div class="accordion-item bg-transparent border-0">
+										<h2 class="accordion-header">
+											<button class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
+												type="button" data-bs-toggle="collapse"
+												th:data-bs-target="'#menu-' + ${lv2.menuId}">
+												<img th:if="${lv2.iconLink != null}" th:src="@{${lv2.iconLink}}" class="me-2" style="width:1em;height:1em;">
+												<th:block th:text="${lv2.name}"></th:block>
+											</button>
+										</h2>
+										<div th:id="'menu-' + ${lv2.menuId}" class="accordion-collapse collapse">
+											<div class="accordion-body py-1 px-0">
+												<ul class="nav flex-column ms-3">
+													<!-- level=3: リンク -->
+													<th:block th:each="lv3 : ${lv2.children}">
+														<li class="nav-item"
+															th:if="${accessibleScreens.contains('*') or lv3.screenId == null or accessibleScreens.contains(lv3.screenId.strip())}">
+															<a class="nav-link text-white-50 py-1 sidebar-link"
+																th:href="@{${lv3.link}}"
+																th:classappend="${#strings.contains(currentUri, lv3.link)} ? 'text-white fw-medium' : ''">
+																<img th:if="${lv3.iconLink != null}" th:src="@{${lv3.iconLink}}" class="me-2" style="width:1em;height:1em;">
+																<th:block th:text="${lv3.name}"></th:block>
+															</a>
+														</li>
+													</th:block>
+												</ul>
+											</div>
+										</div>
+									</div>
 								</div>
-							</div>
-						</div>
-					</div>
+							</th:block>
 
-					<!-- 設定 -->
-					<div class="accordion accordion-flush" id="adminSettingAccordion">
-						<div class="accordion-item bg-transparent border-0">
-							<h2 class="accordion-header">
-								<button
-									class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
-									type="button" data-bs-toggle="collapse"
-									data-bs-target="#adminSetting">
-									<i class="bi bi-gear me-2 text-warning"></i>設定
-								</button>
-							</h2>
-							<div id="adminSetting" class="accordion-collapse collapse">
-								<div class="accordion-body py-1 px-0">
-									<ul class="nav flex-column ms-3">
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/reports-config}"
-											th:classappend="${#strings.contains(currentUri, '/admin/reports-config')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-file-earmark-ruled me-2"></i>帳票出力
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/kofu-ritsu}"
-											th:classappend="${#strings.contains(currentUri, '/admin/kofu-ritsu') and !#strings.contains(currentUri, '/admin/kofu-ritsu/list')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-cash-coin me-2"></i>交付率
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/zeiritsu/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/zeiritsu/register')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-sliders me-2"></i>賦課方式
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/shitei-gassan/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/shitei-gassan/register')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-sliders me-2"></i>指定番号・合算指定番号設定
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/nozei-shuki/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nozei-shuki') and !#strings.contains(currentUri, '/admin/nozei-shuki/list')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-calendar me-2"></i>納税周期
-										</a></li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/nokigen/register}"
-											th:classappend="${#strings.contains(currentUri, '/admin/nokigen') and !#strings.contains(currentUri, '/admin/nokigen/view')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-calendar-check me-2"></i>納入期限
-										</a></li>
-										<li class="nav-item"
-											th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('sc00000004')}">
-											<a class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/role/management}"
-											th:classappend="${#strings.contains(currentUri, '/admin/role')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-shield-lock me-2"></i>権限管理
+							<!-- level=2 子メニューなし：直接リンク -->
+							<th:block th:if="${#lists.isEmpty(lv2.children)}">
+								<ul class="nav flex-column">
+									<li class="nav-item">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+											th:href="@{${lv2.link}}"
+											th:classappend="${#strings.contains(currentUri, lv2.link)} ? 'text-white fw-medium' : ''">
+											<img th:if="${lv2.iconLink != null}" th:src="@{${lv2.iconLink}}" class="me-2" style="width:1em;height:1em;">
+											<th:block th:text="${lv2.name}"></th:block>
 										</a>
-										</li>
-										<li class="nav-item"><a
-											class="nav-link text-white-50 py-1 sidebar-link"
-											th:href="@{/admin/jichitai-config}"
-											th:classappend="${#strings.contains(currentUri, '/admin/jichitai-config')} ? 'text-white fw-medium' : ''">
-												<i class="bi bi-building me-2"></i>自治体情報
-										</a></li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
+									</li>
+								</ul>
+							</th:block>
 
-				</div>
-				<!-- /システム管理 -->
-
+						</th:block>
+					</th:block>
+				</th:block>
 			</div>
 		</nav>
 		<!-- ========== /サイドバー ========== -->
