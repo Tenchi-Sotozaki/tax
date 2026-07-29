@@ -5,15 +5,24 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import jp.lg.asp.accommodation.dto.AtenaImportDiffDto;
+import jp.lg.asp.accommodation.dto.AtenaImportPreviewDto;
+import jp.lg.asp.accommodation.dto.AtenaImportRowDto;
+import jp.lg.asp.accommodation.dto.AtenaImportValueDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.AtenaId;
 import jp.lg.asp.accommodation.entity.AtenaRenkei;
+import jp.lg.asp.accommodation.entity.AtenaRenkeiDef;
+import jp.lg.asp.accommodation.repository.AtenaRenkeiDefRepository;
 import jp.lg.asp.accommodation.repository.AtenaRenkeiRepository;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.service.AtenaImportService;
@@ -28,15 +37,19 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 
 	private final AtenaRepository atenaRepository;
 	private final AtenaRenkeiRepository atenaRenkeiRepository;
+	private final AtenaRenkeiDefRepository atenaRenkeiDefRepository;
 	private final HashUtil hashUtil;
 
-	@Override
-	@Transactional
-	public AtenaRenkei importCsv(MultipartFile file, String jichitaiCd, String userId) {
-		int shinkiKensu = 0;
-		int koshinKensu = 0;
-		int gyosu = 0;
+	// ============================================================
+	// 解析フェーズ
+	// ============================================================
 
+	@Override
+	public AtenaImportPreviewDto analyze(MultipartFile file, String jichitaiCd) {
+		AtenaImportPreviewDto preview = new AtenaImportPreviewDto();
+		preview.setFileName(file.getOriginalFilename());
+
+		int gyosu = 0;
 		try (BufferedReader reader = new BufferedReader(
 				new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
 
@@ -45,11 +58,7 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 			if (headerLine == null) {
 				throw new RuntimeException("CSVファイルが空です。");
 			}
-			
-			// BOM (Byte Order Mark) を除去
 			headerLine = removeBOM(headerLine);
-			
-			// ヘッダーのフォーマットチェック
 			validateHeader(headerLine);
 
 			String line;
@@ -58,64 +67,115 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 				if (line.isBlank()) {
 					continue;
 				}
-				
-				// データ行のフォーマットチェック
+
 				String[] cols = validateAndParseDataLine(line, gyosu);
-				
 				if (cols == null) {
-					continue; // 空行はスキップ
+					continue;
 				}
 
-				BigDecimal atenaNo = new BigDecimal(cols[0].trim());
-				String kojinNo = cols.length > 1 ? cols[1].trim() : null;
-				String hojinNo = cols.length > 2 ? cols[2].trim() : null;
-				String name = cols[3].trim();
-				String nameKana = cols[4].trim();
-				String yubinNo = cols[5].trim();
-				String jusho = cols[6].trim();
-				String tel1 = cols[7].trim();
-				String tel2 = cols.length > 8 ? cols[8].trim() : null;
+				AtenaImportValueDto value = toValue(cols);
 
 				AtenaId pk = new AtenaId();
 				pk.setJichitaiCd(jichitaiCd);
-				pk.setAtenaNo(atenaNo);
+				pk.setAtenaNo(new BigDecimal(value.getAtenaNo()));
+				Atena current = atenaRepository.findById(pk).orElse(null);
 
-				boolean isNew = !atenaRepository.existsById(pk);
-				Atena atena = atenaRepository.findById(pk).orElse(new Atena());
+				AtenaImportRowDto row = new AtenaImportRowDto();
+				row.setAtenaNo(value.getAtenaNo());
+				row.setName(value.getName());
+				row.setValue(value);
 
-				atena.setJichitaiCd(jichitaiCd);
-				atena.setAtenaNo(atenaNo);
-				atena.setKbn(kojinNo != null && !kojinNo.isBlank() ? "1" : "2");
-				atena.setName(name);
-				atena.setNameKana(nameKana.isBlank() ? null : nameKana);
-				atena.setYubinNo(yubinNo.isBlank() ? null : yubinNo);
-				atena.setJusho(jusho.isBlank() ? null : jusho);
-				atena.setTel1(tel1.isBlank() ? null : tel1);
-				atena.setTel2(tel2 == null || tel2.isBlank() ? null : tel2);
-				atena.setKojinNo(kojinNo == null || kojinNo.isBlank() ? null : hashUtil.sha256(kojinNo));
-				atena.setHojinNo(hojinNo == null || hojinNo.isBlank() ? null : hojinNo);
-				atenaRepository.save(atena);
-
-				if (isNew)
-					shinkiKensu++;
-				else
-					koshinKensu++;
+				if (current == null) {
+					// 既存データなし。新規登録のため差分確認の対象外とする
+					row.setShinki(true);
+					row.setSabunAri(false);
+				} else {
+					row.setShinki(false);
+					List<AtenaImportDiffDto> diffs = buildDiffs(current, value);
+					row.setDiffs(diffs);
+					row.setSabunAri(diffs.stream().anyMatch(AtenaImportDiffDto::isChanged));
+				}
+				preview.getRows().add(row);
 			}
 		} catch (RuntimeException e) {
-			// フォーマットエラーやデータエラーなRuntimeExceptionはメッセージをそのまま使用
-			log.warn("CSV処理エラー: {}", e.getMessage());
+			log.warn("CSV解析エラー: {}", e.getMessage());
 			throw e;
 		} catch (Exception e) {
-			// その他の予期しないエラー
-			log.error("CSV取込中に予期しないエラーが発生しました", e);
+			log.error("CSV解析中に予期しないエラーが発生しました", e);
 			throw new RuntimeException("CSV取込に失敗しました: " + e.getMessage(), e);
 		}
+		return preview;
+	}
+
+	/**
+	 * 既存データとCSVの値を項目単位で比較する。
+	 */
+	private List<AtenaImportDiffDto> buildDiffs(Atena current, AtenaImportValueDto value) {
+		List<AtenaImportDiffDto> diffs = new ArrayList<>();
+		diffs.add(diff("氏名/名称", current.getName(), value.getName()));
+		diffs.add(diff("ふりがな", current.getNameKana(), value.getNameKana()));
+		diffs.add(diff("郵便番号", current.getYubinNo(), value.getYubinNo()));
+		diffs.add(diff("住所", current.getJusho(), value.getJusho()));
+		diffs.add(diff("電話番号1", current.getTel1(), value.getTel1()));
+		diffs.add(diff("電話番号2", current.getTel2(), value.getTel2()));
+		diffs.add(diff("法人番号", current.getHojinNo(), value.getHojinNo()));
+		// 個人番号はハッシュ化して保持しているため、値そのものは表示しない
+		AtenaImportDiffDto kojinNo = diff("個人番号", current.getKojinNo(), value.getKojinNo());
+		kojinNo.setCurrent(maskKojinNo(current.getKojinNo()));
+		kojinNo.setUpdated(maskKojinNo(value.getKojinNo()));
+		diffs.add(kojinNo);
+		return diffs;
+	}
+
+	private AtenaImportDiffDto diff(String label, String current, String updated) {
+		String c = current == null ? "" : current;
+		String u = updated == null ? "" : updated;
+		return new AtenaImportDiffDto(label, c, u, !Objects.equals(c, u));
+	}
+
+	private String maskKojinNo(String hashed) {
+		return (hashed == null || hashed.isBlank()) ? "" : "設定あり";
+	}
+
+	// ============================================================
+	// 確定フェーズ
+	// ============================================================
+
+	@Override
+	@Transactional
+	public AtenaRenkei confirm(AtenaImportPreviewDto preview, Set<String> torikomuAtenaNo,
+			String jichitaiCd, String userId) {
 
 		BigDecimal nextSeq = atenaRenkeiRepository.findMaxSeqByJichitaiCd(jichitaiCd).add(BigDecimal.ONE);
+
+		int shinkiKensu = 0;
+		int koshinKensu = 0;
+
+		for (AtenaImportRowDto row : preview.getRows()) {
+			String kbn;
+			if (row.isShinki()) {
+				// 新規は無条件に登録する
+				saveAtena(row.getValue(), jichitaiCd);
+				shinkiKensu++;
+				kbn = AtenaRenkeiDef.KBN_TORIKOMI;
+			} else if (!row.isSabunAri()) {
+				// 既存データと同一のため更新しない
+				kbn = AtenaRenkeiDef.KBN_SAI_NASHI;
+			} else if (torikomuAtenaNo != null && torikomuAtenaNo.contains(row.getAtenaNo())) {
+				saveAtena(row.getValue(), jichitaiCd);
+				koshinKensu++;
+				kbn = AtenaRenkeiDef.KBN_TORIKOMI;
+			} else {
+				// 差分ありだが取り込まないと選択された
+				kbn = AtenaRenkeiDef.KBN_SKIP;
+			}
+			saveRenkeiDef(jichitaiCd, nextSeq, row, kbn);
+		}
+
 		AtenaRenkei renkei = new AtenaRenkei();
 		renkei.setJichitaiCd(jichitaiCd);
 		renkei.setSeq(nextSeq);
-		renkei.setFileName(file.getOriginalFilename());
+		renkei.setFileName(preview.getFileName());
 		renkei.setShoriDt(LocalDateTime.now());
 		renkei.setShoriKensu(BigDecimal.valueOf(shinkiKensu + koshinKensu));
 		renkei.setShinkiKensu(BigDecimal.valueOf(shinkiKensu));
@@ -123,9 +183,119 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 		return atenaRenkeiRepository.save(renkei);
 	}
 
+	private void saveAtena(AtenaImportValueDto value, String jichitaiCd) {
+		BigDecimal atenaNo = new BigDecimal(value.getAtenaNo());
+		AtenaId pk = new AtenaId();
+		pk.setJichitaiCd(jichitaiCd);
+		pk.setAtenaNo(atenaNo);
+
+		Atena atena = atenaRepository.findById(pk).orElse(new Atena());
+		atena.setJichitaiCd(jichitaiCd);
+		atena.setAtenaNo(atenaNo);
+		atena.setKbn(value.getKbn());
+		atena.setName(value.getName());
+		atena.setNameKana(blankToNull(value.getNameKana()));
+		atena.setYubinNo(blankToNull(value.getYubinNo()));
+		atena.setJusho(blankToNull(value.getJusho()));
+		atena.setTel1(blankToNull(value.getTel1()));
+		atena.setTel2(blankToNull(value.getTel2()));
+		atena.setKojinNo(blankToNull(value.getKojinNo()));
+		atena.setHojinNo(blankToNull(value.getHojinNo()));
+		atenaRepository.save(atena);
+	}
+
+	private void saveRenkeiDef(String jichitaiCd, BigDecimal seq, AtenaImportRowDto row, String kbn) {
+		AtenaRenkeiDef def = new AtenaRenkeiDef();
+		def.setJichitaiCd(jichitaiCd);
+		def.setSeq(seq);
+		def.setAtenaNo(new BigDecimal(row.getAtenaNo()));
+		def.setName(row.getName());
+		def.setKbn(kbn);
+		atenaRenkeiDefRepository.save(def);
+	}
+
+	// ============================================================
+	// 参照
+	// ============================================================
+
 	@Override
 	public List<AtenaRenkei> findHistory(String jichitaiCd) {
 		return atenaRenkeiRepository.findByJichitaiCdOrderBySeqDesc(jichitaiCd);
+	}
+
+	@Override
+	public List<AtenaRenkeiDef> findDetail(String jichitaiCd, BigDecimal seq) {
+		return atenaRenkeiDefRepository.findByJichitaiCdAndSeqOrderByAtenaNoAsc(jichitaiCd, seq);
+	}
+
+	// ============================================================
+	// CSVパース
+	// ============================================================
+
+	/**
+	 * CSVの1行を登録値に変換する。
+	 */
+	private AtenaImportValueDto toValue(String[] cols) {
+		String atenaNo = cols[0].trim();
+		String kojinNo = cols.length > 1 ? cols[1].trim() : null;
+		String hojinNo = cols.length > 2 ? cols[2].trim() : null;
+		String tel2 = cols.length > 8 ? cols[8].trim() : null;
+
+		AtenaImportValueDto value = new AtenaImportValueDto();
+		value.setAtenaNo(new BigDecimal(atenaNo).toPlainString());
+		value.setKbn(kojinNo != null && !kojinNo.isBlank() ? "1" : "2");
+		value.setName(cols[3].trim());
+		value.setNameKana(cols[4].trim());
+		value.setYubinNo(cols[5].trim());
+		value.setJusho(cols[6].trim());
+		value.setTel1(cols[7].trim());
+		value.setTel2(tel2);
+		value.setKojinNo(kojinNo == null || kojinNo.isBlank() ? null : hashUtil.sha256(kojinNo));
+		value.setHojinNo(hojinNo == null || hojinNo.isBlank() ? null : hojinNo);
+		return value;
+	}
+
+	private String blankToNull(String s) {
+		return (s == null || s.isBlank()) ? null : s;
+	}
+
+	/**
+	 * CSVの1行を項目に分割する。
+	 *
+	 * Excel等から出力されたCSVは各項目がダブルクォートで囲まれる場合があるため、
+	 * 引用符の内側のカンマを区切りとして扱わないようにし、前後の引用符は除去する。
+	 * 引用符内の "" は 1つの " として扱う。
+	 */
+	private String[] parseCsvLine(String line) {
+		List<String> cols = new ArrayList<>();
+		StringBuilder sb = new StringBuilder();
+		boolean inQuote = false;
+
+		for (int i = 0; i < line.length(); i++) {
+			char c = line.charAt(i);
+			if (inQuote) {
+				if (c == '"') {
+					// 連続する引用符はエスケープされた引用符とみなす
+					if (i + 1 < line.length() && line.charAt(i + 1) == '"') {
+						sb.append('"');
+						i++;
+					} else {
+						inQuote = false;
+					}
+				} else {
+					sb.append(c);
+				}
+			} else if (c == '"') {
+				inQuote = true;
+			} else if (c == ',') {
+				cols.add(sb.toString());
+				sb.setLength(0);
+			} else {
+				sb.append(c);
+			}
+		}
+		cols.add(sb.toString());
+		return cols.toArray(new String[0]);
 	}
 
 	/**
@@ -135,56 +305,31 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 		if (headerLine == null || headerLine.trim().isEmpty()) {
 			throw new RuntimeException("ヘッダー行が空です。");
 		}
-		
-		log.debug("ヘッダー行の検証開始: [{}]", headerLine);
-		
-		String[] headers = headerLine.split(",", -1);
-		log.debug("ヘッダー項目数: {}", headers.length);
-		
+
+		String[] headers = parseCsvLine(headerLine);
 		if (headers.length < 8) {
 			throw new RuntimeException(
 					"CSVファイルのフォーマットが不正です。\n" +
 					"期待するフォーマット: 宛名番号,個人番号,法人番号,氏名,氏名カナ,郵便番号,住所,電話番号1[、電話番号2]");
 		}
-		
-		// 期待されるヘッダー名とのチェック
+
 		String[] expectedHeaders = {
-				"宛名番号", "個人番号", "法人番号", "氏名/名称", "ふりがな", 
+				"宛名番号", "個人番号", "法人番号", "氏名/名称", "ふりがな",
 				"郵便番号", "住所", "電話番号", "電話番号"
 		};
-		
+
 		for (int i = 0; i < Math.min(expectedHeaders.length, headers.length); i++) {
-			// トリム、スペース除去、全角・半角正規化を行う
 			String actual = normalizeHeader(headers[i]);
 			String expected = normalizeHeader(expectedHeaders[i]);
-			
-			log.debug("ヘッダー検証[{}]: 期待値=[{}], 実際の値=[{}]", i + 1, expected, actual);
-			
 			if (!actual.equals(expected)) {
-				log.error("ヘッダー不一致: 位置={}, 期待=[{}](長さ:{}), 実際=[{}](長さ:{})", 
-						i + 1, expected, expected.length(), actual, actual.length());
-						
-				// 文字コードレベルでの比較
-				for (int j = 0; j < Math.max(expected.length(), actual.length()); j++) {
-					char expectedChar = j < expected.length() ? expected.charAt(j) : ' ';
-					char actualChar = j < actual.length() ? actual.charAt(j) : ' ';
-					if (expectedChar != actualChar) {
-						log.error("文字不一致位置[{}]: 期待='{}' (\\u{:04x}), 実際='{}' (\\u{:04x})", 
-								j, expectedChar, (int)expectedChar, actualChar, (int)actualChar);
-						break; // 最初の不一致だけ表示
-					}
-				}
-				
 				throw new RuntimeException(
 						String.format("ヘッダーの%d番目の項目が不正です。\n" +
 								"期待値: [%s], 実際の値: [%s]\n" +
 								"元のヘッダー: [%s]", i + 1, expected, actual, headers[i]));
 			}
 		}
-		
-		log.debug("ヘッダー検証成功");
 	}
-	
+
 	/**
 	 * ヘッダー文字列を正規化する
 	 */
@@ -192,12 +337,11 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 		if (header == null) {
 			return "";
 		}
-		
 		return header.trim()
-				.replaceAll("\\s+", "")  // すべての空白文字を除去
-				.replaceAll("（", "(")   // 全角かっこを半角に
-				.replaceAll("）", ")")   // 全角かっこを半角に
-				.replaceAll("１", "1")   // 全角数字を半角に
+				.replaceAll("\\s+", "")
+				.replaceAll("（", "(")
+				.replaceAll("）", ")")
+				.replaceAll("１", "1")
 				.replaceAll("２", "2");
 	}
 
@@ -206,52 +350,37 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 	 */
 	private String[] validateAndParseDataLine(String line, int rowNumber) {
 		if (line == null || line.trim().isEmpty()) {
-			return null; // 空行はスキップ
+			return null;
 		}
-		
-		String[] cols = line.split(",", -1);
+
+		String[] cols = parseCsvLine(line);
 		if (cols.length < 8) {
 			throw new RuntimeException(
-					String.format("%d行目: データの項目数が不足です。(期待: 最低8項目, 実際: %d項目)", 
+					String.format("%d行目: データの項目数が不足です。(期待: 最低8項目, 実際: %d項目)",
 							rowNumber + 1, cols.length));
 		}
-		
-		// 宛名番号(必須)のチェック
+
 		String atenaNoStr = cols[0].trim();
 		if (atenaNoStr.isEmpty()) {
-			throw new RuntimeException(
-					String.format("%d行目: 宛名番号が空です。", rowNumber + 1));
+			throw new RuntimeException(String.format("%d行目: 宛名番号が空です。", rowNumber + 1));
 		}
-		
 		try {
 			new BigDecimal(atenaNoStr);
 		} catch (NumberFormatException e) {
 			throw new RuntimeException(
-					String.format("%d行目: 宛名番号が数値ではありません。(値: %s)", 
-							rowNumber + 1, atenaNoStr));
+					String.format("%d行目: 宛名番号が数値ではありません。(値: %s)", rowNumber + 1, atenaNoStr));
 		}
-		
-		// 氏名(必須)のチェック
-		String name = cols[3].trim();
-		if (name.isEmpty()) {
-			throw new RuntimeException(
-					String.format("%d行目: 氏名が空です。", rowNumber + 1));
+
+		if (cols[3].trim().isEmpty()) {
+			throw new RuntimeException(String.format("%d行目: 氏名が空です。", rowNumber + 1));
 		}
-		
-		// 氏名カナ(必須)のチェック
-		String nameKana = cols[4].trim();
-		if (nameKana.isEmpty()) {
-			throw new RuntimeException(
-					String.format("%d行目: 氏名カナが空です。", rowNumber + 1));
+		if (cols[4].trim().isEmpty()) {
+			throw new RuntimeException(String.format("%d行目: 氏名カナが空です。", rowNumber + 1));
 		}
-		
-		// 電話番号1(必須)のチェック
-		String tel1 = cols[7].trim();
-		if (tel1.isEmpty()) {
-			throw new RuntimeException(
-					String.format("%d行目: 電話番号1が空です。", rowNumber + 1));
+		if (cols[7].trim().isEmpty()) {
+			throw new RuntimeException(String.format("%d行目: 電話番号1が空です。", rowNumber + 1));
 		}
-		
+
 		return cols;
 	}
 
@@ -262,14 +391,9 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 		if (text == null || text.isEmpty()) {
 			return text;
 		}
-		
-		// UTF-8 BOM (\ufeff) を除去
-		if (text.charAt(0) == '\ufeff') {
-			log.debug("BOMを検出しました。除去します。");
+		if (text.charAt(0) == '﻿') {
 			return text.substring(1);
 		}
-		
 		return text;
 	}
-
 }
