@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver;
+import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver.Kind;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
 import jp.lg.asp.accommodation.service.TaxManagerService;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +34,12 @@ public class TaxManagerController {
 
 	private final TaxManagerService taxManagerService;
 	private final ScreenAccessChecker accessChecker;
+	private final SelectedJigyoshaResolver selectedJigyoshaResolver;
 
 	private static final String SCREEN_ID = ScreenManagement.TAXMANAGER_CONFIG;
 	private static final String FORM_VIEW = "tokugimu/tTaxManagerConfig";
+	/** 特別徴収義務者が未選択の場合に表示する選択画面 */
+	private static final String SELECT_VIEW = "tokugimu/shiteiGassanSelect";
 
 	/**
 	 * 特別徴収義務者との同一人物チェックAPI
@@ -61,6 +67,36 @@ public class TaxManagerController {
 				"message", "チェック中にエラーが発生しました。"
 			));
 		}
+	}
+
+	/**
+	 * サイドメニューからの遷移用。
+	 * 指定番号はセッションで選択中の特別徴収義務者から取得する。
+	 */
+	@GetMapping("/register")
+	public String registerFromSession(HttpSession session, Model model) {
+		// 特別徴収義務者のセッションを保持していない場合は指定モーダルで選択させる
+		String shiteiNo = selectedJigyoshaResolver.resolveShiteiNo(session, Kind.TOKUGIMU);
+		if (shiteiNo == null) {
+			model.addAttribute("targetName", "納税管理人登録");
+			return SELECT_VIEW;
+		}
+		return "redirect:/tax-manager/edit/" + shiteiNo + "?from=register";
+	}
+
+	/**
+	 * サイドメニューからの遷移用。
+	 * 指定番号はセッションで選択中の特別徴収義務者から取得する。
+	 */
+	@GetMapping("/view")
+	public String viewFromSession(HttpSession session, Model model) {
+		// 特別徴収義務者のセッションを保持していない場合は指定モーダルで選択させる
+		String shiteiNo = selectedJigyoshaResolver.resolveShiteiNo(session, Kind.TOKUGIMU);
+		if (shiteiNo == null) {
+			model.addAttribute("targetName", "納税管理人照会");
+			return SELECT_VIEW;
+		}
+		return "redirect:/tax-manager/view/" + shiteiNo;
 	}
 
 	@GetMapping("/edit/{id}")

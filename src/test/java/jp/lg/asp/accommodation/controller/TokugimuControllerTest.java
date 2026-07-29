@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -36,15 +37,28 @@ class TokugimuControllerTest {
     @InjectMocks TokugimuController controller;
 
     @Test
-    void list_一覧画面を返す() {
-        Page<TokugimuListItem> page = new PageImpl<>(List.of(), PageRequest.of(0, 5), 0);
+    void list_検索後は一覧を表示する() {
+        Page<TokugimuListItem> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
         when(tokugimuService.search(any())).thenReturn(page);
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new TokugimuSearchForm(), 0, 5, model);
+        String view = controller.list(new TokugimuSearchForm(), 0, 10, true, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
         assertThat(model.asMap()).containsKey("items");
+        assertThat(model.asMap()).containsEntry("isSearched", true);
+    }
+
+    @Test
+    void list_初期表示時は検索しない() {
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(new TokugimuSearchForm(), 0, 10, false, model);
+
+        assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
+        assertThat(model.asMap()).containsEntry("isSearched", false);
+        // 初期表示時は検索処理を行わない
+        verify(tokugimuService, never()).search(any());
     }
 
     @Test
@@ -87,7 +101,9 @@ class TokugimuControllerTest {
         when(tokugimuService.getTokugimuByShiteiNo("00100001")).thenReturn(form);
         Model model = new ExtendedModelMap();
 
-        String view = controller.showView("00100001", null, model);
+        MockHttpSession session = new MockHttpSession();
+
+        String view = controller.showView("00100001", null, session, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
         assertThat(model.asMap()).containsEntry("isView", true);

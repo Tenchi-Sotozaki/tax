@@ -894,6 +894,13 @@
 					</button>
 				</th:block>
 
+				<!-- 編集時のみ削除ボタンを表示（台帳から移設） -->
+				<button type="button" class="btn btn-danger btn-lg px-5"
+					th:if="${(isEdit ?: false) and !(isView ?: false)}"
+					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
+
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -906,6 +913,16 @@
 				</a>
 			</div>
 		</form>
+
+		<!-- 削除用フォーム・確認モーダル（編集画面のみ） -->
+		<th:block th:if="${(isEdit ?: false) and !(isView ?: false)}">
+			<form id="deleteTokugimuForm"
+				th:action="@{/tokugimu/delete/{id}(id=${editId})}" method="post"
+				class="d-none"></form>
+			<div
+				th:replace="~{layout/components :: confirmModal('deleteConfirmModal', '削除確認', 'この特別徴収義務者を削除します。よろしいですか？', 'deleteTokugimuForm', 'btn-danger', '削除する')}">
+			</div>
+		</th:block>
 
 		<!-- 確認モーダル（登録と更新） -->
 		<div th:if="!${isView}"

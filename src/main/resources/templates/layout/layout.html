@@ -66,6 +66,38 @@
 											<i class="bi bi-person-lines-fill me-2"></i>宛名情報
 									</a></li>
 									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000002')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/tokugimu/report}"
+										th:classappend="${#strings.contains(currentUri, '/tokugimu/report')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-printer me-2"></i>帳票発行
+									</a>
+									</li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000003')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/tax-manager/view}"
+										th:classappend="${#strings.contains(currentUri, '/tax-manager/view')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-person me-2"></i>納税管理人照会
+									</a>
+									</li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000024')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/tekiyo-nozei-shuki/view}"
+										th:classappend="${#strings.contains(currentUri, '/tekiyo-nozei-shuki/view')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-calendar-check me-2"></i>納入期限特例照会
+									</a>
+									</li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000004')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/declaration/payment-ledger}"
+										th:classappend="${#strings.contains(currentUri, '/declaration/payment-ledger')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-currency-yen me-2"></i>納入申告管理
+									</a>
+									</li>
+									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000006')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"
 										th:href="@{/gassan/list}"
@@ -109,6 +141,30 @@
 						<div id="mainInsert" class="accordion-collapse collapse">
 							<div class="accordion-body py-1 px-0">
 								<ul class="nav flex-column ms-3">
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000002')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/tokugimu/registration}"
+										th:classappend="${#strings.contains(currentUri, '/tokugimu/registration')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-building-add me-2"></i>特別徴収義務者
+									</a>
+									</li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000003')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/tax-manager/register}"
+										th:classappend="${#strings.contains(currentUri, '/tax-manager/register')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-person-plus me-2"></i>納税管理人
+									</a>
+									</li>
+									<li class="nav-item"
+										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('ms00000024')}">
+										<a class="nav-link text-white-50 py-1 sidebar-link"
+										th:href="@{/tekiyo-nozei-shuki/register}"
+										th:classappend="${#strings.contains(currentUri, '/tekiyo-nozei-shuki/register')} ? 'text-white fw-medium' : ''">
+											<i class="bi bi-calendar-plus me-2"></i>納入期限特例
+									</a>
+									</li>
 									<li class="nav-item"
 										th:if="${accessibleScreens.contains('*') or accessibleScreens.contains('mi00000001')}">
 										<a class="nav-link text-white-50 py-1 sidebar-link"

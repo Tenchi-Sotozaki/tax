@@ -23,9 +23,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver;
+import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver.Kind;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
@@ -45,12 +48,15 @@ public class FukaController {
 
 	private final FukaService fukaService;
 	private final ScreenAccessChecker accessChecker;
+	private final SelectedJigyoshaResolver selectedJigyoshaResolver;
 	private final FukaValidatorService fukaValidatorService;
 
 	private static final String SCREEN_ID = ScreenManagement.FUKA_DAICHO;
 	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
 
 	private static final String CONFIG_VIEW = "fuka/tFukaConfig";
+	/** 事業者が未選択の場合に表示する選択画面 */
+	private static final String SELECT_VIEW = "tokugimu/shiteiGassanSelect";
 
 	/**
 	 * 納入金額管理台帳を表示し、検索処理を行う。
@@ -60,6 +66,21 @@ public class FukaController {
 	 * @param model モデルオブジェクト
 	 * @return 画面パス
 	 */
+	/**
+	 * サイドメニューからの遷移用。
+	 * 指定番号はセッションで選択中の特別徴収義務者から取得する。
+	 */
+	@GetMapping("/payment-ledger")
+	public String showDaichoFromSession(HttpSession session, Model model) {
+		// 事業者のセッションを保持していない場合は指定モーダルで選択させる（種別はどちらでも可）
+		String shiteiNo = selectedJigyoshaResolver.resolveShiteiNo(session, Kind.ANY);
+		if (shiteiNo == null) {
+			model.addAttribute("targetName", "納入申告管理");
+			return SELECT_VIEW;
+		}
+		return "redirect:/declaration/payment-ledger/" + shiteiNo;
+	}
+
 	@GetMapping("/payment-ledger/{shiteiNo}")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String showDaicho(

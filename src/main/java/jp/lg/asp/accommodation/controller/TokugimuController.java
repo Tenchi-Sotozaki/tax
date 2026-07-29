@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,8 @@ import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver;
+import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver.Kind;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
@@ -36,12 +39,15 @@ public class TokugimuController {
 	private final TokugimuService tokugimuService;
 	private final NozeiShukiService nozeiShukiService;
 	private final ScreenAccessChecker accessChecker;
+	private final SelectedJigyoshaResolver selectedJigyoshaResolver;
 
 	private static final String TOKUGIMU_DAICHO = ScreenManagement.TOKUGIMU_DAICHO;
 	private static final String TOKUGIMU_CONFIG = ScreenManagement.TOKUGIMU_CONFIG;
 	private static final String LIST_VIEW = "tokugimu/tTokugimuDaicho";
 	private static final String FORM_VIEW = "tokugimu/tTokugimuConfig";
 	private static final String REPORT_VIEW = "tokugimu/tTokugimuReport";
+	/** 特別徴収義務者が未選択の場合に表示する選択画面 */
+	private static final String SELECT_VIEW = "tokugimu/shiteiGassanSelect";
 
 	// ========== 一覧・検索 ==========
 
@@ -49,13 +55,27 @@ public class TokugimuController {
 	@OpeLog(screenId = TOKUGIMU_DAICHO, operation = "一覧表示")
 	public String list(@ModelAttribute TokugimuSearchForm searchForm,
 			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int pageSize, Model model) {
+			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "false") boolean searched,
+			Model model) {
 		accessChecker.checkAccess(TOKUGIMU_DAICHO);
 		searchForm.setPage(page);
 		searchForm.setPageSize(pageSize);
-		Page<TokugimuListItem> pageResult = tokugimuService.search(searchForm);
+
+		// 初期表示時は検索結果一覧を表示しない
+		Page<TokugimuListItem> pageResult = searched
+				? tokugimuService.search(searchForm)
+				: Page.empty(PageRequest.of(page, pageSize));
+
 		model.addAttribute("items", pageResult);
 		model.addAttribute("searchForm", searchForm);
+		model.addAttribute("isSearched", searched);
+
+		// 選択中のページを中央に固定するため、前後1ページ分の範囲を算出する
+		int currentPage = pageResult.getNumber();
+		int totalPages = pageResult.getTotalPages();
+		model.addAttribute("startPage", Math.max(0, currentPage - 1));
+		model.addAttribute("endPage", Math.min(Math.max(totalPages - 1, 0), currentPage + 1));
 		return LIST_VIEW;
 	}
 
@@ -103,11 +123,13 @@ public class TokugimuController {
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "照会")
 	public String showView(@PathVariable("id") String id,
 			@RequestParam(required = false) Integer rno,
+			HttpSession session,
 			Model model) {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		TokugimuForm form = (rno != null)
 				? tokugimuService.getTokugimuByShiteiNoAndRno(id, rno)
 				: tokugimuService.getTokugimuByShiteiNo(id);
+		storeSelectedShiteiGassan(session, id, form);
 		model.addAttribute("TokugimuForm", form);
 		model.addAttribute("isView", true);
 		model.addAttribute("isEdit", false);
@@ -119,13 +141,36 @@ public class TokugimuController {
 
 	@GetMapping("/edit/{id}")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "編集画面表示")
-	public String showEditForm(@PathVariable("id") String id, Model model) {
+	public String showEditForm(@PathVariable("id") String id, HttpSession session, Model model) {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
-		model.addAttribute("TokugimuForm", tokugimuService.getTokugimuByShiteiNo(id));
+		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
+		storeSelectedShiteiGassan(session, id, form);
+		model.addAttribute("TokugimuForm", form);
 		model.addAttribute("isView", false);
 		model.addAttribute("isEdit", true);
 		model.addAttribute("editId", id);
 		return FORM_VIEW;
+	}
+
+	/**
+	 * 表示中の特別徴収義務者をセッションに保持する。
+	 * 納税管理人照会・納入期限特例照会・納入申告管理・帳票発行は
+	 * 指定番号をセッションから取得するため、照会・編集画面を開いた時点で選択状態を更新しておく。
+	 * すでに同一の指定番号が選択済みの場合は、合算指定番号の選択状態を維持するため上書きしない。
+	 */
+	private void storeSelectedShiteiGassan(HttpSession session, String shiteiNo, TokugimuForm form) {
+		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session
+				.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		if (selected != null && shiteiNo.equals(selected.getShiteiNo())) {
+			return;
+		}
+		session.setAttribute(ShiteiGassanSearchApiController.SESSION_KEY,
+				new ShiteiGassanSearchDto(
+						form.getAtenaNo() != null ? String.valueOf(form.getAtenaNo()) : null,
+						shiteiNo,
+						null,
+						form.getName(),
+						form.getFacilityName()));
 	}
 
 	// ========== 編集（更新） ==========
@@ -157,6 +202,21 @@ public class TokugimuController {
 	}
 
 	// ========== 帳票出力 ==========
+
+	/**
+	 * サイドメニューからの遷移用。
+	 * 指定番号はセッションで選択中の特別徴収義務者から取得する。
+	 */
+	@GetMapping("/report")
+	public String showReportFromSession(HttpSession session, Model model) {
+		// 事業者のセッションを保持していない場合は指定モーダルで選択させる（種別はどちらでも可）
+		String shiteiNo = selectedJigyoshaResolver.resolveShiteiNo(session, Kind.ANY);
+		if (shiteiNo == null) {
+			model.addAttribute("targetName", "帳票発行");
+			return SELECT_VIEW;
+		}
+		return "redirect:/tokugimu/report/" + shiteiNo;
+	}
 
 	@GetMapping("/report/{id}")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "帳票出力")
