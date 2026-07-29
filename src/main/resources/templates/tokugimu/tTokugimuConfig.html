@@ -23,11 +23,11 @@
 						th:text="${isView} ? '特別徴収義務者 照会' : (${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録')"></span>
 				</h5>
 				<div class="d-flex gap-2 ms-auto" th:if="${isView}">
-					<a th:href="@{/reports/tokugimuShiteiTsuchi(shiteiNo=${editId})}"
+					<a th:href="@{/reports/tokugimuShiteiTsuchi}"
 						class="btn btn-outline-primary btn-sm"> <i
 						class="bi bi-printer me-1"></i>特別徴収義務者指定通知書
 					</a>
-					<a th:href="@{/reports/tokugimuJuriTsuchi(shiteiNo=${editId})}"
+					<a th:href="@{/reports/tokugimuJuriTsuchi}"
 						class="btn btn-outline-primary btn-sm"> <i
 						class="bi bi-printer me-1"></i>特別徴収義務者申請受理通知書
 					</a>

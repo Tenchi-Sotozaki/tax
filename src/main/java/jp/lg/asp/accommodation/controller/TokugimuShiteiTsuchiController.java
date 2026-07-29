@@ -10,13 +10,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuShiteiTsuchiDto;
 import jp.lg.asp.accommodation.service.TokugimuShiteiTsuchiReportsService;
 import jp.lg.asp.accommodation.service.TokugimuShiteiTsuchiService;
@@ -42,11 +43,16 @@ public class TokugimuShiteiTsuchiController {
 	 */
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
+	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TokugimuShiteiTsuchiDto dto = new TokugimuShiteiTsuchiDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
+		// 指定番号はパラメータではなくセッションの選択状態から取得する
+		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session
+				.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		String shiteiNo = (selected != null && selected.getShiteiNo() != null) ? selected.getShiteiNo() : "";
+
+		if (!shiteiNo.isEmpty()) {
 			TokugimuShiteiTsuchiDto tokugimuInfo = tokugimuShiteiTsuchiService.getTokugimuInfo(shiteiNo);
 			if (tokugimuInfo != null) {
 				dto = tokugimuInfo;
