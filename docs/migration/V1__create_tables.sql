@@ -1007,6 +1007,32 @@ COMMENT ON COLUMN t_atena_renkei.upd_user IS '更新者';
 COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
 
 ------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_atena_renkei_def (
+  jichitai_cd char(5) NOT NULL,
+  seq numeric(8) NOT NULL,
+  atena_no numeric(15) NOT NULL,
+  name text NOT NULL,
+  kbn char(1) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user text NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user text NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_atena_renkei_def_pkey PRIMARY KEY (jichitai_cd, seq, atena_no)
+);
+COMMENT ON TABLE t_atena_renkei_def IS '宛名連携詳細';
+COMMENT ON COLUMN t_atena_renkei_def.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_atena_renkei_def.seq IS '管理番号';
+COMMENT ON COLUMN t_atena_renkei_def.atena_no IS '宛名番号';
+COMMENT ON COLUMN t_atena_renkei_def.name IS '宛名名';
+COMMENT ON COLUMN t_atena_renkei_def.kbn IS '区分(1:差異なし/2:取込/3:スキップ)';
+COMMENT ON COLUMN t_atena_renkei_def.add_dt IS '作成日時';
+COMMENT ON COLUMN t_atena_renkei_def.add_user IS '作成者';
+COMMENT ON COLUMN t_atena_renkei_def.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_atena_renkei_def.upd_user IS '更新者';
+COMMENT ON COLUMN t_atena_renkei_def.version IS 'バージョン';
+
+------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_jichitai (
   jichitai_cd char(5) NOT NULL,
   name text NOT NULL,
