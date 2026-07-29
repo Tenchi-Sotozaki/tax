@@ -86,7 +86,7 @@ function updateNendoDisplay() {
  * 指定番号に基づいて特別徴収義務者情報を読み込む
  */
 function loadTokugimuInfo(shiteiNo) {
-    fetch(`/accommodation-tax/api/tokugimu/info?shiteiNo=${encodeURIComponent(shiteiNo)}`)
+    fetch(`/api/tokugimu/info?shiteiNo=${encodeURIComponent(shiteiNo)}`)
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -106,6 +106,18 @@ function loadTokugimuInfo(shiteiNo) {
         });
 }
 
+// URLパラメータのerrorをチェックしてアラートを出す
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+
+    if (error === 'pdf_not_found') {
+        alert('対象データが見つかりませんでした。');
+    } else if (error === 'server_error') {
+        alert('PDFの生成中にエラーが発生しました。');
+    }
+});
+
 /**
  * 印刷処理
  */
@@ -118,8 +130,8 @@ async function printReport() {
     
     const formData = await collectFormData();
     const csrfToken = document.querySelector('input[name="_csrf"]').value;
-    
-    fetch('/accommodation-tax/nonyusho/pdf', {
+
+    fetch('/accommodation-tax/nonyusho/print', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -127,27 +139,27 @@ async function printReport() {
         },
         body: JSON.stringify(formData)
     })
-    .then(response => {
-        if (response.ok) {
-            return response.blob();
-        }
-        throw new Error('印刷用PDF生成に失敗しました');
-    })
-    .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = url;
-        document.body.appendChild(iframe);
-        iframe.onload = function() {
-            iframe.contentWindow.print();
-        };
-        console.log('印刷処理完了');
-    })
-    .catch(error => {
-        console.error('印刷エラー:', error);
-        showErrorMessage('印刷用PDF生成に失敗しました: ' + error.message);
-    });
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error('対象データが見つかりませんでした');
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = url;
+            document.body.appendChild(iframe);
+            iframe.onload = function() {
+                iframe.contentWindow.print();
+            };
+            console.log('印刷処理完了');
+        })
+        .catch(error => {
+            console.error('印刷エラー:', error);
+            showErrorMessage('error.message');
+        });
 }
 
 /**
@@ -178,12 +190,12 @@ async function collectFormData() {
     return {
         shiteiNo: shiteiNo,
         nendo: nendo,
-        shinkokuYmd: shinkokuYmd,
+        shinkokuYmd: shinkokuYmd ? shinkokuYmd : null,
         entai: entai,
         zeigaku: dynamicData.zeigaku,
         kasan: dynamicData.kasan,
         gokei: gokei,
-        nokigen: dynamicData.nokigen,
+        nokigen: dynamicData.nokigen ? dynamicData.nokigen : null,
         tokuName: document.getElementById('tokuName')?.value || '',
         tokuJusho: document.getElementById('tokuJusho')?.value || '',
         tokuYubinNo: document.getElementById('tokuYubinNo')?.value || '',
@@ -280,7 +292,7 @@ function validateForm() {
     }
     
     if (!nendoValue) {
-        showErrorMessage('年度を選択してください。');
+        showErrorMessage('年度を入力してください。');
         return false;
     }
     

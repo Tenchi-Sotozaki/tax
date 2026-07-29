@@ -1281,22 +1281,22 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="textField" uuid="4c070568-f7af-46e1-890f-9a1ea19ca485" x="191" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
-				<expression><![CDATA[公]]></expression>
-			</element>
-			<element kind="textField" uuid="f5a3fb0c-cd9f-4256-975d-e5668d8f4730" x="488" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
-				<expression><![CDATA[公]]></expression>
-			</element>
 			<element kind="ellipse" uuid="8efa501e-e138-494e-8c14-b659e2592430" mode="Opaque" x="493" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="textField" uuid="4862a085-a8f9-4356-aae2-ff3d0becaa5f" x="745" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
-				<expression><![CDATA[公]]></expression>
-			</element>
-			<element kind="ellipse" uuid="52207071-5074-4f00-80c2-7b7f324d0851" mode="Transparent" x="750" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
+			<element kind="ellipse" uuid="52207071-5074-4f00-80c2-7b7f324d0851" mode="Transparent" x="751" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="staticText" uuid="ba45ee87-99a6-4155-a625-b99722f77601" x="186" y="12" width="40" height="40" fontName="IPAex明朝" fontSize="16.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[公]]></text>
+			</element>
+			<element kind="staticText" uuid="aaf60520-20ac-41c3-ae2a-6906672163dd" x="483" y="12" width="40" height="40" fontName="IPAex明朝" fontSize="16.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[公]]></text>
+			</element>
+			<element kind="staticText" uuid="9ef8bf68-5a41-483b-a3eb-f4d042c2a6f8" x="741" y="12" width="40" height="40" fontName="IPAex明朝" fontSize="16.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[公]]></text>
 			</element>
 		</band>
 	</detail>
