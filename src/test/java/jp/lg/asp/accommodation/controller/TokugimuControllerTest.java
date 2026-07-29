@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -86,11 +87,14 @@ class TokugimuControllerTest {
         TokugimuForm form = new TokugimuForm();
         when(tokugimuService.getTokugimuByShiteiNo("00100001")).thenReturn(form);
         Model model = new ExtendedModelMap();
+        MockHttpSession session = new MockHttpSession();
 
-        String view = controller.showView("00100001", null, model);
+        String view = controller.showView("00100001", null, session, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
         assertThat(model.asMap()).containsEntry("isView", true);
+        // 帳票発行画面が参照するセッションに、表示中の特別徴収義務者が格納されること
+        assertThat(session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY)).isNotNull();
     }
 
     @Test
