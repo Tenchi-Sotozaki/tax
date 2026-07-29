@@ -62,6 +62,13 @@
 											placeholder="指定番号" maxlength="8">
 									</div>
 
+									<!-- 合算指定番号 -->
+									<div class="col">
+										<label class="form-label form-label-sm fw-medium mb-1">合算指定番号</label>
+										<input type="text" class="form-control form-control-sm" th:field="*{gassanShiteiNo}"
+											placeholder="合算指定番号" maxlength="8">
+									</div>
+
 									<!-- 氏名／名称 -->
 									<div class="col">
 										<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
@@ -104,12 +111,6 @@
 											th:field="*{shisetsuName}" placeholder="施設名称" maxlength="200">
 									</div>
 
-									<!-- 合算指定番号 -->
-									<div class="col">
-										<label class="form-label form-label-sm fw-medium mb-1">合算指定番号</label>
-										<input type="text" class="form-control form-control-sm" th:field="*{gassanShiteiNo}"
-											placeholder="合算指定番号" maxlength="8">
-									</div>
 								</div>
 								<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 									<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary btn-sm"> <i
