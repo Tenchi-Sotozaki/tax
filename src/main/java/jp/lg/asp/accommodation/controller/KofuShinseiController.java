@@ -1,4 +1,4 @@
-﻿package jp.lg.asp.accommodation.controller;
+package jp.lg.asp.accommodation.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
