@@ -270,8 +270,8 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	public boolean dataCheck(NonyushoDto dto) {
 		
 		// 最新の賆課データを取得
-		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(
-				jichitaiContext.getJichitaiCd(), dto.getShiteiNo(), dto.getNendo());
+		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndTaishoYmOrderByKibetsuAsc(
+				jichitaiContext.getJichitaiCd(), dto.getShiteiNo(), dto.getShinkokuYmd());
 		
 		// データが存在するかどうかを返す
 		return fukaList.isEmpty();

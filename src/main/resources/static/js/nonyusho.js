@@ -53,32 +53,10 @@ function initializeNendoField() {
         const month = String(today.getMonth() + 1).padStart(2, '0');
         nendoField.value = `${year}-${month}`;
     }
-    
-    // 初期表示を更新
-    updateNendoDisplay();
-    
+   
     // 値変更時のイベントリスナー
     nendoField.addEventListener('change', updateNendoDisplay);
     nendoField.addEventListener('input', updateNendoDisplay);
-}
-
-/**
- * 年度表示を更新（YYYYのみ表示）
- */
-function updateNendoDisplay() {
-    const nendoField = document.getElementById('nendo');
-    const nendoDisplay = document.getElementById('nendoDisplay');
-    
-    if (!nendoField || !nendoDisplay) return;
-    
-    const value = nendoField.value;
-    if (value) {
-        // YYYY-MMからYYYYのみを抽出
-        const year = value.split('-')[0];
-        nendoDisplay.textContent = year + '年度';
-    } else {
-        nendoDisplay.textContent = '年度を選択してください';
-    }
 }
 
 /**
@@ -213,16 +191,15 @@ async function printReport() {
  */
 async function collectFormData() {
     const shiteiNo = document.getElementById('shiteiNo')?.value || '';
-    const nendoValue = document.getElementById('nendo')?.value || '';
     const taishoYmValue = document.getElementById('taishoYm')?.value || '';
     const entai = document.getElementById('entai')?.value || '0';
     
     // 年度から年のみを抽出（YYYY-MM から YYYY を取得）
-    const nendo = nendoValue ? nendoValue.split('-')[0] : '';
-    
-    // 対象年月をLocalDate形式に変換（YYYY-MM-01）
-    const shinkokuYmd = taishoYmValue ? taishoYmValue + '-01' : null;
-    
+    const nendo = taishoYmValue ? taishoYmValue.replace(/-/g, '').slice(0, 4) : '';
+	
+	// YYYY-MM-DDからハイフンを除き、先頭6桁（YYYYMM）を取得する
+	const shinkokuYmd = taishoYmValue ? taishoYmValue.replace(/-/g, '').slice(0, 6) : '';
+   
     // 動的にデータを取得
     const dynamicData = await loadDynamicData(shiteiNo, nendo, taishoYmValue);
     
@@ -323,28 +300,22 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
  */
 function validateForm() {
     const shiteiNo = document.getElementById('shiteiNo')?.value;
-    const nendoValue = document.getElementById('nendo')?.value;
-    const taishoYm = document.getElementById('taishoYm')?.value;
+    const taishoYmValue = document.getElementById('taishoYm')?.value;
     
     if (!shiteiNo) {
         showErrorMessage('指定番号を入力してください。');
         return false;
     }
-    
-    if (!nendoValue) {
-        showErrorMessage('年度を入力してください。');
-        return false;
-    }
-    
-    if (!taishoYm) {
+   
+    if (!taishoYmValue) {
         showErrorMessage('対象年月を入力してください。');
         return false;
     }
     
     // 年度の妥当性チェック（YYYY-MM形式から年を抽出）
-    const nendo = nendoValue.split('-')[0];
-    const nendoNum = parseInt(nendo, 10);
-    if (isNaN(nendoNum) || nendoNum < 1900 || nendoNum > 2100) {
+    const taishoYm = taishoYmValue.split('-')[0];
+    const taishoYmNum = parseInt(taishoYm, 10);
+    if (isNaN(taishoYmNum) || taishoYmNum < 1900 || taishoYmNum > 2100) {
         showErrorMessage('年度は1900年から2100年の間で選択してください。');
         return false;
     }

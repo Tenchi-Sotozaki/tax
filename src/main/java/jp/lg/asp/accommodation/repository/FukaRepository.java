@@ -27,6 +27,20 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 	List<Fuka> findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(
 			String jichitaiCd, String shiteiNo, String nendo);
 
+	@Query("""
+			SELECT f FROM Fuka f
+			WHERE f.jichitaiCd = :jichitaiCd
+			AND f.shiteiNo = :shiteiNo
+			AND f.taishoYm = :taishoYm
+			AND f.newFlg = '1'
+			AND f.delFlg = '0'
+			ORDER BY f.kibetsu ASC
+			""")
+	List<Fuka> findByJichitaiCdAndShiteiNoAndTaishoYmOrderByKibetsuAsc(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo,
+			@Param("taishoYm") String taishoYm);
+
 	Optional<Fuka> findByJichitaiCdAndShiteiNoAndNendoAndKibetsu(
 			String jichitaiCd, String shiteiNo, String nendo, Integer kibetsu);
 
