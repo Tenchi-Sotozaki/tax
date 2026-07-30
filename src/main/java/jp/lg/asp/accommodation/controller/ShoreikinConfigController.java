@@ -1,4 +1,4 @@
-ackage jp.lg.asp.accommodation.controller;
+package jp.lg.asp.accommodation.controller;
 
 import jakarta.validation.Valid;
 
