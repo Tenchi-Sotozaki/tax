@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.nio.charset.StandardCharsets;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import jakarta.servlet.http.HttpSession;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
-import jp.lg.asp.accommodation.util.SessionHelper;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -29,6 +28,7 @@ import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.service.NonyushoReportsService;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -131,7 +131,8 @@ public class NonyushoController {
     public Object previewPdf(@RequestBody NonyushoDto dto) {
         try {
             if (nonyushoReportsService.dataCheck(dto)) {
-                return buildErrorScriptResponse("対象データが見つかりませんでした。");
+            	// 400 Bad Request ステータスを指定
+				return buildErrorScriptResponse("対象データが見つかりませんでした。", HttpStatus.BAD_REQUEST);
             }
             
             byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
@@ -184,15 +185,16 @@ public class NonyushoController {
 	/**
      * エラー時にアラートを表示して新しいタブを閉じるHTMLレスポンスを生成
      */
-    private ResponseEntity<String> buildErrorScriptResponse(String message) {
-        String html = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head><body><script>"
-                + "alert('" + message + "');"
-                + "window.close();"
-                + "</script></body></html>";
-        
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8));
-        
-        return new ResponseEntity<>(html, headers, HttpStatus.OK);
-    }
+    private ResponseEntity<String> buildErrorScriptResponse(String message, HttpStatus status) {
+		String html = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head><body><script>"
+				+ "alert('" + message + "');"
+				+ "window.close();"
+				+ "</script></body></html>";
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(new MediaType(MediaType.TEXT_HTML, StandardCharsets.UTF_8));
+		
+		// 引数で受け取ったステータスコードを設定して返却
+		return new ResponseEntity<>(html, headers, status);
+	}
 }
