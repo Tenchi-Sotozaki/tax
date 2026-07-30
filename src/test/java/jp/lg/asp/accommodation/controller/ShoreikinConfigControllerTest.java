@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
@@ -9,14 +8,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.ShoreikinConfigDto;
 import jp.lg.asp.accommodation.service.ShoreikinConfigService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 
 @ExtendWith(MockitoExtension.class)
 class ShoreikinConfigControllerTest {
@@ -26,16 +28,36 @@ class ShoreikinConfigControllerTest {
 
     @InjectMocks ShoreikinConfigController controller;
 
+    private MockHttpSession sessionWith(String shiteiNo) {
+        MockHttpSession session = new MockHttpSession();
+        ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+        dto.setShiteiNo(shiteiNo);
+        SessionHelper.saveShiteiGassan(session, dto);
+        return session;
+    }
+
     @Test
     void config_照会画面を返す() {
+        MockHttpSession session = sessionWith("00100001");
         ShoreikinConfigDto dto = new ShoreikinConfigDto();
         when(shoreikinConfigService.getShoreikin("00100001", "2024")).thenReturn(dto);
         Model model = new ExtendedModelMap();
 
-        String view = controller.config("00100001", "2024", model);
+        String view = controller.config(session, "2024", model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
         assertThat(model.asMap()).containsKey("configForm");
+    }
+
+    @Test
+    void config_セッション未設定はモーダル表示() {
+        MockHttpSession session = new MockHttpSession();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.config(session, null, model);
+
+        assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+        assertThat(model.asMap()).containsKey("showShiteiGassanModal");
     }
 
     @Test

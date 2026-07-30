@@ -9,20 +9,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FurikomiKozaDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.FurikomiKozaService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 振込先口座照会／登録／編集 Controller
- * 仕様書：振込先口座照会・登録・編集.csv に基づく実装
  */
 @Slf4j
 @Controller
@@ -36,16 +37,17 @@ public class FurikomiKozaController {
 	private static final String SCREEN_ID = ScreenManagement.FURIKOMI_KOZA;
 	private static final String KOZA_VIEW = "shoreikin/furikomiKoza";
 
-	/**
-	 * 振込先口座照会画面表示
-	 * @param shiteiNo 指定番号
-	 * @param model モデル
-	 * @return 画面パス
-	 */
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
-	public String view(@RequestParam String shiteiNo, Model model) {
+	public String view(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+
+		if (shiteiNo == null || shiteiNo.isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("kozaForm", new FurikomiKozaDto());
+			return KOZA_VIEW;
+		}
 
 		FurikomiKozaDto dto = furikomiKozaService.getFurikomiKoza(shiteiNo);
 		model.addAttribute("kozaForm", dto);
@@ -53,12 +55,6 @@ public class FurikomiKozaController {
 		return KOZA_VIEW;
 	}
 
-	/**
-	 * 編集モード切り替え
-	 * @param kozaForm フォームデータ
-	 * @param model モデル
-	 * @return 画面パス
-	 */
 	@PostMapping("/edit")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集切り替え")
 	public String editMode(@ModelAttribute FurikomiKozaDto kozaForm, Model model) {
@@ -70,14 +66,6 @@ public class FurikomiKozaController {
 		return KOZA_VIEW;
 	}
 
-	/**
-	 * 振込先口座情報登録処理
-	 * @param kozaForm フォームデータ
-	 * @param bindingResult バリデーション結果
-	 * @param model モデル
-	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先または画面パス
-	 */
 	@PostMapping("/create")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録")
 	public String create(@Valid @ModelAttribute FurikomiKozaDto kozaForm,
@@ -103,14 +91,6 @@ public class FurikomiKozaController {
 		return "redirect:/shoreikin/list";
 	}
 
-	/**
-	 * 振込先口座情報更新処理
-	 * @param kozaForm フォームデータ
-	 * @param bindingResult バリデーション結果
-	 * @param model モデル
-	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先または画面パス
-	 */
 	@PostMapping("/update")
 	@OpeLog(screenId = SCREEN_ID, operation = "更新")
 	public String update(@Valid @ModelAttribute FurikomiKozaDto kozaForm,

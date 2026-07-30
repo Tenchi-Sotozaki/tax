@@ -144,6 +144,14 @@
 	<script th:src="@{/js/common.js}"></script>
 	<script th:src="@{/js/layout.js}"></script>
 	<script th:src="@{/js/browserBack.js}"></script>
+	<th:block th:if="${showShiteiGassanModal}">
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				var modal = new bootstrap.Modal(document.getElementById('shiteiGassanSearchModal'), {backdrop: 'static'});
+				modal.show();
+			});
+		</script>
+	</th:block>
 	<th:block layout:fragment="scripts"></th:block>
 </body>
 </html>

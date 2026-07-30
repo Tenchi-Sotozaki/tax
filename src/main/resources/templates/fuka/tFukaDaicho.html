@@ -46,14 +46,15 @@
 			nendoList=${nendoList}, 
 			firstNendo=${!#lists.isEmpty(nendoList) ? nendoList[0] : selectedNendo}, 
 			lastNendo=${!#lists.isEmpty(nendoList) ? nendoList[#lists.size(nendoList) - 1] : selectedNendo}" 
-			class="pagination-container my-3">
+			class="pagination-container my-3"
+			th:if="${fukaDaichoForm != null}">
 
 			<ul class="pagination pagination-sm justify-content-center mb-0">
 
 				<!-- 前へボタン -->
 				<li class="page-item" th:classappend="${selectedNendo <= firstNendo} ? 'disabled'">
 					<a class="page-link" 
-					   th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDaichoForm.shiteiNo}, nendo=${selectedNendo - 1}, status=${currentStatus})}">
+					   th:href="@{/declaration/payment-ledger(nendo=${selectedNendo - 1}, status=${currentStatus})}">
 						前へ
 					</a>
 				</li>
@@ -62,7 +63,7 @@
 				<li class="page-item" 
 				    th:if="${selectedNendo - 1 > firstNendo}">
 					<a class="page-link"
-					   th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDaichoForm.shiteiNo}, nendo=${firstNendo}, status=${currentStatus})}"
+					   th:href="@{/declaration/payment-ledger(nendo=${firstNendo}, status=${currentStatus})}"
 					   th:text="${firstNendo}">2022</a>
 				</li>
 
@@ -77,7 +78,7 @@
 					    th:if="${nendo >= selectedNendo - 1 and nendo <= selectedNendo + 1}"
 					    th:classappend="${nendo == selectedNendo} ? 'active'">
 						<a class="page-link"
-						   th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDaichoForm.shiteiNo}, nendo=${nendo}, status=${currentStatus})}"
+						   th:href="@{/declaration/payment-ledger(nendo=${nendo}, status=${currentStatus})}"
 						   th:text="${nendo}">
 						</a>
 					</li>
@@ -92,7 +93,7 @@
 				<li class="page-item" 
 				    th:if="${selectedNendo + 1 < lastNendo}">
 					<a class="page-link"
-					   th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDaichoForm.shiteiNo}, nendo=${lastNendo}, status=${currentStatus})}"
+					   th:href="@{/declaration/payment-ledger(nendo=${lastNendo}, status=${currentStatus})}"
 					   th:text="${lastNendo}">
 				   </a>
 				</li>
@@ -100,7 +101,7 @@
 				<!-- 次へボタン -->
 				<li class="page-item" th:classappend="${selectedNendo >= lastNendo} ? 'disabled'">
 					<a class="page-link" 
-					   th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDaichoForm.shiteiNo}, nendo=${selectedNendo + 1}, status=${currentStatus})}">
+					   th:href="@{/declaration/payment-ledger(nendo=${selectedNendo + 1}, status=${currentStatus})}">
 						次へ
 					</a>
 				</li>
@@ -109,8 +110,8 @@
 		</nav>
 
 		<!-- 明細テーブル -->
-		<form
-			th:action="@{/declaration/register/{id}(id=${fukaDaichoForm.shiteiNo})}"
+		<form th:if="${fukaDaichoForm != null}"
+			th:action="@{/declaration/register}"
 			method="get">
 
 			<div class="card shadow-sm">
@@ -163,51 +164,29 @@
 
 									<!-- 申告状況 -->
 									<td class="text-center">
-										<!-- 申告済み -->
 										<span th:if="${item.shinkokuZumi}">〇</span>
-										
-										<!-- 未申告 -->
 										<span th:unless="${item.shinkokuZumi}">
-											<span th:if="${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">
-												ー
-											</span>
-											
-											<!-- 申告遅れ -->
-											<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">
-												△
-											</span>
+											<span th:if="${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">ー</span>
+											<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">△</span>
 										</span>
 									</td>
 
 									<!-- 納入状況 -->
 									<td class="text-center">
 										<span th:if="${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">
-											<!-- 納入済み -->
 											<span th:if="${item.nonyuStatus == 'paid'}">〇</span>
-											
-											<!-- 一部納入 -->
 											<span th:if="${item.nonyuStatus == 'partial'}">△</span>
-											
-											<!-- 未納入 -->
 											<span th:if="${item.nonyuStatus == 'unpaid'}">ー</span>
 										</span>
-										
-										<!-- 納入遅れ -->
-										<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">
-											▲
-										</span>
+										<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">▲</span>
 									</td>
 
 									<!-- 新規or照会 -->
 									<td class="text-center">
-
-										<!-- 照会ボタン -->
 										<button th:if="${item.shinkokuZumi}" type="button"
 											class="btn btn-outline-primary btn-lg px-5 btn-view bg-white">
 											照会
 										</button>
-
-										<!-- 新規ボタン -->
 										<button th:unless="${item.shinkokuZumi}" type="submit"
 											class="btn btn-success btn-lg px-5 btn-register">
 											新規
@@ -221,7 +200,7 @@
 										th:data-nendo="${item.nendo}"
 										th:data-kibetsu="${item.kibetsu}">
 								</tr>
-								<tr th:if="${#lists.isEmpty(fukaDaichoForm.items)}">
+								<tr th:if="${fukaDaichoForm == null or #lists.isEmpty(fukaDaichoForm.items)}">
 									<td colspan="8" class="text-center py-5 text-muted">
 										表示できる情報がありません</td>
 								</tr>
@@ -239,9 +218,7 @@
 			<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 			<script th:inline="javascript">
 				/*<![CDATA[*/
-				// Thymeleaf変数をグローバルスコープに設定
-				window.fukaDaichoFormShiteiNo = /*[[${fukaDaichoForm.shiteiNo}]]*/'';
-				window.declarationViewBaseUrl = /*[[@{/declaration/view/}]]*/'/declaration/view/';
+				window.declarationViewBaseUrl = /*[[@{/declaration/view}]]*/'/declaration/view';
 				/*]]>*/
 			</script>
 			<script th:src="@{/js/tFukaDaicho.js}"></script>

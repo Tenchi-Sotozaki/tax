@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,14 +20,14 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
-import java.util.List;
-
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 
 @ExtendWith(MockitoExtension.class)
 class TokugimuControllerTest {
@@ -35,6 +37,14 @@ class TokugimuControllerTest {
     @Mock ScreenAccessChecker accessChecker;
 
     @InjectMocks TokugimuController controller;
+
+    private MockHttpSession sessionWith(String shiteiNo) {
+        MockHttpSession session = new MockHttpSession();
+        ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+        dto.setShiteiNo(shiteiNo);
+        SessionHelper.saveShiteiGassan(session, dto);
+        return session;
+    }
 
     @Test
     void list_一覧画面を返す() {
@@ -84,17 +94,28 @@ class TokugimuControllerTest {
 
     @Test
     void showView_照会画面を返す() {
+        MockHttpSession session = sessionWith("00100001");
         TokugimuForm form = new TokugimuForm();
         when(tokugimuService.getTokugimuByShiteiNo("00100001")).thenReturn(form);
         Model model = new ExtendedModelMap();
-        MockHttpSession session = new MockHttpSession();
 
-        String view = controller.showView("00100001", null, session, model);
+        String view = controller.showView(session, null, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
         assertThat(model.asMap()).containsEntry("isView", true);
         // 帳票発行画面が参照するセッションに、表示中の特別徴収義務者が格納されること
-        assertThat(session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY)).isNotNull();
+        assertThat(SessionHelper.getShiteiGassan(session)).isNotNull();
+    }
+
+    @Test
+    void showView_セッション未設定はモーダル表示() {
+        MockHttpSession session = new MockHttpSession();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.showView(session, null, model);
+
+        assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
+        assertThat(model.asMap()).containsKey("showShiteiGassanModal");
     }
 
     @Test

@@ -82,8 +82,7 @@ public class ShoreikinController {
 			return "redirect:/shoreikin/list";
 		}
 
-		// 交付金照会画面への遷移（単一指定番号）
-		redirectAttributes.addAttribute("shiteiNo", selectedItems.get(0));
+		// 交付金照会画面への遷移（セッションに指定番号が保存済みのためパラメータ不要）
 		if (nendo != null && !nendo.isEmpty()) {
 			redirectAttributes.addAttribute("nendo", nendo);
 		}
@@ -108,8 +107,7 @@ public class ShoreikinController {
 			return "redirect:/shoreikin/list";
 		}
 
-		// 振込先口座照会画面への遷移（単一指定番号）
-		redirectAttributes.addAttribute("shiteiNo", selectedItems.get(0));
+		// 振込先口座照会画面への遷移（セッションに指定番号が保存済みのためパラメータ不要）
 		return "redirect:/shoreikin/furikomiKoza";
 	}
 }

@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -46,25 +49,26 @@ public class NonyushoController {
      * 納入書発行画面表示
      */
     @GetMapping
-    public String index(Model model, @RequestParam(required = false) String shiteiNo) {
+    public String index(Model model, HttpSession session) {
+        String shiteiNo = SessionHelper.getShiteiNo(session);
         log.debug("納入書発行画面表示: shiteiNo={}", shiteiNo);
         
-        if (shiteiNo != null && !shiteiNo.trim().isEmpty()) {
-            try {
-                // 指定番号に紐づく特別徴収義務者情報を取得
-                TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
-                model.addAttribute("shiteiNo", shiteiNo);
-                model.addAttribute("shisetsuName", tokugimuForm.getFacilityName());
-                model.addAttribute("tokuName", tokugimuForm.getName());
-                model.addAttribute("tokuJusho", tokugimuForm.getTokugimuAddress());
-                model.addAttribute("tokuYubinNo", tokugimuForm.getTokugimuYubinNo());
-                model.addAttribute("shisetsuJusho", tokugimuForm.getFacilityAddress());
-            } catch (Exception e) {
-                log.error("特別徴収義務者情報の取得に失敗: shiteiNo={}", shiteiNo, e);
-                model.addAttribute("shiteiNo", shiteiNo);
-            }
+        if (shiteiNo == null || shiteiNo.trim().isEmpty()) {
+            model.addAttribute("showShiteiGassanModal", true);
+            return "reports/nonyusho";
         }
-        
+        try {
+            TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
+            model.addAttribute("shiteiNo", shiteiNo);
+            model.addAttribute("shisetsuName", tokugimuForm.getFacilityName());
+            model.addAttribute("tokuName", tokugimuForm.getName());
+            model.addAttribute("tokuJusho", tokugimuForm.getTokugimuAddress());
+            model.addAttribute("tokuYubinNo", tokugimuForm.getTokugimuYubinNo());
+            model.addAttribute("shisetsuJusho", tokugimuForm.getFacilityAddress());
+        } catch (Exception e) {
+            log.error("特別徴収義務者情報の取得に失敗: shiteiNo={}", shiteiNo, e);
+            model.addAttribute("shiteiNo", shiteiNo);
+        }
         return "reports/nonyusho";
     }
     
