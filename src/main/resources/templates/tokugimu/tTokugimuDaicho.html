@@ -204,16 +204,20 @@
 							<thead class="table-primary">
 								<tr>
 									<th style="min-width: 100px">指定番号</th>
+									<th style="min-width: 110px">合算指定番号</th>
 									<th style="min-width: 140px">氏名/名称</th>
 									<th style="min-width: 140px">施設名称</th>
 									<th style="min-width: 80px" class="text-center">ステータス</th>
 									<th style="min-width: 80px" class="text-center">合算対象</th>
+									<th style="min-width: 100px" class="text-center">最終申告日</th>
+									<th style="min-width: 90px" class="text-center">最終納付状況</th>
 									<th style="width: 90px" class="text-center"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${items.content}">
 									<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
+									<td th:text="${item.gassanShiteiNo}"></td>
 									<td th:text="${item.name}"></td>
 									<td th:text="${item.shisetsuName}"></td>
 									<td class="text-center"><span class="badge bg-success"
@@ -228,6 +232,18 @@
 											class="badge bg-light text-muted border"
 											th:unless="${item.consolidationTarget == 'target'}">非対象</span>
 									</td>
+									<!-- 最終申告日（申告実績が無い場合は空欄） -->
+									<td class="text-center"
+										th:text="${item.lastShinkokuYmd != null ? #temporals.format(item.lastShinkokuYmd, 'yyyy/MM/dd') : ''}"></td>
+									<!-- 最終申告分の納付状況（申告実績が無い場合は「-」） -->
+									<td class="text-center"><span class="badge bg-success"
+											th:if="${item.lastNonyuStatus == 'paid'}">完納</span> <span
+											class="badge bg-warning text-dark"
+											th:if="${item.lastNonyuStatus == 'partial'}">一部納付</span> <span
+											class="badge bg-danger"
+											th:if="${item.lastNonyuStatus == 'unpaid'}">未納</span> <span
+											class="text-muted small" th:if="${item.lastNonyuStatus == null}">-</span>
+									</td>
 									<td class="text-center">
 										<!-- 指定番号はパラメータでは渡さず、セッションに保存してから遷移する -->
 										<button type="button" class="btn btn-outline-primary btn-sm detail-btn"
@@ -238,7 +254,7 @@
 									</td>
 								</tr>
 								<tr th:if="${items.totalElements == 0}">
-									<td colspan="6" class="text-center text-muted py-5"><i
+									<td colspan="9" class="text-center text-muted py-5"><i
 											class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
 										該当するデータが見つかりませんでした。</td>
 								</tr>
@@ -250,7 +266,11 @@
 		</th:block>
 	</div>
 
+	<!-- 特別徴収義務者指定モーダル（未選択のまま照会・編集・帳票発行へ遷移した場合に表示） -->
+	<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+
 	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 		<script th:src="@{/js/tTokugimuDaicho.js}"></script>
 	</th:block>
 </body>

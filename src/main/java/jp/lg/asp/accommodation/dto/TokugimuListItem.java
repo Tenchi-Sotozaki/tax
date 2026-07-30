@@ -1,12 +1,12 @@
 package jp.lg.asp.accommodation.dto;
 
-import lombok.AllArgsConstructor;
+import java.time.LocalDate;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class TokugimuListItem {
 
 	private Long id;
@@ -23,7 +23,28 @@ public class TokugimuListItem {
 	/** 法人番号 */
 	private String hojinNo;
 
+	/** 合算指定番号（合算対象でない場合は null） */
+	private String gassanShiteiNo;
+
+	/** 最終申告日（申告実績が無い場合は null） */
+	private LocalDate lastShinkokuYmd;
+
+	/**
+	 * 最終申告分の納付状況。
+	 * paid=完納 / partial=一部納付 / unpaid=未納。
+	 * 申告実績が無い場合は null（画面では「-」を表示する）。
+	 */
+	private String lastNonyuStatus;
+
 	// コンストラクタ（既存のコードとの互換性のため）
+	public TokugimuListItem(Long id, String shiteiNo, String name, String shisetsuName,
+			String businessType, String businessTypeLabel, String consolidationTarget, String status,
+			String kojinNo, String hojinNo) {
+		this(id, shiteiNo, name, shisetsuName, businessType, businessTypeLabel, consolidationTarget, status);
+		this.kojinNo = kojinNo;
+		this.hojinNo = hojinNo;
+	}
+
 	public TokugimuListItem(Long id, String shiteiNo, String name, String shisetsuName,
 			String businessType, String businessTypeLabel, String consolidationTarget, String status) {
 		this.id = id;

@@ -110,4 +110,19 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
 
+	/**
+	 * 指定番号ごとの申告済みレコードを、申告日の新しい順で一括取得する。
+	 * 呼び出し側で指定番号ごとの先頭行を採用することで「最終申告」を得る。
+	 */
+	@Query("""
+			SELECT f FROM Fuka f
+			WHERE f.jichitaiCd = :jichitaiCd
+			AND f.shiteiNo IN :shiteiNos
+			AND f.newFlg = '1' AND f.delFlg = '0'
+			AND f.shinkokuYmd IS NOT NULL
+			ORDER BY f.shiteiNo, f.shinkokuYmd DESC, f.rno DESC
+			""")
+	List<Fuka> findDeclaredByShiteiNoInOrderByShinkokuYmdDesc(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNos") List<String> shiteiNos);
 }
