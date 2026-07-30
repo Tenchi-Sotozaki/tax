@@ -68,36 +68,37 @@ class ShoreikinBulkControllerTest {
     }
 
     @Test
-    void executeBulk_正常実行_成功メッセージ() {
+    void executeBulk_正常実行() {
         ShoreikinBulkDto form = new ShoreikinBulkDto();
         form.setNendo("2024");
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "bulkForm");
         ShoreikinBulkDto result = new ShoreikinBulkDto();
         result.setFailureCount(0);
-        result.setResultMessage("処理完了");
         when(shoreikinBulkService.executeBulkSanshutsu(form)).thenReturn(result);
         Model model = new ExtendedModelMap();
 
         String view = controller.executeBulk(form, bindingResult, model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
-        assertThat(model.asMap()).containsKey("successMessage");
+        assertThat(model.asMap()).containsKey("bulkForm");
+        assertThat(model.asMap()).doesNotContainKey("successMessage");
+        assertThat(model.asMap()).doesNotContainKey("warningMessage");
     }
 
     @Test
-    void executeBulk_失敗あり_警告メッセージ() {
+    void executeBulk_失敗あり() {
         ShoreikinBulkDto form = new ShoreikinBulkDto();
         form.setNendo("2024");
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "bulkForm");
         ShoreikinBulkDto result = new ShoreikinBulkDto();
         result.setFailureCount(2);
-        result.setResultMessage("2件失敗");
         when(shoreikinBulkService.executeBulkSanshutsu(form)).thenReturn(result);
         Model model = new ExtendedModelMap();
 
         String view = controller.executeBulk(form, bindingResult, model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
-        assertThat(model.asMap()).containsKey("warningMessage");
+        assertThat(model.asMap()).containsKey("bulkForm");
+        assertThat(model.asMap()).doesNotContainKey("warningMessage");
     }
 }
