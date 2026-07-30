@@ -66,51 +66,51 @@ public class KofuKetteiTsuchiController {
 		model.addAttribute("dto", dto);
 		return "reports/kofuKetteiTsuchi";
 	}
-
-	/**
-	 * PDF出力
-	 */
-	@PostMapping("/kofuKetteiTsuchi/pdf")
-	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
-	@RptLog(rptId = ReportsConstants.KOFU_KETTEI_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-	public ResponseEntity<byte[]> generatePdf(KofuKetteiTsuchiDto dto) {
-		try {
-			accessChecker.checkAccess(SCREEN_ID);
-
-			KofuKetteiTsuchiDto reportData = kofuKetteiTsuchiService.getReportData(dto.getShiteiNo());
-			if (reportData == null) {
-				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
-				return ResponseEntity.badRequest().build();
-			}
-
-			// 画面入力値をコピー（日付フォーマット変換）
-			if (dto.getHakkoYmd() != null) {
-				// yyyy-MM-dd 形式から yyyy年MM月dd日 形式に変換
-				try {
-					java.time.LocalDate date = java.time.LocalDate.parse(dto.getHakkoYmd());
-					String formattedDate = String.format("%d年%d月%d日",
-							date.getYear(),
-							date.getMonthValue(),
-							date.getDayOfMonth());
-					reportData.setHakkoYmd(formattedDate);
-				} catch (Exception e) {
-					// パースエラーの場合はそのまま使用
-					reportData.setHakkoYmd(dto.getHakkoYmd());
-				}
-			}
-
-			byte[] pdfData = reportsService.generateKofuKetteiTsuchiPdf(reportData);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.setContentDispositionFormData("inline", "kofu_kettei_tsuchi.pdf");
-
-			return ResponseEntity.ok().headers(headers).body(pdfData);
-		} catch (Exception e) {
-			log.error("PDF生成中にエラーが発生しました", e);
-			return ResponseEntity.internalServerError().build();
-		}
-	}
+//
+//	/**
+//	 * PDF出力
+//	 */
+//	@PostMapping("/kofuKetteiTsuchi/pdf")
+//	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
+//	@RptLog(rptId = ReportsConstants.KOFU_KETTEI_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
+//	public ResponseEntity<byte[]> generatePdf(KofuKetteiTsuchiDto dto) {
+//		try {
+//			accessChecker.checkAccess(SCREEN_ID);
+//
+//			KofuKetteiTsuchiDto reportData = kofuKetteiTsuchiService.getReportData(dto.getShiteiNo());
+//			if (reportData == null) {
+//				log.error("報告データが取得できません。指定番号: {}", dto.getShiteiNo());
+//				return ResponseEntity.badRequest().build();
+//			}
+//
+//			// 画面入力値をコピー（日付フォーマット変換）
+//			if (dto.getHakkoYmd() != null) {
+//				// yyyy-MM-dd 形式から yyyy年MM月dd日 形式に変換
+//				try {
+//					java.time.LocalDate date = java.time.LocalDate.parse(dto.getHakkoYmd());
+//					String formattedDate = String.format("%d年%d月%d日",
+//							date.getYear(),
+//							date.getMonthValue(),
+//							date.getDayOfMonth());
+//					reportData.setHakkoYmd(formattedDate);
+//				} catch (Exception e) {
+//					// パースエラーの場合はそのまま使用
+//					reportData.setHakkoYmd(dto.getHakkoYmd());
+//				}
+//			}
+//
+//			byte[] pdfData = reportsService.generateKofuKetteiTsuchiPdf(reportData);
+//
+//			HttpHeaders headers = new HttpHeaders();
+//			headers.setContentType(MediaType.APPLICATION_PDF);
+//			headers.setContentDispositionFormData("inline", "kofu_kettei_tsuchi.pdf");
+//
+//			return ResponseEntity.ok().headers(headers).body(pdfData);
+//		} catch (Exception e) {
+//			log.error("PDF生成中にエラーが発生しました", e);
+//			return ResponseEntity.internalServerError().build();
+//		}
+//	}
 
 	/**
 	 * プレビュー

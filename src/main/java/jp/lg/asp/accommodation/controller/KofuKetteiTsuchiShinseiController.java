@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,24 +17,24 @@ import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.KofuShinseiDto;
-import jp.lg.asp.accommodation.service.KofuShinseiReportsService;
-import jp.lg.asp.accommodation.service.KofuShinseiService;
+import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
+import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiReportsService;
+import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 宿泊税特別徴収事務交付金交付申請書 Controller
+ * 宿泊税特別徴収事務交付金決定通知書・交付申請書 Controller
  */
 @Slf4j
 @Controller
 @RequestMapping("/reports")
 @RequiredArgsConstructor
-public class KofuShinseiController {
+public class KofuKetteiTsuchiShinseiController {
 
-	private final KofuShinseiService kofuShinseiService;
-	private final KofuShinseiReportsService reportsService;
+	private final KofuKetteiTsuchiShinseiService KofuKetteiTsuchiShinseiService;
+	private final KofuKetteiTsuchiShinseiReportsService shinseiReportsService;
 	private final ScreenAccessChecker accessChecker;
 	private final ReportsCommonService reportsCommonService;
 	private static final String SCREEN_ID = ScreenManagement.KOFU_SHINSEI;
@@ -40,80 +42,72 @@ public class KofuShinseiController {
 	/**
 	 * 画面表示
 	 */
-	@GetMapping("/kofuShinsei")
+	@GetMapping("/kofuKetteiTsuchiShinsei")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String nendo,
+			@RequestParam(required = false) String hakkoYmd,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		KofuShinseiDto dto = new KofuShinseiDto();
+		KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			// 指定番号に基づいて特別徴収義務者情報と施設情報を取得
-			if (nendo != null && !nendo.isEmpty()) {
-				// 年度が指定されている場合はyyyy部分のみを抽出
-				String nenodoYear = nendo.split("-")[0];
-				dto = kofuShinseiService.getReportData(shiteiNo, nenodoYear);
-			} else {
-				// デフォルト（現在年度）で取得
-				dto = kofuShinseiService.getReportData(shiteiNo);
-			}
-
-			if (dto == null) {
-				dto = new KofuShinseiDto();
-				dto.setShiteiNo(shiteiNo);
-				if (nendo != null && !nendo.isEmpty()) {
-					dto.setNendo(nendo);
-				} else {
-					// デフォルト年度を設定（yyyy-MM形式）
-					java.time.LocalDate now = java.time.LocalDate.now();
-					int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-					dto.setNendo(currentYear + "-04");
-				}
-			} else {
-				// 取得したデータに年度を設定（yyyy-MM形式で）
-				if (nendo != null && !nendo.isEmpty()) {
-					dto.setNendo(nendo);
-				} else {
-					java.time.LocalDate now = java.time.LocalDate.now();
-					int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-					dto.setNendo(currentYear + "-04");
-				}
-			}
-		}
-
-		// 年度が設定されていない場合、デフォルト年度を設定（yyyy-MM形式）
-		if (dto.getNendo() == null || dto.getNendo().isEmpty()) {
+		// YYYY形式の算定ロジックを共通化
+		String targetNendo = nendo;
+		if (targetNendo == null || targetNendo.isEmpty()) {
 			java.time.LocalDate now = java.time.LocalDate.now();
 			int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-			dto.setNendo(currentYear + "-04");
+			targetNendo = String.valueOf(currentYear);
 		}
+
+		// 指定番号がある場合のデータ取得
+		if (shiteiNo != null && !shiteiNo.isEmpty()) {
+			// ハイフンが含まれていれば分割して先頭を取得
+			String nendoYear = targetNendo.split("-")[0];
+			dto = KofuKetteiTsuchiShinseiService.getReportData(shiteiNo, nendoYear);
+		}
+
+		// データが存在しない場合、または指定番号がない場合のDto初期化
+		if (dto == null) {
+			dto = new KofuKetteiTsuchiShinseiDto();
+			dto.setShiteiNo(shiteiNo);
+		}
+
+		// YYYY形式の年度をDTOにセット
+		dto.setNendo(targetNendo.split("-")[0]);
 		
+		// 発行年月日が指定されている場合はそれを使用、されていない場合は当日を設定
+		if (hakkoYmd != null && !hakkoYmd.isEmpty()) {
+			dto.setHakkoYmd(hakkoYmd);
+		} else if (dto.getHakkoYmd() == null || dto.getHakkoYmd().isEmpty()) {
+			// 当日をデフォルトとして設定
+			java.time.LocalDate today = java.time.LocalDate.now();
+			dto.setHakkoYmd(today.toString());
+		}
+
 		model.addAttribute("dto", dto);
-		return "reports/kofuShinsei";
+		return "reports/kofuKetteiTsuchiShinsei";
 	}
 
 	/**
 	 * 年度変更時のデータ取得API
 	 */
-	@PostMapping("/kofuShinsei/reload")
+	@PostMapping("/kofuKetteiTsuchiShinsei/reload")
 	@OpeLog(screenId = SCREEN_ID, operation = "年度更新")
-	public ResponseEntity<KofuShinseiDto> reloadData(@RequestParam String shiteiNo,
+	public ResponseEntity<KofuKetteiTsuchiShinseiDto> reloadData(@RequestParam String shiteiNo,
 			@RequestParam String nendo) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
 			// 年度からyyyy部分のみを抽出
 			String nendoYear = nendo.split("-")[0];
-			KofuShinseiDto dto = kofuShinseiService.getReportData(shiteiNo, nendoYear);
+			KofuKetteiTsuchiShinseiDto dto = KofuKetteiTsuchiShinseiService.getReportData(shiteiNo, nendoYear);
 
 			if (dto == null) {
-				dto = new KofuShinseiDto();
+				dto = new KofuKetteiTsuchiShinseiDto();
 				dto.setShiteiNo(shiteiNo);
-				dto.setNendo(nendo);
-			} else {
-				dto.setNendo(nendo);
-			}
+			} 
+			
+			dto.setNendo(nendo);
 
 			return ResponseEntity.ok(dto);
 		} catch (Exception e) {
@@ -125,28 +119,37 @@ public class KofuShinseiController {
 	/**
 	 * PDF出力
 	 */
-	@PostMapping("/kofuShinsei/pdf")
+	@PostMapping("/kofuKetteiTsuchiShinsei/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-	public ResponseEntity<byte[]> generatePdf(KofuShinseiDto dto) {
+	public ResponseEntity<byte[]> generatePdf(KofuKetteiTsuchiShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-
+		
 			// 年度が指定されている場合はその年度で取得
-			KofuShinseiDto reportData;
+			KofuKetteiTsuchiShinseiDto reportData;
 			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
 				String nendoYear = dto.getNendo().split("-")[0];
-				reportData = kofuShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
+				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
 			} else {
-				reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo());
 			}
 
-			if (reportData == null) {
+			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
 				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
-				return ResponseEntity.badRequest().build();
+				
+				// データが発見出来なかった時のエラーメッセージを送信
+				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
+			
+			// 発行年月日を設定
+			reportData.setHakkoYmd(dto.getHakkoYmd());
 
-			byte[] pdfData = reportsService.generateKofuShinseiPdf(reportData);
+			// 印刷対象を設定
+			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
+			reportData.setShinsei(dto.isShinsei());
+
+			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
@@ -162,28 +165,37 @@ public class KofuShinseiController {
 	/**
 	 * プレビュー
 	 */
-	@PostMapping("/kofuShinsei/preview")
+	@PostMapping("/kofuKetteiTsuchiShinsei/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
-	public ResponseEntity<byte[]> preview(KofuShinseiDto dto) {
+	public ResponseEntity<byte[]> preview(KofuKetteiTsuchiShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-
+			
 			// 年度が指定されている場合はその年度で取得
-			KofuShinseiDto reportData;
+			KofuKetteiTsuchiShinseiDto reportData;
 			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
 				String nendoYear = dto.getNendo().split("-")[0];
-				reportData = kofuShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
+				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
 			} else {
-				reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo());
 			}
 
-			if (reportData == null) {
+			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
 				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
-				return ResponseEntity.badRequest().build();
+				
+				// データが発見出来なかった時のエラーメッセージを送信
+				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
+			
+			// 発行年月日を設定
+			reportData.setHakkoYmd(dto.getHakkoYmd());
 
-			byte[] pdfData = reportsService.generateKofuShinseiPdf(reportData);
+			// 印刷対象を設定
+			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
+			reportData.setShinsei(dto.isShinsei());
+
+			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
@@ -200,28 +212,37 @@ public class KofuShinseiController {
 	/**
 	 * 印刷
 	 */
-	@PostMapping("/kofuShinsei/print")
+	@PostMapping("/kofuKetteiTsuchiShinsei/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
-	public ResponseEntity<byte[]> print(KofuShinseiDto dto) {
+	public ResponseEntity<byte[]> print(KofuKetteiTsuchiShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-
+			
 			// 年度が指定されている場合はその年度で取得
-			KofuShinseiDto reportData;
+			KofuKetteiTsuchiShinseiDto reportData;
 			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
 				String nendoYear = dto.getNendo().split("-")[0];
-				reportData = kofuShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
+				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
 			} else {
-				reportData = kofuShinseiService.getReportData(dto.getShiteiNo());
+				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo());
 			}
 
-			if (reportData == null) {
+			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
 				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
-				return ResponseEntity.badRequest().build();
+				
+				// データが発見出来なかった時のエラーメッセージを送信
+				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
+			
+			// 発行年月日を設定
+			reportData.setHakkoYmd(dto.getHakkoYmd());
+			
+			// 印刷対象を設定
+			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
+			reportData.setShinsei(dto.isShinsei());
 
-			byte[] pdfData = reportsService.generateKofuShinseiPdf(reportData);
+			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);

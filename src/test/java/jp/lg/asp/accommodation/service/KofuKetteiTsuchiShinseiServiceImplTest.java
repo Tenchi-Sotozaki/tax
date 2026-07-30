@@ -13,24 +13,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
-import jp.lg.asp.accommodation.dto.KofuShinseiDto;
+import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.ReportsDef;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
-import jp.lg.asp.accommodation.service.impl.KofuShinseiServiceImpl;
+import jp.lg.asp.accommodation.service.impl.KofuKetteiTsuchiShinseiServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class KofuShinseiServiceImplTest {
+class kofuKetteiTsuchiShinseiServiceImplTest {
 
     @Mock TokugimuRepository tokugimuRepository;
     @Mock AtenaRepository atenaRepository;
@@ -39,7 +40,7 @@ class KofuShinseiServiceImplTest {
     @Mock ReportsCommonService reportsCommonService;
     @Mock JichitaiContext jichitaiContext;
 
-    @InjectMocks KofuShinseiServiceImpl service;
+    @InjectMocks KofuKetteiTsuchiShinseiServiceImpl service;
 
     private static final String JICHITAI_CD = "011002";
     private static final String SHITEI_NO = "00100001";
@@ -53,7 +54,10 @@ class KofuShinseiServiceImplTest {
         when(reportsCommonService.getJichitaiInfo()).thenReturn(jichitai);
         when(reportsCommonService.getReportsDefText(any())).thenReturn("テスト条例");
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
-        when(reportsDefRepository.findByIdAndJichitaiCd(any(), any())).thenReturn(Optional.empty());
+		when(reportsDefRepository.findByIdAndJichitaiCd(eq("KOFU_HAKKO_YOSHIKI"), any()))
+				.thenReturn(Optional.of(new ReportsDef()));
+		when(reportsDefRepository.findByIdAndJichitaiCd(eq("KOFU_JOKEN"), any()))
+				.thenReturn(Optional.of(new ReportsDef()));
     }
 
     @Test
@@ -76,7 +80,7 @@ class KofuShinseiServiceImplTest {
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(Optional.of(shoreikin));
 
-        KofuShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
         assertThat(result).isNotNull();
         assertThat(result.getTokuName()).isEqualTo("テスト太郎");
@@ -89,7 +93,7 @@ class KofuShinseiServiceImplTest {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
                 .thenReturn(Optional.empty());
 
-        KofuShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
         assertThat(result).isNull();
     }
@@ -104,7 +108,7 @@ class KofuShinseiServiceImplTest {
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.valueOf(9999)))
                 .thenReturn(Optional.empty());
 
-        KofuShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
         assertThat(result).isNull();
     }
@@ -123,7 +127,7 @@ class KofuShinseiServiceImplTest {
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(Optional.empty());
 
-        KofuShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
         assertThat(result).isNotNull();
         assertThat(result.getNonyugaku()).isEqualTo("0");
