@@ -72,7 +72,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	        if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
 	        fetch('/accommodation-tax/api/shitei-gassan/select', {
 	            method: 'POST', headers, body: JSON.stringify(dto)
-	        }).then(() => location.href = url);
+	        }).then(res => {
+	            if (!res.ok) throw new Error('セッション保存に失敗しました');
+	            location.href = url;
+	        }).catch(err => {
+	            console.error(err);
+	            alert('遷移に失敗しました。画面を再読み込みして再度お試しください。');
+	        });
 	    });
 
 	const nav = (btnId, msg, url) =>
