@@ -265,6 +265,7 @@
 									<th style="min-width: 80px" class="text-center">合算対象</th>
 									<th style="min-width: 100px" class="text-center">最終申告日</th>
 									<th style="min-width: 90px" class="text-center">最終納付状況</th>
+									<th style="width: 90px" class="text-center"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -299,9 +300,17 @@
 										<span th:if="${item.lastNonyuStatus == 'partial'}">△</span>
 										<span th:if="${item.lastNonyuStatus == 'unpaid'}">ー</span>
 									</td>
+									<!-- 指定番号はパラメータでは渡さず、セッションに保存してから照会画面へ遷移する -->
+									<td class="text-center">
+										<a href="#" class="detail-link"
+											th:data-shitei-no="${item.shiteiNo}"
+											th:data-atena-no="${item.id}"
+											th:data-name="${item.name}"
+											th:data-shisetsu-name="${item.shisetsuName}">詳細</a>
+									</td>
 								</tr>
 								<tr th:if="${items.totalElements == 0}">
-									<td colspan="9" class="text-center text-muted py-5"><i
+									<td colspan="10" class="text-center text-muted py-5"><i
 											class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
 										該当するデータが見つかりませんでした。</td>
 								</tr>

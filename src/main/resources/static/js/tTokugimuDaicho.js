@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('tbody tr').forEach(function (row) {
         row.style.cursor = 'pointer';
         row.addEventListener('click', function (e) {
-            if (e.target.closest('.btn, input[type="checkbox"]')) return;
+            if (e.target.closest('.btn, .detail-link, input[type="checkbox"]')) return;
             const cb = row.querySelector('.row-select');
             if (!cb) return;
             const next = !cb.checked;
@@ -50,6 +50,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 '「' + name + '」を削除します。この操作は取り消せません。よろしいですか？';
             modal.querySelector('[data-form-id]').dataset.formId = 'deleteForm-' + id;
             new bootstrap.Modal(modal).show();
+        });
+    });
+
+    // 選択した特別徴収義務者をセッションに保存してから遷移する
+    const saveSessionThenGo = (dto, url) => {
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+        fetch('/accommodation-tax/api/shitei-gassan/select', {
+            method: 'POST', headers, body: JSON.stringify(dto)
+        }).then(res => {
+            if (!res.ok) throw new Error('セッション保存に失敗しました');
+            location.href = url;
+        }).catch(err => {
+            console.error(err);
+            alert('遷移に失敗しました。画面を再読み込みして再度お試しください。');
+        });
+    };
+
+    // 一覧の「詳細」。指定番号はパラメータで渡さずセッション経由で照会画面へ遷移する
+    document.querySelectorAll('.detail-link').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            saveSessionThenGo({
+                atenaNo: this.dataset.atenaNo || null,
+                shiteiNo: this.dataset.shiteiNo,
+                gassanShiteiNo: null,
+                name: this.dataset.name || null,
+                shisetsuName: this.dataset.shisetsuName || null
+            }, '/accommodation-tax/tokugimu/view');
         });
     });
 
