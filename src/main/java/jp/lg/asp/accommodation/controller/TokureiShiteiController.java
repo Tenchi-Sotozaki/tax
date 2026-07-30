@@ -1,4 +1,4 @@
-package jp.lg.asp.accommodation.controller;
+﻿package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
@@ -10,16 +10,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.service.TokureiShiteiReportsService;
 import jp.lg.asp.accommodation.service.TokureiShiteiService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,15 +44,20 @@ public class TokureiShiteiController {
 	 */
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
+	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
 		TokureiShiteiDto dto = new TokureiShiteiDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			TokureiShiteiDto tokugimuInfo = tokureiShiteiService.getTokugimuInfo(shiteiNo);
-			if (tokugimuInfo != null) {
-				dto = tokugimuInfo;
-			}
+		if (shiteiNo == null || shiteiNo.isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("dto", dto);
+			return "reports/tokureiShitei";
+		}
+
+		TokureiShiteiDto tokugimuInfo = tokureiShiteiService.getTokugimuInfo(shiteiNo);
+		if (tokugimuInfo != null) {
+			dto = tokugimuInfo;
 		}
 
 		if (dto.getHakkoYmd() == null) {

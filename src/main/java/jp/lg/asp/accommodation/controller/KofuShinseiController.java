@@ -1,4 +1,4 @@
-package jp.lg.asp.accommodation.controller;
+﻿package jp.lg.asp.accommodation.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -10,15 +10,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuShinseiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KofuShinseiReportsService;
 import jp.lg.asp.accommodation.service.KofuShinseiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,48 +45,33 @@ public class KofuShinseiController {
 	 */
 	@GetMapping("/kofuShinsei")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(@RequestParam(required = false) String shiteiNo,
+	public String index(HttpSession session,
 			@RequestParam(required = false) String nendo,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
 		KofuShinseiDto dto = new KofuShinseiDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			// 指定番号に基づいて特別徴収義務者情報と施設情報を取得
-			if (nendo != null && !nendo.isEmpty()) {
-				// 年度が指定されている場合はyyyy部分のみを抽出
-				String nenodoYear = nendo.split("-")[0];
-				dto = kofuShinseiService.getReportData(shiteiNo, nenodoYear);
-			} else {
-				// デフォルト（現在年度）で取得
-				dto = kofuShinseiService.getReportData(shiteiNo);
-			}
-
-			if (dto == null) {
-				dto = new KofuShinseiDto();
-				dto.setShiteiNo(shiteiNo);
-				if (nendo != null && !nendo.isEmpty()) {
-					dto.setNendo(nendo);
-				} else {
-					// デフォルト年度を設定（yyyy-MM形式）
-					java.time.LocalDate now = java.time.LocalDate.now();
-					int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-					dto.setNendo(currentYear + "-04");
-				}
-			} else {
-				// 取得したデータに年度を設定（yyyy-MM形式で）
-				if (nendo != null && !nendo.isEmpty()) {
-					dto.setNendo(nendo);
-				} else {
-					java.time.LocalDate now = java.time.LocalDate.now();
-					int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
-					dto.setNendo(currentYear + "-04");
-				}
-			}
+		if (shiteiNo == null || shiteiNo.isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("dto", dto);
+			return "reports/kofuShinsei";
 		}
 
-		// 年度が設定されていない場合、デフォルト年度を設定（yyyy-MM形式）
-		if (dto.getNendo() == null || dto.getNendo().isEmpty()) {
+		if (nendo != null && !nendo.isEmpty()) {
+			String nendoYear = nendo.split("-")[0];
+			dto = kofuShinseiService.getReportData(shiteiNo, nendoYear);
+		} else {
+			dto = kofuShinseiService.getReportData(shiteiNo);
+		}
+
+		if (dto == null) {
+			dto = new KofuShinseiDto();
+			dto.setShiteiNo(shiteiNo);
+		}
+		if (nendo != null && !nendo.isEmpty()) {
+			dto.setNendo(nendo);
+		} else if (dto.getNendo() == null || dto.getNendo().isEmpty()) {
 			java.time.LocalDate now = java.time.LocalDate.now();
 			int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
 			dto.setNendo(currentYear + "-04");

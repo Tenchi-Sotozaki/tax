@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function generateViewUrl(nendo, kibetsu) {
-    var baseUrl = window.declarationViewBaseUrl || '/declaration/view/';
-    var shiteiNo = window.fukaDaichoFormShiteiNo || '';
-    return baseUrl + shiteiNo + '/' + nendo + '/' + kibetsu;
+    var baseUrl = window.declarationViewBaseUrl || '/declaration/view';
+    return baseUrl + '?nendo=' + nendo + '&kibetsu=' + kibetsu;
 }

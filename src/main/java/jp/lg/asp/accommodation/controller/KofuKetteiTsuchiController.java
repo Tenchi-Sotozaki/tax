@@ -1,4 +1,4 @@
-package jp.lg.asp.accommodation.controller;
+﻿package jp.lg.asp.accommodation.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -10,14 +10,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiReportsService;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,18 +43,23 @@ public class KofuKetteiTsuchiController {
 	 */
 	@GetMapping("/kofuKetteiTsuchi")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(@RequestParam(required = false) String shiteiNo,
+	public String index(HttpSession session,
 			@RequestParam(required = false) String hakkoYmd,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
 		KofuKetteiTsuchiDto dto = new KofuKetteiTsuchiDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			dto = kofuKetteiTsuchiService.getReportData(shiteiNo);
-			if (dto == null) {
-				dto = new KofuKetteiTsuchiDto();
-				dto.setShiteiNo(shiteiNo);
-			}
+		if (shiteiNo == null || shiteiNo.isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("dto", dto);
+			return "reports/kofuKetteiTsuchi";
+		}
+
+		dto = kofuKetteiTsuchiService.getReportData(shiteiNo);
+		if (dto == null) {
+			dto = new KofuKetteiTsuchiDto();
+			dto.setShiteiNo(shiteiNo);
 		}
 
 		// 発行年月日が指定されている場合はそれを使用、されていない場合は当日を設定

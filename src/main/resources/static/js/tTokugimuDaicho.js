@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.querySelectorAll('.delete-btn').forEach(function (btn) {
 	        btn.addEventListener('click', function (e) {
 	            e.stopPropagation();
-	            // HTML側が data-shitei-no の場合は dataset.shiteiNo に変更する
 	            const id = this.dataset.shiteiNo, name = this.dataset.name;
 	            const modal = document.getElementById('deleteModal');
             modal.querySelector('.modal-body p').textContent =
@@ -54,15 +53,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ナビゲーションヘルパー
+    // セッションに指定番号を保存してから遷移するヘルパー
+	const navWithSession = (btnId, msg, url) =>
+	    document.getElementById(btnId)?.addEventListener('click', () => {
+	        const id = requireSelected(msg);
+	        if (!id) return;
+	        const cb = document.querySelector('.row-select:checked');
+	        const dto = {
+	            atenaNo: cb?.dataset.atenaNo || null,
+	            shiteiNo: id,
+	            gassanShiteiNo: null,
+	            name: cb?.dataset.name || null,
+	            shisetsuName: cb?.dataset.shisetsuName || null
+	        };
+	        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+	        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+	        const headers = { 'Content-Type': 'application/json' };
+	        if (csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+	        fetch('/accommodation-tax/api/shitei-gassan/select', {
+	            method: 'POST', headers, body: JSON.stringify(dto)
+	        }).then(() => location.href = url);
+	    });
+
 	const nav = (btnId, msg, url) =>
 	    document.getElementById(btnId)?.addEventListener('click', () => {
 	        const id = requireSelected(msg);
 	        if (id) location.href = url.replace('{id}', id);
 	    });
 
-    nav('btnView',            '照会する特別徴収義務者を選択してください。',
-                              '/accommodation-tax/tokugimu/view/{id}');
+    navWithSession('btnView',          '照会する特別徴収義務者を選択してください。',
+                                       '/accommodation-tax/tokugimu/view');
+    navWithSession('btnReport',        '特別徴収義務者を選択してください。',
+                                       '/accommodation-tax/tokugimu/report');
+    navWithSession('btnPaymentLedger', '事業者を選択してください。',
+                                       '/accommodation-tax/declaration/payment-ledger');
     nav('btnTaxManager',      '特別徴収義務者を選択してください。',
                               '/accommodation-tax/tax-manager/edit/{id}?from=register');
 	nav('btnTaxManagerView',  '特別徴収義務者を選択してください。',
@@ -71,9 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
                               '/accommodation-tax/tekiyo-nozei-shuki/edit/{id}?from=register');
     nav('btnNozeiShukiView',  '特別徴収義務者を選択してください。',
                               '/accommodation-tax/tekiyo-nozei-shuki/view/{id}');
-    nav('btnPaymentLedger',   '事業者を選択してください。',
-                              '/accommodation-tax/declaration/payment-ledger/{id}');
-
 
     document.getElementById('btnDelete')?.addEventListener('click', () => {
         const id = requireSelected('削除するレコードを選択してください。');
@@ -91,23 +112,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // モーダル内のフォームIDを更新
         const confirmButton = modal.querySelector('[data-form-id]');
         if (confirmButton) {
             confirmButton.dataset.formId = 'deleteForm-' + id;
         }
         
-        // モーダルを表示
         new bootstrap.Modal(modal).show();
     });
     document.getElementById('btnCorrection')?.addEventListener('click', () => {
         const id = requireSelected('特別徴収義務者を選択してください。');
         if (id) alert('更生請求画面は未実装です。');
     });
-    document.getElementById('btnReport')?.addEventListener('click', () => {
-        const id = requireSelected('特別徴収義務者を選択してください。');
-        if (id) location.href = '/accommodation-tax/tokugimu/report/' + id;
-    });
-
 });
-
