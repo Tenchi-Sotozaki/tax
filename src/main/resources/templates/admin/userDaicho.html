@@ -34,94 +34,102 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- ======== 抽出条件アコーディオン ======== -->
+		<!-- ======== 検索条件アコーディオン ======== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button"
 						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2"></i>抽出条件
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
-			</div>
-			<div id="searchPanel" class="accordion-collapse collapse show">
-				<div class="accordion-body pt-3 pb-2 px-3">
-					<form th:action="@{/admin/user-search}"
-						th:object="${userSearchForm}" method="get">
-						<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
-							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">ID</label>
-								<input type="text" class="form-control form-control-sm"
-									th:field="*{id}" placeholder="IDを入力">
-							</div>
-							<div class="col">
-								<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
-									<label class="form-label form-label-sm fw-medium mb-0">氏名</label>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
-										<label class="form-check-label small" for="namePrefix">前方</label>
-									</div>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
-										<label class="form-check-label small" for="namePartial">部分</label>
-									</div>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
-										<label class="form-check-label small" for="nameExact">完全</label>
-									</div>
+				<div id="searchPanel" class="accordion-collapse collapse show">
+					<div class="accordion-body pt-3 pb-2 px-3">
+						<form th:action="@{/admin/user-search}"
+							th:object="${userSearchForm}" method="get">
+							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">ID</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{id}" placeholder="IDを入力">
 								</div>
-								<input type="text" class="form-control form-control-sm"
-									th:field="*{name}" placeholder="氏名を入力">
-							</div>
-							<div class="col">
-								<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
-									<label class="form-label form-label-sm fw-medium mb-0">ふりがな</label>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="prefix" id="nameKanaPrefix">
-										<label class="form-check-label small" for="nameKanaPrefix">前方</label>
+								<div class="col">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">氏名</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
+											<label class="form-check-label small" for="namePrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
+											<label class="form-check-label small" for="namePartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
+											<label class="form-check-label small" for="nameExact">完全</label>
+										</div>
 									</div>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="partial" id="nameKanaPartial">
-										<label class="form-check-label small" for="nameKanaPartial">部分</label>
-									</div>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="exact" id="nameKanaExact">
-										<label class="form-check-label small" for="nameKanaExact">完全</label>
-									</div>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{name}" placeholder="氏名を入力">
 								</div>
-								<input type="text" class="form-control form-control-sm"
-									th:field="*{nameKana}" placeholder="ふりがなを入力">
-							</div>
-							<div class="col">
-								<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
-									<label class="form-label form-label-sm fw-medium mb-0">部署</label>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="prefix" id="bushoPrefix">
-										<label class="form-check-label small" for="bushoPrefix">前方</label>
+								<div class="col">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">ふりがな</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="prefix" id="nameKanaPrefix">
+											<label class="form-check-label small" for="nameKanaPrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="partial" id="nameKanaPartial">
+											<label class="form-check-label small" for="nameKanaPartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="exact" id="nameKanaExact">
+											<label class="form-check-label small" for="nameKanaExact">完全</label>
+										</div>
 									</div>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="partial" id="bushoPartial">
-										<label class="form-check-label small" for="bushoPartial">部分</label>
-									</div>
-									<div class="form-check form-check-inline me-0">
-										<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="exact" id="bushoExact">
-										<label class="form-check-label small" for="bushoExact">完全</label>
-									</div>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{nameKana}" placeholder="ふりがなを入力">
 								</div>
-								<input type="text" class="form-control form-control-sm"
-									th:field="*{busho}" placeholder="部署を入力">
+								<div class="col">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">部署</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="prefix" id="bushoPrefix">
+											<label class="form-check-label small" for="bushoPrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="partial" id="bushoPartial">
+											<label class="form-check-label small" for="bushoPartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{bushoMatchType}" value="exact" id="bushoExact">
+											<label class="form-check-label small" for="bushoExact">完全</label>
+										</div>
+									</div>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{busho}" placeholder="部署を入力">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">権限</label>
+									<select class="form-select form-select-sm" th:field="*{roleId}">
+										<option value="">すべて</option>
+										<option th:each="role : ${roles}" th:value="${role.roleId}"
+											th:text="${role.name}"></option>
+									</select>
+								</div>
 							</div>
-						</div>
-						<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-							<a th:href="@{/admin/user-search}"
-								class="btn btn-outline-secondary btn-sm"> <i
-								class="bi bi-arrow-counterclockwise me-1"></i>クリア
-							</a>
-							<button type="submit" class="btn btn-primary btn-sm px-4">
-								<i class="bi bi-search me-1"></i>検索する
-							</button>
-						</div>
-					</form>
+							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+								<a th:href="@{/admin/user-search}"
+									class="btn btn-outline-secondary btn-sm"> <i
+									class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
+								</a>
+								<button type="submit" class="btn btn-primary btn-sm px-4">
+									<i class="bi bi-search me-1"></i>検索する
+								</button>
+							</div>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -141,19 +149,19 @@
 				<ul class="pagination pagination-sm justify-content-center mb-0">
 					<!-- 前へ -->
 					<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-						<a class="page-link" th:href="@{/admin/user-search(page=${items.number - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}">前へ</a>
+						<a class="page-link" th:href="@{/admin/user-search(page=${items.number - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">前へ</a>
 					</li>
 					<!-- 省略なし（6ページ以下） -->
 					<th:block th:if="${items.totalPages <= 6}">
 						<li class="page-item" th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}" th:classappend="${i == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}" th:text="${i + 1}">1</a>
+							<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${i + 1}">1</a>
 						</li>
 					</th:block>
 					<!-- 省略あり（7ページ以上） -->
 					<th:block th:if="${items.totalPages > 6}">
 						<!-- 先頭ページ -->
 						<li class="page-item" th:classappend="${0 == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=0, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}">1</a>
+							<a class="page-link" th:href="@{/admin/user-search(page=0, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">1</a>
 						</li>
 						<!-- 先頭省略 -->
 						<li class="page-item disabled" th:if="${items.number > 3}">
@@ -162,7 +170,7 @@
 						<!-- 中間ページ（先頭・末尾を除く） -->
 						<th:block th:each="i : ${#numbers.sequence(1, items.totalPages - 2)}">
 							<li class="page-item" th:if="${i >= items.number - 1 and i <= items.number + 1}" th:classappend="${i == items.number} ? 'active'">
-								<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}" th:text="${i + 1}">2</a>
+								<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${i + 1}">2</a>
 							</li>
 						</th:block>
 						<!-- 末尾省略 -->
@@ -171,12 +179,12 @@
 						</li>
 						<!-- 末尾ページ -->
 						<li class="page-item" th:classappend="${items.totalPages - 1 == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=${items.totalPages - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}" th:text="${items.totalPages}">N</a>
+							<a class="page-link" th:href="@{/admin/user-search(page=${items.totalPages - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${items.totalPages}">N</a>
 						</li>
 					</th:block>
 					<!-- 次へ -->
 					<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-						<a class="page-link" th:href="@{/admin/user-search(page=${items.number + 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}">次へ</a>
+						<a class="page-link" th:href="@{/admin/user-search(page=${items.number + 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">次へ</a>
 					</li>
 				</ul>
 			</nav>
@@ -186,7 +194,7 @@
 				<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 				<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
 					<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-						th:value="@{/admin/user-search(page=0, pageSize=${s}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}"
+						th:value="@{/admin/user-search(page=0, pageSize=${s}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}"
 						th:text="${s}" th:selected="${s == userSearchForm.pageSize}">
 					</option>
 				</select>
@@ -218,7 +226,8 @@
 								<td th:text="${user.name}"></td>
 								<td class="text-muted" th:text="${user.nameKana}"></td>
 								<td th:text="${user.busho}"></td>
-								<td th:text="${roleMap[user.roleId.toString()]}"></td>
+								<td
+									th:text="${user.roleId == null ? '' : roleMap[user.roleId.longValue()]}"></td>
 								<td class="text-center">
 									<a th:href="@{/admin/user-view/{id}(id=${user.id})}"
 										class="btn btn-outline-primary btn-sm">

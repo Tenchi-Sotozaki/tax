@@ -17,7 +17,7 @@
 			</h5>
 
 			<a th:if="${fukaDeclarationForm.view}"
-				th:href="@{/declaration/edit/{shiteiNo}/{nendo}/{kibetsu}(shiteiNo=${fukaDeclarationForm.shiteiNo}, nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
+				th:href="@{/declaration/edit(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
 				class="btn btn-primary btn-sm"> <i class="bi bi-pencil-square me-2"></i>編集する
 			</a>
 		</div>
@@ -25,13 +25,13 @@
 		<!-- 履歴ナビゲーション（照会画面のみ） -->
 		<div th:if="${fukaDeclarationForm.view and fukaDeclarationForm.rno != null and fukaDeclarationForm.maxRno != null and fukaDeclarationForm.maxRno > 1}"
 			class="d-flex align-items-center gap-2 mb-3">
-			<a th:href="@{/declaration/view/{shiteiNo}/{nendo}/{kibetsu}(shiteiNo=${fukaDeclarationForm.shiteiNo}, nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno - 1})}"
+			<a th:href="@{/declaration/view(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno - 1})}"
 				class="btn btn-outline-secondary btn-sm"
 				th:classappend="${fukaDeclarationForm.rno <= fukaDeclarationForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a>
 			<span class="text-muted small">履歴 <span th:text="${fukaDeclarationForm.rno}"></span> / <span th:text="${fukaDeclarationForm.maxRno}"></span></span>
-			<a th:href="@{/declaration/view/{shiteiNo}/{nendo}/{kibetsu}(shiteiNo=${fukaDeclarationForm.shiteiNo}, nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno + 1})}"
+			<a th:href="@{/declaration/view(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno + 1})}"
 				class="btn btn-outline-secondary btn-sm"
 				th:classappend="${fukaDeclarationForm.rno >= fukaDeclarationForm.maxRno} ? ' disabled'">
 				次の履歴 <i class="bi bi-chevron-right"></i>
@@ -592,10 +592,10 @@
 						th:text="${fukaDeclarationForm.edit ? '更新する' : '登録する'}"></span>
 				</button>
 
-				<a th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
+				<a th:href="@{/declaration/payment-ledger}"
 					class="btn btn-outline-primary px-4 shadow-sm" th:if="${fukaDeclarationForm.view}"> <i
 						class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a th:href="@{/declaration/payment-ledger/{shiteiNo}(shiteiNo=${fukaDeclarationForm.shiteiNo})}"
+				</a> <a th:href="@{/declaration/payment-ledger}"
 					class="btn btn-outline-primary px-4 shadow-sm" th:unless="${fukaDeclarationForm.view}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>

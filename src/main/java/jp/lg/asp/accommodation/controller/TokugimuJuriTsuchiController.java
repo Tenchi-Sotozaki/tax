@@ -17,11 +17,10 @@ import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
-import jp.lg.asp.accommodation.util.SessionHelper;
 import jp.lg.asp.accommodation.dto.TokugimuJuriTsuchiDto;
 import jp.lg.asp.accommodation.service.TokugimuJuriTsuchiReportsService;
 import jp.lg.asp.accommodation.service.TokugimuJuriTsuchiService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,9 +47,9 @@ public class TokugimuJuriTsuchiController {
 		accessChecker.checkAccess(SCREEN_ID);
 		TokugimuJuriTsuchiDto dto = new TokugimuJuriTsuchiDto();
 
-		// 指定番号はパラメータではなくセッションの選択状態から取得する
-		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		String shiteiNo = (selected != null && selected.getShiteiNo() != null) ? selected.getShiteiNo() : "";
+		// 指定番号はセッションから取得
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) shiteiNo = "";
 
 		if (!shiteiNo.isEmpty()) {
 			TokugimuJuriTsuchiDto tokugimuInfo = tokugimuJuriTsuchiService.getTokugimuInfo(shiteiNo);

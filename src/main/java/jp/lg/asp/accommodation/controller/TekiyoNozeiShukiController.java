@@ -14,8 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
-import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver;
-import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver.Kind;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
 import jp.lg.asp.accommodation.service.TekiyoNozeiShukiService;
 import lombok.RequiredArgsConstructor;
@@ -29,24 +28,20 @@ public class TekiyoNozeiShukiController {
 
 	private final TekiyoNozeiShukiService tekiyoNozeiShukiService;
 	private final ScreenAccessChecker accessChecker;
-	private final SelectedJigyoshaResolver selectedJigyoshaResolver;
 
 	private static final String SCREEN_ID = ScreenManagement.TEKIYO_NOZEI_SHUKI_CONFIG;
 	private static final String FORM_VIEW = "tokugimu/tTekiyoNozeiShukiConfig";
-	/** 特別徴収義務者が未選択の場合に表示する選択画面 */
-	private static final String SELECT_VIEW = "tokugimu/shiteiGassanSelect";
 
 	/**
 	 * サイドメニューからの遷移用。
 	 * 指定番号はセッションで選択中の特別徴収義務者から取得する。
+	 * 未選択の場合は指定番号選択モーダルを表示する。
 	 */
 	@GetMapping("/register")
 	public String registerFromSession(HttpSession session, Model model) {
-		// 特別徴収義務者のセッションを保持していない場合は指定モーダルで選択させる
-		String shiteiNo = selectedJigyoshaResolver.resolveShiteiNo(session, Kind.TOKUGIMU);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
 		if (shiteiNo == null) {
-			model.addAttribute("targetName", "納入期限特例登録");
-			return SELECT_VIEW;
+			return showSelectModal(model);
 		}
 		return "redirect:/tekiyo-nozei-shuki/edit/" + shiteiNo + "?from=register";
 	}
@@ -54,16 +49,27 @@ public class TekiyoNozeiShukiController {
 	/**
 	 * サイドメニューからの遷移用。
 	 * 指定番号はセッションで選択中の特別徴収義務者から取得する。
+	 * 未選択の場合は指定番号選択モーダルを表示する。
 	 */
 	@GetMapping("/view")
 	public String viewFromSession(HttpSession session, Model model) {
-		// 特別徴収義務者のセッションを保持していない場合は指定モーダルで選択させる
-		String shiteiNo = selectedJigyoshaResolver.resolveShiteiNo(session, Kind.TOKUGIMU);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
 		if (shiteiNo == null) {
-			model.addAttribute("targetName", "納入期限特例照会");
-			return SELECT_VIEW;
+			return showSelectModal(model);
 		}
 		return "redirect:/tekiyo-nozei-shuki/view/" + shiteiNo;
+	}
+
+	/**
+	 * 特別徴収義務者が未選択の場合に、指定番号選択モーダルを開いた状態で画面を表示する。
+	 */
+	private String showSelectModal(Model model) {
+		model.addAttribute("tekiyoNozeiShukiForm", new TekiyoNozeiShukiForm());
+		model.addAttribute("nozeiShukiOptions", tekiyoNozeiShukiService.getNozeiShukiOptions());
+		model.addAttribute("isEdit", false);
+		model.addAttribute("isView", true);
+		model.addAttribute("showShiteiGassanModal", true);
+		return FORM_VIEW;
 	}
 
 	@GetMapping("/edit/{id}")

@@ -15,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,13 +26,13 @@ import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
-import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver;
-import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver.Kind;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,15 +47,12 @@ public class FukaController {
 
 	private final FukaService fukaService;
 	private final ScreenAccessChecker accessChecker;
-	private final SelectedJigyoshaResolver selectedJigyoshaResolver;
 	private final FukaValidatorService fukaValidatorService;
 
 	private static final String SCREEN_ID = ScreenManagement.FUKA_DAICHO;
 	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
 
 	private static final String CONFIG_VIEW = "fuka/tFukaConfig";
-	/** 事業者が未選択の場合に表示する選択画面 */
-	private static final String SELECT_VIEW = "tokugimu/shiteiGassanSelect";
 
 	/**
 	 * 納入金額管理台帳を表示し、検索処理を行う。
@@ -66,29 +62,20 @@ public class FukaController {
 	 * @param model モデルオブジェクト
 	 * @return 画面パス
 	 */
-	/**
-	 * サイドメニューからの遷移用。
-	 * 指定番号はセッションで選択中の特別徴収義務者から取得する。
-	 */
 	@GetMapping("/payment-ledger")
-	public String showDaichoFromSession(HttpSession session, Model model) {
-		// 事業者のセッションを保持していない場合は指定モーダルで選択させる（種別はどちらでも可）
-		String shiteiNo = selectedJigyoshaResolver.resolveShiteiNo(session, Kind.ANY);
-		if (shiteiNo == null) {
-			model.addAttribute("targetName", "納入申告管理");
-			return SELECT_VIEW;
-		}
-		return "redirect:/declaration/payment-ledger/" + shiteiNo;
-	}
-
-	@GetMapping("/payment-ledger/{shiteiNo}")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String showDaicho(
-			@PathVariable String shiteiNo,
 			@RequestParam(required = false) String nendo,
 			@RequestParam(required = false) String status,
+			HttpSession session,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			return DAICHO_VIEW;
+		}
+		String shiteiNo = selected.getShiteiNo();
 		
 		// 今年度と前年度を計算
 	    LocalDate now = LocalDate.now();
@@ -140,20 +127,26 @@ public class FukaController {
 	 * @param model モデルオブジェクト
 	 * @return 画面パス
 	 */
-	@GetMapping("/register/{shiteiNo}")
+	@GetMapping("/register")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
 	public String register(
-			@PathVariable String shiteiNo,
 			@RequestParam(required = false) String month,
+			HttpSession session,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			return DAICHO_VIEW;
+		}
+		String shiteiNo = selected.getShiteiNo();
 
 		// 二重申告を防止するためのアクセスガード
 		if (month != null && !month.isEmpty()) {
 			if (fukaService.isAlreadyRegistered(shiteiNo, month)) {
 				redirectAttributes.addFlashAttribute("errorMessage", "申告済みのデータです。「照会」ボタンから確認してください。");
-				return "redirect:/declaration/payment-ledger/" + shiteiNo;
+				return "redirect:/declaration/payment-ledger";
 			}
 		}
 
@@ -162,7 +155,7 @@ public class FukaController {
 			model.addAttribute("fukaDeclarationForm", form);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-			return "redirect:/declaration/payment-ledger/" + shiteiNo;
+			return "redirect:/declaration/payment-ledger";
 		}
 		return CONFIG_VIEW;
 	}
@@ -176,20 +169,26 @@ public class FukaController {
 	 * @param model モデルオブジェクト
 	 * @return 画面パス
 	 */
-	@GetMapping("/edit/{shiteiNo}/{nendo}/{kibetsu}")
+	@GetMapping("/edit")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String showEdit(
-			@PathVariable String shiteiNo,
-			@PathVariable String nendo,
-			@PathVariable Integer kibetsu,
+			@RequestParam String nendo,
+			@RequestParam Integer kibetsu,
+			HttpSession session,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			return DAICHO_VIEW;
+		}
+		String shiteiNo = selected.getShiteiNo();
 
 		// 未申告データに対する編集アクセス制限
 		if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
 			redirectAttributes.addFlashAttribute("errorMessage", "未申告のデータです。「新規登録」ボタンから登録してください。");
-			return "redirect:/declaration/payment-ledger/" + shiteiNo;
+			return "redirect:/declaration/payment-ledger";
 		}
 
 		FukaDeclarationForm form = fukaService.getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
@@ -208,20 +207,26 @@ public class FukaController {
 	 * @param model モデルオブジェクト
 	 * @return 画面パス
 	 */
-	@GetMapping("/view/{shiteiNo}/{nendo}/{kibetsu}")
+	@GetMapping("/view")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String showView(
-			@PathVariable String shiteiNo,
-			@PathVariable String nendo,
-			@PathVariable Integer kibetsu,
+			@RequestParam String nendo,
+			@RequestParam Integer kibetsu,
 			@RequestParam(required = false) Integer rno,
+			HttpSession session,
 			RedirectAttributes redirectAttributes,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			return DAICHO_VIEW;
+		}
+		String shiteiNo = selected.getShiteiNo();
 
 		if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
 			redirectAttributes.addFlashAttribute("errorMessage", "未申告のデータです。「新規登録」ボタンから登録してください。");
-			return "redirect:/declaration/payment-ledger/" + shiteiNo;
+			return "redirect:/declaration/payment-ledger";
 		}
 
 		FukaDeclarationForm form = (rno != null)
@@ -295,7 +300,7 @@ public class FukaController {
 			// バリデーションをすべて通過、またはユーザーが警告を承認（バイパス）したため保存を実行
 			fukaService.saveDeclaration(form);
 			redirectAttributes.addFlashAttribute("successMessage", "賦課情報を更新しました。");
-			return "redirect:/declaration/payment-ledger/" + form.getShiteiNo();
+			return "redirect:/declaration/payment-ledger";
 
 		} catch (RuntimeException e) {
 			log.error("保存処理中に予期せぬエラーが発生しました", e);

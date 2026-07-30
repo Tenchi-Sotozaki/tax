@@ -25,4 +25,11 @@ public class SessionHelper {
     public static ShiteiGassanSearchDto getShiteiGassan(HttpServletRequest request) {
         return getShiteiGassan(request.getSession(false));
     }
+
+    /** セッションから指定番号を取得する。未設定の場合は null を返す。 */
+    public static String getShiteiNo(HttpSession session) {
+        ShiteiGassanSearchDto dto = getShiteiGassan(session);
+        return (dto != null && dto.getShiteiNo() != null && !dto.getShiteiNo().isEmpty())
+                ? dto.getShiteiNo() : null;
+    }
 }

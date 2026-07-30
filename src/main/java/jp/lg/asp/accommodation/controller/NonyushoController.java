@@ -10,14 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -48,25 +49,26 @@ public class NonyushoController {
      * 納入書発行画面表示
      */
     @GetMapping
-    public String index(Model model, @RequestParam(required = false) String shiteiNo) {
+    public String index(Model model, HttpSession session) {
+        String shiteiNo = SessionHelper.getShiteiNo(session);
         log.debug("納入書発行画面表示: shiteiNo={}", shiteiNo);
         
-        if (shiteiNo != null && !shiteiNo.trim().isEmpty()) {
-            try {
-                // 指定番号に紐づく特別徴収義務者情報を取得
-                TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
-                model.addAttribute("shiteiNo", shiteiNo);
-                model.addAttribute("shisetsuName", tokugimuForm.getFacilityName());
-                model.addAttribute("tokuName", tokugimuForm.getName());
-                model.addAttribute("tokuJusho", tokugimuForm.getTokugimuAddress());
-                model.addAttribute("tokuYubinNo", tokugimuForm.getTokugimuYubinNo());
-                model.addAttribute("shisetsuJusho", tokugimuForm.getFacilityAddress());
-            } catch (Exception e) {
-                log.error("特別徴収義務者情報の取得に失敗: shiteiNo={}", shiteiNo, e);
-                model.addAttribute("shiteiNo", shiteiNo);
-            }
+        if (shiteiNo == null || shiteiNo.trim().isEmpty()) {
+            model.addAttribute("showShiteiGassanModal", true);
+            return "reports/nonyusho";
         }
-        
+        try {
+            TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
+            model.addAttribute("shiteiNo", shiteiNo);
+            model.addAttribute("shisetsuName", tokugimuForm.getFacilityName());
+            model.addAttribute("tokuName", tokugimuForm.getName());
+            model.addAttribute("tokuJusho", tokugimuForm.getTokugimuAddress());
+            model.addAttribute("tokuYubinNo", tokugimuForm.getTokugimuYubinNo());
+            model.addAttribute("shisetsuJusho", tokugimuForm.getFacilityAddress());
+        } catch (Exception e) {
+            log.error("特別徴収義務者情報の取得に失敗: shiteiNo={}", shiteiNo, e);
+            model.addAttribute("shiteiNo", shiteiNo);
+        }
         return "reports/nonyusho";
     }
     
@@ -92,22 +94,19 @@ public class NonyushoController {
 		}
 	}
 
-    /**
+	/**
      * 納入書PDFダウンロード
      */
     @PostMapping("/pdf")
     @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "PDF")
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-    public Object generatePdf(RedirectAttributes redirectAttributes, @ModelAttribute NonyushoDto dto) {
+    public Object generatePdf(@RequestBody NonyushoDto dto) {
         try {
-            byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
-            
-            // データ無しの場合
             if (nonyushoReportsService.dataCheck(dto)) {
-            	redirectAttributes.addAttribute("error", "pdf_not_found");
-                redirectAttributes.addAttribute("shiteiNo", dto.getShiteiNo());
-                return "redirect:/nonyusho";
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("対象データが見つかりませんでした。");
             }
+            
+            byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -129,15 +128,14 @@ public class NonyushoController {
     @PostMapping("/preview")
     @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "プレビュー")
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-    public Object previewPdf(@ModelAttribute NonyushoDto dto) {
+    public Object previewPdf(@RequestBody NonyushoDto dto) {
         try {
-        	byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
-        	
-        	// データ無しの場合
             if (nonyushoReportsService.dataCheck(dto)) {
                 return buildErrorScriptResponse("対象データが見つかりませんでした。");
             }
-        	
+            
+            byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
+        
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.inline()
@@ -151,7 +149,7 @@ public class NonyushoController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     /**
      * 納入書印刷
      */

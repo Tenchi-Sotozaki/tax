@@ -229,8 +229,12 @@
 											th:unless="${item.consolidationTarget == 'target'}">非対象</span>
 									</td>
 									<td class="text-center">
-										<a th:href="@{/tokugimu/view/{id}(id=${item.shiteiNo})}"
-											class="btn btn-outline-primary btn-sm">詳細</a>
+										<!-- 指定番号はパラメータでは渡さず、セッションに保存してから遷移する -->
+										<button type="button" class="btn btn-outline-primary btn-sm detail-btn"
+											th:data-shitei-no="${item.shiteiNo}"
+											th:data-atena-no="${item.id}"
+											th:data-name="${item.name}"
+											th:data-shisetsu-name="${item.shisetsuName}">詳細</button>
 									</td>
 								</tr>
 								<tr th:if="${items.totalElements == 0}">
@@ -246,6 +250,9 @@
 		</th:block>
 	</div>
 
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/tTokugimuDaicho.js}"></script>
+	</th:block>
 </body>
 
 </html>

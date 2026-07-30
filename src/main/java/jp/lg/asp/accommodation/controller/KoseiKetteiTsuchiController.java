@@ -16,7 +16,6 @@ import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KoseiKetteiTsuchiReportsService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +42,8 @@ public class KoseiKetteiTsuchiController {
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
-		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		String shiteiNo = (selected != null && selected.getShiteiNo() != null) ? selected.getShiteiNo() : "";
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) shiteiNo = "";
 
 		model.addAttribute("dto", reportsService.buildDtoForDisplay(shiteiNo));
 		model.addAttribute("taishoYmList",

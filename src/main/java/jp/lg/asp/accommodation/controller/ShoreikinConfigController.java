@@ -12,17 +12,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.ShoreikinConfigDto;
 import jp.lg.asp.accommodation.service.ShoreikinConfigService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 特別徴収事務交付金照会／登録／編集 Controller
- * 仕様書：特別徴収事務交付金照会・登録・編集.csv に基づく実装
  */
 @Slf4j
 @Controller
@@ -36,19 +38,19 @@ public class ShoreikinConfigController {
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN_CONFIG;
 	private static final String CONFIG_VIEW = "shoreikin/shoreikinConfig";
 
-	/**
-	 * 特別徴収事務交付金照会画面表示
-	 * @param shiteiNo 指定番号
-	 * @param nendo 交付金年度
-	 * @param model モデル
-	 * @return 画面パス
-	 */
 	@GetMapping("/config")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
-	public String config(@RequestParam String shiteiNo,
+	public String config(HttpSession session,
 			@RequestParam(required = false) String nendo,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+
+		if (shiteiNo == null || shiteiNo.isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("configForm", new ShoreikinConfigDto());
+			return CONFIG_VIEW;
+		}
 
 		ShoreikinConfigDto dto = shoreikinConfigService.getShoreikin(shiteiNo, nendo);
 		model.addAttribute("configForm", dto);
@@ -56,12 +58,6 @@ public class ShoreikinConfigController {
 		return CONFIG_VIEW;
 	}
 
-	/**
-	 * 編集モード切り替え
-	 * @param configForm フォームデータ
-	 * @param model モデル
-	 * @return 画面パス
-	 */
 	@PostMapping("/config/edit")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集モード切替")
 	public String editMode(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
@@ -73,12 +69,6 @@ public class ShoreikinConfigController {
 		return CONFIG_VIEW;
 	}
 
-	/**
-	 * 交付金算出処理
-	 * @param configForm フォームデータ
-	 * @param model モデル
-	 * @return 画面パス
-	 */
 	@PostMapping("/config/calculate")
 	@OpeLog(screenId = SCREEN_ID, operation = "算出")
 	public String calculate(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
@@ -96,14 +86,6 @@ public class ShoreikinConfigController {
 		return CONFIG_VIEW;
 	}
 
-	/**
-	 * 交付金情報登録処理
-	 * @param configForm フォームデータ
-	 * @param bindingResult バリデーション結果
-	 * @param model モデル
-	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先または画面パス
-	 */
 	@PostMapping("/config/create")
 	@OpeLog(screenId = SCREEN_ID, operation = "新規登録")
 	public String create(@Valid @ModelAttribute ShoreikinConfigDto configForm,
@@ -129,14 +111,6 @@ public class ShoreikinConfigController {
 		return "redirect:/shoreikin/list";
 	}
 
-	/**
-	 * 交付金情報更新処理
-	 * @param configForm フォームデータ
-	 * @param bindingResult バリデーション結果
-	 * @param model モデル
-	 * @param redirectAttributes リダイレクト属性
-	 * @return リダイレクト先または画面パス
-	 */
 	@PostMapping("/config/update")
 	@OpeLog(screenId = SCREEN_ID, operation = "更新")
 	public String update(@Valid @ModelAttribute ShoreikinConfigDto configForm,
