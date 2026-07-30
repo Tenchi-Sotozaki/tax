@@ -143,7 +143,7 @@ public class FukaController {
 		String shiteiNo = selected.getShiteiNo();
 
 		// 二重申告を防止するためのアクセスガード
-		if (month != null && !month.isEmpty()) {
+		if (StringUtils.hasText(month)) {
 			if (fukaService.isAlreadyRegistered(shiteiNo, month)) {
 				redirectAttributes.addFlashAttribute("errorMessage", "申告済みのデータです。「照会」ボタンから確認してください。");
 				return "redirect:/declaration/payment-ledger";

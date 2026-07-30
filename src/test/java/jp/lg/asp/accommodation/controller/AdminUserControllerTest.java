@@ -51,7 +51,7 @@ class AdminUserControllerTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(userRepository.searchPage(any(), any(), any(), any(), any(), any()))
+        when(userRepository.searchPage(any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of()));
         when(roleRepository.findByJichitaiCdOrderByRoleId("011002")).thenReturn(List.of());
 

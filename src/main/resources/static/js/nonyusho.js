@@ -6,7 +6,6 @@
  * DOM読み込み完了後の初期化処理
  */
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('納入書発行画面が読み込まれました');
     
     // 年度フィールドの初期化
     initializeNendoField();
@@ -119,10 +118,58 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
+ * PDF発行・プレビュー処理
+ * @param {string} type 'pdf' または 'preview'
+ */
+async function submitReport(type) {
+    
+    if (!validateForm()) {
+        return;
+    }
+    
+    const formData = await collectFormData();
+    const csrfToken = document.querySelector('input[name="_csrf"]').value;
+    const endpoint = `/accommodation-tax/nonyusho/${type}`;
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error('対象データが見つかりませんでした');
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        if (type === 'preview') {
+            // プレビューの場合は別タブで開く
+            window.open(url, '_blank');
+        } else {
+            // PDFダウンロードの場合はファイルをダウンロードさせる
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nonyusho.pdf';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+    } catch (error) {
+        console.error(`${type} エラー:`, error);
+        alert('対象データが見つかりませんでした、または処理に失敗しました。');
+    }
+}
+
+/**
  * 印刷処理
  */
 async function printReport() {
-    console.log('印刷開始');
     
     if (!validateForm()) {
         return;
@@ -154,7 +201,6 @@ async function printReport() {
             iframe.onload = function() {
                 iframe.contentWindow.print();
             };
-            console.log('印刷処理完了');
         })
         .catch(error => {
             console.error('印刷エラー:', error);
@@ -173,7 +219,6 @@ async function collectFormData() {
     
     // 年度から年のみを抽出（YYYY-MM から YYYY を取得）
     const nendo = nendoValue ? nendoValue.split('-')[0] : '';
-    console.log('年度抽出結果:', { nendoValue, nendo });
     
     // 対象年月をLocalDate形式に変換（YYYY-MM-01）
     const shinkokuYmd = taishoYmValue ? taishoYmValue + '-01' : null;
@@ -214,19 +259,15 @@ async function collectFormData() {
  */
 async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
     try {
-        console.log('動的データ取得開始:', { shiteiNo, nendo, taishoYmValue });
-        
         // パラメーターのバリデーション
         if (!shiteiNo || !nendo) {
             throw new Error('指定番号と年度が必要です');
         }
         
         const url = `/accommodation-tax/nonyusho/data?shiteiNo=${encodeURIComponent(shiteiNo)}&nendo=${encodeURIComponent(nendo)}&shinkokuYm=${encodeURIComponent(taishoYmValue || '')}`;
-        console.log('リクエストURL:', url);
         
         const response = await fetch(url);
-        console.log('レスポンスステータス:', response.status);
-        
+       
         if (!response.ok) {
             const errorText = await response.text();
             console.error('サーバーエラー:', errorText);
@@ -234,8 +275,7 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
         }
         
         const data = await response.json();
-        console.log('取得したデータ:', data);
-        
+       
         // nokigenが空の場合、対象年月の翌月末を設定
         let nokigen = data.nokigen;
         if (!nokigen && taishoYmValue) {
@@ -323,6 +363,4 @@ function showErrorMessage(message) {
  * 成功メッセージ表示
  */
 function showSuccessMessage(message) {
-    // 成功メッセージの表示（必要に応じてトースト通知などを実装）
-    console.log('成功: ' + message);
 }

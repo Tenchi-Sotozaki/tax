@@ -36,9 +36,11 @@
 				<!-- ===== 動的サイドメニュー ===== -->
 				<th:block th:each="lv1 : ${sideMenuTree}">
 					<!-- level=1: ラベル -->
-					<div class="text-uppercase text-secondary small fw-semibold px-2 pt-3 pb-1"
-						th:classappend="${lv1Stat.index} > 0 ? 'border-top border-secondary' : ''"
-						th:text="${lv1.name}"></div>
+					<div class="fw-semibold px-2 pt-3 pb-1"
+						th:classappend="${lv1Stat.index} > 0 ? 'border-top border-secondary' : ''">
+						<img th:if="${lv1.iconLink != null}" th:src="@{${lv1.iconLink}}" class="me-2" style="width:1em;height:1em;">
+						<th:block th:text="${lv1.name}"></th:block>
+					</div>
 
 					<!-- level=2: アコーディオンまたは直接リンク -->
 					<th:block th:each="lv2 : ${lv1.children}">
