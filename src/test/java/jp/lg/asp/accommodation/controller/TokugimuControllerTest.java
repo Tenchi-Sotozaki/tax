@@ -120,14 +120,26 @@ class TokugimuControllerTest {
     }
 
     @Test
-    void showView_セッション未設定はモーダル表示() {
+    void showView_セッション未設定は照会画面でモーダル表示() {
         MockHttpSession session = new MockHttpSession();
         Model model = new ExtendedModelMap();
 
         String view = controller.showView(session, null, model);
 
-        assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
-        assertThat(model.asMap()).containsKey("showShiteiGassanModal");
+        // モーダルは一覧ではなく遷移先の画面で開く
+        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
+        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
+    }
+
+    @Test
+    void showReport_セッション未設定は帳票発行画面でモーダル表示() {
+        MockHttpSession session = new MockHttpSession();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.showReport(session, model);
+
+        assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
+        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
     }
 
     @Test
