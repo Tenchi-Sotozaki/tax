@@ -10,13 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
@@ -92,22 +90,19 @@ public class NonyushoController {
 		}
 	}
 
-    /**
+	/**
      * 納入書PDFダウンロード
      */
     @PostMapping("/pdf")
     @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "PDF")
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-    public Object generatePdf(RedirectAttributes redirectAttributes, @ModelAttribute NonyushoDto dto) {
+    public Object generatePdf(@RequestBody NonyushoDto dto) {
         try {
-            byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
-            
-            // データ無しの場合
             if (nonyushoReportsService.dataCheck(dto)) {
-            	redirectAttributes.addAttribute("error", "pdf_not_found");
-                redirectAttributes.addAttribute("shiteiNo", dto.getShiteiNo());
-                return "redirect:/nonyusho";
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("対象データが見つかりませんでした。");
             }
+            
+            byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -129,15 +124,14 @@ public class NonyushoController {
     @PostMapping("/preview")
     @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "プレビュー")
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
-    public Object previewPdf(@ModelAttribute NonyushoDto dto) {
+    public Object previewPdf(@RequestBody NonyushoDto dto) {
         try {
-        	byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
-        	
-        	// データ無しの場合
             if (nonyushoReportsService.dataCheck(dto)) {
                 return buildErrorScriptResponse("対象データが見つかりませんでした。");
             }
-        	
+            
+            byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
+        
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.inline()
@@ -151,7 +145,7 @@ public class NonyushoController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     /**
      * 納入書印刷
      */
