@@ -209,7 +209,10 @@
 						<tbody>
 							<tr th:each="item : ${items.content}">
 								<td class="text-center"><input type="checkbox" class="form-check-input row-select"
-										th:data-shitei-no="${item.shiteiNo}"></td>
+										th:data-shitei-no="${item.shiteiNo}"
+										th:data-atena-no="${item.id}"
+										th:data-name="${item.name}"
+										th:data-shisetsu-name="${item.shisetsuName}"></td>
 								<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
 								<td th:text="${item.name}"></td>
 								<td th:text="${item.shisetsuName}"></td>
