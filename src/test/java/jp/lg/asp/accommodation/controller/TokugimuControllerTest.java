@@ -21,11 +21,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import java.util.List;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.SelectedJigyoshaResolver;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 
 @ExtendWith(MockitoExtension.class)
 class TokugimuControllerTest {
@@ -33,6 +35,7 @@ class TokugimuControllerTest {
     @Mock TokugimuService tokugimuService;
     @Mock NozeiShukiService nozeiShukiService;
     @Mock ScreenAccessChecker accessChecker;
+    @Mock SelectedJigyoshaResolver selectedJigyoshaResolver;
 
     @InjectMocks TokugimuController controller;
 
@@ -100,13 +103,14 @@ class TokugimuControllerTest {
         TokugimuForm form = new TokugimuForm();
         when(tokugimuService.getTokugimuByShiteiNo("00100001")).thenReturn(form);
         Model model = new ExtendedModelMap();
-
         MockHttpSession session = new MockHttpSession();
 
         String view = controller.showView("00100001", null, session, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
         assertThat(model.asMap()).containsEntry("isView", true);
+        // 帳票発行画面が参照するセッションに、表示中の特別徴収義務者が格納されること
+        assertThat(SessionHelper.getShiteiGassan(session)).isNotNull();
     }
 
     @Test

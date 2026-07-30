@@ -22,7 +22,7 @@ public class NonyushoDto {
     private String nendo;
     
     /** 申告年月 */
-    private LocalDate shinkokuYmd;
+    private String shinkokuYmd;
     
     /** 指定番号 */
     private String shiteiNo;
@@ -40,7 +40,7 @@ public class NonyushoDto {
     private String gokei;
     
     /** 納期限 */
-    private LocalDate nokigen;
+    private String nokigen;
     
     /** 特別徴収義務者住所(所在地) */
     private String tokuJusho;

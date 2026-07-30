@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import jakarta.servlet.http.HttpSession;
-import jp.lg.asp.accommodation.controller.ShiteiGassanSearchApiController;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.util.SessionHelper;
 
 /**
  * 事業者（特別徴収義務者／合算申請事業者）の選択状態を解決する。
@@ -30,10 +30,7 @@ public class SelectedJigyoshaResolver {
 	 * セッションに保持している選択情報を取得する。
 	 */
 	public ShiteiGassanSearchDto getSelected(HttpSession session) {
-		if (session == null) {
-			return null;
-		}
-		return (ShiteiGassanSearchDto) session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		return SessionHelper.getShiteiGassan(session);
 	}
 
 	/**

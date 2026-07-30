@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btnTokugimuShitei.addEventListener('click', function() {
             console.log('特別徴収義務者指定通知書ボタンがクリックされました。指定番号:', shiteiNo);
             if (shiteiNo) {
-                const url = '/accommodation-tax/reports/tokugimuShiteiTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                // 指定番号はパラメータではなくセッションの選択状態を利用する
+                const url = '/accommodation-tax/reports/tokugimuShiteiTsuchi';
                 console.log('開くURL:', url);
                 window.location.href = url;
             } else {
@@ -40,7 +41,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btnTokugimuJuri.addEventListener('click', function() {
             console.log('特別徴収義務者申請受理通知書ボタンがクリックされました。指定番号:', shiteiNo);
             if (shiteiNo) {
-                const url = '/accommodation-tax/reports/tokugimuJuriTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
+                // 指定番号はパラメータではなくセッションの選択状態を利用する
+                const url = '/accommodation-tax/reports/tokugimuJuriTsuchi';
                 console.log('開くURL:', url);
                 window.location.href = url;
             } else {
@@ -206,21 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 async function selectShiteiGassanByShiteiNo(shiteiNo) {
     try {
-        const res = await fetch('/accommodation-tax/api/shitei-gassan/search?shiteiNo=' + encodeURIComponent(shiteiNo));
-        const data = await res.json();
+        const data = await SessionManager.get('/accommodation-tax/api/shitei-gassan/search?shiteiNo=' + encodeURIComponent(shiteiNo));
         if (!data.length) return;
-
-        const d = data[0];
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-        const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
-        const headers = { 'Content-Type': 'application/json' };
-        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
-
-        await fetch('/accommodation-tax/api/shitei-gassan/select', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(d)
-        });
+        await SessionManager.save('/accommodation-tax/api/shitei-gassan/select', data[0]);
     } catch (err) {
         console.error('セッション保存エラー:', err);
     }

@@ -107,19 +107,8 @@ async function selectShiteiGassan(d) {
     }
 
     // セッションに保存
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-    const headers = { 'Content-Type': 'application/json' };
-    if (csrfHeader && csrfToken) {
-        headers[csrfHeader] = csrfToken;
-    }
-
     try {
-        await fetch(SG_SELECT_API, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(d)
-        });
+        await SessionManager.save(SG_SELECT_API, d);
     } catch (err) {
         console.error('セッション保存エラー:', err);
     }

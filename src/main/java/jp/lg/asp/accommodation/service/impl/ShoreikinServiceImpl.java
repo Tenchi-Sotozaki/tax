@@ -46,7 +46,10 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		List<Tokugimu> tokugimuList;
-		if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
+		if (form.getGassanShiteiNo() != null && !form.getGassanShiteiNo().isBlank()) {
+			// 合算指定番号で検索
+			tokugimuList = findTokugimuByGassanShiteiNo(form.getGassanShiteiNo());
+		} else if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
 			// 指定番号が9で始まる場合、t_gassanから検索
 			tokugimuList = findTokugimuByGassanShiteiNo(form.getShiteiNo());
 		} else {
@@ -57,9 +60,9 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 					toLikePattern(form.getName(), form.getNameMatchType()),
 					form.getShisetsuName(),
 					toLikePattern(form.getShisetsuName(), form.getShisetsuNameMatchType()),
-					form.getKyokaShu(),
-					form.getKojinNo(),
-					form.getHojinNo());
+					null,
+					null,
+					null);
 		}
 
 		if (tokugimuList.isEmpty()) {
@@ -96,24 +99,6 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 				.<ShoreikinDto> flatMap(t -> {
 					List<Shoreikin> shoreikinList = shoreikinMap.get(t.getShiteiNo());
 					Atena atena = atenaMap.get(t.getAtenaNo());
-					boolean isGassanTarget = gassanMap.containsKey(t.getShiteiNo());
-
-					// 合算対象フィルタ
-					if (!"999".equals(form.getGassanTaisho())) {
-						boolean shouldBeTarget = "2".equals(form.getGassanTaisho());
-						if (shouldBeTarget != isGassanTarget) {
-							return Stream.empty();
-						}
-					}
-
-					// ステータスフィルタ
-					if (!"999".equals(form.getStatus())) {
-						String currentStatus = t.getStatus();
-						if (!form.getStatus().equals(currentStatus)) {
-							return Stream.empty();
-						}
-					}
-
 					// shoreikinListがnullまたは空の場合の処理
 					if (shoreikinList == null || shoreikinList.isEmpty()) {
 						// 交付金算出有無フィルタ（算出無のみ表示する場合）

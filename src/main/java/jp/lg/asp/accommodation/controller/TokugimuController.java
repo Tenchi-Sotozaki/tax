@@ -27,6 +27,7 @@ import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -159,12 +160,11 @@ public class TokugimuController {
 	 * すでに同一の指定番号が選択済みの場合は、合算指定番号の選択状態を維持するため上書きしない。
 	 */
 	private void storeSelectedShiteiGassan(HttpSession session, String shiteiNo, TokugimuForm form) {
-		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session
-				.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
 		if (selected != null && shiteiNo.equals(selected.getShiteiNo())) {
 			return;
 		}
-		session.setAttribute(ShiteiGassanSearchApiController.SESSION_KEY,
+		SessionHelper.saveShiteiGassan(session,
 				new ShiteiGassanSearchDto(
 						form.getAtenaNo() != null ? String.valueOf(form.getAtenaNo()) : null,
 						shiteiNo,
@@ -220,9 +220,10 @@ public class TokugimuController {
 
 	@GetMapping("/report/{id}")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "帳票出力")
-	public String showReport(@PathVariable("id") String id, Model model) {
+	public String showReport(@PathVariable("id") String id, HttpSession session, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
+		storeSelectedShiteiGassan(session, id, form);
 		model.addAttribute("shiteiNo", id);
 		model.addAttribute("tokugimuName", form.getName());
 		model.addAttribute("shisetsuName", form.getFacilityName());
@@ -236,7 +237,7 @@ public class TokugimuController {
 	public String showGassanReport(@PathVariable("id") String id, HttpSession session,
 			Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		ShiteiGassanSearchDto selected = (ShiteiGassanSearchDto) session.getAttribute(ShiteiGassanSearchApiController.SESSION_KEY);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
 		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isEmpty()) {
 			redirectAttributes.addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
 			return "redirect:/tokugimu/report/" + id;
@@ -254,4 +255,5 @@ public class TokugimuController {
 		redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " のデータを削除しました。");
 		return "redirect:/tokugimu/list";
 	}
+
 }
