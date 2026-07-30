@@ -138,6 +138,59 @@
 			</div>
 		</div>
 
+		<!-- ========== ツールバー（ボタンエリア） ==========
+			 サイドメニューからの導線が整うまでは残す方針のため削除しない -->
+		<div class="card shadow-sm mb-3">
+			<div class="card-body py-2 px-3">
+				<div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
+					<!-- グループ1: 基本操作 -->
+					<div class="d-flex flex-wrap gap-1">
+						<a th:href="@{/tokugimu/registration}" class="btn btn-success btn-sm"> <i
+								class="bi bi-plus-circle me-1"></i>新規登録
+						</a>
+						<button type="button" id="btnView" class="btn btn-outline-primary btn-sm">
+							<i class="bi bi-eye me-1"></i>照会
+						</button>
+						<button type="button" id="btnDelete" class="btn btn-danger btn-sm">
+							<i class="bi bi-trash me-1"></i>削除
+						</button>
+					</div>
+					<div class="vr mx-1 toolbar-divider"></div>
+					<!-- グループ2: 納税管理人 -->
+					<div class="d-flex flex-wrap gap-1">
+						<button type="button" id="btnTaxManager" class="btn btn-success btn-sm">
+							<i class="bi bi-person-plus me-1"></i>納税管理人登録
+						</button>
+						<button type="button" id="btnTaxManagerView" class="btn btn-outline-primary btn-sm">
+							<i class="bi bi-person me-1"></i>納税管理人照会
+						</button>
+					</div>
+					<div class="vr mx-1 toolbar-divider"></div>
+					<!-- グループ3: 納税周期(特例申請) -->
+					<div class="d-flex flex-wrap gap-1">
+						<button type="button" id="btnNozeiShuki" class="btn btn-success btn-sm">
+							<i class="bi bi-calendar-plus me-1"></i>納税周期登録
+						</button>
+						<button type="button" id="btnNozeiShukiView" class="btn btn-outline-primary btn-sm">
+							<i class="bi bi-calendar-check me-1"></i>納税周期照会
+						</button>
+					</div>
+					<div class="vr mx-1 toolbar-divider"></div>
+					<!-- グループ4: 納入台帳 -->
+					<button type="button" id="btnPaymentLedger" class="btn btn-outline-primary btn-sm">
+						<i class="bi bi-currency-yen me-1"></i>納入申告管理台帳
+					</button>
+
+					<!-- グループ5: その他 -->
+					<div class="d-flex flex-wrap gap-1">
+						<button type="button" id="btnReport" class="btn btn-primary btn-sm">
+							<i class="bi bi-printer me-1"></i>帳票発行
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- ========== 検索結果エリア（初期表示時は表示しない） ========== -->
 		<th:block th:if="${isSearched}">
 
@@ -203,6 +256,7 @@
 						<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
 							<thead class="table-primary">
 								<tr>
+									<th style="width: 40px" class="text-center"></th>
 									<th style="min-width: 100px">指定番号</th>
 									<th style="min-width: 110px">合算指定番号</th>
 									<th style="min-width: 140px">氏名/名称</th>
@@ -211,11 +265,15 @@
 									<th style="min-width: 80px" class="text-center">合算対象</th>
 									<th style="min-width: 100px" class="text-center">最終申告日</th>
 									<th style="min-width: 90px" class="text-center">最終納付状況</th>
-									<th style="width: 90px" class="text-center"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${items.content}">
+									<td class="text-center"><input type="checkbox" class="form-check-input row-select"
+											th:data-shitei-no="${item.shiteiNo}"
+											th:data-atena-no="${item.id}"
+											th:data-name="${item.name}"
+											th:data-shisetsu-name="${item.shisetsuName}"></td>
 									<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
 									<td th:text="${item.gassanShiteiNo}"></td>
 									<td th:text="${item.name}"></td>
@@ -235,22 +293,11 @@
 									<!-- 最終申告日（申告実績が無い場合は空欄） -->
 									<td class="text-center"
 										th:text="${item.lastShinkokuYmd != null ? #temporals.format(item.lastShinkokuYmd, 'yyyy/MM/dd') : ''}"></td>
-									<!-- 最終申告分の納付状況（申告実績が無い場合は「-」） -->
-									<td class="text-center"><span class="badge bg-success"
-											th:if="${item.lastNonyuStatus == 'paid'}">完納</span> <span
-											class="badge bg-warning text-dark"
-											th:if="${item.lastNonyuStatus == 'partial'}">一部納付</span> <span
-											class="badge bg-danger"
-											th:if="${item.lastNonyuStatus == 'unpaid'}">未納</span> <span
-											class="text-muted small" th:if="${item.lastNonyuStatus == null}">-</span>
-									</td>
+									<!-- 最終申告分の納付状況（記号は納入申告管理と共通） -->
 									<td class="text-center">
-										<!-- 指定番号はパラメータでは渡さず、セッションに保存してから遷移する -->
-										<button type="button" class="btn btn-outline-primary btn-sm detail-btn"
-											th:data-shitei-no="${item.shiteiNo}"
-											th:data-atena-no="${item.id}"
-											th:data-name="${item.name}"
-											th:data-shisetsu-name="${item.shisetsuName}">詳細</button>
+										<span th:if="${item.lastNonyuStatus == 'paid'}">〇</span>
+										<span th:if="${item.lastNonyuStatus == 'partial'}">△</span>
+										<span th:if="${item.lastNonyuStatus == 'unpaid'}">ー</span>
 									</td>
 								</tr>
 								<tr th:if="${items.totalElements == 0}">
@@ -264,10 +311,19 @@
 				</div>
 			</div>
 		</th:block>
-	</div>
 
-	<!-- 特別徴収義務者指定モーダル（未選択のまま照会・編集・帳票発行へ遷移した場合に表示） -->
-	<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+		<!-- 削除フォーム（隠し） -->
+		<form th:each="item : ${items.content}" th:id="'deleteForm-' + ${item.shiteiNo}"
+			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}" method="post" class="d-none"></form>
+
+		<!-- 削除確認モーダル -->
+		<div
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
+		</div>
+
+		<!-- 特別徴収義務者指定モーダル（未選択のまま照会・編集・帳票発行へ遷移した場合に表示） -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
