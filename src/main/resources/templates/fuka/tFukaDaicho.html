@@ -110,9 +110,7 @@
 		</nav>
 
 		<!-- 明細テーブル -->
-		<form th:if="${fukaDaichoForm != null}"
-			th:action="@{/declaration/register}"
-			method="get">
+		<div th:if="${fukaDaichoForm != null}">
 
 			<div class="card shadow-sm">
 				<div class="card-body p-0">
@@ -187,7 +185,7 @@
 											class="btn btn-outline-primary btn-lg px-5 btn-view bg-white">
 											照会
 										</button>
-										<button th:unless="${item.shinkokuZumi}" type="submit"
+										<button th:unless="${item.shinkokuZumi}" type="button"
 											class="btn btn-success btn-lg px-5 btn-register">
 											新規
 										</button>
@@ -210,7 +208,7 @@
 				</div>
 			</div>
 
-		</form>
+		</div>
 		<!-- 特別徴収義務者指定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
@@ -219,6 +217,7 @@
 			<script th:inline="javascript">
 				/*<![CDATA[*/
 				window.declarationViewBaseUrl = /*[[@{/declaration/view}]]*/'/declaration/view';
+				window.declarationRegisterBaseUrl = /*[[@{/declaration/register}]]*/'/declaration/register';
 				/*]]>*/
 			</script>
 			<script th:src="@{/js/tFukaDaicho.js}"></script>

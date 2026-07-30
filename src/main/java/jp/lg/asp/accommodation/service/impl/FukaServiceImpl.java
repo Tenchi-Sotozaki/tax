@@ -855,7 +855,7 @@ public class FukaServiceImpl implements FukaService {
 			parentFuka.setKenZeigaku(0L);
 		}
 
-		if (!form.getAdditionalCategory1().isEmpty()) {
+		if (StringUtils.hasText(form.getAdditionalCategory1())) {
 			parentFuka.setKasanKbn1(form.getAdditionalCategory1());
 			if (StringUtils.hasText(form.getAdditionalRate1())) {
 				try {
@@ -871,7 +871,7 @@ public class FukaServiceImpl implements FukaService {
 			parentFuka.setNokigen(form.getAdditionalDueDate1());
 		}
 
-		if (!form.getAdditionalCategory2().isEmpty()) {
+		if (StringUtils.hasText(form.getAdditionalCategory2())) {
 			parentFuka.setKasanKbn2(form.getAdditionalCategory2());
 			if (StringUtils.hasText(form.getAdditionalRate2())) {
 				try {
@@ -886,7 +886,7 @@ public class FukaServiceImpl implements FukaService {
 			parentFuka.setKasanGaku2(form.getAdditionalAmount2());
 		}
 
-		if (!form.getAdditionalCategory3().isEmpty()) {
+		if (StringUtils.hasText(form.getAdditionalCategory3())) {
 			parentFuka.setKasanKbn3(form.getAdditionalCategory3());
 			if (StringUtils.hasText(form.getAdditionalRate3())) {
 				try {
