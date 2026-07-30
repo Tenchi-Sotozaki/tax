@@ -1,4 +1,4 @@
-﻿package jp.lg.asp.accommodation.controller;
+ackage jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
