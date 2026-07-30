@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.List;
+
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.UserForm;
 import jp.lg.asp.accommodation.dto.UserSearchForm;
+import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
@@ -67,12 +70,38 @@ public class AdminUserController {
 				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
 				toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
 				toLikePattern(searchForm.getBusho(), searchForm.getBushoMatchType()),
+				searchForm.getRoleId(),
 				PageRequest.of(page, pageSize));
 		model.addAttribute("items", items);
-		model.addAttribute("roleMap", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd)
-				.stream().collect(java.util.stream.Collectors.toMap(
-						r -> String.valueOf(r.getRoleId()), r -> r.getName())));
+
+		// デフォルトユーザー用の権限は検索条件のプルダウンには表示しない
+		List<Role> roles = selectableRoles(jichitaiCd, null);
+		model.addAttribute("roles", roles);
+		// 一覧の権限名解決用（キーは権限IDの数値。BigDecimal/Longの表記揺れを避けるためLongで統一）
+		model.addAttribute("roleMap", roles.stream()
+				.filter(r -> r.getRoleId() != null)
+				.collect(java.util.stream.Collectors.toMap(Role::getRoleId, Role::getName)));
 		return LIST_VIEW;
+	}
+
+	/**
+	 * 画面のプルダウンに表示する権限一覧を返す。
+	 * <p>
+	 * システム管理用のデフォルトユーザー権限（{@link UserRepository#DEFAULT_USER_ROLE_ID}）は
+	 * 選択できないよう除外する。ただし対象ユーザーが既にその権限を持っている場合は、
+	 * 照会・編集時に表示が空欄にならないよう例外的に残す。
+	 *
+	 * @param jichitaiCd 自治体コード
+	 * @param currentRoleId 対象ユーザーの現在の権限ID（新規登録・検索条件では null）
+	 * @return 表示対象の権限一覧
+	 */
+	private List<Role> selectableRoles(String jichitaiCd, java.math.BigDecimal currentRoleId) {
+		Long current = currentRoleId != null ? currentRoleId.longValue() : null;
+		return roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd).stream()
+				.filter(r -> r.getRoleId() == null
+						|| r.getRoleId().longValue() != UserRepository.DEFAULT_USER_ROLE_ID
+						|| r.getRoleId().equals(current))
+				.toList();
 	}
 
 	@GetMapping("/user-registration")
@@ -81,7 +110,7 @@ public class AdminUserController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("userForm", new UserForm());
-		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+		model.addAttribute("roles", selectableRoles(jichitaiCd, null));
 		model.addAttribute("isEdit", false);
 		model.addAttribute("isView", false);
 		model.addAttribute("isDefaultUser", false);
@@ -101,7 +130,7 @@ public class AdminUserController {
 			bindingResult.rejectValue("passwordConfirm", "error.passwordConfirm", "パスワードが一致しません");
 		}
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+			model.addAttribute("roles", selectableRoles(jichitaiCd, form.getRoleId()));
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
 			model.addAttribute("isDefaultUser", false);
@@ -112,7 +141,7 @@ public class AdminUserController {
 				.orElse(null);
 		if (user != null && "0".equals(user.getDelFlg())) {
 			bindingResult.rejectValue("id", "error.id", "このIDは既に登録済みです");
-			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+			model.addAttribute("roles", selectableRoles(jichitaiCd, form.getRoleId()));
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
 			model.addAttribute("isDefaultUser", false);
@@ -152,7 +181,7 @@ public class AdminUserController {
 		form.setRoleId(user.getRoleId());
 
 		model.addAttribute("userForm", form);
-		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+		model.addAttribute("roles", selectableRoles(jichitaiCd, form.getRoleId()));
 		model.addAttribute("isEdit", true);
 		model.addAttribute("isView", false);
 		model.addAttribute("isDefaultUser", InitialPasswordController.ADMIN_ID.equals(user.getId()));
@@ -176,7 +205,7 @@ public class AdminUserController {
 		form.setRoleId(user.getRoleId());
 
 		model.addAttribute("userForm", form);
-		model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+		model.addAttribute("roles", selectableRoles(jichitaiCd, form.getRoleId()));
 		model.addAttribute("isEdit", true);
 		model.addAttribute("isView", true);
 		model.addAttribute("isDefaultUser", InitialPasswordController.ADMIN_ID.equals(user.getId()));
@@ -209,7 +238,7 @@ public class AdminUserController {
 			}
 		}
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("roles", roleRepository.findByJichitaiCdOrderByRoleId(jichitaiCd));
+			model.addAttribute("roles", selectableRoles(jichitaiCd, form.getRoleId()));
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("isDefaultUser", isDefaultUser);
