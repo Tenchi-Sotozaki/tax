@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -25,7 +27,6 @@ public class Jichitai extends BaseEntity {
 	private String kbnName;
 
 	@Column(name = "nendo_st_month", length = 2)
-
 	private String nendoStMonth;
 
 	@Column(name = "shitei_st_char", length = 3)
@@ -33,5 +34,8 @@ public class Jichitai extends BaseEntity {
 
 	@Column(name = "gassan_st_char", length = 3)
 	private String gassanStChar;
+
+	@Column(name = "atena_st_no", precision = 15)
+	private BigDecimal atenaStNo;
 
 }
