@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -20,8 +21,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 
 @ExtendWith(MockitoExtension.class)
 class FukaControllerTest {
@@ -32,13 +35,23 @@ class FukaControllerTest {
 
     @InjectMocks FukaController controller;
 
+    private MockHttpSession sessionWith(String shiteiNo) {
+        MockHttpSession session = new MockHttpSession();
+        ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+        dto.setShiteiNo(shiteiNo);
+        SessionHelper.saveShiteiGassan(session, dto);
+        return session;
+    }
+
     @Test
     void showDaicho_台帳画面を返す() {
+        MockHttpSession session = sessionWith("00100001");
         FukaDaichoForm form = new FukaDaichoForm();
         when(fukaService.getDaichoData("00100001", "2024", null)).thenReturn(form);
+        when(fukaService.getExistingNendoList("00100001")).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
-        String view = controller.showDaicho("00100001", "2024", null, model);
+        String view = controller.showDaicho("2024", null, session, model);
 
         assertThat(view).isEqualTo("fuka/tFukaDaicho");
         assertThat(model.asMap()).containsKey("fukaDaichoForm");
@@ -46,33 +59,48 @@ class FukaControllerTest {
 
     @Test
     void showDaicho_年度未指定はデフォルト年度() {
+        MockHttpSession session = sessionWith("00100001");
         FukaDaichoForm form = new FukaDaichoForm();
         when(fukaService.getDaichoData(eq("00100001"), any(), isNull())).thenReturn(form);
+        when(fukaService.getExistingNendoList("00100001")).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
-        String view = controller.showDaicho("00100001", null, null, model);
+        String view = controller.showDaicho(null, null, session, model);
 
         assertThat(view).isEqualTo("fuka/tFukaDaicho");
     }
 
     @Test
+    void showDaicho_セッション未設定はモーダル表示() {
+        MockHttpSession session = new MockHttpSession();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.showDaicho(null, null, session, model);
+
+        assertThat(view).isEqualTo("fuka/tFukaDaicho");
+        assertThat(model.asMap()).containsKey("showShiteiGassanModal");
+    }
+
+    @Test
     void register_申告済みはリダイレクト() {
+        MockHttpSession session = sessionWith("00100001");
         when(fukaService.isAlreadyRegistered("00100001", "2024-04")).thenReturn(true);
 
-        String view = controller.register("00100001", "2024-04",
+        String view = controller.register("2024-04", session,
                 new RedirectAttributesModelMap(), new ExtendedModelMap());
 
-        assertThat(view).isEqualTo("redirect:/declaration/payment-ledger/00100001");
+        assertThat(view).isEqualTo("redirect:/declaration/payment-ledger");
     }
 
     @Test
     void register_未申告は登録画面を返す() {
+        MockHttpSession session = sessionWith("00100001");
         when(fukaService.isAlreadyRegistered("00100001", "2024-04")).thenReturn(false);
         when(fukaService.getDeclarationFormForRegister("00100001", "2024-04"))
                 .thenReturn(new FukaDeclarationForm());
         Model model = new ExtendedModelMap();
 
-        String view = controller.register("00100001", "2024-04",
+        String view = controller.register("2024-04", session,
                 new RedirectAttributesModelMap(), model);
 
         assertThat(view).isEqualTo("fuka/tFukaConfig");
@@ -80,22 +108,24 @@ class FukaControllerTest {
 
     @Test
     void showEdit_未申告はリダイレクト() {
+        MockHttpSession session = sessionWith("00100001");
         when(fukaService.isAlreadyRegisteredByKibetsu("00100001", "2024", 1)).thenReturn(false);
 
-        String view = controller.showEdit("00100001", "2024", 1,
+        String view = controller.showEdit("2024", 1, session,
                 new RedirectAttributesModelMap(), new ExtendedModelMap());
 
-        assertThat(view).isEqualTo("redirect:/declaration/payment-ledger/00100001");
+        assertThat(view).isEqualTo("redirect:/declaration/payment-ledger");
     }
 
     @Test
     void showEdit_申告済みは編集画面を返す() {
+        MockHttpSession session = sessionWith("00100001");
         when(fukaService.isAlreadyRegisteredByKibetsu("00100001", "2024", 1)).thenReturn(true);
         FukaDeclarationForm form = new FukaDeclarationForm();
         when(fukaService.getDeclarationFormForEdit("00100001", "2024", 1)).thenReturn(form);
         Model model = new ExtendedModelMap();
 
-        String view = controller.showEdit("00100001", "2024", 1,
+        String view = controller.showEdit("2024", 1, session,
                 new RedirectAttributesModelMap(), model);
 
         assertThat(view).isEqualTo("fuka/tFukaConfig");
@@ -142,7 +172,7 @@ class FukaControllerTest {
 
         String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("redirect:/declaration/payment-ledger/00100001");
+        assertThat(view).isEqualTo("redirect:/declaration/payment-ledger");
         verify(fukaService).saveDeclaration(form);
     }
 }
