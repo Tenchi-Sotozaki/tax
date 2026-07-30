@@ -24,9 +24,11 @@ import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
+import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.KyodoJigyoshaRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
+import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TokugimuServiceImpl;
 
@@ -40,6 +42,8 @@ class TokugimuServiceImplTest {
     @Mock ShoyushaRepository shoyushaRepository;
     @Mock KyodoJigyoshaRepository kyodoJigyoshaRepository;
     @Mock JichitaiRepository jichitaiRepository;
+    @Mock FukaRepository fukaRepository;
+    @Mock ShunoRirekiRepository shunoRirekiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks TokugimuServiceImpl service;
 
