@@ -122,6 +122,20 @@ function validateForm() {
         );
         return false;
     }
+	
+//    if (!kofuRitsu) {
+//        errors.push('交付率は必須入力です。「交付率登録」から設定してください。');
+//        isValid = false;
+//    } else {
+//        const ritsu = parseFloat(kofuRitsu);
+//        if (isNaN(ritsu) || ritsu < 0) {
+//            errors.push('交付率は0.00以上の数字で入力してください');
+//            isValid = false;
+//        } else if (ritsu > 99999.99) {
+//            errors.push('交付率は整数部5桁、小数部2桁以内で入力してください');
+//            isValid = false;
+//        }
+//    }
 
     // 交付額バリデーション
     const kofuGaku = document.getElementById('kofuGaku').value.trim();
