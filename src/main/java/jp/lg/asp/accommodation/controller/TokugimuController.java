@@ -76,18 +76,24 @@ public class TokugimuController {
 	}
 
 	/**
-	 * 指定番号が未選択の状態で照会・編集・帳票発行に遷移した場合に、
-	 * 一覧画面へ指定番号選択モーダルを表示させるための共通処理。
-	 * 一覧の描画に必要なモデル属性を空の状態で設定する。
+	 * 指定番号が未選択の状態で照会・編集に遷移した場合に、
+	 * 遷移先の画面で指定番号選択モーダルを開いた状態で表示する。
 	 */
-	private String showSelectModalOnList(Model model) {
-		model.addAttribute("items", Page.empty(PageRequest.of(0, 10)));
-		model.addAttribute("searchForm", new TokugimuSearchForm());
-		model.addAttribute("isSearched", false);
-		model.addAttribute("startPage", 0);
-		model.addAttribute("endPage", 0);
+	private String showSelectModalOnForm(Model model) {
+		model.addAttribute("TokugimuForm", new TokugimuForm());
+		model.addAttribute("isView", true);
+		model.addAttribute("isEdit", false);
 		model.addAttribute("showShiteiGassanModal", true);
-		return LIST_VIEW;
+		return FORM_VIEW;
+	}
+
+	/**
+	 * 指定番号が未選択の状態で帳票発行に遷移した場合に、
+	 * 帳票発行画面で指定番号選択モーダルを開いた状態で表示する。
+	 */
+	private String showSelectModalOnReport(Model model) {
+		model.addAttribute("showShiteiGassanModal", true);
+		return REPORT_VIEW;
 	}
 
 	// ========== 新規登録 ==========
@@ -138,7 +144,7 @@ public class TokugimuController {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			return showSelectModalOnList(model);
+			return showSelectModalOnForm(model);
 		}
 		TokugimuForm form = (rno != null)
 				? tokugimuService.getTokugimuByShiteiNoAndRno(id, rno)
@@ -159,7 +165,7 @@ public class TokugimuController {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			return showSelectModalOnList(model);
+			return showSelectModalOnForm(model);
 		}
 		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
 		storeSelectedShiteiGassan(session, id, form);
@@ -183,7 +189,7 @@ public class TokugimuController {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			return showSelectModalOnList(model);
+			return showSelectModalOnForm(model);
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -210,7 +216,7 @@ public class TokugimuController {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			return showSelectModalOnList(model);
+			return showSelectModalOnReport(model);
 		}
 		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
 		storeSelectedShiteiGassan(session, id, form);

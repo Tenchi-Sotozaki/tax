@@ -75,7 +75,24 @@
 										placeholder="氏名または名称">
 								</div>
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">施設名称</label>
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">施設名称</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
+												value="prefix" id="shisetsuNamePrefix">
+											<label class="form-check-label small" for="shisetsuNamePrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
+												value="partial" id="shisetsuNamePartial">
+											<label class="form-check-label small" for="shisetsuNamePartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
+												value="exact" id="shisetsuNameExact">
+											<label class="form-check-label small" for="shisetsuNameExact">完全</label>
+										</div>
+									</div>
 									<input type="text" class="form-control form-control-sm" th:field="*{shisetsuName}"
 										placeholder="施設名称">
 								</div>
@@ -203,13 +220,13 @@
 						<!-- 前へ -->
 						<li class="page-item" th:classappend="${items.first} ? 'disabled'">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${curr - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
+								th:href="@{/tokugimu/list(searched=true, page=${curr - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
 						</li>
 
 						<!-- 先頭ページ（中間に含まれない場合のみ） -->
 						<li class="page-item" th:if="${start > 0}">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=0, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">1</a>
+								th:href="@{/tokugimu/list(searched=true, page=0, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">1</a>
 						</li>
 						<li class="page-item disabled" th:if="${start > 1}"><span class="page-link">...</span></li>
 
@@ -217,7 +234,7 @@
 						<li class="page-item" th:each="i : ${#numbers.sequence(start, end)}"
 							th:classappend="${i == curr} ? 'active'">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+								th:href="@{/tokugimu/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
 								th:text="${i + 1}">1</a>
 						</li>
 
@@ -225,14 +242,14 @@
 						<li class="page-item disabled" th:if="${end < total - 2}"><span class="page-link">...</span></li>
 						<li class="page-item" th:if="${end < total - 1}">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${total - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+								th:href="@{/tokugimu/list(searched=true, page=${total - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
 								th:text="${total}">N</a>
 						</li>
 
 						<!-- 次へ -->
 						<li class="page-item" th:classappend="${items.last} ? 'disabled'">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${curr + 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
+								th:href="@{/tokugimu/list(searched=true, page=${curr + 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
 						</li>
 					</ul>
 				</nav>
@@ -242,7 +259,7 @@
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 					<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
 						<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-							th:value="@{/tokugimu/list(searched=true, page=0, pageSize=${s}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+							th:value="@{/tokugimu/list(searched=true, page=0, pageSize=${s}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
 							th:text="${s}" th:selected="${s == searchForm.pageSize}">
 						</option>
 					</select>
@@ -330,12 +347,9 @@
 			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
 		</div>
 
-		<!-- 特別徴収義務者指定モーダル（未選択のまま照会・編集・帳票発行へ遷移した場合に表示） -->
-		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 		<script th:src="@{/js/tTokugimuDaicho.js}"></script>
 	</th:block>
 </body>
