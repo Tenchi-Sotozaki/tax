@@ -19,12 +19,17 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 
 	List<User> findByJichitaiCdAndRoleId(String jichitaiCd, java.math.BigDecimal roleId);
 
+	/** システム管理用のデフォルトユーザーに割り当てる権限ID（一覧には表示しない） */
+	long DEFAULT_USER_ROLE_ID = 99L;
+
 	@Query("SELECT u FROM User u WHERE u.jichitaiCd = :jichitaiCd" +
 			" AND u.delFlg = '0'" +
+			" AND u.roleId <> " + DEFAULT_USER_ROLE_ID +
 			" AND (:id IS NULL OR u.id LIKE %:id%)" +
 			" AND (:name IS NULL OR u.name LIKE :name)" +
 			" AND (:nameKana IS NULL OR u.nameKana LIKE :nameKana)" +
 			" AND (:busho IS NULL OR u.busho LIKE :busho)" +
+			" AND (:roleId IS NULL OR u.roleId = :roleId)" +
 			" ORDER BY u.id")
 	Page<User> searchPage(
 			@Param("jichitaiCd") String jichitaiCd,
@@ -32,6 +37,7 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 			@Param("name") String name,
 			@Param("nameKana") String nameKana,
 			@Param("busho") String busho,
+			@Param("roleId") java.math.BigDecimal roleId,
 			Pageable pageable);
 
 }

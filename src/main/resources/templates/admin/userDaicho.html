@@ -111,6 +111,14 @@
 								<input type="text" class="form-control form-control-sm"
 									th:field="*{busho}" placeholder="部署を入力">
 							</div>
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">権限</label>
+								<select class="form-select form-select-sm" th:field="*{roleId}">
+									<option value="">すべて</option>
+									<option th:each="role : ${roles}" th:value="${role.roleId}"
+										th:text="${role.name}"></option>
+								</select>
+							</div>
 						</div>
 						<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 							<a th:href="@{/admin/user-search}"
@@ -141,19 +149,19 @@
 				<ul class="pagination pagination-sm justify-content-center mb-0">
 					<!-- 前へ -->
 					<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-						<a class="page-link" th:href="@{/admin/user-search(page=${items.number - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}">前へ</a>
+						<a class="page-link" th:href="@{/admin/user-search(page=${items.number - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">前へ</a>
 					</li>
 					<!-- 省略なし（6ページ以下） -->
 					<th:block th:if="${items.totalPages <= 6}">
 						<li class="page-item" th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}" th:classappend="${i == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}" th:text="${i + 1}">1</a>
+							<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${i + 1}">1</a>
 						</li>
 					</th:block>
 					<!-- 省略あり（7ページ以上） -->
 					<th:block th:if="${items.totalPages > 6}">
 						<!-- 先頭ページ -->
 						<li class="page-item" th:classappend="${0 == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=0, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}">1</a>
+							<a class="page-link" th:href="@{/admin/user-search(page=0, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">1</a>
 						</li>
 						<!-- 先頭省略 -->
 						<li class="page-item disabled" th:if="${items.number > 3}">
@@ -162,7 +170,7 @@
 						<!-- 中間ページ（先頭・末尾を除く） -->
 						<th:block th:each="i : ${#numbers.sequence(1, items.totalPages - 2)}">
 							<li class="page-item" th:if="${i >= items.number - 1 and i <= items.number + 1}" th:classappend="${i == items.number} ? 'active'">
-								<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}" th:text="${i + 1}">2</a>
+								<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${i + 1}">2</a>
 							</li>
 						</th:block>
 						<!-- 末尾省略 -->
@@ -171,12 +179,12 @@
 						</li>
 						<!-- 末尾ページ -->
 						<li class="page-item" th:classappend="${items.totalPages - 1 == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=${items.totalPages - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}" th:text="${items.totalPages}">N</a>
+							<a class="page-link" th:href="@{/admin/user-search(page=${items.totalPages - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${items.totalPages}">N</a>
 						</li>
 					</th:block>
 					<!-- 次へ -->
 					<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-						<a class="page-link" th:href="@{/admin/user-search(page=${items.number + 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}">次へ</a>
+						<a class="page-link" th:href="@{/admin/user-search(page=${items.number + 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">次へ</a>
 					</li>
 				</ul>
 			</nav>
@@ -186,7 +194,7 @@
 				<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 				<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
 					<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-						th:value="@{/admin/user-search(page=0, pageSize=${s}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType})}"
+						th:value="@{/admin/user-search(page=0, pageSize=${s}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}"
 						th:text="${s}" th:selected="${s == userSearchForm.pageSize}">
 					</option>
 				</select>
@@ -218,7 +226,8 @@
 								<td th:text="${user.name}"></td>
 								<td class="text-muted" th:text="${user.nameKana}"></td>
 								<td th:text="${user.busho}"></td>
-								<td th:text="${roleMap[user.roleId.toString()]}"></td>
+								<td
+									th:text="${user.roleId == null ? '' : roleMap[user.roleId.longValue()]}"></td>
 								<td class="text-center">
 									<a th:href="@{/admin/user-view/{id}(id=${user.id})}"
 										class="btn btn-outline-primary btn-sm">
