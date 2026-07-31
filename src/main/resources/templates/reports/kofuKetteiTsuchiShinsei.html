@@ -23,17 +23,24 @@
 						
 						<!-- 特別徴収義務者エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
-
-						<!-- 年度選択エリア -->
-						<div class="card mb-4">
+						
+						<!-- 年度・発行年月日入力エリア -->
+						<div class="card mb-2">
 							<div class="card-header">
-								<h5 class="mb-0">年度入力</h5>
+								<h5 class="mb-0">年度・発行年月日入力
+								</h5>
 							</div>
 							<div class="card-body">
+								<!-- 年度入力 -->
 								<div class="row g-3">
-									<div class="col-md-6">
+									<div class="col-md-1">
 										<label class="form-label">年度</label> <span class="text-danger">*</span>
-										<input type="text" class="form-control" th:field="*{nendo}" id="nendoInput" placeholder="年度を入力してください">
+										<input type="text" class="form-control" th:field="*{nendo}" id="nendoInput" placeholder="年度を入力">
+									</div>
+									
+									<div class="col-md-2">
+										<label class="form-label">発行年月日</label> <span class="text-danger">*</span>
+										<input type="date" class="form-control" th:field="*{hakkoYmd}" id="hakkoYmdInput" onchange="updateDisplayDate()">
 									</div>
 								</div>
 							</div>
@@ -57,7 +64,6 @@
 							</div>
 						</div>
 
-						<input type="hidden" th:field="*{hakkoYmd}">
 						<input type="hidden" th:field="*{tokuName}">
 						<input type="hidden" th:field="*{shisetsuName}">
 						<input type="hidden" th:field="*{shisetsuJusho}">

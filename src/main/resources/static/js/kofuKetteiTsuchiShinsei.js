@@ -232,6 +232,37 @@ function validateForm() {
         nendoInput.focus();
         return false;
     }
+	
+    // 発行年月日入力チェック
+    const hakkoYmdInput = document.getElementById('hakkoYmdInput');
+    const hakkoYmdValue = hakkoYmdInput ? hakkoYmdInput.value.trim() : '';
+
+    if (!hakkoYmdValue) {
+        alert('発行年月日を入力してください。');
+        hakkoYmdInput.focus();
+        return false;
+    }
 
     return true;
+}
+
+/**
+ * 日付表示を更新
+ */
+function updateDisplayDate() {
+    const hakkoYmdInput = document.querySelector('input[name="hakkoYmd"]');
+    const displayDate = document.getElementById('displayDate');
+    
+    if (hakkoYmdInput && displayDate) {
+        const dateValue = hakkoYmdInput.value;
+        if (dateValue) {
+            const date = new Date(dateValue);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            displayDate.textContent = `${year}年${month}月${day}日`;
+        } else {
+            displayDate.textContent = '年　　月　　日';
+        }
+    }
 }

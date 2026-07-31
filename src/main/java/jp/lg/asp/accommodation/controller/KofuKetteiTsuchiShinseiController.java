@@ -47,7 +47,6 @@ public class KofuKetteiTsuchiShinseiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String nendo,
-			@RequestParam(required = false) String hakkoYmd,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
@@ -63,15 +62,7 @@ public class KofuKetteiTsuchiShinseiController {
 		}
 
 		// YYYY形式の年度をDTOにセット
-		dto.setNendo(targetNendo.split("-")[0]);
-		
-		// 発行年月日が指定されている場合はそれを使用、されていない場合は当日を設定
-		if (hakkoYmd != null && !hakkoYmd.isEmpty()) {
-			dto.setHakkoYmd(hakkoYmd);
-		} else if (dto.getHakkoYmd() == null || dto.getHakkoYmd().isEmpty()) {
-			// 当日をデフォルトとして設定
-			dto.setHakkoYmd(now.toString());
-		}
+		dto.setNendo(targetNendo);
 		
 		// 指定番号を設定
 		dto.setShiteiNo(shiteiNo);
