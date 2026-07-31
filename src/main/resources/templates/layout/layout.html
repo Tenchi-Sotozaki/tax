@@ -21,7 +21,7 @@
 
 		<!-- ========== サイドバー ========== -->
 		<nav id="sidebar"
-			class="d-flex flex-column flex-shrink-0 bg-dark text-white"
+			class="d-flex flex-column flex-shrink-0 bg-dark"
 			style="width: 260px; overflow-y: auto;">
 			<!-- システム名 -->
 			<div class="px-3 py-3 border-bottom border-secondary">
@@ -36,8 +36,8 @@
 				<!-- ===== 動的サイドメニュー ===== -->
 				<th:block th:each="lv1 : ${sideMenuTree}">
 					<!-- level=1: ラベル -->
-					<div class="fw-semibold px-2 pt-3 pb-1"
-						th:classappend="${lv1Stat.index} > 0 ? 'border-top border-secondary' : ''">
+					<div class="fw-semibold px-2 pt-3 pb-1 text-white-50"
+						th:classappend="${lv1Stat.index} > 0 ? 'border-bottom border-secondary' : ''">
 						<img th:if="${lv1.iconLink != null}" th:src="@{${lv1.iconLink}}" class="me-2" style="width:1em;height:1em;">
 						<th:block th:text="${lv1.name}"></th:block>
 					</div>
@@ -52,7 +52,7 @@
 								<div class="accordion accordion-flush">
 									<div class="accordion-item bg-transparent border-0">
 										<h2 class="accordion-header">
-											<button class="accordion-button bg-transparent text-white collapsed py-2 px-2 rounded"
+											<button class="accordion-button bg-transparent text-white-70 collapsed py-2 px-2 rounded"
 												type="button" data-bs-toggle="collapse"
 												th:data-bs-target="'#menu-' + ${lv2.menuId}">
 												<img th:if="${lv2.iconLink != null}" th:src="@{${lv2.iconLink}}" class="me-2" style="width:1em;height:1em;">
@@ -62,17 +62,60 @@
 										<div th:id="'menu-' + ${lv2.menuId}" class="accordion-collapse collapse">
 											<div class="accordion-body py-1 px-0">
 												<ul class="nav flex-column ms-3">
-													<!-- level=3: リンク -->
+													<!-- level=3: アコーディオンまたは直接リンク -->
 													<th:block th:each="lv3 : ${lv2.children}">
-														<li class="nav-item"
-															th:if="${accessibleScreens.contains('*') or lv3.screenId == null or accessibleScreens.contains(lv3.screenId.strip())}">
-															<a class="nav-link text-white-50 py-1 sidebar-link"
-																th:href="@{${lv3.link}}"
-																th:classappend="${#strings.contains(currentUri, lv3.link)} ? 'text-white fw-medium' : ''">
-																<img th:if="${lv3.iconLink != null}" th:src="@{${lv3.iconLink}}" class="me-2" style="width:1em;height:1em;">
-																<th:block th:text="${lv3.name}"></th:block>
-															</a>
-														</li>
+														<th:block
+															th:if="${accessibleScreens.contains('*') or lv2.screenId == null or accessibleScreens.contains(lv3.screenId.strip())}">
+
+															<!-- level=3 子メニューあり：アコーディオン -->
+															<th:block th:if="${not #lists.isEmpty(lv3.children)}">
+																<div class="accordion accordion-flush">
+																	<div class="accordion-item bg-transparent border-0">
+																		<h2 class="accordion-header">
+																			<button class="accordion-button bg-transparent text-white-70 collapsed py-2 px-2 rounded"
+																				type="button" data-bs-toggle="collapse"
+																				th:data-bs-target="'#menu-' + ${lv3.menuId}">
+																				<img th:if="${lv3.iconLink != null}" th:src="@{${lv3.iconLink}}" class="me-2" style="width:1em;height:1em;">
+																				<th:block th:text="${lv3.name}"></th:block>
+																			</button>
+																		</h2>
+																		<div th:id="'menu-' + ${lv3.menuId}" class="accordion-collapse collapse">
+																			<div class="accordion-body py-1 px-0">
+																				<ul class="nav flex-column ms-3">
+
+																					<!-- level=4 直接リンク -->
+																					<th:block th:each="lv4 : ${lv3.children}">
+																						<li class="nav-item"
+																							th:if="${accessibleScreens.contains('*') or lv4.screenId == null or accessibleScreens.contains(lv4.screenId.strip())}">
+																							<a class="nav-link text-white px-2 py-1 sidebar-link"
+																								th:href="@{${lv4.link}}"
+																								th:classappend="${#strings.contains(currentUri, lv4.link)} ? 'text-white fw-medium' : ''">
+																								<img th:if="${lv4.iconLink != null}" th:src="@{${lv4.iconLink}}" class="me-2" style="width:1em;height:1em;">
+																								<th:block th:text="${lv4.name}"></th:block>
+																							</a>
+																						</li>
+																					</th:block>
+
+																				</ul>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</th:block>
+	
+															<!-- level=3 子メニューなし：直接リンク -->
+															<th:block th:if="${#lists.isEmpty(lv3.children)}">
+																<li class="nav-item">
+																	<a class="nav-link text-white px-2 py-1 sidebar-link"
+																		th:href="@{${lv3.link}}"
+																		th:classappend="${#strings.contains(currentUri, lv3.link)} ? 'text-white fw-medium' : ''">
+																		<img th:if="${lv3.iconLink != null}" th:src="@{${lv3.iconLink}}" class="me-2" style="width:1em;height:1em;">
+																		<th:block th:text="${lv3.name}"></th:block>
+																	</a>
+																</li>
+															</th:block>
+
+														</th:block>
 													</th:block>
 												</ul>
 											</div>
@@ -85,7 +128,7 @@
 							<th:block th:if="${#lists.isEmpty(lv2.children)}">
 								<ul class="nav flex-column">
 									<li class="nav-item">
-										<a class="nav-link text-white-50 py-1 sidebar-link"
+										<a class="nav-link text-white px-2 py-1 sidebar-link"
 											th:href="@{${lv2.link}}"
 											th:classappend="${#strings.contains(currentUri, lv2.link)} ? 'text-white fw-medium' : ''">
 											<img th:if="${lv2.iconLink != null}" th:src="@{${lv2.iconLink}}" class="me-2" style="width:1em;height:1em;">
