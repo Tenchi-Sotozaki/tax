@@ -449,15 +449,29 @@ public class TokugimuServiceImpl implements TokugimuService {
 	 */
 	@Override
 	@Transactional
-	public void deleteByShiteiNo(String shiteiNo) {
+	public boolean deleteByShiteiNo(String shiteiNo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
 				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("削除対象が見つかりません: " + shiteiNo));
 
 		t.setDelFlg("1");
+		t.setNewFlg("0");
 		tokugimuRepository.save(t);
-		log.debug("特別徴収義務者論理削除完了: shiteiNo={}", shiteiNo);
+
+		// 履歴が残っている場合は、残っている中で最も新しいものを最新版に戻す。
+		// これをしないと new_flg='1' のレコードが無くなり、一覧・照会のいずれからも参照できなくなる。
+		Tokugimu latest = tokugimuRepository
+				.findActiveHistoryByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream().findFirst().orElse(null);
+		if (latest == null) {
+			log.debug("特別徴収義務者論理削除完了（履歴なし）: shiteiNo={}", shiteiNo);
+			return false;
+		}
+		latest.setNewFlg("1");
+		tokugimuRepository.save(latest);
+		log.debug("特別徴収義務者論理削除完了（最新履歴を rno={} に戻す）: shiteiNo={}", latest.getRno(), shiteiNo);
+		return true;
 	}
 
 	// ========== ヘルパーメソッド ==========

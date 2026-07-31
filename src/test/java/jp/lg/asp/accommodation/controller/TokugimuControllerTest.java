@@ -143,16 +143,27 @@ class TokugimuControllerTest {
     }
 
     @Test
-    void delete_セッションの指定番号を削除しリダイレクト() {
+    void delete_全履歴が削除された場合は一覧に戻りセッションを解除する() {
         MockHttpSession session = sessionWith("00100001");
         Model model = new ExtendedModelMap();
+        when(tokugimuService.deleteByShiteiNo("00100001")).thenReturn(false);
 
         String view = controller.delete(session, model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/tokugimu/list");
-        verify(tokugimuService).deleteByShiteiNo("00100001");
-        // 削除済みの特別徴収義務者が選択されたまま残らないこと
         assertThat(SessionHelper.getShiteiGassan(session)).isNull();
+    }
+
+    @Test
+    void delete_履歴が残る場合は照会画面に戻りセッションを維持する() {
+        MockHttpSession session = sessionWith("00100001");
+        Model model = new ExtendedModelMap();
+        when(tokugimuService.deleteByShiteiNo("00100001")).thenReturn(true);
+
+        String view = controller.delete(session, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("redirect:/tokugimu/view");
+        assertThat(SessionHelper.getShiteiGassan(session)).isNotNull();
     }
 
     @Test

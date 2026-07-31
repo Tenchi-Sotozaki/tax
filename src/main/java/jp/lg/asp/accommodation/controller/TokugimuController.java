@@ -251,8 +251,13 @@ public class TokugimuController {
 		if (id == null) {
 			return showSelectModalOnForm(model);
 		}
-		tokugimuService.deleteByShiteiNo(id);
-		// 削除済みの特別徴収義務者が選択されたままにならないよう、セッションを解除する
+		boolean historyRemains = tokugimuService.deleteByShiteiNo(id);
+		if (historyRemains) {
+			// 履歴が残っている場合は選択状態を維持し、最新履歴の照会画面へ戻る
+			redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " の最新履歴を削除しました。");
+			return "redirect:/tokugimu/view";
+		}
+		// すべての履歴が削除された場合は、存在しない特別徴収義務者が選択されたまま残らないよう解除する
 		SessionHelper.saveShiteiGassan(session, null);
 		redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " のデータを削除しました。");
 		return "redirect:/tokugimu/list";
