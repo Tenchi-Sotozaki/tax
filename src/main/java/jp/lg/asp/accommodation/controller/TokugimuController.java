@@ -8,7 +8,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -241,11 +240,20 @@ public class TokugimuController {
 
 	// ========== 削除 ==========
 
-	@PostMapping("/delete/{id}")
+	/**
+	 * 削除対象はエンドポイントに含めず、セッションで選択中の特別徴収義務者を対象とする。
+	 */
+	@PostMapping("/delete")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "削除")
-	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
+	public String delete(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
+		String id = getShiteiNoFromSession(session);
+		if (id == null) {
+			return showSelectModalOnForm(model);
+		}
 		tokugimuService.deleteByShiteiNo(id);
+		// 削除済みの特別徴収義務者が選択されたままにならないよう、セッションを解除する
+		SessionHelper.saveShiteiGassan(session, null);
 		redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " のデータを削除しました。");
 		return "redirect:/tokugimu/list";
 	}

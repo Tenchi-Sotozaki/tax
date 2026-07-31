@@ -338,13 +338,12 @@
 			</div>
 		</th:block>
 
-		<!-- 削除フォーム（隠し） -->
-		<form th:each="item : ${items.content}" th:id="'deleteForm-' + ${item.shiteiNo}"
-			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}" method="post" class="d-none"></form>
+		<!-- 削除フォーム（隠し）。削除対象はセッションから取得するため指定番号は渡さない -->
+		<form id="deleteForm" th:action="@{/tokugimu/delete}" method="post" class="d-none"></form>
 
 		<!-- 削除確認モーダル -->
 		<div
-			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm', 'btn-danger', '削除する')}">
 		</div>
 
 	</div>

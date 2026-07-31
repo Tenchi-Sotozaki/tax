@@ -932,7 +932,7 @@
 		<!-- 削除用フォーム・確認モーダル（編集画面のみ） -->
 		<th:block th:if="${(isEdit ?: false) and !(isView ?: false)}">
 			<form id="deleteTokugimuForm"
-				th:action="@{/tokugimu/delete/{id}(id=${editId})}" method="post"
+				th:action="@{/tokugimu/delete}" method="post"
 				class="d-none"></form>
 			<div
 				th:replace="~{layout/components :: confirmModal('deleteConfirmModal', '削除確認', 'この特別徴収義務者を削除します。よろしいですか？', 'deleteTokugimuForm', 'btn-danger', '削除する')}">
