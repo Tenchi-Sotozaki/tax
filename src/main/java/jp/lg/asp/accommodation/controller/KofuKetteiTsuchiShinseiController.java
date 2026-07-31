@@ -103,8 +103,6 @@ public class KofuKetteiTsuchiShinseiController {
 					nendo);
 			
 			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
-				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
-				
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
@@ -152,7 +150,6 @@ public class KofuKetteiTsuchiShinseiController {
 					nendo);
 
 			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
-				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 				
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
@@ -202,7 +199,6 @@ public class KofuKetteiTsuchiShinseiController {
 					nendo);
 
 			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
-				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 				
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
