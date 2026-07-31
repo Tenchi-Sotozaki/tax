@@ -106,6 +106,7 @@ public class GlobalModelAdvice {
 	public List<MenuDto> sideMenuTree() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		try {
+			Set<String> screens = accessibleScreens();
 			List<Menu> menus = menuRepository.findByJichitaiCdOrderByDspOdr(jichitaiCd);
 			Map<String, MenuDto> map = new LinkedHashMap<>();
 			for (Menu m : menus) {
@@ -119,6 +120,7 @@ public class GlobalModelAdvice {
 				dto.setLink(m.getLink());
 				map.put(m.getMenuId(), dto);
 			}
+			// ツリー構築
 			List<MenuDto> roots = new java.util.ArrayList<>();
 			for (MenuDto dto : map.values()) {
 				if (dto.getLevel() == 1) {
@@ -130,11 +132,32 @@ public class GlobalModelAdvice {
 					}
 				}
 			}
+			// 権限フィルタリング：下位から上位へ不要ノードを除去
+			for (MenuDto lv1 : roots) {
+				for (MenuDto lv2 : lv1.getChildren()) {
+					for (MenuDto lv3 : lv2.getChildren()) {
+						lv3.getChildren().removeIf(lv4 -> !isAccessible(lv4, screens));
+					}
+					lv2.getChildren().removeIf(lv3 ->
+						!isAccessible(lv3, screens) ||
+						(!lv3.getChildren().isEmpty() && lv3.getChildren().stream().noneMatch(lv4 -> isAccessible(lv4, screens)))
+					);
+				}
+				lv1.getChildren().removeIf(lv2 ->
+					!isAccessible(lv2, screens) ||
+					(!lv2.getChildren().isEmpty() && lv2.getChildren().stream().noneMatch(lv3 -> isAccessible(lv3, screens)))
+				);
+			}
+			roots.removeIf(lv1 -> lv1.getChildren().isEmpty());
 			return roots;
 		} catch (Exception e) {
 			log.error("sideMenuTree取得エラー: {}", e.getMessage());
 			return Collections.emptyList();
 		}
+	}
+
+	private boolean isAccessible(MenuDto menu, Set<String> screens) {
+		return screens.contains("*") || menu.getScreenId() == null || screens.contains(menu.getScreenId().strip());
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)
