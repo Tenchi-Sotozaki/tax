@@ -81,34 +81,6 @@ public class KofuKetteiTsuchiShinseiController {
 	}
 
 	/**
-	 * 年度変更時のデータ取得API
-	 */
-	@PostMapping("/kofuKetteiTsuchiShinsei/reload")
-	@OpeLog(screenId = SCREEN_ID, operation = "年度更新")
-	public ResponseEntity<KofuKetteiTsuchiShinseiDto> reloadData(@RequestParam String shiteiNo,
-			@RequestParam String nendo) {
-		try {
-			accessChecker.checkAccess(SCREEN_ID);
-
-			// 年度からyyyy部分のみを抽出
-			String nendoYear = nendo.split("-")[0];
-			KofuKetteiTsuchiShinseiDto dto = KofuKetteiTsuchiShinseiService.getReportData(shiteiNo, nendoYear);
-
-			if (dto == null) {
-				dto = new KofuKetteiTsuchiShinseiDto();
-				dto.setShiteiNo(shiteiNo);
-			} 
-			
-			dto.setNendo(nendo);
-
-			return ResponseEntity.ok(dto);
-		} catch (Exception e) {
-			log.error("データ再読み込み中にエラーが発生しました", e);
-			return ResponseEntity.internalServerError().build();
-		}
-	}
-
-	/**
 	 * PDF出力
 	 */
 	@PostMapping("/kofuKetteiTsuchiShinsei/pdf")
@@ -117,16 +89,19 @@ public class KofuKetteiTsuchiShinseiController {
 	public ResponseEntity<byte[]> generatePdf(KofuKetteiTsuchiShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-		
-			// 年度が指定されている場合はその年度で取得
-			KofuKetteiTsuchiShinseiDto reportData;
-			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
-				String nendoYear = dto.getNendo().split("-")[0];
-				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
-			} else {
-				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo());
+			
+			// 年度を取得
+			String nendo = dto.getNendo();
+
+			// 年度が入力されていない場合
+			if (nendo == null || nendo.isEmpty()) {
+				return ResponseEntity.badRequest().body("年度が入力されていません。".getBytes(StandardCharsets.UTF_8));
 			}
 
+			// 年度を指定して帳票データを取得
+			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
+					nendo);
+			
 			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
 				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 				
@@ -164,14 +139,17 @@ public class KofuKetteiTsuchiShinseiController {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 			
-			// 年度が指定されている場合はその年度で取得
-			KofuKetteiTsuchiShinseiDto reportData;
-			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
-				String nendoYear = dto.getNendo().split("-")[0];
-				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
-			} else {
-				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo());
+			/// 年度を取得
+			String nendo = dto.getNendo();
+
+			// 年度が入力されていない場合
+			if (nendo == null || nendo.isEmpty()) {
+				return ResponseEntity.badRequest().body("年度が入力されていません。".getBytes(StandardCharsets.UTF_8));
 			}
+
+			// 年度を指定して帳票データを取得
+			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
+					nendo);
 
 			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
 				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
@@ -211,14 +189,17 @@ public class KofuKetteiTsuchiShinseiController {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 			
-			// 年度が指定されている場合はその年度で取得
-			KofuKetteiTsuchiShinseiDto reportData;
-			if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
-				String nendoYear = dto.getNendo().split("-")[0];
-				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(), nendoYear);
-			} else {
-				reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo());
+			// 年度を取得
+			String nendo = dto.getNendo();
+
+			// 年度が入力されていない場合
+			if (nendo == null || nendo.isEmpty()) {
+				return ResponseEntity.badRequest().body("年度が入力されていません。".getBytes(StandardCharsets.UTF_8));
 			}
+
+			// 年度を指定して帳票データを取得
+			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
+					nendo);
 
 			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
 				log.error("報告データが取得できません。指定番号: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
