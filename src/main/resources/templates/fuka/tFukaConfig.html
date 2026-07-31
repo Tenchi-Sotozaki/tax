@@ -230,7 +230,7 @@
 											th:text="${detail.label}">区分</span></td>
 
 										<td class="text-center fw-medium bg-light"><span
-											th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA') + ' 円)'}">税率</span>
+											th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA') + ' 円'}">税率</span>
 										</td>
 
 										<td><input type="text"
@@ -328,7 +328,7 @@
 							<table class="table table-bordered table-sm align-middle mb-0">
 								<thead class="table-light text-center">
 									<tr>
-										<th style="width: 8%;">区分/th>
+										<th style="width: 8%;">区分</th>
 										<th style="width: 7%;">税率</th>
 										<th style="width: 15%;">宿泊料金総額(円)</th>
 										<th style="width: 10%;">宿泊数</th>
@@ -777,7 +777,7 @@
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"
 												class="text-end align-middle"><span
 												th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA')}">0</span>
-												円)<input type="hidden"
+												円<input type="hidden"
 												th:id="|modal-tax-rate-${stat.index}|"
 												th:value="${detail.taxRate + detail.taxKenRate}" /></td>
 											<td class="bg-light text-center text-muted align-middle"><i
