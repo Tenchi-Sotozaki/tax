@@ -24,6 +24,12 @@
 						<!-- 特別徴収義務者エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 						
+						<!-- エラーメッセージ -->
+						<div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert" id="errorAlert" style="display: none;">
+						    <i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="errorMessageText"></span>
+						    <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+						</div>
+						
 						<!-- 年度・発行年月日入力エリア -->
 						<div class="card mb-2">
 							<div class="card-header">

@@ -93,7 +93,7 @@ public class KofuKetteiTsuchiShinseiController {
 			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
 					nendo);
 			
-			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
+			if (reportData == null) {
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
@@ -140,7 +140,7 @@ public class KofuKetteiTsuchiShinseiController {
 			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
 					nendo);
 
-			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
+			if (reportData == null) {
 				
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
@@ -189,7 +189,7 @@ public class KofuKetteiTsuchiShinseiController {
 			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
 					nendo);
 
-			if (reportData.getNonyugaku().equals("0") && reportData.getKofugaku().equals("0")) {
+			if (reportData == null) {
 				
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));

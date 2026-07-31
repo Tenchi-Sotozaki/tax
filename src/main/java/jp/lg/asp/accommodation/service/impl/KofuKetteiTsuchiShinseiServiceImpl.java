@@ -139,6 +139,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				dto.setNonyugaku("0");
 				dto.setKofugaku("0");
 				log.error("奨励金情報が見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);
+				return null;
 			}
 
 			// 固定値設定

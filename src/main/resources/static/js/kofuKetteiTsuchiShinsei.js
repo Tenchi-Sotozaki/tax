@@ -48,10 +48,10 @@ function generatePdf() {
 
     // 両方チェックされていない場合
     if (!isKetteiChecked && !isShinseiChecked) {
-        alert('印刷対象が選択されていません。');
+        showErrorMessage('印刷対象が選択されていません。');
         return;
     }
-	
+
     if (!validateForm()) {
         return;
     }
@@ -91,7 +91,7 @@ function generatePdf() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert(error.message);
+            showErrorMessage(error.message);
         });
 }
 
@@ -108,7 +108,7 @@ function preview() {
 
     // 両方チェックされていない場合
     if (!isKetteiChecked && !isShinseiChecked) {
-        alert('印刷対象が選択されていません。');
+        showErrorMessage('印刷対象が選択されていません。');
         return;
     }
 	
@@ -136,7 +136,7 @@ function preview() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert(error.message);
+            showErrorMessage(error.message);
         });
 }
 
@@ -153,7 +153,7 @@ function printReport() {
 
     // 両方チェックされていない場合
     if (!isKetteiChecked && !isShinseiChecked) {
-        alert('印刷対象が選択されていません。');
+        showErrorMessage('印刷対象が選択されていません。');
         return;
     }
 	
@@ -200,7 +200,7 @@ function printReport() {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert(error.message);
+            showErrorMessage(error.message);
         });
 }
 
@@ -211,7 +211,7 @@ function validateForm() {
     const shiteiNo = document.querySelector('input[name="shiteiNo"]').value;
 
     if (!shiteiNo) {
-        alert('指定番号が取得できません。');
+        showErrorMessage('指定番号が取得できません。');
         return false;
     }
 	
@@ -220,7 +220,7 @@ function validateForm() {
     const nendoValue = nendoInput ? nendoInput.value.trim() : '';
 
     if (!nendoValue) {
-        alert('年度を入力してください。');
+        showErrorMessage('年度を入力してください。');
         nendoInput.focus();
         return false;
     }
@@ -228,7 +228,7 @@ function validateForm() {
     // 4桁の半角数字であるかチェックする正規表現
     const nendoRegex = /^\d{4}$/;
     if (!nendoRegex.test(nendoValue)) {
-        alert('年度は4桁の半角数字（例: 2026）で入力してください。');
+        showErrorMessage('年度は4桁の半角数字（例: 2026）で入力してください。');
         nendoInput.focus();
         return false;
     }
@@ -238,7 +238,7 @@ function validateForm() {
     const hakkoYmdValue = hakkoYmdInput ? hakkoYmdInput.value.trim() : '';
 
     if (!hakkoYmdValue) {
-        alert('発行年月日を入力してください。');
+        showErrorMessage('発行年月日を入力してください。');
         hakkoYmdInput.focus();
         return false;
     }
@@ -266,3 +266,17 @@ function updateDisplayDate() {
         }
     }
 }
+
+/**
+ * 画面上部にエラーメッセージを表示する
+ */
+function showErrorMessage(message) {
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessageText = document.getElementById('errorMessageText');
+    
+    if (errorAlert && errorMessageText) {
+        errorMessageText.textContent = message;
+        errorAlert.style.display = 'block';
+    }
+}
+
