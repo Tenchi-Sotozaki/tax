@@ -1,6 +1,4 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -9,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Shoreikin;
@@ -37,6 +36,7 @@ public class ShoreikinBulkServiceImpl implements ShoreikinBulkService {
 			dto.setResultMessage("交付金年度が指定されていません");
 			return dto;
 		}
+		
 
 		// 賦課情報がある特別徴収義務者を取得
 		List<Fuka> fukaList = fukaRepository

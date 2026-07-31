@@ -1,11 +1,12 @@
 package jp.lg.asp.accommodation.controller;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,13 +25,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.AtenaConfigForm;
+import jp.lg.asp.accommodation.dto.AtenaDaichoItem;
 import jp.lg.asp.accommodation.dto.AtenaImportPreviewDto;
 import jp.lg.asp.accommodation.dto.AtenaSearchForm;
+import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.service.AtenaConfigService;
 import jp.lg.asp.accommodation.service.AtenaImportService;
 import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +51,8 @@ public class AtenaController {
 
 	private final AtenaRepository atenaRepository;
 	private final AtenaImportService atenaImportService;
+	private final AtenaConfigService atenaConfigService;
+	private final JichitaiRepository jichitaiRepository;
 	private final ScreenAccessChecker accessChecker;
 	private final HashUtil hashUtil;
 
@@ -51,6 +60,7 @@ public class AtenaController {
 
 	private static final String ATENA_DAICHO = ScreenManagement.ATENA_DAICHO;
 	private static final String ATENA_INSERT = ScreenManagement.ATENA_INSERT;
+	private static final String ATENA_CONFIG = ScreenManagement.ATENA_CONFIG;
 
 	/** 解析結果を確定処理まで保持するセッションキー */
 	private static final String IMPORT_PREVIEW_KEY = "atenaImportPreview";
@@ -65,7 +75,7 @@ public class AtenaController {
 		accessChecker.checkAccess(ATENA_DAICHO);
 		searchForm.setPage(page);
 		searchForm.setPageSize(pageSize);
-		Page<jp.lg.asp.accommodation.entity.Atena> items = atenaRepository.searchPage(
+		Page<Atena> atenaPage = atenaRepository.searchPage(
 				jichitaiCd,
 				toLikePattern(searchForm.getAtenaNo(), "exact"),
 				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
@@ -76,6 +86,10 @@ public class AtenaController {
 				toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
 				toLikePattern(searchForm.getHojinNo(), "exact"),
 				PageRequest.of(page, pageSize));
+		BigDecimal atenaStNo = jichitaiRepository.findById(jichitaiCd)
+				.map(Jichitai::getAtenaStNo).orElse(null);
+		org.springframework.data.domain.Page<AtenaDaichoItem> items = atenaPage
+				.map(a -> new AtenaDaichoItem(a, atenaStNo));
 		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
 		return "atena/atenaDaicho";
@@ -175,6 +189,119 @@ public class AtenaController {
 		return ResponseEntity.badRequest().body(Map.of("message", message));
 	}
 
+	@GetMapping("/register")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "登録画面表示")
+	public String showRegister(Model model) {
+		//accessChecker.checkWriteAccess(ATENA_CONFIG);
+		model.addAttribute("form", new AtenaConfigForm());
+		model.addAttribute("mode", "register");
+		return "atena/atenaConfig";
+	}
+
+	@PostMapping("/register")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "登録")
+	public String register(@ModelAttribute("form") AtenaConfigForm form,
+			org.springframework.validation.BindingResult result,
+			Model model,
+			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		//accessChecker.checkWriteAccess(ATENA_CONFIG);
+		if (isBlank(form.getKojinNo()) && isBlank(form.getHojinNo())) {
+			model.addAttribute("errorMessage", "個人番号または法人番号のいずれかを入力してください。");
+			model.addAttribute("mode", "register");
+			return "atena/atenaConfig";
+		}
+		if (!isBlank(form.getKojinNo()) && !isBlank(form.getHojinNo())) {
+			model.addAttribute("errorMessage", "個人番号と法人番号は同時に入力できません。");
+			model.addAttribute("mode", "register");
+			return "atena/atenaConfig";
+		}
+		Atena atena = toEntity(form);
+		atenaConfigService.register(atena, jichitaiCd);
+		redirectAttributes.addFlashAttribute("successMessage", "宛名を登録しました。");
+		return "redirect:/atena/list";
+	}
+
+	@GetMapping("/view/{atenaNo}")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "照会")
+	public String view(@PathVariable java.math.BigDecimal atenaNo, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		//accessChecker.checkAccess(ATENA_CONFIG);
+		Atena atena = atenaConfigService.findByAtenaNo(jichitaiCd, atenaNo);
+		model.addAttribute("form", toForm(atena));
+		model.addAttribute("mode", "view");
+		return "atena/atenaConfig";
+	}
+
+	@GetMapping("/edit/{atenaNo}")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "編集画面表示")
+	public String showEdit(@PathVariable java.math.BigDecimal atenaNo, Model model) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		//accessChecker.checkWriteAccess(ATENA_CONFIG);
+		Atena atena = atenaConfigService.findByAtenaNo(jichitaiCd, atenaNo);
+		model.addAttribute("form", toForm(atena));
+		model.addAttribute("mode", "edit");
+		return "atena/atenaConfig";
+	}
+
+	@PostMapping("/edit")
+	@OpeLog(screenId = ATENA_CONFIG, operation = "更新")
+	public String edit(@ModelAttribute("form") AtenaConfigForm form,
+			Model model,
+			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		//accessChecker.checkWriteAccess(ATENA_CONFIG);
+		if (isBlank(form.getKojinNo()) && isBlank(form.getHojinNo())) {
+			model.addAttribute("errorMessage", "個人番号または法人番号のいずれかを入力してください。");
+			model.addAttribute("mode", "edit");
+			return "atena/atenaConfig";
+		}
+		if (!isBlank(form.getKojinNo()) && !isBlank(form.getHojinNo())) {
+			model.addAttribute("errorMessage", "個人番号と法人番号は同時に入力できません。");
+			model.addAttribute("mode", "edit");
+			return "atena/atenaConfig";
+		}
+		Atena atena = toEntity(form);
+		atenaConfigService.update(atena, jichitaiCd);
+		redirectAttributes.addFlashAttribute("successMessage", "宛名を更新しました。");
+		return "redirect:/atena/view/" + form.getAtenaNo();
+	}
+
+	private boolean isBlank(String s) {
+		return s == null || s.isBlank();
+	}
+
+	private Atena toEntity(AtenaConfigForm form) {
+		Atena a = new Atena();
+		a.setAtenaNo(form.getAtenaNo());
+		a.setKojinNo(emptyToNull(form.getKojinNo()));
+		a.setHojinNo(emptyToNull(form.getHojinNo()));
+		a.setName(form.getName());
+		a.setNameKana(emptyToNull(form.getNameKana()));
+		a.setYubinNo(emptyToNull(form.getYubinNo()));
+		a.setJusho(emptyToNull(form.getJusho()));
+		a.setTel1(emptyToNull(form.getTel1()));
+		a.setTel2(emptyToNull(form.getTel2()));
+		if (form.getVersion() != null)
+			a.setVersion(form.getVersion());
+		return a;
+	}
+
+	private AtenaConfigForm toForm(Atena a) {
+		AtenaConfigForm f = new AtenaConfigForm();
+		f.setAtenaNo(a.getAtenaNo());
+		f.setKojinNo(a.getKojinNo());
+		f.setHojinNo(a.getHojinNo());
+		f.setName(a.getName());
+		f.setNameKana(a.getNameKana());
+		f.setYubinNo(a.getYubinNo());
+		f.setJusho(a.getJusho());
+		f.setTel1(a.getTel1());
+		f.setTel2(a.getTel2());
+		f.setVersion(a.getVersion());
+		return f;
+	}
+
 	private String emptyToNull(String s) {
 		return (s == null || s.isBlank()) ? null : s;
 	}
@@ -184,11 +311,12 @@ public class AtenaController {
 	}
 
 	private String toLikePattern(String value, String matchType) {
-		if (value == null || value.isBlank()) return "%";
+		if (value == null || value.isBlank())
+			return "%";
 		return switch (matchType) {
-			case "prefix" -> value + "%";
-			case "exact"  -> value;
-			default       -> "%" + value + "%"; // partial
+		case "prefix" -> value + "%";
+		case "exact" -> value;
+		default -> "%" + value + "%"; // partial
 		};
 	}
 }

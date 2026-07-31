@@ -1,7 +1,11 @@
 package jp.lg.asp.accommodation.controller;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -45,12 +49,14 @@ public class ShoreikinBulkController {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
-
-		// 決定した年度を設定
 		dto.setNendo(nendo);
 
-		// 交付率を取得して設定
-		dto.setKofuRitsu(kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now()));
+		List<BigDecimal> kofuRitsuList = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now());
+		if (kofuRitsuList.isEmpty()) {
+			model.addAttribute("errorMessage", "交付率のシステム設定値が登録されていません。システム設定から交付率を設定してください。");
+		} else {
+			dto.setKofuRitsu(kofuRitsuList.get(0));
+		}
 
 		model.addAttribute("bulkForm", dto);
 		return BULK_VIEW;
@@ -72,16 +78,12 @@ public class ShoreikinBulkController {
 			ShoreikinBulkDto result = shoreikinBulkService.executeBulkSanshutsu(bulkForm);
 			model.addAttribute("bulkForm", result);
 
-			if (result.getFailureCount() == 0) {
-				model.addAttribute("successMessage", result.getResultMessage());
-			} else {
-				model.addAttribute("warningMessage", result.getResultMessage());
-			}
-
 		} catch (Exception e) {
 			log.error("一括算出処理エラー", e);
-			bulkForm.setResultMessage("一括算出処理中にエラーが発生しました: " + e.getMessage());
-			model.addAttribute("errorMessage", bulkForm.getResultMessage());
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			model.addAttribute("errorMessage", "一括算出処理中にエラーが発生しました。システム管理者にお問い合わせください。");
+			model.addAttribute("errorDetail", sw.toString());
 			model.addAttribute("bulkForm", bulkForm);
 		}
 
