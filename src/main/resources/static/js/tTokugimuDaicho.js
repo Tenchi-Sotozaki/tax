@@ -94,8 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (id) location.href = url.replace('{id}', id);
 		});
 
-	navWithSession('btnView',          '照会する特別徴収義務者を選択してください。',
-	                                   '/accommodation-tax/tokugimu/view');
 	navWithSession('btnReport',        '特別徴収義務者を選択してください。',
 	                                   '/accommodation-tax/tokugimu/report');
 	navWithSession('btnPaymentLedger', '事業者を選択してください。',
@@ -108,25 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	                          '/accommodation-tax/tekiyo-nozei-shuki/edit/{id}?from=register');
 	nav('btnNozeiShukiView',  '特別徴収義務者を選択してください。',
 	                          '/accommodation-tax/tekiyo-nozei-shuki/view/{id}');
-
-	// 削除。削除対象はエンドポイントに含めずセッションから取得するため、
-	// 確認モーダルを開く前に選択内容をセッションへ保存する
-	document.getElementById('btnDelete')?.addEventListener('click', async () => {
-		const id = requireSelected('削除するレコードを選択してください。');
-		if (!id) return;
-
-		const modal = document.getElementById('deleteModal');
-		if (!modal) {
-			console.error('削除モーダルが見つかりません');
-			return;
-		}
-		const cb = document.querySelector('.row-select:checked');
-		if (!(await saveSelected(cb, id))) return;
-
-		modal.querySelector('.modal-body p').textContent =
-			'「' + (cb?.dataset.name || id) + '」を削除します。この操作は取り消せません。よろしいですか？';
-		new bootstrap.Modal(modal).show();
-	});
 
 	document.getElementById('btnCorrection')?.addEventListener('click', () => {
 		const id = requireSelected('特別徴収義務者を選択してください。');
