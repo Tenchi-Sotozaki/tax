@@ -140,12 +140,12 @@ public class GlobalModelAdvice {
 					}
 					lv2.getChildren().removeIf(lv3 ->
 						!isAccessible(lv3, screens) ||
-						(!lv3.getChildren().isEmpty() && lv3.getChildren().stream().noneMatch(lv4 -> isAccessible(lv4, screens)))
+						(lv3.getLink() == null && lv3.getChildren().isEmpty())
 					);
 				}
 				lv1.getChildren().removeIf(lv2 ->
 					!isAccessible(lv2, screens) ||
-					(!lv2.getChildren().isEmpty() && lv2.getChildren().stream().noneMatch(lv3 -> isAccessible(lv3, screens)))
+					(lv2.getLink() == null && lv2.getChildren().isEmpty())
 				);
 			}
 			roots.removeIf(lv1 -> lv1.getChildren().isEmpty());

@@ -35,7 +35,6 @@ class GlobalModelAdviceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
         isAccessible = GlobalModelAdvice.class.getDeclaredMethod("isAccessible", MenuDto.class, Set.class);
         isAccessible.setAccessible(true);
     }
@@ -75,12 +74,14 @@ class GlobalModelAdviceTest {
 
     @Test
     void sideMenuTree_空のメニューは空リストを返す() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
         when(menuRepository.findByJichitaiCdOrderByDspOdr("00001")).thenReturn(List.of());
         assertThat(advice.sideMenuTree()).isEmpty();
     }
 
     @Test
     void sideMenuTree_ツリー構造が正しく構築される() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
         when(menuRepository.findByJichitaiCdOrderByDspOdr("00001")).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1),
             menu("lv2", 2, "lv1", null, null, 2),
@@ -96,6 +97,7 @@ class GlobalModelAdviceTest {
 
     @Test
     void sideMenuTree_lv3が全除去されたlv2はlv1も連鎖除去される() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
         when(menuRepository.findByJichitaiCdOrderByDspOdr("00001")).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1),
             menu("lv2", 2, "lv1", null, null, 2),
@@ -107,6 +109,7 @@ class GlobalModelAdviceTest {
 
     @Test
     void sideMenuTree_screenIdがnullのlv2直接リンクは残る() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
         when(menuRepository.findByJichitaiCdOrderByDspOdr("00001")).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1),
             menu("lv2", 2, "lv1", null, "/path", 2)
@@ -119,6 +122,7 @@ class GlobalModelAdviceTest {
 
     @Test
     void sideMenuTree_screenIdがnullのlv3は認証なしでも残る() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
         when(menuRepository.findByJichitaiCdOrderByDspOdr("00001")).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1),
             menu("lv2", 2, "lv1", null, null, 2),
@@ -131,6 +135,7 @@ class GlobalModelAdviceTest {
 
     @Test
     void sideMenuTree_アクセス可能なlv3が1件でもあればlv2とlv1は残る() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
         when(menuRepository.findByJichitaiCdOrderByDspOdr("00001")).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1),
             menu("lv2", 2, "lv1", null, null, 2),
