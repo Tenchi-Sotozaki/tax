@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -50,26 +51,15 @@ public class KofuKetteiTsuchiShinseiController {
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
+		
+		// 現在の日付を取得
+		LocalDate now = LocalDate.now();
 
 		// YYYY形式の算定ロジックを共通化
 		String targetNendo = nendo;
 		if (targetNendo == null || targetNendo.isEmpty()) {
-			java.time.LocalDate now = java.time.LocalDate.now();
 			int currentYear = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
 			targetNendo = String.valueOf(currentYear);
-		}
-
-		// 指定番号がある場合のデータ取得
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			// ハイフンが含まれていれば分割して先頭を取得
-			String nendoYear = targetNendo.split("-")[0];
-			dto = KofuKetteiTsuchiShinseiService.getReportData(shiteiNo, nendoYear);
-		}
-
-		// データが存在しない場合、または指定番号がない場合のDto初期化
-		if (dto == null) {
-			dto = new KofuKetteiTsuchiShinseiDto();
-			dto.setShiteiNo(shiteiNo);
 		}
 
 		// YYYY形式の年度をDTOにセット
@@ -80,9 +70,11 @@ public class KofuKetteiTsuchiShinseiController {
 			dto.setHakkoYmd(hakkoYmd);
 		} else if (dto.getHakkoYmd() == null || dto.getHakkoYmd().isEmpty()) {
 			// 当日をデフォルトとして設定
-			java.time.LocalDate today = java.time.LocalDate.now();
-			dto.setHakkoYmd(today.toString());
+			dto.setHakkoYmd(now.toString());
 		}
+		
+		// 指定番号を設定
+		dto.setShiteiNo(shiteiNo);
 
 		model.addAttribute("dto", dto);
 		return "reports/kofuKetteiTsuchiShinsei";
