@@ -92,4 +92,17 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo,
 			@Param("rno") BigDecimal rno);
+
+	/**
+	 * 削除されていない履歴を新しい順（rno 降順）で取得する。
+	 * new_flg は問わないため、最新版を論理削除した後の履歴確認にも利用できる。
+	 */
+	@Query("""
+			SELECT t FROM Tokugimu t
+			WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0'
+			ORDER BY t.rno DESC
+			""")
+	List<Tokugimu> findActiveHistoryByJichitaiCdAndShiteiNo(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo);
 }

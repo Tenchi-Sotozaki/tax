@@ -899,16 +899,8 @@
 			</div>
 
 			<!-- ===== アクションボタン ===== -->
+			<!-- 並び順は左から「一覧に戻る」「削除する」「登録する/更新する」 -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<th:block th:if="!${isView}">
-					<button type="button" id="openConfirmModalBtn"
-						class="btn btn-success btn-lg px-5">
-						<i
-							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
-						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
-					</button>
-				</th:block>
-
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -917,10 +909,35 @@
 					th:unless="${isView ?: false}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
-
 				</a>
+
+				<!-- 編集時のみ削除ボタンを表示（台帳から移設） -->
+				<button type="button" class="btn btn-danger btn-lg px-5"
+					th:if="${(isEdit ?: false) and !(isView ?: false)}"
+					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
+
+				<th:block th:if="!${isView}">
+					<button type="button" id="openConfirmModalBtn"
+						class="btn btn-success btn-lg px-5">
+						<i
+							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+					</button>
+				</th:block>
 			</div>
 		</form>
+
+		<!-- 削除用フォーム・確認モーダル（編集画面のみ） -->
+		<th:block th:if="${(isEdit ?: false) and !(isView ?: false)}">
+			<form id="deleteTokugimuForm"
+				th:action="@{/tokugimu/delete}" method="post"
+				class="d-none"></form>
+			<div
+				th:replace="~{layout/components :: confirmModal('deleteConfirmModal', '削除確認', 'この特別徴収義務者を削除します。よろしいですか？', 'deleteTokugimuForm', 'btn-danger', '削除する')}">
+			</div>
+		</th:block>
 
 		<!-- 確認モーダル（登録と更新） -->
 		<div th:if="!${isView}"

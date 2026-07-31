@@ -47,15 +47,27 @@ class TokugimuControllerTest {
     }
 
     @Test
-    void list_一覧画面を返す() {
-        Page<TokugimuListItem> page = new PageImpl<>(List.of(), PageRequest.of(0, 5), 0);
+    void list_検索済みの場合は一覧を表示する() {
+        Page<TokugimuListItem> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
         when(tokugimuService.search(any())).thenReturn(page);
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new TokugimuSearchForm(), 0, 5, model);
+        String view = controller.list(new TokugimuSearchForm(), 0, 10, true, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
         assertThat(model.asMap()).containsKey("items");
+        assertThat(model.asMap()).containsEntry("isSearched", true);
+    }
+
+    @Test
+    void list_初期表示では検索を実行しない() {
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(new TokugimuSearchForm(), 0, 10, false, model);
+
+        assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
+        assertThat(model.asMap()).containsEntry("isSearched", false);
+        verify(tokugimuService, never()).search(any());
     }
 
     @Test
@@ -108,21 +120,61 @@ class TokugimuControllerTest {
     }
 
     @Test
-    void showView_セッション未設定はモーダル表示() {
+    void showView_セッション未設定は照会画面でモーダル表示() {
         MockHttpSession session = new MockHttpSession();
         Model model = new ExtendedModelMap();
 
         String view = controller.showView(session, null, model);
 
-        assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
-        assertThat(model.asMap()).containsKey("showShiteiGassanModal");
+        // モーダルは一覧ではなく遷移先の画面で開く
+        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
+        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
     }
 
     @Test
-    void delete_削除後リダイレクト() {
-        String view = controller.delete("00100001", new RedirectAttributesModelMap());
+    void showReport_セッション未設定は帳票発行画面でモーダル表示() {
+        MockHttpSession session = new MockHttpSession();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.showReport(session, model);
+
+        assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
+        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
+    }
+
+    @Test
+    void delete_全履歴が削除された場合は一覧に戻りセッションを解除する() {
+        MockHttpSession session = sessionWith("00100001");
+        Model model = new ExtendedModelMap();
+        when(tokugimuService.deleteByShiteiNo("00100001")).thenReturn(false);
+
+        String view = controller.delete(session, model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/tokugimu/list");
-        verify(tokugimuService).deleteByShiteiNo("00100001");
+        assertThat(SessionHelper.getShiteiGassan(session)).isNull();
+    }
+
+    @Test
+    void delete_履歴が残る場合は照会画面に戻りセッションを維持する() {
+        MockHttpSession session = sessionWith("00100001");
+        Model model = new ExtendedModelMap();
+        when(tokugimuService.deleteByShiteiNo("00100001")).thenReturn(true);
+
+        String view = controller.delete(session, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("redirect:/tokugimu/view");
+        assertThat(SessionHelper.getShiteiGassan(session)).isNotNull();
+    }
+
+    @Test
+    void delete_セッション未設定は削除せずモーダル表示() {
+        MockHttpSession session = new MockHttpSession();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.delete(session, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
+        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
+        verify(tokugimuService, never()).deleteByShiteiNo(any());
     }
 }

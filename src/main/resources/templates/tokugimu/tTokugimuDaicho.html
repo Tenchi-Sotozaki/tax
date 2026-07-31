@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>特別徴収義務者管理台帳</title>
+	<title>特別徴収義務者台帳</title>
 	<link rel="stylesheet" th:href="@{/css/tokugimu-daicho.css}">
 </head>
 
@@ -13,9 +13,10 @@
 		<!-- ページヘッダー -->
 		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-building text-primary me-2"></i>特別徴収義務者管理台帳
+				<i class="bi bi-building text-primary me-2"></i>特別徴収義務者台帳
 			</h5>
-			<span class="text-muted small"> 検索結果: <strong th:text="${items.totalElements}">0</strong> 件
+			<span class="text-muted small" th:if="${isSearched}"> 検索結果: <strong
+					th:text="${items.totalElements}">0</strong> 件
 			</span>
 		</div>
 
@@ -30,16 +31,18 @@
 			<button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- ========== 抽出条件（アコーディオン） ========== -->
+		<!-- ========== 検索条件（アコーディオン） ========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
-						data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2 text-primary"></i>抽出条件
+						data-bs-target="#searchPanel" th:classappend="${isSearched} ? 'collapsed' : ''">
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
-				<div id="searchPanel" class="accordion-collapse collapse show">
+				<!-- 初期表示時は開き、検索後は折りたたむ -->
+				<div id="searchPanel" class="accordion-collapse collapse"
+					th:classappend="${isSearched} ? '' : 'show'">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/tokugimu/list}" th:object="${searchForm}" method="get">
 							<!-- SP:1列 / タブレット:2列 / PC:4列 -->
@@ -72,7 +75,24 @@
 										placeholder="氏名または名称">
 								</div>
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">施設名称</label>
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">施設名称</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
+												value="prefix" id="shisetsuNamePrefix">
+											<label class="form-check-label small" for="shisetsuNamePrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
+												value="partial" id="shisetsuNamePartial">
+											<label class="form-check-label small" for="shisetsuNamePartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
+												value="exact" id="shisetsuNameExact">
+											<label class="form-check-label small" for="shisetsuNameExact">完全</label>
+										</div>
+									</div>
 									<input type="text" class="form-control form-control-sm" th:field="*{shisetsuName}"
 										placeholder="施設名称">
 								</div>
@@ -114,13 +134,20 @@
 										placeholder="法人番号">
 								</div>
 							</div>
-							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-								<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-sm"> <i
-										class="bi bi-arrow-counterclockwise me-1"></i>リセット
-								</a>
-								<button type="submit" class="btn btn-primary btn-sm px-4">
-									<i class="bi bi-search me-1"></i>検索する
-								</button>
+							<!-- 検索実行を判別するためのフラグ。初期表示時は一覧を表示しない -->
+							<input type="hidden" name="searched" value="true">
+							<div class="d-flex justify-content-between align-items-center gap-2 pt-1 border-top">
+								<span class="text-muted small">
+									<i class="bi bi-info-circle me-1"></i>複数の条件を入力した場合は、すべてを満たすデータを検索します。
+								</span>
+								<div class="d-flex gap-2">
+									<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-sm"> <i
+											class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
+									</a>
+									<button type="submit" class="btn btn-primary btn-sm px-4">
+										<i class="bi bi-search me-1"></i>検索する
+									</button>
+								</div>
 							</div>
 						</form>
 					</div>
@@ -128,21 +155,17 @@
 			</div>
 		</div>
 
-		<!-- ========== ツールバー（ボタンエリア） ========== -->
+		<!-- ========== ツールバー（ボタンエリア） ==========
+			 サイドメニューからの導線が整うまでは残す方針のため削除しない -->
 		<div class="card shadow-sm mb-3">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
-					<!-- グループ1: 基本操作 -->
+					<!-- グループ1: 基本操作
+						 照会・削除は一覧の「詳細」リンクから遷移できるため設置しない -->
 					<div class="d-flex flex-wrap gap-1">
 						<a th:href="@{/tokugimu/registration}" class="btn btn-success btn-sm"> <i
 								class="bi bi-plus-circle me-1"></i>新規登録
 						</a>
-						<button type="button" id="btnView" class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-eye me-1"></i>照会
-						</button>
-						<button type="button" id="btnDelete" class="btn btn-danger btn-sm">
-							<i class="bi bi-trash me-1"></i>削除
-						</button>
 					</div>
 					<div class="vr mx-1 toolbar-divider"></div>
 					<!-- グループ2: 納税管理人 -->
@@ -180,94 +203,136 @@
 			</div>
 		</div>
 
-		<!-- 表示件数選択プルダウン -->
-		<div class="d-flex justify-content-end align-items-center mb-1">
-			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-				<option th:each="s : ${#arrays.toArray({5, 10, 20})}"
-					th:value="@{/tokugimu/list(page=0, pageSize=${s}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-					th:text="${s}" th:selected="${s == searchForm.pageSize}">
-				</option>
-			</select>
-		</div>
+		<!-- ========== 検索結果エリア（初期表示時は表示しない） ========== -->
+		<th:block th:if="${isSearched}">
 
-		<!-- ========== 一覧テーブル ========== -->
-		<div class="card shadow-sm">
-			<div class="card-body p-0">
-				<div class="table-scroll">
-					<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
-						<thead class="table-primary">
-							<tr>
-								<th style="width: 40px" class="text-center"></th>
-								<th style="min-width: 100px">指定番号</th>
-								<th style="min-width: 140px">氏名/名称</th>
-								<th style="min-width: 140px">事業所名称</th>
-								<th style="min-width: 80px" class="text-center">ステータス</th>
-								<th style="min-width: 80px" class="text-center">合算対象</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="item : ${items.content}">
-								<td class="text-center"><input type="checkbox" class="form-check-input row-select"
-										th:data-shitei-no="${item.shiteiNo}"
-										th:data-atena-no="${item.id}"
-										th:data-name="${item.name}"
-										th:data-shisetsu-name="${item.shisetsuName}"></td>
-								<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
-								<td th:text="${item.name}"></td>
-								<td th:text="${item.shisetsuName}"></td>
-								<td class="text-center"><span class="badge bg-success"
-										th:if="${item.status == '1'}">営業中</span> <span
-										class="badge bg-warning text-dark" th:if="${item.status == '2'}">休止</span> <span
-										class="badge bg-secondary" th:if="${item.status == '3'}">廃止</span>
-									<span class="text-muted small"
-										th:if="${item.status == null or item.status == ''}">-</span>
-								</td>
-								<td class="text-center"><span class="badge bg-primary"
-										th:if="${item.consolidationTarget == 'target'}">対象</span> <span
-										class="badge bg-light text-muted border"
-										th:unless="${item.consolidationTarget == 'target'}">非対象</span>
-								</td>
-							</tr>
-							<tr th:if="${items.totalElements == 0}">
-								<td colspan="7" class="text-center text-muted py-5"><i
-										class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-									該当するデータが見つかりませんでした。</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			</div>
-			<div class="card-footer bg-white py-2 border-top">
-				<nav>
+			<!-- ページネーション（中央固定）＆表示件数 -->
+			<div class="d-flex justify-content-center align-items-center mb-1 position-relative"
+				th:with="curr=${items.number}, total=${items.totalPages}, start=${startPage}, end=${endPage}">
+
+				<nav th:if="${total > 0}">
 					<ul class="pagination pagination-sm justify-content-center mb-0">
+						<!-- 前へ -->
 						<li class="page-item" th:classappend="${items.first} ? 'disabled'">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(page=${items.number - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
+								th:href="@{/tokugimu/list(searched=true, page=${curr - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
 						</li>
-						<li class="page-item" th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
-							th:classappend="${i == items.number} ? 'active'">
+
+						<!-- 先頭ページ（中間に含まれない場合のみ） -->
+						<li class="page-item" th:if="${start > 0}">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(page=${i}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+								th:href="@{/tokugimu/list(searched=true, page=0, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">1</a>
+						</li>
+						<li class="page-item disabled" th:if="${start > 1}"><span class="page-link">...</span></li>
+
+						<!-- 選択中ページを中央に固定するため、前後1ページを表示 -->
+						<li class="page-item" th:each="i : ${#numbers.sequence(start, end)}"
+							th:classappend="${i == curr} ? 'active'">
+							<a class="page-link"
+								th:href="@{/tokugimu/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
 								th:text="${i + 1}">1</a>
 						</li>
+
+						<!-- 最終ページ（中間に含まれない場合のみ） -->
+						<li class="page-item disabled" th:if="${end < total - 2}"><span class="page-link">...</span></li>
+						<li class="page-item" th:if="${end < total - 1}">
+							<a class="page-link"
+								th:href="@{/tokugimu/list(searched=true, page=${total - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+								th:text="${total}">N</a>
+						</li>
+
+						<!-- 次へ -->
 						<li class="page-item" th:classappend="${items.last} ? 'disabled'">
 							<a class="page-link"
-								th:href="@{/tokugimu/list(page=${items.number + 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
+								th:href="@{/tokugimu/list(searched=true, page=${curr + 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
 						</li>
 					</ul>
 				</nav>
-				<div style="width: 120px;"></div>
-			</div>
-		</div>
-		<!-- 削除フォーム（隠し） -->
-		<form th:each="item : ${items.content}" th:id="'deleteForm-' + ${item.shiteiNo}"
-			th:action="@{/tokugimu/delete/{id}(id=${item.shiteiNo})}" method="post" class="d-none"></form>
 
-		<!-- 削除確認モーダル -->
-		<div
-			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', '選択したデータを削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
-		</div>
+				<!-- 表示件数 -->
+				<div class="d-flex align-items-center position-absolute end-0">
+					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
+					<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
+						<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
+							th:value="@{/tokugimu/list(searched=true, page=0, pageSize=${s}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
+							th:text="${s}" th:selected="${s == searchForm.pageSize}">
+						</option>
+					</select>
+				</div>
+			</div>
+
+			<!-- ========== 一覧テーブル ========== -->
+			<div class="card shadow-sm">
+				<div class="card-body p-0">
+					<div class="table-scroll">
+						<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
+							<thead class="table-primary">
+								<tr>
+									<th style="width: 40px" class="text-center"></th>
+									<th style="min-width: 100px">指定番号</th>
+									<th style="min-width: 110px">合算指定番号</th>
+									<th style="min-width: 140px">氏名/名称</th>
+									<th style="min-width: 140px">施設名称</th>
+									<th style="min-width: 80px" class="text-center">ステータス</th>
+									<th style="min-width: 80px" class="text-center">合算対象</th>
+									<th style="min-width: 100px" class="text-center">最終申告日</th>
+									<th style="min-width: 90px" class="text-center">最終納付状況</th>
+									<th style="width: 90px" class="text-center"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item : ${items.content}">
+									<td class="text-center"><input type="checkbox" class="form-check-input row-select"
+											th:data-shitei-no="${item.shiteiNo}"
+											th:data-atena-no="${item.id}"
+											th:data-name="${item.name}"
+											th:data-shisetsu-name="${item.shisetsuName}"></td>
+									<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
+									<td th:text="${item.gassanShiteiNo}"></td>
+									<td th:text="${item.name}"></td>
+									<td th:text="${item.shisetsuName}"></td>
+									<td class="text-center"><span class="badge bg-success"
+											th:if="${item.status == '1'}">営業中</span> <span
+											class="badge bg-warning text-dark" th:if="${item.status == '2'}">休止</span> <span
+											class="badge bg-secondary" th:if="${item.status == '3'}">廃止</span>
+										<span class="text-muted small"
+											th:if="${item.status == null or item.status == ''}">-</span>
+									</td>
+									<td class="text-center"><span class="badge bg-primary"
+											th:if="${item.consolidationTarget == 'target'}">対象</span> <span
+											class="badge bg-light text-muted border"
+											th:unless="${item.consolidationTarget == 'target'}">非対象</span>
+									</td>
+									<!-- 最終申告日（申告実績が無い場合は空欄） -->
+									<td class="text-center"
+										th:text="${item.lastShinkokuYmd != null ? #temporals.format(item.lastShinkokuYmd, 'yyyy/MM/dd') : ''}"></td>
+									<!-- 最終申告分の納付状況（記号は納入申告管理と共通） -->
+									<td class="text-center">
+										<span th:if="${item.lastNonyuStatus == 'paid'}">〇</span>
+										<span th:if="${item.lastNonyuStatus == 'partial'}">△</span>
+										<span th:if="${item.lastNonyuStatus == 'unpaid'}">ー</span>
+									</td>
+									<!-- 指定番号はパラメータでは渡さず、セッションに保存してから照会画面へ遷移する -->
+									<td class="text-center">
+										<a href="#" class="detail-link"
+											th:data-shitei-no="${item.shiteiNo}"
+											th:data-atena-no="${item.id}"
+											th:data-name="${item.name}"
+											th:data-shisetsu-name="${item.shisetsuName}">詳細</a>
+									</td>
+								</tr>
+								<tr th:if="${items.totalElements == 0}">
+									<td colspan="10" class="text-center text-muted py-5"><i
+											class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+										該当するデータが見つかりませんでした。</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</th:block>
+
 	</div>
 
 	<th:block layout:fragment="scripts">

@@ -38,5 +38,5 @@ public class TokugimuSearchForm {
 	private int page = 0;
 
 	/** No.10 */
-	private int pageSize = 5;
+	private int pageSize = 10;
 }

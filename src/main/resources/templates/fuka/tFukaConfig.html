@@ -71,7 +71,7 @@
 				th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 				class="alert alert-danger alert-dismissible fade show" role="alert">
 				<i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に <span
-					th:text="${validationErrors.size()}"></span> 件のエラーがあります、E
+					th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 				<ul class="mb-0 mt-1">
 					<li th:each="err : ${validationErrors}" th:text="${err}"
 						class="small"></li>
@@ -486,9 +486,9 @@
 									th:disabled="${fukaDeclarationForm.view}"
 									th:data-initial-value="*{additionalCategory1}">
 									<option value="">区分を選択してください</option>
-									<option value="1">過少申告加算</option>
-									<option value="2">不申告加算</option>
-									<option value="3">重加算</option>
+									<option value="1">過少申告加算金</option>
+									<option value="2">不申告加算金</option>
+									<option value="3">重加算金</option>
 								</select>
 							</div>
 
@@ -543,9 +543,9 @@
 									th:disabled="${fukaDeclarationForm.view}"
 									th:data-initial-value="*{additionalCategory2}">
 									<option value="">区分を選択してください</option>
-									<option value="1">過少申告加算</option>
-									<option value="2">不申告加算</option>
-									<option value="3">重加算</option>
+									<option value="1">過少申告加算金</option>
+									<option value="2">不申告加算金</option>
+									<option value="3">重加算金</option>
 								</select>
 							</div>
 
@@ -595,9 +595,9 @@
 									th:disabled="${fukaDeclarationForm.view}"
 									th:data-initial-value="*{additionalCategory3}">
 									<option value="">区分を選択してください</option>
-									<option value="1">過少申告加算</option>
-									<option value="2">不申告加算</option>
-									<option value="3">重加算</option>
+									<option value="1">過少申告加算金</option>
+									<option value="2">不申告加算金</option>
+									<option value="3">重加算金</option>
 								</select>
 							</div>
 
@@ -777,7 +777,7 @@
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"
 												class="text-end align-middle"><span
 												th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA')}">0</span>
-												円<input type="hidden"
+												円 <input type="hidden"
 												th:id="|modal-tax-rate-${stat.index}|"
 												th:value="${detail.taxRate + detail.taxKenRate}" /></td>
 											<td class="bg-light text-center text-muted align-middle"><i

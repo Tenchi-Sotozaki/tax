@@ -1,13 +1,13 @@
 package jp.lg.asp.accommodation.controller;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,14 +50,49 @@ public class TokugimuController {
 	@OpeLog(screenId = TOKUGIMU_DAICHO, operation = "一覧表示")
 	public String list(@ModelAttribute TokugimuSearchForm searchForm,
 			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int pageSize, Model model) {
+			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "false") boolean searched,
+			Model model) {
 		accessChecker.checkAccess(TOKUGIMU_DAICHO);
 		searchForm.setPage(page);
 		searchForm.setPageSize(pageSize);
-		Page<TokugimuListItem> pageResult = tokugimuService.search(searchForm);
+
+		// 初期表示時は検索結果一覧を表示しない
+		Page<TokugimuListItem> pageResult = searched
+				? tokugimuService.search(searchForm)
+				: Page.empty(PageRequest.of(page, pageSize));
+
 		model.addAttribute("items", pageResult);
 		model.addAttribute("searchForm", searchForm);
+		model.addAttribute("isSearched", searched);
+
+		// 選択中のページを中央に固定するため、前後1ページ分の範囲を算出する
+		int currentPage = pageResult.getNumber();
+		int totalPages = pageResult.getTotalPages();
+		model.addAttribute("startPage", Math.max(0, currentPage - 1));
+		model.addAttribute("endPage", Math.min(Math.max(totalPages - 1, 0), currentPage + 1));
 		return LIST_VIEW;
+	}
+
+	/**
+	 * 指定番号が未選択の状態で照会・編集に遷移した場合に、
+	 * 遷移先の画面で指定番号選択モーダルを開いた状態で表示する。
+	 */
+	private String showSelectModalOnForm(Model model) {
+		model.addAttribute("TokugimuForm", new TokugimuForm());
+		model.addAttribute("isView", true);
+		model.addAttribute("isEdit", false);
+		model.addAttribute("showShiteiGassanModal", true);
+		return FORM_VIEW;
+	}
+
+	/**
+	 * 指定番号が未選択の状態で帳票発行に遷移した場合に、
+	 * 帳票発行画面で指定番号選択モーダルを開いた状態で表示する。
+	 */
+	private String showSelectModalOnReport(Model model) {
+		model.addAttribute("showShiteiGassanModal", true);
+		return REPORT_VIEW;
 	}
 
 	// ========== 新規登録 ==========
@@ -108,8 +143,7 @@ public class TokugimuController {
 		accessChecker.checkAccess(TOKUGIMU_CONFIG);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			model.addAttribute("showShiteiGassanModal", true);
-			return LIST_VIEW;
+			return showSelectModalOnForm(model);
 		}
 		TokugimuForm form = (rno != null)
 				? tokugimuService.getTokugimuByShiteiNoAndRno(id, rno)
@@ -130,8 +164,7 @@ public class TokugimuController {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			model.addAttribute("showShiteiGassanModal", true);
-			return LIST_VIEW;
+			return showSelectModalOnForm(model);
 		}
 		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
 		storeSelectedShiteiGassan(session, id, form);
@@ -155,8 +188,7 @@ public class TokugimuController {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			model.addAttribute("showShiteiGassanModal", true);
-			return LIST_VIEW;
+			return showSelectModalOnForm(model);
 		}
 
 		if (bindingResult.hasErrors()) {
@@ -183,8 +215,7 @@ public class TokugimuController {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
-			model.addAttribute("showShiteiGassanModal", true);
-			return LIST_VIEW;
+			return showSelectModalOnReport(model);
 		}
 		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
 		storeSelectedShiteiGassan(session, id, form);
@@ -209,11 +240,25 @@ public class TokugimuController {
 
 	// ========== 削除 ==========
 
-	@PostMapping("/delete/{id}")
+	/**
+	 * 削除対象はエンドポイントに含めず、セッションで選択中の特別徴収義務者を対象とする。
+	 */
+	@PostMapping("/delete")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "削除")
-	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
+	public String delete(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
-		tokugimuService.deleteByShiteiNo(id);
+		String id = getShiteiNoFromSession(session);
+		if (id == null) {
+			return showSelectModalOnForm(model);
+		}
+		boolean historyRemains = tokugimuService.deleteByShiteiNo(id);
+		if (historyRemains) {
+			// 履歴が残っている場合は選択状態を維持し、最新履歴の照会画面へ戻る
+			redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " の最新履歴を削除しました。");
+			return "redirect:/tokugimu/view";
+		}
+		// すべての履歴が削除された場合は、存在しない特別徴収義務者が選択されたまま残らないよう解除する
+		SessionHelper.saveShiteiGassan(session, null);
 		redirectAttributes.addFlashAttribute("successMessage", "指定番号:" + id + " のデータを削除しました。");
 		return "redirect:/tokugimu/list";
 	}
