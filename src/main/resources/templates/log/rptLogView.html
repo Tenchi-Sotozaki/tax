@@ -36,16 +36,18 @@
 
 							<!-- 印刷日時 FROM -->
 							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（FROM）</label>
+								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（FROM） <span class="text-danger">*</span></label>
 								<input type="datetime-local" class="form-control form-control-sm" id="opeDtFrom"
-									th:field="*{opeDtFrom}">
+									th:field="*{opeDtFrom}" th:classappend="${#fields.hasErrors('opeDtFrom')} ? 'is-invalid' : ''">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('opeDtFrom')}" th:errors="*{opeDtFrom}"></div>
 							</div>
 
 							<!-- 印刷日時 TO -->
 							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（TO）</label>
+								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（TO） <span class="text-danger">*</span></label>
 								<input type="datetime-local" class="form-control form-control-sm" id="opeDtTo"
-									th:field="*{opeDtTo}">
+									th:field="*{opeDtTo}" th:classappend="${#fields.hasErrors('opeDtTo')} ? 'is-invalid' : ''">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('opeDtTo')}" th:errors="*{opeDtTo}"></div>
 							</div>
 
 							<!-- 帳票名 -->
