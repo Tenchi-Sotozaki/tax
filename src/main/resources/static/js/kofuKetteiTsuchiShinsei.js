@@ -214,6 +214,24 @@ function validateForm() {
         alert('指定番号が取得できません。');
         return false;
     }
+	
+    // 年度（YYYY形式）のバリデーション
+    const nendoInput = document.getElementById('nendoInput');
+    const nendoValue = nendoInput ? nendoInput.value.trim() : '';
+
+    if (!nendoValue) {
+        alert('年度を入力してください。');
+        nendoInput.focus();
+        return false;
+    }
+
+    // 4桁の半角数字であるかチェックする正規表現
+    const nendoRegex = /^\d{4}$/;
+    if (!nendoRegex.test(nendoValue)) {
+        alert('年度は4桁の半角数字（例: 2026）で入力してください。');
+        nendoInput.focus();
+        return false;
+    }
 
     return true;
 }
