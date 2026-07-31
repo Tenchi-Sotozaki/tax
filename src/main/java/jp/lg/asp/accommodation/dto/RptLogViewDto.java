@@ -2,6 +2,7 @@ package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -22,9 +23,11 @@ public class RptLogViewDto {
 	private String opeUser;
 
 	/** 印刷日時 FROM */
+	@NotBlank(message = "印刷日時（FROM）は必須です")
 	private String opeDtFrom;
 
 	/** 印刷日時 TO */
+	@NotBlank(message = "印刷日時（TO）は必須です")
 	private String opeDtTo;
 
 	/** 指定番号（完全一致） */
