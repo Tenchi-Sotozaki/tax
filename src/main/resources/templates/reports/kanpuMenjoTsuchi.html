@@ -22,120 +22,48 @@
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
 						<!-- 特別徴収義務者情報エリア -->
-						<div class="card mb-4">
-							<div class="card-header">
-								<h5 class="mb-0">特別徴収義務者情報</h5>
-							</div>
-							<div class="card-body">
-								<div class="row g-3">
-									<div class="col-md-4">
-										<label class="form-label">指定番号</label>
-										<input type="text" class="form-control" th:field="*{shiteiNo}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">施設名称</label>
-										<input type="text" class="form-control" th:field="*{shisetsuName}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">特別徴収義務者名</label>
-										<input type="text" class="form-control" th:field="*{tokuName}" readonly>
-									</div>
-								</div>
-								<div class="row g-3 mt-2">
-									<div class="col-md-6">
-										<label class="form-label">特別徴収義務者住所</label>
-										<input type="text" class="form-control" th:field="*{tokuJusho}" readonly>
-									</div>
-									<div class="col-md-6">
-										<label class="form-label">施設住所</label>
-										<input type="text" class="form-control" th:field="*{shisetsuJusho}" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
+						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
 						<!-- 通知書情報エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">通知書情報</h5>
+								<h5 class="mb-0">内容</h5>
 							</div>
 							<div class="card-body">
 
 								<div class="row g-3">
 									<!-- 申請の区分 -->
-									<div class="col-md-4">
-										<label class="form-label">申請の区分 <span class="text-danger">*</span></label>
-
-										<div class="d-flex gap-3 mt-1">
-											<div class="form-check">
-												<input class="form-check-input" type="radio" id="shinseiKbn1"
-													th:field="*{shinsei_kbn}" value="1" checked>
-
-												<label class="form-check-label" for="shinseiKbn1">還付</label>
-											</div>
-
-											<div class="form-check">
-												<input class="form-check-input" type="radio" id="shinseiKbn2"
-													th:field="*{shinsei_kbn}" value="2">
-
-												<label class="form-check-label" for="shinseiKbn2">納入義務の免除</label>
-											</div>
-										</div>
-									</div>
-
-									<!-- 決定の内容 -->
-									<div class="col-md-4">
-										<label class="form-label">決定の内容
-											<span class="text-danger">*</span>
-										</label>
-
-										<div class="d-flex gap-3 mt-1">
-											<div class="form-check">
-												<input class="form-check-input" type="radio" id="ketteiNaiyou1"
-													th:field="*{kettei_naiyou}" value="1" checked>
-
-												<label class="form-check-label" for="ketteiNaiyou1">申請額どおり承認する</label>
-											</div>
-
-											<div class="form-check">
-												<input class="form-check-input" type="radio" id="ketteiNaiyou2"
-													th:field="*{kettei_naiyou}" value="2">
-
-												<label class="form-check-label" for="ketteiNaiyou2">一部承認する</label>
-											</div>
-
-											<div class="form-check">
-												<input class="form-check-input" type="radio" id="ketteiNaiyou3"
-													th:field="*{kettei_naiyou}" value="3">
-
-												<label class="form-check-label" for="ketteiNaiyou3">不承認</label>
-											</div>
-										</div>
+									<div class="col-md-2">
+										<label for="shinseiKbn" class="form-label">申請の区分 <span class="text-danger">*</span></label>
+										<select class="form-select" id="shinseiKbn" th:field="*{shinsei_kbn}" required>
+											<option value="1">還付</option>
+											<option value="2">納入義務の免除</option>
+										</select>
 									</div>
 								</div>
 
 								<div class="row g-3 mt-2">
-									<div class="col-md-4">
-										<label for="hakkoYmd" class="form-label">発行日 <span
+									<div class="col-md-2">
+										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label>
 										<input type="date" class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}"
 											required>
 									</div>
-									<div class="col-md-4">
-										<label for="juriYmd" class="form-label">申請受理日 <span
+									<div class="col-md-2">
+										<label for="juriYmd" class="form-label">申請受理年月日 <span
 												class="text-danger">*</span></label>
 										<input type="date" class="form-control" id="juriYmd" th:field="*{juriYmd}"
 											required>
 									</div>
-									<div class="col-md-4">
-										<label for="shinseiYm" class="form-label">申請の年月 <span
+									<div class="col-md-2">
+										<label for="shinseiYm" class="form-label">対象年月 <span
 												class="text-danger">*</span></label>
 										<input type="month" class="form-control" id="shinseiYm" th:field="*{shinseiYm}"
 											required>
 									</div>
 								</div>
 								<div class="row g-3 mt-2">
-									<div class="col-md-6">
+									<div class="col-md-3">
 										<label for="zeigaku" class="form-label">申請した税額 <span
 												class="text-danger">*</span></label>
 										<div class="input-group">
@@ -144,7 +72,7 @@
 											<span class="input-group-text">円</span>
 										</div>
 									</div>
-									<div class="col-md-6">
+									<div class="col-md-3">
 										<label for="kanpuMenjoGaku" class="form-label">還付又は納入義務の免除を決定した額 <span
 												class="text-danger">*</span></label>
 										<div class="input-group">
@@ -154,6 +82,19 @@
 										</div>
 									</div>
 								</div>
+								
+								<!-- 決定の内容 -->
+								<div class="row g-3 mt-2">
+									<div class="col-md-2">
+										<label for="ketteiNaiyou" class="form-label">決定の内容 <span class="text-danger">*</span></label>
+										<select class="form-select" id="ketteiNaiyou" th:field="*{kettei_naiyou}" required>
+											<option value="1">申請額どおり承認する</option>
+											<option value="2">一部承認する</option>
+											<option value="3">不承認</option>
+										</select>
+									</div>
+								</div>
+								
 								<div class="row g-3 mt-2">
 									<div class="col-12">
 										<label for="riyu" class="form-label">一部承認または不承認と決定した理由</label>
@@ -186,6 +127,9 @@
 							<button type="button" class="btn btn-primary" onclick="printReport()">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
 						</div>
 					</form>
 				</div>
