@@ -76,14 +76,14 @@
 							<table class="table table-hover">
 								<thead class="table-light">
 									<tr>
-										<th>ID</th>
+										<th>ファイル名</th>
 										<th>取込日時</th>
 										<th>取込者</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr th:each="item : ${importHistory}">
-										<td th:text="${item.id}">-</td>
+										<td th:text="${item.fileName}">-</td>
 										<td
 											th:text="${#temporals.format(item.addDt, 'yyyy/MM/dd HH:mm:ss')}">-</td>
 										<td th:text="${item.addUser}">-</td>

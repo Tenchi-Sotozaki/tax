@@ -1,18 +1,20 @@
-package jp.lg.asp.accommodation.dto;
+package jp.lg.asp.accommodation.entity;
 
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 import lombok.Data;
 
 @Entity
 @Table(name = "t_koin_torikomi")
+@IdClass(KoinTorikomiId.class)
 @Data
-public class KoinTorikomiDto {
+public class KoinTorikomi {
 
     /**
      * 自治体コード
