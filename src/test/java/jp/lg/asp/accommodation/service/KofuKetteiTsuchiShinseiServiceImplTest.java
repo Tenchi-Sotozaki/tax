@@ -114,7 +114,7 @@ class kofuKetteiTsuchiShinseiServiceImplTest {
     }
 
     @Test
-    void getReportData_奨励金なしはデフォルト0() {
+    void getReportData_奨励金なしの場合はnullを返す() {
         Tokugimu tokugimu = new Tokugimu();
         tokugimu.setShiteiNo(SHITEI_NO);
         tokugimu.setAtenaNo(BigDecimal.valueOf(1001));
@@ -129,8 +129,6 @@ class kofuKetteiTsuchiShinseiServiceImplTest {
 
         KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getNonyugaku()).isEqualTo("0");
-        assertThat(result.getKofugaku()).isEqualTo("0");
+        assertThat(result).isNull();
     }
 }
