@@ -11,17 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    go('btnReportTokugimuShiteiTsuchi', '/accommodation-tax/reports/tokugimuShiteiTsuchi');
-    go('btnReportTokugimuJuriTsuchi',   '/accommodation-tax/reports/tokugimuJuriTsuchi');
-    go('btnReportNozeiKanrinin',        '/accommodation-tax/reports/nozeiKanrininShoninTsuchi');
-    go('btnReportNozeiMenjo',           '/accommodation-tax/reports/nozeiKanrininNintei');
-    go('btnReportTokureiShitei',        '/accommodation-tax/reports/tokureiShitei');
-    go('btnReportTokureiTorikeshi',     '/accommodation-tax/reports/tokureiShiteiCancel');
-    go('btnReportKanpu',                '/accommodation-tax/kanpuMenjoTsuchi');
-    go('btnReportNonyusho',             '/accommodation-tax/nonyusho');
-    go('btnReportShoreikinShinsei',     '/accommodation-tax/reports/kofuShinsei');
-    go('btnReportShoreikinKettei',      '/accommodation-tax/reports/kofuKetteiTsuchi');
-    go('btnReportGassan',               '/accommodation-tax/tokugimu/report/gassan');
+    go('btnReportTokugimuShiteiTsuchi',         '/accommodation-tax/reports/tokugimuShiteiTsuchi');
+    go('btnReportTokugimuJuriTsuchi',           '/accommodation-tax/reports/tokugimuJuriTsuchi');
+    go('btnReportNozeiKanrinin',                '/accommodation-tax/reports/nozeiKanrininShoninTsuchi');
+    go('btnReportNozeiMenjo',                   '/accommodation-tax/reports/nozeiKanrininNintei');
+    go('btnReportTokureiShitei',                '/accommodation-tax/reports/tokureiShitei');
+    go('btnReportTokureiTorikeshi',             '/accommodation-tax/reports/tokureiShiteiCancel');
+    go('btnReportKanpu',                        '/accommodation-tax/kanpuMenjoTsuchi');
+    go('btnReportNonyusho',                     '/accommodation-tax/nonyusho');
+    go('btnReportShoreikinKetteiTsuchiShinsei', '/accommodation-tax/reports/kofuKetteiTsuchiShinsei');
+    go('btnReportGassan',                       '/accommodation-tax/tokugimu/report/gassan');
 
     // 宿泊税更正・決定通知書（セッション保存が必要なため別処理）
     document.getElementById('btnReportKosei')?.addEventListener('click', async function() {
