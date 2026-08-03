@@ -117,7 +117,11 @@ public class NonyushoController {
             
             return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+			// サービス層でスローされた賦課情報未発見エラー
+			log.warn("納入書PDFダウンロードエラー: shiteiNo={}, message={}", dto.getShiteiNo(), e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage().getBytes(StandardCharsets.UTF_8));
+		}catch (Exception e) {
             log.error("納入書PDFダウンロードエラー: shiteiNo={}", dto.getShiteiNo(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -146,7 +150,11 @@ public class NonyushoController {
             
             return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
             
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+			// サービス層でスローされた賦課情報未発見エラー
+			log.warn("納入書PDFダウンロードエラー: shiteiNo={}, message={}", dto.getShiteiNo(), e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage().getBytes(StandardCharsets.UTF_8));
+		}catch (Exception e) {
             log.error("納入書PDFプレビューエラー: shiteiNo={}", dto.getShiteiNo(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -175,7 +183,11 @@ public class NonyushoController {
             log.debug("納入書PDF生成完了: shiteiNo={}", dto.getShiteiNo());
             return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
 			
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
+			// サービス層でスローされた賦課情報未発見エラー
+			log.warn("納入書PDFダウンロードエラー: shiteiNo={}, message={}", dto.getShiteiNo(), e.getMessage());
+			return ResponseEntity.badRequest().body(e.getMessage().getBytes(StandardCharsets.UTF_8));
+		}catch (Exception e) {
             log.error("納入書PDF生成エラー: shiteiNo={}", dto.getShiteiNo(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

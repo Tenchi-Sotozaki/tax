@@ -58,6 +58,13 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 			Map<String, Object> parameters = new HashMap<>();
 			JRDataSource dataSource = buildParams(dto);
+			
+			// 賦課情報が見つからない
+			if (dataSource == null) {
+				log.error("該当する賦課レコードが見つかりません: shiteiNo={}, nendo={}", dto.getShiteiNo(), dto.getNendo());
+				throw new RuntimeException("賦課情報が見つかりません。");
+			}
+			
 			JasperPrint jasperPrint = JasperFillManager.fillReport(
 					jasperReport, parameters, dataSource);
 
@@ -210,13 +217,31 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	private JRDataSource buildParams(NonyushoDto dto) {
 		NonyushoReportsDto reportsDto = new NonyushoReportsDto();
 
+		// 自治体コードを取得
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		
+		// 指定番号を取得
+		String shiteiNo = dto.getShiteiNo();
+		
+		// 年度を取得
+		String nendo = dto.getNendo();
+		
+		// 最新の賦課データを取得
+		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo,
+				nendo);
+
+		// 賦課情報が存在しない場合は null を返す
+		if (fukaList.isEmpty()) {
+			return null;
+		}
+		
 		// 基本情報
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
-		reportsDto.setJichitaiCd(jichitaiContext.getJichitaiCd());
+		reportsDto.setJichitaiCd(jichitaiCd);
 		reportsDto.setKozaNo(dto.getKozaNo() != null ? dto.getKozaNo() : "");
 		reportsDto.setKozaName(dto.getKozaName() != null ? dto.getKozaName() : "");
-		reportsDto.setNendo(dto.getNendo() != null ? dto.getNendo() : "");
-		reportsDto.setShiteiNo(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
+		reportsDto.setNendo(nendo != null ? nendo : "");
+		reportsDto.setShiteiNo(shiteiNo != null ? shiteiNo : "");
 		reportsDto.setZeigaku(dto.getZeigaku() != null ? dto.getZeigaku() : "0");
 		reportsDto.setEntai(dto.getEntai() != null ? dto.getEntai() : "0");
 		reportsDto.setKasan(dto.getKasan() != null ? dto.getKasan() : "0");
@@ -260,7 +285,15 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		} else {
 			reportsDto.setNokigen("");
 		}
-
+		
+		// 最新の賦課情報を取得
+		Fuka fuka = fukaList.stream()
+				.max(Comparator.comparing(Fuka::getRno))
+				.orElse(fukaList.get(0));
+		
+		// 申告区分を設定
+		reportsDto.setShinkokuKubun(fuka.getHenkoKbn());
+		
 		List<NonyushoReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		JRDataSource params = new JRBeanCollectionDataSource(dataSourceList);
 

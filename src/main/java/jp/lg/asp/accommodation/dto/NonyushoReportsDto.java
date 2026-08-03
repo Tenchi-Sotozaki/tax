@@ -23,6 +23,9 @@ public class NonyushoReportsDto {
     /** 年度 */
     private String nendo;
     
+    /** 申告区分 */
+    private String shinkokuKubun;
+    
     /** 申告年月 */
     private String shinkokuYm;
     
