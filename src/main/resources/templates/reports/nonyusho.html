@@ -19,6 +19,9 @@
 						</h5>
 					</div>
 
+					<!-- 帳票発行エラー表示エリア -->
+					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
+
 					<form id="nonyushoForm" method="post">
 						<input type="hidden" id="shiteiNo" name="shiteiNo" th:value="${shiteiNo}" />
 						<input type="hidden" id="tokuName" name="tokuName" th:value="${tokuName}">
@@ -78,6 +81,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/nonyusho.js}"></script>
+		<script th:src="@{/js/reportForm.js}"></script>
 	</th:block>
 </body>
 

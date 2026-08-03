@@ -18,6 +18,9 @@
 						</h5>
 					</div>
 
+					<!-- 帳票発行エラー表示エリア -->
+					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
+
 					<form id="tsuchiForm" th:object="${dto}" method="post"
 						onsubmit="return validateForm()">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -99,6 +102,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/tokugimuShiteiTsuchi.js}"></script>
+		<script th:src="@{/js/reportForm.js}"></script>
 	</th:block>
 </body>
 
