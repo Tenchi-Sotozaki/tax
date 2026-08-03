@@ -10,8 +10,20 @@
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
 
-		<!-- 共通の情報。運用側が用意したHTMLをそのまま差し込む -->
-		<div class="top-page-common" th:utext="${commonHtml}"></div>
+		<div
+			class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-house-door me-2 text-primary"></i>トップページ
+			</h5>
+		</div>
+
+		<!-- 掲載期間内の項目を掲載開始日の新しい順に表示する -->
+		<div th:each="item : ${items}" class="top-page-item mb-3"
+			th:utext="${item.contents}"></div>
+
+		<div th:if="${#lists.isEmpty(items)}" class="text-muted py-4">
+			現在お知らせはありません。
+		</div>
 
 	</div>
 </body>

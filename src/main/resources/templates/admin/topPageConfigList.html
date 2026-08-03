@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title>トップページ編集</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div
+			class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-pencil-square me-2 text-primary"></i>トップページ編集
+			</h5>
+			<span class="text-muted small">登録件数：<span
+				th:text="${#lists.size(items)}">0</span> 件
+			</span>
+		</div>
+
+		<div th:if="${successMessage}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i> <span
+				th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> <span
+				th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- 操作ボタン -->
+		<div class="d-flex mb-2">
+			<a th:href="@{/admin/top-page-config/register}"
+				class="btn btn-success btn-sm"> <i class="bi bi-plus-circle me-1"></i>新規登録
+			</a>
+		</div>
+
+		<!-- 一覧 -->
+		<div class="card shadow-sm">
+			<div class="card-body p-0">
+				<table
+					class="table table-bordered table-hover table-sm align-middle mb-0">
+					<thead class="table-primary">
+						<tr>
+							<th style="width: 80px" class="text-center">No.</th>
+							<th style="width: 120px" class="text-center">掲載開始日</th>
+							<th style="width: 120px" class="text-center">掲載終了日</th>
+							<th style="width: 90px" class="text-center">掲載状況</th>
+							<th>掲載内容</th>
+							<th style="width: 90px" class="text-center"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${items}">
+							<td class="text-center" th:text="${item.seq}"></td>
+							<td class="text-center"
+								th:text="${item.keisaiStYmd != null ? #temporals.format(item.keisaiStYmd, 'yyyy/MM/dd') : ''}"></td>
+							<td class="text-center"
+								th:text="${item.keisaiEdYmd != null ? #temporals.format(item.keisaiEdYmd, 'yyyy/MM/dd') : ''}"></td>
+							<!-- 掲載期間から現在の状態を判定する -->
+							<td class="text-center"
+								th:with="before=${item.keisaiStYmd != null and item.keisaiStYmd.isAfter(today)},
+										 after=${item.keisaiEdYmd != null and item.keisaiEdYmd.isBefore(today)}">
+								<span class="badge bg-secondary" th:if="${before}">掲載前</span>
+								<span class="badge bg-light text-muted border"
+									th:if="${!before and after}">掲載終了</span>
+								<span class="badge bg-success" th:if="${!before and !after}">掲載中</span>
+							</td>
+							<td>
+								<div class="text-truncate" style="max-width: 600px;"
+									th:text="${item.contents}"></div>
+							</td>
+							<td class="text-center">
+								<button type="button" class="btn btn-outline-danger btn-sm delete-btn"
+									th:data-seq="${item.seq}">削除</button>
+							</td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(items)}">
+							<td colspan="6" class="text-center text-muted py-4">
+								登録されている掲載項目はありません。</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- 削除フォーム（隠し） -->
+		<form th:each="item : ${items}" th:id="'deleteForm-' + ${item.seq}"
+			th:action="@{/admin/top-page-config/delete/{seq}(seq=${item.seq})}"
+			method="post" class="d-none"></form>
+
+		<!-- 削除確認モーダル -->
+		<div
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', 'この掲載項目を削除します。よろしいですか？', 'deleteForm-0', 'btn-danger', '削除する')}">
+		</div>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/topPageConfig.js}"></script>
+	</th:block>
+</body>
+
+</html>

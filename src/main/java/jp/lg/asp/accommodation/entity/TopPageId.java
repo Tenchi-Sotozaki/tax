@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TopPageId implements Serializable {
-	private String kbn;
 	private String jichitaiCd;
+	private BigDecimal seq;
 }

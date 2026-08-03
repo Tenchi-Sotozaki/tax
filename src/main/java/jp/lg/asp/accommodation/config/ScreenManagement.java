@@ -167,4 +167,7 @@ public final class ScreenManagement {
 
 	// トップページ
 	public static final String TOP_PAGE = "ms00000029";
+
+	// トップページ編集（運用者用）
+	public static final String TOP_PAGE_CONFIG = "sc00000010";
 }
