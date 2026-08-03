@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,24 +13,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
-import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiDto;
+import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.ReportsDef;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
-import jp.lg.asp.accommodation.service.impl.KofuKetteiTsuchiServiceImpl;
+import jp.lg.asp.accommodation.service.impl.KofuKetteiTsuchiShinseiServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class KofuKetteiTsuchiServiceImplTest {
+class kofuKetteiTsuchiShinseiServiceImplTest {
 
     @Mock TokugimuRepository tokugimuRepository;
     @Mock AtenaRepository atenaRepository;
@@ -40,10 +40,11 @@ class KofuKetteiTsuchiServiceImplTest {
     @Mock ReportsCommonService reportsCommonService;
     @Mock JichitaiContext jichitaiContext;
 
-    @InjectMocks KofuKetteiTsuchiServiceImpl service;
+    @InjectMocks KofuKetteiTsuchiShinseiServiceImpl service;
 
     private static final String JICHITAI_CD = "011002";
     private static final String SHITEI_NO = "00100001";
+    private static final String NENDO = "2024";
 
     @BeforeEach
     void setUp() {
@@ -53,11 +54,14 @@ class KofuKetteiTsuchiServiceImplTest {
         when(reportsCommonService.getJichitaiInfo()).thenReturn(jichitai);
         when(reportsCommonService.getReportsDefText(any())).thenReturn("テスト条例");
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
-        when(reportsDefRepository.findByIdAndJichitaiCd(any(), any())).thenReturn(Optional.empty());
+		when(reportsDefRepository.findByIdAndJichitaiCd(eq("KOFU_HAKKO_YOSHIKI"), any()))
+				.thenReturn(Optional.of(new ReportsDef()));
+		when(reportsDefRepository.findByIdAndJichitaiCd(eq("KOFU_JOKEN"), any()))
+				.thenReturn(Optional.of(new ReportsDef()));
     }
 
     @Test
-    void getReportData_正常取得() {
+    void getReportData_年度指定_正常取得() {
         Tokugimu tokugimu = new Tokugimu();
         tokugimu.setShiteiNo(SHITEI_NO);
         tokugimu.setAtenaNo(BigDecimal.valueOf(1001));
@@ -71,15 +75,16 @@ class KofuKetteiTsuchiServiceImplTest {
                 .thenReturn(Optional.of(atena));
 
         Shoreikin shoreikin = new Shoreikin();
-        shoreikin.setShiteiNo(SHITEI_NO);
+        shoreikin.setKofuZeigaku(500000L);
         shoreikin.setKofuGaku(100000L);
-        when(shoreikinRepository.findActiveByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(shoreikin));
+        when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, NENDO))
+                .thenReturn(Optional.of(shoreikin));
 
-        KofuKetteiTsuchiDto result = service.getReportData(SHITEI_NO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
         assertThat(result).isNotNull();
-        assertThat(result.getTokugimuName()).isEqualTo("テスト太郎");
-        assertThat(result.getShisetsuName()).isEqualTo("テスト施設");
+        assertThat(result.getTokuName()).isEqualTo("テスト太郎");
+        assertThat(result.getNonyugaku()).isEqualTo("500000");
         assertThat(result.getKofugaku()).isEqualTo("100000");
     }
 
@@ -88,7 +93,7 @@ class KofuKetteiTsuchiServiceImplTest {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
                 .thenReturn(Optional.empty());
 
-        KofuKetteiTsuchiDto result = service.getReportData(SHITEI_NO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
         assertThat(result).isNull();
     }
@@ -103,13 +108,13 @@ class KofuKetteiTsuchiServiceImplTest {
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.valueOf(9999)))
                 .thenReturn(Optional.empty());
 
-        KofuKetteiTsuchiDto result = service.getReportData(SHITEI_NO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
         assertThat(result).isNull();
     }
 
     @Test
-    void getReportData_奨励金なしはkofugaku0() {
+    void getReportData_奨励金なしの場合はnullを返す() {
         Tokugimu tokugimu = new Tokugimu();
         tokugimu.setShiteiNo(SHITEI_NO);
         tokugimu.setAtenaNo(BigDecimal.valueOf(1001));
@@ -119,11 +124,11 @@ class KofuKetteiTsuchiServiceImplTest {
         atena.setName("テスト太郎");
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.valueOf(1001)))
                 .thenReturn(Optional.of(atena));
-        when(shoreikinRepository.findActiveByJichitaiCd(JICHITAI_CD)).thenReturn(List.of());
+        when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, NENDO))
+                .thenReturn(Optional.empty());
 
-        KofuKetteiTsuchiDto result = service.getReportData(SHITEI_NO);
+        KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getKofugaku()).isEqualTo("0");
+        assertThat(result).isNull();
     }
 }

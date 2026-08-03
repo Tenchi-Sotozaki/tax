@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.KofuShinseiDto;
+import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.ReportsDef;
@@ -16,18 +16,18 @@ import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
-import jp.lg.asp.accommodation.service.KofuShinseiService;
+import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 宿泊税特別徴収事務交付金交付申請書 Service実装
+ * 宿泊税特別徴収事務交付金決定通知書・交付申請書 Service実装
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KofuShinseiServiceImpl implements KofuShinseiService {
+public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShinseiService {
 
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
@@ -51,7 +51,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 	}
 
 	@Override
-	public KofuShinseiDto getReportData(String shiteiNo) {
+	public KofuKetteiTsuchiShinseiDto getReportData(String shiteiNo) {
 		init();
 		// デフォルト年度（現在年度）で取得
 		LocalDate now = LocalDate.now();
@@ -61,7 +61,7 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 	}
 
 	@Override
-	public KofuShinseiDto getReportData(String shiteiNo, String nendo) {
+	public KofuKetteiTsuchiShinseiDto getReportData(String shiteiNo, String nendo) {
 		init();
 		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
@@ -97,16 +97,16 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 					.findByJichitaiCdAndShiteiNoAndNendo(jichitaiCode, shiteiNo, nendo);
 
 			// 帳票定義から発行様式と交付条件を取得
-			String hakkoYoshiki = getReportsDefText("KOFU_SHINSEI_HAKKO_YOSHIKI");
-			String kofuJoken = getReportsDefText("KOFU_SHINSEI_KOFU_JOKEN");
-
+			String hakkoYoshiki = getReportsDefText(ReportsConstants.KOFU_HAKKO_YOSHIKI);
+			String kofuJoken = getReportsDefText(ReportsConstants.KOFU_JOKEN);
+			
 			// DTOに設定
-			KofuShinseiDto dto = new KofuShinseiDto();
+			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
 			dto.setShiteiNo(tokugimu.getShiteiNo());
 			dto.setNendo(nendo);
 			dto.setTokuName(atena.getName());
 			dto.setShisetsuName(tokugimu.getShisetsuName());
-
+			
 			// 施設住所を郵便番号と住所で連結
 			StringBuilder shisetsuJusho = new StringBuilder();
 			if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
@@ -123,10 +123,15 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 				// 数値を文字列に変換し、nullチェックを実施
 				Long kofuZeigaku = shoreikin.getKofuZeigaku();
 				Long kofuGaku = shoreikin.getKofuGaku();
-
+			
 				// 数値のみを設定（JRXMLで単位を付与）
 				dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
 				dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
+				
+				if (shoreikin.getKofuYmd() != null) {
+					
+					dto.setKofuYmd(shoreikin.getKofuYmd().toString());
+				}
 
 				log.debug("奨励金情報設定: 納入額={}, 交付額={}", dto.getNonyugaku(), dto.getKofugaku());
 			} else {
@@ -134,11 +139,13 @@ public class KofuShinseiServiceImpl implements KofuShinseiService {
 				dto.setNonyugaku("0");
 				dto.setKofugaku("0");
 				log.error("奨励金情報が見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);
+				return null;
 			}
 
 			// 固定値設定
 			dto.setCityName(jichitaiName);
 			dto.setJorei(jorei);
+			dto.setHakkoJorei(jorei);
 			dto.setHakkoYoshiki(hakkoYoshiki);
 			dto.setKofuJoken(kofuJoken);
 			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
