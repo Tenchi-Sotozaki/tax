@@ -3,6 +3,8 @@ package jp.lg.asp.accommodation.controller;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiReportsService;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +48,7 @@ public class KofuKetteiTsuchiShinseiController {
 	 */
 	@GetMapping("/kofuKetteiTsuchiShinsei")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(@RequestParam(required = false) String shiteiNo,
+	public String index(HttpSession session,
 			@RequestParam(required = false) String nendo,
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
@@ -65,7 +68,7 @@ public class KofuKetteiTsuchiShinseiController {
 		dto.setNendo(targetNendo);
 		
 		// 指定番号を設定
-		dto.setShiteiNo(shiteiNo);
+		dto.setShiteiNo(SessionHelper.getShiteiNo(session));
 
 		model.addAttribute("dto", dto);
 		return "reports/kofuKetteiTsuchiShinsei";

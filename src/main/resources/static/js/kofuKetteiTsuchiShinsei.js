@@ -40,6 +40,9 @@ async function handleResponseError(response, defaultMessage) {
  */
 function generatePdf() {
 	
+	// 処理の最初にエラーをクリア
+	hideErrorMessage();
+	
     const ketteiCheckbox = document.querySelector('input[name="ketteiTsuchi"]');
     const shinseiCheckbox = document.querySelector('input[name="shinsei"]');
 
@@ -99,6 +102,8 @@ function generatePdf() {
  * プレビュー
  */
 function preview() {
+	// 処理の最初にエラーをクリア
+	hideErrorMessage();
 	
     const ketteiCheckbox = document.querySelector('input[name="ketteiTsuchi"]');
     const shinseiCheckbox = document.querySelector('input[name="shinsei"]');
@@ -144,6 +149,8 @@ function preview() {
  * 印刷
  */
 function printReport() {
+	// 処理の最初にエラーをクリア
+	hideErrorMessage();
 	
     const ketteiCheckbox = document.querySelector('input[name="ketteiTsuchi"]');
     const shinseiCheckbox = document.querySelector('input[name="shinsei"]');
@@ -208,6 +215,10 @@ function printReport() {
  * フォームバリデーション
  */
 function validateForm() {
+	
+	// 処理開始時に古いエラーをクリアする
+	hideErrorMessage();
+	
     const shiteiNo = document.querySelector('input[name="shiteiNo"]').value;
 
     if (!shiteiNo) {
@@ -277,6 +288,20 @@ function showErrorMessage(message) {
     if (errorAlert && errorMessageText) {
         errorMessageText.textContent = message;
         errorAlert.style.display = 'block';
+        errorAlert.classList.add('show');
     }
 }
 
+/**
+ * 画面上部のエラーメッセージを非表示にする
+ */
+function hideErrorMessage() {
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessageText = document.getElementById('errorMessageText');
+    
+    if (errorAlert && errorMessageText) {
+        errorMessageText.textContent = '';
+        errorAlert.style.display = 'none';
+        errorAlert.classList.remove('show');
+    }
+}
