@@ -14,10 +14,11 @@ public class MainViewController {
 	}
 
 	// ========== メイン（リダイレクト） ==========
+	// "/" は TopPageController が処理する
 
-	@GetMapping({ "/", "/declarations/form" })
-	public String root() {
-		return "redirect:/collector/list";
+	@GetMapping("/declarations/form")
+	public String declarationsForm() {
+		return "redirect:/top-page";
 	}
 
 	// ========== 申告・納付管理 ==========

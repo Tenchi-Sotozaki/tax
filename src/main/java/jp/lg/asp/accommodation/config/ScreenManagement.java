@@ -164,4 +164,7 @@ public final class ScreenManagement {
 
 	// 特別徴収義務者状況照会
 	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";
+
+	// トップページ
+	public static final String TOP_PAGE = "ms00000029";
 }

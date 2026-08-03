@@ -37,11 +37,11 @@ public class SecurityConfig {
 						.anyRequest().authenticated())
 	            .formLogin(form -> form
 	                    .loginPage("/login")
-	                    // 初期ユーザーはユーザー検索画面へ、それ以外は業務トップへ
+	                    // 初期ユーザーはユーザー検索画面へ、それ以外はトップページへ
 	                    .successHandler((request, response, authentication) -> {
 	                        String target = InitialPasswordController.ADMIN_ID.equals(authentication.getName())
 	                                ? "/admin/user-search"
-	                                : "/tokugimu/list";
+	                                : "/top-page";
 	                        response.sendRedirect(request.getContextPath() + target);
 	                    })
 	                    .permitAll())

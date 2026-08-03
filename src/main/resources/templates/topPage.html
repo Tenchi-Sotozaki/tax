@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title>トップページ</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
+
+		<!-- 共通の情報。運用側が用意したHTMLをそのまま差し込む -->
+		<div class="top-page-common" th:utext="${commonHtml}"></div>
+
+	</div>
+</body>
+
+</html>
