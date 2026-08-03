@@ -166,9 +166,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (monthlyTallyModal) {
+        // 「入力内容を決定」で閉じる場合は確認ダイアログを出さないための判定用
+        let closingByApply = false;
+        // 照会時は「入力内容を決定」ボタンが存在しない
+        const isViewMode = !document.getElementById('btnApplyTally');
+
         monthlyTallyModal.addEventListener('shown.bs.modal', function() {
             if (fukaKbn === '1') calculateTeigaku();
             else if (fukaKbn === '2') calculateTeiritsu();
+
+            // 先頭の入力欄にフォーカスを当てる
+            const table = fukaKbn === '1' ? tableTeigaku : tableTeiritsu;
+            const firstInput = table?.querySelector(
+                'tbody input[type="text"]:not([readonly]):not([disabled])');
+            firstInput?.focus();
+        });
+
+        document.getElementById('btnApplyTally')?.addEventListener('click', function() {
+            closingByApply = true;
+        });
+
+        // 閉じる操作（×ボタン・閉じるボタン）は入力内容が破棄されるため確認する
+        monthlyTallyModal.addEventListener('hide.bs.modal', function(e) {
+            if (isViewMode || closingByApply) {
+                closingByApply = false;
+                return;
+            }
+            if (!confirm('入力内容は破棄されます。よろしいですか？')) {
+                e.preventDefault();
+            }
         });
     }
 

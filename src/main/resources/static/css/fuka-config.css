@@ -1,0 +1,16 @@
+/* 月計表モーダル：ヘッダーを固定表示する
+   ヘッダーが2段のため、2段目は1段目の高さぶんだけ下げる */
+.monthly-tally-table thead th {
+	position: sticky;
+	z-index: 2;
+	background-color: #f8f9fa;
+}
+
+.monthly-tally-table thead tr:first-child th {
+	top: 0;
+	height: 2.25rem;
+}
+
+.monthly-tally-table thead tr:nth-child(2) th {
+	top: 2.25rem;
+}
