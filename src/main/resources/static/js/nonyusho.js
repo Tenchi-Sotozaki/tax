@@ -100,6 +100,9 @@ window.addEventListener('DOMContentLoaded', () => {
  * @param {string} type 'pdf' または 'preview'
  */
 async function submitReport(type) {
+	
+	// 処理開始時に古いエラーをクリアする
+	hideErrorMessage();
     
     if (!validateForm()) {
         return;
@@ -139,8 +142,8 @@ async function submitReport(type) {
             a.remove();
         }
     } catch (error) {
-        console.error(`${type} エラー:`, error);
-        alert('対象データが見つかりませんでした、または処理に失敗しました。');
+		console.error('Error:', error);
+		showErrorMessage(error.message);
     }
 }
 
@@ -148,6 +151,9 @@ async function submitReport(type) {
  * 印刷処理
  */
 async function printReport() {
+	
+	// 処理開始時に古いエラーをクリアする
+	hideErrorMessage();
     
     if (!validateForm()) {
         return;
@@ -181,8 +187,8 @@ async function printReport() {
             };
         })
         .catch(error => {
-            console.error('印刷エラー:', error);
-            showErrorMessage('error.message');
+			console.error('Error:', error);
+			showErrorMessage(error.message);
         });
 }
 
@@ -299,6 +305,10 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
  * フォームバリデーション
  */
 function validateForm() {
+	
+	// 処理開始時に古いエラーをクリアする
+	hideErrorMessage();
+	
     const shiteiNo = document.getElementById('shiteiNo')?.value;
     const taishoYmValue = document.getElementById('taishoYm')?.value;
     
@@ -324,14 +334,29 @@ function validateForm() {
 }
 
 /**
- * エラーメッセージ表示
+ * 画面上部にエラーメッセージを表示する
  */
 function showErrorMessage(message) {
-    alert(message);
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessageText = document.getElementById('errorMessageText');
+    
+    if (errorAlert && errorMessageText) {
+        errorMessageText.textContent = message;
+        errorAlert.style.display = 'block';
+        errorAlert.classList.add('show');
+    }
 }
 
 /**
- * 成功メッセージ表示
+ * 画面上部のエラーメッセージを非表示にする
  */
-function showSuccessMessage(message) {
+function hideErrorMessage() {
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessageText = document.getElementById('errorMessageText');
+    
+    if (errorAlert && errorMessageText) {
+        errorMessageText.textContent = '';
+        errorAlert.style.display = 'none';
+        errorAlert.classList.remove('show');
+    }
 }

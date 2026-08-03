@@ -102,8 +102,9 @@ public class NonyushoController {
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
     public Object generatePdf(@RequestBody NonyushoDto dto) {
         try {
+        	// データ無し
             if (nonyushoReportsService.dataCheck(dto)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("対象データが見つかりませんでした。");
+            	return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
             }
             
             byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
@@ -130,9 +131,9 @@ public class NonyushoController {
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
     public Object previewPdf(@RequestBody NonyushoDto dto) {
         try {
+        	// データ無し
             if (nonyushoReportsService.dataCheck(dto)) {
-            	// 400 Bad Request ステータスを指定
-				return buildErrorScriptResponse("対象データが見つかりませんでした。", HttpStatus.BAD_REQUEST);
+            	return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
             }
             
             byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
@@ -158,14 +159,12 @@ public class NonyushoController {
     @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
     public Object printPDF(@RequestBody NonyushoDto dto) {
     	try {
+			// データ無し
+			if (nonyushoReportsService.dataCheck(dto)) {
+				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
+			}
+
             log.debug("納入書PDF生成開始: shiteiNo={}", dto.getShiteiNo());
-            
-            // データ無しの場合
-            if (nonyushoReportsService.dataCheck(dto)) {
-            	return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body("対象データが見つかりませんでした。");
-            }
         
             byte[] pdf = nonyushoReportsService.generateNonyushoPdf(dto);
 			
