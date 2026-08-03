@@ -23,13 +23,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.ReportsConfigForm;
-import jp.lg.asp.accommodation.service.ReportsConfigService;
+import jp.lg.asp.accommodation.service.KoinTorikomiService;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ReportsConfigControllerTest {
 
-    @Mock ReportsConfigService reportsConfigService;
+	@Mock KoinTorikomiService koinTorikomiService;
     @Mock ScreenAccessChecker accessChecker;
     @Mock JichitaiContext jichitaiContext;
 
@@ -38,7 +38,7 @@ class ReportsConfigControllerTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(reportsConfigService.getImportHistory()).thenReturn(List.of());
+        when(koinTorikomiService.getImportHistory()).thenReturn(List.of());
     }
 
     @Test
@@ -84,6 +84,6 @@ class ReportsConfigControllerTest {
         String view = controller.importFile(form, new RedirectAttributesModelMap(), auth);
 
         assertThat(view).isEqualTo("redirect:/admin/reports-config");
-        verify(reportsConfigService).importReportFile(any(), eq("011002"), eq("admin"));
+        verify(koinTorikomiService).importReportFile(any(), eq("011002"), eq("admin"));
     }
 }

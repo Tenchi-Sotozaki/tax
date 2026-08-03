@@ -15,8 +15,8 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ReportsConfigForm;
-import jp.lg.asp.accommodation.entity.ReportsDef;
-import jp.lg.asp.accommodation.service.ReportsConfigService;
+import jp.lg.asp.accommodation.entity.KoinTorikomi;
+import jp.lg.asp.accommodation.service.KoinTorikomiService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/admin/reports-config")
 public class ReportsConfigController {
 
-	private final ReportsConfigService reportsConfigService;
+	private final KoinTorikomiService koinTorikomiService;
 	private final ScreenAccessChecker accessChecker;
 
 	private final JichitaiContext jichitaiContext;
@@ -35,7 +35,7 @@ public class ReportsConfigController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
-		List<ReportsDef> importHistory = reportsConfigService.getImportHistory();
+		List<KoinTorikomi> importHistory = koinTorikomiService.getImportHistory();
 		model.addAttribute("reportsConfigForm", new ReportsConfigForm());
 		model.addAttribute("importHistory", importHistory);
 		return "admin/reportsConfig";
@@ -67,7 +67,7 @@ public class ReportsConfigController {
 
 			String userId = authentication.getName();
 
-			reportsConfigService.importReportFile(form.getFile(), jichitaiContext.getJichitaiCd(), userId);
+			koinTorikomiService.importReportFile(form.getFile(), jichitaiContext.getJichitaiCd(), userId);
 			redirectAttributes.addFlashAttribute("successMessage", "帳票ファイルの取り込みが完了しました。");
 		} catch (Exception e) {
 			e.printStackTrace(); // コンソールにエラーを出力

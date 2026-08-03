@@ -34,7 +34,7 @@
 			<div class="card mb-4">
 				<div class="card-header">
 					<h5 class="mb-0">
-						<i class="bi bi-upload me-2"></i>帳票ファイル取り込み
+						<i class="bi bi-upload me-2"></i>公印画像ファイル取り込み
 					</h5>
 				</div>
 				<div class="card-body">
@@ -43,7 +43,7 @@
 						enctype="multipart/form-data">
 						<div class="row align-items-end">
 							<div class="col-md-8">
-								<label for="file" class="form-label">ファイル選択</label> <input
+								<label for="file" class="form-label">ファイル選択（.pngのみ選択可能）</label> <input
 									type="file" class="form-control" id="file" th:field="*{file}"
 									accept=".png,image/png">
 							</div>
@@ -76,22 +76,17 @@
 							<table class="table table-hover">
 								<thead class="table-light">
 									<tr>
-										<th>ID</th>
+										<th>ファイル名</th>
 										<th>取込日時</th>
 										<th>取込者</th>
-										<th>区分</th>
 									</tr>
 								</thead>
 								<tbody>
 									<tr th:each="item : ${importHistory}">
-										<td th:text="${item.id}">-</td>
+										<td th:text="${item.fileName}">-</td>
 										<td
 											th:text="${#temporals.format(item.addDt, 'yyyy/MM/dd HH:mm:ss')}">-</td>
 										<td th:text="${item.addUser}">-</td>
-										<td><span class="badge bg-info"
-											th:if="${item.kbn == '1'}">テキスト</span> <span
-											class="badge bg-secondary" th:if="${item.kbn == '2'}">バイナリ</span>
-										</td>
 									</tr>
 								</tbody>
 							</table>
