@@ -18,7 +18,8 @@
 						</h5>
 					</div>
 
-					<form id="kofuKetteiForm" th:object="${dto}" method="post">
+					<form id="kofuKetteiForm" th:object="${dto}" method="post"
+						onsubmit="return validateForm()">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
 						<!-- 特別徴収義務者エリア -->
@@ -84,14 +85,17 @@
 						<input type="hidden" th:field="*{koin}">
 
 						<!-- アクションボタン -->
-						<div class="d-flex gap-2">
-							<button type="button" class="btn btn-primary" onclick="generatePdf()">
+						<div class="d-flex justify-content-center gap-2">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/kofuKetteiTsuchi/pdf}">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
 							</button>
-							<button type="button" class="btn btn-outline-primary" onclick="preview()">
+							<button type="submit" class="btn btn-outline-primary"
+								th:formaction="@{/reports/kofuKetteiTsuchi/preview}" formtarget="_blank">
 								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
-							<button type="button" class="btn btn-primary" onclick="printReport()">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/kofuKetteiTsuchi/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
 						</div>

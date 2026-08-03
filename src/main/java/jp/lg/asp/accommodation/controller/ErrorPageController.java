@@ -36,6 +36,10 @@ public class ErrorPageController implements ErrorController {
 			saveLog(request, statusCode);
 		}
 
+		if (statusCode == HttpStatus.BAD_REQUEST.value()) {
+			// 入力値の変換に失敗した場合など。コンテナ標準の英語表記が出ないよう専用画面を返す
+			return "error/400";
+		}
 		if (statusCode == HttpStatus.NOT_FOUND.value()) {
 			return "error/404";
 		}
