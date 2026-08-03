@@ -14,8 +14,8 @@ class MainViewControllerTest {
     }
 
     @Test
-    void root_リダイレクト() {
-        assertThat(controller.root()).isEqualTo("redirect:/collector/list");
+    void declarationsForm_トップページへリダイレクト() {
+        assertThat(controller.declarationsForm()).isEqualTo("redirect:/top-page");
     }
 
     @Test
