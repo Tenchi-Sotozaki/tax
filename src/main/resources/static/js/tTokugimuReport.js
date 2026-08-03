@@ -1,53 +1,26 @@
 /**
  * 特別徴収義務者帳票出力 JavaScript
+ * 指定番号はセッションから取得するため、URLパラメータへの付与は不要
  */
 
-// 指定番号をグローバル変数として保持
-let shiteiNo = '';
-
-/**
- * DOM読み込み完了後の初期化処理
- */
 document.addEventListener('DOMContentLoaded', function() {
-    // Thymeleafから渡された指定番号を取得
-    const shiteiNoElement = document.getElementById('shiteiNoData');
-    if (shiteiNoElement) {
-        shiteiNo = shiteiNoElement.textContent || shiteiNoElement.innerText || '';
-    }
 
-    console.log('ページ読み込み完了。指定番号:', shiteiNo);
-
-    // 特別徴収義務者指定通知書ボタンのクリックイベント
-    const btnTokugimuShitei = document.getElementById('btnReportTokugimuShiteiTsuchi');
-    if (btnTokugimuShitei) {
-        console.log('特別徴収義務者指定通知書ボタンが見つかりました。');
-        btnTokugimuShitei.addEventListener('click', function() {
-            console.log('特別徴収義務者指定通知書ボタンがクリックされました。指定番号:', shiteiNo);
-            if (shiteiNo) {
-                const url = '/accommodation-tax/reports/tokugimuShiteiTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
-                console.log('開くURL:', url);
-                window.location.href = url;
-            } else {
-                alert('指定番号が取得できませんでした。');
-            }
+    function go(btnId, url) {
+        document.getElementById(btnId)?.addEventListener('click', function() {
+            window.location.href = url;
         });
     }
 
-    // 特別徴収義務者申請受理通知書ボタンのクリックイベント
-    const btnTokugimuJuri = document.getElementById('btnReportTokugimuJuriTsuchi');
-    if (btnTokugimuJuri) {
-        console.log('特別徴収義務者申請受理通知書ボタンが見つかりました。');
-        btnTokugimuJuri.addEventListener('click', function() {
-            console.log('特別徴収義務者申請受理通知書ボタンがクリックされました。指定番号:', shiteiNo);
-            if (shiteiNo) {
-                const url = '/accommodation-tax/reports/tokugimuJuriTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
-                console.log('開くURL:', url);
-                window.location.href = url;
-            } else {
-                alert('指定番号が取得できませんでした。');
-            }
-        });
-    }
+    go('btnReportTokugimuShiteiTsuchi',         '/accommodation-tax/reports/tokugimuShiteiTsuchi');
+    go('btnReportTokugimuJuriTsuchi',           '/accommodation-tax/reports/tokugimuJuriTsuchi');
+    go('btnReportNozeiKanrinin',                '/accommodation-tax/reports/nozeiKanrininShoninTsuchi');
+    go('btnReportNozeiMenjo',                   '/accommodation-tax/reports/nozeiKanrininNintei');
+    go('btnReportTokureiShitei',                '/accommodation-tax/reports/tokureiShitei');
+    go('btnReportTokureiTorikeshi',             '/accommodation-tax/reports/tokureiShiteiCancel');
+    go('btnReportKanpu',                        '/accommodation-tax/kanpuMenjoTsuchi');
+    go('btnReportNonyusho',                     '/accommodation-tax/nonyusho');
+    go('btnReportShoreikinKetteiTsuchiShinsei', '/accommodation-tax/reports/kofuKetteiTsuchiShinsei');
+    go('btnReportGassan',                       '/accommodation-tax/tokugimu/report/gassan');
 
     // 納税管理人承認(不承認)通知書ボタンのクリックイベント
     const btnNozeiKanrinin = document.getElementById('btnReportNozeiKanrinin');
@@ -143,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 奨励金交付申請書ボタンのクリックイベント
-    const btnkofuKetteiTsuchiShinsei = document.getElementById('btnReportShoreikinShinsei');
+    const btnkofuKetteiTsuchiShinsei = document.getElementById('btnReportShoreikinKetteiTsuchiShinsei');
     if (btnkofuKetteiTsuchiShinsei) {
         console.log('奨励金決定通知書・交付申請書ボタンが見つかりました。');
         btnkofuKetteiTsuchiShinsei.addEventListener('click', function() {
@@ -183,56 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // 宿泊税更正・決定通知書（セッション保存が必要なため別処理）
+    document.getElementById('btnReportKosei')?.addEventListener('click', async function() {
+        window.location.href = '/accommodation-tax/reports/koseiKetteiTsuchi';
+    });
 });
-
-/**
- * 指定番号で特別徴収義務者を検索してセッションに保存する
- */
-async function selectShiteiGassanByShiteiNo(shiteiNo) {
-    try {
-        const res = await fetch('/accommodation-tax/api/shitei-gassan/search?shiteiNo=' + encodeURIComponent(shiteiNo));
-        const data = await res.json();
-        if (!data.length) return;
-
-        const d = data[0];
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-        const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
-        const headers = { 'Content-Type': 'application/json' };
-        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
-
-        await fetch('/accommodation-tax/api/shitei-gassan/select', {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(d)
-        });
-    } catch (err) {
-        console.error('セッション保存エラー:', err);
-    }
-}
-
-/**
- * 納税管理人の登録状況をチェックする関数
- * @param {string} shiteiNo - 指定番号
- * 
- * 使用方法:
- * 1. ボタンクリックイベントで checkNozeiKanrininRegistration(shiteiNo); のコメントアウトを外す
- * 2. 直接画面遷移の部分をコメントアウトする
- */
-function checkNozeiKanrininRegistration(shiteiNo) {
-    fetch('/accommodation-tax/api/nozeiKanrinin/check?shiteiNo=' + encodeURIComponent(shiteiNo))
-        .then(response => response.json())
-        .then(data => {
-            if (data.isRegistered) {
-                // 納税管理人が登録されている場合は画面遷移
-                const url = '/accommodation-tax/reports/nozeiKanrininShoninTsuchi?shiteiNo=' + encodeURIComponent(shiteiNo);
-                window.location.href = url;
-            } else {
-                // 納税管理人が登録されていない場合はエラーメッセージ表示
-                alert('納税管理人が登録されていません。先に納税管理人の登録を行ってください。');
-            }
-        })
-        .catch(error => {
-            console.error('納税管理人登録チェックエラー:', error);
-            alert('納税管理人の登録状況を確認できませんでした。');
-        });
-}

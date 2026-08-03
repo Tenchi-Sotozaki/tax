@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDate;
+import java.time.Month;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,7 +19,10 @@ public class ShoreikinDto {
 	// ========== 抽出条件エリア ==========
 
 	/** No.1 交付金年度 (t_shoreikin.nendo) */
-	private String nendo;
+	private String nendo = String.valueOf(
+			LocalDate.now().getMonthValue() >= Month.APRIL.getValue()
+					? LocalDate.now().getYear()
+					: LocalDate.now().getYear() - 1);
 
 	/**
 	 * No.2 交付金算出有無: 1=算出有 / 2=算出無 / 999=すべて
@@ -37,28 +41,13 @@ public class ShoreikinDto {
 	private String shisetsuName;
 	private String shisetsuNameMatchType = "partial";
 
-	/** No.6 営業種別 (t_tokugimu.kyoka_shu): 1=ホテル/2=旅館/3=簡易宿所/4=民泊/999=すべて */
-	private String kyokaShu = "999";
+	/** No.6 合算指定番号 (t_gassan.gassan_shitei_no) */
+	private String gassanShiteiNo;
 
-	/** No.7 合算対象 (t_gassan_uchi): 1=非対象/2=対象/999=すべて */
-	private String gassanTaisho = "999";
-
-	/**
-	 * No.8 ステータス (t_tokugimu の営業・休止日付から判定):
-	 * 1=営業中/2=休止/3=廃止/999=すべて
-	 */
-	private String status = "999";
-
-	/** No.9 個人番号 (m_atena.kojin_no) */
-	private String kojinNo;
-
-	/** No.10 法人番号 (m_atena.hojin_no) */
-	private String hojinNo;
-
-	/** No.11 ページ番号 */
+	/** No.7 ページ番号 */
 	private int page = 0;
 
-	/** No.12 1ページあたりの表示件数 */
+	/** No.8 1ページあたりの表示件数 */
 	private int pageSize = 10;
 
 	// ========== 情報一覧エリア（表示用） ==========

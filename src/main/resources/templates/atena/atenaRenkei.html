@@ -28,6 +28,13 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
+		<!-- 画面内メッセージ（取込処理の結果を表示する） -->
+		<div id="importAlert" class="alert alert-dismissible fade show d-none"
+			role="alert">
+			<span id="importAlertText"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
 		<!-- ファイル選択エリア -->
 		<div class="card mb-4 shadow-sm">
 			<div class="card-header bg-primary text-white py-3">
@@ -36,10 +43,7 @@
 				</h5>
 			</div>
 			<div class="card-body bg-light-subtle">
-				<form th:action="@{/atena/import}" method="post"
-					enctype="multipart/form-data">
-					<input type="hidden" th:name="${_csrf.parameterName}"
-						th:value="${_csrf.token}">
+				<form id="importForm" enctype="multipart/form-data">
 					<div class="row g-3 align-items-end">
 						<div class="col-md-6">
 							<label for="file" class="form-label fw-medium"> CSVファイル <span
@@ -48,7 +52,7 @@
 								accept=".csv" required>
 						</div>
 						<div class="col-md-2">
-							<button type="submit" class="btn btn-primary w-100">
+							<button type="submit" id="btnAnalyze" class="btn btn-primary w-100">
 								<i class="bi bi-upload me-1"></i>内容取込
 							</button>
 						</div>
@@ -71,7 +75,7 @@
 							<th>ファイル名</th>
 							<th>処理日時</th>
 							<th>処理件数</th>
-							<th>備考</th>
+							<th>処理詳細</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -82,14 +86,118 @@
 							<td th:text="${h.fileName}"></td>
 							<td th:text="${#temporals.format(h.shoriDt, 'yyyy/MM/dd HH:mm')}"></td>
 							<td th:text="${h.shoriKensu}"></td>
-							<td><span th:text="'新規：' + ${h.shinkiKensu} + '件'"></span> <span
-								class="ms-2" th:text="'更新：' + ${h.koshinKensu} + '件'"></span></td>
+							<td>
+								<a href="#" class="js-detail-link"
+									th:data-seq="${h.seq}"
+									th:data-file-name="${h.fileName}">
+									<span th:text="'新規：' + ${h.shinkiKensu} + '件'"></span>
+									<span class="ms-2" th:text="'更新：' + ${h.koshinKensu} + '件'"></span>
+								</a>
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 		</div>
 
+		<!-- ========== 差分確認モーダル ========== -->
+		<div class="modal fade" id="sabunModal" tabindex="-1"
+			data-bs-backdrop="static" data-bs-keyboard="false"
+			aria-labelledby="sabunModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title" id="sabunModalLabel">
+							<i class="bi bi-list-check me-2"></i>取込内容の確認
+						</h5>
+						<button type="button" class="btn-close btn-close-white"
+							data-bs-dismiss="modal" aria-label="閉じる"></button>
+					</div>
+					<div class="modal-body">
+						<!-- サマリー -->
+						<div class="d-flex gap-3 flex-wrap mb-3 small">
+							<span>新規：<span id="sumShinki" class="fw-bold">0</span> 件</span>
+							<span>差分あり：<span id="sumSabun" class="fw-bold">0</span> 件</span>
+							<span>差異なし：<span id="sumSaiNashi" class="fw-bold">0</span> 件</span>
+						</div>
+
+						<!-- 差分一覧（最大数十件を想定し縦スクロールで対応） -->
+						<div id="sabunListWrapper" class="table-responsive"
+							style="max-height: 55vh; overflow-y: auto;">
+							<table class="table table-bordered table-sm align-middle mb-0">
+								<thead class="table-primary text-center position-sticky top-0">
+									<tr>
+										<th style="width: 140px;">宛名番号</th>
+										<th>宛名名</th>
+										<th style="width: 90px;"></th>
+										<th style="width: 200px;">取込</th>
+									</tr>
+								</thead>
+								<tbody id="sabunList"></tbody>
+							</table>
+						</div>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="button" class="btn btn-outline-secondary"
+							data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>キャンセル
+						</button>
+						<button type="button" class="btn btn-primary px-4" id="btnConfirmImport">
+							<i class="bi bi-check-lg me-1"></i>取り込む
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== 取込結果モーダル ========== -->
+		<div class="modal fade" id="detailModal" tabindex="-1"
+			aria-labelledby="detailModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div class="modal-header bg-secondary text-white">
+						<h5 class="modal-title" id="detailModalLabel">
+							<i class="bi bi-clock-history me-2"></i>取込結果
+						</h5>
+						<button type="button" class="btn-close btn-close-white"
+							data-bs-dismiss="modal" aria-label="閉じる"></button>
+					</div>
+					<div class="modal-body">
+						<p class="small text-muted mb-2" id="detailFileName"></p>
+						<div class="table-responsive" style="max-height: 55vh; overflow-y: auto;">
+							<table class="table table-bordered table-sm align-middle mb-0">
+								<thead class="table-secondary text-center position-sticky top-0">
+									<tr>
+										<th style="width: 140px;">宛名番号</th>
+										<th>宛名名</th>
+										<th style="width: 120px;">結果</th>
+									</tr>
+								</thead>
+								<tbody id="detailList"></tbody>
+							</table>
+						</div>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="button" class="btn btn-outline-secondary"
+							data-bs-dismiss="modal">閉じる</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:inline="javascript">
+			/*<![CDATA[*/
+			window.atenaImportUrls = {
+				analyze: /*[[@{/atena/import/analyze}]]*/ '/atena/import/analyze',
+				confirm: /*[[@{/atena/import/confirm}]]*/ '/atena/import/confirm',
+				detail:  /*[[@{/atena/import/detail/}]]*/ '/atena/import/detail/'
+			};
+			/*]]>*/
+		</script>
+		<script th:src="@{/js/atenaRenkei.js}"></script>
+	</th:block>
 </body>
 </html>

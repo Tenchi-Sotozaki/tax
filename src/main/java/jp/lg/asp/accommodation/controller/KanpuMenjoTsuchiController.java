@@ -15,16 +15,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.KanpuMenjoTsuchiReportsService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,12 +51,19 @@ public class KanpuMenjoTsuchiController {
      * 徴収不能額の還付又は納入義務の免除決定通知書画面表示
      */
     @GetMapping
-    public String index(@RequestParam String shiteiNo,
+    public String index(HttpSession session,
                        @AuthenticationPrincipal User userDetails,
                        Model model) {
     	String jichitaiCode = jichitaiContext.getJichitaiCd();
+    	String shiteiNo = SessionHelper.getShiteiNo(session);
         try {
             log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
+
+            if (shiteiNo == null || shiteiNo.isEmpty()) {
+                model.addAttribute("showShiteiGassanModal", true);
+                model.addAttribute("dto", new KanpuMenjoTsuchiDto());
+                return "reports/kanpuMenjoTsuchi";
+            }
 
             // 特別徴収義務者情報取得
             TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);

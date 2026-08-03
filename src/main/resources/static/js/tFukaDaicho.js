@@ -4,30 +4,24 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerButtons = document.querySelectorAll('.btn-register');
     registerButtons.forEach(button => {
         button.addEventListener('click', function(e) {
-            // クリックされたボタンと同じ行（tr）を取得
+            e.preventDefault();
             const tr = this.closest('tr');
             const hiddenInput = tr ? tr.querySelector('input[name="month"]') : null;
 
             if (!hiddenInput) {
                 alert("対象データが見つかりません。");
-                e.preventDefault();
                 return;
             }
 
-            // 万が一申告済みの行で押された場合のガード
             const isShinkokuZumi = hiddenInput.getAttribute('data-status') === 'true';
             if (isShinkokuZumi) {
                 alert("既に申告済みのデータです。「照会」ボタンを使用してください。");
-                e.preventDefault();
                 return;
             }
 
-            // 送信不要な他行の hidden input を一時的に無効化（現在行のデータのみ送信するため）
-            document.querySelectorAll('input[name="month"]').forEach(input => {
-                if (input !== hiddenInput) {
-                    input.disabled = true;
-                }
-            });
+            const month = hiddenInput.value;
+            const baseUrl = window.declarationRegisterBaseUrl || '/declaration/register';
+            window.location.href = baseUrl + '?month=' + encodeURIComponent(month);
         });
     });
 
@@ -59,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function generateViewUrl(nendo, kibetsu) {
-    var baseUrl = window.declarationViewBaseUrl || '/declaration/view/';
-    var shiteiNo = window.fukaDaichoFormShiteiNo || '';
-    return baseUrl + shiteiNo + '/' + nendo + '/' + kibetsu;
+    var baseUrl = window.declarationViewBaseUrl || '/declaration/view';
+    return baseUrl + '?nendo=' + nendo + '&kibetsu=' + kibetsu;
 }

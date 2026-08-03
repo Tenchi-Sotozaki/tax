@@ -2,6 +2,14 @@
  * ユーザー情報編集画面用JavaScript
  */
 
+// 削除確認モーダル表示（編集画面の「削除する」ボタンから呼び出し）
+function confirmUserDelete() {
+    const modalEl = document.getElementById('deleteModal');
+    if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // 編集モードでなければ処理を行わない

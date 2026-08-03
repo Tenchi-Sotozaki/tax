@@ -12,9 +12,14 @@
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 			th:data-is-edit="${isEdit}">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-person-plus me-2 text-primary"></i> <span
-					th:text="${isEdit} ? 'ユーザー編集' : 'ユーザー登録'"></span>
+				<i th:class="${isView} ? 'bi bi-person-lines-fill me-2 text-primary' : (${isEdit} ? 'bi bi-pencil-square me-2 text-primary' : 'bi bi-person-plus me-2 text-primary')"></i>
+				<span th:text="${isView} ? 'ユーザー照会' : (${isEdit} ? 'ユーザー編集' : 'ユーザー登録')"></span>
 			</h5>
+
+			<a th:href="@{/admin/user-edit/{id}(id=${userForm.originalId})}"
+				class="btn btn-primary btn-sm" th:if="${isView}"> <i
+				class="bi bi-pencil-square me-2"></i>編集する
+			</a>
 		</div>
 
 		<form
@@ -67,7 +72,7 @@
 								class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="name"
 								th:field="*{name}" th:errorclass="is-invalid"
-								th:data-initial-value="*{name}">
+								th:readonly="${isView}" th:data-initial-value="*{name}">
 
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
@@ -80,7 +85,8 @@
 								<span class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="nameKana"
 								th:field="*{nameKana}" th:errorclass="is-invalid"
-								placeholder="ひらがなで入力" th:data-initial-value="*{nameKana}">
+								placeholder="ひらがなで入力" th:readonly="${isView}"
+								th:data-initial-value="*{nameKana}">
 
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('nameKana')}" th:errors="*{nameKana}"></div>
@@ -94,7 +100,7 @@
 								class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="busho"
 								th:field="*{busho}" th:errorclass="is-invalid"
-								th:data-initial-value="*{busho}">
+								th:readonly="${isView}" th:data-initial-value="*{busho}">
 
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('busho')}" th:errors="*{busho}">
@@ -107,7 +113,7 @@
 								class="text-danger">*</span>
 							</label> <select class="form-select" id="roleId" th:field="*{roleId}"
 								th:errorclass="is-invalid" th:data-initial-value="*{roleId}"
-								th:disabled="${isDefaultUser}">
+								th:disabled="${isView == true or isDefaultUser == true}">
 								<option value="">選択してください</option>
 								<option th:each="role : ${roles}" th:value="${role.roleId}"
 									th:text="${role.name}"></option>
@@ -121,32 +127,37 @@
 
 						<div class="col-md-4"></div>
 
-						<!-- 新しいパスワード -->
-						<div class="col-md-4">
-							<label for="password" class="form-label fw-medium"> <span
-								th:if="${isEdit}">新しいパスワード</span> <span th:if="!${isEdit}">パスワード
-									<span class="text-danger">*</span>
-							</span> <span th:if="${isEdit}" class="text-muted small ms-1">(変更する場合のみ入力)</span>
-							</label> <input type="password" class="form-control" id="password"
-								th:field="*{password}" th:errorclass="is-invalid"
-								autocomplete="new-password" th:data-initial-value="*{password}">
+						<!-- パスワード関連は照会画面では表示しない -->
+						<th:block th:unless="${isView}">
 
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-						</div>
+							<!-- 新しいパスワード -->
+							<div class="col-md-4">
+								<label for="password" class="form-label fw-medium"> <span
+									th:if="${isEdit}">新しいパスワード</span> <span th:if="!${isEdit}">パスワード
+										<span class="text-danger">*</span>
+								</span> <span th:if="${isEdit}" class="text-muted small ms-1">(変更する場合のみ入力)</span>
+								</label> <input type="password" class="form-control" id="password"
+									th:field="*{password}" th:errorclass="is-invalid"
+									autocomplete="new-password" th:data-initial-value="*{password}">
 
-						<!-- パスワード(確認用) -->
-						<div class="col-md-4">
-							<label for="passwordConfirm" class="form-label fw-medium">
-								パスワード(確認用) <span class="text-danger" th:if="!${isEdit}">*</span>
-							</label> <input type="password" class="form-control" id="passwordConfirm"
-								name="passwordConfirm" th:errorclass="is-invalid"
-								autocomplete="new-password">
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+							</div>
 
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('passwordConfirm')}"
-								th:errors="*{passwordConfirm}"></div>
-						</div>
+							<!-- パスワード(確認用) -->
+							<div class="col-md-4">
+								<label for="passwordConfirm" class="form-label fw-medium">
+									パスワード(確認用) <span class="text-danger" th:if="!${isEdit}">*</span>
+								</label> <input type="password" class="form-control" id="passwordConfirm"
+									name="passwordConfirm" th:errorclass="is-invalid"
+									autocomplete="new-password">
+
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('passwordConfirm')}"
+									th:errors="*{passwordConfirm}"></div>
+							</div>
+
+						</th:block>
 
 					</div>
 				</div>
@@ -154,13 +165,28 @@
 
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<a th:href="@{/admin/user-search}"
+
+				<!-- 一覧に戻る（照会画面は入力破棄の確認を出さない） -->
+				<a th:if="${isView != true}" th:href="@{/admin/user-search}"
 					class="btn btn-outline-primary btn-lg px-4"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
-				
-				<button type="submit" class="btn btn-success btn-lg px-5">
+				<a th:if="${isView}" th:href="@{/admin/user-search}"
+					class="btn btn-outline-primary btn-lg px-4"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+
+				<!-- 編集時のみ削除ボタンを表示 -->
+				<button type="button" class="btn btn-danger btn-lg px-5"
+					th:if="${isEdit == true and isView != true}"
+					onclick="confirmUserDelete()">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
+
+				<!-- 登録する／更新する -->
+				<button type="submit" class="btn btn-success btn-lg px-5"
+					th:unless="${isView}">
 					<i
 						th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
@@ -168,6 +194,15 @@
 
 			</div>
 		</form>
+
+		<!-- 削除用フォーム・確認モーダル（編集画面のみ） -->
+		<th:block th:if="${isEdit == true and isView != true}">
+			<form id="deleteForm" th:action="@{/admin/user-delete/{id}(id=${userForm.originalId})}" method="post"
+				style="display:none;"></form>
+			<div
+				th:replace="~{layout/components :: confirmModal('deleteModal','削除確認','このユーザーを削除します。よろしいですか？','deleteForm','btn-danger','削除する')}">
+			</div>
+		</th:block>
 
 	</div>
 

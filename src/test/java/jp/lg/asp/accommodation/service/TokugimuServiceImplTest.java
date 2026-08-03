@@ -24,9 +24,11 @@ import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
+import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.KyodoJigyoshaRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
+import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TokugimuServiceImpl;
 
@@ -40,6 +42,8 @@ class TokugimuServiceImplTest {
     @Mock ShoyushaRepository shoyushaRepository;
     @Mock KyodoJigyoshaRepository kyodoJigyoshaRepository;
     @Mock JichitaiRepository jichitaiRepository;
+    @Mock FukaRepository fukaRepository;
+    @Mock ShunoRirekiRepository shunoRirekiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks TokugimuServiceImpl service;
 
@@ -130,15 +134,41 @@ class TokugimuServiceImplTest {
     }
 
     @Test
-    void deleteByShiteiNo_setsDelFlg1() {
+    void deleteByShiteiNo_履歴が残らない場合はfalseを返す() {
         Tokugimu t = buildTokugimu(SHITEI_NO);
         t.setDelFlg("0");
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of(t));
+        when(tokugimuRepository.findActiveHistoryByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of());
         when(tokugimuRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        service.deleteByShiteiNo(SHITEI_NO);
+        boolean remains = service.deleteByShiteiNo(SHITEI_NO);
 
+        assertThat(remains).isFalse();
         assertThat(t.getDelFlg()).isEqualTo("1");
+        assertThat(t.getNewFlg()).isEqualTo("0");
+    }
+
+    @Test
+    void deleteByShiteiNo_履歴が残る場合は最新履歴を最新版に戻す() {
+        Tokugimu current = buildTokugimu(SHITEI_NO);
+        current.setDelFlg("0");
+        current.setRno(BigDecimal.valueOf(2));
+        Tokugimu prev = buildTokugimu(SHITEI_NO);
+        prev.setDelFlg("0");
+        prev.setNewFlg("0");
+        prev.setRno(BigDecimal.ONE);
+
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of(current));
+        when(tokugimuRepository.findActiveHistoryByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(prev));
+        when(tokugimuRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        boolean remains = service.deleteByShiteiNo(SHITEI_NO);
+
+        assertThat(remains).isTrue();
+        assertThat(current.getDelFlg()).isEqualTo("1");
+        assertThat(prev.getNewFlg()).isEqualTo("1");
     }
 
     @Test

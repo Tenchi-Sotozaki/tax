@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
@@ -10,32 +10,33 @@
 
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 pb-4"
-		th:with="formAction=${isEdit} ? '/tokugimu/edit/' + ${editId} : '/tokugimu/registration'"
+		th:with="formAction=${isEdit} ? '/tokugimu/edit' : '/tokugimu/registration'"
 		th:data-is-edit="${isEdit}">
 
 		<div class="pb-2 mb-3 border-bottom sticky-top shadow-sm pt-3"
 			style="z-index: 1020; top: -1rem; background-color: #f8f9fa;">
+			<!-- 1段目：タイトル / 帳票印刷ボタン（照会のみ） -->
 			<div
-				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center gap-2">
 				<h5 class="mb-0 fw-bold text-dark">
 					<i class="bi bi-person-plus me-2 text-primary"></i> <span
 						th:text="${isView} ? '特別徴収義務者 照会' : (${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録')"></span>
 				</h5>
-				<div class="d-flex gap-2 mr-2">
-					<a href="#hiduke-info" class="btn btn-outline-primary btn-sm">日付情報</a>
-					<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
-					<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
-					<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
-					<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
-					<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
-					<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
-					<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
-					<a href="#business-status-info" class="btn btn-outline-primary btn-sm"
-						th:if="${isEdit} or ${isView}">宿泊施設営業状況情報</a>
+				<div class="d-flex gap-2 ms-auto" th:if="${isView}">
+					<a th:href="@{/reports/tokugimuShiteiTsuchi}"
+						class="btn btn-outline-primary btn-sm"> <i
+						class="bi bi-printer me-1"></i>特別徴収義務者指定通知書
+					</a>
+					<a th:href="@{/reports/tokugimuJuriTsuchi}"
+						class="btn btn-outline-primary btn-sm"> <i
+						class="bi bi-printer me-1"></i>特別徴収義務者申請受理通知書
+					</a>
 				</div>
 			</div>
+
+			<!-- 2段目：特別徴収義務者情報・指定ボタン / 編集するボタン -->
 			<div
-				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center gap-2 mt-2">
 				<!-- 特別徴収義務者情報 -->
 
 				<div th:if="${isEdit} or ${isView}">
@@ -44,36 +45,50 @@
 				</div>
 
 				<th:block th:if="${isView}">
-					<a th:href="@{/tokugimu/edit/{id}(id=${editId})}"
-						class="btn btn-primary btn-sm mt-2"> <i
+					<a th:href="@{/tokugimu/edit}"
+						class="btn btn-primary btn-sm ms-auto"> <i
 						class="bi bi-pencil-square me-2"></i>編集する
 					</a>
 				</th:block>
 			</div>
+
+			<!-- 3段目：アンカーリンク -->
+			<div class="d-flex gap-2 flex-wrap mt-2 justify-content-end">
+				<a href="#hiduke-info" class="btn btn-outline-primary btn-sm">日付情報</a>
+				<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
+				<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
+				<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
+				<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
+				<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
+				<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
+				<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
+				<a href="#business-status-info" class="btn btn-outline-primary btn-sm"
+					th:if="${isEdit} or ${isView}">宿泊施設営業状況情報</a>
+			</div>
 		</div>
 
-		<!-- 履歴ナビゲーション（照会画面のみ） -->
-		<div th:if="${(isView ?: false) and TokugimuForm.maxRno != null and TokugimuForm.maxRno > 1}"
-			class="d-flex align-items-center gap-2 mb-3">
-			<a th:href="@{/tokugimu/view/{id}(id=${editId}, rno=${TokugimuForm.rno - 1})}"
-				class="btn btn-outline-secondary btn-sm"
-				th:classappend="${TokugimuForm.rno <= TokugimuForm.minRno} ? ' disabled'">
-				<i class="bi bi-chevron-left"></i> 前の履歴
-			</a>
-			<span class="text-muted small">履歴 <span th:text="${TokugimuForm.rno}"></span> / <span th:text="${TokugimuForm.maxRno}"></span></span>
-			<a th:href="@{/tokugimu/view/{id}(id=${editId}, rno=${TokugimuForm.rno + 1})}"
-				class="btn btn-outline-secondary btn-sm"
-				th:classappend="${TokugimuForm.rno >= TokugimuForm.maxRno} ? ' disabled'">
-				次の履歴 <i class="bi bi-chevron-right"></i>
-			</a>
-		</div>
-
-		<!-- 登録・更新成功メッセージ -->
+		<!-- 登録・更新成功メッセージ（固定ヘッダーの直下に表示する） -->
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show" role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i> <span
 				th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- 履歴ナビゲーション（照会画面のみ） -->
+		<div th:if="${(isView ?: false) and TokugimuForm.maxRno != null and TokugimuForm.maxRno > 1}"
+			class="d-flex align-items-center gap-2 mb-3">
+			<a th:href="@{/tokugimu/view(rno=${TokugimuForm.rno - 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${TokugimuForm.rno <= TokugimuForm.minRno} ? ' disabled'">
+				<i class="bi bi-chevron-left"></i> 前の履歴
+			</a>
+			<span class="text-muted small">履歴 <span th:text="${TokugimuForm.rno}"></span> / <span th:text="${TokugimuForm.maxRno}"></span></span>
+			<a th:href="@{/tokugimu/view(rno=${TokugimuForm.rno + 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${TokugimuForm.rno >= TokugimuForm.maxRno} ? ' disabled'">
+				次の履歴 <i class="bi bi-chevron-right"></i>
+			</a>
 		</div>
 
 		<form id="registerForm" th:action="@{${formAction}}"
@@ -884,16 +899,8 @@
 			</div>
 
 			<!-- ===== アクションボタン ===== -->
+			<!-- 並び順は左から「一覧に戻る」「削除する」「登録する/更新する」 -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<th:block th:if="!${isView}">
-					<button type="button" id="openConfirmModalBtn"
-						class="btn btn-success btn-lg px-5">
-						<i
-							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
-						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
-					</button>
-				</th:block>
-
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -902,10 +909,35 @@
 					th:unless="${isView ?: false}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
-
 				</a>
+
+				<!-- 編集時のみ削除ボタンを表示（台帳から移設） -->
+				<button type="button" class="btn btn-danger btn-lg px-5"
+					th:if="${(isEdit ?: false) and !(isView ?: false)}"
+					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
+
+				<th:block th:if="!${isView}">
+					<button type="button" id="openConfirmModalBtn"
+						class="btn btn-success btn-lg px-5">
+						<i
+							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+					</button>
+				</th:block>
 			</div>
 		</form>
+
+		<!-- 削除用フォーム・確認モーダル（編集画面のみ） -->
+		<th:block th:if="${(isEdit ?: false) and !(isView ?: false)}">
+			<form id="deleteTokugimuForm"
+				th:action="@{/tokugimu/delete}" method="post"
+				class="d-none"></form>
+			<div
+				th:replace="~{layout/components :: confirmModal('deleteConfirmModal', '削除確認', 'この特別徴収義務者を削除します。よろしいですか？', 'deleteTokugimuForm', 'btn-danger', '削除する')}">
+			</div>
+		</th:block>
 
 		<!-- 確認モーダル（登録と更新） -->
 		<div th:if="!${isView}"

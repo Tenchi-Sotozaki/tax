@@ -27,7 +27,14 @@ public interface TokugimuService {
 	void updateByShiteiNo(String shiteiNo, TokugimuForm form);
 
 	// 指定番号をキーに特別徴収義務者を削除する
-	void deleteByShiteiNo(String shiteiNo);
+	/**
+	 * 最新の履歴を論理削除する。
+	 * 削除後も履歴が残っている場合は、残っている中で最も新しい履歴を最新版に戻す。
+	 *
+	 * @param shiteiNo 指定番号
+	 * @return 削除後も履歴が残っている場合 true、すべて削除された場合 false
+	 */
+	boolean deleteByShiteiNo(String shiteiNo);
 
 	// IDから指定番号を取得する
 	String getShiteiNoById(Long id);

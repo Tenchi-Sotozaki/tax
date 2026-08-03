@@ -13,7 +13,7 @@ public interface RoleRepository extends JpaRepository<Role, RoleId> {
     
     List<Role> findByJichitaiCdOrderByRoleId(String jichitaiCd);
     
-    @Query("SELECT r FROM Role r LEFT JOIN FETCH r.roleDetails rd LEFT JOIN FETCH rd.screen WHERE r.jichitaiCd = :jichitaiCd")
+    @Query("SELECT r FROM Role r LEFT JOIN FETCH r.roleDetails rd LEFT JOIN FETCH rd.screen WHERE r.jichitaiCd = :jichitaiCd ORDER BY r.roleId ASC")
     List<Role> findByJichitaiCdWithDetails(@Param("jichitaiCd") String jichitaiCd);
     @Query("SELECT r FROM Role r LEFT JOIN FETCH r.roleDetails WHERE r.jichitaiCd = :jichitaiCd AND r.roleId = :roleId")
     java.util.Optional<Role> findByIdWithDetails(@Param("jichitaiCd") String jichitaiCd, @Param("roleId") Long roleId);
