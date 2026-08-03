@@ -1,16 +1,27 @@
 /* 月計表モーダル：ヘッダーを固定表示する
-   ヘッダーが2段のため、2段目は1段目の高さぶんだけ下げる */
-.monthly-tally-table thead th {
+   ヘッダーは2段構成で rowspan のセルもあるため、段ごとに位置を指定せず
+   thead 全体をひとまとまりとして固定する */
+.monthly-tally-table {
+	/* 固定したセルの枠線が追従するよう、罫線を重ねない指定にする */
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
+.monthly-tally-table thead {
 	position: sticky;
-	z-index: 2;
+	top: 0;
+	z-index: 3;
 	background-color: #f8f9fa;
 }
 
-.monthly-tally-table thead tr:first-child th {
-	top: 0;
-	height: 2.25rem;
+.monthly-tally-table thead th {
+	/* 固定時に下の行が透けないよう背景色を指定する */
+	background-color: #f8f9fa;
+	/* border-collapse を解除したぶん、枠線を明示する */
+	border: 1px solid #dee2e6;
 }
 
-.monthly-tally-table thead tr:nth-child(2) th {
-	top: 2.25rem;
+.monthly-tally-table tbody td,
+.monthly-tally-table tfoot td {
+	border: 1px solid #dee2e6;
 }
