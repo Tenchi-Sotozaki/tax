@@ -18,7 +18,7 @@ public final class ScreenManagement {
 	/**
 	 * 画面区分（screen_idの先頭2文字）と表示名の対応
 	 *
-	 * 1文字目が大分類（m=メイン / s=システム管理）、2文字目が中分類を表す
+	 * 1文字目が大分類（m=メイン / s=システム）、2文字目が中分類を表す
 	 * 定義した並び順がそのまま画面上の表示順になる
 	 */
 	private static final java.util.Map<String, String> SCREEN_KBN_NAMES;
@@ -28,8 +28,8 @@ public final class ScreenManagement {
 		kbnNames.put("mi", "メイン／登録");
 		kbnNames.put("mt", "メイン／取り込み");
 		kbnNames.put("mo", "メイン／csv出力");
-		kbnNames.put("ss", "システム管理／照会");
-		kbnNames.put("sc", "システム管理／設定");
+		kbnNames.put("ss", "システム／照会");
+		kbnNames.put("sc", "システム／設定");
 		SCREEN_KBN_NAMES = java.util.Collections.unmodifiableMap(kbnNames);
 	}
 
