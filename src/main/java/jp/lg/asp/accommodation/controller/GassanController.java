@@ -212,4 +212,49 @@ public class GassanController {
 			return FORM_VIEW;
 		}
 	}
+	
+	/**
+	 * 合算申告の削除
+	 * @author Atsumu Kuboichi
+	 * @param form
+	 * @param bindingResult
+	 * @param model
+	 * @param redirectAttributes
+	 * @return 遷移先のURL
+	 */
+	@PostMapping("/delete")
+	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "削除")
+	public String delete(@Validated @ModelAttribute("GassanForm") GassanForm form,
+			BindingResult bindingResult,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+		
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+		
+		if (bindingResult.hasErrors()) {
+			gassanService.reloadFacilityList(form);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
+			model.addAttribute("validationErrors", GassanForm.validate(form).values());
+			return FORM_VIEW;
+		}
+		
+		try {
+			// 指定番号を指定して削除
+			gassanService.deleteByGassanShiteiNo(form.getGassanShiteiNo());
+			
+			// 削除成功のメッセージを設定
+			redirectAttributes.addFlashAttribute("successMessage", "合算申告の削除が完了しました。");
+			
+			return "redirect:/gassan/list";
+			
+		} catch (Exception e) {
+			log.error("合算申告削除エラー", e);
+			gassanService.reloadFacilityList(form);
+			model.addAttribute("isEdit", true);
+			model.addAttribute("isView", false);
+			model.addAttribute("errorMessage", e.getMessage());
+			return FORM_VIEW;
+		}
+	}
 }

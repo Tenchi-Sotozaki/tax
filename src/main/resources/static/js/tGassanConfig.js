@@ -163,7 +163,7 @@ function renderFacilityTable(facilities) {
     if (!tbody) return;
 
     if (!facilities.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">
             <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>対象施設が見つかりませんでした。</td></tr>`;
         return;
     }
@@ -178,6 +178,7 @@ function renderFacilityTable(facilities) {
                 <input type="radio" class="form-check-input daihyo-radio"
                     name="daihyoShiteiNo" value="${f.shiteiNo}">
             </td>
+            <td>${f.shiteiNo ?? ''}</td>
             <td>${f.choshuGimushaName ?? ''}</td>
             <td>${f.shisetsuName ?? ''}</td>
         </tr>`).join('');
@@ -209,3 +210,14 @@ function setupFacilityEventListeners() {
         });
     });
 }
+
+// 削除モーダルを開く
+document.getElementById('openDeleteModalBtn')?.addEventListener('click', () => {
+    const modal = document.getElementById('deleteModal');
+    if (modal) new bootstrap.Modal(modal).show();
+});
+
+// 削除確認モーダルの実行ボタンで削除フォーム送信
+document.querySelector('#deleteModal .btn-confirm')?.addEventListener('click', () => {
+    document.getElementById('deleteForm')?.submit();
+});
