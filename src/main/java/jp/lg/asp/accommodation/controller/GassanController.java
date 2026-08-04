@@ -231,12 +231,9 @@ public class GassanController {
 		
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		
-		if (bindingResult.hasErrors()) {
-			gassanService.reloadFacilityList(form);
-			model.addAttribute("isEdit", false);
-			model.addAttribute("isView", false);
-			model.addAttribute("validationErrors", GassanForm.validate(form).values());
-			return FORM_VIEW;
+		if (form.getGassanShiteiNo() == null || form.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "削除対象の指定がありません。");
+			return "redirect:/gassan/list";
 		}
 		
 		try {
@@ -250,11 +247,8 @@ public class GassanController {
 			
 		} catch (Exception e) {
 			log.error("合算申告削除エラー", e);
-			gassanService.reloadFacilityList(form);
-			model.addAttribute("isEdit", true);
-			model.addAttribute("isView", false);
-			model.addAttribute("errorMessage", e.getMessage());
-			return FORM_VIEW;
+			redirectAttributes.addFlashAttribute("errorMessage", "削除に失敗しました: " + e.getMessage());
+			return "redirect:/gassan/edit/" + form.getGassanShiteiNo();
 		}
 	}
 }

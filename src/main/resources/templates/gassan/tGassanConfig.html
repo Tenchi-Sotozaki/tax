@@ -236,9 +236,10 @@
 
 				<!-- 削除ボタン -->
 				<th:block th:if="${!isView and isEdit}">
-					<button type="button" id="openDeleteModalBtn" class="btn btn-danger btn-lg px-5">
-						<span th:text="削除する"></span>
-					</button>
+				    <button type="button" id="openDeleteModalBtn" class="btn btn-danger btn-lg px-5"
+				            th:disabled="${GassanForm.gassanShiteiNo == null or #strings.isEmpty(GassanForm.gassanShiteiNo)}">
+				        <span>削除する</span>
+				    </button>
 				</th:block>
 			</div>
 		</form>

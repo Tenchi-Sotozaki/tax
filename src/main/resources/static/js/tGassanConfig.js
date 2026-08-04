@@ -4,6 +4,13 @@ const ADDR_API = '/accommodation-tax/api/address/search';
 const FACILITIES_API = '/accommodation-tax/gassan/facilities-by-atena';
 
 document.addEventListener('DOMContentLoaded', () => {
+	
+    // チェックされた行をハイライト
+    setupFacilityEventListeners();
+	
+
+    // 画面読み込み時に初期の削除ボタン状態を判定
+    updateDeleteButtonState();
 
     // 宛名検索モーダル初期化
     initAddressSearchModal();
@@ -195,6 +202,8 @@ function setupFacilityEventListeners() {
                 const radio = this.closest('tr').querySelector('.daihyo-radio');
                 if (radio) radio.checked = false;
             }
+			
+			updateDeleteButtonState();
         });
     });
 
@@ -205,6 +214,8 @@ function setupFacilityEventListeners() {
                 if (checkbox && !checkbox.disabled) {
                     checkbox.checked = true;
                     checkbox.closest('tr').classList.add('table-primary');
+					
+					updateDeleteButtonState();
                 }
             }
         });
@@ -221,3 +232,21 @@ document.getElementById('openDeleteModalBtn')?.addEventListener('click', () => {
 document.querySelector('#deleteModal .btn-confirm')?.addEventListener('click', () => {
     document.getElementById('deleteForm')?.submit();
 });
+
+// 削除ボタンの活性/非活性を制御する関数
+function updateDeleteButtonState() {
+    const deleteBtn = document.getElementById('openDeleteModalBtn');
+    if (!deleteBtn) return;
+
+    // チェックされている施設の数をカウント
+    const checkedCount = document.querySelectorAll('.facility-check:checked').length;
+
+    // 0件の場合は削除ボタンを無効化（disabled属性の付与とクラス調整）
+    if (checkedCount <= 1) {
+        deleteBtn.setAttribute('disabled', 'disabled');
+        deleteBtn.classList.add('disabled');
+    } else {
+        deleteBtn.removeAttribute('disabled');
+        deleteBtn.classList.remove('disabled');
+    }
+}
