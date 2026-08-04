@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.RoleDetail;
@@ -41,6 +43,26 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public List<Screen> findAllScreens() {
 		return screenRepository.findByJichitaiCdOrderByScreenId(jichitaiContext.getJichitaiCd());
+	}
+
+	@Override
+	public Map<String, List<Screen>> findScreensGroupedByKbn() {
+		Map<String, List<Screen>> grouped = new LinkedHashMap<>();
+
+		// 表示順を固定するため、先に区分の入れ物を用意する
+		for (String kbnName : ScreenManagement.getScreenKbnNames()) {
+			grouped.put(kbnName, new ArrayList<>());
+		}
+
+		for (Screen screen : findAllScreens()) {
+			grouped.computeIfAbsent(ScreenManagement.getScreenKbnName(screen.getScreenId()),
+					key -> new ArrayList<>()).add(screen);
+		}
+
+		// 画面が1件も無い区分は見出しごと表示しない
+		grouped.values().removeIf(List::isEmpty);
+
+		return grouped;
 	}
 
 	@Override

@@ -155,18 +155,25 @@
 											</tr>
 										</thead>
 										<tbody id="screenPermissions">
-											<tr th:each="screen : ${screens}">
-												<td th:text="${screen.screenName}"></td>
-												<td><input type="radio"
-													th:name="'permission_' + ${screen.screenId}" value="0"
-													checked></td>
-												<td><input type="radio"
-													th:name="'permission_' + ${screen.screenId}" value="1">
-												</td>
-												<td><input type="radio"
-													th:name="'permission_' + ${screen.screenId}" value="2">
-												</td>
-											</tr>
+											<!-- 画面区分単位でグループ化して表示する -->
+											<th:block th:each="group : ${screenGroups}">
+												<tr class="table-secondary">
+													<td colspan="4" class="fw-bold small"
+														th:text="${group.key}"></td>
+												</tr>
+												<tr th:each="screen : ${group.value}">
+													<td th:text="${screen.screenName}"></td>
+													<td><input type="radio"
+														th:name="'permission_' + ${screen.screenId}" value="0"
+														checked></td>
+													<td><input type="radio"
+														th:name="'permission_' + ${screen.screenId}" value="1">
+													</td>
+													<td><input type="radio"
+														th:name="'permission_' + ${screen.screenId}" value="2">
+													</td>
+												</tr>
+											</th:block>
 										</tbody>
 									</table>
 								</div>

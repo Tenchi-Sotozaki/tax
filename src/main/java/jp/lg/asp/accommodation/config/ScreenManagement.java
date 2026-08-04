@@ -12,6 +12,40 @@ public final class ScreenManagement {
 	private ScreenManagement() {
 	}
 
+	/** 画面区分が判別できない場合の表示名 */
+	public static final String SCREEN_KBN_OTHER = "その他";
+
+	/**
+	 * 画面区分（screen_idの先頭2文字）と表示名の対応
+	 *
+	 * 1文字目が大分類（m=メイン / s=システム管理）、2文字目が中分類を表す
+	 * 定義した並び順がそのまま画面上の表示順になる
+	 */
+	private static final java.util.Map<String, String> SCREEN_KBN_NAMES;
+	static {
+		java.util.Map<String, String> kbnNames = new java.util.LinkedHashMap<>();
+		kbnNames.put("ms", "メイン／照会");
+		kbnNames.put("mi", "メイン／登録");
+		kbnNames.put("mt", "メイン／取り込み");
+		kbnNames.put("mo", "メイン／csv出力");
+		kbnNames.put("ss", "システム管理／照会");
+		kbnNames.put("sc", "システム管理／設定");
+		SCREEN_KBN_NAMES = java.util.Collections.unmodifiableMap(kbnNames);
+	}
+
+	/** 画面IDから画面区分の表示名を取得する */
+	public static String getScreenKbnName(String screenId) {
+		if (screenId == null || screenId.length() < 2) {
+			return SCREEN_KBN_OTHER;
+		}
+		return SCREEN_KBN_NAMES.getOrDefault(screenId.substring(0, 2), SCREEN_KBN_OTHER);
+	}
+
+	/** 画面区分の表示名を表示順で取得する */
+	public static java.util.List<String> getScreenKbnNames() {
+		return new java.util.ArrayList<>(SCREEN_KBN_NAMES.values());
+	}
+
 	// 特別徴収義務者管理台帳
 	public static final String TOKUGIMU_DAICHO = "ms00000001";
 
