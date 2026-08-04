@@ -25,55 +25,28 @@
 						onsubmit="return validateForm()">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						<!-- 特別徴収義務者情報エリア -->
-						<div class="card mb-4">
-							<div class="card-header">
-								<h5 class="mb-0">特別徴収義務者情報</h5>
-							</div>
-							<div class="card-body">
-								<div class="row g-3">
-									<div class="col-md-4">
-										<label class="form-label">指定番号</label> <input type="text" class="form-control"
-											th:field="*{shiteiNo}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">施設名称</label> <input type="text" class="form-control"
-											th:field="*{shisetsuName}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">特別徴収義務者名</label> <input type="text"
-											class="form-control" th:field="*{tokuName}" readonly>
-									</div>
-								</div>
-								<div class="row g-3 mt-2">
-									<div class="col-md-6">
-										<label class="form-label">特別徴収義務者住所</label> <input type="text"
-											class="form-control" th:field="*{tokuJusho}" readonly>
-									</div>
-									<div class="col-md-6">
-										<label class="form-label">施設住所</label> <input type="text" class="form-control"
-											th:field="*{shisetsuJusho}" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
-
+						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+						
+						<!-- エラーメッセージ -->
+						<div th:replace="~{layout/components :: reportErrorAlert}"></div>
+						
 						<!-- 通知書情報エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">通知書情報</h5>
+								<h5 class="mb-0">内容</h5>
 							</div>
 							<div class="card-body">
 								<div class="row g-3">
 									<div class="col-md-4">
-										<label for="hakkoYmd" class="form-label">発行日 <span
+										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label> <input type="date"
 											class="form-control" id="hakkoYmd" name="hakkoYmd"
 											th:value="${dto.hakkoYmd != null ? dto.hakkoYmd.toString() : ''}" required>
 									</div>
 									<div class="col-md-4">
-										<label for="nintei" class="form-label">認定区分 <span
+										<label for="nintei" class="form-label">区分 <span
 												class="text-danger">*</span></label>
-										<select class="form-select" id="nintei" th:field="*{nintei}">
+										<select class="form-select" id="nintei" th:field="*{nintei}" onchange="toggleBikoState()">
 											<option value="認定">認定</option>
 											<option value="不認定">不認定</option>
 										</select>
@@ -83,7 +56,8 @@
 									<div class="col-12">
 										<label for="biko" class="form-label">不認定の理由</label>
 										<textarea class="form-control" id="biko" th:field="*{biko}" rows="3"
-											placeholder="不認定の場合、理由を入力してください"></textarea>
+											placeholder="不認定の場合、理由を入力してください"
+											th:disabled="${dto.nintei == '認定'}"></textarea>
 									</div>
 								</div>
 							</div>
@@ -107,6 +81,9 @@
 								th:formaction="@{/reports/nozeiKanrininNintei/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
 						</div>
 					</form>
 				</div>
