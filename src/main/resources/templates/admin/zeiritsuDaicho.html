@@ -10,7 +10,7 @@
 
 		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-sliders text-primary me-2"></i>賦課方式照会
+				<i class="bi bi-sliders text-primary me-2"></i>賦課方式設定
 			</h5>
 			<span class="text-muted small">検索結果: <strong th:text="${#lists.size(items)}">0</strong> 件</span>
 		</div>
@@ -20,35 +20,27 @@
 			<button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- 抽出条件 -->
+		<!-- 検索条件 -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button"
 						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2 text-primary"></i>抽出条件
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
-				<div id="searchPanel" class="accordion-collapse collapse show">
+				<div id="searchPanel" th:classappend="${param.tekiyoYmFrom != null or param.tekiyoYmTo != null or param.taishoKbn != null or param.fukaKbn != null} ? '' : 'show'" class="accordion-collapse collapse">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/admin/zeiritsu/list}" th:object="${searchForm}" method="get">
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
 
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">適用時期（FROM）</label>
+									<label class="form-label form-label-sm fw-medium mb-1">適用開始年月</label>
 									<input type="month" class="form-control form-control-sm" th:field="*{tekiyoYmFrom}">
 								</div>
 								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">適用時期（TO）</label>
+									<label class="form-label form-label-sm fw-medium mb-1">適用終了年月</label>
 									<input type="month" class="form-control form-control-sm" th:field="*{tekiyoYmTo}">
-								</div>
-								<div class="col">
-									<label class="form-label form-label-sm fw-medium mb-1">賦課方式</label>
-									<select class="form-select form-select-sm" th:field="*{fukaKbn}">
-										<option value="">すべて</option>
-										<option th:value="${fukaTeigaku.value}" th:text="${fukaTeigaku.name}"></option>
-										<option th:value="${fukaTeiritsu.value}" th:text="${fukaTeiritsu.name}"></option>
-									</select>
 								</div>
 								<div class="col">
 									<label class="form-label form-label-sm fw-medium mb-1">対象区分</label>
@@ -58,11 +50,19 @@
 										<option th:value="${taishoKen.value}" th:text="${taishoKen.name}"></option>
 									</select>
 								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">賦課方式</label>
+									<select class="form-select form-select-sm" th:field="*{fukaKbn}">
+										<option value="">すべて</option>
+										<option th:value="${fukaTeigaku.value}" th:text="${fukaTeigaku.name}"></option>
+										<option th:value="${fukaTeiritsu.value}" th:text="${fukaTeiritsu.name}"></option>
+									</select>
+								</div>
 
 							</div>
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/admin/zeiritsu/list}" class="btn btn-outline-secondary btn-sm">
-									<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
+									<i class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 								</a>
 								<button type="submit" class="btn btn-primary btn-sm px-4">
 									<i class="bi bi-search me-1"></i>検索する
@@ -78,9 +78,9 @@
 		<div class="card shadow-sm mb-2">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex gap-2">
-					<button type="button" id="btnView" class="btn btn-outline-primary btn-sm" th:data-view-base="@{/admin/zeiritsu/view/}">
-						<i class="bi bi-eye me-1"></i>照会
-					</button>
+					<a th:href="@{/admin/zeiritsu/register}" class="btn btn-success btn-sm">
+						<i class="bi bi-plus-lg me-1"></i>新規登録
+					</a>
 				</div>
 			</div>
 		</div>
@@ -92,19 +92,15 @@
 					<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
 						<thead class="table-primary">
 							<tr>
-								<th style="width:40px" class="text-center"></th>
 								<th>賦課方式</th>
 								<th>適用開始</th>
 								<th>適用終了</th>
 								<th>対象区分</th>
+								<th style="width:70px" class="text-center"></th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:each="item : ${items}" th:data-seq="${item.seq}">
-								<td class="text-center">
-									<input type="radio" class="form-check-input row-select" name="selectedRow"
-										th:value="${item.seq.toBigInteger()}">
-								</td>
+							<tr th:each="item : ${items}" th:data-seq="${item.seq}" th:classappend="${item.taishoKbn == '2'} ? 'table-secondary'">
 								<td>
 									<span class="badge"
 										th:classappend="${item.fukaKbn == '1'} ? 'bg-primary' : 'bg-success'"
@@ -113,6 +109,9 @@
 								<td th:text="${#strings.substring(item.tekiyoStYm,0,4) + '/' + #strings.substring(item.tekiyoStYm,4,6)}"></td>
 								<td th:text="${item.tekiyoEdYm == null or item.tekiyoEdYm == ''} ? '-' : ${#strings.substring(item.tekiyoEdYm,0,4) + '/' + #strings.substring(item.tekiyoEdYm,4,6)}"></td>
 								<td th:text="${item.taishoKbnName}"></td>
+								<td class="text-center">
+									<a class="btn btn-outline-primary btn-sm" th:href="@{/admin/zeiritsu/view/} + ${item.seq.toBigInteger()}"><i class="bi bi-eye me-1"></i>照会</a>
+								</td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(items)}">
 								<td colspan="5" class="text-center text-muted py-5">
