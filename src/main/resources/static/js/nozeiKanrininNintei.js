@@ -5,7 +5,7 @@ function validateForm() {
 	
     const hakkoYmd = document.getElementById('hakkoYmd');
     if (!hakkoYmd || !hakkoYmd.value.trim()) {
-        window.ReportError.show('発行日を入力してください。');
+        window.ReportError.show('発行年月日を入力してください。');
         if (hakkoYmd) hakkoYmd.focus();
         return false;
     }
