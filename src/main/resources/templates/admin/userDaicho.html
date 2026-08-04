@@ -135,71 +135,21 @@
 		</div>
 
 		<!-- 操作ボタン＆ページネーション＆表示件数選択プルダウン -->
-		<div class="d-flex justify-content-center align-items-center mb-1 position-relative">
-
-			<!-- 操作ボタン -->
-			<div class="position-absolute start-0">
-				<a th:href="@{/admin/user-registration}" class="btn btn-success btn-sm">
-					<i class="bi bi-person-plus me-1"></i>ユーザー登録
-				</a>
-			</div>
-
-			<!-- ページネーション -->
-			<nav th:if="${items.totalPages > 0}">
-				<ul class="pagination pagination-sm justify-content-center mb-0">
-					<!-- 前へ -->
-					<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-						<a class="page-link" th:href="@{/admin/user-search(page=${items.number - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">前へ</a>
-					</li>
-					<!-- 省略なし（6ページ以下） -->
-					<th:block th:if="${items.totalPages <= 6}">
-						<li class="page-item" th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}" th:classappend="${i == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${i + 1}">1</a>
-						</li>
-					</th:block>
-					<!-- 省略あり（7ページ以上） -->
-					<th:block th:if="${items.totalPages > 6}">
-						<!-- 先頭ページ -->
-						<li class="page-item" th:classappend="${0 == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=0, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">1</a>
-						</li>
-						<!-- 先頭省略 -->
-						<li class="page-item disabled" th:if="${items.number > 3}">
-							<span class="page-link">...</span>
-						</li>
-						<!-- 中間ページ（先頭・末尾を除く） -->
-						<th:block th:each="i : ${#numbers.sequence(1, items.totalPages - 2)}">
-							<li class="page-item" th:if="${i >= items.number - 1 and i <= items.number + 1}" th:classappend="${i == items.number} ? 'active'">
-								<a class="page-link" th:href="@{/admin/user-search(page=${i}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${i + 1}">2</a>
-							</li>
-						</th:block>
-						<!-- 末尾省略 -->
-						<li class="page-item disabled" th:if="${items.number < items.totalPages - 4}">
-							<span class="page-link">...</span>
-						</li>
-						<!-- 末尾ページ -->
-						<li class="page-item" th:classappend="${items.totalPages - 1 == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/admin/user-search(page=${items.totalPages - 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}" th:text="${items.totalPages}">N</a>
-						</li>
-					</th:block>
-					<!-- 次へ -->
-					<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-						<a class="page-link" th:href="@{/admin/user-search(page=${items.number + 1}, pageSize=${userSearchForm.pageSize}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}">次へ</a>
-					</li>
-				</ul>
+		<div class="d-flex justify-content-between align-items-center mb-1 position-relative">
+			<a th:href="@{/admin/user-registration}" class="btn btn-success btn-sm">
+				<i class="bi bi-person-plus me-1"></i>ユーザー登録
+			</a>
+			<nav class="position-absolute start-50 translate-middle-x">
+				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
 			</nav>
-
-			<!-- 表示件数選択プルダウン -->
-			<div class="d-flex align-items-center position-absolute end-0">
-				<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-				<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-					<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-						th:value="@{/admin/user-search(page=0, pageSize=${s}, id=${userSearchForm.id}, name=${userSearchForm.name}, nameMatchType=${userSearchForm.nameMatchType}, nameKana=${userSearchForm.nameKana}, nameKanaMatchType=${userSearchForm.nameKanaMatchType}, busho=${userSearchForm.busho}, bushoMatchType=${userSearchForm.bushoMatchType}, roleId=${userSearchForm.roleId})}"
-						th:text="${s}" th:selected="${s == userSearchForm.pageSize}">
-					</option>
+			<div class="d-flex align-items-center gap-2">
+				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
+				<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+					<option value="10" th:selected="${userSearchForm.pageSize == 10}">10件</option>
+					<option value="50" th:selected="${userSearchForm.pageSize == 50}">50件</option>
+					<option value="100" th:selected="${userSearchForm.pageSize == 100}">100件</option>
 				</select>
 			</div>
-
 		</div>
 
 		<!-- 一覧テーブル -->
@@ -242,5 +192,18 @@
 		</div>
 
 	</div>
+	<th:block layout:fragment="scripts">
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				const rows = Array.from(document.querySelectorAll('tbody tr')).filter(tr => tr.querySelector('td'));
+				const pageSizeSelect = document.getElementById('pageSizeSelect');
+				const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
+				if (rows.length > 0) {
+					pager.render(1);
+					pageSizeSelect?.addEventListener('change', () => pager.render(1));
+				}
+			});
+		</script>
+	</th:block>
 </body>
 </html>

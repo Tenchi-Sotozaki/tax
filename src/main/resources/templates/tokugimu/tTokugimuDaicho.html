@@ -207,56 +207,16 @@
 		<th:block th:if="${isSearched}">
 
 			<!-- ページネーション（中央固定）＆表示件数 -->
-			<div class="d-flex justify-content-center align-items-center mb-1 position-relative"
-				th:with="curr=${items.number}, total=${items.totalPages}, start=${startPage}, end=${endPage}">
-
-				<nav th:if="${total > 0}">
-					<ul class="pagination pagination-sm justify-content-center mb-0">
-						<!-- 前へ -->
-						<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${curr - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
-						</li>
-
-						<!-- 先頭ページ（中間に含まれない場合のみ） -->
-						<li class="page-item" th:if="${start > 0}">
-							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=0, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">1</a>
-						</li>
-						<li class="page-item disabled" th:if="${start > 1}"><span class="page-link">...</span></li>
-
-						<!-- 選択中ページを中央に固定するため、前後1ページを表示 -->
-						<li class="page-item" th:each="i : ${#numbers.sequence(start, end)}"
-							th:classappend="${i == curr} ? 'active'">
-							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-								th:text="${i + 1}">1</a>
-						</li>
-
-						<!-- 最終ページ（中間に含まれない場合のみ） -->
-						<li class="page-item disabled" th:if="${end < total - 2}"><span class="page-link">...</span></li>
-						<li class="page-item" th:if="${end < total - 1}">
-							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${total - 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-								th:text="${total}">N</a>
-						</li>
-
-						<!-- 次へ -->
-						<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-							<a class="page-link"
-								th:href="@{/tokugimu/list(searched=true, page=${curr + 1}, pageSize=${searchForm.pageSize}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
-						</li>
-					</ul>
+			<div class="d-flex justify-content-center align-items-center mb-1 position-relative">
+				<nav>
+					<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
 				</nav>
-
-				<!-- 表示件数 -->
 				<div class="d-flex align-items-center position-absolute end-0">
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-					<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-						<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-							th:value="@{/tokugimu/list(searched=true, page=0, pageSize=${s}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, shisetsuName=${searchForm.shisetsuName}, shisetsuNameMatchType=${searchForm.shisetsuNameMatchType}, kyokaShu=${searchForm.kyokaShu}, gasanTaisho=${searchForm.gasanTaisho}, status=${searchForm.status}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-							th:text="${s}" th:selected="${s == searchForm.pageSize}">
-						</option>
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
 					</select>
 				</div>
 			</div>

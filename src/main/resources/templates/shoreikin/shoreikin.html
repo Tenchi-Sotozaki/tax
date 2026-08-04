@@ -150,74 +150,18 @@
 
 			<!-- 表示件数・ページネーション行 -->
 			<div th:if="${items != null}" class="d-flex align-items-center mb-1">
-				<!-- 左: スペーサー（右の表示件数と対称） -->
 				<div style="min-width: 120px;"></div>
-				<!-- 中央: ページネーション -->
 				<div class="flex-grow-1 d-flex justify-content-center">
 					<nav>
-						<ul class="pagination pagination-sm justify-content-center mb-0">
-							<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-								<a class="page-link"
-									th:href="@{/shoreikin/list(searched=true, page=${items.number - 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, gassanShiteiNo=${searchForm.gassanShiteiNo})}">前へ</a>
-							</li>
-							<!-- 省略なし（6ページ以下） -->
-							<th:block th:if="${items.totalPages <= 6}">
-								<li class="page-item active" th:if="${items.totalPages == 0}">
-									<a class="page-link" href="#">1</a>
-								</li>
-								<li class="page-item" th:if="${items.totalPages > 0}"
-									th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
-									th:classappend="${i == items.number} ? 'active'">
-									<a class="page-link"
-										th:href="@{/shoreikin/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, gassanShiteiNo=${searchForm.gassanShiteiNo})}"
-										th:text="${i + 1}">1</a>
-								</li>
-							</th:block>
-							<!-- 省略あり（7ページ以上） -->
-							<th:block th:if="${items.totalPages > 6}">
-								<!-- 先頭ページ -->
-								<li class="page-item" th:classappend="${0 == items.number} ? 'active'">
-									<a class="page-link"
-										th:href="@{/shoreikin/list(searched=true, page=0, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, gassanShiteiNo=${searchForm.gassanShiteiNo})}">1</a>
-								</li>
-								<!-- 先頭省略 -->
-								<li class="page-item disabled" th:if="${items.number > 3}">
-									<span class="page-link">...</span>
-								</li>
-								<!-- 中間ページ（先頭・末尾を除く） -->
-								<th:block th:each="i : ${#numbers.sequence(1, items.totalPages - 2)}">
-									<li class="page-item" th:if="${i >= items.number - 1 and i <= items.number + 1}" th:classappend="${i == items.number} ? 'active'">
-										<a class="page-link"
-											th:href="@{/shoreikin/list(searched=true, page=${i}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, gassanShiteiNo=${searchForm.gassanShiteiNo})}"
-											th:text="${i + 1}">2</a>
-									</li>
-								</th:block>
-								<!-- 末尾省略 -->
-								<li class="page-item disabled" th:if="${items.number < items.totalPages - 4}">
-									<span class="page-link">...</span>
-								</li>
-								<!-- 末尾ページ -->
-								<li class="page-item" th:classappend="${items.totalPages - 1 == items.number} ? 'active'">
-									<a class="page-link"
-										th:href="@{/shoreikin/list(searched=true, page=${items.totalPages - 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, gassanShiteiNo=${searchForm.gassanShiteiNo})}"
-										th:text="${items.totalPages}">最後</a>
-								</li>
-							</th:block>
-							<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-								<a class="page-link"
-									th:href="@{/shoreikin/list(searched=true, page=${items.number + 1}, pageSize=${searchForm.pageSize}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, gassanShiteiNo=${searchForm.gassanShiteiNo})}">次へ</a>
-							</li>
-						</ul>
+						<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
 					</nav>
 				</div>
-				<!-- 右: 表示件数 -->
 				<div class="d-flex align-items-center" style="min-width: 120px; justify-content: flex-end;">
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-					<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-						<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-							th:value="@{/shoreikin/list(searched=true, page=0, pageSize=${s}, nendo=${searchForm.nendo}, kofuSanshutsuUmu=${searchForm.kofuSanshutsuUmu}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, shisetsuName=${searchForm.shisetsuName}, gassanShiteiNo=${searchForm.gassanShiteiNo})}"
-							th:text="${s}" th:selected="${s == searchForm.pageSize}">
-						</option>
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
 					</select>
 				</div>
 			</div>

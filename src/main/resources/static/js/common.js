@@ -1,4 +1,97 @@
 /**
+ * クライアントサイドページネーション共通部品
+ *
+ * 使い方:
+ *   const pager = new Pagination(rows, pageSizeSelect, paginationUl, { half: 2 });
+ *   pager.render(1);
+ *   pageSizeSelect?.addEventListener('change', () => pager.render(1));
+ */
+class Pagination {
+    #rows;
+    #pageSizeSelect;
+    #pagination;
+    #half;
+    #currentPage = 1;
+
+    constructor(rows, pageSizeSelect, pagination, { half = 2 } = {}) {
+        this.#rows = rows;
+        this.#pageSizeSelect = pageSizeSelect;
+        this.#pagination = pagination;
+        this.#half = half;
+    }
+
+    render(page) {
+        const size = parseInt(this.#pageSizeSelect?.value ?? '10', 10);
+        const totalPages = Math.max(1, Math.ceil(this.#rows.length / size));
+        this.#currentPage = Math.min(page, totalPages);
+        const start = (this.#currentPage - 1) * size;
+        const end = start + size;
+        this.#rows.forEach((row, i) => {
+            row.style.display = (i >= start && i < end) ? '' : 'none';
+        });
+        this.#renderPagination(totalPages);
+    }
+
+    #renderPagination(totalPages) {
+        if (!this.#pagination) return;
+        this.#pagination.innerHTML = '';
+        const cur = this.#currentPage;
+        const half = this.#half;
+
+        const addBtn = (label, page, active) => {
+            const li = document.createElement('li');
+            li.className = 'page-item' + (active ? ' active' : '');
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.textContent = label;
+            a.addEventListener('click', e => { e.preventDefault(); this.render(page); });
+            li.appendChild(a);
+            this.#pagination.appendChild(li);
+        };
+
+        const addDisabled = (label, visible = true) => {
+            const li = document.createElement('li');
+            li.className = 'page-item disabled';
+            if (!visible) li.style.visibility = 'hidden';
+            li.innerHTML = `<span class="page-link">${label}</span>`;
+            this.#pagination.appendChild(li);
+        };
+
+        // 前へ
+        if (cur > 1) addBtn('前へ', cur - 1, false);
+        else addDisabled('前へ');
+
+        const winStart = cur - half;
+        const winEnd   = cur + half;
+        const leftDots  = winStart > 2;
+        const rightDots = winEnd < totalPages - 1;
+
+        if (winStart > 1) addBtn('1', 1, cur === 1);
+        else              addDisabled('1', false);
+
+        if (leftDots) addDisabled('…');
+        else          addDisabled('…', false);
+
+        for (let offset = -half; offset <= half; offset++) {
+            const p = cur + offset;
+            if (p >= 1 && p <= totalPages) addBtn(String(p), p, p === cur);
+            else                           addDisabled('0', false);
+        }
+
+        if (rightDots) addDisabled('…');
+        else           addDisabled('…', false);
+
+        if (totalPages > 1 && winEnd < totalPages) addBtn(String(totalPages), totalPages, cur === totalPages);
+        else                                       addDisabled(String(totalPages), false);
+
+        // 次へ
+        if (cur < totalPages) addBtn('次へ', cur + 1, false);
+        else addDisabled('次へ');
+    }
+}
+
+/**
  * セッション情報の取得・保存を管理するクラス
  */
 class SessionManager {

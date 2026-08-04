@@ -2,7 +2,6 @@ package jp.lg.asp.accommodation.controller;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -78,7 +77,6 @@ public class ShunoRenkeiController {
 				PageRequest.of(current, size), total);
 
 		model.addAttribute("items", items);
-		model.addAttribute("pageWindow", buildPageWindow(current, items.getTotalPages()));
 		Map<String, Object> searchForm = new HashMap<>();
 		searchForm.put("shinkokuFrom", shinkokuFrom);
 		searchForm.put("shinkokuTo", shinkokuTo);
@@ -194,30 +192,6 @@ public class ShunoRenkeiController {
 			model.addAttribute("rows", java.util.Collections.emptyList());
 		}
 		return "renkei/shunoRenkeiKakunin";
-	}
-
-	private java.util.List<Integer> buildPageWindow(int current, int totalPages) {
-		java.util.List<Integer> pages = new ArrayList<>();
-		if (totalPages <= 0) {
-			return pages;
-		}
-		java.util.TreeSet<Integer> show = new java.util.TreeSet<>();
-		show.add(0);
-		show.add(totalPages - 1);
-		for (int i = current - 1; i <= current + 1; i++) {
-			if (i >= 0 && i < totalPages) {
-				show.add(i);
-			}
-		}
-		int prev = -2;
-		for (int pIdx : show) {
-			if (prev != -2 && pIdx - prev > 1) {
-				pages.add(-1);
-			}
-			pages.add(pIdx);
-			prev = pIdx;
-		}
-		return pages;
 	}
 
 	private String formatTaishoYm(String taishoYm) {
