@@ -166,8 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (monthlyTallyModal) {
-        // 「入力内容を決定」で閉じる場合は確認ダイアログを出さないための判定用
-        let closingByApply = false;
         // 照会時は「入力内容を決定」ボタンが存在しない
         const isViewMode = !document.getElementById('btnApplyTally');
         // モーダルを開いた時点の入力値。変更有無の判定と破棄時の復元に使う
@@ -203,7 +201,11 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (fukaKbn === '2') calculateTeiritsu();
 
             // 変更マーク（黄色の枠）も開いた時点の状態に戻す
-            openedSnapshot.forEach((value, input) => checkValue(input));
+            // 自動計算欄は利用者が編集した箇所ではないため対象外とする
+            openedSnapshot.forEach((value, input) => {
+                if (input.readOnly || input.disabled) return;
+                checkValue(input);
+            });
         };
 
         monthlyTallyModal.addEventListener('shown.bs.modal', function() {
@@ -220,16 +222,15 @@ document.addEventListener('DOMContentLoaded', function() {
             firstInput?.focus();
         });
 
+        // 「入力内容を決定」を押した時点で入力内容を確定させる
+        // これ以降は「変更なし」となるため、閉じる際に確認ダイアログは出ない
         document.getElementById('btnApplyTally')?.addEventListener('click', function() {
-            closingByApply = true;
+            openedSnapshot = takeSnapshot();
         });
 
         // 閉じる操作（×ボタン・閉じるボタン）は、入力内容に変更がある場合のみ確認する
         monthlyTallyModal.addEventListener('hide.bs.modal', function(e) {
-            if (isViewMode || closingByApply) {
-                closingByApply = false;
-                return;
-            }
+            if (isViewMode) return;
             if (!isTallyChanged()) return;
 
             if (confirm('入力内容は破棄されます。よろしいですか？')) {
