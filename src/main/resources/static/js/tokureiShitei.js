@@ -14,12 +14,12 @@ function validateForm() {
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
 
     if (!hakkoYmd) {
-        window.ReportError.show('発行日を入力してください。')
+        window.ReportError.show('発行年月日を入力してください。')
 		return false;
     }
 
     if (!tekiyoYmd) {
-        window.ReportError.show('適用年月日を入力してください。');
+        window.ReportError.show('適用年月を入力してください。');
         return false;
     }
 
