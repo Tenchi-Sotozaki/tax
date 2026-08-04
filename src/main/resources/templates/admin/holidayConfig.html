@@ -21,8 +21,7 @@
 				<div class="d-flex align-items-center gap-2">
 					<select class="form-select form-select-sm" id="nenSelect"
 						onchange="changeNen(this)"
-						th:data-base-url="@{/admin/holiday/view/}"
-						th:data-mode="${mode}"
+						th:data-base-url="@{/admin/holiday/view/}" th:data-mode="${mode}"
 						th:disabled="${mode == 'edit'}">
 					</select>
 					<div th:if="${mode == 'view'}">
@@ -65,7 +64,8 @@
 					</div>
 				</div>
 				<div class="card-body bg-light-subtle">
-					<div id="calendarGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;"></div>
+					<div id="calendarGrid"
+						style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;"></div>
 					<div class="mt-2 small text-muted">
 						<span class="badge bg-danger me-1">&nbsp;</span>日曜 <span
 							class="badge bg-primary ms-2 me-1">&nbsp;</span>土曜 <span
@@ -112,15 +112,17 @@
 					class="btn btn-success btn-lg px-5" th:if="${mode == 'edit'}">
 					<i class="bi bi-check-circle me-2"></i>更新
 				</button>
-
-				<a th:href="@{/admin/nokigen/list}"
-					class="btn btn-outline-secondary btn-lg px-4"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
+				<button type="button" class="btn btn-outline-secondary btn-lg px-4"
+					th:if="${mode == 'edit'}"
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal">
+					<i class="bi bi-arrow-left me-2"></i>戻る
+				</button>
 
 			</div>
 
 		</form>
+
+		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/holiday/view/{nen}(nen=${form.nendo})}, '戻る')}"></div>
 
 	</div>
 
