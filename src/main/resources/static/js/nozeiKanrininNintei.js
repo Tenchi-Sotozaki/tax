@@ -1,7 +1,11 @@
 function validateForm() {
+	
+	// エラーメッセージを隠す
+	window.ReportError.hide();
+	
     const hakkoYmd = document.getElementById('hakkoYmd');
     if (!hakkoYmd || !hakkoYmd.value.trim()) {
-        alert('発行日を入力してください。');
+        window.ReportError.show('発行日を入力してください。');
         if (hakkoYmd) hakkoYmd.focus();
         return false;
     }
