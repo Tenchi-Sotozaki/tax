@@ -26,8 +26,8 @@ public class SecurityConfig {
 						.requestMatchers("/css/**", "/js/**", "/fonts/**", "/images/**",
 								"/login", "/error", "/*.html")
 						.permitAll()
-						// 初回パスワード設定画面はログイン済みユーザーのみアクセス可
-						.requestMatchers("/admin/password-change").authenticated()
+						// 初回パスワード設定・パスワード変更画面はログイン済みユーザーのみアクセス可
+						.requestMatchers("/admin/password-change", "/admin/user-password-change").authenticated()
 						// /admin/** は ADMIN のみ
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						// 業務画面は USER・ADMIN 両方アクセス可

@@ -3,41 +3,8 @@
  */
 
 // PDF生成
-function generatePdf() {
-    if (!validateForm()) {
-        return;
-    }
-    
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/kanpuMenjoTsuchi/generatePdf';
-    form.target = '_blank';
-    form.submit();
-}
-
 // プレビュー
-function preview() {
-    if (!validateForm()) {
-        return;
-    }
-    
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/kanpuMenjoTsuchi/preview';
-    form.target = '_blank';
-    form.submit();
-}
-
 // 印刷
-function print() {
-    if (!validateForm()) {
-        return;
-    }
-    
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/kanpuMenjoTsuchi/print';
-    form.target = '_blank';
-    form.submit();
-}
-
 // フォームバリデーション
 function validateForm() {
     const requiredFields = [

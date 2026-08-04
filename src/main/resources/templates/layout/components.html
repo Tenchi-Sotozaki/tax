@@ -192,6 +192,18 @@
 	</div>
 
 	<!--
+  帳票発行エラー表示 フラグメント
+  帳票の作成に失敗した場合にJavaScriptからメッセージを差し込む領域
+  使用例:
+    <div th:replace="~{layout/components :: reportErrorAlert}"></div>
+-->
+	<div th:fragment="reportErrorAlert" id="reportError"
+		class="alert alert-danger d-none" role="alert">
+		<i class="bi bi-exclamation-triangle-fill me-2"></i><span
+			id="reportErrorText"></span>
+	</div>
+
+	<!--
   特別徴収義務者指定モーダル フラグメント
   使用例:
     <div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>

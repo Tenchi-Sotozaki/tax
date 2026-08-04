@@ -3,45 +3,6 @@
  */
 
 /**
- * PDF生成
- */
-function generatePdf() {
-    if (!validateForm()) {
-        return false;
-    }
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/reports/nozeiKanrininShoninTsuchi/pdf';
-    form.target = '_blank';
-    form.submit();
-}
-
-/**
- * プレビュー
- */
-function preview() {
-    if (!validateForm()) {
-        return false;
-    }
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/reports/nozeiKanrininShoninTsuchi/preview';
-    form.target = '_blank';
-    form.submit();
-}
-
-/**
- * 印刷
- */
-function print() {
-    if (!validateForm()) {
-        return false;
-    }
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/reports/nozeiKanrininShoninTsuchi/print';
-    form.target = '_blank';
-    form.submit();
-}
-
-/**
  * フォームバリデーション
  */
 function validateForm() {

@@ -141,10 +141,10 @@
 				</button>
 				<span class="text-muted small d-none d-md-inline">宿泊税LGWAN-ASPシステム</span>
 				<div class="d-flex align-items-center gap-3">
-					<span class="text-muted small"> <i
-						class="bi bi-person-circle me-1"></i> <span
-						th:text="${loginUserName}">ユーザー</span>
-					</span>
+					<a th:href="@{/admin/user-password-change(from=${currentUri})}" class="text-muted small text-decoration-none">
+						<i class="bi bi-person-circle me-1"></i>
+						<span th:text="${loginUserName}">ユーザー</span>
+					</a>
 					<form th:action="@{/logout}" method="post" class="mb-0">
 						<!-- CSRFトークン（CSRF保護が有効な場合のみ） -->
 						<input type="hidden" th:if="${_csrf}"
@@ -159,6 +159,10 @@
 
 			<!-- ========== メインコンテンツ ========== -->
 			<main class="flex-grow-1 overflow-auto bg-light">
+				<div th:if="${flashSuccessMessage}" class="alert alert-success alert-dismissible fade show mx-4 mt-3 mb-0" role="alert">
+					<i class="bi bi-check-circle-fill me-2"></i><span th:text="${flashSuccessMessage}"></span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+				</div>
 				<div layout:fragment="content"></div>
 			</main>
 			<!-- ========== /メインコンテンツ ========== -->

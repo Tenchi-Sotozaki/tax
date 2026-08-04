@@ -27,7 +27,7 @@ public class InitialPasswordController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JichitaiContext jichitaiContext; 
+    private final JichitaiContext jichitaiContext;
 
     private static final String FORM_VIEW = "auth/initialPassword";
 
@@ -60,7 +60,7 @@ public class InitialPasswordController {
             return FORM_VIEW;
         }
 
-        String jichitaiCd = jichitaiContext.getJichitaiCd(); // ★変更: セッションから取得（invalidateする前に取得しておく）
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
 
         UserId pk = new UserId();
         pk.setJichitaiCd(jichitaiCd);
@@ -68,7 +68,6 @@ public class InitialPasswordController {
         User user = userRepository.findById(pk)
                 .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
 
-        // 初期パスワード状態でなければ受け付けない（設定済みパスワードの上書き防止）
         if (!"1".equals(user.getInitialPasswordFlg())) {
             model.addAttribute("error", "パスワードは設定済みです。");
             return FORM_VIEW;
@@ -78,10 +77,8 @@ public class InitialPasswordController {
         user.setInitialPasswordFlg("0");
         userRepository.save(user);
 
-
         log.info("初回パスワード変更が完了しました: userId={}, jichitaiCd={}", ADMIN_ID, jichitaiCd);
 
-        // セッションを破棄すると自治体コードも消えるため、新しいセッションに引き継ぐ
         request.getSession().invalidate();
         request.getSession(true).setAttribute("jichitaiCd", jichitaiCd);
         redirectAttributes.addFlashAttribute("successMessage", "パスワードを設定しました。設定したパスワードでログインしてください。");

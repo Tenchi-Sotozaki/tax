@@ -127,6 +127,8 @@ async function submitReport(type) {
         return;
     }
     
+    clearErrorMessage();
+
     const formData = await collectFormData();
     const csrfToken = document.querySelector('input[name="_csrf"]').value;
     const endpoint = `/accommodation-tax/nonyusho/${type}`;
@@ -142,7 +144,7 @@ async function submitReport(type) {
         });
 
         if (!response.ok) {
-            throw new Error('対象データが見つかりませんでした');
+            throw new Error(await readErrorMessage(response));
         }
 
         const blob = await response.blob();
@@ -162,8 +164,31 @@ async function submitReport(type) {
         }
     } catch (error) {
         console.error(`${type} エラー:`, error);
-        alert('対象データが見つかりませんでした、または処理に失敗しました。');
+        showErrorMessage(error.message || '帳票の作成に失敗しました。');
     }
+}
+
+/**
+ * エラーレスポンスから表示用のメッセージを取り出す
+ */
+async function readErrorMessage(response) {
+    const statusMessages = {
+        400: '入力内容に誤りがあります。入力内容をご確認のうえ、再度実行してください。',
+        403: 'この操作を行う権限がありません。',
+        404: '対象のデータが見つかりませんでした。',
+        500: '帳票の作成中にエラーが発生しました。時間をおいて再度お試しください。'
+    };
+    let body = '';
+    try {
+        body = (await response.text()).trim();
+    } catch (e) {
+        body = '';
+    }
+    // サーバーが返した短いテキストはそのまま表示する（HTMLの場合は既定文言）
+    if (body && body.length <= 200 && body.charAt(0) !== '<') {
+        return body;
+    }
+    return statusMessages[response.status] || '帳票の作成に失敗しました。';
 }
 
 /**
@@ -175,6 +200,8 @@ async function printReport() {
         return;
     }
     
+    clearErrorMessage();
+
     const formData = await collectFormData();
     const csrfToken = document.querySelector('input[name="_csrf"]').value;
 
@@ -186,11 +213,11 @@ async function printReport() {
         },
         body: JSON.stringify(formData)
     })
-        .then(response => {
+        .then(async response => {
             if (response.ok) {
                 return response.blob();
             }
-            throw new Error('対象データが見つかりませんでした');
+            throw new Error(await readErrorMessage(response));
         })
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
@@ -204,7 +231,7 @@ async function printReport() {
         })
         .catch(error => {
             console.error('印刷エラー:', error);
-            showErrorMessage('error.message');
+            showErrorMessage(error.message || '帳票の作成に失敗しました。');
         });
 }
 
@@ -356,7 +383,21 @@ function validateForm() {
  * エラーメッセージ表示
  */
 function showErrorMessage(message) {
+    // 画面上部のalert-danger領域に表示する（reportForm.jsで定義）
+    if (window.ReportError) {
+        window.ReportError.show(message);
+        return;
+    }
     alert(message);
+}
+
+/**
+ * エラーメッセージを消す
+ */
+function clearErrorMessage() {
+    if (window.ReportError) {
+        window.ReportError.hide();
+    }
 }
 
 /**

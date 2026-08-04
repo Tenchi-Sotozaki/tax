@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
@@ -47,10 +49,13 @@ public class KanpuMenjoTsuchiController {
 
     private final JichitaiContext jichitaiContext;
 
+    private static final String SCREEN_ID = ScreenManagement.KANPU_MENJO_TSUCHI;
+
     /**
      * 徴収不能額の還付又は納入義務の免除決定通知書画面表示
      */
     @GetMapping
+    @OpeLog(screenId = SCREEN_ID, operation = "初期表示")
     public String index(HttpSession session,
                        @AuthenticationPrincipal User userDetails,
                        Model model) {
@@ -118,6 +123,7 @@ public class KanpuMenjoTsuchiController {
      * PDF生成
      */
     @PostMapping("/generatePdf")
+    @OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	@RptLog(rptId = ReportsConstants.KANPU_MENJO_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
     public ResponseEntity<byte[]> generatePdf(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                              @AuthenticationPrincipal User userDetails) {
@@ -148,6 +154,7 @@ public class KanpuMenjoTsuchiController {
      * プレビュー
      */
     @PostMapping("/preview")
+    @OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
 	@RptLog(rptId = ReportsConstants.KANPU_MENJO_TSUCHI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
     public ResponseEntity<byte[]> preview(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                          @AuthenticationPrincipal User userDetails) {
@@ -175,6 +182,7 @@ public class KanpuMenjoTsuchiController {
      * 印刷
      */
     @PostMapping("/print")
+    @OpeLog(screenId = SCREEN_ID, operation = "印刷")
 	@RptLog(rptId = ReportsConstants.KANPU_MENJO_TSUCHI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
     public ResponseEntity<byte[]> print(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                        @AuthenticationPrincipal User userDetails) {

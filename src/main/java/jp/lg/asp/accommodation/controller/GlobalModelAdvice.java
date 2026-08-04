@@ -59,6 +59,15 @@ public class GlobalModelAdvice {
 		return request.getRequestURI();
 	}
 
+	@ModelAttribute("flashSuccessMessage")
+	public String flashSuccessMessage(HttpServletRequest request) {
+		var session = request.getSession(false);
+		if (session == null) return null;
+		String msg = (String) session.getAttribute("flashSuccessMessage");
+		if (msg != null) session.removeAttribute("flashSuccessMessage");
+		return msg;
+	}
+
 	@ModelAttribute("selectedShiteiGassan")
 	public ShiteiGassanSearchDto selectedShiteiGassan(HttpServletRequest request) {
 		return SessionHelper.getShiteiGassan(request);
