@@ -6,7 +6,7 @@
 <head>
 <title
 	th:text="${fukaDeclarationForm.view ? '宿泊税納入情報 照会' : (fukaDeclarationForm.edit ? '宿泊税納入情報 編集' : '宿泊税納入情報 登録')}">宿泊税納入情報</title>
-<link rel="stylesheet" th:href="@{/css/fuka-config.css}">
+
 </head>
 
 <body>
@@ -697,11 +697,8 @@
 						</div>
 						<div class="modal-body"
 							style="max-height: 65vh; overflow-y: auto; padding-bottom: 0;">
-							<!-- 入力の案内文は照会時には表示しない -->
-							<p class="text-muted small"
-								th:if="${!fukaDeclarationForm.view and fukaDeclarationForm.fukaKbn == '1'}">＊各日の宿泊数を入力してください。</p>
-							<p class="text-muted small"
-								th:if="${!fukaDeclarationForm.view and fukaDeclarationForm.fukaKbn == '2'}">＊各日の区分ごとの宿泊数と宿泊料金を入力してください。</p>
+							<p class="text-muted small" th:if="*{fukaKbn == '1'}">＊各日の宿泊数を入力してください。</p>
+							<p class="text-muted small" th:if="*{fukaKbn == '2'}">＊各日の区分ごとの宿泊数と宿泊料金を入力してください。</p>
 							<div class="alert alert-info py-2 mb-3"
 								style="font-size: 0.85rem;">
 								<i class="bi bi-arrow-left-right me-1"></i>
@@ -714,7 +711,6 @@
 								<table
 									class="table table-sm table-bordered align-middle text-center"
 									id="monthlyTallyTableTeigaku" style="min-width: 800px;"
-									th:classappend="'monthly-tally-table'"
 									th:if="*{fukaKbn == '1'}">
 									<thead class="table-light">
 										<tr>
@@ -768,13 +764,13 @@
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input
 												type="text"
 												class="form-control form-control-sm text-end js-comma-format"
-												th:id="|modal-total-count-${stat.index}|" value="0" readonly></td>
+												th:id="|modal-total-count-${stat.index}|" value="0"></td>
 											<td><input type="text"
 												class="form-control form-control-sm text-end js-comma-format"
-												id="modal-total-exempt" value="0" readonly></td>
+												id="modal-total-exempt" value="0"></td>
 											<td><input type="text"
 												class="form-control form-control-sm text-end js-comma-format"
-												id="modal-total-zeigaku" value="0" readonly></td>
+												id="modal-total-zeigaku" value="0"></td>
 										</tr>
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
@@ -794,7 +790,7 @@
 											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"><input
 												type="text"
 												class="form-control form-control-sm text-end js-comma-format"
-												th:id="|modal-tax-amount-${stat.index}|" value="0" readonly></td>
+												th:id="|modal-tax-amount-${stat.index}|" value="0"></td>
 											<td class="bg-light text-center text-muted align-middle"><i
 												class="bi bi-slash-lg"></i></td>
 											<td class="bg-light text-center text-muted align-middle"><i
@@ -806,7 +802,6 @@
 								<table
 									class="table table-sm table-bordered align-middle text-center"
 									id="monthlyTallyTableTeiritsu" style="min-width: 800px;"
-									th:classappend="'monthly-tally-table'"
 									th:if="*{fukaKbn == '2'}">
 									<thead class="table-light">
 										<tr>
@@ -971,10 +966,16 @@
 						<!-- 月計表モーダルのフッター -->
 						<div class="modal-footer">
 
-							<!-- 閉じる（入力時は確認ダイアログを表示する） -->
+							<!-- 入力時の場合「破棄」 -->
 							<button type="button" class="btn btn-outline-primary"
-								data-bs-dismiss="modal">
-								<span>閉じる</span>
+								data-bs-dismiss="modal" th:if="${!fukaDeclarationForm.view}">
+								<span>入力内容を破棄</span>
+							</button>
+
+							<!-- 照会時の場合「閉じる」 -->
+							<button type="button" class="btn btn-outline-primary"
+								data-bs-dismiss="modal" th:if="${fukaDeclarationForm.view}">
+								<span>閉じる</span> 
 							</button>
 
 							<!-- 決定入力時の場合 -->
