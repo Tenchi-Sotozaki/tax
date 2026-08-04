@@ -81,16 +81,18 @@
 			<div class="modal-dialog modal-lg">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title">
-							権限付与ユーザー一覧 - <span id="usersModalRoleName"></span>
-						</h5>
+						<div>
+							<h5 class="modal-title">権限付与ユーザー一覧</h5>
+							<div class="text-muted small mt-1">
+								権限名：<span id="usersModalRoleName"></span>
+							</div>
+						</div>
 						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 					</div>
 					<div class="modal-body">
 						<table class="table table-sm">
 							<thead class="table-light">
 								<tr>
-									<th>付与</th>
 									<th>ユーザー名</th>
 								</tr>
 							</thead>
@@ -100,8 +102,6 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-outline-primary"
 							data-bs-dismiss="modal">閉じる</button>
-						<button type="button" class="btn btn-success" id="updateUsersBtn"
-							onclick="updateAssignedUsers()">更新する</button>
 					</div>
 				</div>
 			</div>
