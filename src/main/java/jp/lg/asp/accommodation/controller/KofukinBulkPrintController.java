@@ -17,13 +17,10 @@ import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiDto;
-import jp.lg.asp.accommodation.dto.KofuShinseiDto;
+import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 import jp.lg.asp.accommodation.dto.KofukinBulkPrintForm;
-import jp.lg.asp.accommodation.service.KofuKetteiTsuchiReportsService;
-import jp.lg.asp.accommodation.service.KofuKetteiTsuchiService;
-import jp.lg.asp.accommodation.service.KofuShinseiReportsService;
-import jp.lg.asp.accommodation.service.KofuShinseiService;
+import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiReportsService;
+import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,10 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class KofukinBulkPrintController {
 
-	private final KofuShinseiService kofuShinseiService;
-	private final KofuShinseiReportsService kofuShinseiReportsService;
-	private final KofuKetteiTsuchiService kofuKetteiTsuchiService;
-	private final KofuKetteiTsuchiReportsService kofuKetteiTsuchiReportsService;
+	private final KofuKetteiTsuchiShinseiService kofuKetteiTsuchiShinseiService;
+	private final KofuKetteiTsuchiShinseiReportsService kofuKetteiTsuchiShinseiReportsService;
 	private final ScreenAccessChecker accessChecker;
 
 	private static final String SCREEN_ID = ScreenManagement.KOFUKIN_BULK_PRINT;
@@ -60,7 +55,7 @@ public class KofukinBulkPrintController {
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "")
 	public ResponseEntity<byte[]> pdf(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, ReportsConstants.SOUSA_PDF, "kofukin_bulk.pdf", false);
+		return generateResponse(form, "kofukin_bulk.pdf", false);
 	}
 
 	@PostMapping("/kofukinBulkPrint/preview")
@@ -68,7 +63,7 @@ public class KofukinBulkPrintController {
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "")
 	public ResponseEntity<byte[]> preview(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, ReportsConstants.SOUSA_PREVIEW, "kofukin_bulk_preview.pdf", false);
+		return generateResponse(form, "kofukin_bulk_preview.pdf", false);
 	}
 
 	@PostMapping("/kofukinBulkPrint/print")
@@ -76,34 +71,25 @@ public class KofukinBulkPrintController {
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "")
 	public ResponseEntity<byte[]> print(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, ReportsConstants.SOUSA_PRINT, "kofukin_bulk_print.pdf", true);
+		return generateResponse(form, "kofukin_bulk_print.pdf", true);
 	}
 
-	private ResponseEntity<byte[]> generateResponse(KofukinBulkPrintForm form, String sousa, String filename,
-			boolean printAction) {
+	private ResponseEntity<byte[]> generateResponse(KofukinBulkPrintForm form, String filename, boolean printAction) {
 		try {
 			if (!form.isKofuShinsei() && !form.isKofuKetteiTsuchi()) {
 				return ResponseEntity.badRequest().build();
 			}
 
-			byte[] pdfData = null;
-
-			if (form.isKofuShinsei()) {
-				KofuShinseiDto dto = kofuShinseiService.getReportData(null, form.getNendo());
-				if (dto != null) {
-					dto.setHakkoYmd(form.getHakkoYmd());
-					pdfData = kofuShinseiReportsService.generateKofuShinseiPdf(dto);
-				}
+			KofuKetteiTsuchiShinseiDto dto = kofuKetteiTsuchiShinseiService.getReportData(null, form.getNendo());
+			if (dto == null) {
+				return ResponseEntity.badRequest().build();
 			}
 
-			if (form.isKofuKetteiTsuchi()) {
-				KofuKetteiTsuchiDto dto = kofuKetteiTsuchiService.getReportData(null);
-				if (dto != null) {
-					dto.setHakkoYmd(formatDate(form.getHakkoYmd()));
-					pdfData = kofuKetteiTsuchiReportsService.generateKofuKetteiTsuchiPdf(dto);
-				}
-			}
+			dto.setHakkoYmd(formatDate(form.getHakkoYmd()));
+			dto.setShinsei(form.isKofuShinsei());
+			dto.setKetteiTsuchi(form.isKofuKetteiTsuchi());
 
+			byte[] pdfData = kofuKetteiTsuchiShinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(dto);
 			if (pdfData == null) {
 				return ResponseEntity.badRequest().build();
 			}
