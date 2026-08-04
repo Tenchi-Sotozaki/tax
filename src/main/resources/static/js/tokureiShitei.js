@@ -8,18 +8,18 @@
 function validateForm() {
 	
 	// 処理開始時に古いエラーをクリアする
-	hideErrorMessage();
+	window.ReportError.hide();
 	
     const hakkoYmd = document.getElementById('hakkoYmd').value;
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
 
     if (!hakkoYmd) {
-        showErrorMessage('発行日を入力してください。')
+        window.ReportError.show('発行日を入力してください。')
 		return false;
     }
 
     if (!tekiyoYmd) {
-        showErrorMessage('適用年月日を入力してください。');
+        window.ReportError.show('適用年月日を入力してください。');
         return false;
     }
 
@@ -53,31 +53,3 @@ document.addEventListener('DOMContentLoaded', function() {
 	// 区分に応じて「不承認の理由」の有効/無効を切り替える
 	toggleBikoState();
 });
-
-/**
- * 画面上部にエラーメッセージを表示する
- */
-function showErrorMessage(message) {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = message;
-        errorAlert.style.display = 'block';
-        errorAlert.classList.add('show');
-    }
-}
-
-/**
- * 画面上部のエラーメッセージを非表示にする
- */
-function hideErrorMessage() {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = '';
-        errorAlert.style.display = 'none';
-        errorAlert.classList.remove('show');
-    }
-}
