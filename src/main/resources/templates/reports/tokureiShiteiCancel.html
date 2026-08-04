@@ -22,49 +22,40 @@
 					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
 
 					<form id="tsuchiForm" th:object="${dto}" method="post"
-						onsubmit="return validateForm()">
+						onsubmit="return validateForm()" novalidate>
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						<!-- 特別徴収義務者情報エリア -->
-						<div class="card mb-4">
-							<div class="card-header">
-								<h5 class="mb-0">特別徴収義務者情報</h5>
-							</div>
-							<div class="card-body">
-								<div class="row g-3">
-									<div class="col-md-4">
-										<label class="form-label">指定番号</label>
-										<input type="text" class="form-control" th:field="*{shiteiNo}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">施設名称</label>
-										<input type="text" class="form-control" th:field="*{shisetsuName}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">特別徴収義務者名</label>
-										<input type="text" class="form-control" th:field="*{tokuName}" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
+						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+						
+						<!-- エラーメッセージ -->
+						<div th:replace="~{layout/components :: reportErrorAlert}"></div>
 
 						<!-- 通知書情報エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">通知書情報</h5>
+								<h5 class="mb-0">内容</h5>
 							</div>
 							<div class="card-body">
 								<div class="row g-3">
-									<div class="col-md-6">
-										<label for="hakkoYmd" class="form-label">発行日 <span
+									<div class="col-md-2">
+										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label>
 										<input type="date" class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}"
 											required>
 									</div>
-									<div class="col-md-6">
-										<label for="tekiyoYmd" class="form-label">適用年月日 <span
+									<div class="col-md-2">
+										<label for="tekiyoYmd" class="form-label">適用年月 <span
 												class="text-danger">*</span></label>
 										<input type="date" class="form-control" id="tekiyoYmd" th:field="*{tekiyoYmd}"
 											required>
+									</div>
+								</div>
+								<!-- 備考欄 -->
+								<div class="row g-3 mt-2">
+									<div class="col-12">
+										<label for="biko" class="form-label">備考</label>
+										<textarea class="form-control" id="biko" th:field="*{biko}" rows="3"
+											placeholder="任意"></textarea>
 									</div>
 								</div>
 								<div class="row g-3 mt-2">
@@ -98,6 +89,9 @@
 								th:formaction="@{/reports/tokureiShiteiCancel/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
 						</div>
 					</form>
 				</div>

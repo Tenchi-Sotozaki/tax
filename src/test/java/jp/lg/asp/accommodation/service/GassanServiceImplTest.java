@@ -8,6 +8,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.EntityManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,13 +17,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import jakarta.persistence.EntityManager;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.GassanForm;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
-import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
@@ -66,7 +66,10 @@ class GassanServiceImplTest {
         t.setShiteiNo(shiteiNo);
         t.setAtenaNo(BigDecimal.ONE);
         t.setShisetsuName("テスト施設");
-        t.setKyokaName("テスト事業者");
+        Atena atena = new Atena();
+        atena.setAtenaNo(BigDecimal.ONE);
+        atena.setName("テスト宛名");
+        t.setAtena(atena);
         return t;
     }
 

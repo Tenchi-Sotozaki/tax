@@ -6,24 +6,28 @@
  * フォームバリデーション
  */
 function validateForm() {
+	
+	// エラーメッセージをクリア
+	window.ReportError.hide();
+	
     const hakkoYmd = document.getElementById('hakkoYmd').value;
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
     const riyu = document.getElementById('riyu').value;
 
     if (!hakkoYmd) {
-        alert('発行日を入力してください。');
+        window.ReportError.show('発行年月日を入力してください。');
         document.getElementById('hakkoYmd').focus();
         return false;
     }
 
     if (!tekiyoYmd) {
-        alert('適用年月日を入力してください。');
+        window.ReportError.show('適用年月を入力してください。');
         document.getElementById('tekiyoYmd').focus();
         return false;
     }
 
     if (!riyu.trim()) {
-        alert('取消理由を入力してください。');
+        window.ReportError.show('取消理由を入力してください。');
         document.getElementById('riyu').focus();
         return false;
     }

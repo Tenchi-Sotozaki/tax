@@ -52,7 +52,7 @@ public class GassanServiceImpl implements GassanService {
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, form.getAtenaNo());
         Set<String> checkedSet = form.getShiteiNoList() != null ? Set.copyOf(form.getShiteiNoList()) : Set.of();
         form.setFacilityList(tokugimuList.stream()
-                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), checkedSet.contains(t.getShiteiNo())))
+                .map(t -> new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getAtena().getName(), checkedSet.contains(t.getShiteiNo())))
                 .toList());
     }
 
@@ -78,7 +78,7 @@ public class GassanServiceImpl implements GassanService {
                 .map(t -> {
                     boolean isChecked = checkedSet.contains(t.getShiteiNo());
                     boolean isDaihyo = t.getShiteiNo().equals(daihyoShiteiNo);
-                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), isChecked);
+                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getAtena().getName(), isChecked);
                     item.setDaihyo(isDaihyo);
                     return item;
                 })
@@ -124,7 +124,7 @@ public class GassanServiceImpl implements GassanService {
                 .map(t -> {
                     boolean isChecked = checkedSet.contains(t.getShiteiNo());
                     boolean isDaihyo = t.getShiteiNo().equals(daihyoShiteiNo);
-                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), isChecked);
+                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getAtena().getName(), isChecked);
                     item.setDaihyo(isDaihyo);
                     return item;
                 })
@@ -171,7 +171,7 @@ public class GassanServiceImpl implements GassanService {
         
         List<FacilityItem> facilityList = tokugimuList.stream()
                 .map(t -> {
-                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false);
+                    FacilityItem item = new FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getAtena().getName(), false);
                     if (assignedMap.containsKey(t.getShiteiNo())) {
                         item.setDisabled(true);
                         item.setGassanShiteiNo(assignedMap.get(t.getShiteiNo()));
@@ -328,7 +328,7 @@ public class GassanServiceImpl implements GassanService {
     	String jichitaiCd = jichitaiContext.getJichitaiCd();
         List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, atenaNo);
         return tokugimuList.stream()
-                .map(t -> new GassanForm.FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getKyokaName(), false))
+                .map(t -> new GassanForm.FacilityItem(t.getShiteiNo(), t.getShisetsuName(), t.getAtena().getName(), false))
                 .toList();
     }
 

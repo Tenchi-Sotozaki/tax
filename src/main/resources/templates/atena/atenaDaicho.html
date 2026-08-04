@@ -164,71 +164,20 @@
 
 			<!-- 表示件数 + ページネーション（同一行） -->
 			<div class="d-flex align-items-center mb-1">
-				<!-- 左：スペーサー 画面確認用 サイドバーが完成次第削除 -->
 				<div style="min-width: 130px;">
 					<a th:href="@{/atena/register}" class="btn btn-primary btn-sm">
 						<i class="bi bi-plus-circle me-1"></i>新規登録
 					</a>
 				</div>
-				<!-- 中央：ページネーション -->
-				<nav class="flex-grow-1" th:if="${items.totalPages > 0}">
-					<ul class="pagination pagination-sm justify-content-center mb-0">
-						<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-							<a class="page-link"
-							th:href="@{/atena/list(page=${items.number - 1}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
-						</li>
-						<th:block th:if="${items.totalPages <= 6}">
-							<li class="page-item"
-								th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}"
-								th:classappend="${i == items.number} ? 'active'"><a
-								class="page-link"
-								th:href="@{/atena/list(page=${i}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-								th:text="${i + 1}">1</a></li>
-						</th:block>
-						<th:block th:if="${items.totalPages > 6}">
-							<li class="page-item"
-								th:classappend="${0 == items.number} ? 'active'"><a
-								class="page-link"
-								th:href="@{/atena/list(page=0, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">1</a>
-							</li>
-							<li class="page-item disabled" th:if="${items.number > 3}">
-								<span class="page-link">...</span>
-							</li>
-							<th:block
-								th:each="i : ${#numbers.sequence(1, items.totalPages - 2)}">
-								<li class="page-item"
-									th:if="${i >= items.number - 1 and i <= items.number + 1}"
-									th:classappend="${i == items.number} ? 'active'"><a
-									class="page-link"
-									th:href="@{/atena/list(page=${i}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-									th:text="${i + 1}">2</a></li>
-							</th:block>
-							<li class="page-item disabled"
-								th:if="${items.number < items.totalPages - 4}"><span
-								class="page-link">...</span></li>
-							<li class="page-item"
-								th:classappend="${items.totalPages - 1 == items.number} ? 'active'">
-								<a class="page-link"
-								th:href="@{/atena/list(page=${items.totalPages - 1}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-								th:text="${items.totalPages}">N</a>
-							</li>
-						</th:block>
-						<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-							<a class="page-link"
-							th:href="@{/atena/list(page=${items.number + 1}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
-						</li>
-					</ul>
+				<nav class="flex-grow-1">
+					<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
 				</nav>
-				<!-- 右：表示件数 -->
-				<div class="d-flex align-items-center"
-					style="min-width: 130px; justify-content: flex-end;">
-					<label class="form-label form-label-sm mb-0 me-2">表示件数</label> <select
-						class="form-select form-select-sm" style="width: auto;"
-						onchange="location.href=this.value">
-						<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-							th:value="@{/atena/list(page=0, pageSize=${s}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-							th:text="${s}" th:selected="${s == searchForm.pageSize}">
-						</option>
+				<div class="d-flex align-items-center" style="min-width: 130px; justify-content: flex-end;">
+					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
 					</select>
 				</div>
 			</div>
@@ -280,5 +229,18 @@
 		</div>
 
 	</div>
+	<th:block layout:fragment="scripts">
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				const rows = Array.from(document.querySelectorAll('tbody tr')).filter(tr => tr.querySelector('td'));
+				const pageSizeSelect = document.getElementById('pageSizeSelect');
+				const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
+				if (rows.length > 0) {
+					pager.render(1);
+					pageSizeSelect?.addEventListener('change', () => pager.render(1));
+				}
+			});
+		</script>
+	</th:block>
 </body>
 </html>

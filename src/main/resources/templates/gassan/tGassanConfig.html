@@ -198,8 +198,9 @@
 							<tr>
 								<th style="width: 60px" class="text-center"></th>
 								<th style="width: 80px" class="text-center">代表指定</th>
-								<th style="width: calc(( 100% - 140px)/2)" class="text-center">特別徴収義務者名</th>
-								<th style="width: calc(( 100% - 140px)/2)" class="text-center">施設名称</th>
+								<th style="width: 120px" class="text-center">指定番号</th>
+								<th style="width: calc(( 100% - 260px)/2)" class="text-center">特別徴収義務者名</th>
+								<th style="width: calc(( 100% - 260px)/2)" class="text-center">施設名称</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -225,6 +226,7 @@
 									th:if="${isView} and ${facility.daihyo}"
 									class="bi bi-check-circle-fill text-success fs-5"></i>
 								</td>
+								<td th:text="${facility.shiteiNo}"></td>
 								<td th:text="${facility.choshuGimushaName}"></td>
 								<td><span th:text="${facility.shisetsuName}"></span> <span
 									th:if="${facility.disabled}"

@@ -178,6 +178,7 @@ function renderFacilityTable(facilities) {
                 <input type="radio" class="form-check-input daihyo-radio"
                     name="daihyoShiteiNo" value="${f.shiteiNo}">
             </td>
+            <td>${f.shiteiNo ?? ''}</td>
             <td>${f.choshuGimushaName ?? ''}</td>
             <td>${f.shisetsuName ?? ''}</td>
         </tr>`).join('');
