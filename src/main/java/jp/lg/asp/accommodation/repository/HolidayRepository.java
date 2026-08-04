@@ -8,15 +8,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import jp.lg.asp.accommodation.entity.Holiday;
-import jp.lg.asp.accommodation.entity.HolidayId;
+import jp.lg.asp.accommodation.entity.Kyugyobi;
+import jp.lg.asp.accommodation.entity.KyugyobiId;
 
 @Repository
-public interface HolidayRepository extends JpaRepository<Holiday, HolidayId> {
+public interface HolidayRepository extends JpaRepository<Kyugyobi, KyugyobiId> {
 
-    List<Holiday> findByJichitaiCdAndNendoOrderByHolidayDt(String jichitaiCd, String nendo);
+	List<Kyugyobi> findByJichitaiCdAndNenOrderByKyugyobi(String jichitaiCd, String nen);
 
-    @Modifying
-    @Query("DELETE FROM Holiday h WHERE h.jichitaiCd = :jichitaiCd AND h.nendo = :nendo")
-    void deleteByJichitaiCdAndNendo(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") String nendo);
+	@Modifying
+	@Query("DELETE FROM Kyugyobi k WHERE k.jichitaiCd = :jichitaiCd AND k.nen = :nen")
+	void deleteByJichitaiCdAndNen(@Param("jichitaiCd") String jichitaiCd, @Param("nen") String nen);
+
+	@Query("SELECT DISTINCT k.nen FROM Kyugyobi k WHERE k.jichitaiCd = :jichitaiCd ORDER BY k.nen")
+	List<String> findDistinctNenByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 }

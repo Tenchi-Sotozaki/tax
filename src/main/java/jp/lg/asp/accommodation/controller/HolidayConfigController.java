@@ -35,31 +35,29 @@ public class HolidayConfigController {
 	@GetMapping
 	public String index(RedirectAttributes redirectAttributes) {
 		//accessChecker.checkAccess(SCREEN_ID);
-		List<String> nendoList = holidayConfigService.findNendoList();
-		if (!nendoList.isEmpty()) {
-			return "redirect:/admin/holiday/view/" + nendoList.getLast();
+		List<String> nenList = holidayConfigService.findNendoList();
+		if (!nenList.isEmpty()) {
+			return "redirect:/admin/holiday/view/" + nenList.getLast();
 		}
-		int currentNendo = LocalDate.now().getMonthValue() >= 4 ? LocalDate.now().getYear()
-				: LocalDate.now().getYear() - 1;
-		return "redirect:/admin/holiday/view/" + currentNendo;
+		return "redirect:/admin/holiday/view/" + LocalDate.now().getYear();
 	}
 
-	@GetMapping("/view/{nendo}")
+	@GetMapping("/view/{nen}")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
-	public String view(@PathVariable String nendo, Model model) {
+	public String view(@PathVariable String nen, Model model) {
 		//accessChecker.checkAccess(SCREEN_ID);
-		model.addAttribute("form", holidayConfigService.findByNendo(nendo));
-		model.addAttribute("nendoList", holidayConfigService.findNendoList());
+		model.addAttribute("form", holidayConfigService.findByNendo(nen));
+		model.addAttribute("nenList", holidayConfigService.findNendoList());
 		model.addAttribute("mode", "view");
 		return VIEW;
 	}
 
-	@GetMapping("/edit/{nendo}")
+	@GetMapping("/edit/{nen}")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
-	public String edit(@PathVariable String nendo, Model model) {
+	public String edit(@PathVariable String nen, Model model) {
 		//accessChecker.checkWriteAccess(SCREEN_ID);
-		model.addAttribute("form", holidayConfigService.findByNendo(nendo));
-		model.addAttribute("nendoList", holidayConfigService.findNendoList());
+		model.addAttribute("form", holidayConfigService.findByNendo(nen));
+		model.addAttribute("nenList", holidayConfigService.findNendoList());
 		model.addAttribute("mode", "edit");
 		return VIEW;
 	}
@@ -72,7 +70,7 @@ public class HolidayConfigController {
 		if (form.getNendo() == null || form.getNendo().isBlank()) {
 			model.addAttribute("form", form);
 			model.addAttribute("mode", "edit");
-			model.addAttribute("errorMessage", "年度は必須です。");
+			model.addAttribute("errorMessage", "年は必須です。");
 			return VIEW;
 		}
 		try {

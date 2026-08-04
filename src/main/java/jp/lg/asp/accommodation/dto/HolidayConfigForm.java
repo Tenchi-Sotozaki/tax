@@ -8,5 +8,5 @@ import lombok.Data;
 public class HolidayConfigForm {
 
     private String nendo;
-    private List<String> holidayDts;
+    private List<String> holidayDts; // yyyyMMdd形式
 }

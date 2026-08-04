@@ -19,14 +19,14 @@
 						th:text="${mode == 'edit'} ? '休業日設定編集' : '休業日設定照会'">休業日設定</span>
 				</h5>
 				<div class="d-flex align-items-center gap-2">
-					<select class="form-select form-select-sm" id="nendoSelect"
-						onchange="changeNendo(this)"
-						th:data-base-url="@{/admin/holiday/view/}">
-						<option th:each="n : ${nendoList}" th:value="${n}"
-							th:text="${n + '年度'}" th:selected="${n == form.nendo}"></option>
+					<select class="form-select form-select-sm" id="nenSelect"
+						onchange="changeNen(this)"
+						th:data-base-url="@{/admin/holiday/view/}"
+						th:data-mode="${mode}"
+						th:disabled="${mode == 'edit'}">
 					</select>
 					<div th:if="${mode == 'view'}">
-						<a th:href="@{/admin/holiday/edit/{nendo}(nendo=${form.nendo})}"
+						<a th:href="@{/admin/holiday/edit/{nen}(nen=${form.nendo})}"
 							class="btn btn-sm btn-primary text-nowrap"> <i
 							class="bi bi-pencil-square me-1"></i>編集する
 						</a>
@@ -45,23 +45,6 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
-
-
-			<!-- <div class="card shadow-sm mb-4">
-				<div class="card-header py-3">
-					<h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>対象年度</h5>
-				</div>
-				<div class="card-body bg-light-subtle">
-					<div class="row g-3 align-items-end">
-						<div class="col-md-3">
-							<label for="nendoDisp" class="form-label fw-medium">対象年度</label>
-							<input type="text" class="form-control" id="nendoDisp"
-								th:value="${form.nendo}" readonly>
-						</div>
-					</div>
-				</div>
-			</div> -->
-
 			<!-- カレンダーエリア -->
 			<div class="card shadow-sm mb-4">
 				<div
@@ -71,18 +54,18 @@
 					</h5>
 					<div class="d-flex align-items-center gap-2">
 						<button type="button" class="btn btn-sm btn-outline-secondary"
-							id="prevMonth">
-							<i class="bi bi-chevron-left"></i>
+							id="prevQuarter">
+							<i class="bi bi-chevron-left"></i> 前へ
 						</button>
 						<span class="fw-medium" id="calendarTitle"></span>
 						<button type="button" class="btn btn-sm btn-outline-secondary"
-							id="nextMonth">
-							<i class="bi bi-chevron-right"></i>
+							id="nextQuarter">
+							次へ <i class="bi bi-chevron-right"></i>
 						</button>
 					</div>
 				</div>
 				<div class="card-body bg-light-subtle">
-					<div id="calendarGrid"></div>
+					<div id="calendarGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;"></div>
 					<div class="mt-2 small text-muted">
 						<span class="badge bg-danger me-1">&nbsp;</span>日曜 <span
 							class="badge bg-primary ms-2 me-1">&nbsp;</span>土曜 <span
@@ -143,7 +126,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:inline="javascript">
-			const NENDO = /*[[${form.nendo}]]*/'';
+			const NEN = /*[[${form.nendo}]]*/'';
 			const IS_EDIT = /*[[${mode == 'edit'}]]*/false;
 			const INITIAL_HOLIDAYS = /*[[${form.holidayDts}]]*/[];
 		</script>
