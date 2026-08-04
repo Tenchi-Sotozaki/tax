@@ -112,10 +112,10 @@
 
 		<div class="d-flex justify-content-end align-items-center mb-2">
 			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-				<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-					th:value="@{/shunoRenkei/list(page=0, pageSize=${s}, shinkokuFrom=${searchForm.shinkokuFrom}, shinkokuTo=${searchForm.shinkokuTo}, taishoMonth=${searchForm.taishoMonth}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType})}"
-					th:text="${s}" th:selected="${s == searchForm.pageSize}">10</option>
+			<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+				<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+				<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+				<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
 			</select>
 		</div>
 
@@ -167,20 +167,7 @@
 		<!-- ページネーション -->
 		<div class="card-footer bg-white py-2 border-top" th:if="${items != null and items.totalPages > 0}">
 			<nav>
-				<ul class="pagination pagination-sm justify-content-center mb-0">
-					<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-						<a class="page-link" th:href="@{/shunoRenkei/list(page=${items.number - 1}, pageSize=${searchForm.pageSize}, shinkokuFrom=${searchForm.shinkokuFrom}, shinkokuTo=${searchForm.shinkokuTo}, taishoMonth=${searchForm.taishoMonth}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType})}">前へ</a>
-					</li>
-					<th:block th:each="p : ${pageWindow}">
-						<li class="page-item disabled" th:if="${p == -1}"><span class="page-link">…</span></li>
-						<li class="page-item" th:if="${p != -1}" th:classappend="${p == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/shunoRenkei/list(page=${p}, pageSize=${searchForm.pageSize}, shinkokuFrom=${searchForm.shinkokuFrom}, shinkokuTo=${searchForm.shinkokuTo}, taishoMonth=${searchForm.taishoMonth}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType})}" th:text="${p + 1}">1</a>
-						</li>
-					</th:block>
-					<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-						<a class="page-link" th:href="@{/shunoRenkei/list(page=${items.number + 1}, pageSize=${searchForm.pageSize}, shinkokuFrom=${searchForm.shinkokuFrom}, shinkokuTo=${searchForm.shinkokuTo}, taishoMonth=${searchForm.taishoMonth}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType})}">次へ</a>
-					</li>
-				</ul>
+				<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
 			</nav>
 		</div>
 	</div>

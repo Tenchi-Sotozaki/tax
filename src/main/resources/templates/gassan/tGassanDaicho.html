@@ -6,22 +6,6 @@
 <head>
 	<title>合算申請管理台帳</title>
 	<link rel="stylesheet" th:href="@{/css/gassan-daicho.css}">
-
-	<style>
-		.card {
-		    min-height: auto !important;
-		    height: auto !important;
-		}
-
-		.table-scroll {
-		    min-height: auto !important;
-		    height: auto !important;
-		}
-
-		.table-scroll table {
-		    margin-bottom: 0 !important;
-		}
-	</style>
 </head>
 
 <body>
@@ -121,95 +105,17 @@
 		<div th:if="${isSearched}">
 
 			<div class="d-flex justify-content-center align-items-center mb-1 position-relative">
-
-				<!-- ページ選択 -->
-				<nav th:with="
-					curr=${currentPage != null ? currentPage : 0}, 
-					total=${totalPages != null and totalPages > 0 ? totalPages : 1}, 
-					start=${startPage != null ? startPage : 0}, 
-					end=${endPage != null ? endPage : 0}" class="pagination-container">
-
-					<ul class="pagination pagination-sm justify-content-center mb-0">
-
-						<!-- 前へボタン -->
-						<li class="page-item" th:classappend="${items.first or total <= 1} ? 'disabled'">
-							<a class="page-link" th:href="@{/gassan/list(page=${items.number - 1}, 
-								pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, 
-								gassanShiteiNo=${searchForm.gassanShiteiNo}, 
-								shiteiNo=${searchForm.shiteiNo}, 
-								name=${searchForm.name})}">
-								前へ
-							</a>
-						</li>
-
-						<!-- 最初のページ -->
-						<li class="page-item" th:classappend="${curr == 0} ? 'active'"
-							th:if="${total > 1 and start > 0}">
-							<a class="page-link"
-								th:href="@{/gassan/list(page=0, pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}">1</a>
-						</li>
-
-						<!-- 中間の省略記号 -->
-						<li class="page-item disabled" th:if="${total > 1 and start > 1}">
-							<span class="page-link">...</span>
-						</li>
-
-						<!-- ページ番号 -->
-						<th:block th:if="${total <= 1}">
-							<li class="page-item active">
-								<span class="page-link">1</span>
-							</li>
-						</th:block>
-						<th:block th:if="${total > 1}">
-							<li class="page-item" th:each="i : ${#numbers.sequence(start, end)}"
-								th:classappend="${i == curr} ? 'active'">
-								<a class="page-link"
-									th:href="@{/gassan/list(page=${i}, pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}"
-									th:text="${i + 1}">
-									1
-								</a>
-							</li>
-						</th:block>
-
-						<!-- 末尾の省略記号 -->
-						<li class="page-item disabled" th:if="${total > 1 and end < total - 2}">
-							<span class="page-link">...</span>
-						</li>
-
-						<!-- 最終ページ -->
-						<li class="page-item" th:classappend="${curr == total - 1} ? 'active'"
-							th:if="${total > 1 and end < total - 1}">
-							<a class="page-link"
-								th:href="@{/gassan/list(page=${total - 1}, pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}"
-								th:text="${total}">
-								20
-							</a>
-						</li>
-
-						<!-- 次へボタン -->
-						<li class="page-item" th:classappend="${items.last or total <= 1} ? 'disabled'">
-							<a class="page-link" th:href="@{/gassan/list(page=${items.number + 1}, 
-								pageSize=${searchForm.pageSize != null ? searchForm.pageSize : 10}, 
-								gassanShiteiNo=${searchForm.gassanShiteiNo}, 
-								shiteiNo=${searchForm.shiteiNo}, 
-								name=${searchForm.name})}">
-								次へ
-							</a>
-						</li>
-					</ul>
+				<nav class="pagination-container">
+					<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
 				</nav>
-
-				<!-- 表示件数選択プルダウン -->
 				<div class="d-flex align-items-center position-absolute end-0">
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-					<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-						<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-							th:value="@{/gassan/list(page=0, pageSize=${s}, gassanShiteiNo=${searchForm.gassanShiteiNo}, shiteiNo=${searchForm.shiteiNo}, name=${searchForm.name})}"
-							th:text="${s}" th:selected="${s == searchForm.pageSize}">
-						</option>
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
 					</select>
 				</div>
-
 			</div>
 
 			<!-- 一覧テーブル -->
