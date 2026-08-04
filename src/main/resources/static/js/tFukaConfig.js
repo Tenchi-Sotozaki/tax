@@ -222,10 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
             firstInput?.focus();
         });
 
-        // 「入力内容を決定」を押した時点で入力内容を確定させる
-        // これ以降は「変更なし」となるため、閉じる際に確認ダイアログは出ない
+        // 「入力内容を決定」を押した時点で入力内容を確定させてから閉じる
+        // 確定後は「変更なし」となるため、閉じる際に確認ダイアログは出ない
+        // 閉じる順序を明確にするため data-bs-dismiss は使わずJSから閉じる
         document.getElementById('btnApplyTally')?.addEventListener('click', function() {
             openedSnapshot = takeSnapshot();
+            bootstrap.Modal.getOrCreateInstance(monthlyTallyModal).hide();
         });
 
         // 閉じる操作（×ボタン・閉じるボタン）は、入力内容に変更がある場合のみ確認する
