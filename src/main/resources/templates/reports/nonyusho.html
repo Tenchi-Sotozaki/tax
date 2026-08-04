@@ -32,25 +32,24 @@
 						<!-- 特別徴収義務者情報 -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 						
-						<!-- 納入書情報エリア -->
+						<!-- エラーメッセージ -->
+						<div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert" id="errorAlert"
+							style="display: none;">
+							<i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="errorMessageText"></span>
+							<button type="button" class="btn-close btn-sm" onclick="hideErrorMessage()"></button>
+						</div>
+						
+						<!-- 納入書内容エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">納入書情報</h5>
+								<h5 class="mb-0">納入書内容</h5>
 							</div>
 							<div class="card-body">
 								<div class="row g-3">
 									<div class="col-md-4">
-										<label for="nendo" class="form-label">年度 <span
-												class="text-danger">*</span></label>
-										<div class="nendo-wrapper">
-											<input type="text" class="form-control nendo-input" id="nendo" name="nendo" value="2026" required>
-											<div class="nendo-display" id="nendoDisplay">年度を入力してください</div>
-										</div>
-									</div>
-									<div class="col-md-4">
 										<label for="taishoYm" class="form-label">対象年月 <span
 												class="text-danger">*</span></label> <input type="month"
-											class="form-control" id="taishoYm" name="taishoYm" required>
+											class="form-control" id="taishoYm" name="shinkokuYmd" required>
 									</div>
 								</div>
 							</div>

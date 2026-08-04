@@ -53,32 +53,10 @@ function initializeNendoField() {
         const month = String(today.getMonth() + 1).padStart(2, '0');
         nendoField.value = `${year}-${month}`;
     }
-    
-    // 初期表示を更新
-    updateNendoDisplay();
-    
+   
     // 値変更時のイベントリスナー
     nendoField.addEventListener('change', updateNendoDisplay);
     nendoField.addEventListener('input', updateNendoDisplay);
-}
-
-/**
- * 年度表示を更新（YYYYのみ表示）
- */
-function updateNendoDisplay() {
-    const nendoField = document.getElementById('nendo');
-    const nendoDisplay = document.getElementById('nendoDisplay');
-    
-    if (!nendoField || !nendoDisplay) return;
-    
-    const value = nendoField.value;
-    if (value) {
-        // YYYY-MMからYYYYのみを抽出
-        const year = value.split('-')[0];
-        nendoDisplay.textContent = year + '年度';
-    } else {
-        nendoDisplay.textContent = '年度を選択してください';
-    }
 }
 
 /**
@@ -97,8 +75,7 @@ function loadTokugimuInfo(shiteiNo) {
             document.getElementById('tokuName').value = data.name || '';
             document.getElementById('tokuJusho').value = data.jusho || '';
         })
-        .catch(error => {
-            console.error('特別徴収義務者情報取得エラー:', error);
+        .catch(() => {
             // エラー時はフィールドをクリア
             document.getElementById('tokuName').value = '';
             document.getElementById('tokuJusho').value = '';
@@ -122,6 +99,9 @@ window.addEventListener('DOMContentLoaded', () => {
  * @param {string} type 'pdf' または 'preview'
  */
 async function submitReport(type) {
+	
+	// 処理開始時に古いエラーをクリアする
+	hideErrorMessage();
     
     if (!validateForm()) {
         return;
@@ -163,7 +143,6 @@ async function submitReport(type) {
             a.remove();
         }
     } catch (error) {
-        console.error(`${type} エラー:`, error);
         showErrorMessage(error.message || '帳票の作成に失敗しました。');
     }
 }
@@ -195,6 +174,9 @@ async function readErrorMessage(response) {
  * 印刷処理
  */
 async function printReport() {
+	
+	// 処理開始時に古いエラーをクリアする
+	hideErrorMessage();
     
     if (!validateForm()) {
         return;
@@ -230,7 +212,6 @@ async function printReport() {
             };
         })
         .catch(error => {
-            console.error('印刷エラー:', error);
             showErrorMessage(error.message || '帳票の作成に失敗しました。');
         });
 }
@@ -240,16 +221,15 @@ async function printReport() {
  */
 async function collectFormData() {
     const shiteiNo = document.getElementById('shiteiNo')?.value || '';
-    const nendoValue = document.getElementById('nendo')?.value || '';
     const taishoYmValue = document.getElementById('taishoYm')?.value || '';
     const entai = document.getElementById('entai')?.value || '0';
     
     // 年度から年のみを抽出（YYYY-MM から YYYY を取得）
-    const nendo = nendoValue ? nendoValue.split('-')[0] : '';
-    
-    // 対象年月をLocalDate形式に変換（YYYY-MM-01）
-    const shinkokuYmd = taishoYmValue ? taishoYmValue + '-01' : null;
-    
+    const nendo = taishoYmValue ? taishoYmValue.replace(/-/g, '').slice(0, 4) : '';
+	
+	// YYYY-MM-DDからハイフンを除き、先頭6桁（YYYYMM）を取得する
+	const shinkokuYmd = taishoYmValue ? taishoYmValue.replace(/-/g, '').slice(0, 6) : '';
+   
     // 動的にデータを取得
     const dynamicData = await loadDynamicData(shiteiNo, nendo, taishoYmValue);
     
@@ -297,7 +277,6 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
        
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('サーバーエラー:', errorText);
             throw new Error(`データの取得に失敗しました (${response.status})`);
         }
         
@@ -323,7 +302,6 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
             torimatome: data.torimatome || ''
         };
     } catch (error) {
-        console.error('動的データ取得エラー:', error);
         // エラー時はデフォルト値を返す
         let nokigen = '';
         if (taishoYmValue) {
@@ -349,29 +327,27 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
  * フォームバリデーション
  */
 function validateForm() {
+	
+	// 処理開始時に古いエラーをクリアする
+	hideErrorMessage();
+	
     const shiteiNo = document.getElementById('shiteiNo')?.value;
-    const nendoValue = document.getElementById('nendo')?.value;
-    const taishoYm = document.getElementById('taishoYm')?.value;
+    const taishoYmValue = document.getElementById('taishoYm')?.value;
     
     if (!shiteiNo) {
         showErrorMessage('指定番号を入力してください。');
         return false;
     }
-    
-    if (!nendoValue) {
-        showErrorMessage('年度を入力してください。');
-        return false;
-    }
-    
-    if (!taishoYm) {
+   
+    if (!taishoYmValue) {
         showErrorMessage('対象年月を入力してください。');
         return false;
     }
     
     // 年度の妥当性チェック（YYYY-MM形式から年を抽出）
-    const nendo = nendoValue.split('-')[0];
-    const nendoNum = parseInt(nendo, 10);
-    if (isNaN(nendoNum) || nendoNum < 1900 || nendoNum > 2100) {
+    const taishoYm = taishoYmValue.split('-')[0];
+    const taishoYmNum = parseInt(taishoYm, 10);
+    if (isNaN(taishoYmNum) || taishoYmNum < 1900 || taishoYmNum > 2100) {
         showErrorMessage('年度は1900年から2100年の間で選択してください。');
         return false;
     }
@@ -380,9 +356,21 @@ function validateForm() {
 }
 
 /**
- * エラーメッセージ表示
+ * 画面上部にエラーメッセージを表示する
  */
 function showErrorMessage(message) {
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessageText = document.getElementById('errorMessageText');
+    
+    if (errorAlert && errorMessageText) {
+        errorMessageText.textContent = message;
+        errorAlert.style.display = 'block';
+        errorAlert.classList.add('show');
+    }
+}
+
+/**
+ * 画面上部のエラーメッセージを非表示にする
     // 画面上部のalert-danger領域に表示する（reportForm.jsで定義）
     if (window.ReportError) {
         window.ReportError.show(message);
@@ -403,5 +391,13 @@ function clearErrorMessage() {
 /**
  * 成功メッセージ表示
  */
-function showSuccessMessage(message) {
+function hideErrorMessage() {
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessageText = document.getElementById('errorMessageText');
+    
+    if (errorAlert && errorMessageText) {
+        errorMessageText.textContent = '';
+        errorAlert.style.display = 'none';
+        errorAlert.classList.remove('show');
+    }
 }
