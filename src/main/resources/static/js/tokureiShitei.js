@@ -6,35 +6,38 @@
  * フォームバリデーション
  */
 function validateForm() {
+	
+	// 処理開始時に古いエラーをクリアする
+	window.ReportError.hide();
+	
     const hakkoYmd = document.getElementById('hakkoYmd').value;
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
-    const shonin = document.querySelector('input[name="shonin"]:checked');
-    const riyu = document.getElementById('riyu').value;
 
     if (!hakkoYmd) {
-        alert('発行日を入力してください。');
-        document.getElementById('hakkoYmd').focus();
-        return false;
+        window.ReportError.show('発行年月日を入力してください。')
+		return false;
     }
 
     if (!tekiyoYmd) {
-        alert('適用年月日を入力してください。');
-        document.getElementById('tekiyoYmd').focus();
-        return false;
-    }
-
-    if (!shonin) {
-        alert('承認を選択してください。');
-        return false;
-    }
-
-    if (shonin.value === '不承認' && !riyu.trim()) {
-        alert('不承認理由を入力してください。');
-        document.getElementById('riyu').focus();
+        window.ReportError.show('適用年月を入力してください。');
         return false;
     }
 
     return true;
+}
+
+// 区分（認定/不認定）の変更に応じて「不認定の理由」の有効/無効を切り替える
+function toggleBikoState() {
+    const shonin = document.getElementById('shonin');
+    const riyu = document.getElementById('riyu');
+
+    if (shonin.value === '承認') { // 承認
+		// 承認に変更された場合は理由をクリア
+        riyu.value = '';
+        riyu.disabled = true;
+    } else { // 不承認
+        riyu.disabled = false;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -47,21 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
         hakkoYmdInput.value = formattedDate;
     }
 
-    // 不承認選択時のみ理由欄を表示
-    const shoninRadios = document.querySelectorAll('input[name="shonin"]');
-    const riyuArea = document.getElementById('riyuArea');
-    shoninRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            riyuArea.style.display = this.value === '不承認' ? '' : 'none';
-            if (this.value !== '不承認') {
-                document.getElementById('riyu').value = '';
-            }
-        });
-    });
-
-    // 初期表示時に不承認が選択済みの場合は表示
-    const checkedShonin = document.querySelector('input[name="shonin"]:checked');
-    if (checkedShonin && checkedShonin.value === '不承認') {
-        riyuArea.style.display = '';
-    }
+	// 区分に応じて「不承認の理由」の有効/無効を切り替える
+	toggleBikoState();
 });
