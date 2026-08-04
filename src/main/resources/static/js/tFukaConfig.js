@@ -166,9 +166,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (monthlyTallyModal) {
+        // 照会時は「入力内容を決定」ボタンが存在しない
+        const isViewMode = !document.getElementById('btnApplyTally');
+        // モーダルを開いた時点の入力値。変更有無の判定と破棄時の復元に使う
+        let openedSnapshot = null;
+
+        // モーダル内の入力欄（日付などの hidden は対象外）
+        const getTallyInputs = () =>
+            monthlyTallyModal.querySelectorAll('input:not([type="hidden"])');
+
+        // 現在の入力値を記録する
+        const takeSnapshot = () => {
+            const snapshot = new Map();
+            getTallyInputs().forEach(input => snapshot.set(input, input.value));
+            return snapshot;
+        };
+
+        // 開いた時点から入力値が変わっているか
+        const isTallyChanged = () => {
+            if (!openedSnapshot) return false;
+            for (const [input, value] of openedSnapshot) {
+                if (input.value !== value) return true;
+            }
+            return false;
+        };
+
+        // 開いた時点の入力値に戻す
+        const restoreSnapshot = () => {
+            if (!openedSnapshot) return;
+            openedSnapshot.forEach((value, input) => {
+                input.value = value;
+            });
+            if (fukaKbn === '1') calculateTeigaku();
+            else if (fukaKbn === '2') calculateTeiritsu();
+
+            // 変更マーク（黄色の枠）も開いた時点の状態に戻す
+            // 自動計算欄は利用者が編集した箇所ではないため対象外とする
+            openedSnapshot.forEach((value, input) => {
+                if (input.readOnly || input.disabled) return;
+                checkValue(input);
+            });
+        };
+
         monthlyTallyModal.addEventListener('shown.bs.modal', function() {
             if (fukaKbn === '1') calculateTeigaku();
             else if (fukaKbn === '2') calculateTeiritsu();
+
+            // 自動計算後の状態を「開いた時点の入力内容」として記録する
+            openedSnapshot = takeSnapshot();
+
+            // 先頭の入力欄にフォーカスを当てる
+            const table = fukaKbn === '1' ? tableTeigaku : tableTeiritsu;
+            const firstInput = table?.querySelector(
+                'tbody input[type="text"]:not([readonly]):not([disabled])');
+            firstInput?.focus();
+        });
+
+        // 「入力内容を決定」を押した時点で入力内容を確定させてから閉じる
+        // 確定後は「変更なし」となるため、閉じる際に確認ダイアログは出ない
+        // 閉じる順序を明確にするため data-bs-dismiss は使わずJSから閉じる
+        document.getElementById('btnApplyTally')?.addEventListener('click', function() {
+            openedSnapshot = takeSnapshot();
+            bootstrap.Modal.getOrCreateInstance(monthlyTallyModal).hide();
+        });
+
+        // 閉じる操作（×ボタン・閉じるボタン）は、入力内容に変更がある場合のみ確認する
+        monthlyTallyModal.addEventListener('hide.bs.modal', function(e) {
+            if (isViewMode) return;
+            if (!isTallyChanged()) return;
+
+            if (confirm('入力内容は破棄されます。よろしいですか？')) {
+                restoreSnapshot();
+            } else {
+                e.preventDefault();
+            }
         });
     }
 

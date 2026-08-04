@@ -23,7 +23,6 @@ import jp.lg.asp.accommodation.entity.RoleDetail;
 import jp.lg.asp.accommodation.entity.RoleId;
 import jp.lg.asp.accommodation.entity.Screen;
 import jp.lg.asp.accommodation.entity.User;
-import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.ScreenRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
@@ -129,24 +128,15 @@ class RoleServiceImplTest {
     }
 
     @Test
-    void updateUserRole_resetsOldUsersAndAssignsNew() {
-        User oldUser = new User();
-        oldUser.setRoleId(BigDecimal.valueOf(1));
-        when(userRepository.findByJichitaiCdAndRoleId(JICHITAI_CD, BigDecimal.valueOf(1L)))
-                .thenReturn(List.of(oldUser));
+    void findAssignedUsers_returnsUsersHavingRole() {
+        User assigned = new User();
+        assigned.setRoleId(BigDecimal.valueOf(1L));
+        when(userRepository.findAssignedUsers(JICHITAI_CD, BigDecimal.valueOf(1L)))
+                .thenReturn(List.of(assigned));
 
-        UserId uid = new UserId();
-        uid.setJichitaiCd(JICHITAI_CD);
-        uid.setId("user02");
-        User newUser = new User();
-        when(userRepository.findById(any())).thenReturn(Optional.of(newUser));
-        when(userRepository.saveAll(any())).thenReturn(List.of());
-        when(userRepository.save(any())).thenReturn(newUser);
+        List<User> actual = service.findAssignedUsers(JICHITAI_CD, 1L);
 
-        service.updateUserRole(JICHITAI_CD, 1L, List.of("user02"), "admin");
-
-        assertThat(oldUser.getRoleId()).isEqualTo(BigDecimal.ZERO);
-        assertThat(newUser.getRoleId()).isEqualTo(BigDecimal.valueOf(1L));
+        assertThat(actual).containsExactly(assigned);
     }
 
     @Test

@@ -126,44 +126,17 @@ public class RoleController {
 			return result;
 		}
 		Role role = roleService.findById(jichitaiCd, roleId);
-		List<User> allUsers = roleService.findAllUsers(jichitaiCd);
+		List<User> assignedUsers = roleService.findAssignedUsers(jichitaiCd, roleId);
 
 		Map<String, Object> result1 = new HashMap<>();
 		result1.put("roleName", role != null ? role.getName() : "");
-		result1.put("users", allUsers.stream().map(u -> {
+		result1.put("users", assignedUsers.stream().map(u -> {
 			Map<String, Object> m = new HashMap<>();
 			m.put("id", u.getId());
 			m.put("name", u.getName());
-			m.put("assigned", u.getRoleId() != null && u.getRoleId().longValue() == roleId);
 			return m;
 		}).collect(Collectors.toList()));
 		return result1;
-	}
-
-	@PostMapping("/users/{roleId}")
-	@ResponseBody
-	@OpeLog(screenId = SCREEN_ID, operation = "権限付与ユーザー更新")
-	public Map<String, Object> updateAssignedUsers(@PathVariable Long roleId,
-			@RequestBody Map<String, List<String>> body) {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		accessChecker.checkWriteAccess(SCREEN_ID);
-		Map<String, Object> result = new HashMap<>();
-		if (roleId == 1L) {
-			List<String> userIds = body.get("userIds");
-			if (userIds == null || userIds.size() != 1 || !"admin".equals(userIds.get(0))) {
-				result.put("success", false);
-				result.put("message", "この権限はadminユーザーのみに付与できます");
-				return result;
-			}
-		}
-		try {
-			roleService.updateUserRole(jichitaiCd, roleId, body.get("userIds"), "admin");
-			result.put("success", true);
-		} catch (Exception e) {
-			result.put("success", false);
-			result.put("message", e.getMessage());
-		}
-		return result;
 	}
 
 	@PostMapping("/delete/{roleId}")

@@ -22,9 +22,7 @@ public interface RoleService {
     
     void deleteRole(String jichitaiCd, Long roleId);
 
-    List<User> findAllUsers(String jichitaiCd);
+    List<User> findAssignedUsers(String jichitaiCd, Long roleId);
 
-    void updateUserRole(String jichitaiCd, Long roleId, List<String> userIds, String updUser);
-    
     void resetUsersToDefaultRole(String jichitaiCd, Long roleId, String updUser);
 }
