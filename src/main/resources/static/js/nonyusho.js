@@ -143,12 +143,7 @@ async function submitReport(type) {
             a.remove();
         }
     } catch (error) {
-<<<<<<< HEAD
-		showErrorMessage(error.message);
-=======
-        console.error(`${type} エラー:`, error);
         showErrorMessage(error.message || '帳票の作成に失敗しました。');
->>>>>>> master
     }
 }
 
@@ -217,12 +212,7 @@ async function printReport() {
             };
         })
         .catch(error => {
-<<<<<<< HEAD
-			showErrorMessage(error.message);
-=======
-            console.error('印刷エラー:', error);
             showErrorMessage(error.message || '帳票の作成に失敗しました。');
->>>>>>> master
         });
 }
 
@@ -369,7 +359,6 @@ function validateForm() {
  * 画面上部にエラーメッセージを表示する
  */
 function showErrorMessage(message) {
-<<<<<<< HEAD
     const errorAlert = document.getElementById('errorAlert');
     const errorMessageText = document.getElementById('errorMessageText');
     
@@ -382,7 +371,6 @@ function showErrorMessage(message) {
 
 /**
  * 画面上部のエラーメッセージを非表示にする
-=======
     // 画面上部のalert-danger領域に表示する（reportForm.jsで定義）
     if (window.ReportError) {
         window.ReportError.show(message);
@@ -402,7 +390,6 @@ function clearErrorMessage() {
 
 /**
  * 成功メッセージ表示
->>>>>>> master
  */
 function hideErrorMessage() {
     const errorAlert = document.getElementById('errorAlert');
