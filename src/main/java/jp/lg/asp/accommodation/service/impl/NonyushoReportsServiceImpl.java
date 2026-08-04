@@ -61,7 +61,6 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 			
 			// 賦課情報が見つからない
 			if (dataSource == null) {
-				log.error("該当する賦課レコードが見つかりません: shiteiNo={}, nendo={}", dto.getShiteiNo(), dto.getNendo());
 				throw new RuntimeException("賦課情報が見つかりません。");
 			}
 			
@@ -151,7 +150,6 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 					log.error("納期限が設定できませんでした");
 				}
 			} else {
-				log.error("該当するt_fukaレコードが見つかりません: shiteiNo={}, nendo={}", shiteiNo, nendo);
 				response.setZeigaku("0");
 				response.setKasan("0");
 				response.setNokigen("");
@@ -165,7 +163,6 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 				response.setCityName(jichitaiOpt.get().getName());
 				log.debug("取得した自治体名: {}", jichitaiOpt.get().getName());
 			} else {
-				log.error("自治体情報が見つかりません: jichitaiCd={}", jichitaiCode);
 				response.setCityName("");
 			}
 

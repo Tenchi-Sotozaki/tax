@@ -75,8 +75,7 @@ function loadTokugimuInfo(shiteiNo) {
             document.getElementById('tokuName').value = data.name || '';
             document.getElementById('tokuJusho').value = data.jusho || '';
         })
-        .catch(error => {
-            console.error('特別徴収義務者情報取得エラー:', error);
+        .catch(() => {
             // エラー時はフィールドをクリア
             document.getElementById('tokuName').value = '';
             document.getElementById('tokuJusho').value = '';
@@ -142,7 +141,6 @@ async function submitReport(type) {
             a.remove();
         }
     } catch (error) {
-		console.error('Error:', error);
 		showErrorMessage(error.message);
     }
 }
@@ -187,7 +185,6 @@ async function printReport() {
             };
         })
         .catch(error => {
-			console.error('Error:', error);
 			showErrorMessage(error.message);
         });
 }
@@ -253,7 +250,6 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
        
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('サーバーエラー:', errorText);
             throw new Error(`データの取得に失敗しました (${response.status})`);
         }
         
@@ -279,7 +275,6 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
             torimatome: data.torimatome || ''
         };
     } catch (error) {
-        console.error('動的データ取得エラー:', error);
         // エラー時はデフォルト値を返す
         let nokigen = '';
         if (taishoYmValue) {
