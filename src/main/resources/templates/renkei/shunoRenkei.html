@@ -15,7 +15,7 @@
 				<i class="bi bi-file-earmark-arrow-up me-2 text-primary"></i>収納管理連携
 			</h5>
 			<span class="text-muted small"> 検索結果: <strong
-				th:text="${#lists.size(items)}">0</strong> 件
+				th:text="${items != null ? items.totalElements : 0}">0</strong> 件
 			</span>
 		</div>
 
@@ -110,6 +110,15 @@
 			</div>
 		</div>
 
+		<div class="d-flex justify-content-end align-items-center mb-2">
+			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
+			<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+				<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+				<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+				<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
+			</select>
+		</div>
+
 		<!-- 一覧エリア -->
 		<div class="table-container">
 			<table
@@ -130,7 +139,7 @@
 				</thead>
 				<tbody>
 					<th:block th:if="${items != null and !items.empty}">
-						<tr th:each="item : ${items}">
+						<tr th:each="item : ${items.content}">
 							<td class="text-center"><input type="checkbox"
 								name="selectedIds" th:value="${item.shiteiNo}"
 								th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo},data-kibetsu=${item.kibetsu}" />
@@ -156,13 +165,9 @@
 		</div>
 
 		<!-- ページネーション -->
-		<div class="card-footer bg-white py-2 border-top">
+		<div class="card-footer bg-white py-2 border-top" th:if="${items != null and items.totalPages > 0}">
 			<nav>
-				<ul class="pagination pagination-sm justify-content-center mb-0">
-					<li class="page-item disabled"><a class="page-link" href="#">前へ</a></li>
-					<li class="page-item active"><a class="page-link" href="#">1</a></li>
-					<li class="page-item"><a class="page-link" href="#">次へ</a></li>
-				</ul>
+				<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
 			</nav>
 		</div>
 	</div>

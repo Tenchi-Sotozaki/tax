@@ -39,8 +39,8 @@ public class TaxManagerForm {
 	private String managerNameKana;
 	private String managerPhone;
 
-	private boolean exemptionFlag;
-	private String exemptionReason;
+	private String kbn;
+	private String reason;
 
 	private boolean edit;
 	private String shiteiNo;
@@ -76,11 +76,14 @@ public class TaxManagerForm {
 				errors.put("registrationDate", "登録日は必須です");
 			if (form.getDeclarationDate() == null)
 				errors.put("declarationDate", "申告日は必須です");
-			if (form.isExemptionFlag()) {
-				if (!StringUtils.hasText(form.getExemptionReason()))
-					errors.put("exemptionReason", "選任免除理由は必須です");
+			String kbn = form.getKbn();
+			if ("2".equals(kbn) || "3".equals(kbn)) {
+				if (!StringUtils.hasText(form.getReason()))
+					errors.put("reason", "理由は必須です");
 			} else {
-				form.setExemptionReason(null);
+				form.setReason(null);
+			}
+			if (!"3".equals(kbn)) {
 				if (!StringUtils.hasText(form.getManagerYubinNo()))
 					errors.put("managerYubinNo", "住所（郵便番号）は必須です");
 				if (!StringUtils.hasText(form.getManagerAddress()))
@@ -99,10 +102,8 @@ public class TaxManagerForm {
 		public boolean isValid(TaxManagerForm form, ConstraintValidatorContext context) {
 			context.disableDefaultConstraintViolation();
 			java.util.Map<String, String> errors = validate(form);
-			errors.forEach((field, message) ->
-				context.buildConstraintViolationWithTemplate(message)
-						.addPropertyNode(field).addConstraintViolation()
-			);
+			errors.forEach((field, message) -> context.buildConstraintViolationWithTemplate(message)
+					.addPropertyNode(field).addConstraintViolation());
 			return errors.isEmpty();
 		}
 	}

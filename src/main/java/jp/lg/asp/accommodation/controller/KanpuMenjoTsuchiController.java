@@ -15,16 +15,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.KanpuMenjoTsuchiReportsService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,16 +49,26 @@ public class KanpuMenjoTsuchiController {
 
     private final JichitaiContext jichitaiContext;
 
+    private static final String SCREEN_ID = ScreenManagement.KANPU_MENJO_TSUCHI;
+
     /**
      * 徴収不能額の還付又は納入義務の免除決定通知書画面表示
      */
     @GetMapping
-    public String index(@RequestParam String shiteiNo,
+    @OpeLog(screenId = SCREEN_ID, operation = "初期表示")
+    public String index(HttpSession session,
                        @AuthenticationPrincipal User userDetails,
                        Model model) {
     	String jichitaiCode = jichitaiContext.getJichitaiCd();
+    	String shiteiNo = SessionHelper.getShiteiNo(session);
         try {
             log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
+
+            if (shiteiNo == null || shiteiNo.isEmpty()) {
+                model.addAttribute("showShiteiGassanModal", true);
+                model.addAttribute("dto", new KanpuMenjoTsuchiDto());
+                return "reports/kanpuMenjoTsuchi";
+            }
 
             // 特別徴収義務者情報取得
             TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
@@ -108,6 +123,7 @@ public class KanpuMenjoTsuchiController {
      * PDF生成
      */
     @PostMapping("/generatePdf")
+    @OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	@RptLog(rptId = ReportsConstants.KANPU_MENJO_TSUCHI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
     public ResponseEntity<byte[]> generatePdf(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                              @AuthenticationPrincipal User userDetails) {
@@ -138,6 +154,7 @@ public class KanpuMenjoTsuchiController {
      * プレビュー
      */
     @PostMapping("/preview")
+    @OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
 	@RptLog(rptId = ReportsConstants.KANPU_MENJO_TSUCHI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
     public ResponseEntity<byte[]> preview(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                          @AuthenticationPrincipal User userDetails) {
@@ -165,6 +182,7 @@ public class KanpuMenjoTsuchiController {
      * 印刷
      */
     @PostMapping("/print")
+    @OpeLog(screenId = SCREEN_ID, operation = "印刷")
 	@RptLog(rptId = ReportsConstants.KANPU_MENJO_TSUCHI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
     public ResponseEntity<byte[]> print(@ModelAttribute KanpuMenjoTsuchiDto dto,
                                        @AuthenticationPrincipal User userDetails) {

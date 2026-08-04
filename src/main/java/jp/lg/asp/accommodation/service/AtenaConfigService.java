@@ -2,13 +2,13 @@ package jp.lg.asp.accommodation.service;
 
 import java.math.BigDecimal;
 
-import jp.lg.asp.accommodation.dto.AtenaConfigForm;
+import jp.lg.asp.accommodation.entity.Atena;
 
 public interface AtenaConfigService {
 
-	AtenaConfigForm findByAtenaNo(BigDecimal atenaNo);
+    Atena findByAtenaNo(String jichitaiCd, BigDecimal atenaNo);
 
-	void register(AtenaConfigForm form);
+    Atena register(Atena atena, String jichitaiCd);
 
-	void update(BigDecimal atenaNo, AtenaConfigForm form);
+    Atena update(Atena atena, String jichitaiCd);
 }

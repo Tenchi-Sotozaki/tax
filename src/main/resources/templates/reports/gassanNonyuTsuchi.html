@@ -18,46 +18,31 @@
 						</h5>
 					</div>
 
-					<form id="tsuchiForm" th:object="${dto}" method="post">
-						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-						<!-- 特別徴収義務者情報エリア -->
-						<div class="card mb-4">
-							<div class="card-header">
-								<h5 class="mb-0">特別徴収義務者情報</h5>
-							</div>
-							<div class="card-body">
-								<div class="row g-3">
-									<div class="col-md-4">
-										<label class="form-label">指定番号</label>
-										<input type="text" class="form-control" th:field="*{shiteiNo}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">合算指定番号</label>
-										<input type="text" class="form-control" th:field="*{gassanShiteiNo}" readonly>
-									</div>
-									<div class="col-md-4">
-										<label class="form-label">特別徴収義務者名</label>
-										<input type="text" class="form-control" th:field="*{tokuName}" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
+					<!-- 帳票発行エラー表示エリア -->
+					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
 
-						<!-- 通知書情報エリア -->
+					<form id="tsuchiForm" th:object="${dto}" method="post"
+						onsubmit="return validateForm()">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						<input type="hidden" name="shiteiNo" th:value="${selectedShiteiGassan?.shiteiNo}" />
+						<!-- 特別徴収義務者情報エリア -->
+						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+
+						<!-- 内容エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">通知書情報</h5>
+								<h5 class="mb-0">内容</h5>
 							</div>
 							<div class="card-body">
 								<div class="row g-3">
 									<div class="col-md-6">
-										<label for="hakkoYmd" class="form-label">発行日 <span
+										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label>
 										<input type="date" class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}"
 											required>
 									</div>
 									<div class="col-md-6">
-										<label for="tekiyoStYmd" class="form-label">適用開始年月日</label>
+										<label for="tekiyoStYmd" class="form-label">適用開始年月</label>
 										<input type="date" class="form-control" id="tekiyoStYmd"
 											th:field="*{tekiyoStYmd}" readonly>
 									</div>
@@ -72,20 +57,28 @@
 							</div>
 						</div>
 
+						<input type="hidden" th:field="*{tokuName}">
 						<input type="hidden" th:field="*{tokuJusho}">
+						<input type="hidden" th:field="*{gassanShiteiNo}">
 						<input type="hidden" th:field="*{city}">
 						<input type="hidden" th:field="*{jorei}">
 						<input type="hidden" th:field="*{koin}">
 
 						<!-- アクションボタン -->
-						<div class="d-flex gap-2">
-							<button type="button" class="btn btn-primary" onclick="generatePdf()">
+						<div class="d-flex justify-content-center gap-2">
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/gassanNonyuTsuchi/pdf}">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
 							</button>
-							<button type="button" class="btn btn-outline-primary" onclick="preview()">
+							<button type="submit" class="btn btn-outline-primary"
+								th:formaction="@{/reports/gassanNonyuTsuchi/preview}" formtarget="_blank">
 								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
-							<button type="button" class="btn btn-primary" onclick="printReport()">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/gassanNonyuTsuchi/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
 						</div>
@@ -93,10 +86,13 @@
 				</div>
 			</div>
 		</div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/gassanNonyuTsuchi.js}"></script>
+		<script th:src="@{/js/reportForm.js}"></script>
 	</th:block>
 </body>
 

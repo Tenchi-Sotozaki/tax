@@ -4,7 +4,15 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-<title>納入申告管理台帳</title>
+	<title>納入申告管理</title>
+	
+	<style>
+		.btn-view:hover {
+			background-color: #ffffff !important;
+			border-color: var(--bs-primary) !important;
+			color: var(--bs-primary) !important;
+		}
+	</style>
 </head>
 
 <body>
@@ -13,7 +21,7 @@
 		<div
 			class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-currency-yen text-primary me-2"></i>納入申告管理台帳
+				<i class="bi bi-currency-yen text-primary me-2"></i>納入申告管理
 			</h5>
 		</div>
 
@@ -31,47 +39,78 @@
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
+		
+		<!-- 年度選択（ページネーション） -->
+		<nav th:with="
+			selectedNendo=${selectedNendo}, 
+			nendoList=${nendoList}, 
+			firstNendo=${!#lists.isEmpty(nendoList) ? nendoList[0] : selectedNendo}, 
+			lastNendo=${!#lists.isEmpty(nendoList) ? nendoList[#lists.size(nendoList) - 1] : selectedNendo}" 
+			class="pagination-container my-3"
+			th:if="${fukaDaichoForm != null}">
 
-		<!-- 抽出条件フォーム -->
-		<div class="card mb-3 shadow-sm">
-			<div class="card-header bg-light py-2">
-				<h6 class="mb-0">
-					<i class="bi bi-funnel me-2"></i>抽出条件
-				</h6>
-			</div>
-			<div class="card-body py-3">
-				<form
-					th:action="@{/declaration/payment-ledger/{id}(id=${fukaDaichoForm.shiteiNo})}"
-					th:object="${fukaDaichoForm}" method="get">
-					<div class="row g-3 align-items-end">
-						<div class="col-md-3">
-							<label for="nendo" class="form-label fw-medium">年度</label> <input
-								type="text" class="form-control" th:field="*{nendo}"
-								maxlength="4" placeholder="例: 2026">
-						</div>
-						<div class="col-md-3">
-							<label class="form-label fw-medium">ステータス</label> <select
-								class="form-select" th:field="*{status}"
-								onchange="this.form.submit()">
-								<option value="999">すべて</option>
-								<option value="1">申告済み</option>
-								<option value="2">未申告</option>
-							</select>
-						</div>
-						<div class="col-md-6 text-end">
-							<button type="submit" class="btn btn-primary px-4">
-								<i class="bi bi-search me-1"></i>検索
-							</button>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
+			<ul class="pagination pagination-sm justify-content-center mb-0">
+
+				<!-- 前へボタン -->
+				<li class="page-item" th:classappend="${selectedNendo <= firstNendo} ? 'disabled'">
+					<a class="page-link" 
+					   th:href="@{/declaration/payment-ledger(nendo=${selectedNendo - 1}, status=${currentStatus})}">
+						前へ
+					</a>
+				</li>
+
+				<!-- 最初の年度 -->
+				<li class="page-item" 
+				    th:if="${selectedNendo - 1 > firstNendo}">
+					<a class="page-link"
+					   th:href="@{/declaration/payment-ledger(nendo=${firstNendo}, status=${currentStatus})}"
+					   th:text="${firstNendo}">2022</a>
+				</li>
+
+				<!-- 前の省略記号 -->
+				<li class="page-item disabled" th:if="${selectedNendo - 2 > firstNendo}">
+					<span class="page-link">...</span>
+				</li>
+
+				<!-- 選択中の前後1年を表示 -->
+				<th:block th:each="nendo : ${nendoList}">
+					<li class="page-item" 
+					    th:if="${nendo >= selectedNendo - 1 and nendo <= selectedNendo + 1}"
+					    th:classappend="${nendo == selectedNendo} ? 'active'">
+						<a class="page-link"
+						   th:href="@{/declaration/payment-ledger(nendo=${nendo}, status=${currentStatus})}"
+						   th:text="${nendo}">
+						</a>
+					</li>
+				</th:block>
+
+				<!-- 後の省略記号 -->
+				<li class="page-item disabled" th:if="${selectedNendo + 2 < lastNendo}">
+					<span class="page-link">...</span>
+				</li>
+
+				<!-- 最後の年度 -->
+				<li class="page-item" 
+				    th:if="${selectedNendo + 1 < lastNendo}">
+					<a class="page-link"
+					   th:href="@{/declaration/payment-ledger(nendo=${lastNendo}, status=${currentStatus})}"
+					   th:text="${lastNendo}">
+				   </a>
+				</li>
+
+				<!-- 次へボタン -->
+				<li class="page-item" th:classappend="${selectedNendo >= lastNendo} ? 'disabled'">
+					<a class="page-link" 
+					   th:href="@{/declaration/payment-ledger(nendo=${selectedNendo + 1}, status=${currentStatus})}">
+						次へ
+					</a>
+				</li>
+
+			</ul>
+		</nav>
 
 		<!-- 明細テーブル -->
-		<form
-			th:action="@{/declaration/register/{id}(id=${fukaDaichoForm.shiteiNo})}"
-			method="get">
+		<div th:if="${fukaDaichoForm != null}">
 
 			<div class="card shadow-sm">
 				<div class="card-body p-0">
@@ -79,61 +118,87 @@
 						<table class="table table-hover table-bordered mb-0 align-middle">
 							<thead class="table-primary text-center">
 								<tr>
-									<th style="width: 50px;">選択</th>
 									<th>対象年月</th>
 									<th>宿泊税額</th>
 									<th>市区町村税額</th>
 									<th>都道府県税額</th>
 									<th>申告・納入期限</th>
-									<th>申告状況</th>
-									<th>納入状況</th>
+									<th>
+										<span data-bs-toggle="tooltip"
+											data-bs-placement="bottom"
+											th:attr="title='「申告済み」：〇&#10;「未申告」：ー&#10;「申告遅れ」：△'"
+											th:text="申告状況">
+										</span>
+									</th>
+									<th>
+										<span data-bs-toggle="tooltip"
+											data-bs-placement="bottom"
+											th:attr="title='「納入済み」：〇&#10;「未納入」：ー&#10;「納入遅れ」：▲&#10;「一部納入」：△'"
+											th:text="納入状況">
+										</span>
+									</th>
+									<th style="width: 50px;"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:each="item : ${fukaDaichoForm.items}"
-									th:classappend="${item.shinkokuZumi} ? '' : 'table-light'">
-									<td class="text-center"><input type="checkbox"
-										name="month" class="row-select"
-										th:value="${item.targetYearMonth}"
-										th:data-status="${item.shinkokuZumi}"
-										th:data-nendo="${item.nendo}"
-										th:data-kibetsu="${item.kibetsu}"></td>
-									<td class="text-center fw-bold"
-										th:text="${item.displayNengetsu}">-</td>
-									<td class="text-end px-4"><span
-										th:if="${item.totalZeigaku != null}"
-										th:text="${#numbers.formatInteger(item.totalZeigaku, 1, 'COMMA') + ' 円'}">-</span>
-										<span th:unless="${item.totalZeigaku != null}"
-										class="text-muted">-</span></td>
-									<td class="text-end px-4"><span
-										th:if="${item.cityZeigaku != null}"
-										th:text="${#numbers.formatInteger(item.cityZeigaku, 1, 'COMMA') + ' 円'}">-</span>
-										<span th:unless="${item.cityZeigaku != null}"
-										class="text-muted">-</span></td>
-									<td class="text-end px-4"><span
-										th:if="${item.kenZeigaku != null}"
-										th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' 円'}">-</span>
-										<span th:unless="${item.kenZeigaku != null}"
-										class="text-muted">-</span></td>
+									th:classappend="${item.nonyuStatus != 'partial'} ? 'table-danger' : 
+										(${item.shinkokuZumi} ? '' : 
+										(${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')} ? 'table-secondary' : 'table-danger'))">
+									<td class="text-center fw-bold" th:text="${item.displayNengetsu}">-</td>
+									<td class="text-end px-4"><span th:if="${item.totalZeigaku != null}"
+											th:text="${#numbers.formatInteger(item.totalZeigaku, 1, 'COMMA') + ' 円'}">-</span>
+										<span th:unless="${item.totalZeigaku != null}" class="text-muted">-</span>
+									</td>
+									<td class="text-end px-4"><span th:if="${item.cityZeigaku != null}"
+											th:text="${#numbers.formatInteger(item.cityZeigaku, 1, 'COMMA') + ' 円'}">-</span>
+										<span th:unless="${item.cityZeigaku != null}" class="text-muted">-</span>
+									</td>
+									<td class="text-end px-4"><span th:if="${item.kenZeigaku != null}"
+											th:text="${#numbers.formatInteger(item.kenZeigaku, 1, 'COMMA') + ' 円'}">-</span>
+										<span th:unless="${item.kenZeigaku != null}" class="text-muted">-</span>
+									</td>
 									<td class="text-center" th:text="${item.displayKigen}">-</td>
-									<td class="text-center"><span th:if="${item.shinkokuZumi}"
-										class="badge bg-success px-3 py-2"> <i
-											class="bi bi-check-circle me-1"></i>申告済み
-									</span> <span th:unless="${item.shinkokuZumi}"
-										class="badge bg-secondary px-3 py-2"> 未申告 </span></td>
+
+									<!-- 申告状況 -->
 									<td class="text-center">
-										<span th:if="${item.nonyuStatus == 'paid'}" class="badge bg-success px-3 py-2">
-											<i class="bi bi-check-circle me-1"></i>納入済み
-										</span>
-										<span th:if="${item.nonyuStatus == 'partial'}" class="badge bg-warning text-dark px-3 py-2">
-											<i class="bi bi-exclamation-circle me-1"></i>一部納入
-										</span>
-										<span th:if="${item.nonyuStatus == 'unpaid'}" class="badge bg-secondary px-3 py-2">
-											未納入
+										<span th:if="${item.shinkokuZumi}">〇</span>
+										<span th:unless="${item.shinkokuZumi}">
+											<span th:if="${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">ー</span>
+											<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">△</span>
 										</span>
 									</td>
+
+									<!-- 納入状況 -->
+									<td class="text-center">
+										<span th:if="${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">
+											<span th:if="${item.nonyuStatus == 'paid'}">〇</span>
+											<span th:if="${item.nonyuStatus == 'partial'}">△</span>
+											<span th:if="${item.nonyuStatus == 'unpaid'}">ー</span>
+										</span>
+										<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">▲</span>
+									</td>
+
+									<!-- 新規or照会 -->
+									<td class="text-center">
+										<button th:if="${item.shinkokuZumi}" type="button"
+											class="btn btn-outline-primary btn-lg px-5 btn-view bg-white">
+											照会
+										</button>
+										<button th:unless="${item.shinkokuZumi}" type="button"
+											class="btn btn-success btn-lg px-5 btn-register">
+											新規
+										</button>
+									</td>
+									
+									<input type="hidden"
+										name="month" class="row-select"
+										th:value="${item.targetYearMonth}"
+										th:data-status="${item.shinkokuZumi}" 
+										th:data-nendo="${item.nendo}"
+										th:data-kibetsu="${item.kibetsu}">
 								</tr>
-								<tr th:if="${#lists.isEmpty(fukaDaichoForm.items)}">
+								<tr th:if="${fukaDaichoForm == null or #lists.isEmpty(fukaDaichoForm.items)}">
 									<td colspan="8" class="text-center py-5 text-muted">
 										表示できる情報がありません</td>
 								</tr>
@@ -143,22 +208,7 @@
 				</div>
 			</div>
 
-			<div class="d-flex justify-content-center gap-3 py-4">
-				<button type="submit" class="btn btn-success btn-lg px-5">
-					<i class="bi bi-plus-circle me-1"></i>新規登録
-				</button>
-
-				<button type="button" id="btnViewDeclaration"
-					class="btn btn-outline-primary btn-lg px-5">
-					<i class="bi bi-eye me-2"></i>照会
-				</button>
-				<a th:href="@{/tokugimu/list}"
-					class="btn btn-outline-primary btn-lg px-3"> <i
-					class="bi bi-arrow-left me-1"></i>一覧に戻る
-				</a>
-			</div>
-
-		</form>
+		</div>
 		<!-- 特別徴収義務者指定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
@@ -166,9 +216,8 @@
 			<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 			<script th:inline="javascript">
 				/*<![CDATA[*/
-				// Thymeleaf変数をグローバルスコープに設定
-				window.fukaDaichoFormShiteiNo = /*[[${fukaDaichoForm.shiteiNo}]]*/'';
-				window.declarationViewBaseUrl = /*[[@{/declaration/view/}]]*/'/declaration/view/';
+				window.declarationViewBaseUrl = /*[[@{/declaration/view}]]*/'/declaration/view';
+				window.declarationRegisterBaseUrl = /*[[@{/declaration/register}]]*/'/declaration/register';
 				/*]]>*/
 			</script>
 			<script th:src="@{/js/tFukaDaicho.js}"></script>

@@ -32,6 +32,6 @@ public class Role extends BaseEntity {
 	@Column(name = "name", nullable = false)
 	private String name;
 
-	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	private List<RoleDetail> roleDetails;
 }

@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
@@ -21,6 +22,7 @@ import jp.lg.asp.accommodation.dto.TokureiShiteiCancelDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.service.TokureiShiteiCancelReportsService;
 import jp.lg.asp.accommodation.service.TokureiShiteiService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,15 +45,20 @@ public class TokureiShiteiCancelController {
 	 */
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
+	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
 		TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(shiteiNo);
-			if (shiteiDto != null) {
-				dto = convertToCancel(shiteiDto);
-			}
+		if (shiteiNo == null || shiteiNo.isEmpty()) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("dto", dto);
+			return "reports/tokureiShiteiCancel";
+		}
+
+		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(shiteiNo);
+		if (shiteiDto != null) {
+			dto = convertToCancel(shiteiDto);
 		}
 
 		if (dto.getHakkoYmd() == null) {
@@ -120,9 +127,6 @@ public class TokureiShiteiCancelController {
 		return ResponseEntity.ok().headers(headers).body(pdfData);
 	}
 
-	/**
-	 * TokureiShiteiDto から TokureiShiteiCancelDto への変換
-	 */
 	private TokureiShiteiCancelDto convertToCancel(TokureiShiteiDto src) {
 		TokureiShiteiCancelDto dest = new TokureiShiteiCancelDto();
 		dest.setShiteiNo(src.getShiteiNo());
@@ -132,6 +136,7 @@ public class TokureiShiteiCancelController {
 		dest.setShisetsuJusho(src.getShisetsuJusho());
 		dest.setCity(src.getCity());
 		dest.setJorei(src.getJorei());
+		dest.setBiko("");
 		return dest;
 	}
 }

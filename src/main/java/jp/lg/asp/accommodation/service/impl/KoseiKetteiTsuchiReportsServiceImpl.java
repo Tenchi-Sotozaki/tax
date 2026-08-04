@@ -87,11 +87,11 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
      */
     @Override
     @Transactional(readOnly = true)
-    public byte[] generatePdf(String shiteiNo, String b1Ym, String b2Ym, String b3Ym) {
+    public byte[] generatePdf(String shiteiNo, String b1Ym, String b2Ym, String b3Ym, String henkoKbn) {
     	init();
         KoseiKetteiTsuchiReportsDto dto = null;
         try {
-            dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym);
+            dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
             log.debug("PDF生成開始 - 指定番号: {}, b1Ym: {}, b2Ym: {}, b3Ym: {}", shiteiNo, b1Ym, b2Ym, b3Ym);
 
             String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(dto.getFukaKbn())
@@ -168,7 +168,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
      */
     @Transactional(readOnly = true)
     private KoseiKetteiTsuchiReportsDto buildDtoByTaishoYm(
-            String shiteiNo, String b1Ym, String b2Ym, String b3Ym) {
+            String shiteiNo, String b1Ym, String b2Ym, String b3Ym, String henkoKbn) {
 
         KoseiKetteiTsuchiReportsDto dto = new KoseiKetteiTsuchiReportsDto();
 
@@ -218,7 +218,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         // 納入税額・加算金・納期限の設定
         if (firstFuka != null) {
             setNofuAndKasan(dto, shiteiNo, firstFuka, ymArr);
-            dto.setHenko_kbn(firstFuka.getHenkoKbn());
+            dto.setHenko_kbn(henkoKbn != null && !henkoKbn.isEmpty() ? henkoKbn : firstFuka.getHenkoKbn());
         }
 
         // 都道府県名（m_jichitai.kbn_name）
@@ -300,10 +300,10 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         
         
 
-        if (firstFuka.getNokigen1() != null) {
-            dto.setNofu_kigen_nen(String.valueOf(firstFuka.getNokigen1().getYear()));
-            dto.setNofu_kigen_tsuki(String.valueOf(firstFuka.getNokigen1().getMonthValue()));
-            dto.setNofu_kigen_hi(String.valueOf(firstFuka.getNokigen1().getDayOfMonth()));
+        if (firstFuka.getNokigen() != null) {
+            dto.setNofu_kigen_nen(String.valueOf(firstFuka.getNokigen().getYear()));
+            dto.setNofu_kigen_tsuki(String.valueOf(firstFuka.getNokigen().getMonthValue()));
+            dto.setNofu_kigen_hi(String.valueOf(firstFuka.getNokigen().getDayOfMonth()));
         } else {
             dto.setNofu_kigen_nen("");
             dto.setNofu_kigen_tsuki("");

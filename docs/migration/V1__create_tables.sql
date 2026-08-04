@@ -193,7 +193,7 @@ CREATE TABLE IF NOT EXISTS t_nokan (
   jichitai_cd char(5) NOT NULL,
   shitei_no char(8) NOT NULL,
   rno numeric(3) NOT NULL,
-  menjo_kbn char(1) NOT NULL,
+  kbn char(1) NOT NULL,
   toroku_ymd date NOT NULL,
   shinkoku_ymd date NOT NULL,
   atena_no char(15),
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS t_nokan (
   yubin_no text,
   jusho text,
   tel text,
-  menjo_riyu text,
+  riyu text,
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
@@ -216,7 +216,7 @@ COMMENT ON TABLE t_nokan IS '納税管理人情報';
 COMMENT ON COLUMN t_nokan.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN t_nokan.shitei_no IS '指定番号';
 COMMENT ON COLUMN t_nokan.rno IS '履歴番号';
-COMMENT ON COLUMN t_nokan.menjo_kbn IS '選任免除区分';
+COMMENT ON COLUMN t_nokan.kbn IS '区分';
 COMMENT ON COLUMN t_nokan.toroku_ymd IS '登録年月日';
 COMMENT ON COLUMN t_nokan.shinkoku_ymd IS '申告年月日';
 COMMENT ON COLUMN t_nokan.atena_no IS '納税管理人宛名番号';
@@ -225,7 +225,7 @@ COMMENT ON COLUMN t_nokan.name_kana IS '納税管理人名称かな';
 COMMENT ON COLUMN t_nokan.yubin_no IS '納税管理人郵便番号';
 COMMENT ON COLUMN t_nokan.jusho IS '納税管理人住所';
 COMMENT ON COLUMN t_nokan.tel IS '納税管理人電話番号';
-COMMENT ON COLUMN t_nokan.menjo_riyu IS '専任免除理由';
+COMMENT ON COLUMN t_nokan.riyu IS '理由';
 COMMENT ON COLUMN t_nokan.new_flg IS '最新フラグ';
 COMMENT ON COLUMN t_nokan.del_flg IS '削除フラグ';
 COMMENT ON COLUMN t_nokan.add_dt IS '作成日時';
@@ -322,15 +322,14 @@ CREATE TABLE IF NOT EXISTS t_fuka (
   kasan_kbn1 char(1),
   kasan_ritsu1 numeric(5, 2),
   kasan_gaku1 numeric(13),
-  nokigen1 date,
   kasan_kbn2 char(1),
   kasan_ritsu2 numeric(5, 2),
   kasan_gaku2 numeric(13),
-  nokigen2 date,
   kasan_kbn3 char(1),
   kasan_ritsu3 numeric(5, 2),
   kasan_gaku3 numeric(13),
-  nokigen3 date,
+  entaikin numeric(13),
+  nokigen date,
   new_flg char(1) NOT NULL,
   del_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
@@ -365,15 +364,14 @@ COMMENT ON COLUMN t_fuka.ken_zeigaku IS '都道府県税額';
 COMMENT ON COLUMN t_fuka.kasan_kbn1 IS '加算金額区分1';
 COMMENT ON COLUMN t_fuka.kasan_ritsu1 IS '加算割合1';
 COMMENT ON COLUMN t_fuka.kasan_gaku1 IS '加算金額1';
-COMMENT ON COLUMN t_fuka.nokigen1 IS '納期限1';
 COMMENT ON COLUMN t_fuka.kasan_kbn2 IS '加算金額区分2';
 COMMENT ON COLUMN t_fuka.kasan_ritsu2 IS '加算割合2';
 COMMENT ON COLUMN t_fuka.kasan_gaku2 IS '加算金額2';
-COMMENT ON COLUMN t_fuka.nokigen2 IS '納期限2';
 COMMENT ON COLUMN t_fuka.kasan_kbn3 IS '加算金額区分3';
 COMMENT ON COLUMN t_fuka.kasan_ritsu3 IS '加算割合3';
 COMMENT ON COLUMN t_fuka.kasan_gaku3 IS '加算金額3';
-COMMENT ON COLUMN t_fuka.nokigen3 IS '納期限3';
+COMMENT ON COLUMN t_fuka.entaikin IS '延滞金';
+COMMENT ON COLUMN t_fuka.nokigen IS '納入期限';
 COMMENT ON COLUMN t_fuka.new_flg IS '最新フラグ';
 COMMENT ON COLUMN t_fuka.del_flg IS '削除フラグ';
 COMMENT ON COLUMN t_fuka.add_dt IS '作成日時';
@@ -1009,6 +1007,32 @@ COMMENT ON COLUMN t_atena_renkei.upd_user IS '更新者';
 COMMENT ON COLUMN t_atena_renkei.version IS 'バージョン';
 
 ------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_atena_renkei_def (
+  jichitai_cd char(5) NOT NULL,
+  seq numeric(8) NOT NULL,
+  atena_no numeric(15) NOT NULL,
+  name text NOT NULL,
+  kbn char(1) NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user text NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user text NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_atena_renkei_def_pkey PRIMARY KEY (jichitai_cd, seq, atena_no)
+);
+COMMENT ON TABLE t_atena_renkei_def IS '宛名連携詳細';
+COMMENT ON COLUMN t_atena_renkei_def.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_atena_renkei_def.seq IS '管理番号';
+COMMENT ON COLUMN t_atena_renkei_def.atena_no IS '宛名番号';
+COMMENT ON COLUMN t_atena_renkei_def.name IS '宛名名';
+COMMENT ON COLUMN t_atena_renkei_def.kbn IS '区分(1:差異なし/2:取込/3:スキップ)';
+COMMENT ON COLUMN t_atena_renkei_def.add_dt IS '作成日時';
+COMMENT ON COLUMN t_atena_renkei_def.add_user IS '作成者';
+COMMENT ON COLUMN t_atena_renkei_def.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_atena_renkei_def.upd_user IS '更新者';
+COMMENT ON COLUMN t_atena_renkei_def.version IS 'バージョン';
+
+------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_jichitai (
   jichitai_cd char(5) NOT NULL,
   name text NOT NULL,
@@ -1164,6 +1188,9 @@ CREATE TABLE IF NOT EXISTS t_operation_log (
   seq numeric(8) NOT NULL,
   screen_id char(10) NOT NULL,
   sousa text NOT NULL,
+  method text,
+  path text,
+  status text,
   param text,
   ope_user text NOT NULL,
   ope_dt timestamp NOT NULL,
@@ -1179,6 +1206,9 @@ COMMENT ON COLUMN t_operation_log.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN t_operation_log.seq IS '管理番号';
 COMMENT ON COLUMN t_operation_log.screen_id IS '画面ＩＤ';
 COMMENT ON COLUMN t_operation_log.sousa IS '操作';
+COMMENT ON COLUMN t_operation_log.method IS 'メソッド';
+COMMENT ON COLUMN t_operation_log.path IS 'PATH';
+COMMENT ON COLUMN t_operation_log.status IS 'ステータスコード';
 COMMENT ON COLUMN t_operation_log.param IS 'リクエストパラメータ';
 COMMENT ON COLUMN t_operation_log.ope_user IS '操作者';
 COMMENT ON COLUMN t_operation_log.ope_dt IS '操作日時';
@@ -1222,6 +1252,7 @@ COMMENT ON COLUMN t_reports_log.version IS 'バージョン';
 CREATE TABLE IF NOT EXISTS t_rpt_status (
   jichitai_cd char(5) NOT NULL,
   shitei_no char(8) NOT NULL,
+  nendo char(4) NOT NULL,
   rpt_id char(10) NOT NULL,
   create_dt timestamp NOT NULL,
   add_dt timestamp NOT NULL,
@@ -1229,11 +1260,12 @@ CREATE TABLE IF NOT EXISTS t_rpt_status (
   upd_dt timestamp NOT NULL,
   upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT t_rpt_status_pkey PRIMARY KEY (jichitai_cd, shitei_no, rpt_id)
+  CONSTRAINT t_rpt_status_pkey PRIMARY KEY (jichitai_cd, shitei_no, nendo, rpt_id)
 );
 COMMENT ON TABLE t_rpt_status IS '帳票発行状況';
 COMMENT ON COLUMN t_rpt_status.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN t_rpt_status.shitei_no IS '指定番号';
+COMMENT ON COLUMN t_rpt_status.nendo IS '年度';
 COMMENT ON COLUMN t_rpt_status.rpt_id IS '帳票ＩＤ';
 COMMENT ON COLUMN t_rpt_status.create_dt IS '帳票作成日時';
 COMMENT ON COLUMN t_rpt_status.add_dt IS '作成日時';
@@ -1241,4 +1273,38 @@ COMMENT ON COLUMN t_rpt_status.add_user IS '作成者';
 COMMENT ON COLUMN t_rpt_status.upd_dt IS '更新日時';
 COMMENT ON COLUMN t_rpt_status.upd_user IS '更新者';
 COMMENT ON COLUMN t_rpt_status.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_menu (
+  jichitai_cd char(5) NOT NULL,
+  menu_id char(8) NOT NULL,
+  level integer NOT NULL,
+  p_menu_id char(8),
+  name text NOT NULL,
+  screen_id char(10),
+  icon_link text,
+  link text,
+  dsp_odr integer NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user text NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user text NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_menu_pkey PRIMARY KEY (jichitai_cd, menu_id)
+);
+COMMENT ON TABLE m_menu IS 'メニュー管理';
+COMMENT ON COLUMN m_menu.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_menu.menu_id IS 'メニューＩＤ';
+COMMENT ON COLUMN m_menu.level IS '階層';
+COMMENT ON COLUMN m_menu.p_menu_id IS '親メニューＩＤ';
+COMMENT ON COLUMN m_menu.name IS 'メニュー名称';
+COMMENT ON COLUMN m_menu.screen_id IS '画面ＩＤ';
+COMMENT ON COLUMN m_menu.icon_link IS 'アイコン画像';
+COMMENT ON COLUMN m_menu.link IS 'リンク';
+COMMENT ON COLUMN m_menu.dsp_odr IS '表示順';
+COMMENT ON COLUMN m_menu.add_dt IS '作成日時';
+COMMENT ON COLUMN m_menu.add_user IS '作成者';
+COMMENT ON COLUMN m_menu.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_menu.upd_user IS '更新者';
+COMMENT ON COLUMN m_menu.version IS 'バージョン';
 

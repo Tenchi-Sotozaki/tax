@@ -31,6 +31,8 @@ public class TokugimuForm {
 
 	// ===== 特別徴収義務者情報 =====
 	private LocalDate registrationDate;
+	private LocalDate shinseiDate;
+	private LocalDate henkoDate;
 	@Size(max = 10)
 	private String tokugimuAddressNo;
 	private String tokugimuAddress;

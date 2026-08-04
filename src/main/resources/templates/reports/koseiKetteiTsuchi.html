@@ -24,33 +24,32 @@
 						th:data-taisho-ym-list="${taishoYmList}" style="display: none;">
 					</div>
 
+					<!-- 帳票発行エラー表示エリア -->
+					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
+
 					<form id="koseiKetteiForm" method="post">
 
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-						<input type="hidden" name="shiteiNo" th:value="${dto.shitei_no}" />
+						<input type="hidden" name="shiteiNo" th:value="${selectedShiteiGassan?.shiteiNo}" />
 						<input type="hidden" name="koin" th:value="${dto.koin}">
 
-						<!-- 対象施設エリア -->
+						<!-- 特別徴収義務者情報エリア -->
+						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+
+						<!-- 発行区分エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">対象施設</h5>
+								<h5 class="mb-0">発行区分 <span class="text-danger">*</span></h5>
 							</div>
 							<div class="card-body">
-								<div class="row g-3">
-									<div class="col-md-6">
-										<label class="form-label">指定番号</label> <input type="text"
-											class="form-control" th:value="${dto.shitei_no}" readonly>
+								<div class="d-flex gap-4">
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="henkoKbn" id="henkoKbnKosei" value="2" checked>
+										<label class="form-check-label" for="henkoKbnKosei">更正</label>
 									</div>
-									<div class="col-md-6">
-										<label class="form-label">施設名称</label> <input type="text"
-											class="form-control" th:value="${dto.shisetsu_name}" readonly>
-									</div>
-								</div>
-								<div class="row g-3 mt-2">
-									<div class="col-md-12">
-										<label class="form-label">施設住所</label> <input type="text"
-											class="form-control" th:value="${dto.shisetsu_jusho}"
-											readonly>
+									<div class="form-check">
+										<input class="form-check-input" type="radio" name="henkoKbn" id="henkoKbnKettei" value="3">
+										<label class="form-check-label" for="henkoKbnKettei">決定</label>
 									</div>
 								</div>
 							</div>
@@ -112,28 +111,35 @@
 						</div>
 
 						<!-- アクションボタン -->
-						<div class="d-flex gap-2">
-							<button type="button" class="btn btn-primary"
-								onclick="generatePdf()">
+						<div class="d-flex justify-content-center gap-2">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/koseiKetteiTsuchi/pdf}">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
 							</button>
-							<button type="button" class="btn btn-outline-primary"
-								onclick="preview()">
+							<button type="submit" class="btn btn-outline-primary"
+								th:formaction="@{/reports/koseiKetteiTsuchi/preview}" formtarget="_blank">
 								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
-							<button type="button" class="btn btn-primary"
-								onclick="printReport()">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/koseiKetteiTsuchi/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
 						</div>
 					</form>
 				</div>
 			</div>
 		</div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/koseiKetteiTsuchi.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
+		<script th:src="@{/js/reportForm.js}"></script>
 	</th:block>
 </body>
 

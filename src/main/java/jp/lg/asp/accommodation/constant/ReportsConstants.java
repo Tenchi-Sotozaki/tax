@@ -88,6 +88,10 @@ public final class ReportsConstants {
 	public static final String KOSEI_KETTEI_HOREI_INYOU1 = "RPT0000007";
 	// 更正・決定通知書 法令引用文2
 	public static final String KOSEI_KETTEI_HOREI_INYOU2 = "RPT0000008";
+	// 発行様式
+	public static final String KOFU_HAKKO_YOSHIKI = "RPT0000009";
+	// 交付条件
+	public static final String KOFU_JOKEN = "RPT0000010";
 
 	/* 
 	 * 操作名変換

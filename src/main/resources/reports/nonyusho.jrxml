@@ -19,6 +19,7 @@
 	<field name="nonyuBasho" class="java.lang.String"/>
 	<field name="shiteiKinyuName" class="java.lang.String"/>
 	<field name="torimatome" class="java.lang.String"/>
+	<field name="shinkokuKubun" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<title splitType="Stretch"/>
 	<detail>
@@ -1281,22 +1282,67 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="textField" uuid="4c070568-f7af-46e1-890f-9a1ea19ca485" x="191" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
-				<expression><![CDATA[公]]></expression>
-			</element>
-			<element kind="textField" uuid="f5a3fb0c-cd9f-4256-975d-e5668d8f4730" x="488" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
-				<expression><![CDATA[公]]></expression>
-			</element>
 			<element kind="ellipse" uuid="8efa501e-e138-494e-8c14-b659e2592430" mode="Opaque" x="493" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
-			<element kind="textField" uuid="4862a085-a8f9-4356-aae2-ff3d0becaa5f" x="745" y="16" width="30" height="30" fontSize="15.0" hTextAlign="Center" vTextAlign="Middle">
-				<expression><![CDATA[公]]></expression>
-			</element>
-			<element kind="ellipse" uuid="52207071-5074-4f00-80c2-7b7f324d0851" mode="Transparent" x="750" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
+			<element kind="ellipse" uuid="52207071-5074-4f00-80c2-7b7f324d0851" mode="Transparent" x="751" y="22" width="20" height="20" backcolor="rgba(255, 255, 255, 0.0)">
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+			</element>
+			<element kind="staticText" uuid="ba45ee87-99a6-4155-a625-b99722f77601" x="186" y="12" width="40" height="40" fontName="IPAex明朝" fontSize="16.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[公]]></text>
+			</element>
+			<element kind="staticText" uuid="aaf60520-20ac-41c3-ae2a-6906672163dd" x="483" y="12" width="40" height="40" fontName="IPAex明朝" fontSize="16.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[公]]></text>
+			</element>
+			<element kind="staticText" uuid="9ef8bf68-5a41-483b-a3eb-f4d042c2a6f8" x="741" y="12" width="40" height="40" fontName="IPAex明朝" fontSize="16.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[公]]></text>
+			</element>
+			<element kind="ellipse" uuid="6b50aa0f-19f7-4a65-bb2e-680684cba725" x="115" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["1".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="beb99fc7-c5ab-488d-80fa-7d83a2f67c3e" x="135" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["2".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="7db8758c-f915-4be6-b733-0bccfcc1e5ee" x="155" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["3".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="3c8796f3-670c-4277-a0bb-d7e2c273c82c" x="385" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["1".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="03c9c97f-7bd6-48b0-8d02-ee1f204ee96a" x="405" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["2".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="06b346ed-d8c0-4634-a52f-88ed72149bed" x="425" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["3".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="f7d98cc2-6e46-44fa-abc5-724f92c3870d" x="655" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["1".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="d97d61ce-9baf-4c8d-a36d-6a992ddb1e11" x="675" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["2".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="06a418e7-83ae-4e1b-a154-1127c6079df8" x="695" y="130" width="20" height="30" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["3".equals($F{shinkokuKubun})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
 		</band>
 	</detail>

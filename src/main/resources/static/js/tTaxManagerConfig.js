@@ -7,46 +7,35 @@ document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
     initAddressSearchModal();
     initSamePersonCheck();
+    initChangeHighlight();
 });
 
 // -----------------------------------------------------------------------
 // イベントバインド
 // -----------------------------------------------------------------------
 function bindEvents() {
-    // 選任免除の表示制御
-    const exemptionFlag = document.getElementById('exemptionFlag');
-    const exemptionReasonArea = document.getElementById('exemptionReasonArea');
+    const kbn = document.getElementById('kbn');
+    if (kbn) {
+        toggleKbnAreas(kbn.value);
+        kbn.addEventListener('change', () => toggleKbnAreas(kbn.value));
+    }
+}
 
-    if (exemptionFlag && exemptionReasonArea) {
-        const toggleExemptionArea = () => {
-            exemptionReasonArea.style.display = exemptionFlag.checked ? 'block' : 'none';
-            
-            if (exemptionFlag.checked) {
-                // 選任免除をチェックした場合、納税管理人情報をクリア
-                const clearField = (id) => {
-                    const el = document.getElementById(id);
-                    if (el) el.value = '';
-                };
-                clearField('managerYubinNo');
-                clearField('managerAddress');
-                clearField('managerName');
-                clearField('managerNameKana');
-                clearField('managerPhone');
-                
-                // 宛名番号もクリア
-                const atenaNoField = document.querySelector('input[name="atenaNo"]');
-                if (atenaNoField) atenaNoField.value = '';
-                
-                // チェックメッセージもクリア
-                hideCheckMessage();
-            } else {
-                // 選任免除のチェックを外した場合、免除理由をクリア
-                const exemptionReasonField = document.getElementById('exemptionReason');
-                if (exemptionReasonField) exemptionReasonField.value = '';
-            }
-        };
-        toggleExemptionArea();
-        exemptionFlag.addEventListener('change', toggleExemptionArea);
+function toggleKbnAreas(val) {
+    const reasonArea = document.getElementById('reasonArea');
+    if (reasonArea) {
+        reasonArea.style.display = (val === '2' || val === '3') ? 'block' : 'none';
+    }
+    const addrSearchBtn = document.querySelector('[data-bs-target="#addressSearchModal"]');
+    if (addrSearchBtn) addrSearchBtn.disabled = (val === '3');
+    if (val === '3') {
+        ['managerYubinNo', 'managerAddress', 'managerName', 'managerNameKana', 'managerPhone'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const atenaNoField = document.querySelector('input[name="atenaNo"]');
+        if (atenaNoField) atenaNoField.value = '';
+        hideCheckMessage();
     }
 }
 
@@ -62,15 +51,17 @@ function initAddressSearchModal() {
     searchBtn.addEventListener('click', async () => {
         const no = document.getElementById('addrSearchNo').value.trim();
         const name = document.getElementById('addrSearchName').value.trim();
+        const nameMatchType = document.querySelector('input[name="addrSearchNameMatchType"]:checked')?.value ?? 'partial';
         const address = document.getElementById('addrSearchAddress').value.trim();
+        const addressMatchType = document.querySelector('input[name="addrSearchAddressMatchType"]:checked')?.value ?? 'partial';
         const phone = document.getElementById('addrSearchPhone').value.trim();
         const kojinNo = document.getElementById('addrSearchKojinNo').value.trim();
         const hojinNo = document.getElementById('addrSearchHojinNo').value.trim();
 
         const params = new URLSearchParams();
         if (no) params.set('addressNumber', no);
-        if (name) params.set('name', name);
-        if (address) params.set('address', address);
+        if (name) { params.set('name', name); params.set('nameMatchType', nameMatchType); }
+        if (address) { params.set('address', address); params.set('addressMatchType', addressMatchType); }
         if (phone) params.set('phone', phone);
         if (kojinNo) params.set('kojinNo', kojinNo);
         if (hojinNo) params.set('hojinNo', hojinNo);
@@ -142,8 +133,6 @@ function selectAddress(d) {
     // 宛名番号をhiddenフィールドに設定
     setByName('atenaNo', d.addressNumber);
     
-    console.log('選択された宛名番号:', d.addressNumber); // デバッグ用
-    
     // 前回のエラーメッセージをクリア
     hideCheckMessage();
     
@@ -155,7 +144,7 @@ function selectAddress(d) {
     
     // モーダルが完全に閉じた後に同一人物チェックを実行
     setTimeout(() => {
-        checkSamePerson();
+        checkSamePerson(d.addressNumber);
     }, 300); // モーダルのアニメーション完了を待つ
 }
 
@@ -165,52 +154,26 @@ function selectAddress(d) {
 function initSamePersonCheck() {
     // 画面初期表示時にチェック実行（既存データがある場合）
     const atenaNo = document.querySelector('input[name="atenaNo"]')?.value;
-    const obligorAtenaNo = document.querySelector('input[name="obligorAtenaNo"]')?.value;
-    
-    if (atenaNo && obligorAtenaNo) {
-        checkSamePerson();
+    const sessionObligorAtenaNo = document.getElementById('sessionObligorAtenaNo')?.value;
+
+    if (atenaNo && sessionObligorAtenaNo) {
+        checkSamePerson(atenaNo);
     }
 }
 
-function checkSamePerson() {
-    const taxManagerAtenaNo = document.querySelector('input[name="atenaNo"]')?.value?.trim();
-    const obligorAtenaNo = document.querySelector('input[name="obligorAtenaNo"]')?.value?.trim();
-    
-    console.log('同一人物チェック:', { taxManagerAtenaNo, obligorAtenaNo }); // デバッグ用
-    
-    if (!taxManagerAtenaNo || !obligorAtenaNo) {
+function checkSamePerson(selectedAtenaNo) {
+    const sessionObligorAtenaNo = document.getElementById('sessionObligorAtenaNo')?.value?.trim();
+
+    if (!selectedAtenaNo || !sessionObligorAtenaNo) {
         hideCheckMessage();
         return;
     }
-    
-    // 同じ宛名番号の場合は即座にエラー表示
-    if (taxManagerAtenaNo === obligorAtenaNo) {
+
+    if (selectedAtenaNo.trim() === sessionObligorAtenaNo) {
         showCheckMessage('特別徴収義務者と同一人物のため、納税管理人として登録できません。', true);
-        return;
+    } else {
+        showCheckMessage('登録可能です。', false);
     }
-    
-    // 異なる宛名番号の場合は成功メッセージ表示
-    showCheckMessage('登録可能です。', false);
-    
-    // APIで詳細チェック（将来の拡張用）
-    $.ajax({
-        url: '/tax-manager/check-atena-duplicate',
-        type: 'POST',
-        data: {
-            taxManagerAtenaNo: taxManagerAtenaNo,
-            obligorAtenaNo: obligorAtenaNo
-        },
-        success: function(response) {
-            if (response.isDuplicate) {
-                showCheckMessage(response.message, true);
-            } else {
-                showCheckMessage(response.message, false);
-            }
-        },
-        error: function() {
-            showCheckMessage('チェック中にエラーが発生しました。', true);
-        }
-    });
 }
 
 function showCheckMessage(message, isError) {
@@ -244,64 +207,24 @@ function hideCheckMessage() {
 // -----------------------------------------------------------------------
 // 値の変更を監視して色を変える処理
 // -----------------------------------------------------------------------
+function initChangeHighlight() {
+    const inputs = document.querySelectorAll('.form-control, .form-check-input, .form-select');
 
-document.addEventListener('DOMContentLoaded', () => {
-
-    // 対象となる入力要素（input, textarea, select）をすべて取得
-    const inputs = document.querySelectorAll('.form-control, .form-check-input');
-
-    // 色を変更する関数
     function checkValue(input) {
         const initialValue = input.getAttribute('data-initial-value');
-        if (initialValue === null) return; // 初期値が設定されていない項目はスキップ
-
-        let currentValue;
-        let isChanged = false;
-
-        if (input.type === 'checkbox') {
-            // チェックボックスの判定（文字列の "true"/"false" と比較）
-            currentValue = input.checked ? 'true' : 'false';
-            isChanged = (currentValue !== initialValue);
-        } else {
-            // 通常の入力項目の判定
-            currentValue = input.value;
-            isChanged = (currentValue !== initialValue);
-        }
-
-        // 変化があれば警告色(薄い黄色とオレンジ枠)を付与、戻れば削除
-        if (isChanged) {
-            input.style.border = '3px solid #ffeb3b'; // 黄色
-        } else {
-            input.style.border = ''; // 元のスタイルに戻す
-        }
+        if (initialValue === null) return;
+        const isChanged = input.type === 'checkbox'
+            ? (input.checked ? 'true' : 'false') !== initialValue
+            : input.value !== initialValue;
+        input.style.border = isChanged ? '3px solid #ffeb3b' : '';
     }
 
-    // 通常の手入力に対するイベントを設定
     inputs.forEach(input => {
         input.addEventListener('input', () => checkValue(input));
         input.addEventListener('change', () => checkValue(input));
     });
 
-    // 画面全体でクリックや何かしらの操作があった時、readonly項目の色を再チェック
     const readonlyInputs = document.querySelectorAll('input[readonly], input[disabled], textarea[readonly]');
-
-    document.addEventListener('click', () => {
-        readonlyInputs.forEach(input => checkValue(input));
-    });
-    document.addEventListener('change', () => {
-        readonlyInputs.forEach(input => checkValue(input));
-    });
-
-    // 選任免除チェックボックスの初期制御
-    const exemptionFlag = document.getElementById('exemptionFlag');
-    const exemptionReasonArea = document.getElementById('exemptionReasonArea');
-    if (exemptionFlag && exemptionReasonArea) {
-        exemptionFlag.addEventListener('change', () => {
-            if (exemptionFlag.checked) {
-                exemptionReasonArea.style.display = 'block';
-            } else {
-                exemptionReasonArea.style.display = 'none';
-            }
-        });
-    }
-});
+    document.addEventListener('click', () => readonlyInputs.forEach(checkValue));
+    document.addEventListener('change', () => readonlyInputs.forEach(checkValue));
+}

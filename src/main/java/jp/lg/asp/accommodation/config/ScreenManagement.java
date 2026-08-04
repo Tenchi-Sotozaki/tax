@@ -37,10 +37,10 @@ public final class ScreenManagement {
 	public static final String TAXMANAGER_CONFIG = "ms00000003";
 
 	// ユーザー検索
-	public static final String USER_MANAGEMENT = "ss00000002";
+	public static final String USER_MANAGEMENT = "ss00000001";
 
 	// ユーザー登録/編集/削除
-	public static final String USER_CONFIG = "ss00000001";
+	public static final String USER_CONFIG = "ss00000002";
 
 	// 権限管理
 	public static final String ROLE_MANAGEMENT = "sc00000004";
@@ -134,6 +134,9 @@ public final class ScreenManagement {
 
 	// 適用納税周期登録/編集/照会
 	public static final String TEKIYO_NOZEI_SHUKI_CONFIG = "ms00000024";
+
+	// 徴収不能額の還付又は納入義務の免除決定通知書
+	public static final String KANPU_MENJO_TSUCHI = "ms00000027";
 
 	// 納入期限登録/編集
 	public static final String NOKIGEN_CONFIG = "sc00000006";

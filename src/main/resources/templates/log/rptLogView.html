@@ -16,13 +16,13 @@
 			</h5>
 		</div>
 
-		<!-- ======== 抽出条件 ======== -->
+		<!-- ======== 検索条件 ======== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
 						data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2"></i>抽出条件
+						<i class="bi bi-funnel me-2"></i>検索条件
 					</button>
 				</h2>
 			</div>
@@ -33,6 +33,22 @@
 							th:value="${_csrf.token}" />
 
 						<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
+
+							<!-- 印刷日時 FROM -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（FROM） <span class="text-danger">*</span></label>
+								<input type="datetime-local" class="form-control form-control-sm" id="opeDtFrom"
+									th:field="*{opeDtFrom}" th:classappend="${#fields.hasErrors('opeDtFrom')} ? 'is-invalid' : ''">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('opeDtFrom')}" th:errors="*{opeDtFrom}"></div>
+							</div>
+
+							<!-- 印刷日時 TO -->
+							<div class="col">
+								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（TO） <span class="text-danger">*</span></label>
+								<input type="datetime-local" class="form-control form-control-sm" id="opeDtTo"
+									th:field="*{opeDtTo}" th:classappend="${#fields.hasErrors('opeDtTo')} ? 'is-invalid' : ''">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('opeDtTo')}" th:errors="*{opeDtTo}"></div>
+							</div>
 
 							<!-- 帳票名 -->
 							<div class="col">
@@ -62,20 +78,6 @@
 									placeholder="前方一致">
 							</div>
 
-							<!-- 印刷日時 FROM -->
-							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（FROM）</label>
-								<input type="datetime-local" class="form-control form-control-sm" id="opeDtFrom"
-									th:field="*{opeDtFrom}">
-							</div>
-
-							<!-- 印刷日時 TO -->
-							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">印刷日時（TO）</label>
-								<input type="datetime-local" class="form-control form-control-sm" id="opeDtTo"
-									th:field="*{opeDtTo}">
-							</div>
-
 							<!-- 指定番号 -->
 							<div class="col">
 								<label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
@@ -87,7 +89,7 @@
 
 						<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 							<button type="button" class="btn btn-outline-secondary btn-sm" id="resetBtn">
-								<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
+								<i class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 							</button>
 							<button type="submit" class="btn btn-primary btn-sm px-4">
 								<i class="bi bi-search me-1"></i>検索する
@@ -98,9 +100,12 @@
 			</div>
 		</div>
 
-		<!-- ======== 件数 ======== -->
+		<!-- ======== 件数・ページネーション ======== -->
 		<div class="d-flex justify-content-between align-items-center mb-2">
 			<span class="text-muted small">検索結果：<span id="totalCount" th:text="${items.size()}">0</span> 件</span>
+			<nav>
+				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+			</nav>
 			<div class="d-flex align-items-center gap-2">
 				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
 				<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
@@ -142,12 +147,6 @@
 			</div>
 		</div>
 
-		<!-- ======== ページネーション ======== -->
-		<div class="d-flex justify-content-center mt-2 mb-2">
-			<nav>
-				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
-			</nav>
-		</div>
 
 	</div>
 

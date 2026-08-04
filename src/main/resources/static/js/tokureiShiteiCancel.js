@@ -3,116 +3,31 @@
  */
 
 /**
- * PDF生成
- */
-function generatePdf() {
-    if (!validateForm()) {
-        return;
-    }
-
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/reports/tokureiShiteiCancel/pdf';
-    form.target = '_self';
-    form.submit();
-}
-
-/**
- * プレビュー
- */
-function preview() {
-    if (!validateForm()) {
-        return;
-    }
-
-    const form = document.getElementById('tsuchiForm');
-    const formData = new URLSearchParams(new FormData(form));
-
-    fetch('/accommodation-tax/reports/tokureiShiteiCancel/preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('プレビューの生成に失敗しました');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('プレビューの表示に失敗しました。');
-        });
-}
-
-/**
- * 印刷
- */
-function print() {
-    if (!validateForm()) {
-        return;
-    }
-
-    const form = document.getElementById('tsuchiForm');
-    const formData = new URLSearchParams(new FormData(form));
-
-    fetch('/accommodation-tax/reports/tokureiShiteiCancel/print', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('印刷用PDFの生成に失敗しました');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const printWindow = window.open(url, '_blank');
-
-            printWindow.onload = function() {
-                setTimeout(() => {
-                    printWindow.print();
-                    printWindow.onafterprint = function() {
-                        printWindow.close();
-                        window.URL.revokeObjectURL(url);
-                    };
-                }, 500);
-            };
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('印刷の実行に失敗しました。');
-        });
-}
-
-/**
  * フォームバリデーション
  */
 function validateForm() {
+	
+	// エラーメッセージをクリア
+	window.ReportError.hide();
+	
     const hakkoYmd = document.getElementById('hakkoYmd').value;
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
     const riyu = document.getElementById('riyu').value;
 
     if (!hakkoYmd) {
-        alert('発行日を入力してください。');
+        window.ReportError.show('発行年月日を入力してください。');
         document.getElementById('hakkoYmd').focus();
         return false;
     }
 
     if (!tekiyoYmd) {
-        alert('適用年月日を入力してください。');
+        window.ReportError.show('適用年月を入力してください。');
         document.getElementById('tekiyoYmd').focus();
         return false;
     }
 
     if (!riyu.trim()) {
-        alert('取消理由を入力してください。');
+        window.ReportError.show('取消理由を入力してください。');
         document.getElementById('riyu').focus();
         return false;
     }

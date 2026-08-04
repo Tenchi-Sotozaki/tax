@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.controller;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import jp.lg.asp.accommodation.dto.KofuRitsuConfigDto;
+import jp.lg.asp.accommodation.entity.KofuRitsu;
 import jp.lg.asp.accommodation.service.KofuRitsuConfigService;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,14 +28,13 @@ class KofuRitsuConfigControllerTest {
     @InjectMocks KofuRitsuConfigController controller;
 
     @Test
-    void index_初期表示() {
-        when(kofuRitsuConfigService.findAll()).thenReturn(List.of());
+    void register_初期表示() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.index(model);
+        String view = controller.register(model);
 
         assertThat(view).isEqualTo("admin/kofuRitsuConfig");
-        assertThat(model.asMap()).containsKeys("configForm", "historyList");
+        assertThat(model.asMap()).containsKey("configForm");
     }
 
     @Test
@@ -41,12 +42,12 @@ class KofuRitsuConfigControllerTest {
         KofuRitsuConfigDto form = new KofuRitsuConfigDto();
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
         bindingResult.rejectValue("kofuRitsu", "NotNull", "必須です");
-        when(kofuRitsuConfigService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("admin/kofuRitsuConfig");
+        verify(kofuRitsuConfigService, never()).register(any());
     }
 
     @Test
@@ -57,7 +58,84 @@ class KofuRitsuConfigControllerTest {
 
         String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("redirect:/admin/kofu-ritsu");
+        assertThat(view).isEqualTo("redirect:/admin/kofu-ritsu/list");
         verify(kofuRitsuConfigService).register(form);
+    }
+
+    @Test
+    void list_照会画面() {
+        when(kofuRitsuConfigService.findAll()).thenReturn(List.of());
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("admin/kofuRitsuList");
+        assertThat(model.asMap()).containsKey("historyList");
+    }
+
+    @Test
+    void list_例外発生() {
+        when(kofuRitsuConfigService.findAll()).thenThrow(new RuntimeException("DB error"));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("admin/kofuRitsuList");
+        assertThat(model.asMap()).containsKey("errorMessage");
+    }
+
+    @Test
+    void editForm_編集画面初期表示() {
+        BigDecimal rno = BigDecimal.ONE;
+        KofuRitsu entity = new KofuRitsu();
+        entity.setRno(rno);
+        entity.setKofuRitsu(new BigDecimal("10.00"));
+        when(kofuRitsuConfigService.findByRno(rno)).thenReturn(entity);
+        Model model = new ExtendedModelMap();
+
+        String view = controller.editForm(rno, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("admin/kofuRitsuEdit");
+        assertThat(model.asMap()).containsKeys("configForm", "rno");
+    }
+
+    @Test
+    void editForm_例外発生() {
+        BigDecimal rno = BigDecimal.ONE;
+        when(kofuRitsuConfigService.findByRno(rno)).thenThrow(new RuntimeException("not found"));
+        Model model = new ExtendedModelMap();
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String view = controller.editForm(rno, model, redirectAttributes);
+
+        assertThat(view).isEqualTo("redirect:/admin/kofu-ritsu/list");
+        assertThat(redirectAttributes.getFlashAttributes()).containsKey("errorMessage");
+    }
+
+    @Test
+    void editSave_バリデーションエラー() {
+        BigDecimal rno = BigDecimal.ONE;
+        KofuRitsuConfigDto form = new KofuRitsuConfigDto();
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
+        bindingResult.rejectValue("kofuRitsu", "NotNull", "必須です");
+        Model model = new ExtendedModelMap();
+
+        String view = controller.editSave(rno, form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("admin/kofuRitsuEdit");
+        verify(kofuRitsuConfigService, never()).update(any(), any());
+    }
+
+    @Test
+    void editSave_正常更新() {
+        BigDecimal rno = BigDecimal.ONE;
+        KofuRitsuConfigDto form = new KofuRitsuConfigDto();
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
+        Model model = new ExtendedModelMap();
+
+        String view = controller.editSave(rno, form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("redirect:/admin/kofu-ritsu/list");
+        verify(kofuRitsuConfigService).update(rno, form);
     }
 }

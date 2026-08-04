@@ -6,32 +6,41 @@
 <title>宛名管理台帳</title>
 </head>
 <body>
-	<div layout:fragment="content" class="container-fluid px-4 py-3">
+	<div layout:fragment="content" class="container-fluid px-4 py-3"
+		th:with="isSearched=${param.atenaNo != null or param.name != null or param.nameKana != null or param.yubinNo != null or param.jusho != null or param.tel != null or param.kojinNo != null or param.hojinNo != null or param.page != null}">
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-person-lines-fill me-2 text-primary"></i>宛名管理台帳
 			</h5>
-
-			<!-- 件数 -->
-			<div class="d-flex justify-content-end mb-2">
-				<span class="text-muted small">検索結果：<span
+			<div class="d-flex align-items-center gap-3">
+				<span class="text-muted small" th:if="${isSearched}">検索結果：<span
 					th:text="${items.totalElements}">0</span> 件
 				</span>
+
 			</div>
 		</div>
 
-		<!-- ======= 抽出条件 (アコーディオン) ========= -->
+		<div th:if="${successMessage}"
+			class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- 抽出条件 (アコーディオン) -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button"
-						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2"></i>抽出条件
+						data-bs-toggle="collapse" data-bs-target="#searchPanel"
+						th:classappend="${isSearched} ? 'collapsed' : ''"
+						th:aria-expanded="${!isSearched} ? 'true' : 'false'">
+						<i class="bi bi-funnel me-2"></i>検索条件
 					</button>
 				</h2>
-				<div id="searchPanel" class="accordion-collapse collapse show">
+				<div id="searchPanel" class="accordion-collapse collapse"
+					th:classappend="${!isSearched} ? 'show' : ''">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/atena/list}" th:object="${searchForm}"
 							method="get">
@@ -42,18 +51,22 @@
 										th:field="*{atenaNo}" placeholder="宛名番号">
 								</div>
 								<div class="col">
-									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<div class="d-flex align-items-center gap-2 mb-1"
+										style="white-space: nowrap;">
 										<label class="form-label form-label-sm fw-medium mb-0">氏名/名称</label>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
+											<input class="form-check-input" type="radio"
+												th:field="*{nameMatchType}" value="prefix" id="namePrefix">
 											<label class="form-check-label small" for="namePrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
+											<input class="form-check-input" type="radio"
+												th:field="*{nameMatchType}" value="partial" id="namePartial">
 											<label class="form-check-label small" for="namePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
+											<input class="form-check-input" type="radio"
+												th:field="*{nameMatchType}" value="exact" id="nameExact">
 											<label class="form-check-label small" for="nameExact">完全</label>
 										</div>
 									</div>
@@ -61,19 +74,26 @@
 										th:field="*{name}" placeholder="氏名または名称">
 								</div>
 								<div class="col">
-									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<div class="d-flex align-items-center gap-2 mb-1"
+										style="white-space: nowrap;">
 										<label class="form-label form-label-sm fw-medium mb-0">ふりがな</label>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="prefix" id="nameKanaPrefix">
-											<label class="form-check-label small" for="nameKanaPrefix">前方</label>
+											<input class="form-check-input" type="radio"
+												th:field="*{nameKanaMatchType}" value="prefix"
+												id="nameKanaPrefix"> <label
+												class="form-check-label small" for="nameKanaPrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="partial" id="nameKanaPartial">
-											<label class="form-check-label small" for="nameKanaPartial">部分</label>
+											<input class="form-check-input" type="radio"
+												th:field="*{nameKanaMatchType}" value="partial"
+												id="nameKanaPartial"> <label
+												class="form-check-label small" for="nameKanaPartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameKanaMatchType}" value="exact" id="nameKanaExact">
-											<label class="form-check-label small" for="nameKanaExact">完全</label>
+											<input class="form-check-input" type="radio"
+												th:field="*{nameKanaMatchType}" value="exact"
+												id="nameKanaExact"> <label
+												class="form-check-label small" for="nameKanaExact">完全</label>
 										</div>
 									</div>
 									<input type="text" class="form-control form-control-sm"
@@ -85,18 +105,23 @@
 										th:field="*{yubinNo}" placeholder="郵便番号">
 								</div>
 								<div class="col">
-									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<div class="d-flex align-items-center gap-2 mb-1"
+										style="white-space: nowrap;">
 										<label class="form-label form-label-sm fw-medium mb-0">住所</label>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="prefix" id="jushoPrefix">
+											<input class="form-check-input" type="radio"
+												th:field="*{jushoMatchType}" value="prefix" id="jushoPrefix">
 											<label class="form-check-label small" for="jushoPrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="partial" id="jushoPartial">
-											<label class="form-check-label small" for="jushoPartial">部分</label>
+											<input class="form-check-input" type="radio"
+												th:field="*{jushoMatchType}" value="partial"
+												id="jushoPartial"> <label
+												class="form-check-label small" for="jushoPartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{jushoMatchType}" value="exact" id="jushoExact">
+											<input class="form-check-input" type="radio"
+												th:field="*{jushoMatchType}" value="exact" id="jushoExact">
 											<label class="form-check-label small" for="jushoExact">完全</label>
 										</div>
 									</div>
@@ -122,7 +147,7 @@
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/atena/list}"
 									class="btn btn-outline-secondary btn-sm"> <i
-									class="bi bi-arrow-counterclockwise me-1"></i>リセット
+									class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 								</a>
 								<button type="submit" class="btn btn-primary btn-sm px-4">
 									<i class="bi bi-search me-1"></i>検索する
@@ -134,99 +159,88 @@
 			</div>
 		</div>
 
-		<!-- 表示件数選択プルダウン -->
-		<div class="d-flex justify-content-end align-items-center mb-1">
-			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-			<select class="form-select form-select-sm" style="width: auto;" onchange="location.href=this.value">
-				<option th:each="s : ${#arrays.toArray({10, 50, 100})}"
-					th:value="@{/atena/list(page=0, pageSize=${s}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}"
-					th:text="${s}" th:selected="${s == searchForm.pageSize}">
-				</option>
-			</select>
-		</div>
+		<!-- 検索結果エリア -->
+		<div th:if="${isSearched}">
 
-		<!-- 一覧テーブル -->
-		<div class="card shadow-sm mb-5">
-			<div class="table-responsive">
-				<table class="table table-striped table-hover table-sm align-middle mb-0">
-					<thead class="table-primary">
-						<tr>
-							<th>宛名番号</th>
-							<th>氏名/名称</th>
-							<th>ふりがな</th>
-							<th>法人番号</th>
-							<th>郵便番号・住所</th>
-							<th>電話番号</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:if="${items.totalElements == 0}">
-							<td colspan="6" class="text-center text-muted py-4">該当する宛名が見つかりません</td>
-						</tr>
-						<tr th:each="item : ${items.content}">
-							<td th:text="${item.atenaNo}"></td>
-							<td th:text="${item.name}"></td>
-							<td class="text-muted" th:text="${item.nameKana}"></td>
-							<td th:text="${item.hojinNo}"></td>
-							<td><div
-									th:text="${item.yubinNo != null ? '〒' + item.yubinNo : ''}"></div>
-								<div th:text="${item.jusho}"></div></td>
-							<td>
-								<div th:text="${item.tel1}"></div>
-								<div th:if="${item.tel2}" th:text="${item.tel2}"
-									class="text-muted small"></div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+			<!-- 表示件数 + ページネーション（同一行） -->
+			<div class="d-flex align-items-center mb-1">
+				<div style="min-width: 130px;">
+					<a th:href="@{/atena/register}" class="btn btn-primary btn-sm">
+						<i class="bi bi-plus-circle me-1"></i>新規登録
+					</a>
+				</div>
+				<nav class="flex-grow-1">
+					<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
+				</nav>
+				<div class="d-flex align-items-center" style="min-width: 130px; justify-content: flex-end;">
+					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
+					</select>
+				</div>
 			</div>
-		</div>
 
-		<!-- ページネーション -->
-		<nav class="mt-2" th:if="${items.totalPages > 0}">
-			<ul class="pagination pagination-sm justify-content-center mb-0">
-				<!-- 前へ -->
-				<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-					<a class="page-link" th:href="@{/atena/list(page=${items.number - 1}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">前へ</a>
-				</li>
-				<!-- 省略なし（6ページ以下） -->
-				<th:block th:if="${items.totalPages <= 6}">
-					<li class="page-item" th:each="i : ${#numbers.sequence(0, items.totalPages - 1)}" th:classappend="${i == items.number} ? 'active'">
-						<a class="page-link" th:href="@{/atena/list(page=${i}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}" th:text="${i + 1}">1</a>
-					</li>
-				</th:block>
-				<!-- 省略あり（7ページ以上） -->
-				<th:block th:if="${items.totalPages > 6}">
-					<!-- 先頭ページ -->
-					<li class="page-item" th:classappend="${0 == items.number} ? 'active'">
-						<a class="page-link" th:href="@{/atena/list(page=0, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">1</a>
-					</li>
-					<!-- 先頭省略 -->
-					<li class="page-item disabled" th:if="${items.number > 3}">
-						<span class="page-link">...</span>
-					</li>
-					<!-- 中間ページ（先頭・末尾を除く） -->
-					<th:block th:each="i : ${#numbers.sequence(1, items.totalPages - 2)}">
-						<li class="page-item" th:if="${i >= items.number - 1 and i <= items.number + 1}" th:classappend="${i == items.number} ? 'active'">
-							<a class="page-link" th:href="@{/atena/list(page=${i}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}" th:text="${i + 1}">2</a>
-						</li>
-					</th:block>
-					<!-- 末尾省略 -->
-					<li class="page-item disabled" th:if="${items.number < items.totalPages - 4}">
-						<span class="page-link">...</span>
-					</li>
-					<!-- 末尾ページ -->
-					<li class="page-item" th:classappend="${items.totalPages - 1 == items.number} ? 'active'">
-						<a class="page-link" th:href="@{/atena/list(page=${items.totalPages - 1}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}" th:text="${items.totalPages}">N</a>
-					</li>
-				</th:block>
-				<!-- 次へ -->
-				<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-					<a class="page-link" th:href="@{/atena/list(page=${items.number + 1}, pageSize=${searchForm.pageSize}, atenaNo=${searchForm.atenaNo}, name=${searchForm.name}, nameMatchType=${searchForm.nameMatchType}, nameKana=${searchForm.nameKana}, nameKanaMatchType=${searchForm.nameKanaMatchType}, yubinNo=${searchForm.yubinNo}, jusho=${searchForm.jusho}, jushoMatchType=${searchForm.jushoMatchType}, tel=${searchForm.tel}, kojinNo=${searchForm.kojinNo}, hojinNo=${searchForm.hojinNo})}">次へ</a>
-				</li>
-			</ul>
-		</nav>
+			<!-- 一覧テーブル -->
+			<div class="card shadow-sm mb-5">
+				<div class="table-responsive">
+					<table
+						class="table table-striped table-hover table-sm align-middle mb-0">
+						<thead class="table-primary">
+							<tr>
+								<th>宛名番号</th>
+								<th>氏名/名称</th>
+								<th>ふりがな</th>
+								<th>法人番号</th>
+								<th>郵便番号・住所</th>
+								<th>電話番号</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${items.totalElements == 0}">
+								<td colspan="7" class="text-center text-muted py-4">該当する宛名が見つかりません</td>
+							</tr>
+							<tr th:each="item : ${items.content}">
+								<td th:text="${item.atena.atenaNo}"></td>
+								<td th:text="${item.atena.name}"></td>
+								<td class="text-muted" th:text="${item.atena.nameKana}"></td>
+								<td th:text="${item.atena.hojinNo}"></td>
+								<td>
+									<div
+										th:text="${item.atena.yubinNo != null ? '〒' + item.atena.yubinNo : ''}"></div>
+									<div th:text="${item.atena.jusho}"></div>
+								</td>
+								<td>
+									<div th:text="${item.atena.tel1}"></div>
+									<div th:if="${item.atena.tel2}" th:text="${item.atena.tel2}"
+										class="text-muted small"></div>
+								</td>
+								<td><a th:if="${item.manual}"
+									th:href="@{/atena/view/{atenaNo}(atenaNo=${item.atena.atenaNo})}"
+									class="btn btn-outline-primary btn-sm">照会</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div>
 
 	</div>
+	<th:block layout:fragment="scripts">
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				const rows = Array.from(document.querySelectorAll('tbody tr')).filter(tr => tr.querySelector('td'));
+				const pageSizeSelect = document.getElementById('pageSizeSelect');
+				const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
+				if (rows.length > 0) {
+					pager.render(1);
+					pageSizeSelect?.addEventListener('change', () => pager.render(1));
+				}
+			});
+		</script>
+	</th:block>
 </body>
 </html>

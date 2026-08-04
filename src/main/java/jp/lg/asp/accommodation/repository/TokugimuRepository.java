@@ -65,7 +65,7 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo);
 
-	@Query(value = "SELECT MAX(CAST(SUBSTRING(shitei_no, 4) AS INTEGER)) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no ~ '^[0-9]+$' AND SUBSTRING(shitei_no, 1, 3) = :prefix", nativeQuery = true)
+	@Query(value = "SELECT COALESCE(MAX(CAST(SUBSTRING(shitei_no, LENGTH(:prefix) + 1) AS INTEGER)), 0) FROM t_tokugimu WHERE jichitai_cd = :jichitaiCd AND shitei_no LIKE CONCAT(:prefix, '%') AND LENGTH(shitei_no) > LENGTH(:prefix) AND SUBSTRING(shitei_no, LENGTH(:prefix) + 1) ~ '^[0-9]+$'", nativeQuery = true)
 	Optional<Integer> findMaxShiteiNoByJichitaiCdAndPrefix(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("prefix") String prefix);
@@ -92,4 +92,17 @@ public interface TokugimuRepository extends JpaRepository<Tokugimu, TokugimuId> 
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("shiteiNo") String shiteiNo,
 			@Param("rno") BigDecimal rno);
+
+	/**
+	 * 削除されていない履歴を新しい順（rno 降順）で取得する。
+	 * new_flg は問わないため、最新版を論理削除した後の履歴確認にも利用できる。
+	 */
+	@Query("""
+			SELECT t FROM Tokugimu t
+			WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0'
+			ORDER BY t.rno DESC
+			""")
+	List<Tokugimu> findActiveHistoryByJichitaiCdAndShiteiNo(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo);
 }

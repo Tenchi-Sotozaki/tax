@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,7 +51,8 @@ class AdminUserControllerTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(userRepository.search(any(), any(), any(), any(), any())).thenReturn(List.of());
+        when(userRepository.searchPage(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(new PageImpl<>(List.of()));
         when(roleRepository.findByJichitaiCdOrderByRoleId("011002")).thenReturn(List.of());
 
         Authentication auth = mock(Authentication.class);
@@ -63,10 +66,11 @@ class AdminUserControllerTest {
     void list_一覧画面を返す() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new UserSearchForm(), model);
+        String view = controller.list(new UserSearchForm(), 0, 10, model);
 
         assertThat(view).isEqualTo("admin/userDaicho");
         assertThat(model.asMap()).containsKey("items");
+        assertThat(model.asMap().get("items")).isInstanceOf(Page.class);
     }
 
     @Test
@@ -122,28 +126,23 @@ class AdminUserControllerTest {
         String view = controller.delete("user01", new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/user-search");
-        verify(userRepository, never()).deleteById(any());
+        verify(userRepository, never()).save(any());
     }
 
     @Test
-    void delete_他ユーザーは削除可能() {
+    void delete_他ユーザーは論理削除される() {
+        User user = new User();
+        user.setId("other_user2");
+        user.setDelFlg("0");
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user));
+        when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
         String view = controller.delete("other_user2", new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/user-search");
-        verify(userRepository).deleteById(any(UserId.class));
+        assertThat(user.getDelFlg()).isEqualTo("1");
+        verify(userRepository).save(any(User.class));
+        verify(userRepository, never()).deleteById(any());
     }
 
-    @Test
-    void deleteBatch_ログイン中ユーザー含む場合はエラー() {
-        Authentication auth = mock(Authentication.class);
-        when(auth.getName()).thenReturn("user01");
-        SecurityContext ctx = mock(SecurityContext.class);
-        when(ctx.getAuthentication()).thenReturn(auth);
-        SecurityContextHolder.setContext(ctx);
-
-        String view = controller.deleteBatch(List.of("user01", "user02"), new RedirectAttributesModelMap());
-
-        assertThat(view).isEqualTo("redirect:/admin/user-search");
-        verify(userRepository, never()).save(any());
-    }
 }

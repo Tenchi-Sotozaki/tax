@@ -33,9 +33,12 @@ public class ShoreikinController {
 
 	@GetMapping("/list")
 	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
-	public String list(@ModelAttribute ShoreikinDto searchForm, Model model) {
+	public String list(@ModelAttribute ShoreikinDto searchForm, Model model,
+			@RequestParam(required = false) String searched) {
 		accessChecker.checkAccess(SCREEN_ID);
-		model.addAttribute("items", shoreikinService.search(searchForm));
+		if (searched != null) {
+			model.addAttribute("items", shoreikinService.search(searchForm));
+		}
 		model.addAttribute("searchForm", searchForm);
 		return LIST_VIEW;
 	}
@@ -79,8 +82,7 @@ public class ShoreikinController {
 			return "redirect:/shoreikin/list";
 		}
 
-		// 交付金照会画面への遷移（単一指定番号）
-		redirectAttributes.addAttribute("shiteiNo", selectedItems.get(0));
+		// 交付金照会画面への遷移（セッションに指定番号が保存済みのためパラメータ不要）
 		if (nendo != null && !nendo.isEmpty()) {
 			redirectAttributes.addAttribute("nendo", nendo);
 		}
@@ -105,8 +107,7 @@ public class ShoreikinController {
 			return "redirect:/shoreikin/list";
 		}
 
-		// 振込先口座照会画面への遷移（単一指定番号）
-		redirectAttributes.addAttribute("shiteiNo", selectedItems.get(0));
+		// 振込先口座照会画面への遷移（セッションに指定番号が保存済みのためパラメータ不要）
 		return "redirect:/shoreikin/furikomiKoza";
 	}
 }

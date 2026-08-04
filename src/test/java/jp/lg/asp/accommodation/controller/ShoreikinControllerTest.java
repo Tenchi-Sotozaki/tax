@@ -41,10 +41,20 @@ class ShoreikinControllerTest {
     }
 
     @Test
-    void list_一覧画面を返す() {
+    void list_初期表示はitemsなし() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new ShoreikinDto(), model);
+        String view = controller.list(new ShoreikinDto(), model, null);
+
+        assertThat(view).isEqualTo("shoreikin/shoreikin");
+        assertThat(model.asMap()).doesNotContainKey("items");
+    }
+
+    @Test
+    void list_検索後はitemsあり() {
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(new ShoreikinDto(), model, "true");
 
         assertThat(view).isEqualTo("shoreikin/shoreikin");
         assertThat(model.asMap()).containsKey("items");

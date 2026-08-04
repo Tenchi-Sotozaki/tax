@@ -3,10 +3,10 @@ package jp.lg.asp.accommodation.dto;
 import lombok.Data;
 
 /**
- * 宿泊税特別徴収事務交付金交付申請書DTO
+ * 宿泊税特別徴収事務交付金決定通知書・交付申請書DTO
  */
 @Data
-public class KofuShinseiDto {
+public class KofuKetteiTsuchiShinseiDto {
 
 	/** 指定番号 */
 	private String shiteiNo;
@@ -40,12 +40,22 @@ public class KofuShinseiDto {
 
 	/** 特別徴収義務者名 */
 	private String tokuName;
-
+	
+	/** 発行年月日 */
+	private String hakkoYmd;
+	
+	/** 交付年月日 */
+	private String kofuYmd;
+	
+	/** 条令 */
+	private String hakkoJorei;
+	
 	/** 公印 */
 	private byte[] koin;
-
-	public void setHakkoYmd(String hakkoYmd) {
-		// TODO 自動生成されたメソッド・スタブ
-
-	}
+	
+	/** 印刷対象：決定通知書 */
+	private boolean ketteiTsuchi = true;
+	
+	/** 印刷対象：交付申請書 */
+	private boolean shinsei = true;
 }

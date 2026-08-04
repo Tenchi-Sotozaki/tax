@@ -18,7 +18,7 @@ public class PasswordChangeRequiredFilter extends OncePerRequestFilter {
 
     // 強制リダイレクトの対象外にするパス（無限リダイレクト防止）
     private static final Set<String> ALLOWED_PATHS = Set.of(
-            "/admin/password-change", "/login", "/logout", "/error"
+            "/admin/password-change", "/admin/user-password-change", "/login", "/logout", "/error"
     );
 
     @Override

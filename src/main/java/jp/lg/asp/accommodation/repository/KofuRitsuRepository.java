@@ -28,6 +28,7 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 		       "WHERE k.jichitaiCd = :jichitaiCd " +
 		       "AND k.newFlg = 1 " +
 		       "AND k.tekiyoStYmd <= :nendoMatsubi " +
-		       "AND (k.tekiyoEdYmd IS NULL OR k.tekiyoEdYmd >= :nendoMatsubi)")
-	BigDecimal findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendoMatsubi") LocalDate nendoMatsubi);
+		       "AND (k.tekiyoEdYmd IS NULL OR k.tekiyoEdYmd >= :nendoMatsubi) " +
+		       "ORDER BY k.rno DESC")
+	List<BigDecimal> findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendoMatsubi") LocalDate nendoMatsubi);
 }

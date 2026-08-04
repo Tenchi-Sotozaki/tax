@@ -9,15 +9,35 @@ function toHalfWidth(str) {
 document.addEventListener('DOMContentLoaded', function() {
     const isView = document.getElementById('zeiritsuConfigRoot').dataset.isView === 'true';
 
+    // 自動更新確認モーダル制御
+    // サーバーが autoUpdateTarget ありで画面を返した場合、モーダルを自動表示
+    const autoUpdateModal = document.getElementById('autoUpdateConfirmModal');
+    if (autoUpdateModal) {
+        new bootstrap.Modal(autoUpdateModal, { backdrop: 'static' }).show();
+        document.getElementById('autoUpdateConfirmBtn').addEventListener('click', function() {
+            document.getElementById('confirmAutoUpdate').value = 'true';
+            bootstrap.Modal.getInstance(autoUpdateModal).hide();
+            document.getElementById('zeiritsuForm').submit();
+        });
+    }
+
+    // 登録ボタン（type=button）からのsubmit
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', function() {
+            document.getElementById('zeiritsuForm').submit();
+        });
+    }
+
     const displaySt = document.querySelector('input[name="tekiyoStYmDisplay"]');
     const hiddenSt = document.getElementById('tekiyoStYmHidden');
     const displayEd = document.querySelector('input[name="tekiyoEdYmDisplay"]');
     const hiddenEd = document.getElementById('tekiyoEdYmHidden');
 
-    if (hiddenSt && hiddenSt.value && hiddenSt.value.length === 6) {
+    if (displaySt && hiddenSt && hiddenSt.value && hiddenSt.value.length === 6) {
         displaySt.value = hiddenSt.value.substring(0, 4) + '-' + hiddenSt.value.substring(4, 6);
     }
-    if (hiddenEd && hiddenEd.value && hiddenEd.value.length === 6) {
+    if (displayEd && hiddenEd && hiddenEd.value && hiddenEd.value.length === 6) {
         displayEd.value = hiddenEd.value.substring(0, 4) + '-' + hiddenEd.value.substring(4, 6);
     }
 
@@ -34,16 +54,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const zeiValueLabel = document.getElementById('zeiValueLabel');
     const conditionLabel = document.getElementById('conditionLabel');
-    const zeiValueHint = document.getElementById('zeiValueHint');
 
     function updateLabel() {
         const checked = document.querySelector('input[name="fukaKbn"]:checked');
         const isTeiritsu = checked && checked.value === '2';
-        zeiValueLabel.textContent = (checked && checked.value === '1') ? '税額' : '税率';
-        conditionLabel.textContent = isTeiritsu ? '区分名' : '条件';
-        zeiValueHint.classList.toggle('d-none', !isTeiritsu);
+        if (zeiValueLabel) zeiValueLabel.textContent = (checked && checked.value === '1') ? '税額(円)' : '税率(%)';
+        if (conditionLabel) conditionLabel.textContent = isTeiritsu ? '区分名(更生・決定通知書等の区分に相当)' : '条件';
         document.querySelectorAll('.teigaku-condition').forEach(el => el.style.display = isTeiritsu ? 'none' : '');
         document.querySelectorAll('.teiritsu-condition').forEach(el => el.style.display = isTeiritsu ? '' : 'none');
+        document.querySelectorAll('[name$=".zeiValue"]').forEach(el => {
+            el.placeholder = isTeiritsu ? '0.00～99.99' : '';
+        });
     }
 
     document.querySelectorAll('input[name="fukaKbn"]').forEach(r => r.addEventListener('change', updateLabel));

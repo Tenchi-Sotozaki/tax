@@ -153,6 +153,8 @@ function saveRole() {
         })
         .then(result => {
             if (result.success) {
+                const msg = (currentMode === 'create') ? '権限を登録しました。' : '権限を更新しました。';
+                sessionStorage.setItem('flashMessage', msg);
                 location.reload();
             } else {
                 alert('保存に失敗しました: ' + result.message);
@@ -193,15 +195,13 @@ function switchToEditMode() {
     }
 }
 
-let currentUsersRoleId = null;
-
 function viewAssignedUsers() {
     const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
     const checked = document.querySelector('.role-checkbox:checked');
     if (!checked) return;
-    currentUsersRoleId = checked.value;
+    const roleId = checked.value;
 
-    fetch(`${ctx}/admin/role/users/${currentUsersRoleId}`)
+    fetch(`${ctx}/admin/role/users/${roleId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
@@ -211,39 +211,21 @@ function viewAssignedUsers() {
             document.getElementById('usersModalRoleName').textContent = data.roleName;
             const tbody = document.getElementById('usersModalBody');
             tbody.innerHTML = '';
-            data.users.forEach(user => {
+            if (data.users.length === 0) {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><input type="checkbox" class="user-assign-checkbox" value="${user.id}" ${user.assigned ? 'checked' : ''}></td>
-                    <td>${user.name}</td>`;
+                tr.innerHTML = '<td class="text-muted">この権限が付与されているユーザーはありません。</td>';
                 tbody.appendChild(tr);
-            });
+            } else {
+                data.users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.textContent = user.name;
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+                });
+            }
             bootstrap.Modal.getOrCreateInstance(document.getElementById('usersModal')).show();
         });
-}
-
-function updateAssignedUsers() {
-    const ctx = document.querySelector('[data-ctx]')?.dataset.ctx?.replace(/\/$/, '') ?? '';
-    const userIds = Array.from(document.querySelectorAll('.user-assign-checkbox:checked')).map(cb => cb.value);
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-
-    fetch(`${ctx}/admin/role/users/${currentUsersRoleId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
-        body: JSON.stringify({ userIds })
-    })
-        .then(r => r.json())
-        .then(result => {
-            if (result.success) {
-                bootstrap.Modal.getInstance(document.getElementById('usersModal')).hide();
-                sessionStorage.setItem('flashMessage', '付与ユーザーを更新しました。');
-                location.reload();
-            } else {
-                alert('更新に失敗しました: ' + result.message);
-            }
-        })
-        .catch(err => alert('通信エラー: ' + err.message));
 }
 
 function deleteRoles() {
@@ -288,6 +270,13 @@ document.getElementById('deleteForm').addEventListener('submit', function(e) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    const flash = sessionStorage.getItem('flashMessage');
+    if (flash) {
+        document.getElementById('flashMessageText').textContent = flash;
+        document.getElementById('flashMessage').classList.remove('d-none');
+        sessionStorage.removeItem('flashMessage');
+    }
 
     // 画面表示時の初期状態を記憶するためのマップ
     const initialValues = {};

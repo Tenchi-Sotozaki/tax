@@ -44,7 +44,7 @@ class ShunoRenkeiControllerTest {
     void index_一覧画面を返す() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.index(null, null, null, null, null, "partial", model);
+        String view = controller.index(null, null, null, null, null, "partial", 0, 10, model);
 
         assertThat(view).isEqualTo("renkei/shunoRenkei");
         assertThat(model.asMap()).containsKey("items");

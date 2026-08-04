@@ -3,127 +3,41 @@
  */
 
 /**
- * PDF生成
- */
-function generatePdf() {
-    if (!validateForm()) {
-        return;
-    }
-
-    const form = document.getElementById('tsuchiForm');
-    form.action = '/accommodation-tax/reports/tokureiShitei/pdf';
-    form.target = '_self';
-    form.submit();
-}
-
-/**
- * プレビュー
- */
-function preview() {
-    if (!validateForm()) {
-        return;
-    }
-
-    const form = document.getElementById('tsuchiForm');
-    const formData = new URLSearchParams(new FormData(form));
-
-    fetch('/accommodation-tax/reports/tokureiShitei/preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('プレビューの生成に失敗しました');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('プレビューの表示に失敗しました。');
-        });
-}
-
-/**
- * 印刷
- */
-function print() {
-    if (!validateForm()) {
-        return;
-    }
-
-    const form = document.getElementById('tsuchiForm');
-    const formData = new URLSearchParams(new FormData(form));
-
-    fetch('/accommodation-tax/reports/tokureiShitei/print', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('印刷用PDFの生成に失敗しました');
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const printWindow = window.open(url, '_blank');
-
-            printWindow.onload = function() {
-                setTimeout(() => {
-                    printWindow.print();
-                    printWindow.onafterprint = function() {
-                        printWindow.close();
-                        window.URL.revokeObjectURL(url);
-                    };
-                }, 500);
-            };
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('印刷の実行に失敗しました。');
-        });
-}
-
-/**
  * フォームバリデーション
  */
 function validateForm() {
+	
+	// 処理開始時に古いエラーをクリアする
+	window.ReportError.hide();
+	
     const hakkoYmd = document.getElementById('hakkoYmd').value;
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
-    const shonin = document.querySelector('input[name="shonin"]:checked');
-    const riyu = document.getElementById('riyu').value;
 
     if (!hakkoYmd) {
-        alert('発行日を入力してください。');
-        document.getElementById('hakkoYmd').focus();
-        return false;
+        window.ReportError.show('発行年月日を入力してください。')
+		return false;
     }
 
     if (!tekiyoYmd) {
-        alert('適用年月日を入力してください。');
-        document.getElementById('tekiyoYmd').focus();
-        return false;
-    }
-
-    if (!shonin) {
-        alert('承認を選択してください。');
-        return false;
-    }
-
-    if (shonin.value === '不承認' && !riyu.trim()) {
-        alert('不承認理由を入力してください。');
-        document.getElementById('riyu').focus();
+        window.ReportError.show('適用年月を入力してください。');
         return false;
     }
 
     return true;
+}
+
+// 区分（認定/不認定）の変更に応じて「不認定の理由」の有効/無効を切り替える
+function toggleBikoState() {
+    const shonin = document.getElementById('shonin');
+    const riyu = document.getElementById('riyu');
+
+    if (shonin.value === '承認') { // 承認
+		// 承認に変更された場合は理由をクリア
+        riyu.value = '';
+        riyu.disabled = true;
+    } else { // 不承認
+        riyu.disabled = false;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -136,21 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
         hakkoYmdInput.value = formattedDate;
     }
 
-    // 不承認選択時のみ理由欄を表示
-    const shoninRadios = document.querySelectorAll('input[name="shonin"]');
-    const riyuArea = document.getElementById('riyuArea');
-    shoninRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            riyuArea.style.display = this.value === '不承認' ? '' : 'none';
-            if (this.value !== '不承認') {
-                document.getElementById('riyu').value = '';
-            }
-        });
-    });
-
-    // 初期表示時に不承認が選択済みの場合は表示
-    const checkedShonin = document.querySelector('input[name="shonin"]:checked');
-    if (checkedShonin && checkedShonin.value === '不承認') {
-        riyuArea.style.display = '';
-    }
+	// 区分に応じて「不承認の理由」の有効/無効を切り替える
+	toggleBikoState();
 });

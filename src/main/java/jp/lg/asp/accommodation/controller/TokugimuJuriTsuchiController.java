@@ -10,8 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -20,6 +20,7 @@ import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.TokugimuJuriTsuchiDto;
 import jp.lg.asp.accommodation.service.TokugimuJuriTsuchiReportsService;
 import jp.lg.asp.accommodation.service.TokugimuJuriTsuchiService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,11 +43,15 @@ public class TokugimuJuriTsuchiController {
 	 */
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
-	public String index(@RequestParam(required = false) String shiteiNo, Model model) {
+	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TokugimuJuriTsuchiDto dto = new TokugimuJuriTsuchiDto();
 
-		if (shiteiNo != null && !shiteiNo.isEmpty()) {
+		// 指定番号はセッションから取得
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) shiteiNo = "";
+
+		if (!shiteiNo.isEmpty()) {
 			TokugimuJuriTsuchiDto tokugimuInfo = tokugimuJuriTsuchiService.getTokugimuInfo(shiteiNo);
 			if (tokugimuInfo != null) {
 				dto = tokugimuInfo;

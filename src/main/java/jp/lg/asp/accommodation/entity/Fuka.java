@@ -96,9 +96,6 @@ public class Fuka extends BaseEntity {
 	@Column(name = "kasan_gaku1")
 	private Long kasanGaku1;
 
-	@Column(name = "nokigen1")
-	private LocalDate nokigen1;
-
 	@Column(name = "kasan_kbn2", length = 1)
 	private String kasanKbn2;
 
@@ -107,9 +104,6 @@ public class Fuka extends BaseEntity {
 
 	@Column(name = "kasan_gaku2")
 	private Long kasanGaku2;
-
-	@Column(name = "nokigen2")
-	private LocalDate nokigen2;
 
 	@Column(name = "kasan_kbn3", length = 1)
 	private String kasanKbn3;
@@ -120,8 +114,11 @@ public class Fuka extends BaseEntity {
 	@Column(name = "kasan_gaku3")
 	private Long kasanGaku3;
 
-	@Column(name = "nokigen3")
-	private LocalDate nokigen3;
+	@Column(name = "entaikin")
+	private Long entaikin;
+
+	@Column(name = "nokigen")
+	private LocalDate nokigen;
 
 	@Column(name = "new_flg", length = 1)
 	private String newFlg;

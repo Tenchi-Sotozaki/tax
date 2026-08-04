@@ -17,7 +17,6 @@ import jp.lg.asp.accommodation.entity.RoleDetail;
 import jp.lg.asp.accommodation.entity.RoleId;
 import jp.lg.asp.accommodation.entity.Screen;
 import jp.lg.asp.accommodation.entity.User;
-import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.ScreenRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
@@ -74,6 +73,7 @@ public class RoleServiceImpl implements RoleService {
 				}
 			}
 			role.getRoleDetails().clear();
+			roleRepository.saveAndFlush(role);
 			role.getRoleDetails().addAll(updatedDetails);
 			roleRepository.save(role);
 		} else {
@@ -102,32 +102,8 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public List<User> findAllUsers(String jichitaiCd) {
-		return userRepository.findByJichitaiCdOrderById(jichitaiCd);
-	}
-
-	@Override
-	@Transactional
-	public void updateUserRole(String jichitaiCd, Long roleId, List<String> userIds, String updUser) {
-		// 現在このrole_idが付与されているユーザーのrole_idを0にリセット
-		List<User> currentUsers = userRepository.findByJichitaiCdAndRoleId(jichitaiCd, BigDecimal.valueOf(roleId));
-		for (User u : currentUsers) {
-			u.setRoleId(BigDecimal.ZERO);
-		}
-		userRepository.saveAll(currentUsers);
-
-		if (userIds != null) {
-			for (String userId : userIds) {
-				UserId pk = new UserId();
-				pk.setJichitaiCd(jichitaiCd);
-				pk.setId(userId);
-				User u = userRepository.findById(pk).orElse(null);
-				if (u != null) {
-					u.setRoleId(BigDecimal.valueOf(roleId));
-					userRepository.save(u);
-				}
-			}
-		}
+	public List<User> findAssignedUsers(String jichitaiCd, Long roleId) {
+		return userRepository.findAssignedUsers(jichitaiCd, BigDecimal.valueOf(roleId));
 	}
 
 	@Override

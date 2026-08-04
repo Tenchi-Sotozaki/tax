@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,17 +19,20 @@ import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.GassanUchi;
 import jp.lg.asp.accommodation.entity.KyodoJigyosha;
 import jp.lg.asp.accommodation.entity.Shoyusha;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.KyodoJigyoshaRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
+import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokugimuService;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +50,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 	private final ShoyushaRepository shoyushaRepository;
 	private final KyodoJigyoshaRepository kyodoJigyoshaRepository;
 	private final JichitaiRepository jichitaiRepository;
+	private final FukaRepository fukaRepository;
+	private final ShunoRirekiRepository shunoRirekiRepository;
 
 	private final JichitaiContext jichitaiContext;
 
@@ -92,8 +98,10 @@ public class TokugimuServiceImpl implements TokugimuService {
 		Map<BigDecimal, Atena> atenaMap = atenaRepository.findByJichitaiCdAndAtenaNoIn(jichitaiCd, atenaNos)
 				.stream().collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
 
-		Map<String, Boolean> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos)
-				.stream().collect(Collectors.toMap(GassanUchi::getShiteiNo, g -> true, (a, b) -> a));
+		// 指定番号 -> 合算指定番号。合算対象かどうかの判定にも利用する
+		Map<String, String> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos)
+				.stream().collect(Collectors.toMap(GassanUchi::getShiteiNo,
+						GassanUchi::getGassanShiteiNo, (a, b) -> a));
 
 		List<TokugimuListItem> allItems = tokugimuList.stream()
 				.map(t -> {
@@ -115,7 +123,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 							return null;
 					}
 
-					return new TokugimuListItem(
+					TokugimuListItem item = new TokugimuListItem(
 							t.getAtenaNo().longValue(),
 							t.getShiteiNo(),
 							atena != null ? atena.getName() : t.getKyokaName(),
@@ -126,6 +134,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 							status,
 							atena != null ? atena.getKojinNo() : null,
 							atena != null ? atena.getHojinNo() : null);
+					item.setGassanShiteiNo(gassanMap.get(t.getShiteiNo()));
+					return item;
 				})
 				.filter(item -> item != null)
 				.toList();
@@ -133,7 +143,77 @@ public class TokugimuServiceImpl implements TokugimuService {
 		int start = (int) pageable.getOffset();
 		int end = Math.min(start + pageable.getPageSize(), allItems.size());
 		List<TokugimuListItem> pageContent = start >= allItems.size() ? List.of() : allItems.subList(start, end);
+
+		// 最終申告日・納付状況は表示するページ分だけ問い合わせる
+		applyLastDeclarationInfo(jichitaiCd, pageContent);
+
 		return new PageImpl<>(pageContent, pageable, allItems.size());
+	}
+
+	/**
+	 * 一覧に表示する行へ、最終申告日と最終申告分の納付状況を設定する。
+	 * <p>
+	 * 「最終申告」は申告日（shinkoku_ymd）が最も新しいレコードとする。
+	 * 納付状況はその年度・期別の納入額合計と税額を突き合わせて判定し、
+	 * 申告実績が無い場合はいずれも未設定（画面では空欄と「-」）とする。
+	 * 行数分の問い合わせが発生しないよう、指定番号をまとめて取得する。
+	 *
+	 * @param jichitaiCd 自治体コード
+	 * @param items 対象行（表示するページ分）
+	 */
+	private void applyLastDeclarationInfo(String jichitaiCd, List<TokugimuListItem> items) {
+		if (items.isEmpty()) {
+			return;
+		}
+		List<String> shiteiNos = items.stream().map(TokugimuListItem::getShiteiNo).distinct().toList();
+
+		// 指定番号ごとの最終申告レコード（申告日の降順で先に来たものを採用）
+		Map<String, Fuka> lastFukaMap = new HashMap<>();
+		for (Fuka fuka : fukaRepository.findDeclaredByShiteiNoInOrderByShinkokuYmdDesc(jichitaiCd, shiteiNos)) {
+			lastFukaMap.putIfAbsent(fuka.getShiteiNo(), fuka);
+		}
+		if (lastFukaMap.isEmpty()) {
+			return;
+		}
+
+		// 指定番号・年度・期別ごとの納入額合計
+		Map<String, Long> nonyuMap = new HashMap<>();
+		for (Object[] row : shunoRirekiRepository.sumNonyugakuByShiteiNoIn(jichitaiCd, shiteiNos)) {
+			nonyuMap.put(nonyuKey((String) row[0], (String) row[1], (Integer) row[2]),
+					((Number) row[3]).longValue());
+		}
+
+		for (TokugimuListItem item : items) {
+			Fuka fuka = lastFukaMap.get(item.getShiteiNo());
+			if (fuka == null) {
+				continue;
+			}
+			item.setLastShinkokuYmd(fuka.getShinkokuYmd());
+			long zeigaku = fuka.getTotalZeigaku() != null ? fuka.getTotalZeigaku() : 0L;
+			long nonyu = nonyuMap.getOrDefault(
+					nonyuKey(fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu()), 0L);
+			item.setLastNonyuStatus(determineNonyuStatus(zeigaku, nonyu));
+		}
+	}
+
+	/** 納入額集計マップのキーを組み立てる。 */
+	private String nonyuKey(String shiteiNo, String nendo, Integer kibetsu) {
+		return shiteiNo + "|" + nendo + "|" + kibetsu;
+	}
+
+	/**
+	 * 税額と納入額合計から納付状況を判定する。
+	 *
+	 * @param zeigaku 税額
+	 * @param nonyugaku 納入額合計
+	 * @return paid=完納 / partial=一部納付 / unpaid=未納
+	 */
+	private String determineNonyuStatus(long zeigaku, long nonyugaku) {
+		long remaining = zeigaku - nonyugaku;
+		if (remaining <= 0) {
+			return "paid";
+		}
+		return remaining < zeigaku ? "partial" : "unpaid";
 	}
 
 	private List<Tokugimu> findTokugimuByGassanShiteiNo(String gassanShiteiNo) {
@@ -229,6 +309,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setAtenaNo(t.getAtenaNo().longValue());
 		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(t.getTorokuYmd());
+		form.setShinseiDate(t.getShinkokuYmd());
+		form.setHenkoDate(t.getHenkoYmd());
 		form.setRno(t.getRno().intValue());
 		form.setMaxRno(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
 		form.setMinRno(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
@@ -254,6 +336,8 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setAtenaNo(t.getAtenaNo().longValue());
 		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(t.getTorokuYmd());
+		form.setShinseiDate(t.getShinkokuYmd());
+		form.setHenkoDate(t.getHenkoYmd());
 		form.setRno(t.getRno().intValue());
 		form.setMaxRno(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
 		form.setMinRno(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).orElse(1));
@@ -365,15 +449,29 @@ public class TokugimuServiceImpl implements TokugimuService {
 	 */
 	@Override
 	@Transactional
-	public void deleteByShiteiNo(String shiteiNo) {
+	public boolean deleteByShiteiNo(String shiteiNo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
 				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("削除対象が見つかりません: " + shiteiNo));
 
 		t.setDelFlg("1");
+		t.setNewFlg("0");
 		tokugimuRepository.save(t);
-		log.debug("特別徴収義務者論理削除完了: shiteiNo={}", shiteiNo);
+
+		// 履歴が残っている場合は、残っている中で最も新しいものを最新版に戻す。
+		// これをしないと new_flg='1' のレコードが無くなり、一覧・照会のいずれからも参照できなくなる。
+		Tokugimu latest = tokugimuRepository
+				.findActiveHistoryByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream().findFirst().orElse(null);
+		if (latest == null) {
+			log.debug("特別徴収義務者論理削除完了（履歴なし）: shiteiNo={}", shiteiNo);
+			return false;
+		}
+		latest.setNewFlg("1");
+		tokugimuRepository.save(latest);
+		log.debug("特別徴収義務者論理削除完了（最新履歴を rno={} に戻す）: shiteiNo={}", latest.getRno(), shiteiNo);
+		return true;
 	}
 
 	// ========== ヘルパーメソッド ==========

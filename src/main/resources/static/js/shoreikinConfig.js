@@ -2,6 +2,23 @@
  * 特別徴収事務交付金照会／登録／編集画面用JavaScript
  */
 
+function createShoreikin() {
+    if (!confirm('交付金情報を登録しますか？')) {
+        return;
+    }
+
+    // バリデーションチェック
+    if (!validateForm()) {
+        return;
+    }
+
+    // メインフォームをそのまま送信
+    const form = document.querySelector('form[th\\:object]');
+    if (form) {
+        form.submit();
+    }
+}
+
 function editMode() {
     // 編集モードに切り替え
     document.getElementById('editForm').submit();
@@ -99,18 +116,26 @@ function validateForm() {
     // 交付率バリデーション
     const kofuRitsu = document.getElementById('kofuRitsu').value.trim();
     if (!kofuRitsu) {
-        errors.push('交付率は必須入力です');
-        isValid = false;
-    } else {
-        const ritsu = parseFloat(kofuRitsu);
-        if (isNaN(ritsu) || ritsu < 0) {
-            errors.push('交付率は0.00以上の数字で入力してください');
-            isValid = false;
-        } else if (ritsu > 99999.99) {
-            errors.push('交付率は整数部5桁、小数部2桁以内で入力してください');
-            isValid = false;
-        }
+        showLinkAlert(
+            '交付率が設定されていません。<br>' +
+            '<a href="/accommodation-tax/admin/kofu-ritsu" class="alert-link">「交付率登録」</a>から設定してください。'
+        );
+        return false;
     }
+	
+//    if (!kofuRitsu) {
+//        errors.push('交付率は必須入力です。「交付率登録」から設定してください。');
+//        isValid = false;
+//    } else {
+//        const ritsu = parseFloat(kofuRitsu);
+//        if (isNaN(ritsu) || ritsu < 0) {
+//            errors.push('交付率は0.00以上の数字で入力してください');
+//            isValid = false;
+//        } else if (ritsu > 99999.99) {
+//            errors.push('交付率は整数部5桁、小数部2桁以内で入力してください');
+//            isValid = false;
+//        }
+//    }
 
     // 交付額バリデーション
     const kofuGaku = document.getElementById('kofuGaku').value.trim();
@@ -196,3 +221,13 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('blur', () => checkValue(input));
     });
 });
+
+// 交付率エラーアラート
+function showLinkAlert(htmlMessage) {
+    const bodyElement = document.getElementById('customAlertBody');
+    bodyElement.innerHTML = htmlMessage; // HTMLをそのまま反映させてリンクを有効にする
+
+    const modalElement = document.getElementById('customAlertModal');
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+}

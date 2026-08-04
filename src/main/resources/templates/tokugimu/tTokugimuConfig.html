@@ -1,40 +1,42 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
 <title>特別徴収義務者新規登録/編集/照会</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 pb-4"
-		th:with="formAction=${isEdit} ? '/tokugimu/edit/' + ${editId} : '/tokugimu/registration'"
+		th:with="formAction=${isEdit} ? '/tokugimu/edit' : '/tokugimu/registration'"
 		th:data-is-edit="${isEdit}">
 
 		<div class="pb-2 mb-3 border-bottom sticky-top shadow-sm pt-3"
 			style="z-index: 1020; top: -1rem; background-color: #f8f9fa;">
+			<!-- 1段目：タイトル / 帳票印刷ボタン（照会のみ） -->
 			<div
-				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center gap-2">
 				<h5 class="mb-0 fw-bold text-dark">
 					<i class="bi bi-person-plus me-2 text-primary"></i> <span
 						th:text="${isView} ? '特別徴収義務者 照会' : (${isEdit} ? '特別徴収義務者 編集' : '特別徴収義務者 新規登録')"></span>
 				</h5>
-				<div class="d-flex gap-2 mr-2">
-					<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
-					<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
-					<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
-					<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
-					<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
-					<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
-					<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
-					<a href="#business-status-info"
-						class="btn btn-outline-warning btn-sm"
-						th:if="${isEdit} or ${isView}">宿泊施設営業状況情報</a>
+				<div class="d-flex gap-2 ms-auto" th:if="${isView}">
+					<a th:href="@{/reports/tokugimuShiteiTsuchi}"
+						class="btn btn-outline-primary btn-sm"> <i
+						class="bi bi-printer me-1"></i>特別徴収義務者指定通知書
+					</a>
+					<a th:href="@{/reports/tokugimuJuriTsuchi}"
+						class="btn btn-outline-primary btn-sm"> <i
+						class="bi bi-printer me-1"></i>特別徴収義務者申請受理通知書
+					</a>
 				</div>
 			</div>
+
+			<!-- 2段目：特別徴収義務者情報・指定ボタン / 編集するボタン -->
 			<div
-				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center ">
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center gap-2 mt-2">
 				<!-- 特別徴収義務者情報 -->
 
 				<div th:if="${isEdit} or ${isView}">
@@ -43,36 +45,50 @@
 				</div>
 
 				<th:block th:if="${isView}">
-					<a th:href="@{/tokugimu/edit/{id}(id=${editId})}"
-						class="btn btn-primary btn-sm mt-2"> <i
+					<a th:href="@{/tokugimu/edit}"
+						class="btn btn-primary btn-sm ms-auto"> <i
 						class="bi bi-pencil-square me-2"></i>編集する
 					</a>
 				</th:block>
 			</div>
+
+			<!-- 3段目：アンカーリンク -->
+			<div class="d-flex gap-2 flex-wrap mt-2 justify-content-end">
+				<a href="#hiduke-info" class="btn btn-outline-primary btn-sm">日付情報</a>
+				<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
+				<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
+				<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
+				<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
+				<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
+				<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
+				<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
+				<a href="#business-status-info" class="btn btn-outline-primary btn-sm"
+					th:if="${isEdit} or ${isView}">宿泊施設営業状況情報</a>
+			</div>
 		</div>
 
-		<!-- 履歴ナビゲーション（照会画面のみ） -->
-		<div th:if="${(isView ?: false) and TokugimuForm.maxRno != null and TokugimuForm.maxRno > 1}"
-			class="d-flex align-items-center gap-2 mb-3">
-			<a th:href="@{/tokugimu/view/{id}(id=${editId}, rno=${TokugimuForm.rno - 1})}"
-				class="btn btn-outline-secondary btn-sm"
-				th:classappend="${TokugimuForm.rno <= TokugimuForm.minRno} ? ' disabled'">
-				<i class="bi bi-chevron-left"></i> 前の履歴
-			</a>
-			<span class="text-muted small">履歴 <span th:text="${TokugimuForm.rno}"></span> / <span th:text="${TokugimuForm.maxRno}"></span></span>
-			<a th:href="@{/tokugimu/view/{id}(id=${editId}, rno=${TokugimuForm.rno + 1})}"
-				class="btn btn-outline-secondary btn-sm"
-				th:classappend="${TokugimuForm.rno >= TokugimuForm.maxRno} ? ' disabled'">
-				次の履歴 <i class="bi bi-chevron-right"></i>
-			</a>
-		</div>
-
-		<!-- 登録・更新成功メッセージ -->
+		<!-- 登録・更新成功メッセージ（固定ヘッダーの直下に表示する） -->
 		<div th:if="${successMessage}"
 			class="alert alert-success alert-dismissible fade show" role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i> <span
 				th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<!-- 履歴ナビゲーション（照会画面のみ） -->
+		<div th:if="${(isView ?: false) and TokugimuForm.maxRno != null and TokugimuForm.maxRno > 1}"
+			class="d-flex align-items-center gap-2 mb-3">
+			<a th:href="@{/tokugimu/view(rno=${TokugimuForm.rno - 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${TokugimuForm.rno <= TokugimuForm.minRno} ? ' disabled'">
+				<i class="bi bi-chevron-left"></i> 前の履歴
+			</a>
+			<span class="text-muted small">履歴 <span th:text="${TokugimuForm.rno}"></span> / <span th:text="${TokugimuForm.maxRno}"></span></span>
+			<a th:href="@{/tokugimu/view(rno=${TokugimuForm.rno + 1})}"
+				class="btn btn-outline-secondary btn-sm"
+				th:classappend="${TokugimuForm.rno >= TokugimuForm.maxRno} ? ' disabled'">
+				次の履歴 <i class="bi bi-chevron-right"></i>
+			</a>
 		</div>
 
 		<form id="registerForm" th:action="@{${formAction}}"
@@ -96,6 +112,70 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
+			<!-- ===== 日付情報 ===== -->
+			<div id="hiduke-info" class="card mb-4 shadow-sm">
+				
+				<!-- カードヘッダー -->
+				<div class="card-header py-3">
+					<h5 class="mb-0">
+						<i class="bi bi-calendar-date me-2"></i>日付情報
+					</h5>
+				</div>
+				
+				<!-- カードボディ -->
+				<div class="card-body bg-light-subtle">
+					<div class="row g-3">
+						<!-- 登録日 -->
+						<div class="col-md-2">
+							<label for="registrationDate" class="form-label fw-medium">
+								登録日 <span class="text-danger" th:if="!${isView}">*</span>
+							</label>
+							<input th:if="!${isView}" type="date" class="form-control" id="registrationDate"
+								name="registrationDate" th:errorclass="is-invalid"
+								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}"
+								th:data-initial-value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{registrationDate}">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('registrationDate')}"
+								th:errors="*{registrationDate}">
+							</div>
+						</div>
+
+						<!-- 変更日 -->
+						<div th:if="${isEdit}" class="col-md-2">
+							<label for="henkoDate" class="form-label fw-medium">
+								変更日 <span class="text-danger" th:if="!${isView}">*</span>
+							</label>
+							<input th:if="!${isView}" type="date" class="form-control" id="henkoDate"
+								name="henkoDate" th:errorclass="is-invalid"
+								th:value="*{henkoDate != null ? #temporals.format(henkoDate, 'yyyy-MM-dd') : ''}"
+								th:data-initial-value="*{henkoDate != null ? #temporals.format(henkoDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{henkoDate}">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('henkoDate')}"
+								th:errors="*{henkoDate}">
+							</div>
+						</div>
+
+						<!-- 申請日 -->
+						<div th:if="!${isEdit}" class="col-md-2">
+							<label for="shinseiDate" class="form-label fw-medium">
+								申請日 <span class="text-danger" th:if="!${isView}">*</span>
+							</label>
+							<input th:if="!${isView}" type="date" class="form-control" id="shinseiDate"
+								name="shinseiDate" th:errorclass="is-invalid"
+								th:value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}"
+								th:data-initial-value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}">
+							<input th:if="${isView}" type="text" class="form-control" readonly
+								th:value="*{shinseiDate}">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('shinseiDate')}"
+								th:errors="*{shinseiDate}">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- ===== 特別徴収義務者情報 ===== -->
 			<div id="tokugimu-info" class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
@@ -107,41 +187,22 @@
 					<div class="row g-3">
 
 						<!-- 指定番号 -->
-						<div class="col-md-4">
-							<label for="shiteiNo" class="form-label fw-medium">指定番号</label> <input
-								type="text" class="form-control" id="shiteiNo"
-								th:field="*{shiteiNo}" placeholder="自動で設定されます" readonly
-								th:data-initial-value="*{shiteiNo}">
-						</div>
-
-						<!-- 登録日 -->
-						<div class="col-md-4">
-							<label for="registrationDate" class="form-label fw-medium">
-								登録日 <span class="text-danger" th:if="!${isView}">*</span>
-							</label> <input th:if="!${isView}" type="date" class="form-control"
-								id="registrationDate" name="registrationDate"
-								th:errorclass="is-invalid"
-								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{registrationDate}">
-							<div class="invalid-feedback"
-								th:if="${#fields.hasErrors('registrationDate')}"
-								th:errors="*{registrationDate}"></div>
+						<div class="col-md-auto">
+							<label for="shiteiNo" class="form-label fw-medium">指定番号</label> <input type="text"
+								class="form-control" id="shiteiNo" th:field="*{shiteiNo}" placeholder="自動で設定されます"
+								readonly th:data-initial-value="*{shiteiNo}">
 						</div>
 
 						<!-- 宛名検索 -->
-						<div class="col-md-4 d-flex align-items-end" th:if="!${isView}">
+						<div class="col-md-auto d-flex align-items-end" th:if="!${isView}">
 							<button type="button" class="btn btn-primary"
 								data-bs-toggle="modal" data-bs-target="#addressSearchModal">
 								<i class="bi bi-search me-1"></i>宛名検索
 							</button>
 						</div>
 
-						<div class="col-md-4" th:if="${isView}"></div>
-
 						<!-- 郵便番号 -->
-						<div class="col-md-4">
+						<div class="col-md-auto">
 							<label for="tokugimuAddressNo" class="form-label fw-medium">
 								郵便番号<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="tokugimuAddressNo"
@@ -154,7 +215,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="tokugimuAddress" class="form-label fw-medium">
 								住所 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="tokugimuAddress"
@@ -165,9 +226,12 @@
 								th:if="${#fields.hasErrors('tokugimuAddress')}"
 								th:errors="*{tokugimuAddress}"></div>
 						</div>
-
+						
+						<!-- 改行 -->
+						<div class="w-100"></div>
+						
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="name" class="form-label fw-medium"> 氏名 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="name"
@@ -179,7 +243,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="nameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="nameKana"
@@ -191,7 +255,7 @@
 						</div>
 
 						<!-- 法人番号 -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="corporateNumber" class="form-label fw-medium">法人番号</label>
 							<input type="text" class="form-control" id="corporateNumber"
 								th:field="*{corporateNumber}" placeholder="自動入力されます" readonly
@@ -199,7 +263,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-auto">
 							<label for="tokugimuPhone" class="form-label fw-medium">
 								電話番号 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="tel" class="form-control" id="tokugimuPhone"
@@ -233,7 +297,7 @@
 					<div class="row g-3">
 
 						<!-- 所在地 -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="facilityAddressNo" class="form-label fw-medium">
 								所在地(郵便番号) </label> <input type="text" class="form-control"
 								id="facilityAddressNo" th:field="*{facilityAddressNo}"
@@ -243,7 +307,7 @@
 						</div>
 
 						<!-- 所在地(住所) -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="facilityAddress" class="form-label fw-medium">
 								所在地(住所) </label> <input type="text" class="form-control"
 								id="facilityAddress" th:field="*{facilityAddress}"
@@ -278,7 +342,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="facilityPhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="facilityPhone"
 								th:field="*{facilityPhone}" th:errorclass="is-invalid"
@@ -288,11 +352,11 @@
 						</div>
 
 						<!-- 延床面積 -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="floorArea" class="form-label fw-medium"> 延床面積
 							</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="floorArea"
+								<input type="text" class="form-control" id="floorArea"
 									th:readonly="${isView}" th:field="*{floorArea}"
 									th:errorclass="is-invalid" step="0.01"
 									th:data-initial-value="*{floorArea}"> <span
@@ -302,11 +366,11 @@
 						</div>
 
 						<!-- 階層(地上) -->
-						<div class="col-md-4">
+						<div class="col-md-1">
 							<label for="aboveGroundFloor" class="form-label fw-medium">
 								階層(地上)</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="floors"
+								<input type="text" class="form-control" id="floors"
 									th:field="*{aboveGroundFloor}" th:errorclass="is-invalid"
 									placeholder="施設の地上階数を入力する" th:readonly="${isView}"
 									th:data-initial-value="*{aboveGroundFloor}"> <span
@@ -316,7 +380,7 @@
 						</div>
 
 						<!-- 階層(地下) -->
-						<div class="col-md-4">
+						<div class="col-md-1">
 							<label for="basementFloor" class="form-label fw-medium">
 								階層(地下) </label>
 							<div class="input-group">
@@ -329,11 +393,11 @@
 						</div>
 
 						<!-- 客室数 -->
-						<div class="col-md-4">
+						<div class="col-md-1">
 							<label for="roomCount" class="form-label fw-medium"> 客室数
 							</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="roomCount"
+								<input type="text" class="form-control" id="roomCount"
 									th:readonly="${isView}" th:field="*{roomCount}"
 									th:errorclass="is-invalid" min="1"
 									th:data-initial-value="*{roomCount}"> <span
@@ -342,11 +406,11 @@
 						</div>
 
 						<!-- 収容人数 -->
-						<div class="col-md-6">
+						<div class="col-md-1">
 							<label for="capacity" class="form-label fw-medium"> 収容人数
 							</label>
 							<div class="input-group">
-								<input type="number" class="form-control" id="capacity"
+								<input type="text" class="form-control" id="capacity"
 									th:readonly="${isView}" th:field="*{capacity}"
 									th:errorclass="is-invalid" min="1"
 									th:data-initial-value="*{capacity}"> <span
@@ -355,7 +419,7 @@
 						</div>
 
 						<!-- 営業開始(予定)日 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="businessStartDate" class="form-label fw-medium">
 								営業開始(予定)日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
@@ -392,7 +456,7 @@
 					<div class="row g-3">
 
 						<!-- 住所(郵便番号) -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="licenseAddressNo" class="form-label fw-medium">
 								住所(郵便番号) </label> <input type="text" class="form-control"
 								id="licenseAddressNo" th:field="*{licenseAddressNo}"
@@ -401,7 +465,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="licenseAddress" class="form-label fw-medium">住所
 							</label> <input type="text" class="form-control" id="licenseAddress"
 								th:field="*{licenseAddress}" th:errorclass="is-invalid"
@@ -410,7 +474,7 @@
 						</div>
 
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licenseName" class="form-label fw-medium"> 氏名
 								<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="licenseName"
@@ -422,7 +486,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licenseNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="licenseNameKana"
@@ -435,7 +499,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licensePhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="licensePhone"
 								th:field="*{licensePhone}" th:errorclass="is-invalid"
@@ -444,7 +508,7 @@
 						</div>
 
 						<!-- 営業種別 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="businessType" class="form-label fw-medium">
 								営業種別 </label> <select class="form-select" id="businessType"
 								th:field="*{businessType}" th:errorclass="is-invalid"
@@ -458,7 +522,7 @@
 						</div>
 
 						<!-- 許可番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="licenseNumber" class="form-label fw-medium">
 								許可番号 </label> <input type="text" class="form-control" id="licenseNumber"
 								th:field="*{licenseNumber}" th:errorclass="is-invalid"
@@ -487,7 +551,7 @@
 					<div class="row g-3">
 
 						<!-- 住所(郵便番号) -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="ownerAddressNo" class="form-label fw-medium">住所(郵便番号)
 							</label> <input type="text" class="form-control" id="ownerAddressNo"
 								th:field="*{ownerAddressNo}" th:errorclass="is-invalid"
@@ -496,7 +560,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="ownerAddress" class="form-label fw-medium">住所
 							</label> <input type="text" class="form-control" id="ownerAddress"
 								th:field="*{ownerAddress}" th:errorclass="is-invalid"
@@ -504,7 +568,7 @@
 						</div>
 
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="ownerName" class="form-label fw-medium"> 氏名 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="ownerName"
@@ -516,7 +580,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="ownerNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="ownerNameKana"
@@ -529,7 +593,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="ownerPhone" class="form-label fw-medium">
 								電話番号 </label> <input type="tel" class="form-control" id="ownerPhone"
 								th:field="*{ownerPhone}" th:errorclass="is-invalid"
@@ -559,7 +623,7 @@
 					<div class="row g-3">
 
 						<!-- 住所(郵便番号) -->
-						<div class="col-md-4">
+						<div class="col-md-2">
 							<label for="mailAddressNo" class="form-label fw-medium">
 								住所(郵便番号) </label> <input type="text" class="form-control"
 								id="mailAddressNo" th:field="*{mailAddressNo}"
@@ -568,7 +632,7 @@
 						</div>
 
 						<!-- 住所 -->
-						<div class="col-md-8">
+						<div class="col-md-5">
 							<label for="mailAddress" class="form-label fw-medium"> 住所
 							</label> <input type="text" class="form-control" id="mailAddress"
 								th:field="*{mailAddress}" th:errorclass="is-invalid"
@@ -576,7 +640,7 @@
 						</div>
 
 						<!-- 氏名 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="mailName" class="form-label fw-medium"> 氏名 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="mailName"
@@ -587,7 +651,7 @@
 						</div>
 
 						<!-- 氏名(ふりがな) -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="mailNameKana" class="form-label fw-medium">
 								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="mailNameKana"
@@ -600,7 +664,7 @@
 						</div>
 
 						<!-- 電話番号 -->
-						<div class="col-md-6">
+						<div class="col-md-2">
 							<label for="mailPhone" class="form-label fw-medium"> 電話番号
 							</label> <input type="tel" class="form-control" id="mailPhone"
 								th:field="*{mailPhone}" th:errorclass="is-invalid"
@@ -612,92 +676,95 @@
 			</div>
 
 			<!-- ===== 共同事業者情報 ===== -->
-			<div id="kyodo-info" class="card mb-4 shadow-sm">
-				<div
-					class="card-header py-3 d-flex justify-content-between align-items-center gap-2">
-					<h5 class="mb-0">
-						<i class="bi bi-people me-2"></i>共同事業者情報
-					</h5>
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox" id="kyodoCheck"
-							name="kyodoFlg" value="true" th:checked="*{kyodoFlg}"
-							th:disabled="${isView}"> <label class="form-check-label"
-							for="kyodoCheck">表示する</label>
-					</div>
-				</div>
-				<div id="kyodoBody" class="card-body bg-light-subtle"
-					style="display: none;">
-					<div id="kyodoRows">
-						<!-- 編集・照会時: 保存済みデータを表示 -->
-						<th:block th:each="kyodo, stat : *{kyodoList}">
-							<div class="kyodo-row border rounded p-3 mb-3">
-								<div
-									class="d-flex justify-content-between align-items-center mb-2">
-									<span class="fw-medium">共同事業者 <span
-										th:text="${stat.index + 1}"></span></span>
-									<button type="button"
-										class="btn btn-sm btn-outline-danger kyodo-remove-btn"
-										th:if="!${isView}">
-										<i class="bi bi-trash"></i>
-									</button>
-								</div>
-								<div class="row g-3">
+			<div class="accordion mb-4 shadow-sm" id="kyodoAccordion">
+				<div class="accordion-item">
+					
+					<!-- ヘッダー部分 -->
+					<h2 class="accordion-header" id="kyodoHeading">
+						<div class="accordion-button collapsed py-3 d-flex justify-content-between align-items-center gap-2"
+							 type="button" 
+							 data-bs-toggle="collapse" 
+							 data-bs-target="#kyodoCollapse" 
+							 aria-expanded="false" 
+							 aria-controls="kyodoCollapse">
+							
+							<span class="mb-0 fs-5 fw-medium">
+								<i class="bi bi-people me-2"></i>共同事業者情報
+							</span>
+						</div>
+					</h2>
 
-									<!-- 郵便番号 -->
-									<div class="col-md-4">
-										<label class="form-label fw-medium">郵便番号</label> <input
-											type="text" class="form-control"
-											th:field="*{kyodoList[__${stat.index}__].kyodoAddressNo}"
-											th:readonly="${isView}"
-											th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddressNo}">
-									</div>
+					<!-- コンテンツ部分 (collapse) -->
+					<div id="kyodoCollapse" class="accordion-collapse collapse" aria-labelledby="kyodoHeading" data-bs-parent="#kyodoAccordion">
+						<div id="kyodoBody" class="accordion-body bg-light-subtle">
+							<div id="kyodoRows">
+								<!-- 編集・照会時: 保存済みデータを表示 -->
+								<th:block th:each="kyodo, stat : *{kyodoList}">
+									<div class="kyodo-row border rounded p-3 mb-3 bg-white">
+										<div class="d-flex justify-content-between align-items-center mb-2">
+											<span class="fw-medium">共同事業者 <span th:text="${stat.index + 1}"></span></span>
+											<button type="button"
+												class="btn btn-sm btn-outline-danger kyodo-remove-btn"
+												th:if="!${isView}">
+												<i class="bi bi-trash"></i>
+											</button>
+										</div>
+										<div class="row g-3">
 
-									<!-- 住所 -->
-									<div class="col-md-8">
-										<label class="form-label fw-medium">住所</label> <input
-											type="text" class="form-control"
-											th:field="*{kyodoList[__${stat.index}__].kyodoAddress}"
-											th:readonly="${isView}"
-											th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddress}">
-									</div>
+											<!-- 郵便番号 -->
+											<div class="col-md-2">
+												<label class="form-label fw-medium">郵便番号</label>
+												<input type="text" class="form-control"
+													th:field="*{kyodoList[__${stat.index}__].kyodoAddressNo}"
+													th:readonly="${isView}"
+													th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddressNo}">
+											</div>
 
-									<!-- 氏名 -->
-									<div class="col-md-6">
-										<label class="form-label fw-medium">氏名 <span
-											class="text-danger" th:if="!${isView}">*</span>
-										</label> <input type="text" class="form-control"
-											th:field="*{kyodoList[__${stat.index}__].kyodoName}"
-											th:readonly="${isView}"
-											th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoName}">
-									</div>
+											<!-- 住所 -->
+											<div class="col-md-5">
+												<label class="form-label fw-medium">住所</label>
+												<input type="text" class="form-control"
+													th:field="*{kyodoList[__${stat.index}__].kyodoAddress}"
+													th:readonly="${isView}"
+													th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddress}">
+											</div>
 
-									<!-- 氏名(ふりがな) -->
-									<div class="col-md-6">
-										<label class="form-label fw-medium">氏名(ふりがな) <span
-											class="text-danger" th:if="!${isView}">*</span>
-										</label> <input type="text" class="form-control"
-											th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
-											placeholder="ひらがなで入力" th:readonly="${isView}"
-											th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoNameKana}">
-									</div>
+											<!-- 氏名 -->
+											<div class="col-md-2">
+												<label class="form-label fw-medium">氏名 <span class="text-danger" th:if="!${isView}">*</span></label>
+												<input type="text" class="form-control"
+													th:field="*{kyodoList[__${stat.index}__].kyodoName}"
+													th:readonly="${isView}"
+													th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoName}">
+											</div>
 
-									<!-- 電話番号 -->
-									<div class="col-md-6">
-										<label class="form-label fw-medium">電話番号</label> <input
-											type="tel" class="form-control"
-											th:field="*{kyodoList[__${stat.index}__].kyodoPhone}"
-											placeholder="例）03-1234-5678" th:readonly="${isView}"
-											th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoPhone}">
+											<!-- 氏名(ふりがな) -->
+											<div class="col-md-2">
+												<label class="form-label fw-medium">氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span></label>
+												<input type="text" class="form-control"
+													th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
+													placeholder="ひらがなで入力" th:readonly="${isView}"
+													th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoNameKana}">
+											</div>
+
+											<!-- 電話番号 -->
+											<div class="col-md-2">
+												<label class="form-label fw-medium">電話番号</label>
+												<input type="tel" class="form-control"
+													th:field="*{kyodoList[__${stat.index}__].kyodoPhone}"
+													placeholder="例）03-1234-5678" th:readonly="${isView}"
+													th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoPhone}">
+											</div>
+										</div>
 									</div>
-								</div>
+								</th:block>
 							</div>
-						</th:block>
-					</div>
-					<div th:if="!${isView}" class="mt-2">
-						<button type="button" id="kyodoAddBtn"
-							class="btn btn-outline-secondary btn-sm">
-							<i class="bi bi-plus-circle me-1"></i>共同事業者を追加
-						</button>
+							<div th:if="!${isView}" class="mt-2">
+								<button type="button" id="kyodoAddBtn" class="btn btn-outline-secondary btn-sm">
+									<i class="bi bi-plus-circle me-1"></i>共同事業者を追加
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -736,119 +803,104 @@
 			</div>
 
 			<!-- ===== 施設営業休止/再開/廃止情報（編集時のみ表示）===== -->
-			<div id="business-status-info" class="card mb-4 shadow-sm"
-				th:if="${isEdit} or ${isView}">
-				<div
-					class="card-header bg-warning text-dark py-3 d-flex justify-content-between align-items-center gap-2">
-					<h5 class="mb-0">
-						<i class="bi bi-exclamation-triangle me-2"></i>宿泊施設営業情報
-					</h5>
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox"
-							id="businessStatusCheck" name="businessStatusFlg" value="true"
-							th:checked="*{businessStatusFlg}" th:disabled="${isView}">
-						<label class="form-check-label" for="businessStatusCheck">表示する</label>
-					</div>
-				</div>
-				<div id="businessStatusBody" class="card-body bg-light-subtle"
-					style="display: none;">
-					<div class="row g-3">
-
-						<!-- 申告区分 -->
-						<div class="col-md-12">
-							<label class="form-label fw-medium">申告区分</label>
-							<div class="mt-1">
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catSuspension"
-										value="休止" th:disabled="${isView}"> <label
-										class="form-check-label" for="catSuspension">休止</label>
+			<div id="business-status-info" class="accordion mb-4 shadow-sm" th:if="${isEdit} or ${isView}">
+				<div class="accordion-item">
+					
+					<!-- ヘッダー（クリックで開閉） -->
+					<h2 class="accordion-header" id="headingBusinessStatus">
+						<button class="accordion-button collapsed text-dark py-3 fw-bold" type="button"
+							data-bs-toggle="collapse" data-bs-target="#collapseBusinessStatus" aria-expanded="false"
+							aria-controls="collapseBusinessStatus">
+							<i class="bi bi-exclamation-triangle me-2"></i>宿泊施設営業情報
+						</button>
+					</h2>
+			
+					<!-- コンテンツ部分（アコーディオン本体） -->
+					<div id="collapseBusinessStatus" class="accordion-collapse collapse" aria-labelledby="headingBusinessStatus"
+						data-bs-parent="#business-status-info">
+						<div class="accordion-body bg-light-subtle">
+							<div class="row g-3">
+			
+								<!-- 申告区分 -->
+								<div class="col-md-auto">
+									<label class="form-label fw-medium">申告区分</label>
+									<div class="mt-1">
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" th:field="*{declarationCategory}"
+												id="catSuspension" value="休止" th:disabled="${isView}">
+											<label class="form-check-label" for="catSuspension">休止</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" th:field="*{declarationCategory}"
+												id="catResumption" value="再開" th:disabled="${isView}">
+											<label class="form-check-label" for="catResumption">再開</label>
+										</div>
+										<div class="form-check form-check-inline">
+											<input class="form-check-input" type="radio" th:field="*{declarationCategory}"
+												id="catAbolition" value="廃止" th:disabled="${isView}">
+											<label class="form-check-label" for="catAbolition">廃止</label>
+										</div>
+									</div>
 								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catResumption"
-										value="再開" th:disabled="${isView}"> <label
-										class="form-check-label" for="catResumption">再開</label>
+			
+								<!-- 休止期間(開始日) -->
+								<div class="col-md-2">
+									<label for="suspensionStartDate" class="form-label fw-medium">休止期間(開始日)</label>
+									<input th:if="!${isView}" type="date" class="form-control" id="suspensionStartDate"
+										name="suspensionStartDate"
+										th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}"
+										th:data-initial-value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
+									<input th:if="${isView}" type="text" class="form-control" readonly
+										th:value="*{suspensionStartDate}">
 								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio"
-										th:field="*{declarationCategory}" id="catAbolition" value="廃止"
-										th:disabled="${isView}"> <label
-										class="form-check-label" for="catAbolition">廃止</label>
+			
+								<!-- 休止期間(終了日) -->
+								<div class="col-md-2">
+									<label for="suspensionEndDate" class="form-label fw-medium">休止期間(終了日)</label>
+									<input th:if="!${isView}" type="date" class="form-control" id="suspensionEndDate"
+										name="suspensionEndDate"
+										th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}"
+										th:data-initial-value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
+									<input th:if="${isView}" type="text" class="form-control" readonly
+										th:value="*{suspensionEndDate}">
 								</div>
+			
+								<div class="col-md-auto d-flex align-items-end">
+									<div class="form-check">
+										<input class="form-check-input" type="checkbox" id="suspensionEndDateUndecided"
+											th:field="*{suspensionEndDateUndecided}" th:disabled="${isView}">
+										<label class="form-check-label" for="suspensionEndDateUndecided">未定</label>
+									</div>
+								</div>
+			
+								<!-- 再開または廃止日 -->
+								<div class="col-md-2">
+									<label for="resumptionOrAbolitionDate" class="form-label fw-medium">再開または廃止日</label>
+									<input th:if="!${isView}" type="date" class="form-control" id="resumptionOrAbolitionDate"
+										name="resumptionOrAbolitionDate"
+										th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}"
+										th:data-initial-value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
+									<input th:if="${isView}" type="text" class="form-control" readonly
+										th:value="*{resumptionOrAbolitionDate}">
+								</div>
+			
+								<!-- 休止または廃止理由 -->
+								<div class="col-md-12">
+									<label for="suspensionOrAbolitionReason" class="form-label fw-medium">休止または廃止理由</label>
+									<input type="text" class="form-control" id="suspensionOrAbolitionReason"
+										th:field="*{suspensionOrAbolitionReason}" th:readonly="${isView}"
+										th:data-initial-value="*{suspensionOrAbolitionReason}">
+								</div>
+			
 							</div>
 						</div>
-
-						<!-- 休止期間(開始日) -->
-						<div class="col-md-4">
-							<label for="suspensionStartDate" class="form-label fw-medium">休止期間(開始日)</label>
-							<input th:if="!${isView}" type="date" class="form-control"
-								id="suspensionStartDate" name="suspensionStartDate"
-								th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{suspensionStartDate}">
-						</div>
-
-						<!-- 休止期間(終了日) -->
-						<div class="col-md-4">
-							<label for="suspensionEndDate" class="form-label fw-medium">休止期間(終了日)</label>
-							<input th:if="!${isView}" type="date" class="form-control"
-								id="suspensionEndDate" name="suspensionEndDate"
-								th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{suspensionEndDate}">
-						</div>
-
-						<div class="col-md-4 d-flex align-items-end">
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox"
-									id="suspensionEndDateUndecided"
-									th:field="*{suspensionEndDateUndecided}"
-									th:disabled="${isView}"> <label
-									class="form-check-label" for="suspensionEndDateUndecided">未定</label>
-							</div>
-						</div>
-
-						<!-- 再開または廃止日 -->
-						<div class="col-md-6">
-							<label for="resumptionOrAbolitionDate"
-								class="form-label fw-medium">再開または廃止日</label> <input
-								th:if="!${isView}" type="date" class="form-control"
-								id="resumptionOrAbolitionDate" name="resumptionOrAbolitionDate"
-								th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}"
-								th:data-initial-value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{resumptionOrAbolitionDate}">
-						</div>
-
-						<!-- 休止または廃止理由 -->
-						<div class="col-md-6">
-							<label for="suspensionOrAbolitionReason"
-								class="form-label fw-medium">休止または廃止理由</label> <input
-								type="text" class="form-control"
-								id="suspensionOrAbolitionReason"
-								th:field="*{suspensionOrAbolitionReason}"
-								th:readonly="${isView}"
-								th:data-initial-value="*{suspensionOrAbolitionReason}">
-						</div>
-
 					</div>
 				</div>
 			</div>
 
 			<!-- ===== アクションボタン ===== -->
+			<!-- 並び順は左から「一覧に戻る」「削除する」「登録する/更新する」 -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<th:block th:if="!${isView}">
-					<button type="button" id="openConfirmModalBtn"
-						class="btn btn-success btn-lg px-5">
-						<i
-							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
-						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
-					</button>
-				</th:block>
-
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -857,10 +909,35 @@
 					th:unless="${isView ?: false}"
 					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
-
 				</a>
+
+				<!-- 編集時のみ削除ボタンを表示（台帳から移設） -->
+				<button type="button" class="btn btn-danger btn-lg px-5"
+					th:if="${(isEdit ?: false) and !(isView ?: false)}"
+					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+					<i class="bi bi-trash me-2"></i>削除する
+				</button>
+
+				<th:block th:if="!${isView}">
+					<button type="button" id="openConfirmModalBtn"
+						class="btn btn-success btn-lg px-5">
+						<i
+							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
+						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+					</button>
+				</th:block>
 			</div>
 		</form>
+
+		<!-- 削除用フォーム・確認モーダル（編集画面のみ） -->
+		<th:block th:if="${(isEdit ?: false) and !(isView ?: false)}">
+			<form id="deleteTokugimuForm"
+				th:action="@{/tokugimu/delete}" method="post"
+				class="d-none"></form>
+			<div
+				th:replace="~{layout/components :: confirmModal('deleteConfirmModal', '削除確認', 'この特別徴収義務者を削除します。よろしいですか？', 'deleteTokugimuForm', 'btn-danger', '削除する')}">
+			</div>
+		</th:block>
 
 		<!-- 確認モーダル（登録と更新） -->
 		<div th:if="!${isView}"

@@ -2,7 +2,6 @@
 .year-only-input {
     position: relative;
     color: transparent;
-    text-shadow: 0 0 0 #495057;
 }
 
 .year-only-input::-webkit-datetime-edit-month-field,
@@ -16,13 +15,11 @@
 
 .year-only-input::-webkit-datetime-edit-year-field {
     visibility: visible;
-    color: #495057;
 }
 
 .year-only-input::-webkit-calendar-picker-indicator {
     position: absolute;
     right: 8px;
-    color: #6c757d;
 }
 
 /* Firefox用 */
@@ -70,15 +67,6 @@
     position: relative;
 }
 
-.sticky-table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: var(--bs-light);
-    color: var(--bs-dark);
-    border-color: var(--bs-border-color);
-}
-
 .sticky-table tbody tr:hover {
     background-color: rgba(13, 110, 253, 0.1);
 }
@@ -102,12 +90,6 @@
 
 .form-control-sm, .form-select-sm {
     font-size: 0.875rem;
-}
-
-/* アコーディオンのスタイル */
-.accordion-button:not(.collapsed) {
-    background-color: rgba(13, 110, 253, 0.1);
-    color: var(--bs-primary);
 }
 
 /* ボタンエリアのスタイル */
