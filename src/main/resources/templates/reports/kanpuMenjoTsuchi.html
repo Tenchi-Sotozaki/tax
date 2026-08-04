@@ -18,7 +18,11 @@
 						</h5>
 					</div>
 
-					<form id="tsuchiForm" th:object="${dto}" method="post">
+					<!-- 帳票発行エラー表示エリア -->
+					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
+
+					<form id="tsuchiForm" th:object="${dto}" method="post"
+						onsubmit="return validateForm()">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
 						<!-- 特別徴収義務者情報エリア -->
@@ -117,14 +121,17 @@
 						<input type="hidden" th:field="*{koin}">
 
 						<!-- アクションボタン -->
-						<div class="d-flex gap-2">
-							<button type="button" class="btn btn-primary" onclick="generatePdf()">
+						<div class="d-flex justify-content-center gap-2">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/kanpuMenjoTsuchi/generatePdf}">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
 							</button>
-							<button type="button" class="btn btn-outline-primary" onclick="preview()">
+							<button type="submit" class="btn btn-outline-primary"
+								th:formaction="@{/kanpuMenjoTsuchi/preview}" formtarget="_blank">
 								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
-							<button type="button" class="btn btn-primary" onclick="printReport()">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/kanpuMenjoTsuchi/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
 							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
@@ -139,6 +146,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/kanpuMenjoTsuchi.js}"></script>
+		<script th:src="@{/js/reportForm.js}"></script>
 	</th:block>
 </body>
 

@@ -132,7 +132,7 @@ public class NonyushoController {
      */
     @PostMapping("/preview")
     @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "プレビュー")
-    @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
+    @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
     public Object previewPdf(@RequestBody NonyushoDto dto) {
         try {
         	// データ無し
@@ -164,7 +164,8 @@ public class NonyushoController {
      * 納入書印刷
      */
     @PostMapping("/print")
-    @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
+    @OpeLog(screenId = ScreenManagement.NONYUSHO, operation = "印刷")
+    @RptLog(rptId = ReportsConstants.NONYUSHO, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
     public Object printPDF(@RequestBody NonyushoDto dto) {
     	try {
 			// データ無し
