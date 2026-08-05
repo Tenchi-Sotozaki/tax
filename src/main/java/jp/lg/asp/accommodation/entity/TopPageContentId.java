@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RptStatusId implements Serializable {
-	private String jichitaiCd;
-	private String shiteiNo;
-	private String nendo;
-	private String rptId;
+public class TopPageContentId implements Serializable {
+    private String kbn;
+    private String jichitaiCd;
 }

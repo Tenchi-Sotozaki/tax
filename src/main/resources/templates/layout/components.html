@@ -65,6 +65,51 @@
 
 
 	<!--
+  リンク遷移用確認モーダル フラグメント
+  引数:
+    modalId  - モーダルのHTML id属性値
+    title    - モーダルのタイトル
+    message  - モーダルの本文メッセージ
+    href     - 遷移先URL
+    btnLabel - 実行ボタンのラベル
+
+  使用例:
+    <div th:replace="~{layout/components :: linkConfirmModal('backModal','確認','入力内容が破棄されます。戻りますか？',@{/some/path},'戻る')}"></div>
+-->
+	<div
+		th:fragment="linkConfirmModal(modalId, title, message, href, btnLabel)"
+		class="modal fade" th:id="${modalId}" tabindex="-1"
+		data-bs-backdrop="static" data-bs-keyboard="false"
+		th:aria-labelledby="${modalId + 'Label'}" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content shadow">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title" th:id="${modalId + 'Label'}">
+						<i class="bi bi-check2-square me-2"></i>
+						<span th:text="${title}">確認</span>
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="閉じる"></button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-0" th:text="${message}">よろしいですか？</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>キャンセル
+					</button>
+					<a class="btn btn-primary" th:href="${href}">
+						<i class="bi bi-check-lg me-1"></i>
+						<span th:text="${btnLabel}">実行</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!--
   宛名検索モーダル フラグメント
   使用例:
     <div th:replace="~{layout/components :: addressSearchModal}"></div>

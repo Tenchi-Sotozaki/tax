@@ -12,7 +12,6 @@ public final class ScreenManagement {
 	private ScreenManagement() {
 	}
 
-
 	// 特別徴収義務者管理台帳
 	public static final String TOKUGIMU_DAICHO = "ms00000001";
 
@@ -157,8 +156,23 @@ public final class ScreenManagement {
 	// 帳票ログ照会
 	public static final String RPT_LOG_VIEW = "ms00000025";
 
+	// 交付金帳票一括発行
+	public static final String KOFUKIN_BULK_PRINT = "ms00000028";
+
+	// 休業日設定照会/編集
+	public static final String HOLIDAY_CONFIG = "ss00000009";
+
+	// トップページ
+	public static final String TOP_PAGE = "ms00000029";
+
+	// トップページ編集
+	public static final String TOP_PAGE_CONFIG = "sc00000010";
+
 	// 帳票出力設定
 	public static final String REPORTS_CONFIG = "sc00000001";
+
+	// 帳票出力項目編集/照会
+	public static final String REPORTS_OUTPUT_CONFIG = "sc00000011";
 
 	// 自治体情報設定
 	public static final String JICHITAI_CONFIG = "sc00000008";
@@ -168,13 +182,4 @@ public final class ScreenManagement {
 
 	// 交付金帳票一括発行
 	public static final String KOFUKIN_REPORT_BULK = "ms00000028";
-
-	// トップページ
-	public static final String TOP_PAGE = "ms00000029";
-
-	// トップページ編集
-	public static final String TOP_PAGE_CONFIG = "sc00000010";
-
-	// 休業日設定
-	public static final String HOLIDAY_CONFIG = "ss00000009";
 }

@@ -167,9 +167,9 @@
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
 				<!-- 一覧に戻る（照会画面は入力破棄の確認を出さない） -->
-				<a th:if="${isView != true}" th:href="@{/admin/user-search}"
+				<a th:if="${isView != true}" href="#"
 					class="btn btn-outline-primary btn-lg px-4"
-					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 				<a th:if="${isView}" th:href="@{/admin/user-search}"
@@ -203,6 +203,8 @@
 				th:replace="~{layout/components :: confirmModal('deleteModal','削除確認','このユーザーを削除します。よろしいですか？','deleteForm','btn-danger','削除する')}">
 			</div>
 		</th:block>
+
+		<div th:if="${isView != true}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/user-search}, '一覧に戻る')}"></div>
 
 	</div>
 

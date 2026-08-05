@@ -21,7 +21,7 @@
 			</div>
 
 			<!-- 対象条件エリア -->
-			<form th:action="@{/shoreikin/bulk/execute}" th:object="${bulkForm}" method="post">
+			<form id="bulkForm" th:action="@{/shoreikin/bulk/execute}" th:object="${bulkForm}" method="post">
 				<div class="card mb-4">
 					<div class="card-header">
 						<h5 class="mb-0">対象条件</h5>
@@ -65,9 +65,9 @@
 
 						<div class="row mt-3">
 							<div class="col-12">
-								<button type="submit" class="btn btn-primary me-2"
+								<button type="button" class="btn btn-primary me-2"
 									th:disabled="${bulkForm.kofuRitsu == null}"
-									onclick="return confirm('交付金を一括算出しますか？')">
+									data-bs-toggle="modal" data-bs-target="#bulkConfirmModal">
 									<i class="bi bi-calculator"></i> 一括算出実行
 								</button>
 								<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary">
@@ -83,6 +83,8 @@
 					</div>
 				</div>
 			</form>
+
+			<div th:replace="~{layout/components :: confirmModal('bulkConfirmModal', '一括算出確認', '交付金を一括算出します。よろしいですか？', 'bulkForm', 'btn-primary', '一括算出実行')}"></div>
 
 			<!-- 処理結果エリア -->
 			<div th:if="${bulkForm.executed or errorDetail != null}" class="card">
