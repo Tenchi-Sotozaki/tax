@@ -35,8 +35,9 @@ public class HolidayConfigController {
 	private static final String VIEW = "admin/holidayConfig";
 
 	@GetMapping
+	@OpeLog(screenId = SCREEN_ID, operation = "初期遷移")
 	public String index(RedirectAttributes redirectAttributes) {
-		//accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(SCREEN_ID);
 		List<String> nenList = holidayConfigService.findNendoList();
 		if (!nenList.isEmpty()) {
 			return "redirect:/admin/holiday/view/" + nenList.getLast();
@@ -47,7 +48,7 @@ public class HolidayConfigController {
 	@GetMapping("/view/{nen}")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String view(@PathVariable String nen, Model model) {
-		//accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("form", holidayConfigService.findByNendo(nen));
 		model.addAttribute("nenList", holidayConfigService.findNendoList());
 		model.addAttribute("mode", "view");
@@ -57,7 +58,7 @@ public class HolidayConfigController {
 	@GetMapping("/edit/{nen}")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(@PathVariable String nen, Model model) {
-		//accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		model.addAttribute("form", holidayConfigService.findByNendo(nen));
 		model.addAttribute("nenList", holidayConfigService.findNendoList());
 		model.addAttribute("mode", "edit");
@@ -66,6 +67,7 @@ public class HolidayConfigController {
 
 	@GetMapping(value = "/init/{nen}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
+	@OpeLog(screenId = SCREEN_ID, operation = "初期化")
 	public List<String> getInitialHolidays(@PathVariable String nen) {
 		List<String> result = holidayConfigService.getInitialHolidays(nen);
 		log.info("getInitialHolidays nen={} result={}", nen, result);
@@ -76,7 +78,7 @@ public class HolidayConfigController {
 	@OpeLog(screenId = SCREEN_ID, operation = "更新")
 	public String save(@ModelAttribute("form") HolidayConfigForm form,
 			Model model, RedirectAttributes redirectAttributes) {
-		//accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		if (form.getNendo() == null || form.getNendo().isBlank()) {
 			model.addAttribute("form", form);
 			model.addAttribute("mode", "edit");
