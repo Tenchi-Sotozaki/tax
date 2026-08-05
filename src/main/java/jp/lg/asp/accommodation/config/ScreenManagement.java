@@ -179,4 +179,7 @@ public final class ScreenManagement {
 
 	// 特別徴収義務者状況照会
 	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";
+
+	// 交付金帳票一括発行
+	public static final String KOFUKIN_REPORT_BULK = "ms00000028";
 }

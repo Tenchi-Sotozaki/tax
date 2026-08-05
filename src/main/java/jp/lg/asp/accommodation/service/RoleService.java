@@ -12,6 +12,9 @@ public interface RoleService {
     List<Role> findAllRoles(String jichitaiCd);
     
     List<Screen> findAllScreens();
+
+    /** 画面を画面区分ごとにまとめて取得する（キーが区分の表示名） */
+    java.util.Map<String, List<Screen>> findScreensGroupedByKbn();
     
     Role findById(String jichitaiCd, Long roleId);
     

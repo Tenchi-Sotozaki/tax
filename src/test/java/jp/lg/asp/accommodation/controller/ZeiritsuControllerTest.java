@@ -50,13 +50,25 @@ class ZeiritsuControllerTest {
     }
 
     @Test
-    void list_一覧画面を返す() {
+    void list_初期表示時は空リストを返す() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new ZeiritsuSearchForm(), model);
+        String view = controller.list(new ZeiritsuSearchForm(), null, model);
 
         assertThat(view).isEqualTo("admin/zeiritsuDaicho");
         assertThat(model.asMap()).containsKey("items");
+        assertThat(model.asMap()).containsEntry("isSearched", false);
+    }
+
+    @Test
+    void list_検索後は一覧を返す() {
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(new ZeiritsuSearchForm(), "", model);
+
+        assertThat(view).isEqualTo("admin/zeiritsuDaicho");
+        assertThat(model.asMap()).containsKey("items");
+        assertThat(model.asMap()).containsEntry("isSearched", true);
     }
 
     @Test

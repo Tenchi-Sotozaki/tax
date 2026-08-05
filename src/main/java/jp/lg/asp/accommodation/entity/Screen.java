@@ -26,5 +26,13 @@ public class Screen extends BaseEntity {
     
     @Column(name = "screen_name", nullable = false)
     private String screenName;
-    
+
+    /** 区分 */
+    @Column(name = "kbn", nullable = false)
+    private String kbn;
+
+    /** 表示順 */
+    @Column(name = "dsp_odr", nullable = false)
+    private Integer dspOdr;
+
 }
