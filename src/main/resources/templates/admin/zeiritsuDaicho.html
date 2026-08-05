@@ -100,7 +100,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:each="item : ${items}" th:data-seq="${item.seq}" th:classappend="${item.taishoKbn == '2'} ? 'table-secondary'">
+							<tr th:each="item : ${items}" th:data-seq="${item.seq}" th:classappend="${item.taishoKbn == '2'} ? 'table-info'">
 								<td>
 									<span class="badge"
 										th:classappend="${item.fukaKbn == '1'} ? 'bg-primary' : 'bg-success'"
