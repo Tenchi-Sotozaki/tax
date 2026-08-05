@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,6 +41,20 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public List<Screen> findAllScreens() {
 		return screenRepository.findByJichitaiCdOrderByScreenId(jichitaiContext.getJichitaiCd());
+	}
+
+	@Override
+	public Map<String, List<Screen>> findScreensGroupedByKbn() {
+		Map<String, List<Screen>> grouped = new LinkedHashMap<>();
+
+		// m_screen を表示順に取得し、区分ごとにまとめる
+		// 表示順で並んでいるため、区分の並び順も表示順に従う
+		for (Screen screen : screenRepository
+				.findByJichitaiCdOrderByDspOdrAsc(jichitaiContext.getJichitaiCd())) {
+			grouped.computeIfAbsent(screen.getKbn(), key -> new ArrayList<>()).add(screen);
+		}
+
+		return grouped;
 	}
 
 	@Override

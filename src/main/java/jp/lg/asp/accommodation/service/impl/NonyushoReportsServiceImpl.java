@@ -298,10 +298,15 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	}
 	
 	public boolean dataCheck(NonyushoDto dto) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		String shiteiNo = dto.getShiteiNo();
+		String shinkokuYmd = dto.getShinkokuYmd();
+		log.debug("dataCheck: jichitaiCd={}, shiteiNo={}, shinkokuYmd={}", jichitaiCd, shiteiNo, shinkokuYmd);
 		
 		// 最新の賆課データを取得
 		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndTaishoYmOrderByKibetsuAsc(
-				jichitaiContext.getJichitaiCd(), dto.getShiteiNo(), dto.getShinkokuYmd());
+				jichitaiCd, shiteiNo, shinkokuYmd);
+		log.debug("dataCheck result: {} 件", fukaList.size());
 		
 		// データが存在するかどうかを返す
 		return fukaList.isEmpty();

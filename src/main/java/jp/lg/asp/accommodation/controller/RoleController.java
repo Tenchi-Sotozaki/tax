@@ -49,14 +49,14 @@ public class RoleController {
 					.filter(role -> role.getRoleId() == null
 							|| role.getRoleId() != UserRepository.DEFAULT_USER_ROLE_ID)
 					.collect(Collectors.toList());
-			List<Screen> screens = roleService.findAllScreens();
+			Map<String, List<Screen>> screenGroups = roleService.findScreensGroupedByKbn();
 			model.addAttribute("roles", roles);
-			model.addAttribute("screens", screens);
+			model.addAttribute("screenGroups", screenGroups);
 			return "admin/roleManagement";
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("roles", java.util.Collections.emptyList());
-			model.addAttribute("screens", java.util.Collections.emptyList());
+			model.addAttribute("screenGroups", java.util.Collections.emptyMap());
 			return "admin/roleManagement";
 		}
 	}

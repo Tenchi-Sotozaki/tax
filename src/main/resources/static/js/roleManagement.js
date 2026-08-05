@@ -3,6 +3,42 @@ let currentMode = 'create';
 // モーダルで操作中の権限ID
 let currentRoleId = null;
 
+// 権限モーダルを開いた時点の入力内容。閉じる際の変更有無の判定に使う
+let roleFormSnapshot = null;
+
+// 権限モーダルの現在の入力内容を文字列にまとめる
+function getRoleFormState() {
+    const name = document.getElementById('roleName')?.value ?? '';
+    const permissions = Array.from(
+        document.querySelectorAll('#screenPermissions input[type="radio"]:checked'))
+        .map(radio => `${radio.name}=${radio.value}`)
+        .join(',');
+    return `${name}|${permissions}`;
+}
+
+function saveRoleFormSnapshot() {
+    roleFormSnapshot = getRoleFormState();
+}
+
+function isRoleFormChanged() {
+    return roleFormSnapshot !== null && roleFormSnapshot !== getRoleFormState();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const roleModal = document.getElementById('roleModal');
+    if (!roleModal) return;
+
+    // 閉じる操作（キャンセルボタン・×ボタン）は、入力内容に変更がある場合のみ確認する
+    roleModal.addEventListener('hide.bs.modal', function(e) {
+        if (currentMode === 'view') return;
+        if (!isRoleFormChanged()) return;
+
+        if (!confirm('入力内容は破棄されます。よろしいですか？')) {
+            e.preventDefault();
+        }
+    });
+});
+
 function openRoleModal(mode, roleId) {
     currentMode = mode;
     currentRoleId = roleId ?? null;
@@ -28,6 +64,8 @@ function openRoleModal(mode, roleId) {
 
         // 新規登録では削除できない
         document.getElementById('deleteBtn').style.display = 'none';
+
+        saveRoleFormSnapshot();
     } else {
         if (currentRoleId == null) return;
 
@@ -84,6 +122,9 @@ function loadRoleDetail(roleId, readonly) {
 
             document.getElementById('roleName').disabled = readonly;
             document.querySelectorAll('#screenPermissions input').forEach(input => input.disabled = readonly);
+
+            // 取得が非同期のため、値を反映し終えてから開いた時点の内容として記録する
+            saveRoleFormSnapshot();
         });
 }
 
