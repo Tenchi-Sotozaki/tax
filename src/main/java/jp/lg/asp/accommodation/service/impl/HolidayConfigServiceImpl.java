@@ -28,6 +28,9 @@ public class HolidayConfigServiceImpl implements HolidayConfigService {
 	public HolidayConfigForm findByNendo(String nendo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		List<Kyugyobi> list = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi(jichitaiCd, nendo);
+		if (list.isEmpty()) {
+			list = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi("99999", nendo);
+		}
 		HolidayConfigForm form = new HolidayConfigForm();
 		form.setNendo(nendo);
 		form.setHolidayDts(list.stream().map(k -> k.getKyugyobi().format(FMT)).toList());
@@ -54,7 +57,11 @@ public class HolidayConfigServiceImpl implements HolidayConfigService {
 	@Transactional(readOnly = true)
 	public List<String> findNendoList() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return holidayRepository.findDistinctNenByJichitaiCd(jichitaiCd);
+		List<String> list = holidayRepository.findDistinctNenByJichitaiCd(jichitaiCd);
+		if (list.isEmpty()) {
+			list = holidayRepository.findDistinctNenByJichitaiCd("99999");
+		}
+		return list;
 	}
 
 	@Override
