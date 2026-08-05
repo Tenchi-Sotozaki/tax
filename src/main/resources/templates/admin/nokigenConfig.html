@@ -40,10 +40,10 @@
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-			<span th:text="${errorMessage}"></span>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
+
+		<!-- エラーメッセージ -->
+		<div th:replace="~{layout/components :: reportErrorAlert}"></div>
+
 		<div th:if="${warnMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
 			<span th:text="${warnMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -61,7 +61,7 @@
 						<!-- 年度 -->
 						<div class="col-md-3">
 							<label for="nendo" class="form-label">
-								年度 <span　class="text-danger" th:if="${mode == 'register'}">*</span>
+								年度 <span class="text-danger" th:if="${mode == 'register'}">*</span>
 							</label>
 
 							<input type="text" class="form-control" th:field="*{nendo}" id="nendo" placeholder="例：2024"
@@ -200,16 +200,16 @@
 					</div>
 
 					<div class="d-flex justify-content-end align-items-center" th:if="${mode == 'register'}">
-						<span class="small text-muted me-2">土日の場合：</span>
+						<span class="small text-muted me-2">休業日の場合：</span>
 						<div class="form-check form-check-inline mb-0">
 							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
 								id="shiftFriday" value="friday" style="width:0.85em;height:0.85em;">
-							<label class="form-check-label small" for="shiftFriday">前の金曜にずらす</label>
+							<label class="form-check-label small" for="shiftFriday">前営業日にずらす</label>
 						</div>
 						<div class="form-check form-check-inline mb-0">
 							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
 								id="shiftMonday" value="monday" style="width:0.85em;height:0.85em;">
-							<label class="form-check-label small" for="shiftMonday">次の月曜にずらす</label>
+							<label class="form-check-label small" for="shiftMonday">翌営業日にずらす</label>
 						</div>
 						<button type="button" class="btn btn-outline-primary btn-sm ms-3"
 							th:data-url="@{/admin/nokigen/prev-data/}" th:data-exists-url="@{/admin/nokigen/exists/}"
