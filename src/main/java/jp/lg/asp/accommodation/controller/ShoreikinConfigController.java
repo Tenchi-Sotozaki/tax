@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -12,11 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.ShoreikinConfigDto;
 import jp.lg.asp.accommodation.service.ShoreikinConfigService;
 import jp.lg.asp.accommodation.util.SessionHelper;
@@ -58,15 +57,28 @@ public class ShoreikinConfigController {
 		return CONFIG_VIEW;
 	}
 
-	@PostMapping("/config/edit")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集モード切替")
-	public String editMode(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
-		accessChecker.checkWriteAccess(SCREEN_ID);
+	/**
+	 * （編集/照会）モード切替
+	 * @author Atsumu Kuboichi
+	 * @param mode
+	 * @param configForm
+	 * @param model
+	 * @return 特別徴収事務交付金照会／登録／編集
+	 */
+	@PostMapping("/config/switch-mode")
+	@OpeLog(screenId = SCREEN_ID, operation = "モード切替")
+	public String switchMode(@RequestParam("mode") String mode, 
+	                         @ModelAttribute ShoreikinConfigDto configForm, 
+	                         Model model) {
+	    accessChecker.checkWriteAccess(SCREEN_ID);
 
-		configForm.setMode("edit");
-		model.addAttribute("configForm", configForm);
-
-		return CONFIG_VIEW;
+	    // 指定されたモードを設定
+	    configForm.setMode(mode);
+	    
+	    // 送信されたフォームの情報をmodelへ保存
+	    model.addAttribute("configForm", configForm);
+	    
+	    return CONFIG_VIEW;
 	}
 
 	@PostMapping("/config/calculate")

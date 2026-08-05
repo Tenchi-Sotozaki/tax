@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +16,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.ShoreikinDto;
 import jp.lg.asp.accommodation.service.ShoreikinService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +31,6 @@ public class ShoreikinController {
 
 	private final ShoreikinService shoreikinService;
 	private final ScreenAccessChecker accessChecker;
-
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN;
 	private static final String LIST_VIEW = "shoreikin/shoreikin";
 
@@ -66,7 +69,10 @@ public class ShoreikinController {
 	@PostMapping("/viewKofu")
 	@OpeLog(screenId = SCREEN_ID, operation = "交付金照会")
 	public String viewKofu(@RequestParam List<String> selectedItems,
+			@RequestParam(required = false) String shisetsuName,
+			@RequestParam(required = false) String shimei,
 			@RequestParam(required = false) String nendo,
+			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 		if (selectedItems.isEmpty()) {
@@ -82,7 +88,13 @@ public class ShoreikinController {
 			return "redirect:/shoreikin/list";
 		}
 
-		// 交付金照会画面への遷移（セッションに指定番号が保存済みのためパラメータ不要）
+		// DTOに指定番号、施設名称、氏名を保存
+		ShiteiGassanSearchDto gassanDto = new ShiteiGassanSearchDto();
+		gassanDto.setShiteiNo(selectedItems.get(0));
+		gassanDto.setShisetsuName(shisetsuName);
+		gassanDto.setName(shimei);
+		SessionHelper.saveShiteiGassan(session, gassanDto);
+		
 		if (nendo != null && !nendo.isEmpty()) {
 			redirectAttributes.addAttribute("nendo", nendo);
 		}
@@ -92,6 +104,9 @@ public class ShoreikinController {
 	@PostMapping("/viewKoza")
 	@OpeLog(screenId = SCREEN_ID, operation = "口座照会")
 	public String viewKoza(@RequestParam List<String> selectedItems,
+			@RequestParam(required = false) String shisetsuName,
+			@RequestParam(required = false) String shimei,
+			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
 		if (selectedItems.isEmpty()) {
@@ -107,7 +122,13 @@ public class ShoreikinController {
 			return "redirect:/shoreikin/list";
 		}
 
-		// 振込先口座照会画面への遷移（セッションに指定番号が保存済みのためパラメータ不要）
+		// DTOに指定番号、施設名称、氏名を保存
+		ShiteiGassanSearchDto gassanDto = new ShiteiGassanSearchDto();
+		gassanDto.setShiteiNo(selectedItems.get(0));
+		gassanDto.setShisetsuName(shisetsuName);
+		gassanDto.setName(shimei);
+		SessionHelper.saveShiteiGassan(session, gassanDto);
+
 		return "redirect:/shoreikin/furikomiKoza";
 	}
 }

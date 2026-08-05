@@ -20,14 +20,19 @@
 						編集</span> <span th:if="${configForm.createMode}" class="text-muted">-
 						登録</span>
 				</h5>
-
-				<div th:if="${configForm.viewMode}">
-					<button type="button" class="btn btn-primary btn-sm"
-						onclick="editMode()">
+				
+				<!-- ボタン -->
+				<div class="d-flex gap-2" th:if="${configForm.viewMode}">
+					<!-- 特別徴収事務交付金交付申請・決定通知ボタン -->
+					<a th:href="@{/reports/kofuKetteiTsuchiShinsei}" class="btn btn-outline-primary btn-sm">
+						<i class="bi bi-pencil-square me-2"></i>特別徴収事務交付金交付申請・決定通知
+					</a>
+					
+					<!-- 編集するボタン -->
+					<button type="button" class="btn btn-primary btn-sm" onclick="editMode()">
 						<i class="bi bi-pencil"></i> 編集する
 					</button>
 				</div>
-
 			</div>
 
 			<!-- 特別徴収義務者情報 -->
@@ -192,9 +197,10 @@
 					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+					</a> 
+					<a th:href="@{/shoreikin/config}" class="btn btn-outline-primary"
 						th:unless="${configForm.viewMode}"
-						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+						onclick="if (confirm('入力内容は破棄されます。よろしいですか？')) { viewMode(); } return false;"> <i
 						class="bi bi-arrow-left"></i> 戻る
 					</a>
 					
@@ -230,18 +236,21 @@
 				<input type="hidden" th:field="*{mode}">
 			</form>
 
-			<!-- 編集モード切り替え用フォーム -->
-			<form th:action="@{/shoreikin/config/edit}" th:object="${configForm}"
-				method="post" id="editForm" style="display: none;">
-				<input type="hidden" th:field="*{shiteiNo}"> <input
-					type="hidden" th:field="*{nendo}"> <input type="hidden"
-					th:field="*{kofuZeigaku}"> <input type="hidden"
-					th:field="*{kofuRitsu}"> <input type="hidden"
-					th:field="*{kofuGaku}"> <input type="hidden"
-					th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
-					name="kofuYmd"> <input type="hidden" th:field="*{version}">
-				<input type="hidden" th:field="*{shisetsuName}"> <input
-					type="hidden" th:field="*{name}">
+			<!-- モード切り替え用共通フォーム -->
+			<form th:action="@{/shoreikin/config/switch-mode}" th:object="${configForm}" method="post" id="switchModeForm"
+			    style="display: none;">
+			    <input type="hidden" id="switchModeField" name="mode" value="">
+			    <input type="hidden" th:field="*{shiteiNo}">
+			    <input type="hidden" th:field="*{nendo}">
+			    <input type="hidden" th:field="*{kofuZeigaku}">
+			    <input type="hidden" th:field="*{kofuRitsu}">
+			    <input type="hidden" th:field="*{kofuGaku}">
+			    <input type="hidden"
+			        th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
+			        name="kofuYmd">
+			    <input type="hidden" th:field="*{version}">
+			    <input type="hidden" th:field="*{shisetsuName}">
+			    <input type="hidden" th:field="*{name}">
 			</form>
 
 			<!-- 算出用フォーム -->
