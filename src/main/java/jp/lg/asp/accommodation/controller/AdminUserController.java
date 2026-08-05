@@ -159,6 +159,7 @@ public class AdminUserController {
 		user.setNameKana(form.getNameKana());
 		user.setBusho(form.getBusho());
 		user.setRoleId(form.getRoleId());
+		user.setInitialPasswordFlg("1");
 		userRepository.save(user);
 		redirectAttributes.addFlashAttribute("successMessage", "ユーザーを登録しました。");
 		return "redirect:/admin/user-search";
@@ -252,6 +253,7 @@ public class AdminUserController {
 		user.setRoleId(form.getRoleId());
 		if (form.getPassword() != null && !form.getPassword().isBlank()) {
 			user.setPassword(passwordEncoder.encode(form.getPassword()));
+			user.setInitialPasswordFlg("1");
 		}
 		userRepository.save(user);
 

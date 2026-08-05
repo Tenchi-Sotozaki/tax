@@ -86,6 +86,11 @@ public class UserPasswordChangeController {
             return VIEW;
         }
 
+        if (passwordEncoder.matches(newPassword, user.getPassword() != null ? user.getPassword().trim() : "")) {
+            model.addAttribute("error", "登録済みパスワードと同一のパスワードは登録できません");
+            return VIEW;
+        }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
