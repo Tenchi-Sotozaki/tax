@@ -46,16 +46,37 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public Map<String, List<Screen>> findScreensGroupedByKbn() {
-		Map<String, List<Screen>> grouped = new LinkedHashMap<>();
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
-		// 表示順を固定するため、先に区分の入れ物を用意する
-		for (String kbnName : ScreenManagement.getScreenKbnNames()) {
-			grouped.put(kbnName, new ArrayList<>());
+		// m_screen の登録内容を画面IDで引けるようにする
+		Map<String, Screen> registered = new LinkedHashMap<>();
+		for (Screen screen : findAllScreens()) {
+			registered.put(screen.getScreenId(), screen);
 		}
 
-		for (Screen screen : findAllScreens()) {
-			grouped.computeIfAbsent(ScreenManagement.getScreenKbnName(screen.getScreenId()),
-					key -> new ArrayList<>()).add(screen);
+		Map<String, List<Screen>> grouped = new LinkedHashMap<>();
+
+		// メニュー構成の定義順に並べる
+		// m_screen に未登録の画面も権限を設定できるよう、定義側の画面名で表示する
+		for (Map.Entry<String, Map<String, String>> kbn : ScreenManagement.getScreensByKbn().entrySet()) {
+			List<Screen> screens = new ArrayList<>();
+			for (Map.Entry<String, String> defined : kbn.getValue().entrySet()) {
+				Screen screen = registered.remove(defined.getKey());
+				if (screen == null) {
+					screen = new Screen();
+					screen.setJichitaiCd(jichitaiCd);
+					screen.setScreenId(defined.getKey());
+					screen.setScreenName(defined.getValue());
+				}
+				screens.add(screen);
+			}
+			grouped.put(kbn.getKey(), screens);
+		}
+
+		// メニュー構成に定義が無い画面は「その他」にまとめる
+		if (!registered.isEmpty()) {
+			grouped.computeIfAbsent(ScreenManagement.SCREEN_KBN_OTHER, key -> new ArrayList<>())
+					.addAll(registered.values());
 		}
 
 		// 画面が1件も無い区分は見出しごと表示しない

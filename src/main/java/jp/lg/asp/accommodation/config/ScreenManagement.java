@@ -16,34 +16,107 @@ public final class ScreenManagement {
 	public static final String SCREEN_KBN_OTHER = "その他";
 
 	/**
-	 * 画面区分（screen_idの先頭2文字）と表示名の対応
+	 * 画面区分ごとの画面IDと画面名
 	 *
-	 * 1文字目が大分類（m=メイン / s=システム）、2文字目が中分類を表す
+	 * 「メニュー再検討_260727-01.xlsx」のメニュー構成に合わせて定義する
 	 * 定義した並び順がそのまま画面上の表示順になる
+	 * 画面名は m_screen に未登録の画面を表示するための予備であり、
+	 * m_screen にレコードがある場合は screen_name を優先する
 	 */
-	private static final java.util.Map<String, String> SCREEN_KBN_NAMES;
+	private static final java.util.Map<String, java.util.Map<String, String>> SCREENS_BY_KBN;
 	static {
-		java.util.Map<String, String> kbnNames = new java.util.LinkedHashMap<>();
-		kbnNames.put("ms", "メイン／照会");
-		kbnNames.put("mi", "メイン／登録");
-		kbnNames.put("mt", "メイン／取り込み");
-		kbnNames.put("mo", "メイン／csv出力");
-		kbnNames.put("ss", "システム／照会");
-		kbnNames.put("sc", "システム／設定");
-		SCREEN_KBN_NAMES = java.util.Collections.unmodifiableMap(kbnNames);
+		java.util.Map<String, java.util.Map<String, String>> kbn = new java.util.LinkedHashMap<>();
+		putKbn(kbn, "台帳管理",
+				"ms00000001", "特別徴収義務者台帳",
+				"ms00000006", "合算申請管理台帳",
+				"ms00000008", "宛名管理台帳");
+		putKbn(kbn, "eLTAX(電子申告)取込",
+				"mt00000002", "eLTAX(電子申告)取込");
+		putKbn(kbn, "納入申告管理",
+				"ms00000004", "納入申告管理",
+				"ms00000005", "納入申告登録",
+				"ms00000017", "納入書",
+				"ms00000023", "宿泊税更正・決定通知書",
+				"ms00000027", "徴収不能額等の還付又は納入義務の免除決定通知書");
+		putKbn(kbn, "行政システム連携",
+				"mo00000001", "収納管理CSV出力",
+				"mo00000002", "収納管理情報確認",
+				"mo00000003", "交付金CSV出力",
+				"mo00000004", "交付金振込情報確認");
+		putKbn(kbn, "特別徴収義務者管理",
+				"ms00000002", "特別徴収義務者登録",
+				"ms00000003", "納税管理人登録",
+				"ms00000013", "特別徴収義務者指定通知書",
+				"ms00000014", "特別徴収義務者申請受理通知書",
+				"ms00000015", "納税管理人承認（不承認）通知書",
+				"ms00000016", "納入申告書の提出期限等の特例適用者承認（不承認）通知書",
+				"ms00000018", "納入申告書の提出期限等の特例取消通知書",
+				"ms00000022", "納税管理人選任免除認定（不認定）通知書",
+				"ms00000024", "納入期限特例照会");
+		putKbn(kbn, "合算申請管理",
+				"mi00000001", "合算申請登録",
+				"ms00000021", "合算申告納入承認通知書");
+		putKbn(kbn, "交付金管理",
+				"ms00000009", "特別徴収事務交付金一覧",
+				"ms00000010", "交付金データ一括登録",
+				"ms00000011", "交付金データ照会",
+				"ms00000012", "振込先口座登録",
+				"ms00000019", "宿泊税特別徴収事務交付金申請書",
+				"ms00000020", "宿泊税特別徴収事務交付金決定通知書",
+				"ms00000028", "交付金帳票一括発行");
+		putKbn(kbn, "帳票発行管理",
+				"ms00000007", "帳票発行",
+				"ms00000025", "帳票発行履歴照会",
+				"ms00000026", "帳票発行状況照会");
+		putKbn(kbn, "宛名管理",
+				"mi00000002", "宛名登録",
+				"mt00000001", "宛名CSV取込");
+		putKbn(kbn, "システム管理",
+				"sc00000001", "帳票発行設定",
+				"sc00000002", "賦課方式登録",
+				"sc00000004", "権限設定",
+				"sc00000005", "交付金交付率設定",
+				"sc00000006", "納入期限登録",
+				"sc00000008", "自治体情報",
+				"sc00000010", "トップページ編集",
+				"ss00000001", "ユーザー管理台帳",
+				"ss00000002", "ユーザー登録",
+				"ss00000004", "賦課方式設定",
+				"ss00000006", "納入期限照会",
+				"ss00000008", "操作ログ照会",
+				"ss00000009", "休業日設定");
+		putKbn(kbn, SCREEN_KBN_OTHER,
+				"ms00000029", "トップページ",
+				"mt00000003", "電子申告情報取込確認",
+				"sc00000003", "納税周期登録/編集",
+				"sc00000007", "指定番号・合算指定番号設定/編集",
+				"ss00000005", "納税周期管理",
+				"ss00000007", "指定番号・合算指定番号照会");
+		SCREENS_BY_KBN = java.util.Collections.unmodifiableMap(kbn);
+	}
+
+	private static void putKbn(java.util.Map<String, java.util.Map<String, String>> kbn,
+			String kbnName, String... screenIdAndNames) {
+		java.util.Map<String, String> screens = new java.util.LinkedHashMap<>();
+		for (int i = 0; i < screenIdAndNames.length; i += 2) {
+			screens.put(screenIdAndNames[i], screenIdAndNames[i + 1]);
+		}
+		kbn.put(kbnName, java.util.Collections.unmodifiableMap(screens));
 	}
 
 	/** 画面IDから画面区分の表示名を取得する */
 	public static String getScreenKbnName(String screenId) {
-		if (screenId == null || screenId.length() < 2) {
-			return SCREEN_KBN_OTHER;
+		for (java.util.Map.Entry<String, java.util.Map<String, String>> entry : SCREENS_BY_KBN.entrySet()) {
+			if (entry.getValue().containsKey(screenId)) {
+				return entry.getKey();
+			}
 		}
-		return SCREEN_KBN_NAMES.getOrDefault(screenId.substring(0, 2), SCREEN_KBN_OTHER);
+		return SCREEN_KBN_OTHER;
 	}
 
-	/** 画面区分の表示名を表示順で取得する */
-	public static java.util.List<String> getScreenKbnNames() {
-		return new java.util.ArrayList<>(SCREEN_KBN_NAMES.values());
+	/** 画面区分ごとの「画面ID→画面名」を表示順で取得する */
+	public static java.util.Map<String, java.util.Map<String, String>> getScreensByKbn() {
+		return SCREENS_BY_KBN;
 	}
 
 	// 特別徴収義務者管理台帳
@@ -198,4 +271,16 @@ public final class ScreenManagement {
 
 	// 特別徴収義務者状況照会
 	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";
+
+	// 交付金帳票一括発行
+	public static final String KOFUKIN_REPORT_BULK = "ms00000028";
+
+	// トップページ
+	public static final String TOP_PAGE = "ms00000029";
+
+	// トップページ編集
+	public static final String TOP_PAGE_CONFIG = "sc00000010";
+
+	// 休業日設定
+	public static final String HOLIDAY_CONFIG = "ss00000009";
 }
