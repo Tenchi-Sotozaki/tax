@@ -1,0 +1,10 @@
+,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,作成者,亀井,
+画面項目一覧表,,画面物理名,reportsOutputConfig,作成日,2026/7/24,
+,,画面論理名,帳票出力項目編集/照会画面,更新日,,
+,,,,,,
+No.,項目名,DBテーブル,DBカラム,部品の種類,有効,備考
+1,編集する,ー,ー,ボタン,〇,照会画面のみ有効
+2,定義名,ー,ー,ラベル,×,ReportsConstants.reportsOutputFiledのname
+3,出力値,m_reports_def,def_text,備考,〇,"ReportsConstants.reportsOutputFiledのkbnが1の場合、テキストボックス
+ReportsConstants.reportsOutputFiledのkbnが2の場合、テキストエリア"
+4,登録する,ー,ー,ボタン,〇,編集画面のみ有効

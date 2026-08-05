@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title th:text="${mode == 'edit'} ? '休業日設定編集' : '休業日設定照会'">休業日設定</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+		<form id="holidayForm" th:action="@{/admin/holiday/save}"
+			th:object="${form}" method="post">
+			<input type="hidden" th:field="*{nendo}">
+			<div
+				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+				<h5 class="mb-0 fw-bold text-dark">
+					<i class="bi bi-calendar-x me-2 text-primary"></i> <span
+						th:text="${mode == 'edit'} ? '休業日設定編集' : '休業日設定照会'">休業日設定</span>
+				</h5>
+				<div class="d-flex align-items-center gap-2">
+					<select class="form-select form-select-sm" id="nenSelect"
+						onchange="changeNen(this)"
+						th:data-base-url="@{/admin/holiday/view/}" th:data-mode="${mode}"
+						th:disabled="${mode == 'edit'}">
+					</select>
+					<div th:if="${mode == 'view'}">
+						<a th:href="@{/admin/holiday/edit/{nen}(nen=${form.nendo})}"
+							class="btn btn-sm btn-primary text-nowrap"> <i
+							class="bi bi-pencil-square me-1"></i>編集する
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div th:if="${successMessage}"
+				class="alert alert-success alert-dismissible fade show" role="alert">
+				<span th:text="${successMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+			<div th:if="${errorMessage}"
+				class="alert alert-danger alert-dismissible fade show" role="alert">
+				<span th:text="${errorMessage}"></span>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+
+			<!-- カレンダーエリア -->
+			<div class="card shadow-sm mb-4">
+				<div
+					class="card-header py-3 d-flex justify-content-between align-items-center">
+					<h5 class="mb-0">
+						<i class="bi bi-calendar-month me-2"></i>カレンダー
+					</h5>
+					<div class="d-flex align-items-center gap-2">
+						<button type="button" class="btn btn-sm btn-outline-secondary"
+							id="prevQuarter">
+							<i class="bi bi-chevron-left"></i> 前へ
+						</button>
+						<span class="fw-medium" id="calendarTitle"></span>
+						<button type="button" class="btn btn-sm btn-outline-secondary"
+							id="nextQuarter">
+							次へ <i class="bi bi-chevron-right"></i>
+						</button>
+					</div>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div id="calendarGrid"
+						style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;"></div>
+					<div class="mt-2 small text-muted">
+						<span class="badge bg-danger me-1">&nbsp;</span>日曜 <span
+							class="badge bg-primary ms-2 me-1">&nbsp;</span>土曜 <span
+							class="badge bg-warning text-dark ms-2 me-1">&nbsp;</span>選択中の休業日
+					</div>
+				</div>
+			</div>
+
+			<!-- 休業日一覧（土・日を除く） -->
+			<div class="card shadow-sm mb-4">
+				<div class="card-header py-3">
+					<h5 class="mb-0">
+						<i class="bi bi-list-check me-2"></i>休業日一覧（土・日を除く）
+					</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div id="holidayList" class="d-flex flex-wrap gap-2">
+						<span
+							th:if="${form.holidayDts == null or form.holidayDts.isEmpty()}"
+							class="text-muted small">休業日が設定されていません。</span> <span
+							th:each="dt : ${form.holidayDts}"
+							class="badge bg-warning text-dark fs-6 holiday-badge"
+							th:data-dt="${dt}"
+							th:text="${#strings.substring(dt,0,4) + '/' + #strings.substring(dt,4,6) + '/' + #strings.substring(dt,6,8)}">
+						</span>
+					</div>
+					<!-- hidden inputs for form submission -->
+					<div id="hiddenInputs">
+						<input th:each="dt : ${form.holidayDts}" type="hidden"
+							name="holidayDts" th:value="${dt}">
+					</div>
+				</div>
+			</div>
+
+			<!-- アクションボタン -->
+			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+
+				<button type="button" class="btn btn-outline-secondary btn-lg px-4"
+					id="initBtn" th:if="${mode == 'edit'}"
+					data-bs-toggle="modal" data-bs-target="#initConfirmModal">
+					<i class="bi bi-arrow-counterclockwise me-2"></i>初期化
+				</button>
+
+				<button type="submit" form="holidayForm"
+					class="btn btn-success btn-lg px-5" th:if="${mode == 'edit'}">
+					<i class="bi bi-check-circle me-2"></i>更新
+				</button>
+				<button type="button" class="btn btn-outline-secondary btn-lg px-4"
+					th:if="${mode == 'edit'}"
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal">
+					<i class="bi bi-arrow-left me-2"></i>戻る
+				</button>
+
+			</div>
+
+		</form>
+
+		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/holiday/view/{nen}(nen=${form.nendo})}, '戻る')}"></div>
+
+		<div class="modal fade" id="initConfirmModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div class="modal-header bg-warning">
+						<h5 class="modal-title"><i class="bi bi-arrow-counterclockwise me-2"></i>初期化確認</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<p class="mb-0">休業日設定を初期化します。よろしいですか？</p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>キャンセル
+						</button>
+						<button type="button" class="btn btn-warning" id="initConfirmBtn">
+							<i class="bi bi-arrow-counterclockwise me-1"></i>初期化する
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:inline="javascript">
+			const NEN = /*[[${form.nendo}]]*/'';
+			const IS_EDIT = /*[[${mode == 'edit'}]]*/false;
+			const INITIAL_HOLIDAYS = /*[[${form.holidayDts}]]*/[];
+			const INIT_URL = /*[[@{/admin/holiday/init/}]]*/'/admin/holiday/init/';
+		</script>
+		<script th:src="@{/js/holidayConfig.js}"></script>
+	</th:block>
+</body>
+</html>

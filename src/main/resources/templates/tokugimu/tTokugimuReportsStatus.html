@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+	<title>特別徴収義務者状況照会</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
+
+		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-clipboard-check text-primary me-2"></i>特別徴収義務者状況照会
+			</h5>
+			<span class="text-muted small">検索結果: <strong th:text="${items.size()}">0</strong> 件</span>
+		</div>
+
+		<!-- 検索条件 -->
+		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
+			<div class="accordion-item border">
+				<h2 class="accordion-header">
+					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
+						data-bs-target="#searchPanel">
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
+					</button>
+				</h2>
+				<div id="searchPanel" class="accordion-collapse collapse show">
+					<div class="accordion-body pt-3 pb-2 px-3">
+						<form th:action="@{/tokugimu/reports-status/search}" th:object="${searchForm}" method="post">
+							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">年度</label>
+									<input type="text" class="form-control form-control-sm" th:field="*{nendo}" placeholder="年度">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
+									<input type="text" class="form-control form-control-sm" th:field="*{shiteiNo}" placeholder="指定番号">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">氏名/名称</label>
+									<input type="text" class="form-control form-control-sm" th:field="*{name}" placeholder="氏名または名称">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">施設名称</label>
+									<input type="text" class="form-control form-control-sm" th:field="*{shisetsuName}" placeholder="施設名称">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
+									<input type="text" class="form-control form-control-sm" th:field="*{kojinNo}" placeholder="個人番号">
+								</div>
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
+									<input type="text" class="form-control form-control-sm" th:field="*{hojinNo}" placeholder="法人番号">
+								</div>
+							</div>
+							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+								<a th:href="@{/tokugimu/reports-status}" class="btn btn-outline-secondary btn-sm">
+									<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
+								</a>
+								<button type="submit" class="btn btn-primary btn-sm px-4">
+									<i class="bi bi-search me-1"></i>検索する
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+			<!-- ======== 件数 ======== -->
+			<span class="text-muted small">検索結果：<span id="totalCount" th:text="${items.size()}">0</span> 件</span>
+			<!-- ======== ページネーション ======== -->
+			<nav class="position-absolute start-50 translate-middle-x">
+				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+			</nav>
+			<!-- ======== 表示件数 ======== -->
+			<div class="d-flex align-items-center gap-2">
+				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
+				<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+					<option value="5">5件</option>
+					<option value="10" selected>10件</option>
+					<option value="20">20件</option>
+					<option value="50">50件</option>
+					<option value="100">100件</option>
+				</select>
+			</div>
+		</div>
+
+		<!-- 一覧テーブル -->
+		<div class="card shadow-sm">
+			<div class="card-body p-0">
+				<div class="table-scroll">
+					<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
+						<thead class="table-primary">
+							<tr>
+								<th style="min-width: 100px">指定番号</th>
+								<th style="min-width: 140px">氏名/名称</th>
+								<th style="min-width: 140px">施設名称</th>
+								<th th:each="rpt : ${reports}" class="text-center" style="width: 4em;">
+									<span th:text="${rpt.rptName}" style="writing-mode: vertical-rl; text-orientation: mixed; white-space: normal; display: inline-block; max-height: 12em;"></span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="log-row"  th:each="item : ${items}">
+								<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
+								<td th:text="${item.name}"></td>
+								<td th:text="${item.shisetsuName}"></td>
+								<td th:each="rpt : ${reports}" class="text-center">
+									<span th:if="${item.rptStatusMap.containsKey(rpt.rptId)}"
+										th:text="${#temporals.format(item.rptStatusMap.get(rpt.rptId), 'yyyy/MM/dd HH:mm')}"
+										class="badge bg-success"></span>
+									<span th:unless="${item.rptStatusMap.containsKey(rpt.rptId)}"
+										class="text-muted small">-</span>
+								</td>
+							</tr>
+							<tr th:if="${items.isEmpty()}">
+								<td th:colspan="${3 + reports.size()}" class="text-center text-muted py-5">
+									<i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+									該当するデータが見つかりませんでした。
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+<th:block layout:fragment="scripts">
+	<script th:src="@{/js/opeLogView.js}"></script>
+</th:block>
+</body>
+
+</html>

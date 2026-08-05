@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title>トップページ</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<!-- 全自治体共有エリア -->
+
+		<div th:utext="${sharedContent}"></div>
+
+
+		<!-- 自治体カスタマイズエリア -->
+
+		<div th:utext="${customContent}"></div>
+
+	</div>
+</body>
+</html>
