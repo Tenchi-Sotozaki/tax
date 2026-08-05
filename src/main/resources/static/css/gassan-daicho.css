@@ -38,3 +38,17 @@
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
 }
+
+.card {
+     min-height: auto !important;
+     height: auto !important;
+}
+
+.table-scroll {
+     min-height: auto !important;
+     height: auto !important;
+}
+
+.table-scroll table {
+     margin-bottom: 0 !important;
+}

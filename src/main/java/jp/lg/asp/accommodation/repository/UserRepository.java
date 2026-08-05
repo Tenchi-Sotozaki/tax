@@ -22,6 +22,16 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 	/** システム管理用のデフォルトユーザーに割り当てる権限ID（一覧には表示しない） */
 	long DEFAULT_USER_ROLE_ID = 99L;
 
+	/** 指定した権限が付与されているユーザーを取得する */
+	@Query("SELECT u FROM User u WHERE u.jichitaiCd = :jichitaiCd" +
+			" AND u.delFlg = '0'" +
+			" AND u.roleId <> " + DEFAULT_USER_ROLE_ID +
+			" AND u.roleId = :roleId" +
+			" ORDER BY u.id")
+	List<User> findAssignedUsers(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("roleId") java.math.BigDecimal roleId);
+
 	@Query("SELECT u FROM User u WHERE u.jichitaiCd = :jichitaiCd" +
 			" AND u.delFlg = '0'" +
 			" AND u.roleId <> " + DEFAULT_USER_ROLE_ID +

@@ -1,18 +1,19 @@
 package jp.lg.asp.accommodation.controller;
+
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,7 +79,6 @@ public class ShunoRenkeiController {
 				PageRequest.of(current, size), total);
 
 		model.addAttribute("items", items);
-		model.addAttribute("pageWindow", buildPageWindow(current, items.getTotalPages()));
 		Map<String, Object> searchForm = new HashMap<>();
 		searchForm.put("shinkokuFrom", shinkokuFrom);
 		searchForm.put("shinkokuTo", shinkokuTo);
@@ -134,31 +134,31 @@ public class ShunoRenkeiController {
 
 		for (ShunoDto r : rows) {
 			String[] cols = new String[] {
-				r.getAtenaNo() != null ? r.getAtenaNo() : "",
-				r.getNendo() != null ? r.getNendo() : "",
-				r.getKibetsu() != null ? String.valueOf(r.getKibetsu()) : "",
-				r.getTorokuYmd() != null ? r.getTorokuYmd().toString() : "",
-				r.getShinkokuYmd() != null ? r.getShinkokuYmd().toString() : "",
-				r.getTaishoYm() != null ? formatTaishoYm(r.getTaishoYm()) : "",
-				r.getTotalZeigaku() != null ? String.valueOf(r.getTotalZeigaku()) : "",
-				r.getCityZeigaku() != null ? String.valueOf(r.getCityZeigaku()) : "",
-				r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "",
-				// 加算1
-				convertKasanKbn(r.getKasanKbn1()),
-				r.getKasanRitsu1() != null ? r.getKasanRitsu1().toString() : "",
-				r.getKasanGaku1() != null ? String.valueOf(r.getKasanGaku1()) : "",
-				// 加算2
-				convertKasanKbn(r.getKasanKbn2()),
-				r.getKasanRitsu2() != null ? r.getKasanRitsu2().toString() : "",
-				r.getKasanGaku2() != null ? String.valueOf(r.getKasanGaku2()) : "",
-				// 加算3
-				convertKasanKbn(r.getKasanKbn3()),
-				r.getKasanRitsu3() != null ? r.getKasanRitsu3().toString() : "",
-				r.getKasanGaku3() != null ? String.valueOf(r.getKasanGaku3()) : "",
-				// 延滞金
-				r.getEntaikin() != null ? String.valueOf(r.getEntaikin()) : "",
-				// 納入期限（定義書の単一 nokigen を出力）
-				r.getNokigen() != null ? r.getNokigen().toString() : "" };
+					r.getAtenaNo() != null ? r.getAtenaNo() : "",
+					r.getNendo() != null ? r.getNendo() : "",
+					r.getKibetsu() != null ? String.valueOf(r.getKibetsu()) : "",
+					r.getTorokuYmd() != null ? r.getTorokuYmd().toString() : "",
+					r.getShinkokuYmd() != null ? r.getShinkokuYmd().toString() : "",
+					r.getTaishoYm() != null ? formatTaishoYm(r.getTaishoYm()) : "",
+					r.getTotalZeigaku() != null ? String.valueOf(r.getTotalZeigaku()) : "",
+					r.getCityZeigaku() != null ? String.valueOf(r.getCityZeigaku()) : "",
+					r.getKenZeigaku() != null ? String.valueOf(r.getKenZeigaku()) : "",
+					// 加算1
+					convertKasanKbn(r.getKasanKbn1()),
+					r.getKasanRitsu1() != null ? r.getKasanRitsu1().toString() : "",
+					r.getKasanGaku1() != null ? String.valueOf(r.getKasanGaku1()) : "",
+					// 加算2
+					convertKasanKbn(r.getKasanKbn2()),
+					r.getKasanRitsu2() != null ? r.getKasanRitsu2().toString() : "",
+					r.getKasanGaku2() != null ? String.valueOf(r.getKasanGaku2()) : "",
+					// 加算3
+					convertKasanKbn(r.getKasanKbn3()),
+					r.getKasanRitsu3() != null ? r.getKasanRitsu3().toString() : "",
+					r.getKasanGaku3() != null ? String.valueOf(r.getKasanGaku3()) : "",
+					// 延滞金
+					r.getEntaikin() != null ? String.valueOf(r.getEntaikin()) : "",
+					// 納入期限（定義書の単一 nokigen を出力）
+					r.getNokigen() != null ? r.getNokigen().toString() : "" };
 			for (int i = 0; i < cols.length; i++) {
 				if (i > 0)
 					sb.append(',');
@@ -194,30 +194,6 @@ public class ShunoRenkeiController {
 			model.addAttribute("rows", java.util.Collections.emptyList());
 		}
 		return "renkei/shunoRenkeiKakunin";
-	}
-
-	private java.util.List<Integer> buildPageWindow(int current, int totalPages) {
-		java.util.List<Integer> pages = new ArrayList<>();
-		if (totalPages <= 0) {
-			return pages;
-		}
-		java.util.TreeSet<Integer> show = new java.util.TreeSet<>();
-		show.add(0);
-		show.add(totalPages - 1);
-		for (int i = current - 1; i <= current + 1; i++) {
-			if (i >= 0 && i < totalPages) {
-				show.add(i);
-			}
-		}
-		int prev = -2;
-		for (int pIdx : show) {
-			if (prev != -2 && pIdx - prev > 1) {
-				pages.add(-1);
-			}
-			pages.add(pIdx);
-			prev = pIdx;
-		}
-		return pages;
 	}
 
 	private String formatTaishoYm(String taishoYm) {

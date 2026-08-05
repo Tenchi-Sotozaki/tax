@@ -2,6 +2,16 @@
 (function () {
     'use strict';
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = Array.from(document.querySelectorAll('input[name="selectedIds"]')).map(cb => cb.closest('tr'));
+        const pageSizeSelect = document.getElementById('pageSizeSelect');
+        const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
+        if (rows.length > 0) {
+            pager.render(1);
+            pageSizeSelect?.addEventListener('change', () => pager.render(1));
+        }
+    });
+
     // テンプレート側でサーバーから描画するため、クライアント側の初期描画は不要。
     const table_body = document.querySelector('#shunoTable tbody');
     const result_count = document.getElementById('resultCount');

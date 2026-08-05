@@ -65,12 +65,6 @@ public class TokugimuController {
 		model.addAttribute("items", pageResult);
 		model.addAttribute("searchForm", searchForm);
 		model.addAttribute("isSearched", searched);
-
-		// 選択中のページを中央に固定するため、前後1ページ分の範囲を算出する
-		int currentPage = pageResult.getNumber();
-		int totalPages = pageResult.getTotalPages();
-		model.addAttribute("startPage", Math.max(0, currentPage - 1));
-		model.addAttribute("endPage", Math.min(Math.max(totalPages - 1, 0), currentPage + 1));
 		return LIST_VIEW;
 	}
 
