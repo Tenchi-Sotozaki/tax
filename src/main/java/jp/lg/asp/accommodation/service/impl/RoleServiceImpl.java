@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
-import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.RoleDetail;
@@ -46,41 +45,14 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public Map<String, List<Screen>> findScreensGroupedByKbn() {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-
-		// m_screen の登録内容を画面IDで引けるようにする
-		Map<String, Screen> registered = new LinkedHashMap<>();
-		for (Screen screen : findAllScreens()) {
-			registered.put(screen.getScreenId(), screen);
-		}
-
 		Map<String, List<Screen>> grouped = new LinkedHashMap<>();
 
-		// メニュー構成の定義順に並べる
-		// m_screen に未登録の画面も権限を設定できるよう、定義側の画面名で表示する
-		for (Map.Entry<String, Map<String, String>> kbn : ScreenManagement.getScreensByKbn().entrySet()) {
-			List<Screen> screens = new ArrayList<>();
-			for (Map.Entry<String, String> defined : kbn.getValue().entrySet()) {
-				Screen screen = registered.remove(defined.getKey());
-				if (screen == null) {
-					screen = new Screen();
-					screen.setJichitaiCd(jichitaiCd);
-					screen.setScreenId(defined.getKey());
-					screen.setScreenName(defined.getValue());
-				}
-				screens.add(screen);
-			}
-			grouped.put(kbn.getKey(), screens);
+		// m_screen を表示順に取得し、区分ごとにまとめる
+		// 表示順で並んでいるため、区分の並び順も表示順に従う
+		for (Screen screen : screenRepository
+				.findByJichitaiCdOrderByDspOdrAsc(jichitaiContext.getJichitaiCd())) {
+			grouped.computeIfAbsent(screen.getKbn(), key -> new ArrayList<>()).add(screen);
 		}
-
-		// メニュー構成に定義が無い画面は「その他」にまとめる
-		if (!registered.isEmpty()) {
-			grouped.computeIfAbsent(ScreenManagement.SCREEN_KBN_OTHER, key -> new ArrayList<>())
-					.addAll(registered.values());
-		}
-
-		// 画面が1件も無い区分は見出しごと表示しない
-		grouped.values().removeIf(List::isEmpty);
 
 		return grouped;
 	}
