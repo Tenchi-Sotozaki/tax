@@ -133,23 +133,26 @@
 						th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
 				</button>
 
-				<a
-					th:href="@{/tekiyo-nozei-shuki/delete/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}"
+				<a href="#"
 					class="btn btn-danger btn-lg px-4"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
-					onclick="return confirm('削除してもよろしいですか？')"> <i
+					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"> <i
+					class="bi bi-trash me-2"></i>
+				</a> <a th:href="@{/tokugimu/list}"削除してもよろしいですか？')"> <i
 					class="bi bi-trash me-2"></i>削除する
 				</a> <a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a th:href="@{/tekiyo-nozei-shuki/view/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}"
-					class="btn btn-outline-primary btn-lg px-4"
+				</a> <a href="#" class="btn btn-outline-primary btn-lg px-4"
 					th:unless="${isView ?: false}"
-					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>照会に戻る
 				</a>
 			</div>
 		</form>
+
+		<div th:if="${(isEdit ?: false) and !(isView ?: false)}" th:replace="~{layout/components :: linkConfirmModal('deleteConfirmModal', '削除確認', '削除してもよろしいですか？', @{/tekiyo-nozei-shuki/delete/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}, '削除する')}"></div>
+		<div th:unless="${isView ?: false}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/tekiyo-nozei-shuki/view/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}, '照会に戻る')}"></div>
 
 		<!-- 特別徴収義務者指定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>

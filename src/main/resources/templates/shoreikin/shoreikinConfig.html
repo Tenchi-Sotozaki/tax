@@ -194,7 +194,7 @@
 						戻る
 					</a> <a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:unless="${configForm.viewMode}"
-						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+						data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る
 					</a>
 					
@@ -258,6 +258,8 @@
 					type="hidden" th:field="*{name}">
 			</form>
 
+			<!-- 戻る確認モーダル -->
+			<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。一覧画面に戻りますか？', @{/shoreikin/list}, '戻る')}"></div>
 			<!-- 特別徴収義務者指定モーダル -->
 			<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 			

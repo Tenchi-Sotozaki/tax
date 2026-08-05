@@ -56,4 +56,16 @@ public class HolidayConfigServiceImpl implements HolidayConfigService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return holidayRepository.findDistinctNenByJichitaiCd(jichitaiCd);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<String> getInitialHolidays(String nen) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		List<Kyugyobi> saved = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi(jichitaiCd, nen);
+		if (!saved.isEmpty()) {
+			return saved.stream().map(k -> k.getKyugyobi().format(FMT)).toList();
+		}
+		List<Kyugyobi> template = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi("99999", nen);
+		return template.stream().map(k -> k.getKyugyobi().format(FMT)).toList();
+	}
 }

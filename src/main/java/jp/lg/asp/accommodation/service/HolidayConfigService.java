@@ -11,4 +11,6 @@ public interface HolidayConfigService {
     void save(HolidayConfigForm form);
 
     List<String> findNendoList();
+
+    List<String> getInitialHolidays(String nen);
 }

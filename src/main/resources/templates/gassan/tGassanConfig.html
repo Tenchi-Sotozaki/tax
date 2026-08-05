@@ -257,10 +257,10 @@
 				<a th:href="@{/gassan/list}"
 					class="btn btn-outline-primary btn-lg px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a th:href="@{/gassan/list}"
+				</a> <a href="#"
 					class="btn btn-outline-primary btn-lg px-4"
 					th:unless="${isView ?: false}"
-					onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 			</div>
@@ -272,6 +272,8 @@
 			${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', 
 			'btn-success', ${isEdit} ? '更新する' : '登録する')}">
 		</div>
+
+		<div th:unless="${isView ?: false}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/gassan/list}, '一覧に戻る')}"></div>
 
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>

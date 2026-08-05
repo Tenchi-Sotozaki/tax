@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
@@ -60,6 +62,14 @@ public class HolidayConfigController {
 		model.addAttribute("nenList", holidayConfigService.findNendoList());
 		model.addAttribute("mode", "edit");
 		return VIEW;
+	}
+
+	@GetMapping(value = "/init/{nen}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<String> getInitialHolidays(@PathVariable String nen) {
+		List<String> result = holidayConfigService.getInitialHolidays(nen);
+		log.info("getInitialHolidays nen={} result={}", nen, result);
+		return result;
 	}
 
 	@PostMapping("/save")

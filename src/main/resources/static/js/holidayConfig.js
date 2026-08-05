@@ -167,12 +167,22 @@
     }
 
     window.initHolidays = function () {
-        if (!confirm('休業日設定を初期化します。よろしいですか？')) return;
-        selected.clear();
-        renderCalendar();
-        renderList();
-        renderHiddenInputs();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('initConfirmModal'));
+        if (modal) modal.hide();
+        fetch(INIT_URL + NEN)
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+            .then(dates => {
+                console.log('init dates:', dates);
+                selected.clear();
+                (dates || []).forEach(d => selected.add(String(d)));
+                renderCalendar();
+                renderList();
+                renderHiddenInputs();
+            })
+            .catch(e => console.error('init error:', e));
     };
+
+    document.getElementById('initConfirmBtn')?.addEventListener('click', () => initHolidays());
 
     window.changeNen = function (sel) {
         const baseUrl = sel.dataset.baseUrl;

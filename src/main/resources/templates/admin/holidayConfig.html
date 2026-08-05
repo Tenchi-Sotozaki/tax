@@ -104,7 +104,8 @@
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
 				<button type="button" class="btn btn-outline-secondary btn-lg px-4"
-					id="initBtn" th:if="${mode == 'edit'}" onclick="initHolidays()">
+					id="initBtn" th:if="${mode == 'edit'}"
+					data-bs-toggle="modal" data-bs-target="#initConfirmModal">
 					<i class="bi bi-arrow-counterclockwise me-2"></i>初期化
 				</button>
 
@@ -124,6 +125,28 @@
 
 		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/holiday/view/{nen}(nen=${form.nendo})}, '戻る')}"></div>
 
+		<div class="modal fade" id="initConfirmModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div class="modal-header bg-warning">
+						<h5 class="modal-title"><i class="bi bi-arrow-counterclockwise me-2"></i>初期化確認</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						<p class="mb-0">休業日設定を初期化します。よろしいですか？</p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>キャンセル
+						</button>
+						<button type="button" class="btn btn-warning" id="initConfirmBtn">
+							<i class="bi bi-arrow-counterclockwise me-1"></i>初期化する
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
 	<th:block layout:fragment="scripts">
@@ -131,6 +154,7 @@
 			const NEN = /*[[${form.nendo}]]*/'';
 			const IS_EDIT = /*[[${mode == 'edit'}]]*/false;
 			const INITIAL_HOLIDAYS = /*[[${form.holidayDts}]]*/[];
+			const INIT_URL = /*[[@{/admin/holiday/init/}]]*/'/admin/holiday/init/';
 		</script>
 		<script th:src="@{/js/holidayConfig.js}"></script>
 	</th:block>
