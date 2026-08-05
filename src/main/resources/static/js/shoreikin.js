@@ -2,7 +2,7 @@
  * 特別徴収事務交付金画面用JavaScript
  */
 
-function viewKofu(shiteiNo, nendo) {
+function viewKofu(shiteiNo, shisetsuName, shimei, nendo) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/accommodation-tax/shoreikin/viewKofu';
@@ -16,11 +16,30 @@ function viewKofu(shiteiNo, nendo) {
         form.appendChild(csrfInput);
     }
 
+    // 指定番号
     const shiteiNoInput = document.createElement('input');
     shiteiNoInput.type = 'hidden';
     shiteiNoInput.name = 'selectedItems';
     shiteiNoInput.value = shiteiNo;
     form.appendChild(shiteiNoInput);
+
+    // 施設名称
+    if (shisetsuName) {
+        const shisetsuInput = document.createElement('input');
+        shisetsuInput.type = 'hidden';
+        shisetsuInput.name = 'shisetsuName';
+        shisetsuInput.value = shisetsuName;
+        form.appendChild(shisetsuInput);
+    }
+
+    // 氏名
+    if (shimei) {
+        const shimeiInput = document.createElement('input');
+        shimeiInput.type = 'hidden';
+        shimeiInput.name = 'shimei';
+        shimeiInput.value = shimei;
+        form.appendChild(shimeiInput);
+    }
 
     if (nendo && nendo !== 'null') {
         const nendoInput = document.createElement('input');
@@ -34,7 +53,7 @@ function viewKofu(shiteiNo, nendo) {
     form.submit();
 }
 
-function viewKoza(shiteiNo) {
+function viewKoza(shiteiNo, shisetsuName, shimei) {
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/accommodation-tax/shoreikin/viewKoza';
@@ -48,11 +67,30 @@ function viewKoza(shiteiNo) {
         form.appendChild(csrfInput);
     }
 
+	// 指定番号
     const shiteiNoInput = document.createElement('input');
     shiteiNoInput.type = 'hidden';
     shiteiNoInput.name = 'selectedItems';
     shiteiNoInput.value = shiteiNo;
     form.appendChild(shiteiNoInput);
+
+	// 施設名称
+    if (shisetsuName) {
+        const shisetsuInput = document.createElement('input');
+        shisetsuInput.type = 'hidden';
+        shisetsuInput.name = 'shisetsuName';
+        shisetsuInput.value = shisetsuName;
+        form.appendChild(shisetsuInput);
+    }
+
+	// 氏名
+    if (shimei) {
+        const shimeiInput = document.createElement('input');
+        shimeiInput.type = 'hidden';
+        shimeiInput.name = 'shimei';
+        shimeiInput.value = shimei;
+        form.appendChild(shimeiInput);
+    }
 
     document.body.appendChild(form);
     form.submit();
@@ -67,15 +105,15 @@ document.addEventListener('DOMContentLoaded', function () {
         pageSizeSelect?.addEventListener('change', () => pager.render(1));
     }
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
         const kofu = e.target.closest('.btn-kofu');
         if (kofu) {
-            viewKofu(kofu.dataset.shiteiNo, kofu.dataset.nendo);
+            viewKofu(kofu.dataset.shiteiNo, kofu.dataset.shisetsuName, kofu.dataset.shimei, kofu.dataset.nendo);
             return;
         }
         const koza = e.target.closest('.btn-koza');
         if (koza) {
-            viewKoza(koza.dataset.shiteiNo);
+            viewKoza(koza.dataset.shiteiNo, koza.dataset.shisetsuName, koza.dataset.shimei);
         }
     });
 });

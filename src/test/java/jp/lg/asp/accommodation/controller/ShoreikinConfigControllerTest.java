@@ -61,14 +61,25 @@ class ShoreikinConfigControllerTest {
     }
 
     @Test
-    void editMode_編集モードに切り替え() {
+    void switchMode_編集モードに切り替え() {
         ShoreikinConfigDto form = new ShoreikinConfigDto();
         Model model = new ExtendedModelMap();
 
-        String view = controller.editMode(form, model);
+        String view = controller.switchMode("edit", form, model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
         assertThat(form.getMode()).isEqualTo("edit");
+    }
+
+    @Test
+    void switchMode_照会モードに切り替え() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.switchMode("view", form, model);
+
+        assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+        assertThat(form.getMode()).isEqualTo("view");
     }
 
     @Test
