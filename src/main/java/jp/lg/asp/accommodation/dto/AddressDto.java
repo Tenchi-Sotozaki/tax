@@ -1,10 +1,14 @@
 package jp.lg.asp.accommodation.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class AddressDto {
     private String addressNumber;
     private String name;
@@ -14,4 +18,7 @@ public class AddressDto {
     private String phone;
     private String kojinNo;
     private String hojinNo;
+    
+    private boolean alreadyRegistered;
+    private String gassanShiteiNo;
 }
