@@ -73,6 +73,11 @@ public class InitialPasswordController {
             return FORM_VIEW;
         }
 
+        if (passwordEncoder.matches(newPassword, user.getPassword() != null ? user.getPassword().trim() : "")) {
+            model.addAttribute("error", "登録済みパスワードと同一のパスワードは登録できません");
+            return FORM_VIEW;
+        }
+
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setInitialPasswordFlg("0");
         userRepository.save(user);
