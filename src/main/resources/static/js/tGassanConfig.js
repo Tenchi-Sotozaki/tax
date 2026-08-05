@@ -177,6 +177,16 @@ async function selectAddress(d) {
             newNoBtn.addEventListener('click', () => {
                 confirmModal.hide();
                 resetAtenaSelection();
+
+                // 確認用モーダルが完全に閉じた後、宛名検索モーダルを再表示する
+                confirmModalEl.addEventListener('hidden.bs.modal', function searchModalHandler() {
+                    confirmModalEl.removeEventListener('hidden.bs.modal', searchModalHandler);
+
+                    const addressSearchModalEl = document.getElementById('addressSearchModal');
+                    if (addressSearchModalEl) {
+                        new bootstrap.Modal(addressSearchModalEl).show();
+                    }
+                }, { once: true });
             });
         }, { once: true });
 
