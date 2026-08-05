@@ -12,6 +12,7 @@ public final class ScreenManagement {
 	private ScreenManagement() {
 	}
 
+
 	// 特別徴収義務者管理台帳
 	public static final String TOKUGIMU_DAICHO = "ms00000001";
 
@@ -164,4 +165,16 @@ public final class ScreenManagement {
 
 	// 特別徴収義務者状況照会
 	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";
+
+	// 交付金帳票一括発行
+	public static final String KOFUKIN_REPORT_BULK = "ms00000028";
+
+	// トップページ
+	public static final String TOP_PAGE = "ms00000029";
+
+	// トップページ編集
+	public static final String TOP_PAGE_CONFIG = "sc00000010";
+
+	// 休業日設定
+	public static final String HOLIDAY_CONFIG = "ss00000009";
 }
