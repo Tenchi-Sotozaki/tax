@@ -12,7 +12,7 @@
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-sliders text-primary me-2"></i>賦課方式設定
 			</h5>
-			<span class="text-muted small">検索結果: <strong th:text="${#lists.size(items)}">0</strong> 件</span>
+			<span class="text-muted small" th:if="${isSearched}">検索結果: <strong th:text="${#lists.size(items)}">0</strong> 件</span>
 		</div>
 
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
@@ -86,7 +86,7 @@
 		</div>
 
 		<!-- 一覧テーブル -->
-		<div class="card shadow-sm">
+		<div th:if="${isSearched}" class="card shadow-sm">
 			<div class="card-body p-0">
 				<div class="table-scroll">
 					<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
