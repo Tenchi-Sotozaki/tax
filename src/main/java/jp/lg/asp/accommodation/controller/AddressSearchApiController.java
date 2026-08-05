@@ -1,16 +1,19 @@
 package jp.lg.asp.accommodation.controller;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 
-import jp.lg.asp.accommodation.dto.AddressDto;
-import jp.lg.asp.accommodation.repository.AtenaRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.dto.AddressDto;
+import jp.lg.asp.accommodation.entity.Gassan;
+import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.GassanRepository;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/address")
@@ -18,7 +21,7 @@ import java.util.List;
 public class AddressSearchApiController {
 
     private final AtenaRepository atenaRepository;
-
+    private final GassanRepository gassanRepository;
     private final JichitaiContext jichitaiContext;
 
     @GetMapping("/search")
@@ -31,7 +34,7 @@ public class AddressSearchApiController {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String kojinNo,
             @RequestParam(required = false) String hojinNo) {
-    	String jichitaiCd = jichitaiContext.getJichitaiCd();
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
 
         if (!StringUtils.hasText(addressNumber) && !StringUtils.hasText(name) && !StringUtils.hasText(address)
                 && !StringUtils.hasText(phone) && !StringUtils.hasText(kojinNo) && !StringUtils.hasText(hojinNo)) {
@@ -46,18 +49,29 @@ public class AddressSearchApiController {
                 "%",
                 StringUtils.hasText(address) ? toPattern(address, addressMatchType) : "%",
                 StringUtils.hasText(phone)   ? phone   : "%",
-                StringUtils.hasText(kojinNo) ? kojinNo : "%",
+                String.format("%s", StringUtils.hasText(kojinNo) ? kojinNo : "%"),
                 StringUtils.hasText(hojinNo) ? hojinNo : "%"
-        ).stream().map(a -> new AddressDto(
-                a.getAtenaNo().toPlainString(),
-                a.getName(),
-                a.getNameKana(),
-                a.getYubinNo(),
-                a.getJusho(),
-                a.getTel1(),
-                a.getKojinNo(),
-                a.getHojinNo()
-        )).toList();
+        ).stream().map(a -> {
+            String atenaNoStr = a.getAtenaNo().toPlainString();
+            
+            // 宛名がすでに合算申請に登録されているかチェック
+            List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, a.getAtenaNo());
+            boolean alreadyRegistered = !gassanList.isEmpty();
+            String gassanShiteiNo = alreadyRegistered ? gassanList.get(0).getGassanShiteiNo() : null;
+
+            return new AddressDto(
+                    atenaNoStr,
+                    a.getName(),
+                    a.getNameKana(),
+                    a.getYubinNo(),
+                    a.getJusho(),
+                    a.getTel1(),
+                    a.getKojinNo(),
+                    a.getHojinNo(),
+                    alreadyRegistered,
+                    gassanShiteiNo
+            );
+        }).toList();
     }
 
     private String toPattern(String value, String matchType) {

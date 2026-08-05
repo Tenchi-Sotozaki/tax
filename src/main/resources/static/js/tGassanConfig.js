@@ -4,6 +4,13 @@ const ADDR_API = '/accommodation-tax/api/address/search';
 const FACILITIES_API = '/accommodation-tax/gassan/facilities-by-atena';
 
 document.addEventListener('DOMContentLoaded', () => {
+	
+    // チェックされた行をハイライト
+    setupFacilityEventListeners();
+	
+
+    // 画面読み込み時に初期の削除ボタン状態を判定
+    updateDeleteButtonState();
 
     // 宛名検索モーダル初期化
     initAddressSearchModal();
@@ -136,17 +143,88 @@ function renderAddressResults(data) {
 }
 
 async function selectAddress(d) {
-    // 宛名番号と宛名名をフォームにセット
+    const searchModalEl = document.getElementById('addressSearchModal');
+    const searchModal = bootstrap.Modal.getInstance(searchModalEl) || new bootstrap.Modal(searchModalEl);
+
+    if (d.alreadyRegistered) {
+        // 宛名検索モーダルを閉じる
+        searchModal.hide();
+
+        // モーダルが完全に閉じたタイミングで、確認用モーダルを表示する
+        searchModalEl.addEventListener('hidden.bs.modal', function handler() {
+			
+            // 多重イベント発火を防止
+            searchModalEl.removeEventListener('hidden.bs.modal', handler);
+
+            const confirmModalEl = document.getElementById('alreadyRegisteredModal');
+            const confirmModal = new bootstrap.Modal(confirmModalEl);
+            confirmModal.show();
+
+            // 「はい」の処理
+            const yesBtn = document.getElementById('alreadyRegisteredYesBtn');
+			
+            // 既存のイベント重複防止で一度クローンして置き換え
+            const newYesBtn = yesBtn.cloneNode(true);
+            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+            newYesBtn.addEventListener('click', () => {
+                window.location.href = `/accommodation-tax/gassan/view-form/${d.gassanShiteiNo}`;
+            });
+
+            // 「いいえ」の処理
+            const noBtn = document.getElementById('alreadyRegisteredNoBtn');
+            const newNoBtn = noBtn.cloneNode(true);
+            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+            newNoBtn.addEventListener('click', () => {
+                confirmModal.hide();
+                resetAtenaSelection();
+
+                // 確認用モーダルが完全に閉じた後、宛名検索モーダルを再表示する
+                confirmModalEl.addEventListener('hidden.bs.modal', function searchModalHandler() {
+                    confirmModalEl.removeEventListener('hidden.bs.modal', searchModalHandler);
+
+                    const addressSearchModalEl = document.getElementById('addressSearchModal');
+                    if (addressSearchModalEl) {
+                        new bootstrap.Modal(addressSearchModalEl).show();
+                    }
+                }, { once: true });
+            });
+        }, { once: true });
+
+        return;
+    }
+
+    // 未登録の場合の通常の処理
+    searchModal.hide();
+
     const atenaNoInput = document.getElementById('atenaNo');
     const atenaNameDisplay = document.getElementById('atenaNameDisplay');
     if (atenaNoInput) atenaNoInput.value = d.addressNumber;
     if (atenaNameDisplay) atenaNameDisplay.value = d.name ?? '';
 
-    // モーダルを閉じる
-    bootstrap.Modal.getInstance(document.getElementById('addressSearchModal')).hide();
-
     // 宛名に紐づく特別徴収義務者一覧を取得
     await loadFacilitiesByAtena(d.addressNumber);
+}
+
+// 宛名選択をリセットし、関連する入力やボタンを非活性にする関数
+function resetAtenaSelection() {
+    const atenaNoInput = document.getElementById('atenaNo');
+    const atenaNameDisplay = document.getElementById('atenaNameDisplay');
+    if (atenaNoInput) atenaNoInput.value = '';
+    if (atenaNameDisplay) atenaNameDisplay.value = '';
+
+    // 施設一覧テーブルをクリア
+    const tbody = document.querySelector('#gassanForm table tbody');
+    if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">
+            <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>対象施設が見つかりませんでした</td></tr>`;
+    }
+
+    // 登録ボタンを非活性化
+    const registerBtn = document.getElementById('openConfirmModalBtn');
+    if (registerBtn) {
+        registerBtn.setAttribute('disabled', 'disabled');
+        registerBtn.classList.add('disabled');
+    }
 }
 
 async function loadFacilitiesByAtena(atenaNo) {
@@ -163,7 +241,7 @@ function renderFacilityTable(facilities) {
     if (!tbody) return;
 
     if (!facilities.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">
             <i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>対象施設が見つかりませんでした。</td></tr>`;
         return;
     }
@@ -195,6 +273,8 @@ function setupFacilityEventListeners() {
                 const radio = this.closest('tr').querySelector('.daihyo-radio');
                 if (radio) radio.checked = false;
             }
+			
+			updateDeleteButtonState();
         });
     });
 
@@ -205,8 +285,39 @@ function setupFacilityEventListeners() {
                 if (checkbox && !checkbox.disabled) {
                     checkbox.checked = true;
                     checkbox.closest('tr').classList.add('table-primary');
+					
+					updateDeleteButtonState();
                 }
             }
         });
     });
+}
+
+// 削除モーダルを開く
+document.getElementById('openDeleteModalBtn')?.addEventListener('click', () => {
+    const modal = document.getElementById('deleteModal');
+    if (modal) new bootstrap.Modal(modal).show();
+});
+
+// 削除確認モーダルの実行ボタンで削除フォーム送信
+document.querySelector('#deleteModal .btn-confirm')?.addEventListener('click', () => {
+    document.getElementById('deleteForm')?.submit();
+});
+
+// 削除ボタンの活性/非活性を制御する関数
+function updateDeleteButtonState() {
+    const deleteBtn = document.getElementById('openDeleteModalBtn');
+    if (!deleteBtn) return;
+
+    // チェックされている施設の数をカウント
+    const checkedCount = document.querySelectorAll('.facility-check:checked').length;
+
+    // 0件の場合は削除ボタンを無効化（disabled属性の付与とクラス調整）
+    if (checkedCount <= 1) {
+        deleteBtn.setAttribute('disabled', 'disabled');
+        deleteBtn.classList.add('disabled');
+    } else {
+        deleteBtn.removeAttribute('disabled');
+        deleteBtn.classList.remove('disabled');
+    }
 }
