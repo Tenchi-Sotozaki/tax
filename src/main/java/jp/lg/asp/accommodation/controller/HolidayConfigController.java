@@ -70,7 +70,7 @@ public class HolidayConfigController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期化")
 	public List<String> getInitialHolidays(@PathVariable String nen) {
 		List<String> result = holidayConfigService.getInitialHolidays(nen);
-		log.info("getInitialHolidays nen={} result={}", nen, result);
+		log.debug("getInitialHolidays nen={} result={}", nen, result);
 		return result;
 	}
 
