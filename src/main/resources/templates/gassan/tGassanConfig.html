@@ -85,7 +85,7 @@
 
 						<!-- 登録日 -->
 						<div class="col-md-3">
-							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'" class="form-label fw-medium"> 登録日
+							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'" class="form-label fw-medium"> 登録年月日
 								<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control" id="torokuYmd"
 								th:field="*{torokuYmd}" th:errorclass="is-invalid" th:data-initial-value="*{torokuYmd}">
@@ -98,7 +98,7 @@
 						<!-- 申告日 -->
 						<div class="col-md-3">
 							<label th:for="!${isView} ? 'shinkokuYmd' : 'shinkokuYmdView'" class="form-label fw-medium">
-								申告日 <span class="text-danger" th:if="!${isView}">*</span>
+								申告年月日 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control" id="shinkokuYmd"
 								th:field="*{shinkokuYmd}" th:errorclass="is-invalid"
 								th:data-initial-value="*{shinkokuYmd}"> <input th:if="${isView}" type="text"
@@ -232,28 +232,29 @@
 
 			<!-- ===== アクションボタン ===== -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+				<a th:href="@{/gassan/list}" class="btn btn-outline-primary btn-lg px-4" th:if="${isView ?: false}">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<a th:href="@{/gassan/list}" class="btn btn-outline-primary btn-lg px-4" th:unless="${isView ?: false}"
+					onclick="return confirm('入力内容は破棄されます。よろしいですか？')">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				
+				<!-- 削除ボタン -->
+				<th:block th:if="${!isView and isEdit}">
+					<button type="button" id="openDeleteModalBtn" class="btn btn-danger btn-lg px-5"
+						th:disabled="${GassanForm.gassanShiteiNo == null or #strings.isEmpty(GassanForm.gassanShiteiNo)}">
+						<span>削除する</span>
+					</button>
+				</th:block>
+				
 				<th:block th:if="!${isView}">
 					<button type="button" id="openConfirmModalBtn" class="btn btn-success btn-lg px-5">
 						<i th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
 					</button>
 				</th:block>
-
-				<a th:href="@{/gassan/list}" class="btn btn-outline-primary btn-lg px-4" th:if="${isView ?: false}">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> 
-				<a th:href="@{/gassan/list}" class="btn btn-outline-primary btn-lg px-4"
-					th:unless="${isView ?: false}" onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> 
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
-
-				<!-- 削除ボタン -->
-				<th:block th:if="${!isView and isEdit}">
-				    <button type="button" id="openDeleteModalBtn" class="btn btn-danger btn-lg px-5"
-				            th:disabled="${GassanForm.gassanShiteiNo == null or #strings.isEmpty(GassanForm.gassanShiteiNo)}">
-				        <span>削除する</span>
-				    </button>
-				</th:block>
+				
 			</div>
 		</form>
 
