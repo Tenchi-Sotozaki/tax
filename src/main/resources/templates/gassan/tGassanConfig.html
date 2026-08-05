@@ -4,7 +4,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-<title>合算申告登録/編集/照会</title>
+<title>合算申請登録/編集/照会</title>
 </head>
 
 <body>
@@ -18,26 +18,38 @@
 			class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-file-earmark-text me-2 text-primary"></i> <span
-					th:text="${isView} ? '合算申告 照会' : (${isEdit} ? '合算申告 編集' : '合算申告 新規登録')"></span>
+					th:text="${isView} ? '合算申請 照会' : (${isEdit} ? '合算申請 編集' : '合算申請 新規登録')"></span>
 			</h5>
-			<th:block th:if="${isView}">
+
+			<!-- ボタン群 -->
+			<div class="d-flex gap-2" th:if="${isView}">
+				<!-- 合算申告納入承認通知書ボタン -->
+				<a th:href="@{/reports/gassanNonyuTsuchi}"
+					class="btn btn-outline-primary btn-sm"> <i
+					class="bi bi-pencil-square me-2"></i>合算申告納入承認通知書
+				</a>
+
+				<!-- 編集するボタン -->
 				<a th:href="@{/gassan/edit/{id}(id=${editId})}"
 					class="btn btn-primary btn-sm"> <i
 					class="bi bi-pencil-square me-2"></i>編集する
 				</a>
-			</th:block>
+			</div>
 		</div>
 
 		<!-- 履歴ナビゲーション（照会画面のみ） -->
-		<div th:if="${isView and GassanForm.maxRno != null and GassanForm.maxRno > 1}"
+		<div
+			th:if="${isView and GassanForm.maxRno != null and GassanForm.maxRno > 1}"
 			class="d-flex align-items-center gap-2 mb-3">
-			<a th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno - 1})}"
+			<a
+				th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno - 1})}"
 				class="btn btn-outline-secondary btn-sm"
 				th:classappend="${GassanForm.rno <= GassanForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
-			</a>
-			<span class="text-muted small">履歴 <span th:text="${GassanForm.rno}"></span> / <span th:text="${GassanForm.maxRno}"></span></span>
-			<a th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno + 1})}"
+			</a> <span class="text-muted small">履歴 <span
+				th:text="${GassanForm.rno}"></span> / <span
+				th:text="${GassanForm.maxRno}"></span></span> <a
+				th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno + 1})}"
 				class="btn btn-outline-secondary btn-sm"
 				th:classappend="${GassanForm.rno >= GassanForm.maxRno} ? ' disabled'">
 				次の履歴 <i class="bi bi-chevron-right"></i>
@@ -88,7 +100,7 @@
 						<!-- 登録日 -->
 						<div class="col-md-3">
 							<label th:for="!${isView} ? 'torokuYmd' : 'torokuYmdView'"
-								class="form-label fw-medium"> 登録日 <span
+								class="form-label fw-medium"> 登録年月日 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="torokuYmd" th:field="*{torokuYmd}"
@@ -103,7 +115,7 @@
 						<!-- 申告日 -->
 						<div class="col-md-3">
 							<label th:for="!${isView} ? 'shinkokuYmd' : 'shinkokuYmdView'"
-								class="form-label fw-medium"> 申告日 <span
+								class="form-label fw-medium"> 申告年月日 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="shinkokuYmd" th:field="*{shinkokuYmd}"
@@ -116,33 +128,21 @@
 								th:errors="*{shinkokuYmd}"></div>
 						</div>
 
-						<!-- 宛名情報 -->
-						<div class="col-md-6">
-							<label class="form-label fw-medium">宛名</label>
-							<div class="input-group">
-								<input type="text" id="atenaNameDisplay"
-									class="form-control bg-light" th:value="*{atenaName}" readonly>
-								<button th:if="!${isView}" type="button"
-									class="btn btn-primary btn-sm" data-bs-toggle="modal"
-									data-bs-target="#addressSearchModal">
-
-									<i class="bi bi-search me-1"></i>宛名検索
-								</button>
-							</div>
-						</div>
-
 						<!-- 合算指定番号（編集・照会のみ） -->
-						<div th:if="${isEdit or isView}" class="col-md-4">
+						<div th:if="${isEdit or isView}" class="col-md-3">
 							<label class="form-label fw-medium">合算指定番号</label> <input
 								type="text" class="form-control bg-light"
 								th:value="*{gassanShiteiNo}" readonly
 								th:data-initial-value="*{gassanShiteiNo}">
 						</div>
 
-						<!-- 適用時期(FROM) -->
-						<div class="col-md-4">
+						<!-- 改行 -->
+						<div th:if="${isEdit or isView}" class="w-100 d-none d-md-block"></div>
+
+						<!-- 適用開始年月 -->
+						<div class="col-md-3">
 							<label th:for="!${isView} ? 'tekiyoStYmd' : 'tekiyoStYmdView'"
-								class="form-label fw-medium"> 適用時期(FROM) <span
+								class="form-label fw-medium"> 適用開始年月 <span
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="tekiyoStYmd" th:field="*{tekiyoStYmd}"
@@ -155,10 +155,10 @@
 								th:errors="*{tekiyoStYmd}"></div>
 						</div>
 
-						<!-- 適用時期(TO) -->
-						<div class="col-md-4">
+						<!-- 適用終了年月 -->
+						<div class="col-md-3">
 							<label th:for="!${isView} ? 'tekiyoEdYmd' : 'tekiyoEdYmdView'"
-								class="form-label fw-medium"> 適用時期(TO) </label> <input
+								class="form-label fw-medium"> 適用終了年月 </label> <input
 								th:if="!${isView}" type="date" class="form-control"
 								id="tekiyoEdYmd" th:field="*{tekiyoEdYmd}"
 								th:errorclass="is-invalid"
@@ -177,9 +177,18 @@
 			<!-- ===== 徴収義務者一覧エリア ===== -->
 			<div class="card mb-4 shadow-sm">
 				<div class="card-header py-3">
-					<h5 class="mb-0">
-						<i class="bi bi-building me-2"></i>特別徴収義務者一覧 <span
-							th:if="!${isView}" class="badge bg-danger ms-2 fs-6">2件以上選択必須</span>
+					<h5 class="mb-0 d-flex align-items-center">
+						<div>
+							<i class="bi bi-building me-2"></i>特別徴収義務者一覧 <span
+								th:if="!${isView}" class="badge bg-danger ms-2 fs-6">2件以上選択必須</span>
+						</div>
+
+						<!-- 宛名検索 -->
+						<button th:if="!${isView}" type="button"
+							class="btn btn-primary btn-sm ms-auto" data-bs-toggle="modal"
+							data-bs-target="#addressSearchModal">
+							<i class="bi bi-search me-1"></i>宛名検索
+						</button>
 					</h5>
 				</div>
 				<div class="card-body p-0">
@@ -198,9 +207,11 @@
 							<tr>
 								<th style="width: 60px" class="text-center"></th>
 								<th style="width: 80px" class="text-center">代表指定</th>
+
 								<th style="width: 120px" class="text-center">指定番号</th>
 								<th style="width: calc(( 100% - 260px)/2)" class="text-center">特別徴収義務者名</th>
 								<th style="width: calc(( 100% - 260px)/2)" class="text-center">施設名称</th>
+
 							</tr>
 						</thead>
 						<tbody>
@@ -222,12 +233,17 @@
 									class="form-check-input daihyo-radio" name="daihyoShiteiNo"
 									th:value="${facility.shiteiNo}" th:checked="${facility.daihyo}"
 									th:disabled="${facility.disabled or !facility.checked}">
+
 									<!-- 照会時：代表指定アイコン --> <i
 									th:if="${isView} and ${facility.daihyo}"
 									class="bi bi-check-circle-fill text-success fs-5"></i>
 								</td>
+
+								<!-- 指定番号 -->
 								<td th:text="${facility.shiteiNo}"></td>
+
 								<td th:text="${facility.choshuGimushaName}"></td>
+
 								<td><span th:text="${facility.shisetsuName}"></span> <span
 									th:if="${facility.disabled}"
 									class="badge bg-warning text-dark ms-2"
@@ -235,8 +251,8 @@
 							</tr>
 							<tr th:if="${#lists.isEmpty(GassanForm.facilityList)}">
 								<td colspan="4" class="text-center text-muted py-4"><i
-									class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
-									対象施設が見つかりませんでした。</td>
+									class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>対象施設が見つかりませんでした
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -245,6 +261,24 @@
 
 			<!-- ===== アクションボタン ===== -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+				<a th:href="@{/gassan/list}"
+					class="btn btn-outline-primary btn-lg px-4"
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a> <a href="#" class="btn btn-outline-primary btn-lg px-4"
+					th:unless="${isView ?: false}" data-bs-toggle="modal"
+					data-bs-target="#backConfirmModal"> <i
+					class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+
+				<!-- 削除ボタン -->
+				<th:block th:if="${!isView and isEdit}">
+					<button type="button" id="openDeleteModalBtn"
+						class="btn btn-danger btn-lg px-5"
+						th:disabled="${GassanForm.gassanShiteiNo == null or #strings.isEmpty(GassanForm.gassanShiteiNo)}">
+						<span>削除する</span>
+					</button>
+				</th:block>
+
 				<th:block th:if="!${isView}">
 					<button type="button" id="openConfirmModalBtn"
 						class="btn btn-success btn-lg px-5">
@@ -254,15 +288,6 @@
 					</button>
 				</th:block>
 
-				<a th:href="@{/gassan/list}"
-					class="btn btn-outline-primary btn-lg px-4"
-					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a href="#"
-					class="btn btn-outline-primary btn-lg px-4"
-					th:unless="${isView ?: false}"
-					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
 			</div>
 		</form>
 
@@ -273,10 +298,47 @@
 			'btn-success', ${isEdit} ? '更新する' : '登録する')}">
 		</div>
 
-		<div th:unless="${isView ?: false}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/gassan/list}, '一覧に戻る')}"></div>
+		<div th:unless="${isView ?: false}"
+			th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/gassan/list}, '一覧に戻る')}"></div>
 
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
+
+		<!-- 削除確認モーダル -->
+		<div th:if="!${isView} && ${isEdit}"
+			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', 
+			'このデータを削除します。よろしいですか？', 'deleteForm', 
+			'btn-danger', '削除する')}">
+		</div>
+
+		<!-- 削除用フォーム -->
+		<form id="deleteForm" th:action="@{/gassan/delete}" method="post"
+			style="display: none;">
+			<input type="hidden" th:name="${_csrf.parameterName}"
+				th:value="${_csrf.token}" /> <input type="hidden"
+				name="gassanShiteiNo" th:value="${GassanForm.gassanShiteiNo}" />
+		</form>
+
+		<!-- すでに登録されている場合の確認用モーダル -->
+		<div class="modal fade" id="alreadyRegisteredModal" tabindex="-1"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">確認</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"
+							aria-label="閉じる"></button>
+					</div>
+					<div class="modal-body">この宛名はすでに合算申請に登録されています。照会画面に遷移しますか？</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal" id="alreadyRegisteredNoBtn">いいえ</button>
+						<button type="button" class="btn btn-primary"
+							id="alreadyRegisteredYesBtn">はい</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</div>
 

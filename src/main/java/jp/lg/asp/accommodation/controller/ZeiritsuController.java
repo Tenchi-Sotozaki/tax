@@ -61,11 +61,14 @@ public class ZeiritsuController {
 	@GetMapping("/list")
 	@OpeLog(screenId = SCREEN_ID, operation = "一覧表示")
 	public String list(@ModelAttribute ZeiritsuSearchForm searchForm,
+			@org.springframework.web.bind.annotation.RequestParam(required = false) String tekiyoYmFrom,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
-		List<ZeiritsuListItem> items = search(jichitaiCd, searchForm);
+		boolean isSearched = tekiyoYmFrom != null;
+		List<ZeiritsuListItem> items = isSearched ? search(jichitaiCd, searchForm) : List.of();
 		model.addAttribute("items", items);
+		model.addAttribute("isSearched", isSearched);
 		model.addAttribute("searchForm", searchForm);
 		addConstants(model);
 		return LIST_VIEW;
@@ -644,11 +647,14 @@ public class ZeiritsuController {
 						return false;
 					if (form.getTekiyoYmFrom() != null && !form.getTekiyoYmFrom().isBlank()) {
 						String from = form.getTekiyoYmFrom().replace("-", "");
-						if (z.getTekiyoStYm().compareTo(from) < 0)
+						// 適用終了年月がfromより前に終わっているレコードは除外（無期限は除外しない）
+						if (z.getTekiyoEdYm() != null && !z.getTekiyoEdYm().isBlank()
+								&& z.getTekiyoEdYm().compareTo(from) < 0)
 							return false;
 					}
 					if (form.getTekiyoYmTo() != null && !form.getTekiyoYmTo().isBlank()) {
 						String to = form.getTekiyoYmTo().replace("-", "");
+						// 適用開始年月がtoより後のレコードは除外
 						if (z.getTekiyoStYm().compareTo(to) > 0)
 							return false;
 					}

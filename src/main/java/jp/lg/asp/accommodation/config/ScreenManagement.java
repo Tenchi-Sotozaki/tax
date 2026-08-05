@@ -160,7 +160,7 @@ public final class ScreenManagement {
 	public static final String KOFUKIN_BULK_PRINT = "ms00000028";
 
 	// 休業日設定照会/編集
-	public static final String HOLIDAY_CONFIG = "sc00000009";
+	public static final String HOLIDAY_CONFIG = "ss00000009";
 
 	// トップページ
 	public static final String TOP_PAGE = "ms00000029";
@@ -179,4 +179,7 @@ public final class ScreenManagement {
 
 	// 特別徴収義務者状況照会
 	public static final String TOKUGIMU_STATUS_VIEW = "ms00000026";
+
+	// 交付金帳票一括発行
+	public static final String KOFUKIN_REPORT_BULK = "ms00000028";
 }

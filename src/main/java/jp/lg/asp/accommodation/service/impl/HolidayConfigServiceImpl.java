@@ -23,14 +23,25 @@ public class HolidayConfigServiceImpl implements HolidayConfigService {
 	private final HolidayRepository holidayRepository;
 	private final JichitaiContext jichitaiContext;
 
+	private static final String SENTINEL_CD = "99999";
+	private static final LocalDate SENTINEL_DATE = LocalDate.of(1, 1, 1);
+
 	@Override
 	@Transactional(readOnly = true)
 	public HolidayConfigForm findByNendo(String nendo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		List<Kyugyobi> list = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi(jichitaiCd, nendo);
+		boolean registered = holidayRepository.existsByJichitaiCdAndNen(jichitaiCd, nendo);
+		List<Kyugyobi> list;
+		if (registered) {
+			list = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi(jichitaiCd, nendo);
+		} else {
+			list = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi(SENTINEL_CD, nendo);
+		}
 		HolidayConfigForm form = new HolidayConfigForm();
 		form.setNendo(nendo);
-		form.setHolidayDts(list.stream().map(k -> k.getKyugyobi().format(FMT)).toList());
+		form.setHolidayDts(list.stream()
+				.filter(k -> !SENTINEL_DATE.equals(k.getKyugyobi()))
+				.map(k -> k.getKyugyobi().format(FMT)).toList());
 		return form;
 	}
 
@@ -39,8 +50,15 @@ public class HolidayConfigServiceImpl implements HolidayConfigService {
 	public void save(HolidayConfigForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		holidayRepository.deleteByJichitaiCdAndNen(jichitaiCd, form.getNendo());
-		if (form.getHolidayDts() == null)
+		if (form.getHolidayDts() == null || form.getHolidayDts().isEmpty()) {
+			// 空登録時は番兵レコードを挿入して「登録済み」を記録
+			Kyugyobi sentinel = new Kyugyobi();
+			sentinel.setJichitaiCd(jichitaiCd);
+			sentinel.setNen(form.getNendo());
+			sentinel.setKyugyobi(SENTINEL_DATE);
+			holidayRepository.save(sentinel);
 			return;
+		}
 		for (String dt : form.getHolidayDts()) {
 			Kyugyobi k = new Kyugyobi();
 			k.setJichitaiCd(jichitaiCd);
@@ -54,17 +72,16 @@ public class HolidayConfigServiceImpl implements HolidayConfigService {
 	@Transactional(readOnly = true)
 	public List<String> findNendoList() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return holidayRepository.findDistinctNenByJichitaiCd(jichitaiCd);
+		List<String> list = holidayRepository.findDistinctNenByJichitaiCd(jichitaiCd);
+		if (list.isEmpty()) {
+			list = holidayRepository.findDistinctNenByJichitaiCd(SENTINEL_CD);
+		}
+		return list;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public List<String> getInitialHolidays(String nen) {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		List<Kyugyobi> saved = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi(jichitaiCd, nen);
-		if (!saved.isEmpty()) {
-			return saved.stream().map(k -> k.getKyugyobi().format(FMT)).toList();
-		}
 		List<Kyugyobi> template = holidayRepository.findByJichitaiCdAndNenOrderByKyugyobi("99999", nen);
 		return template.stream().map(k -> k.getKyugyobi().format(FMT)).toList();
 	}

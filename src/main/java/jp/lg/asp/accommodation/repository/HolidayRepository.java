@@ -16,6 +16,8 @@ public interface HolidayRepository extends JpaRepository<Kyugyobi, KyugyobiId> {
 
 	List<Kyugyobi> findByJichitaiCdAndNenOrderByKyugyobi(String jichitaiCd, String nen);
 
+	boolean existsByJichitaiCdAndNen(String jichitaiCd, String nen);
+
 	@Modifying
 	@Query("DELETE FROM Kyugyobi k WHERE k.jichitaiCd = :jichitaiCd AND k.nen = :nen")
 	void deleteByJichitaiCdAndNen(@Param("jichitaiCd") String jichitaiCd, @Param("nen") String nen);

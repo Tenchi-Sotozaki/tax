@@ -184,6 +184,13 @@
 
     document.getElementById('initConfirmBtn')?.addEventListener('click', () => initHolidays());
 
+    document.getElementById('clearAllBtn')?.addEventListener('click', () => {
+        selected.clear();
+        renderCalendar();
+        renderList();
+        renderHiddenInputs();
+    });
+
     window.changeNen = function (sel) {
         const baseUrl = sel.dataset.baseUrl;
         const mode = sel.dataset.mode;

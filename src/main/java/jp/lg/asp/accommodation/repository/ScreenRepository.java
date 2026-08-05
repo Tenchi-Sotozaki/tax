@@ -10,4 +10,7 @@ import java.util.List;
 public interface ScreenRepository extends JpaRepository<Screen, ScreenId> {
     
     List<Screen> findByJichitaiCdOrderByScreenId(String jichitaiCd);
+
+    /** 表示順に並べて取得する（区分の並び順も表示順に従う） */
+    List<Screen> findByJichitaiCdOrderByDspOdrAsc(String jichitaiCd);
 }

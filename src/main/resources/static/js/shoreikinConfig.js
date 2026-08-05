@@ -19,9 +19,23 @@ function createShoreikin() {
     }
 }
 
+function changeMode(mode) {
+	
+    // 隠しフィールドにモードを設定
+    document.getElementById('switchModeField').value = mode;
+	
+    // 共通フォームを送信
+    document.getElementById('switchModeForm').submit();
+}
+
+// 編集モード
 function editMode() {
-    // 編集モードに切り替え
-    document.getElementById('editForm').submit();
+    changeMode('edit');
+}
+
+// 照会モード
+function viewMode() {
+    changeMode('view');
 }
 
 function updateShoreikin() {
