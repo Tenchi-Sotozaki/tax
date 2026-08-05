@@ -140,7 +140,7 @@ class RoleServiceImplTest {
     }
 
     @Test
-    void resetUsersToDefaultRole_setsRoleIdToTwo() {
+    void resetUsersToDefaultRole_setsRoleIdToDefault() {
         User user = new User();
         when(userRepository.findByJichitaiCdAndRoleId(JICHITAI_CD, BigDecimal.valueOf(1L)))
                 .thenReturn(List.of(user));
@@ -148,7 +148,8 @@ class RoleServiceImplTest {
 
         service.resetUsersToDefaultRole(JICHITAI_CD, 1L, "admin");
 
-        assertThat(user.getRoleId()).isEqualTo(BigDecimal.TWO);
+        assertThat(user.getRoleId())
+                .isEqualTo(BigDecimal.valueOf(UserRepository.DEFAULT_USER_ROLE_ID));
     }
 
     @Test

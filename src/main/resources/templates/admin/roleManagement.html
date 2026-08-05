@@ -25,25 +25,25 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- アクションボタン -->
-		<div class="mb-3">
-			<button type="button" class="btn btn-success me-2"
+		<!-- 新規登録ボタン＆ページネーション＆表示件数選択プルダウン -->
+		<div
+			class="d-flex justify-content-between align-items-center mb-1 position-relative">
+			<button type="button" class="btn btn-success btn-sm"
 				onclick="openRoleModal('create')">
 				<i class="bi bi-plus-circle me-1"></i>新規登録
 			</button>
-			<button type="button" class="btn btn-outline-primary me-2"
-				onclick="openRoleModal('view')" id="viewBtn" disabled>
-				<i class="bi bi-eye me-1"></i>権限照会
-			</button>
-			<button type="button" class="btn btn-danger me-2"
-				onclick="deleteRoles()" id="deleteBtn" disabled>
-				<i class="bi bi-trash me-1"></i>削除
-			</button>
-			<button type="button" class="btn btn-outline-primary"
-				onclick="viewAssignedUsers()" id="usersBtn" disabled>
-				<i class="bi bi-people me-1"></i>付与ユーザー照会
-			</button>
-
+			<nav class="position-absolute start-50 translate-middle-x">
+				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+			</nav>
+			<div class="d-flex align-items-center gap-2">
+				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label> <select
+					id="pageSizeSelect" class="form-select form-select-sm"
+					style="width: auto;">
+					<option value="10">10件</option>
+					<option value="50">50件</option>
+					<option value="100">100件</option>
+				</select>
+			</div>
 		</div>
 
 		<!-- 権限一覧テーブル -->
@@ -52,22 +52,24 @@
 				<table class="table table-hover">
 					<thead class="table-light">
 						<tr>
-							<th style="width: 40px"></th>
 							<th style="min-width: 70px" class="text-center">権限ID</th>
 							<th style="min-width: 100px">権限名</th>
-							<th style="min-width: 200px">権限詳細</th>
+							<th style="width: 260px"></th>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody id="roleTableBody">
 						<tr th:each="role : ${roles}">
-							<td class="text-center"><input type="checkbox"
-								class="role-checkbox" th:value="${role.roleId}"
-								onchange="updateButtons()"></td>
 							<td th:text="${role.roleId}" class="text-center"></td>
 							<td th:text="${role.name}"></td>
-							<td><span th:each="detail, iterStat : ${role.roleDetails}"
-								th:if="${detail.screen != null}"
-								th:text="${detail.screen.screenName + (detail.permission == 1 ? '(参照)' : '(更新)') + (!iterStat.last ? ', ' : '')}"></span>
+							<td class="text-end">
+								<button type="button" class="btn btn-outline-primary btn-sm me-1"
+									th:onclick="|openRoleModal('view', ${role.roleId})|">
+									<i class="bi bi-eye me-1"></i>照会
+								</button>
+								<button type="button" class="btn btn-outline-primary btn-sm"
+									th:onclick="|viewAssignedUsers(${role.roleId})|">
+									<i class="bi bi-people me-1"></i>付与ユーザー照会
+								</button>
 							</td>
 						</tr>
 					</tbody>
@@ -174,6 +176,10 @@
 						</form>
 					</div>
 					<div class="modal-footer">
+						<button type="button" class="btn btn-danger me-auto"
+							id="deleteBtn" onclick="deleteRole()" style="display: none;">
+							<i class="bi bi-trash me-1"></i>削除する
+						</button>
 						<button type="button" class="btn btn-outline-primary"
 							data-bs-dismiss="modal">キャンセル</button>
 

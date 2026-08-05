@@ -111,7 +111,7 @@ public class RoleServiceImpl implements RoleService {
 	public void resetUsersToDefaultRole(String jichitaiCd, Long roleId, String updUser) {
 		List<User> users = userRepository.findByJichitaiCdAndRoleId(jichitaiCd, BigDecimal.valueOf(roleId));
 		for (User u : users) {
-			u.setRoleId(BigDecimal.TWO);
+			u.setRoleId(BigDecimal.valueOf(UserRepository.DEFAULT_USER_ROLE_ID));
 		}
 		userRepository.saveAll(users);
 	}

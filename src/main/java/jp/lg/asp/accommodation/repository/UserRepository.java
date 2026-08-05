@@ -19,8 +19,8 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 
 	List<User> findByJichitaiCdAndRoleId(String jichitaiCd, java.math.BigDecimal roleId);
 
-	/** システム管理用のデフォルトユーザーに割り当てる権限ID（一覧には表示しない） */
-	long DEFAULT_USER_ROLE_ID = 99L;
+	/** システム管理用のデフォルト権限のID（内部データのため一覧には表示しない） */
+	long DEFAULT_USER_ROLE_ID = 99999L;
 
 	/** 指定した権限が付与されているユーザーを取得する */
 	@Query("SELECT u FROM User u WHERE u.jichitaiCd = :jichitaiCd" +

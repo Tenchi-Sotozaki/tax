@@ -22,6 +22,7 @@ import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.Screen;
 import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.RoleService;
 import lombok.RequiredArgsConstructor;
 
@@ -43,7 +44,11 @@ public class RoleController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		try {
-			List<Role> roles = roleService.findAllRoles(jichitaiCd);
+			// デフォルト権限は内部データのため一覧には表示しない
+			List<Role> roles = roleService.findAllRoles(jichitaiCd).stream()
+					.filter(role -> role.getRoleId() == null
+							|| role.getRoleId() != UserRepository.DEFAULT_USER_ROLE_ID)
+					.collect(Collectors.toList());
 			List<Screen> screens = roleService.findAllScreens();
 			model.addAttribute("roles", roles);
 			model.addAttribute("screens", screens);
@@ -63,7 +68,7 @@ public class RoleController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
-		if (form.getRoleId() != null && form.getRoleId() == 1L) {
+		if (form.getRoleId() != null && form.getRoleId() == UserRepository.DEFAULT_USER_ROLE_ID) {
 			result.put("success", false);
 			result.put("message", "この権限は編集できません");
 			return result;
@@ -100,7 +105,7 @@ public class RoleController {
 		roleMap.put("name", role.getName());
 		roleMap.put("version", role.getVersion());
 		result.put("role", roleMap);
-		result.put("editable", roleId != 1L && roleId != 2L);
+		result.put("editable", roleId != UserRepository.DEFAULT_USER_ROLE_ID);
 
 		if (role.getRoleDetails() != null) {
 			Map<String, String> permissions = role.getRoleDetails().stream()
@@ -120,9 +125,9 @@ public class RoleController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
-		if (roleId == 1L) {
+		if (roleId == UserRepository.DEFAULT_USER_ROLE_ID) {
 			result.put("error", true);
-			result.put("message", "この権限のユーザー付与は変更できません");
+			result.put("message", "この権限は照会できません");
 			return result;
 		}
 		Role role = roleService.findById(jichitaiCd, roleId);
@@ -147,7 +152,7 @@ public class RoleController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 
-		if (roleId == 1L || roleId == 2L) {
+		if (roleId == UserRepository.DEFAULT_USER_ROLE_ID) {
 			result.put("success", false);
 			result.put("message", "デフォルト権限のため削除できません");
 			return result;
