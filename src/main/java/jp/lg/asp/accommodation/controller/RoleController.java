@@ -158,10 +158,15 @@ public class RoleController {
 			return result;
 		}
 
-		try {
-			// 削除対象の権限が付与されているユーザーをデフォルト権限に変更
-			roleService.resetUsersToDefaultRole(jichitaiCd, roleId, "admin");
+		// 付与されているユーザーがいる場合は削除しない
+		if (!roleService.findAssignedUsers(jichitaiCd, roleId).isEmpty()) {
+			result.put("success", false);
+			result.put("message", "この権限が付与されているユーザーがいるため削除できません。"
+					+ "先に対象ユーザーの権限を変更してください。");
+			return result;
+		}
 
+		try {
 			roleService.deleteRole(jichitaiCd, roleId);
 			result.put("success", true);
 		} catch (Exception e) {
