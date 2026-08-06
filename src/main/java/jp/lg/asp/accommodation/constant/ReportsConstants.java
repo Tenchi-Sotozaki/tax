@@ -49,7 +49,9 @@ public final class ReportsConstants {
 		SHOREIKIN_KOFU_JOREI("RPT0000006", "特別徴収義務者奨励金交付要綱", 1),
 		KOSEI_KETTEI_HOREI_INYOU1("RPT0000007", "更正・決定通知書 法令引用文1",1),
 		KOSEI_KETTEI_HOREI_INYOU2("RPT0000008", "更正・決定通知書 法令引用文2", 1),
-		NONYUSHO_KOZA("RPT0000009", "納入書　納入場所", 2);
+		// RPT0000009 は KOFU_HAKKO_YOSHIKI（発行様式）が使用しているため、
+		// 重複を避けて末尾の RPT0000011 に採番し直している
+		NONYUSHO_KOZA("RPT0000011", "納入書　納入場所", 2);
 
 		private final String id; // 帳票定義マスタのID
 		private final String name; // 設定画面に表示する定義名
@@ -92,6 +94,8 @@ public final class ReportsConstants {
 	public static final String KOFU_HAKKO_YOSHIKI = "RPT0000009";
 	// 交付条件
 	public static final String KOFU_JOKEN = "RPT0000010";
+	// 納入書　納入場所
+	public static final String NONYUSHO_KOZA = "RPT0000011";
 
 	/* 
 	 * 操作名変換
