@@ -22,6 +22,8 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
+import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.RoleService;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,9 +53,9 @@ class RoleControllerTest {
     }
 
     @Test
-    void saveRole_roleId1は編集不可() {
+    void saveRole_デフォルト権限は編集不可() {
         RoleForm form = new RoleForm();
-        form.setRoleId(1L);
+        form.setRoleId(UserRepository.DEFAULT_USER_ROLE_ID);
         form.setName("管理者");
 
         Map<String, Object> result = controller.saveRole(form);
@@ -105,23 +107,34 @@ class RoleControllerTest {
     }
 
     @Test
-    void getAssignedUsers_roleId1はエラー() {
-        Map<String, Object> result = controller.getAssignedUsers(1L);
+    void getAssignedUsers_デフォルト権限はエラー() {
+        Map<String, Object> result = controller.getAssignedUsers(UserRepository.DEFAULT_USER_ROLE_ID);
 
         assertThat(result).containsEntry("error", true);
     }
 
     @Test
     void deleteRole_デフォルト権限は削除不可() {
-        Map<String, Object> result = controller.deleteRole(1L);
-        assertThat(result).containsEntry("success", false);
+        Map<String, Object> result = controller.deleteRole(UserRepository.DEFAULT_USER_ROLE_ID);
 
-        result = controller.deleteRole(2L);
         assertThat(result).containsEntry("success", false);
+        verify(roleService, never()).deleteRole(anyString(), anyLong());
+    }
+
+    @Test
+    void deleteRole_付与ユーザーがいる場合は削除不可() {
+        when(roleService.findAssignedUsers("011002", 3L)).thenReturn(List.of(new User()));
+
+        Map<String, Object> result = controller.deleteRole(3L);
+
+        assertThat(result).containsEntry("success", false);
+        verify(roleService, never()).deleteRole(anyString(), anyLong());
     }
 
     @Test
     void deleteRole_正常削除() {
+        when(roleService.findAssignedUsers("011002", 3L)).thenReturn(List.of());
+
         Map<String, Object> result = controller.deleteRole(3L);
 
         assertThat(result).containsEntry("success", true);
