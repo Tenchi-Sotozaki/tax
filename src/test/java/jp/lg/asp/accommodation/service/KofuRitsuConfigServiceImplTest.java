@@ -70,7 +70,7 @@ class KofuRitsuConfigServiceImplTest {
 
         service.register(dto);
 
-        assertThat(current.getNewFlg()).isEqualTo(0);
+        assertThat(current.getNewFlg()).isEqualTo("0");
         verify(kofuRitsuRepository, times(2)).save(any());
     }
 
