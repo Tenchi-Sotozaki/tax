@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +39,7 @@ class ShoreikinBulkControllerTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(kofuRitsuRepository.findKofuRitsuByJichitaiCd(eq("011002"), any(LocalDate.class)))
+        when(kofuRitsuRepository.findKofuRitsuByJichitaiCd(eq("011002"), any(Integer.class)))
                 .thenReturn(List.of(BigDecimal.valueOf(50)));
     }
 

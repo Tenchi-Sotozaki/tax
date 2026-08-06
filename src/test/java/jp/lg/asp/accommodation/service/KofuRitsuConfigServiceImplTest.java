@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,14 +59,14 @@ class KofuRitsuConfigServiceImplTest {
     @Test
     void register_existingCurrent_setsNewFlgToZeroAndCreatesNew() {
         KofuRitsu current = new KofuRitsu();
-        current.setNewFlg(1);
+        current.setNewFlg("1");
         when(kofuRitsuRepository.findCurrentByJichitaiCd(JICHITAI_CD)).thenReturn(Optional.of(current));
         when(kofuRitsuRepository.findNextRno(JICHITAI_CD)).thenReturn(BigDecimal.valueOf(2));
         when(kofuRitsuRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         KofuRitsuConfigDto dto = new KofuRitsuConfigDto();
         dto.setKofuRitsu(BigDecimal.valueOf(10));
-        dto.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
+        dto.setTekiyoStNendo(2024);
 
         service.register(dto);
 

@@ -50,8 +50,10 @@ public class KofuRitsuConfigServiceImpl implements KofuRitsuConfigService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		KofuRitsu entity = kofuRitsuRepository.findById(new KofuRitsuId(jichitaiCd, rno)).orElseThrow();
 		entity.setKofuRitsu(dto.getKofuRitsu());
-		entity.setTekiyoStYmd(dto.getTekiyoStYmd());
-		entity.setTekiyoEdYmd(dto.getTekiyoEdYmd());
+		entity.setSanshutsu(dto.getSanshutsu());
+		entity.setKbn(dto.getKbn());
+		entity.setSaiteigaku(dto.getSaiteigaku());
+		entity.setTekiyoStNendo(dto.getTekiyoStNendo());
 		kofuRitsuRepository.save(entity);
 	}
 
@@ -61,7 +63,7 @@ public class KofuRitsuConfigServiceImpl implements KofuRitsuConfigService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		// 既存の最新レコードのnew_flgを0に更新
 		kofuRitsuRepository.findCurrentByJichitaiCd(jichitaiCd).ifPresent(current -> {
-			current.setNewFlg(0);
+			current.setNewFlg("0");
 			kofuRitsuRepository.save(current);
 		});
 
@@ -71,9 +73,11 @@ public class KofuRitsuConfigServiceImpl implements KofuRitsuConfigService {
 		entity.setJichitaiCd(jichitaiCd);
 		entity.setRno(nextRno);
 		entity.setKofuRitsu(dto.getKofuRitsu());
-		entity.setTekiyoStYmd(dto.getTekiyoStYmd());
-		entity.setTekiyoEdYmd(dto.getTekiyoEdYmd());
-		entity.setNewFlg(1);
+		entity.setSanshutsu(dto.getSanshutsu());
+		entity.setKbn(dto.getKbn());
+		entity.setSaiteigaku(dto.getSaiteigaku());
+		entity.setTekiyoStNendo(dto.getTekiyoStNendo());
+		entity.setNewFlg("1");
 		kofuRitsuRepository.save(entity);
 	}
 }
