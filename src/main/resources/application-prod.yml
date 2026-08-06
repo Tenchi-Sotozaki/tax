@@ -10,7 +10,7 @@ server:
   tomcat:
     accesslog:
       enabled: true
-      directory: /var/log/accomo
+      directory: /var/log/acomo
       prefix: access_log
       suffix: .log
       rotate: true
