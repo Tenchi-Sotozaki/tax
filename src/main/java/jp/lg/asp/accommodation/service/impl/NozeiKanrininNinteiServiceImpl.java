@@ -40,7 +40,12 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
 
         Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
         String cityName = jichitai != null ? jichitai.getName() : "";
-        String jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
+        // 条項を含む条令文は自治体ごとに異なるため設定値を優先し、
+        // 未設定の場合のみ従来どおり自治体名からの組み立てにフォールバックする
+        String jorei = reportsCommonService.getReportsDefText(ReportsConstants.NOZEI_KANRININ_NINTEI_JOREI);
+        if (jorei == null || jorei.isEmpty()) {
+            jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
+        }
 
         NozeiKanrininNinteiDto dto = new NozeiKanrininNinteiDto();
         dto.setShiteiNo(shiteiNo);

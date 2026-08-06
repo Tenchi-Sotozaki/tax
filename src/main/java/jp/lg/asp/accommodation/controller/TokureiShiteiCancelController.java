@@ -21,6 +21,8 @@ import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.TokureiShiteiCancelDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.service.TokureiShiteiCancelReportsService;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.TokureiShiteiService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class TokureiShiteiCancelController {
 
 	private final TokureiShiteiService tokureiShiteiService;
 	private final TokureiShiteiCancelReportsService reportsService;
+	private final ReportsCommonService reportsCommonService;
 	private final ScreenAccessChecker accessChecker;
 	private static final String SCREEN_ID = ScreenManagement.TOKUREI_SHITEI_CANCEL;
 
@@ -135,7 +138,8 @@ public class TokureiShiteiCancelController {
 		dest.setShisetsuName(src.getShisetsuName());
 		dest.setShisetsuJusho(src.getShisetsuJusho());
 		dest.setCity(src.getCity());
-		dest.setJorei(src.getJorei());
+		// 条令は指定通知書とは別の条項になるため、取消通知書専用の定義を読む
+		dest.setJorei(reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_CANCEL_JOREI));
 		dest.setBiko("");
 		return dest;
 	}

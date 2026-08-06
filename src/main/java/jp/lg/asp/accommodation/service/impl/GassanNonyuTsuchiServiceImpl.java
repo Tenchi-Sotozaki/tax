@@ -42,7 +42,7 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 		if (jichitaiInfo != null) {
 			cityName = jichitaiInfo.getName();
 		}
-		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_SHITEI_JOREI);
+		jorei = reportsCommonService.getReportsDefText(ReportsConstants.GASSAN_NONYU_JOREI);
 	}
 
 	@Override

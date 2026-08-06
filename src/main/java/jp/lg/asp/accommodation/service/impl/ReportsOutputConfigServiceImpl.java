@@ -49,11 +49,12 @@ public class ReportsOutputConfigServiceImpl implements ReportsOutputConfigServic
 				ReportsDef newDef = new ReportsDef();
 				newDef.setJichitaiCd(jichitaiCd);
 				newDef.setId(field.getId());
-				newDef.setKbn(String.valueOf(field.getKbn()));
 				newDef.setAddDt(now);
 				newDef.setAddUser(userId);
 				return newDef;
 			});
+			// 既存行の区分が誤っていると帳票側で読み出せないため、毎回設定し直す
+			def.setKbn(field.getKbn());
 			def.setDefText(defText);
 			def.setUpdDt(now);
 			def.setUpdUser(userId);
