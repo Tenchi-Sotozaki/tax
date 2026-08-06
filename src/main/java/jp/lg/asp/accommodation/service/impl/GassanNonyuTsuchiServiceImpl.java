@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,9 +11,12 @@ import jp.lg.asp.accommodation.dto.GassanNonyuTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.Nokigen;
+import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
+import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.GassanNonyuTsuchiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
@@ -30,6 +34,7 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
 	private final GassanRepository gassanRepository;
+	private final NokigenRepository nokigenRepository;
 	private final ReportsCommonService reportsCommonService;
 
 	private final JichitaiContext jichitaiContext;
@@ -89,7 +94,30 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 		if (!gassanList.isEmpty()) {
 			Gassan gassan = gassanList.get(0);
 			dto.setGassanShiteiNo(gassan.getGassanShiteiNo());
-			dto.setTekiyoStYmd(gassan.getTekiyoStYmd());
+			LocalDate tekiyoStYmd = gassan.getTekiyoStYmd();
+			dto.setTekiyoStYmd(tekiyoStYmd);
+
+			// 納入期限を取得
+			Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
+			if (jichitaiInfo != null && tekiyoStYmd != null) {
+				int nendoStMonth = Integer.parseInt(jichitaiInfo.getNendoStMonth());
+				int targetMonth = tekiyoStYmd.getMonthValue();
+				int ki = ((targetMonth - nendoStMonth + 12) % 12) + 1;
+				int nendo = tekiyoStYmd.getYear();
+				if (targetMonth < nendoStMonth) {
+					nendo--;
+				}
+				Optional<Nokigen> nokigenOpt = nokigenRepository.findById(new NokigenId(jichitaiCode, String.valueOf(nendo)));
+				if (nokigenOpt.isPresent()) {
+					Nokigen nokigen = nokigenOpt.get();
+					String nokigenYmd = getNokigenByKi(nokigen, ki);
+					if (nokigenYmd != null && nokigenYmd.length() == 8) {
+						int month = Integer.parseInt(nokigenYmd.substring(4, 6));
+						int day = Integer.parseInt(nokigenYmd.substring(6, 8));
+						dto.setNonyuKigen(month + "月" + day + "日");
+					}
+				}
+			}
 		}
 
 		dto.setCity(cityName);
@@ -97,5 +125,23 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 		dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));;
 
 		return dto;
+	}
+
+	private String getNokigenByKi(Nokigen nokigen, int ki) {
+		switch (ki) {
+			case 1: return nokigen.getNokigen1st();
+			case 2: return nokigen.getNokigen2nd();
+			case 3: return nokigen.getNokigen3rd();
+			case 4: return nokigen.getNokigen4th();
+			case 5: return nokigen.getNokigen5th();
+			case 6: return nokigen.getNokigen6th();
+			case 7: return nokigen.getNokigen7th();
+			case 8: return nokigen.getNokigen8th();
+			case 9: return nokigen.getNokigen9th();
+			case 10: return nokigen.getNokigen10th();
+			case 11: return nokigen.getNokigen11th();
+			case 12: return nokigen.getNokigen12th();
+			default: return null;
+		}
 	}
 }
