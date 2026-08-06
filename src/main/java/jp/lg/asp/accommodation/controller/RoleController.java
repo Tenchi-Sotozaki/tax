@@ -52,11 +52,13 @@ public class RoleController {
 			Map<String, List<Screen>> screenGroups = roleService.findScreensGroupedByKbn();
 			model.addAttribute("roles", roles);
 			model.addAttribute("screenGroups", screenGroups);
+			model.addAttribute("defaultRoleId", UserRepository.DEFAULT_USER_ROLE_ID);
 			return "admin/roleManagement";
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("roles", java.util.Collections.emptyList());
 			model.addAttribute("screenGroups", java.util.Collections.emptyMap());
+			model.addAttribute("defaultRoleId", UserRepository.DEFAULT_USER_ROLE_ID);
 			return "admin/roleManagement";
 		}
 	}
@@ -124,12 +126,8 @@ public class RoleController {
 	public Map<String, Object> getAssignedUsers(@PathVariable Long roleId) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
-		Map<String, Object> result = new HashMap<>();
-		if (roleId == UserRepository.DEFAULT_USER_ROLE_ID) {
-			result.put("error", true);
-			result.put("message", "この権限は照会できません");
-			return result;
-		}
+		// デフォルト権限であっても照会は妨げない。
+		// 編集・削除への導線は権限編集モーダル側で塞いでいる
 		Role role = roleService.findById(jichitaiCd, roleId);
 		List<User> assignedUsers = roleService.findAssignedUsers(jichitaiCd, roleId);
 
@@ -162,7 +160,7 @@ public class RoleController {
 		if (!roleService.findAssignedUsers(jichitaiCd, roleId).isEmpty()) {
 			result.put("success", false);
 			result.put("message", "この権限が付与されているユーザーがいるため削除できません。"
-					+ "先に対象ユーザーの権限を変更してください。");
+					+ "対象ユーザーの権限を変更後、再度実行してください。");
 			return result;
 		}
 

@@ -3,6 +3,17 @@ let currentMode = 'create';
 // モーダルで操作中の権限ID
 let currentRoleId = null;
 
+// システム管理用のデフォルト権限ID。編集・削除への導線を出さない判定に使う
+function getDefaultRoleId() {
+    const raw = document.querySelector('[data-default-role-id]')?.dataset.defaultRoleId;
+    return raw != null && raw !== '' ? Number(raw) : null;
+}
+
+function isDefaultRole(roleId) {
+    const defaultRoleId = getDefaultRoleId();
+    return defaultRoleId !== null && Number(roleId) === defaultRoleId;
+}
+
 // 権限モーダルを開いた時点の入力内容。閉じる際の変更有無の判定に使う
 let roleFormSnapshot = null;
 
@@ -89,6 +100,14 @@ function openRoleModal(mode, roleId) {
         document.getElementById('deleteBtn').style.display =
             (mode === 'edit') ? 'block' : 'none';
 
+        // デフォルト権限は一覧に出ない想定だが、万一表示された場合でも
+        // 編集・削除へ進めないよう、詳細取得を待たずにボタンを隠しておく
+        if (isDefaultRole(currentRoleId)) {
+            switchToEditBtn.style.display = 'none';
+            document.getElementById('deleteBtn').style.display = 'none';
+            saveBtn.style.display = 'none';
+        }
+
         loadRoleDetail(currentRoleId, mode === 'view');
     }
 
@@ -104,11 +123,10 @@ function loadRoleDetail(roleId, readonly) {
             document.getElementById('roleName').value = data.role.name;
             document.getElementById('version').value = data.role.version;
 
-            if (readonly && !data.editable) {
-                switchToEditBtn.style.display = 'none';
-            }
             if (!data.editable) {
+                switchToEditBtn.style.display = 'none';
                 document.getElementById('deleteBtn').style.display = 'none';
+                document.getElementById('saveBtn').style.display = 'none';
             }
 
             // パーミッションをリセットしてから設定
