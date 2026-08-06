@@ -45,7 +45,7 @@
 			</div>
 
 			<!-- 統合メインフォーム -->
-			<form
+			<form id="createForm"
 				th:action="@{${kozaForm.createMode ? '/shoreikin/furikomiKoza/create' : ''}}"
 				th:object="${kozaForm}" method="post">
 				<input type="hidden" th:field="*{shiteiNo}"> <input
@@ -203,8 +203,8 @@
 
 					<!-- 登録モード -->
 					<div th:if="${kozaForm.createMode}">
-						<button type="submit" class="btn btn-success"
-							onclick="return confirm('振込先口座情報を登録しますか？')">
+						<button type="button" class="btn btn-success"
+							data-bs-toggle="modal" data-bs-target="#registerConfirmModal">
 							<i class="bi bi-check-circle"></i> 登録する
 						</button>
 					</div>
@@ -220,9 +220,9 @@
 					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:if="${kozaForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+					</a> <a href="#" class="btn btn-outline-primary"
 						th:unless="${kozaForm.viewMode}"
-						onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+						data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る
 					</a>
 				</div>
@@ -263,6 +263,9 @@
 					th:field="*{version}">
 			</form>
 		</div>
+
+		<div th:if="${kozaForm.createMode}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '振込先口座情報を登録しますか？', 'createForm', 'btn-success', '登録する')}"></div>
+		<div th:unless="${kozaForm.viewMode}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/shoreikin/list}, '戻る')}"></div>
 
 		<!-- 特別徴収義務者指定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>

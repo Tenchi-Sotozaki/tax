@@ -20,16 +20,18 @@
 						編集</span> <span th:if="${configForm.createMode}" class="text-muted">-
 						登録</span>
 				</h5>
-				
+
 				<!-- ボタン -->
 				<div class="d-flex gap-2" th:if="${configForm.viewMode}">
 					<!-- 特別徴収事務交付金交付申請・決定通知ボタン -->
-					<a th:href="@{/reports/kofuKetteiTsuchiShinsei}" class="btn btn-outline-primary btn-sm">
-						<i class="bi bi-pencil-square me-2"></i>特別徴収事務交付金交付申請・決定通知
+					<a th:href="@{/reports/kofuKetteiTsuchiShinsei}"
+						class="btn btn-outline-primary btn-sm"> <i
+						class="bi bi-pencil-square me-2"></i>特別徴収事務交付金交付申請・決定通知
 					</a>
-					
+
 					<!-- 編集するボタン -->
-					<button type="button" class="btn btn-primary btn-sm" onclick="editMode()">
+					<button type="button" class="btn btn-primary btn-sm"
+						onclick="editMode()">
 						<i class="bi bi-pencil"></i> 編集する
 					</button>
 				</div>
@@ -121,8 +123,7 @@
 								<div class="input-group">
 
 									<input type="number" class="form-control text-end"
-										id="kofuRitsu" th:field="*{kofuRitsu}"
-										readonly
+										id="kofuRitsu" th:field="*{kofuRitsu}" readonly
 										th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
 										step="0.01" min="0" max="99999.99" required
 										th:data-initial-value="*{kofuRitsu}"> <span
@@ -197,16 +198,16 @@
 					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
 						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> 
-					<a th:href="@{/shoreikin/config}" class="btn btn-outline-primary"
-						th:unless="${configForm.viewMode}"
-						onclick="if (confirm('入力内容は破棄されます。よろしいですか？')) { viewMode(); } return false;"> <i
+					</a> <a href="#" class="btn btn-outline-primary"
+						th:unless="${configForm.viewMode}" data-bs-toggle="modal"
+						data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る
 					</a>
-					
+
 					<!-- 登録モード -->
 					<div th:if="${configForm.createMode}">
-						<button type="button" class="btn btn-success" onclick="createShoreikin()">
+						<button type="button" class="btn btn-success"
+							onclick="createShoreikin()">
 							<i class="bi bi-check-circle"></i> 登録する
 						</button>
 					</div>
@@ -237,20 +238,19 @@
 			</form>
 
 			<!-- モード切り替え用共通フォーム -->
-			<form th:action="@{/shoreikin/config/switch-mode}" th:object="${configForm}" method="post" id="switchModeForm"
-			    style="display: none;">
-			    <input type="hidden" id="switchModeField" name="mode" value="">
-			    <input type="hidden" th:field="*{shiteiNo}">
-			    <input type="hidden" th:field="*{nendo}">
-			    <input type="hidden" th:field="*{kofuZeigaku}">
-			    <input type="hidden" th:field="*{kofuRitsu}">
-			    <input type="hidden" th:field="*{kofuGaku}">
-			    <input type="hidden"
-			        th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
-			        name="kofuYmd">
-			    <input type="hidden" th:field="*{version}">
-			    <input type="hidden" th:field="*{shisetsuName}">
-			    <input type="hidden" th:field="*{name}">
+			<form th:action="@{/shoreikin/config/switch-mode}"
+				th:object="${configForm}" method="post" id="switchModeForm"
+				style="display: none;">
+				<input type="hidden" id="switchModeField" name="mode" value="">
+				<input type="hidden" th:field="*{shiteiNo}"> <input
+					type="hidden" th:field="*{nendo}"> <input type="hidden"
+					th:field="*{kofuZeigaku}"> <input type="hidden"
+					th:field="*{kofuRitsu}"> <input type="hidden"
+					th:field="*{kofuGaku}"> <input type="hidden"
+					th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
+					name="kofuYmd"> <input type="hidden" th:field="*{version}">
+				<input type="hidden" th:field="*{shisetsuName}"> <input
+					type="hidden" th:field="*{name}">
 			</form>
 
 			<!-- 算出用フォーム -->
@@ -267,25 +267,31 @@
 					type="hidden" th:field="*{name}">
 			</form>
 
+			<!-- 戻る確認モーダル -->
+			<div
+				th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。一覧画面に戻りますか？', @{/shoreikin/list}, '戻る')}"></div>
 			<!-- 特別徴収義務者指定モーダル -->
 			<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
-			
+
 			<!-- ハイパーリンク付きメッセージ用モーダル -->
-			<div class="modal fade" id="customAlertModal" tabindex="-1" aria-hidden="true">
-			    <div class="modal-dialog">
-			        <div class="modal-content">
-			            <div class="modal-header bg-dark text-white border-bottom-0">
-			                <h5 class="modal-title">入力エラー</h5>
-			                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
-			            </div>
-			            <div class="modal-body" id="customAlertBody">
-			                <!-- HTMLメッセージが挿入箇所 -->
-			            </div>
-			            <div class="modal-footer">
-			                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">閉じる</button>
-			            </div>
-			        </div>
-			    </div>
+			<div class="modal fade" id="customAlertModal" tabindex="-1"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header bg-dark text-white border-bottom-0">
+							<h5 class="modal-title">入力エラー</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="閉じる"></button>
+						</div>
+						<div class="modal-body" id="customAlertBody">
+							<!-- HTMLメッセージが挿入箇所 -->
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary btn-sm"
+								data-bs-dismiss="modal">閉じる</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 

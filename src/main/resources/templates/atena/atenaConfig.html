@@ -121,16 +121,15 @@
 				class="bi bi-arrow-left me-1"></i>一覧に戻る
 			</a>
 			<!-- 登録モード：一覧に戻る（確認ダイアログ） -->
-			<a th:if="${mode == 'register'}" th:href="@{/atena/list}"
+			<a th:if="${mode == 'register'}" href="#"
 				class="btn btn-outline-secondary"
-				onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+				data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 				class="bi bi-arrow-left me-1"></i>一覧に戻る
 			</a>
 			<!-- 編集モード：照会画面に戻る（確認ダイアログ） -->
-			<a th:if="${mode == 'edit'}"
-				th:href="@{/atena/view/{atenaNo}(atenaNo=${form.atenaNo})}"
+			<a th:if="${mode == 'edit'}" href="#"
 				class="btn btn-outline-secondary"
-				onclick="return confirm('入力内容は破棄されます。よろしいですか？')"> <i
+				data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 				class="bi bi-arrow-left me-1"></i>戻る
 			</a>
 			<!-- 登録・編集モード：登録する/更新するボタン -->
@@ -141,6 +140,8 @@
 			</button>
 		</div>
 
+		<div th:if="${mode == 'register'}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/atena/list}, '一覧に戻る')}"></div>
+		<div th:if="${mode == 'edit'}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/atena/view/{atenaNo}(atenaNo=${form.atenaNo})}, '戻る')}"></div>
 	</div>
 </body>
 </html>

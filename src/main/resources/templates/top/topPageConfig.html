@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+	<title>トップページ編集</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-pencil-square me-2 text-primary"></i>トップページ編集
+			</h5>
+		</div>
+
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<form id="configForm" th:action="@{/top/config/save}" th:object="${form}" method="post">
+
+			<div class="card shadow-sm mb-4">
+				<div class="card-header py-3">
+					<h5 class="mb-0"><i class="bi bi-sliders me-2"></i>編集対象</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div class="row g-3 align-items-end">
+
+						<!-- 情報選択 -->
+						<div class="col-md-4">
+							<label class="form-label fw-medium">情報選択</label>
+							<div class="d-flex gap-4 pt-1">
+								<div class="form-check">
+									<input class="form-check-input" type="radio" id="kbnShared"
+										th:field="*{kbn}" value="0"
+										onchange="onKbnChange(this)">
+									<label class="form-check-label" for="kbnShared">共有エリア</label>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" id="kbnCustom"
+										th:field="*{kbn}" value="1"
+										onchange="onKbnChange(this)">
+									<label class="form-check-label" for="kbnCustom">カスタマイズエリア</label>
+								</div>
+							</div>
+						</div>
+
+						<!-- 自治体選択（カスタマイズ時のみ有効） -->
+						<div class="col-md-4">
+							<label for="jichitaiCd" class="form-label fw-medium">自治体選択</label>
+							<select class="form-select" id="jichitaiCd" th:field="*{jichitaiCd}"
+								th:disabled="${form.kbn == '0'}">
+								<option value="">選択してください</option>
+								<option th:each="j : ${jichitaiList}"
+									th:value="${j.jichitaiCd}"
+									th:text="${j.jichitaiCd + ' ' + j.name}">
+								</option>
+							</select>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- HTML入力エリア -->
+			<div class="card shadow-sm mb-4">
+				<div class="card-header py-3">
+					<h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>HTML入力エリア</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<textarea class="form-control font-monospace" id="htmlContent" th:field="*{htmlContent}"
+						rows="15" placeholder="HTMLを入力してください"></textarea>
+				</div>
+			</div>
+
+			<!-- プレビューエリア -->
+			<div class="card shadow-sm mb-4" th:if="${preview}">
+				<div class="card-header py-3">
+					<h5 class="mb-0"><i class="bi bi-eye me-2"></i>プレビュー</h5>
+				</div>
+				<div class="card-body" th:utext="${form.htmlContent}"></div>
+			</div>
+
+			<!-- アクションボタン -->
+			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+
+				<button type="submit" form="configForm"
+					formaction="/accommodation-tax/top/config/preview"
+					class="btn btn-outline-primary btn-lg px-4">
+					<i class="bi bi-eye me-2"></i>プレビュー
+				</button>
+
+				<button type="submit" form="configForm"
+					formaction="/accommodation-tax/top/config/save"
+					class="btn btn-success btn-lg px-5">
+					<i class="bi bi-check-circle me-2"></i>
+					<span th:text="${form.htmlContent != null and !#strings.isEmpty(form.htmlContent)} ? '更新' : '登録'">保存</span>
+				</button>
+
+				<a th:href="@{/top}" class="btn btn-outline-secondary btn-lg px-4">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+
+			</div>
+
+		</form>
+
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script>
+			function onKbnChange(radio) {
+				const sel = document.getElementById('jichitaiCd');
+				sel.disabled = (radio.value === '0');
+				if (radio.value === '0') sel.value = '';
+			}
+		</script>
+	</th:block>
+</body>
+</html>

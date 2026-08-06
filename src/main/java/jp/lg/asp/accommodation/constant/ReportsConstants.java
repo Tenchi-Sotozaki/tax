@@ -41,6 +41,39 @@ public final class ReportsConstants {
 	public static final String KBN_DATA = "2";
 
 	// 定義ID
+	public enum reportsOutputFiled {
+
+		TOKUGIMU_SHITEI_JOREI("RPT0000002", "特別徴収義務者指定通知条令", 1),
+		TOKUGIMU_JURI_JOREI("RPT0000003", "特別徴収義務者承認受理通知条令",1),
+		TOKUREI_SHITEI_JOREI("RPT0000005", "納入申告書の提出期限等の特例適用者指定通知条令", 1),
+		SHOREIKIN_KOFU_JOREI("RPT0000006", "特別徴収義務者奨励金交付要綱", 1),
+		KOSEI_KETTEI_HOREI_INYOU1("RPT0000007", "更正・決定通知書 法令引用文1",1),
+		KOSEI_KETTEI_HOREI_INYOU2("RPT0000008", "更正・決定通知書 法令引用文2", 1),
+		NONYUSHO_KOZA("RPT0000009", "納入書　納入場所", 2);
+
+		private final String id; // 帳票定義マスタのID
+		private final String name; // 設定画面に表示する定義名
+		private final Integer kbn; // 1:テキストボックス、2:テキストエリア
+
+		reportsOutputFiled(String id, String name, Integer kbn) {
+			this.id = id;
+			this.name = name;
+			this.kbn = kbn;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public Integer getKbn() {
+			return kbn;
+		}
+	}
+
 	// 公印
 	public static final String KOIN = "RPT0000001";
 	// 特別徴収義務者指定通知条令
