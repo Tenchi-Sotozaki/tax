@@ -107,10 +107,18 @@ class RoleControllerTest {
     }
 
     @Test
-    void getAssignedUsers_デフォルト権限はエラー() {
+    void getAssignedUsers_デフォルト権限でも照会できる() {
+        Role role = new Role();
+        role.setRoleId(UserRepository.DEFAULT_USER_ROLE_ID);
+        role.setName("デフォルト権限");
+        when(roleService.findById("011002", UserRepository.DEFAULT_USER_ROLE_ID)).thenReturn(role);
+        when(roleService.findAssignedUsers("011002", UserRepository.DEFAULT_USER_ROLE_ID))
+                .thenReturn(List.of());
+
         Map<String, Object> result = controller.getAssignedUsers(UserRepository.DEFAULT_USER_ROLE_ID);
 
-        assertThat(result).containsEntry("error", true);
+        assertThat(result).doesNotContainKey("error");
+        assertThat(result).containsEntry("roleName", "デフォルト権限");
     }
 
     @Test
