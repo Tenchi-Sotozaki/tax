@@ -13,18 +13,6 @@ function getShiftMode() {
     return checked ? checked.value : 'none';
 }
 
-function shiftWeekend(dateStr, mode) {
-    if (!dateStr || mode === 'none') return dateStr;
-    const d = new Date(dateStr);
-    const day = d.getDay();
-    if (day === 6) {
-        d.setDate(d.getDate() + (mode === 'friday' ? -1 : 2));
-    } else if (day === 0) {
-        d.setDate(d.getDate() + (mode === 'friday' ? -2 : 1));
-    }
-    return d.toISOString().substring(0, 10);
-}
-
 function copyPrevYear(btn) {
     const nendo = document.getElementById('nendo').value;
     if (!nendo) { alert('年度を入力してください。'); return; }
@@ -37,7 +25,9 @@ function copyPrevYear(btn) {
                 alert('既に登録済みです。編集画面から修正してください。');
                 return;
             }
-            return fetch(btn.dataset.url + nendo);
+            // サーバー側に shiftMode をクエリパラメータとして渡す
+            const url = `${btn.dataset.url}${nendo}?shiftMode=${shiftMode}`;
+            return fetch(url);
         })
         .then(res => {
             if (!res) return;
@@ -49,10 +39,8 @@ function copyPrevYear(btn) {
             ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'].forEach(k => {
                 const el = document.getElementById('nokigen' + k);
                 if (el) {
-                    const v = data['nokigen' + k] || '';
-                    let dateVal = v ? nendo + v.substring(4) : '';
-                    dateVal = shiftWeekend(dateVal, shiftMode);
-                    el.value = dateVal;
+                    // サーバー側で休業日考慮済みの日付が返却される想定
+                    el.value = data['nokigen' + k] || '';
                     applyDayColor(el);
                 }
             });
@@ -84,8 +72,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (existsBtn) {
             const existsUrl = existsBtn.dataset.existsUrl;
             document.querySelector('form').addEventListener('submit', function(e) {
+                if (!validateForm()) { e.preventDefault(); return; }
                 const nendo = document.getElementById('nendo').value;
-                if (!nendo) return;
                 e.preventDefault();
                 const form = this;
                 fetch(existsUrl + nendo)
@@ -99,6 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             });
         }
+    }
+
+    // editモード時のsubmitバリデーション
+    if (modeInput && modeInput.value === 'edit') {
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!validateForm()) e.preventDefault();
+        });
     }
 
     // 編集モードでなければ処理を行わない

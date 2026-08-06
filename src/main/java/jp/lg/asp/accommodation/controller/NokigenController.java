@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -112,26 +113,20 @@ public class NokigenController {
 	/** 前年度データをJSONで返す（画面への複写用） */
 	@GetMapping("/prev-data/{nendo}")
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> prevData(@PathVariable String nendo) {
+	public ResponseEntity<Map<String, String>> prevData(
+			@PathVariable String nendo,
+			@RequestParam(defaultValue = "none") String shiftMode) {
+		
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		int prevNendo = Integer.parseInt(nendo) - 1;
 		Nokigen prev = nokigenService.findByNendo(String.valueOf(prevNendo));
 		if (prev == null) {
 			return ResponseEntity.notFound().build();
 		}
-		Map<String, String> result = new java.util.LinkedHashMap<>();
-		result.put("nokigen1st", toHtml(prev.getNokigen1st()));
-		result.put("nokigen2nd", toHtml(prev.getNokigen2nd()));
-		result.put("nokigen3rd", toHtml(prev.getNokigen3rd()));
-		result.put("nokigen4th", toHtml(prev.getNokigen4th()));
-		result.put("nokigen5th", toHtml(prev.getNokigen5th()));
-		result.put("nokigen6th", toHtml(prev.getNokigen6th()));
-		result.put("nokigen7th", toHtml(prev.getNokigen7th()));
-		result.put("nokigen8th", toHtml(prev.getNokigen8th()));
-		result.put("nokigen9th", toHtml(prev.getNokigen9th()));
-		result.put("nokigen10th", toHtml(prev.getNokigen10th()));
-		result.put("nokigen11th", toHtml(prev.getNokigen11th()));
-		result.put("nokigen12th", toHtml(prev.getNokigen12th()));
+		
+		// サービス層で休業日（土日・m_kyugyobi）とシフトモードを考慮したマップを生成する
+		Map<String, String> result = nokigenService.getPrevDataWithShift(prev, nendo, shiftMode);
+		
 		return ResponseEntity.ok(result);
 	}
 

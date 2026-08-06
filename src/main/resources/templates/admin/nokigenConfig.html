@@ -42,7 +42,10 @@
 		</div>
 
 		<!-- エラーメッセージ -->
-		<div th:replace="~{layout/components :: reportErrorAlert}"></div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 
 		<div th:if="${warnMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
 			<span th:text="${warnMessage}"></span>
@@ -52,7 +55,7 @@
 		<!-- 入力フォーム -->
 		<div class="card shadow-sm">
 			<div class="card-body">
-				<form id="nokigenForm" th:action="@{/admin/nokigen/save}" method="post" th:object="${nokigen}">
+				<form id="nokigenForm" th:action="@{/admin/nokigen/save}" method="post" th:object="${nokigen}" novalidate>
 					<input type="hidden" th:field="*{jichitaiCd}"> <input type="hidden" th:field="*{addDt}"> <input
 						type="hidden" th:field="*{addUser}"> <input type="hidden" th:field="*{updDt}"> <input
 						type="hidden" th:field="*{updUser}"> <input type="hidden" th:field="*{version}">
