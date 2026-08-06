@@ -54,22 +54,25 @@
 						<tr>
 							<th style="min-width: 70px" class="text-center">権限ID</th>
 							<th style="min-width: 100px">権限名</th>
-							<th style="width: 260px"></th>
+							<!-- 共通CSSの .table td { max-width: 200px } では操作列が省略表示されるため個別に解除する -->
+							<th style="width: 300px; max-width: none"></th>
 						</tr>
 					</thead>
 					<tbody id="roleTableBody">
 						<tr th:each="role : ${roles}">
 							<td th:text="${role.roleId}" class="text-center"></td>
 							<td th:text="${role.name}"></td>
-							<td class="text-end">
-								<button type="button" class="btn btn-outline-primary btn-sm me-1"
-									th:onclick="|openRoleModal('view', ${role.roleId})|">
-									<i class="bi bi-eye me-1"></i>照会
-								</button>
-								<button type="button" class="btn btn-outline-primary btn-sm"
-									th:onclick="|viewAssignedUsers(${role.roleId})|">
-									<i class="bi bi-people me-1"></i>付与ユーザー照会
-								</button>
+							<td style="max-width: none; overflow: visible">
+								<div class="d-flex justify-content-end gap-2">
+									<button type="button" class="btn btn-outline-primary btn-sm"
+										th:onclick="|openRoleModal('view', ${role.roleId})|">
+										<i class="bi bi-eye me-1"></i>照会
+									</button>
+									<button type="button" class="btn btn-outline-primary btn-sm"
+										th:onclick="|viewAssignedUsers(${role.roleId})|">
+										<i class="bi bi-people me-1"></i>付与ユーザー照会
+									</button>
+								</div>
 							</td>
 						</tr>
 					</tbody>
@@ -186,13 +189,13 @@
 						<button type="button" class="btn btn-outline-primary me-auto"
 							data-bs-dismiss="modal">キャンセル</button>
 
-						<button type="button" class="btn btn-success" id="saveBtn"
-							onclick="saveRole()">登録する</button>
-
 						<button type="button" class="btn btn-danger"
 							id="deleteBtn" onclick="deleteRole()" style="display: none;">
 							<i class="bi bi-trash me-1"></i>削除する
 						</button>
+
+						<button type="button" class="btn btn-success" id="saveBtn"
+							onclick="saveRole()">登録する</button>
 					</div>
 				</div>
 			</div>
