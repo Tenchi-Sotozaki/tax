@@ -58,14 +58,23 @@ function validateForm() {
     const nendoInput = document.getElementById('nendo');
     if (!nendoInput || !nendoInput.value.trim()) {
         errors.push('年度は必須入力です。');
-    } else {
-        const nendoVal = parseInt(nendoInput.value, 10);
-        if (isNaN(nendoVal) || nendoVal < 2000 || nendoVal > 2100) {
-            errors.push('年度は有効な4桁の数値を入力してください。');
-        }
+        showClientErrors(errors);
+        return false;
+    }
+    
+    const nendoVal = parseInt(nendoInput.value, 10);
+    
+    // 現在の年度を取得
+    const now = new Date();
+    const calendarYear = now.getFullYear();
+    const currentNendo = (now.getMonth() + 1 < 4) ? calendarYear - 1 : calendarYear;
+    const maxNendo = currentNendo + 2; // 現在の年度 ＋ 2年を上限とする
+
+    if (isNaN(nendoVal) || nendoVal < 2000 || nendoVal > maxNendo) {
+        errors.push(`年度は ${maxNendo}年度（現在年度＋2年）までの間で入力してください。`);
     }
 
-    // 1期〜12期の未入力チェックおよび日付整合性チェック
+    // 1期〜12期の未入力、日付順序、および「年度＋月より古くないか」のチェック
     const kiKeys = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th'];
     let previousDate = null;
 
@@ -82,11 +91,26 @@ function validateForm() {
                 if (isNaN(currentDate.getTime())) {
                     errors.push(`${kiNum}期の日付形式が不正です。`);
                 } else {
-//                    // 期ごとの時系列チェック（前の期より後の日付になっているか）
-//                    if (previousDate && currentDate <= previousDate) {
-//                        errors.push(`${kiNum}期の日付は前回の期より後の日付を設定してください。`);
-//                    }
+                    // 時系列チェック（前の期より後の日付か）
+                    if (previousDate && currentDate <= previousDate) {
+                        errors.push(`${kiNum}期の日付は前回の期より後の日付を設定してください。`);
+                    }
                     previousDate = currentDate;
+
+                    // 年度＋月より古い日付になっていないかチェック
+                    let targetYear = nendoVal;
+                    let targetMonth = index + 4; // 4〜15
+                    if (targetMonth > 12) {
+                        targetMonth -= 12;
+                        targetYear += 1;
+                    }
+                    
+                    // その月の初日
+                    const targetDateFirstDay = new Date(targetYear, targetMonth - 1, 1);
+                    
+                    if (currentDate < targetDateFirstDay) {
+                        errors.push(`${kiNum}期の日付は、対応する月（${targetYear}年${targetMonth}月）より古い日付には設定できません。`);
+                    }
                 }
             }
         }

@@ -66,16 +66,43 @@
 							<label for="nendo" class="form-label">
 								年度 <span class="text-danger" th:if="${mode == 'register'}">*</span>
 							</label>
-
-							<input type="text" class="form-control" th:field="*{nendo}" id="nendo" placeholder="例：2024"
-								th:readonly="${mode != 'register'}"
-								th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'"
-								th:data-initial-value="*{nendo}">
-
-							<div class="invalid-feedback"
-								th:if="${validationErrors != null and !validationErrors.isEmpty()}">
+					
+							<!-- 照会モードの場合はプルダウン -->
+							<select th:if="${mode == 'view'}" class="form-select" id="nendo" th:field="*{nendo}"
+								th:data-base-url="@{/admin/nokigen/view/}" onchange="changeNendo(this)">
+								<option th:each="n : ${nendoList}" th:value="${n}" th:text="${n + '年度'}"
+									th:selected="${n == nokigen.nendo}">
+								</option>
+							</select>
+					
+							<!-- 登録・編集モードの場合はテキスト入力 -->
+							<input th:unless="${mode == 'view'}" type="text" class="form-control" th:field="*{nendo}" id="nendo"
+							    placeholder="例：2024" th:readonly="${mode != 'register'}"
+							    th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'"
+							    th:data-initial-value="*{nendo}">
+					
+							<div class="invalid-feedback" th:if="${validationErrors != null and !validationErrors.isEmpty()}">
 								<span th:each="err : ${validationErrors}" th:text="${err}"></span>
 							</div>
+						</div>
+					
+						<!-- 休業日・複写ボタン（登録モード時のみ表示） -->
+						<div class="col-md-9 d-flex align-items-center flex-wrap gap-2 mt-2 mt-md-0" th:if="${mode == 'register'}">
+							<span class="small text-muted me-1">休業日の場合：</span>
+							<div class="form-check form-check-inline mb-0">
+								<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend" id="shiftFriday"
+									value="friday" style="width:0.85em;height:0.85em;">
+								<label class="form-check-label small" for="shiftFriday">前営業日にずらす</label>
+							</div>
+							<div class="form-check form-check-inline mb-0">
+								<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend" id="shiftMonday"
+									value="monday" style="width:0.85em;height:0.85em;">
+								<label class="form-check-label small" for="shiftMonday">翌営業日にずらす</label>
+							</div>
+							<button type="button" class="btn btn-outline-primary btn-sm ms-2" th:data-url="@{/admin/nokigen/prev-data/}"
+								th:data-exists-url="@{/admin/nokigen/exists/}" onclick="copyPrevYear(this)">
+								<i class="bi bi-copy me-1"></i>前年度を複写する
+							</button>
 						</div>
 					</div>
 
@@ -201,26 +228,6 @@
 								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen12th}">
 						</div>
 					</div>
-
-					<div class="d-flex justify-content-end align-items-center" th:if="${mode == 'register'}">
-						<span class="small text-muted me-2">休業日の場合：</span>
-						<div class="form-check form-check-inline mb-0">
-							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
-								id="shiftFriday" value="friday" style="width:0.85em;height:0.85em;">
-							<label class="form-check-label small" for="shiftFriday">前営業日にずらす</label>
-						</div>
-						<div class="form-check form-check-inline mb-0">
-							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
-								id="shiftMonday" value="monday" style="width:0.85em;height:0.85em;">
-							<label class="form-check-label small" for="shiftMonday">翌営業日にずらす</label>
-						</div>
-						<button type="button" class="btn btn-outline-primary btn-sm ms-3"
-							th:data-url="@{/admin/nokigen/prev-data/}" th:data-exists-url="@{/admin/nokigen/exists/}"
-							onclick="copyPrevYear(this)">
-							<i class="bi bi-copy me-1"></i>前年度を複写する
-						</button>
-					</div>
-
 				</form>
 			</div>
 		</div>
