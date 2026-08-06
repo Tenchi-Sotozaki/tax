@@ -22,6 +22,7 @@ import jp.lg.asp.accommodation.dto.RoleForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.Screen;
 import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.RoleService;
 import lombok.RequiredArgsConstructor;
 
@@ -43,15 +44,21 @@ public class RoleController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
 		try {
-			List<Role> roles = roleService.findAllRoles(jichitaiCd);
+			// デフォルト権限は内部データのため一覧には表示しない
+			List<Role> roles = roleService.findAllRoles(jichitaiCd).stream()
+					.filter(role -> role.getRoleId() == null
+							|| role.getRoleId() != UserRepository.DEFAULT_USER_ROLE_ID)
+					.collect(Collectors.toList());
 			Map<String, List<Screen>> screenGroups = roleService.findScreensGroupedByKbn();
 			model.addAttribute("roles", roles);
 			model.addAttribute("screenGroups", screenGroups);
+			model.addAttribute("defaultRoleId", UserRepository.DEFAULT_USER_ROLE_ID);
 			return "admin/roleManagement";
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("roles", java.util.Collections.emptyList());
 			model.addAttribute("screenGroups", java.util.Collections.emptyMap());
+			model.addAttribute("defaultRoleId", UserRepository.DEFAULT_USER_ROLE_ID);
 			return "admin/roleManagement";
 		}
 	}
@@ -63,7 +70,7 @@ public class RoleController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
-		if (form.getRoleId() != null && form.getRoleId() == 1L) {
+		if (form.getRoleId() != null && form.getRoleId() == UserRepository.DEFAULT_USER_ROLE_ID) {
 			result.put("success", false);
 			result.put("message", "この権限は編集できません");
 			return result;
@@ -100,7 +107,7 @@ public class RoleController {
 		roleMap.put("name", role.getName());
 		roleMap.put("version", role.getVersion());
 		result.put("role", roleMap);
-		result.put("editable", roleId != 1L && roleId != 2L);
+		result.put("editable", roleId != UserRepository.DEFAULT_USER_ROLE_ID);
 
 		if (role.getRoleDetails() != null) {
 			Map<String, String> permissions = role.getRoleDetails().stream()
@@ -119,12 +126,8 @@ public class RoleController {
 	public Map<String, Object> getAssignedUsers(@PathVariable Long roleId) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(SCREEN_ID);
-		Map<String, Object> result = new HashMap<>();
-		if (roleId == 1L) {
-			result.put("error", true);
-			result.put("message", "この権限のユーザー付与は変更できません");
-			return result;
-		}
+		// デフォルト権限であっても照会は妨げない。
+		// 編集・削除への導線は権限編集モーダル側で塞いでいる
 		Role role = roleService.findById(jichitaiCd, roleId);
 		List<User> assignedUsers = roleService.findAssignedUsers(jichitaiCd, roleId);
 
@@ -147,16 +150,21 @@ public class RoleController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		Map<String, Object> result = new HashMap<>();
 
-		if (roleId == 1L || roleId == 2L) {
+		if (roleId == UserRepository.DEFAULT_USER_ROLE_ID) {
 			result.put("success", false);
 			result.put("message", "デフォルト権限のため削除できません");
 			return result;
 		}
 
-		try {
-			// 削除対象の権限が付与されているユーザーをデフォルト権限に変更
-			roleService.resetUsersToDefaultRole(jichitaiCd, roleId, "admin");
+		// 付与されているユーザーがいる場合は削除しない
+		if (!roleService.findAssignedUsers(jichitaiCd, roleId).isEmpty()) {
+			result.put("success", false);
+			result.put("message", "この権限が付与されているユーザーがいるため削除できません。"
+					+ "対象ユーザーの権限を変更後、再度実行してください。");
+			return result;
+		}
 
+		try {
 			roleService.deleteRole(jichitaiCd, roleId);
 			result.put("success", true);
 		} catch (Exception e) {

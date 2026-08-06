@@ -24,5 +24,4 @@ public interface RoleService {
 
     List<User> findAssignedUsers(String jichitaiCd, Long roleId);
 
-    void resetUsersToDefaultRole(String jichitaiCd, Long roleId, String updUser);
 }
