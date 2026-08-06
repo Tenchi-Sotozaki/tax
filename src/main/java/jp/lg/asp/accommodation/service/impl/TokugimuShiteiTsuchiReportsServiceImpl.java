@@ -1,7 +1,9 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
+import java.time.chrono.JapaneseChronology;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -63,18 +65,21 @@ public class TokugimuShiteiTsuchiReportsServiceImpl implements TokugimuShiteiTsu
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
 		reportsDto.setShiteiNo(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
+		reportsDto.setShisetsuYubinNo(dto.getShisetsuYubinNo() != null ? dto.getShisetsuYubinNo() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
+		reportsDto.setTokuYubinNo(dto.getTokuYubinNo() != null ? dto.getTokuYubinNo() : "");
 		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setCity(dto.getCity() != null ? dto.getCity() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
-		// 発行日
+		// 発行日（和暦）
 		if (dto.getHakkoYmd() != null) {
-			// 和暦変換（令和元年 = 2019年）
-			String strDate = dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
-			reportsDto.setHakkoYmd(strDate);
+			DateTimeFormatter warekiFormatter = DateTimeFormatter
+					.ofPattern("GGGGy年M月d日", Locale.JAPANESE)
+					.withChronology(JapaneseChronology.INSTANCE);
+			reportsDto.setHakkoYmd(dto.getHakkoYmd().format(warekiFormatter));
 		} else {
 			reportsDto.setHakkoYmd("");
 		}
