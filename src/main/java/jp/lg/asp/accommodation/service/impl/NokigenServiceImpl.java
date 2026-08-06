@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -152,15 +151,9 @@ public class NokigenServiceImpl implements NokigenService {
     }
 
     /**
-     * 土日、またはメモリ上の休日Setに含まれる日であれば休業日と判定
+     * DBに含まれる日であれば休業日と判定
      */
     private boolean isHoliday(LocalDate date, Set<LocalDate> holidaySet) {
-        // 土日判定
-        DayOfWeek dow = date.getDayOfWeek();
-        if (dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY) {
-            return true;
-        }
-        
         return holidaySet.contains(date);
     }
 }
