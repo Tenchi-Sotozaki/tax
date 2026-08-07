@@ -1,9 +1,8 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanrininNinteiDto;
 import jp.lg.asp.accommodation.entity.Atena;
@@ -40,7 +39,7 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
 
         Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
         String cityName = jichitai != null ? jichitai.getName() : "";
-        String jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
+        String 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.NOZEI_KANRININ_NINTEI_JOREI);
 
         NozeiKanrininNinteiDto dto = new NozeiKanrininNinteiDto();
         dto.setShiteiNo(shiteiNo);
@@ -58,22 +57,14 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo())
                 .orElseThrow(() -> new RuntimeException("宛名情報が見つかりません: " + tokugimu.getAtenaNo()));
 
-        dto.setTokuJusho(buildAddress(atena.getYubinNo(), atena.getJusho()));
+        dto.setTokuYubinNo(atena.getYubinNo() != null ? atena.getYubinNo() : "");
+        dto.setTokuJusho(atena.getJusho() != null ? atena.getJusho() : "");
         dto.setTokuName(atena.getName());
-        dto.setShisetsuJusho(buildAddress(tokugimu.getShisetsuYubinNo(), tokugimu.getShisetsuJusho()));
+        dto.setShisetsuYubinNo(tokugimu.getShisetsuYubinNo() != null ? tokugimu.getShisetsuYubinNo() : "");
+        dto.setShisetsuJusho(tokugimu.getShisetsuJusho() != null ? tokugimu.getShisetsuJusho() : "");
         dto.setShisetsuName(tokugimu.getShisetsuName());
 
         log.debug("納税管理人選任免除認定通知書情報取得完了: {}", dto);
         return dto;
-    }
-
-    private String buildAddress(String yubinNo, String jusho) {
-        if (yubinNo != null && !yubinNo.isEmpty() && jusho != null && !jusho.isEmpty()) {
-            return "〒" + yubinNo + " " + jusho;
-        } else if (jusho != null && !jusho.isEmpty()) {
-            return jusho;
-        } else {
-            return "";
-        }
     }
 }

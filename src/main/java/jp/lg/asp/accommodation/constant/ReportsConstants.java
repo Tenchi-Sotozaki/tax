@@ -45,6 +45,7 @@ public final class ReportsConstants {
 
 		TOKUGIMU_SHITEI_JOREI("RPT0000002", "特別徴収義務者指定通知条令", 1),
 		TOKUGIMU_JURI_JOREI("RPT0000003", "特別徴収義務者承認受理通知条令",1),
+		NOZEI_KANRININ_NINTEI_JOREI("RPT0000004", "納税管理人選任免除認定通知条例",1),
 		TOKUREI_SHITEI_JOREI("RPT0000005", "納入申告書の提出期限等の特例適用者指定通知条令", 1),
 		SHOREIKIN_KOFU_JOREI("RPT0000006", "特別徴収義務者奨励金交付要綱", 1),
 		KOSEI_KETTEI_HOREI_INYOU1("RPT0000007", "更正・決定通知書 法令引用文1",1),
@@ -80,6 +81,8 @@ public final class ReportsConstants {
 	public static final String TOKUGIMU_SHITEI_JOREI = "RPT0000002";
 	// 特別徴収義務者承認受理通知条令
 	public static final String TOKUGIMU_JURI_JOREI = "RPT0000003";
+	// 納税管理人選任免除認定通知書
+	public static final String NOZEI_KANRININ_NINTEI_JOREI = "RPT0000004";
 	// 納入申告書の提出期限等の特例適用者指定通知条令
 	public static final String TOKUREI_SHITEI_JOREI = "RPT0000005";
 	// 特別徴収義務者奨励金交付要綱
