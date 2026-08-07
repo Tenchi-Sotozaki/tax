@@ -1,5 +1,8 @@
 package jp.lg.asp.accommodation.service.impl;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,29 +18,17 @@ import lombok.RequiredArgsConstructor;
 public class TopPageServiceImpl implements TopPageService {
 
 	/** 全自治体共有コンテンツの jichitai_cd 固定値 */
-	private static final String SHARED_JICHITAI_CD = "00000";
-	private static final String KBN_SHARED = "0";
-	private static final String KBN_CUSTOM = "1";
+	private static final String SHARED_JICHITAI_CD = "99999";
+	//private static final String KBN_SHARED = "0";
+	//private static final String KBN_CUSTOM = "1";
 
 	private final TopPageContentRepository repository;
 	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
-	public TopPageContent findShared() {
-		TopPageContent content = new TopPageContent();
-		content.setHtmlContent("<h1> 共通の情報 </h1>");
-		return content;
-		//        return repository.findByKbnAndJichitaiCd(KBN_SHARED, SHARED_JICHITAI_CD).orElse(null);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public TopPageContent findCustom(String jichitaiCd) {
-		TopPageContent content = new TopPageContent();
-		content.setHtmlContent("<h1> 自治体ごとの情報 </h1>");
-		return content;
-		//		return repository.findByKbnAndJichitaiCd(KBN_CUSTOM, jichitaiCd).orElse(null);
+	public List<TopPageContent> findShared() {
+		return repository.findByJichitaiCdAndPostingStartDateLessThanEqualAndPostingEndDateGreaterThanEqual(SHARED_JICHITAI_CD,LocalDate.now(), LocalDate.now());			
 	}
 
 	@Override

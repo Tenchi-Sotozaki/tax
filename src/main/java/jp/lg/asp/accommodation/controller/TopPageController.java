@@ -40,12 +40,8 @@ public class TopPageController {
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(Model model) {
-		//accessChecker.checkAccess(SCREEN_ID);
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		TopPageContent shared = topPageService.findShared();
-		TopPageContent custom = topPageService.findCustom(jichitaiCd);
-		model.addAttribute("sharedContent", shared != null ? shared.getHtmlContent() : "");
-		model.addAttribute("customContent", custom != null ? custom.getHtmlContent() : "");
+		List<TopPageContent> sharedList = topPageService.findShared();
+		model.addAttribute("sharedList", sharedList);
 		return "top/topPage";
 	}
 
