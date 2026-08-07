@@ -166,18 +166,29 @@ public class TokugimuForm {
 				errors.put("facilityNameKana", "宿泊施設情報の施設名称(ふりがな)は必須です");
 			if (f.getBusinessStartDate() == null)
 				errors.put("businessStartDate", "宿泊施設情報の営業開始(予定)日は必須です");
+			if (!StringUtils.hasText(f.getLicenseAddressNo()))
+				errors.put("licenseAddressNo", "営業許可等情報の郵便番号は必須です");
+			if (!StringUtils.hasText(f.getLicenseAddress()))
+				errors.put("licenseAddress", "営業許可等情報の住所は必須です");
 			if (!StringUtils.hasText(f.getLicenseName()))
 				errors.put("licenseName", "営業許可等情報の氏名は必須です");
 			if (!StringUtils.hasText(f.getLicenseNameKana()))
 				errors.put("licenseNameKana", "営業許可等情報の氏名(ふりがな)は必須です");
-			if (!StringUtils.hasText(f.getOwnerName()))
-				errors.put("ownerName", "施設所有者情報の氏名は必須です");
-			if (!StringUtils.hasText(f.getOwnerNameKana()))
-				errors.put("ownerNameKana", "施設所有者情報の氏名(ふりがな)は必須です");
+			if (!StringUtils.hasText(f.getBusinessType()))
+				errors.put("businessType", "営業許可等情報の営業種別は必須です");
+			if (!StringUtils.hasText(f.getLicenseNumber()))
+				errors.put("licenseNumber", "営業許可等情報の許可番号は必須です");
+			boolean ownerAnyInput = StringUtils.hasText(f.getOwnerName()) || StringUtils.hasText(f.getOwnerNameKana())
+					|| StringUtils.hasText(f.getOwnerAddressNo()) || StringUtils.hasText(f.getOwnerAddress())
+					|| StringUtils.hasText(f.getOwnerPhone());
+			if (ownerAnyInput) {
+				if (!StringUtils.hasText(f.getOwnerName()))
+					errors.put("ownerName", "施設所有者情報の氏名は必須です");
+				if (!StringUtils.hasText(f.getOwnerNameKana()))
+					errors.put("ownerNameKana", "施設所有者情報の氏名(ふりがな)は必須です");
+			}
 			if (!StringUtils.hasText(f.getMailName()))
 				errors.put("mailName", "書類送付先情報の氏名は必須です");
-			if (!StringUtils.hasText(f.getMailNameKana()))
-				errors.put("mailNameKana", "書類送付先情報の氏名(ふりがな)は必須です");
 			if (f.isKyodoFlg()) {
 				if (f.getKyodoList().stream().anyMatch(k -> !StringUtils.hasText(k.getKyodoName())))
 					errors.put("kyodoName", "共同事業者情報の氏名は必須です");
