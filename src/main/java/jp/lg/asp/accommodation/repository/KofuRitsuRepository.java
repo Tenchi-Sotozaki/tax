@@ -30,4 +30,11 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 		       "AND k.tekiyoStNendo <= :nendo " +
 		       "ORDER BY k.rno DESC")
 	List<BigDecimal> findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
+
+	@Query("SELECT k FROM KofuRitsu k " +
+		       "WHERE k.jichitaiCd = :jichitaiCd " +
+		       "AND k.newFlg = '1' " +
+		       "AND k.tekiyoStNendo <= :nendo " +
+		       "ORDER BY k.rno DESC")
+	List<KofuRitsu> findKofuRitsuEntityByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
 }
