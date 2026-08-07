@@ -91,7 +91,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				dto.setNendo(String.valueOf(today.getYear()));
 
 				// 交付率を取得して設定 ( 処理日を指定 )
-				List<BigDecimal> ritsuList1 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today);
+				List<BigDecimal> ritsuList1 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today.getYear());
 				dto.setKofuRitsu(ritsuList1.isEmpty() ? null : ritsuList1.get(0));
 			}
 		} else {
@@ -103,7 +103,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 			dto.setNendo(String.valueOf(today.getYear()));
 
 			// 交付率を取得して設定 ( 処理日を指定 )
-			List<BigDecimal> ritsuList2 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today);
+			List<BigDecimal> ritsuList2 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today.getYear());
 			dto.setKofuRitsu(ritsuList2.isEmpty() ? null : ritsuList2.get(0));
 		}
 
@@ -177,7 +177,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 
 		// デフォルト交付率を設定
 		if (dto.getKofuRitsu() == null) {
-			List<BigDecimal> ritsuList = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now());
+			List<BigDecimal> ritsuList = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now().getYear());
 			dto.setKofuRitsu(ritsuList.isEmpty() ? null : ritsuList.get(0));
 		}
 

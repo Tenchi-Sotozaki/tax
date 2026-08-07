@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +75,7 @@ class ShoreikinConfigServiceImplTest {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
                 .thenReturn(Optional.empty());
         when(shoreikinRepository.findById(any())).thenReturn(Optional.empty());
-        when(kofuRitsuRepository.findKofuRitsuByJichitaiCd(eq(JICHITAI_CD), any(LocalDate.class)))
+        when(kofuRitsuRepository.findKofuRitsuByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
                 .thenReturn(List.of(BigDecimal.valueOf(10)));
 
         ShoreikinConfigDto result = service.getShoreikin(SHITEI_NO, NENDO);
