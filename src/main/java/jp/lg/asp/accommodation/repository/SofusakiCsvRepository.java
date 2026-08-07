@@ -17,7 +17,6 @@ public interface SofusakiCsvRepository extends JpaRepository<ReportsLog, Reports
     @Query("""
             SELECT r FROM ReportsLog r
             WHERE r.jichitaiCd = :jichitaiCd
-            AND r.sousa = '3'
             AND r.shiteiNo IS NOT NULL
             AND r.opeDt >= :twoWeeksAgo
             ORDER BY r.opeDt DESC
@@ -30,11 +29,11 @@ public interface SofusakiCsvRepository extends JpaRepository<ReportsLog, Reports
             SELECT r.rptId, rp.rptName FROM ReportsLog r
             LEFT JOIN Reports rp ON rp.jichitaiCd = r.jichitaiCd AND TRIM(rp.rptId) = TRIM(r.rptId)
             WHERE r.jichitaiCd = :jichitaiCd
-            AND r.sousa = '3'
             AND r.shiteiNo IS NOT NULL
             AND r.opeDt >= :twoWeeksAgo
             ORDER BY r.opeDt DESC
             """)
+
     List<Object[]> findPrintedLogsWithRptName(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("twoWeeksAgo") LocalDateTime twoWeeksAgo);

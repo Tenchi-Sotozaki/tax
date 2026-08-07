@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.SofusakiCsvDto;
+import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.ReportsLog;
 import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.SofusakiCsvRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.SofusakiCsvService;
@@ -24,6 +26,7 @@ public class SofusakiCsvServiceImpl implements SofusakiCsvService {
 
     private final SofusakiCsvRepository sofusakiCsvRepository;
     private final TokugimuRepository tokugimuRepository;
+    private final AtenaRepository atenaRepository;
     private final JichitaiContext jichitaiContext;
 
     @Override
@@ -50,14 +53,18 @@ public class SofusakiCsvServiceImpl implements SofusakiCsvService {
             if (tokugimuList.isEmpty()) continue;
 
             Tokugimu t = tokugimuList.get(0);
+            Atena atena = atenaRepository
+                    .findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
+                    .orElse(null);
+
             SofusakiCsvDto dto = new SofusakiCsvDto();
             dto.setAtenaNo(t.getAtenaNo());
             dto.setShiteiNo(t.getShiteiNo() != null ? t.getShiteiNo().strip() : null);
-            dto.setSoufusakiName(t.getSoufusakiName());
-            dto.setSoufusakiNameKana(t.getSoufusakiNameKana());
-            dto.setSoufusakiYubinNo(t.getSoufusakiYubinNo());
-            dto.setSoufusakiJusho(t.getSoufusakiJusho());
-            dto.setSoufusakiTel(t.getSoufusakiTel());
+            dto.setSoufusakiName(fallback(t.getSoufusakiName(), atena != null ? atena.getName() : null));
+            dto.setSoufusakiNameKana(fallback(t.getSoufusakiNameKana(), atena != null ? atena.getNameKana() : null));
+            dto.setSoufusakiYubinNo(fallback(t.getSoufusakiYubinNo(), atena != null ? atena.getYubinNo() : null));
+            dto.setSoufusakiJusho(fallback(t.getSoufusakiJusho(), atena != null ? atena.getJusho() : null));
+            dto.setSoufusakiTel(fallback(t.getSoufusakiTel(), atena != null ? atena.getTel1() : null));
             dto.setRptName(rptNameMap.getOrDefault(log.getRptId().strip(), ""));
             dto.setOpeDt(log.getOpeDt());
             results.add(dto);
@@ -79,6 +86,11 @@ public class SofusakiCsvServiceImpl implements SofusakiCsvService {
             sb.append(escape(item.getSoufusakiTel())).append("\n");
         }
         return sb.toString();
+    }
+
+    /** valueが空の場合はfallbackValueを返す */
+    private String fallback(String value, String fallbackValue) {
+        return (value == null || value.isBlank()) ? fallbackValue : value;
     }
 
     private String quoteForced(String value) {
