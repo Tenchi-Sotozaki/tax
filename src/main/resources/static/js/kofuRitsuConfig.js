@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function checkValue(input) {
         if (input.type === 'checkbox' || input.type === 'radio') return;
         const initial = input.getAttribute('data-initial-value');
-        const initialStr = (initial === null || initial === 'null') ? '' : String(initial).trim();
+        if (initial === null) return;
+        const initialStr = (initial === 'null') ? '' : String(initial).trim();
         const currentStr = String(input.value).trim();
         input.style.border = (currentStr !== initialStr) ? '3px solid #ffeb3b' : '';
     }
