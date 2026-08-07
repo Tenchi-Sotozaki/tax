@@ -31,6 +31,7 @@ public class KofuRitsuConfigController {
 	@GetMapping
 	public String register(Model model) {
 		model.addAttribute("configForm", new KofuRitsuConfigDto());
+		model.addAttribute("mode", "register");
 		return "admin/kofuRitsuConfig";
 	}
 
@@ -40,6 +41,7 @@ public class KofuRitsuConfigController {
 			RedirectAttributes redirectAttributes) {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("validationErrors", KofuRitsuConfigDto.validate(configForm).values());
+			model.addAttribute("mode", "register");
 			return "admin/kofuRitsuConfig";
 		}
 		try {
@@ -64,22 +66,36 @@ public class KofuRitsuConfigController {
 		return "admin/kofuRitsuList";
 	}
 
-	@GetMapping("/edit/{rno}")
-	public String editForm(@PathVariable BigDecimal rno, Model model, RedirectAttributes redirectAttributes) {
+	@GetMapping("/view/{rno}")
+	public String viewForm(@PathVariable BigDecimal rno, Model model, RedirectAttributes redirectAttributes) {
 		try {
 			KofuRitsu entity = kofuRitsuConfigService.findByRno(rno);
-			KofuRitsuConfigDto form = new KofuRitsuConfigDto();
-			form.setKofuRitsu(entity.getKofuRitsu());
-			form.setTekiyoStYmd(entity.getTekiyoStYmd());
-			form.setTekiyoEdYmd(entity.getTekiyoEdYmd());
+			KofuRitsuConfigDto form = toDto(entity);
 			model.addAttribute("configForm", form);
 			model.addAttribute("rno", rno);
+			model.addAttribute("mode", "view");
 		} catch (Exception e) {
 			log.error("交付率取得エラー", e);
 			redirectAttributes.addFlashAttribute("errorMessage", "交付率の取得に失敗しました: " + e.getMessage());
 			return "redirect:/admin/kofu-ritsu/list";
 		}
-		return "admin/kofuRitsuEdit";
+		return "admin/kofuRitsuConfig";
+	}
+
+	@GetMapping("/edit/{rno}")
+	public String editForm(@PathVariable BigDecimal rno, Model model, RedirectAttributes redirectAttributes) {
+		try {
+			KofuRitsu entity = kofuRitsuConfigService.findByRno(rno);
+			KofuRitsuConfigDto form = toDto(entity);
+			model.addAttribute("configForm", form);
+			model.addAttribute("rno", rno);
+			model.addAttribute("mode", "edit");
+		} catch (Exception e) {
+			log.error("交付率取得エラー", e);
+			redirectAttributes.addFlashAttribute("errorMessage", "交付率の取得に失敗しました: " + e.getMessage());
+			return "redirect:/admin/kofu-ritsu/list";
+		}
+		return "admin/kofuRitsuConfig";
 	}
 
 	@PostMapping("/edit/{rno}")
@@ -90,7 +106,8 @@ public class KofuRitsuConfigController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("validationErrors", KofuRitsuConfigDto.validate(configForm).values());
 			model.addAttribute("rno", rno);
-			return "admin/kofuRitsuEdit";
+			model.addAttribute("mode", "edit");
+			return "admin/kofuRitsuConfig";
 		}
 		try {
 			kofuRitsuConfigService.update(rno, configForm);
@@ -100,5 +117,15 @@ public class KofuRitsuConfigController {
 			redirectAttributes.addFlashAttribute("errorMessage", "交付率の更新に失敗しました: " + e.getMessage());
 		}
 		return "redirect:/admin/kofu-ritsu/list";
+	}
+
+	private KofuRitsuConfigDto toDto(KofuRitsu entity) {
+		KofuRitsuConfigDto form = new KofuRitsuConfigDto();
+		form.setKofuRitsu(entity.getKofuRitsu());
+		form.setSanshutsu(entity.getSanshutsu());
+		form.setKbn(entity.getKbn());
+		form.setSaiteigaku(entity.getSaiteigaku());
+		form.setTekiyoStNendo(entity.getTekiyoStNendo());
+		return form;
 	}
 }

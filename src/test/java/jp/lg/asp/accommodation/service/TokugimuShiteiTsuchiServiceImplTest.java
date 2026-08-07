@@ -70,6 +70,10 @@ class TokugimuShiteiTsuchiServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getShiteiNo()).isEqualTo(SHITEI_NO);
         assertThat(result.getTokuName()).isEqualTo("テスト事業者");
+        assertThat(result.getTokuYubinNo()).isEqualTo("060-0001");
+        assertThat(result.getTokuJusho()).isEqualTo("北海道占冠村");
+        assertThat(result.getShisetsuYubinNo()).isEqualTo("060-0001");
+        assertThat(result.getShisetsuJusho()).isEqualTo("北海道占冠村");
         assertThat(result.getCityName()).isEqualTo("占冠村");
         assertThat(result.getCity()).isEqualTo("北海道");
     }

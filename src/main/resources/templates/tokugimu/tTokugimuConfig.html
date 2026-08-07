@@ -966,7 +966,7 @@
 		</div>
 
 		<div th:if="!${isView}"
-			th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/tokugimu/list}, '一覧に戻る')}"></div>
+			th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容は破棄されます。よろしいですか？', @{/tokugimu/list}, '一覧に戻る')}"></div>
 
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
