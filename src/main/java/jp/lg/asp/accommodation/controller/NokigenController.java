@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,7 @@ public class NokigenController {
 	@GetMapping("/list")
 	public String list(RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+		redirectAttributes.addFlashAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
 		Nokigen latest = nokigenService.findAll().stream().findFirst().orElse(null);
 		if (latest == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "登録された納入期限がありません。");
@@ -76,6 +78,9 @@ public class NokigenController {
 	@GetMapping("/view/{nendo}")
 	public String view(@PathVariable String nendo, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+		
+		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
+		
 		Nokigen nokigen = nokigenService.findByNendo(nendo);
 		if (nokigen == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "指定されたデータが見つかりません。");
@@ -84,7 +89,6 @@ public class NokigenController {
 		toHtmlDate(nokigen);
 		model.addAttribute("nokigen", nokigen);
 		model.addAttribute("mode", "view");
-		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
 		addKiMonthLabels(model);
 		return "admin/nokigenConfig";
 	}
@@ -137,10 +141,14 @@ public class NokigenController {
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
+		// nendoListを取得する
+		List<String> nendoList = nokigenService.findAll().stream().map(Nokigen::getNendo).toList();
+
 		if (nokigen.getNendo() == null || nokigen.getNendo().isBlank()) {
 			model.addAttribute("nokigen", nokigen);
 			model.addAttribute("mode", mode);
 			model.addAttribute("validationErrors", java.util.List.of("年度は必須です"));
+			model.addAttribute("nendoList", nendoList);
 			addKiMonthLabels(model);
 			return "admin/nokigenConfig";
 		}
@@ -150,6 +158,7 @@ public class NokigenController {
 				model.addAttribute("nokigen", nokigen);
 				model.addAttribute("mode", "register");
 				model.addAttribute("errorMessage", "登録済みの年度です。編集画面から修正してください。");
+				model.addAttribute("nendoList", nendoList);
 				addKiMonthLabels(model);
 				return "admin/nokigenConfig";
 			}
@@ -160,6 +169,7 @@ public class NokigenController {
 			model.addAttribute("nokigen", nokigen);
 			model.addAttribute("mode", mode);
 			model.addAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+			model.addAttribute("nendoList", nendoList);
 			addKiMonthLabels(model);
 			return "admin/nokigenConfig";
 		}
