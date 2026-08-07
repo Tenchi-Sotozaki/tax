@@ -17,25 +17,30 @@ import org.springframework.ui.Model;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.entity.EltaxRenkei;
+import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.service.EltaxRenkeiService;
+import jp.lg.asp.accommodation.service.NokigenService;
 
 @ExtendWith(MockitoExtension.class)
 class EltaxRenkeiControllerTest {
 
     @Mock EltaxRenkeiService eltaxRenkeiService;
     @Mock ScreenAccessChecker accessChecker;
+    @Mock NokigenService nokigenService;
 
     @InjectMocks EltaxRenkeiController controller;
 
     @Test
     void index_一覧画面を返す() {
         Model model = new ExtendedModelMap();
+        when(nokigenService.findAll()).thenReturn(List.of(new Nokigen()));
         when(eltaxRenkeiService.findAll()).thenReturn(List.of());
 
         String view = controller.index(model);
 
         assertThat(view).isEqualTo("eltaxRenkei/eltaxRenkei");
         assertThat(model.asMap()).containsKey("eltaxRenkeiList");
+        assertThat(model.asMap()).doesNotContainKey("errorMessage");
     }
 
     @Test

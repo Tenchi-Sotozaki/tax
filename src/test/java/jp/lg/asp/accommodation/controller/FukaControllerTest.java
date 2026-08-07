@@ -22,8 +22,10 @@ import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
+import jp.lg.asp.accommodation.service.NokigenService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +34,7 @@ class FukaControllerTest {
     @Mock FukaService fukaService;
     @Mock ScreenAccessChecker accessChecker;
     @Mock FukaValidatorService fukaValidatorService;
+    @Mock NokigenService nokigenService;
 
     @InjectMocks FukaController controller;
 
@@ -47,6 +50,7 @@ class FukaControllerTest {
     void showDaicho_台帳画面を返す() {
         MockHttpSession session = sessionWith("00100001");
         FukaDaichoForm form = new FukaDaichoForm();
+        when(nokigenService.findAll()).thenReturn(List.of(new Nokigen()));
         when(fukaService.getDaichoData("00100001", "2024", null)).thenReturn(form);
         when(fukaService.getExistingNendoList("00100001")).thenReturn(List.of());
         Model model = new ExtendedModelMap();
@@ -55,8 +59,25 @@ class FukaControllerTest {
 
         assertThat(view).isEqualTo("fuka/tFukaDaicho");
         assertThat(model.asMap()).containsKey("fukaDaichoForm");
+        assertThat(model.asMap()).doesNotContainKey("errorMessage");
     }
 
+    @Test
+	void showDaicho_台帳画面を返す_納入期限未登録() {
+		MockHttpSession session = sessionWith("00100001");
+		FukaDaichoForm form = new FukaDaichoForm();
+		when(nokigenService.findAll()).thenReturn(List.of());
+		when(fukaService.getDaichoData("00100001", "2024", null)).thenReturn(form);
+		when(fukaService.getExistingNendoList("00100001")).thenReturn(List.of());
+		Model model = new ExtendedModelMap();
+
+		String view = controller.showDaicho("2024", null, session, model);
+
+		assertThat(view).isEqualTo("fuka/tFukaDaicho");
+		assertThat(model.asMap()).containsKey("fukaDaichoForm");
+		assertThat(model.asMap()).containsEntry("errorMessage", "納入期限が登録されていません。");
+	}
+    
     @Test
     void showDaicho_年度未指定はデフォルト年度() {
         MockHttpSession session = sessionWith("00100001");

@@ -1,6 +1,11 @@
 package jp.lg.asp.accommodation.service.impl;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -157,6 +162,74 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 			log.error("交付申請書データ取得中にエラーが発生しました - 指定番号: {}, 年度: {}", shiteiNo, nendo, e);
 			return null;
 		}
+	}
+
+	@Override
+	public List<KofuKetteiTsuchiShinseiDto> getAllReportData(String nendo) {
+		if (nendo == null || nendo.isBlank()) {
+			return List.of();
+		}
+		init();
+		String jichitaiCode = jichitaiContext.getJichitaiCd();
+		String hakkoYoshiki = getReportsDefText(ReportsConstants.KOFU_HAKKO_YOSHIKI);
+		String kofuJoken = getReportsDefText(ReportsConstants.KOFU_JOKEN);
+
+		List<Tokugimu> tokugimuList = tokugimuRepository.findAllByJichitaiCd(jichitaiCode);
+		if (tokugimuList.isEmpty()) {
+			return List.of();
+		}
+
+		List<BigDecimal> atenaNos = tokugimuList.stream().map(Tokugimu::getAtenaNo).distinct().collect(Collectors.toList());
+		Map<BigDecimal, Atena> atenaMap = atenaRepository.findByJichitaiCdAndAtenaNoIn(jichitaiCode, atenaNos)
+				.stream().collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
+
+		List<String> shiteiNoList = tokugimuList.stream().map(Tokugimu::getShiteiNo).collect(Collectors.toList());
+		Map<String, Shoreikin> shoreikinMap = shoreikinRepository
+				.findByJichitaiCdAndShiteiNoInAndNendo(jichitaiCode, shiteiNoList, nendo)
+				.stream().collect(Collectors.toMap(Shoreikin::getShiteiNo, s -> s));
+
+		List<KofuKetteiTsuchiShinseiDto> result = new ArrayList<>();
+		for (Tokugimu tokugimu : tokugimuList) {
+			Atena atena = atenaMap.get(tokugimu.getAtenaNo());
+			Shoreikin shoreikin = shoreikinMap.get(tokugimu.getShiteiNo());
+			if (atena == null || shoreikin == null) {
+				log.warn("帳票データスキップ: shiteiNo={}", tokugimu.getShiteiNo());
+				continue;
+			}
+
+			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
+			dto.setShiteiNo(tokugimu.getShiteiNo());
+			dto.setNendo(nendo);
+			dto.setTokuName(atena.getName());
+			dto.setShisetsuName(tokugimu.getShisetsuName());
+
+			StringBuilder shisetsuJusho = new StringBuilder();
+			if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
+				shisetsuJusho.append("〒").append(tokugimu.getShisetsuYubinNo()).append("\n");
+			}
+			if (tokugimu.getShisetsuJusho() != null) {
+				shisetsuJusho.append(tokugimu.getShisetsuJusho());
+			}
+			dto.setShisetsuJusho(shisetsuJusho.toString());
+
+			Long kofuZeigaku = shoreikin.getKofuZeigaku();
+			Long kofuGaku = shoreikin.getKofuGaku();
+			dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
+			dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
+			if (shoreikin.getKofuYmd() != null) {
+				dto.setKofuYmd(shoreikin.getKofuYmd().toString());
+			}
+
+			dto.setCityName(jichitaiName);
+			dto.setJorei(jorei);
+			dto.setHakkoJorei(jorei);
+			dto.setHakkoYoshiki(hakkoYoshiki);
+			dto.setKofuJoken(kofuJoken);
+			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
+
+			result.add(dto);
+		}
+		return result;
 	}
 
 	/**
