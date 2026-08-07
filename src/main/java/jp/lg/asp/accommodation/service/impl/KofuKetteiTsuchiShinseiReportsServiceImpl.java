@@ -106,4 +106,47 @@ public class KofuKetteiTsuchiShinseiReportsServiceImpl implements KofuKetteiTsuc
 			throw new RuntimeException("PDF生成に失敗しました: " + e.getMessage(), e);
 		}
 	}
+
+	@Override
+	public byte[] generateBulkPdf(List<KofuKetteiTsuchiShinseiDto> dtoList) {
+		if (dtoList == null || dtoList.isEmpty()) {
+			throw new RuntimeException("帳票データがありません。");
+		}
+		try {
+			System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
+			System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
+
+			List<JasperPrint> jasperPrintList = new ArrayList<>();
+			for (KofuKetteiTsuchiShinseiDto dto : dtoList) {
+				Map<String, Object> parameters = new HashMap<>();
+				if (dto.isKetteiTsuchi()) {
+					ClassPathResource res = new ClassPathResource("reports/kofuKetteiTsuchijrxml.jrxml");
+					if (!res.exists()) throw new RuntimeException("JRXMLファイルが見つかりません: reports/kofuKetteiTsuchijrxml.jrxml");
+					JasperReport report = JasperCompileManager.compileReport(res.getInputStream());
+					jasperPrintList.add(JasperFillManager.fillReport(report, parameters, new JRBeanCollectionDataSource(Arrays.asList(dto))));
+				}
+				if (dto.isShinsei()) {
+					ClassPathResource res = new ClassPathResource("reports/kofukinShinsei.jrxml");
+					if (!res.exists()) throw new RuntimeException("JRXMLファイルが見つかりません: reports/kofukinShinsei.jrxml");
+					JasperReport report = JasperCompileManager.compileReport(res.getInputStream());
+					jasperPrintList.add(JasperFillManager.fillReport(report, parameters, new JRBeanCollectionDataSource(Arrays.asList(dto))));
+				}
+			}
+
+			if (jasperPrintList.isEmpty()) {
+				throw new RuntimeException("印刷対象がありません。");
+			}
+
+			JRPdfExporter exporter = new JRPdfExporter();
+			exporter.setExporterInput(SimpleExporterInput.getInstance(jasperPrintList));
+			java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+			exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(out));
+			exporter.exportReport();
+			return out.toByteArray();
+
+		} catch (Exception e) {
+			log.error("一括PDF生成に失敗しました", e);
+			throw new RuntimeException("一括PDF生成に失敗しました: " + e.getMessage(), e);
+		}
+	}
 }

@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
+import java.util.List;
+
 import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 
 /**
@@ -13,4 +15,11 @@ public interface KofuKetteiTsuchiShinseiReportsService {
      * @return PDFデータ
      */
     byte[] generatekofuKetteiTsuchiShinseiPdf(KofuKetteiTsuchiShinseiDto dto);
+
+    /**
+     * 全件一括で決定通知書・交付申請書を生成
+     * @param dtoList 帳票DTOリスト
+     * @return PDFデータ
+     */
+    byte[] generateBulkPdf(List<KofuKetteiTsuchiShinseiDto> dtoList);
 }

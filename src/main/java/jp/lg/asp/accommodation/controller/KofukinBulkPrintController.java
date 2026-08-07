@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -46,6 +47,8 @@ public class KofukinBulkPrintController {
 		int currentYear = LocalDate.now().getMonthValue() >= 4 ? LocalDate.now().getYear()
 				: LocalDate.now().getYear() - 1;
 		form.setNendo(String.valueOf(currentYear));
+		form.setKofuShinsei(true);
+		form.setKofuKetteiTsuchi(true);
 		model.addAttribute("form", form);
 		return VIEW;
 	}
@@ -55,7 +58,7 @@ public class KofukinBulkPrintController {
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "")
 	public ResponseEntity<byte[]> pdf(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, "kofukin_bulk.pdf", false);
+		return generateResponse(form, "kofukin_bulk.pdf", false, true);
 	}
 
 	@PostMapping("/kofukinBulkPrint/preview")
@@ -63,7 +66,7 @@ public class KofukinBulkPrintController {
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "")
 	public ResponseEntity<byte[]> preview(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, "kofukin_bulk_preview.pdf", false);
+		return generateResponse(form, "kofukin_bulk_preview.pdf", false, false);
 	}
 
 	@PostMapping("/kofukinBulkPrint/print")
@@ -71,32 +74,32 @@ public class KofukinBulkPrintController {
 	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "")
 	public ResponseEntity<byte[]> print(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, "kofukin_bulk_print.pdf", true);
+		return generateResponse(form, "kofukin_bulk_print.pdf", true, false);
 	}
 
-	private ResponseEntity<byte[]> generateResponse(KofukinBulkPrintForm form, String filename, boolean printAction) {
+	private ResponseEntity<byte[]> generateResponse(KofukinBulkPrintForm form, String filename, boolean printAction, boolean download) {
 		try {
 			if (!form.isKofuShinsei() && !form.isKofuKetteiTsuchi()) {
 				return ResponseEntity.badRequest().build();
 			}
 
-			KofuKetteiTsuchiShinseiDto dto = kofuKetteiTsuchiShinseiService.getReportData(null, form.getNendo());
-			if (dto == null) {
+			List<KofuKetteiTsuchiShinseiDto> dtoList = kofuKetteiTsuchiShinseiService.getAllReportData(form.getNendo());
+			if (dtoList == null || dtoList.isEmpty()) {
 				return ResponseEntity.badRequest().build();
 			}
 
-			dto.setHakkoYmd(formatDate(form.getHakkoYmd()));
-			dto.setShinsei(form.isKofuShinsei());
-			dto.setKetteiTsuchi(form.isKofuKetteiTsuchi());
-
-			byte[] pdfData = kofuKetteiTsuchiShinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(dto);
-			if (pdfData == null) {
-				return ResponseEntity.badRequest().build();
+			String formattedDate = formatDate(form.getHakkoYmd());
+			for (KofuKetteiTsuchiShinseiDto dto : dtoList) {
+				dto.setHakkoYmd(formattedDate);
+				dto.setShinsei(form.isKofuShinsei());
+				dto.setKetteiTsuchi(form.isKofuKetteiTsuchi());
 			}
+
+			byte[] pdfData = kofuKetteiTsuchiShinseiReportsService.generateBulkPdf(dtoList);
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.add("Content-Disposition", "inline; filename=" + filename);
+			headers.add("Content-Disposition", (download ? "attachment" : "inline") + "; filename=" + filename);
 			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 			if (printAction) {
 				headers.add("X-Print-Action", "true");
