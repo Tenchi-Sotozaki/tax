@@ -34,6 +34,9 @@ public class NozeiKanriShoninTsuchiReportsDto {
 
     /** 納税管理人名 */
     private String nozeiKanriName;
+    
+    /** 承認・不承認 */
+    private String shonin;
 
     /** 理由 */
     private String riyu;

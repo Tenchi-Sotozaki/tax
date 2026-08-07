@@ -40,6 +40,7 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
 
 			Map<String, Object> parameters = new HashMap<>();
+			
 			// フォント設定を明示的に追加
 			parameters.put("net.sf.jasperreports.default.font.name", "IPAex明朝");
 			parameters.put("net.sf.jasperreports.default.pdf.font.name", "IPAex明朝");
@@ -66,13 +67,23 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
-		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
 		reportsDto.setNozeiKanriJusho(dto.getNozeiKanriJusho() != null ? dto.getNozeiKanriJusho() : "");
 		reportsDto.setNozeiKanriName(dto.getNozeiKanriName() != null ? dto.getNozeiKanriName() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
+		reportsDto.setShonin("0");
+		
+		// 郵便番号と住所の間に改行を入れる
+		String tokujusho = dto.getTokuJusho();
+		if (tokujusho != null) {
+			// 最初に見つかったスペースを改行に
+		    String formattedJusho = tokujusho.replaceFirst(" ", "\n");
+		    reportsDto.setTokuJusho(formattedJusho);
+		} else {
+		    reportsDto.setTokuJusho("");
+		}
 
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
