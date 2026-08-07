@@ -50,16 +50,15 @@
 			<expression><![CDATA[$F{cityName}+"長"]]></expression>
 		</element>
 		<element kind="textField" uuid="c35f0ea1-6fa0-4bac-ab7d-6dc86e9c9d20" x="28" y="120" width="499" height="24" fontName="IPAex明朝" fontSize="10.0">
-			<expression><![CDATA["　"+$F{cityName}+"宿泊税条令施行規則"+$F{jorei}+"の規定により、" + "\n"+
-"宿泊税の納税管理人として次のとおり（ 承認  不承認 ）することを決定しましたので通知します。"]]></expression>
+			<expression><![CDATA["　"+$F{cityName}+"宿泊税条令施行規則"+$F{jorei}+"の規定により、宿泊税の納税管理人として次のとおり"+ "\n"+"（ 承認  不承認 ）することを決定しましたので通知します。"]]></expression>
 		</element>
 		<element kind="image" uuid="41c1e8c1-28a3-4cb1-b94e-5943bbf97d6e" x="495" y="57" width="50" height="50" onErrorType="Blank">
 			<expression><![CDATA[$F{koin}]]></expression>
 		</element>
-		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="206" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="28" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
 			<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
 		</element>
-		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="232" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="54" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
 			<printWhenExpression><![CDATA["2".equals($F{shonin})]]></printWhenExpression>
 		</element>
 	</columnHeader>
