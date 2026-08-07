@@ -130,9 +130,15 @@ public class NokigenServiceImpl implements NokigenService {
         }
         
         try {
-            // 前年度の日付から月日を抽出し、targetNendoの年を適用
+            // 前年度の日付から月および月日を抽出
+            int month = Integer.parseInt(originalValue.substring(4, 6));
             String monthDay = originalValue.substring(4, 8);
-            LocalDate date = LocalDate.parse(targetNendo + monthDay, DateTimeFormatter.ofPattern("yyyyMMdd"));
+            
+            // 対象年を決定（1月、2月、3月の場合は targetNendo + 1 年）
+            int year = Integer.parseInt(targetNendo);
+            if (month <= 3) year++;
+            
+            LocalDate date = LocalDate.parse(String.format("%04d%s", year, monthDay), DateTimeFormatter.ofPattern("yyyyMMdd"));
             
             // シフトモードが "none" の場合はそのまま返却
             if ("none".equals(shiftMode)) {
