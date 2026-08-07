@@ -20,8 +20,7 @@ public class TokureiShiteiCancelDto {
 	private LocalDate hakkoYmd;
 
 	/** 適用年月日 */
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate tekiyoYmd;
+	private String tekiyoYmd;
 
 	/** 取消理由 */
 	private String riyu;
