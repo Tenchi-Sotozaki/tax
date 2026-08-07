@@ -21,10 +21,10 @@
 　　　不承認]]></text>
 		</element>
 		<element kind="ellipse" uuid="e2516a20-c4ef-4e1a-8010-ac70558fc80a" x="281" y="6" width="40" height="20" backcolor="rgba(255, 255, 255, 0.0)">
-			<printWhenExpression><![CDATA["0".equals($F{shonin})]]></printWhenExpression>
+			<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
 		</element>
 		<element kind="ellipse" uuid="6aef561e-7eca-416d-967f-64dc3d0b1f4e" x="276" y="34" width="50" height="20" backcolor="rgba(255, 255, 255, 0.0)">
-			<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
+			<printWhenExpression><![CDATA["2".equals($F{shonin})]]></printWhenExpression>
 		</element>
 	</pageHeader>
 	<columnHeader height="150" splitType="Stretch">
@@ -56,11 +56,11 @@
 		<element kind="image" uuid="41c1e8c1-28a3-4cb1-b94e-5943bbf97d6e" x="495" y="57" width="50" height="50" onErrorType="Blank">
 			<expression><![CDATA[$F{koin}]]></expression>
 		</element>
-		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="209" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
-			<printWhenExpression><![CDATA["0".equals($F{shonin})]]></printWhenExpression>
-		</element>
-		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="235" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="206" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
 			<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
+		</element>
+		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="232" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+			<printWhenExpression><![CDATA["2".equals($F{shonin})]]></printWhenExpression>
 		</element>
 	</columnHeader>
 	<detail>

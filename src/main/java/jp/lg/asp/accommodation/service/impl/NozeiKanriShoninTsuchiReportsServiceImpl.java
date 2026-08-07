@@ -6,12 +6,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiReportsDto;
+import jp.lg.asp.accommodation.entity.Nokan;
+import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +36,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoninTsuchiReportsService {
 
 	private static final String JRXML_PATH = "reports/nozeiKanrininShoninTsuchi.jrxml";
-
+	private final NokanRepository nokanRepository;
+	private final JichitaiContext jichitaiContext;
+	
 	@Override
 	public byte[] generateTsuchiPdf(NozeiKanriShoninTsuchiDto dto) {
 		try {
@@ -73,13 +79,12 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setNozeiKanriName(dto.getNozeiKanriName() != null ? dto.getNozeiKanriName() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
-		reportsDto.setShonin("0");
 		
 		// 郵便番号と住所の間に改行を入れる
 		String tokujusho = dto.getTokuJusho();
 		if (tokujusho != null) {
 			// 最初に見つかったスペースを改行に
-		    String formattedJusho = tokujusho.replaceFirst(" ", "\n");
+		    String formattedJusho = tokujusho.replaceFirst(" ", "\n   ");
 		    reportsDto.setTokuJusho(formattedJusho);
 		} else {
 		    reportsDto.setTokuJusho("");
@@ -92,7 +97,15 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		} else {
 			reportsDto.setHakkoYmd("");
 		}
-
+		
+		// 納税管理人情報を取得
+		Optional<Nokan> nokan = nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiContext.getJichitaiCd(), dto.getShiteiNo());
+		
+		// 納税管理人の区分を設定
+		if(nokan != null) {
+			reportsDto.setShonin(nokan.get().getKbn() != null ? nokan.get().getKbn() : "");
+		}
+		
 		List<NozeiKanriShoninTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		JRDataSource params = new JRBeanCollectionDataSource(dataSourceList);
 
