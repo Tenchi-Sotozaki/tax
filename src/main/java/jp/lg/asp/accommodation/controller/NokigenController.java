@@ -68,6 +68,7 @@ public class NokigenController {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("nokigen", new Nokigen());
 		model.addAttribute("mode", "register");
+		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
 		addKiMonthLabels(model);
 		return "admin/nokigenConfig";
 	}

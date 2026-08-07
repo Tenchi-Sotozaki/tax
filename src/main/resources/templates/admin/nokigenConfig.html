@@ -16,12 +16,8 @@
 					th:text="${mode == 'register' ? '納入期限登録' : (mode == 'edit' ? '納入期限編集' : '納入期限照会')}">納入期限設定</span>
 			</h5>
 			<div th:if="${mode == 'view'}" class="d-flex align-items-center gap-2">
-				<select class="form-select form-select-sm" id="nendoSelect" th:data-base-url="@{/admin/nokigen/view/}"
-					onchange="changeNendo(this)">
-					<option th:each="n : ${nendoList}" th:value="${n}" th:text="${n + '年度'}"
-						th:selected="${n == nokigen.nendo}"></option>
-				</select> <a th:href="@{/admin/nokigen/edit/{nendo}(nendo=${nokigen.nendo})}"
-					class="btn btn-sm btn-primary text-nowrap"> <i class="bi bi-pencil-square me-1"></i>編集する
+				<a th:href="@{/admin/nokigen/edit/{nendo}(nendo=${nokigen.nendo})}" class="btn btn-sm btn-primary text-nowrap">
+					<i class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
 		</div>
@@ -56,9 +52,11 @@
 		<div class="card shadow-sm">
 			<div class="card-body">
 				<form id="nokigenForm" th:action="@{/admin/nokigen/save}" method="post" th:object="${nokigen}" novalidate>
-					<input type="hidden" th:field="*{jichitaiCd}"> <input type="hidden" th:field="*{addDt}"> <input
-						type="hidden" th:field="*{addUser}"> <input type="hidden" th:field="*{updDt}"> <input
-						type="hidden" th:field="*{updUser}"> <input type="hidden" th:field="*{version}">
+					<input type="hidden" th:field="*{addDt}"> 
+					<input type="hidden" th:field="*{addUser}">
+					<input type="hidden" th:field="*{updDt}">
+					<input type="hidden" th:field="*{updUser}"> 
+					<input type="hidden" th:field="*{version}">
 					<input type="hidden" name="mode" th:value="${mode}">
 					<div class="row mb-3 align-items-end">
 						<!-- 年度 -->
@@ -75,7 +73,7 @@
 								</option>
 							</select>
 					
-							<!-- 登録・編集モードの場合はテキスト入力 -->
+							<!-- 登録モードの場合はテキスト入力 -->
 							<input th:unless="${mode == 'view'}" type="text" class="form-control" th:field="*{nendo}" id="nendo"
 							    placeholder="例：2024" th:readonly="${mode != 'register'}"
 							    th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'"
@@ -232,11 +230,16 @@
 			</div>
 		</div>
 
-		<!-- 登録/更新ボタン -->
+		<!-- ボタン -->
 		<div class="text-center mt-4" th:if="${mode != 'view'}">
+			<!-- 戻る -->
+			<a th:href="@{/admin/nokigen/view/{nendo}(nendo=${mode == 'edit' ? nokigen.nendo : nendoList[0]})}"
+				class="btn btn-outline-secondary btn-lg">
+				<i class="bi bi-arrow-left me-1"></i> 戻る
+			</a>
+			<!-- 登録/更新 -->
 			<button type="submit" form="nokigenForm" class="btn btn-success btn-lg">
-				<i class="bi bi-check-circle me-1"></i> <span
-					th:text="${mode == 'register' ? '登録する' : '更新する'}">保存</span>
+				<i class="bi bi-check-circle me-1"></i> <span th:text="${mode == 'register' ? '登録する' : '更新する'}">保存</span>
 			</button>
 		</div>
 
