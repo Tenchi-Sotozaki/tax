@@ -16,6 +16,7 @@
 	<parameter name="city" class="java.lang.String"/>
 	<parameter name="tekiyoYmd" class="java.lang.String"/>
 	<parameter name="riyu" class="java.lang.String"/>
+	<parameter name="biko" class="java.lang.String"/>
 	<query language="SQL"><![CDATA[SELECT *
 FROM t_tokugimu tkg
 left outer join m_atena at 
@@ -49,12 +50,6 @@ and tkg.atena_no = at.atena_no ]]></query>
 		<description><![CDATA[指定番号]]></description>
 		<property name="com.jaspersoft.studio.field.name" value="shitei_no"/>
 		<property name="com.jaspersoft.studio.field.label" value="shitei_no"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="t_tokugimu"/>
-	</field>
-	<field name="biko" class="java.lang.String">
-		<description><![CDATA[申請備考]]></description>
-		<property name="com.jaspersoft.studio.field.name" value="biko"/>
-		<property name="com.jaspersoft.studio.field.label" value="biko"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="t_tokugimu"/>
 	</field>
 	<field name="koin" class="java.lang.Object"/>

@@ -63,6 +63,7 @@ public class TokureiShiteiReportsServiceImpl implements TokureiShiteiReportsServ
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
 		parameters.put("city", dto.getCity() != null ? dto.getCity() : "");
 		parameters.put("riyu", dto.getRiyu() != null ? dto.getRiyu() : "");
+		parameters.put("biko", dto.getBiko() != null ? dto.getBiko() : "");
 		return parameters;
 	}
 
@@ -73,7 +74,6 @@ public class TokureiShiteiReportsServiceImpl implements TokureiShiteiReportsServ
 		reportsDto.setShisetsu_jusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsu_name(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
 		reportsDto.setShitei_no(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
-		reportsDto.setBiko("");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 		reportsDto.setShonin(dto.getShonin() != null ? dto.getShonin() : null);
 
