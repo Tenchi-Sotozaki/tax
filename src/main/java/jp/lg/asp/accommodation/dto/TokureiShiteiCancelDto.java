@@ -41,7 +41,7 @@ public class TokureiShiteiCancelDto {
 	/** 市区町村 */
 	private String city;
 
-	/** 条令 */
+	/** 条例 */
 	private String jorei;
 	
 	/** 備考 */

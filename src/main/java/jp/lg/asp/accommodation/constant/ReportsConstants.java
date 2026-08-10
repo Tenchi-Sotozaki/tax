@@ -48,9 +48,9 @@ public final class ReportsConstants {
 	// 定義ID
 	public enum reportsOutputFiled {
 
-		TOKUGIMU_SHITEI_JOREI("RPT0000002", "特別徴収義務者指定通知条令", KBN_TEXT, INPUT_TEXTBOX),
-		TOKUGIMU_JURI_JOREI("RPT0000003", "特別徴収義務者承認受理通知条令", KBN_TEXT, INPUT_TEXTBOX),
-		TOKUREI_SHITEI_JOREI("RPT0000005", "納入申告書の提出期限等の特例適用者指定通知条令", KBN_TEXT, INPUT_TEXTBOX),
+		TOKUGIMU_SHITEI_JOREI("RPT0000002", "特別徴収義務者指定通知条例", KBN_TEXT, INPUT_TEXTBOX),
+		TOKUGIMU_JURI_JOREI("RPT0000003", "特別徴収義務者承認受理通知条例", KBN_TEXT, INPUT_TEXTBOX),
+		TOKUREI_SHITEI_JOREI("RPT0000005", "納入申告書の提出期限等の特例適用者指定通知条例", KBN_TEXT, INPUT_TEXTBOX),
 		SHOREIKIN_KOFU_JOREI("RPT0000006", "特別徴収義務者奨励金交付要綱", KBN_TEXT, INPUT_TEXTBOX),
 		KOSEI_KETTEI_HOREI_INYOU1("RPT0000007", "更正・決定通知書 法令引用文1", KBN_TEXT, INPUT_TEXTBOX),
 		KOSEI_KETTEI_HOREI_INYOU2("RPT0000008", "更正・決定通知書 法令引用文2", KBN_TEXT, INPUT_TEXTBOX),
@@ -62,10 +62,10 @@ public final class ReportsConstants {
 		NONYUSHO_TORIMATOME("RPT0000014", "納入書　取りまとめ店", KBN_TEXT, INPUT_TEXTBOX),
 		KOFU_HAKKO_YOSHIKI_DEF("RPT0000009", "交付金　発行様式", KBN_TEXT, INPUT_TEXTBOX),
 		KOFU_JOKEN_DEF("RPT0000010", "交付金　交付条件", KBN_TEXT, INPUT_TEXTAREA),
-		GASSAN_NONYU_JOREI("RPT0000015", "合算申告納入承認通知条令", KBN_TEXT, INPUT_TEXTBOX),
-		TOKUREI_CANCEL_JOREI("RPT0000016", "納入申告書の提出期限等の特例適用者指定取消通知条令", KBN_TEXT, INPUT_TEXTBOX),
-		NOZEI_KANRININ_SHONIN_JOREI("RPT0000017", "納税管理人承認通知条令", KBN_TEXT, INPUT_TEXTBOX),
-		NOZEI_KANRININ_NINTEI_JOREI("RPT0000018", "納税管理人選任免除認定通知条令", KBN_TEXT, INPUT_TEXTBOX);
+		GASSAN_NONYU_JOREI("RPT0000015", "合算申告納入承認通知条例", KBN_TEXT, INPUT_TEXTBOX),
+		TOKUREI_CANCEL_JOREI("RPT0000016", "納入申告書の提出期限等の特例適用者指定取消通知条例", KBN_TEXT, INPUT_TEXTBOX),
+		NOZEI_KANRININ_SHONIN_JOREI("RPT0000017", "納税管理人承認通知条例", KBN_TEXT, INPUT_TEXTBOX),
+		NOZEI_KANRININ_NINTEI_JOREI("RPT0000018", "納税管理人選任免除認定通知条例", KBN_TEXT, INPUT_TEXTBOX);
 
 		private final String id; // 帳票定義マスタのID
 		private final String name; // 設定画面に表示する定義名
@@ -98,11 +98,11 @@ public final class ReportsConstants {
 
 	// 公印
 	public static final String KOIN = "RPT0000001";
-	// 特別徴収義務者指定通知条令
+	// 特別徴収義務者指定通知条例
 	public static final String TOKUGIMU_SHITEI_JOREI = "RPT0000002";
-	// 特別徴収義務者承認受理通知条令
+	// 特別徴収義務者承認受理通知条例
 	public static final String TOKUGIMU_JURI_JOREI = "RPT0000003";
-	// 納入申告書の提出期限等の特例適用者指定通知条令
+	// 納入申告書の提出期限等の特例適用者指定通知条例
 	public static final String TOKUREI_SHITEI_JOREI = "RPT0000005";
 	// 特別徴収義務者奨励金交付要綱
 	public static final String SHOREIKIN_KOFU_JOREI = "RPT0000006";
@@ -122,13 +122,13 @@ public final class ReportsConstants {
 	public static final String NONYUSHO_SHITEI_KINYU_NAME = "RPT0000013";
 	// 納入書　取りまとめ店
 	public static final String NONYUSHO_TORIMATOME = "RPT0000014";
-	// 合算申告納入承認通知条令
+	// 合算申告納入承認通知条例
 	public static final String GASSAN_NONYU_JOREI = "RPT0000015";
-	// 納入申告書の提出期限等の特例適用者指定取消通知条令
+	// 納入申告書の提出期限等の特例適用者指定取消通知条例
 	public static final String TOKUREI_CANCEL_JOREI = "RPT0000016";
-	// 納税管理人承認通知条令
+	// 納税管理人承認通知条例
 	public static final String NOZEI_KANRININ_SHONIN_JOREI = "RPT0000017";
-	// 納税管理人選任免除認定通知条令
+	// 納税管理人選任免除認定通知条例
 	public static final String NOZEI_KANRININ_NINTEI_JOREI = "RPT0000018";
 
 	/* 

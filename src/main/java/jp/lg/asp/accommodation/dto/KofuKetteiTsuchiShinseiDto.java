@@ -20,7 +20,7 @@ public class KofuKetteiTsuchiShinseiDto {
 	/** 市区町村名 */
 	private String cityName;
 
-	/** 条令 */
+	/** 条例 */
 	private String jorei;
 
 	/** 施設住所 */
@@ -47,7 +47,7 @@ public class KofuKetteiTsuchiShinseiDto {
 	/** 交付年月日 */
 	private String kofuYmd;
 	
-	/** 条令 */
+	/** 条例 */
 	private String hakkoJorei;
 	
 	/** 公印 */
