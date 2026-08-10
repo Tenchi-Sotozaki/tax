@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.service.TokureiShiteiReportsService;
 import jp.lg.asp.accommodation.service.TokureiShiteiService;
@@ -58,6 +58,9 @@ public class TokureiShiteiController {
 		TokureiShiteiDto tokugimuInfo = tokureiShiteiService.getTokugimuInfo(shiteiNo);
 		if (tokugimuInfo != null) {
 			dto = tokugimuInfo;
+		} else {
+			model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
+			return "tokugimu/tTokugimuReport";
 		}
 
 		if (dto.getHakkoYmd() == null) {
