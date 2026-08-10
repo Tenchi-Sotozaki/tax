@@ -36,6 +36,9 @@ public class NozeiKanriShoninTsuchiDto {
 
     /** 納税管理人名 */
     private String nozeiKanriName;
+    
+    /** 区分 */
+    private String kbn;
 
     /** 理由 */
     private String riyu;

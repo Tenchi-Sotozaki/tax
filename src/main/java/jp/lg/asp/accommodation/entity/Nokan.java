@@ -51,4 +51,8 @@ public class Nokan {
     /** 区分 */
     @Column(name = "kbn")
     private String kbn;
+    
+    /** 理由 */
+    @Column(name="riyu")
+    private String riyu;
 }

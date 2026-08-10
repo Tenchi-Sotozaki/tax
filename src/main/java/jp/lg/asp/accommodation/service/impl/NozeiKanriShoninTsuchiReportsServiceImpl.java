@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiReportsDto;
-import jp.lg.asp.accommodation.entity.Nokan;
 import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
@@ -79,13 +77,30 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setNozeiKanriName(dto.getNozeiKanriName() != null ? dto.getNozeiKanriName() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
+		reportsDto.setShonin(dto.getKbn() != null ? dto.getKbn() : "");
 		
 		// 郵便番号と住所の間に改行を入れる
 		String tokujusho = dto.getTokuJusho();
 		if (tokujusho != null) {
 			// 最初に見つかったスペースを改行に
-		    String formattedJusho = tokujusho.replaceFirst(" ", "\n   ");
+		    String formattedJusho = tokujusho.replaceFirst(" ", "\n");
 		    reportsDto.setTokuJusho(formattedJusho);
+		    
+			// 最初に見つかった空白（半角・全角）を境界にして、最大2つの配列に分割する
+			String[] parts = formattedJusho.split("\n", 2);
+
+			if (parts.length > 0) {
+				reportsDto.setYubin(parts[0]); // 郵便番号
+			} else {
+				reportsDto.setYubin("");
+			}
+
+			if (parts.length > 1) {
+				reportsDto.setJusho(parts[1]); // 住所
+			} else {
+				reportsDto.setJusho("");
+			}
+		    
 		} else {
 		    reportsDto.setTokuJusho("");
 		}
@@ -96,14 +111,6 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 			reportsDto.setHakkoYmd(strDate);
 		} else {
 			reportsDto.setHakkoYmd("");
-		}
-		
-		// 納税管理人情報を取得
-		Optional<Nokan> nokan = nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiContext.getJichitaiCd(), dto.getShiteiNo());
-		
-		// 納税管理人の区分を設定
-		if(nokan != null) {
-			reportsDto.setShonin(nokan.get().getKbn() != null ? nokan.get().getKbn() : "");
 		}
 		
 		List<NozeiKanriShoninTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
