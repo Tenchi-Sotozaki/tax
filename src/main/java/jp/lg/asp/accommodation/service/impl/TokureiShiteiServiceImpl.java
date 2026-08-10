@@ -69,7 +69,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 		Atena atena = atenaOpt.get();
 
 		TokureiShiteiDto dto = new TokureiShiteiDto();
-		dto.setShiteiNo(tokugimu.getShiteiNo());
+		dto.setShiteiNo(shiteiNo);
 		dto.setTokuName(atena.getName());
 
 		String tokuJusho = "";
@@ -85,7 +85,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 
 		String shisetsuJusho = "";
 		if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
-			shisetsuJusho = "〒" + tokugimu.getShisetsuYubinNo() + "\r\n";
+			shisetsuJusho = "〒" + tokugimu.getShisetsuYubinNo() + "\r\n   ";
 		}
 		if (tokugimu.getShisetsuJusho() != null) {
 			shisetsuJusho += tokugimu.getShisetsuJusho();

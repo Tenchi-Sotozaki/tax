@@ -136,7 +136,8 @@ public class TokureiShiteiCancelController {
 		dest.setShisetsuJusho(src.getShisetsuJusho());
 		dest.setCity(src.getCity());
 		dest.setJorei(src.getJorei());
-		dest.setBiko("");
+		dest.setBiko(src.getBiko());
+		dest.setKoin(src.getKoin());
 		return dest;
 	}
 }

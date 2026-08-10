@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
+import java.time.chrono.JapaneseDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,7 +56,8 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 	private Map<String, Object> buildParameters(TokureiShiteiCancelDto dto) {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("hakkoYmd", dto.getHakkoYmd() != null
-				? dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")) : "");
+			    ? JapaneseDate.from(dto.getHakkoYmd()).format(DateTimeFormatter.ofPattern("GGGGy年M月d日", java.util.Locale.JAPANESE))
+			    : "");
 		parameters.put("tekiyoYmd", dto.getTekiyoYmd() != null
 				? dto.getTekiyoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")) : "");
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");

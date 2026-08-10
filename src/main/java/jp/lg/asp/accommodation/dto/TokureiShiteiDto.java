@@ -47,6 +47,9 @@ public class TokureiShiteiDto {
 	/** 条令 */
 	private String jorei;
 	
+	/** 備考 */
+	private String biko;
+	
 	/** 公印 */
 	private byte[] koin;
 }
