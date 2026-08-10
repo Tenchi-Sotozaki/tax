@@ -13,6 +13,8 @@
 	<field name="riyu" class="java.lang.String"/>
 	<field name="koin" class="java.lang.Object"/>
 	<field name="shonin" class="java.lang.String"/>
+	<field name="Yubin" class="java.lang.String"/>
+	<field name="Jusho" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<pageHeader height="100" splitType="Stretch">
 		<element kind="staticText" uuid="8010567e-b9c9-4abd-bb05-8934c9779ea1" x="80" y="5" width="400" height="50" markup="none" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
@@ -55,10 +57,10 @@
 		<element kind="image" uuid="41c1e8c1-28a3-4cb1-b94e-5943bbf97d6e" x="495" y="57" width="50" height="50" onErrorType="Blank">
 			<expression><![CDATA[$F{koin}]]></expression>
 		</element>
-		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="28" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="33" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
 			<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
 		</element>
-		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="54" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="59" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
 			<printWhenExpression><![CDATA["2".equals($F{shonin})]]></printWhenExpression>
 		</element>
 	</columnHeader>
@@ -90,7 +92,8 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="4a98e892-4e06-4add-88b4-cfd12a268d09" x="187" y="0" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA["   "+$F{tokuJusho}]]></expression>
+				<expression><![CDATA["   "+$F{Yubin}+"\n"+
+"   "+$F{Jusho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>

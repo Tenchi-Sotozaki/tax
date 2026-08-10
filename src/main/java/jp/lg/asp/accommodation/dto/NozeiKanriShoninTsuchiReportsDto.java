@@ -19,6 +19,12 @@ public class NozeiKanriShoninTsuchiReportsDto {
 
     /** 特別徴収義務者住所 */
     private String tokuJusho;
+    
+    /** 郵便番号 */
+    private String Yubin;
+    
+    /** 住所 */
+    private String Jusho;
 
     /** 特別徴収義務者名 */
     private String tokuName;
