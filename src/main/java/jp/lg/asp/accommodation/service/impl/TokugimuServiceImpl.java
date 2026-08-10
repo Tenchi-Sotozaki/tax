@@ -618,6 +618,12 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private void saveShoyusha(String shiteiNo, BigDecimal rno, TokugimuForm form, LocalDateTime now, String user) {
+		if (!org.springframework.util.StringUtils.hasText(form.getOwnerName())
+				&& !org.springframework.util.StringUtils.hasText(form.getOwnerNameKana())
+				&& !org.springframework.util.StringUtils.hasText(form.getOwnerAddressNo())
+				&& !org.springframework.util.StringUtils.hasText(form.getOwnerAddress())
+				&& !org.springframework.util.StringUtils.hasText(form.getOwnerPhone()))
+			return;
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Shoyusha s = new Shoyusha();
 		s.setJichitaiCd(jichitaiCd);
