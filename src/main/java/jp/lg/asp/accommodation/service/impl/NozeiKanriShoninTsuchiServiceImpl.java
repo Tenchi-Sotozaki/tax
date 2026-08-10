@@ -69,13 +69,11 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
         dto.setShisetsuName(tokugimu.getShisetsuName());
 
         // 納税管理人情報を取得
-		nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-				.ifPresent(nokan -> {
-					dto.setNozeiKanriJusho(buildAddress(nokan.getYubinNo(), nokan.getJusho()));
-					dto.setNozeiKanriName(nokan.getName());
-					dto.setKbn(nokan.getKbn());
-					dto.setRiyu(nokan.getRiyu());
-				});
+        nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .ifPresent(nokan -> {
+                    dto.setNozeiKanriJusho(buildAddress(nokan.getYubinNo(), nokan.getJusho()));
+                    dto.setNozeiKanriName(nokan.getName());
+                });
 
         log.debug("納税管理人承認通知書情報取得完了: {}", dto);
         return dto;

@@ -19,12 +19,6 @@ public class NozeiKanriShoninTsuchiReportsDto {
 
     /** 特別徴収義務者住所 */
     private String tokuJusho;
-    
-    /** 郵便番号 */
-    private String Yubin;
-    
-    /** 住所 */
-    private String Jusho;
 
     /** 特別徴収義務者名 */
     private String tokuName;
@@ -40,9 +34,6 @@ public class NozeiKanriShoninTsuchiReportsDto {
 
     /** 納税管理人名 */
     private String nozeiKanriName;
-    
-    /** 承認・不承認 */
-    private String shonin;
 
     /** 理由 */
     private String riyu;

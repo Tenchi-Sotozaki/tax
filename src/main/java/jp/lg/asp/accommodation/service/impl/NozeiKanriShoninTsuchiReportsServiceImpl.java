@@ -10,10 +10,8 @@ import java.util.Map;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiReportsDto;
-import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +32,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoninTsuchiReportsService {
 
 	private static final String JRXML_PATH = "reports/nozeiKanrininShoninTsuchi.jrxml";
-	private final NokanRepository nokanRepository;
-	private final JichitaiContext jichitaiContext;
-	
+
 	@Override
 	public byte[] generateTsuchiPdf(NozeiKanriShoninTsuchiDto dto) {
 		try {
@@ -44,7 +40,6 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
 
 			Map<String, Object> parameters = new HashMap<>();
-			
 			// フォント設定を明示的に追加
 			parameters.put("net.sf.jasperreports.default.font.name", "IPAex明朝");
 			parameters.put("net.sf.jasperreports.default.pdf.font.name", "IPAex明朝");
@@ -71,39 +66,13 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
+		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
 		reportsDto.setNozeiKanriJusho(dto.getNozeiKanriJusho() != null ? dto.getNozeiKanriJusho() : "");
 		reportsDto.setNozeiKanriName(dto.getNozeiKanriName() != null ? dto.getNozeiKanriName() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
-		reportsDto.setShonin(dto.getKbn() != null ? dto.getKbn() : "");
-		
-		// 郵便番号と住所の間に改行を入れる
-		String tokujusho = dto.getTokuJusho();
-		if (tokujusho != null) {
-			// 最初に見つかったスペースを改行に
-		    String formattedJusho = tokujusho.replaceFirst(" ", "\n");
-		    reportsDto.setTokuJusho(formattedJusho);
-		    
-			// 最初に見つかった空白（半角・全角）を境界にして、最大2つの配列に分割する
-			String[] parts = formattedJusho.split("\n", 2);
-
-			if (parts.length > 0) {
-				reportsDto.setYubin(parts[0]); // 郵便番号
-			} else {
-				reportsDto.setYubin("");
-			}
-
-			if (parts.length > 1) {
-				reportsDto.setJusho(parts[1]); // 住所
-			} else {
-				reportsDto.setJusho("");
-			}
-		    
-		} else {
-		    reportsDto.setTokuJusho("");
-		}
 
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
@@ -112,7 +81,7 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		} else {
 			reportsDto.setHakkoYmd("");
 		}
-		
+
 		List<NozeiKanriShoninTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		JRDataSource params = new JRBeanCollectionDataSource(dataSourceList);
 
