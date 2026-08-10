@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
-import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
@@ -55,29 +54,27 @@ public class KofukinBulkPrintController {
 
 	@PostMapping("/kofukinBulkPrint/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
-	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "")
 	public ResponseEntity<byte[]> pdf(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, "kofukin_bulk.pdf", false, true);
+		return generateResponse(form, "kofukin_bulk.pdf", false, true, ReportsConstants.SOUSA_PDF);
 	}
 
 	@PostMapping("/kofukinBulkPrint/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
-	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "")
 	public ResponseEntity<byte[]> preview(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, "kofukin_bulk_preview.pdf", false, false);
+		return generateResponse(form, "kofukin_bulk_preview.pdf", false, false, ReportsConstants.SOUSA_PREVIEW);
 	}
 
 	@PostMapping("/kofukinBulkPrint/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
-	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "")
 	public ResponseEntity<byte[]> print(@ModelAttribute("form") KofukinBulkPrintForm form, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		return generateResponse(form, "kofukin_bulk_print.pdf", true, false);
+		return generateResponse(form, "kofukin_bulk_print.pdf", true, false, ReportsConstants.SOUSA_PRINT);
 	}
 
-	private ResponseEntity<byte[]> generateResponse(KofukinBulkPrintForm form, String filename, boolean printAction, boolean download) {
+	private ResponseEntity<byte[]> generateResponse(KofukinBulkPrintForm form, String filename, boolean printAction,
+			boolean download, String operation) {
 		try {
 			if (!form.isKofuShinsei() && !form.isKofuKetteiTsuchi()) {
 				return ResponseEntity.badRequest().build();
@@ -93,6 +90,7 @@ public class KofukinBulkPrintController {
 				dto.setHakkoYmd(formattedDate);
 				dto.setShinsei(form.isKofuShinsei());
 				dto.setKetteiTsuchi(form.isKofuKetteiTsuchi());
+				dto.setOperation(operation);
 			}
 
 			byte[] pdfData = kofuKetteiTsuchiShinseiReportsService.generateBulkPdf(dtoList);
@@ -106,7 +104,9 @@ public class KofukinBulkPrintController {
 			}
 			return ResponseEntity.ok().headers(headers).body(pdfData);
 
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			log.error("帳票一括発行エラー", e);
 			return ResponseEntity.internalServerError().build();
 		}
