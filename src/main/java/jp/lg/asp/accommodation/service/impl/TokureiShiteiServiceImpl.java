@@ -8,8 +8,10 @@ import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.Nokan;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.TokureiShiteiService;
@@ -26,6 +28,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 
 	private final TokugimuRepository tokugimuRepository;
 	private final AtenaRepository atenaRepository;
+	private final NokanRepository nokanRepository;
 	private final ReportsCommonService reportsCommonService;
 
 	private final JichitaiContext jichitaiContext;
@@ -67,11 +70,23 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 		}
 
 		Atena atena = atenaOpt.get();
+		
+		// 納税管理人情報を取得
+		Optional<Nokan> nokanOpt = nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiCode, shiteiNo);
+
+		// 納税管理人情報が見つからない
+		if (nokanOpt.isEmpty()) {
+			return null;
+		}
+
+		// 納税管理人の実データを取得
+		Nokan nokan = nokanOpt.get();
 
 		TokureiShiteiDto dto = new TokureiShiteiDto();
 		dto.setShiteiNo(tokugimu.getShiteiNo());
 		dto.setTokuName(atena.getName());
-
+		dto.setShonin(nokan.getKbn());
+		
 		String tokuJusho = "";
 		if (atena.getYubinNo() != null && !atena.getYubinNo().isEmpty()) {
 			tokuJusho = "〒" + atena.getYubinNo() + "\r\n";
@@ -91,6 +106,13 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 			shisetsuJusho += tokugimu.getShisetsuJusho();
 		}
 		dto.setShisetsuJusho(shisetsuJusho);
+		
+		// 備考を設定
+		String biko = "";
+		if(tokugimu.getBiko() != null && !tokugimu.getBiko().isEmpty()) {
+			biko = tokugimu.getBiko();
+		}
+		dto.setBiko(biko);
 
 		dto.setCity(cityName);
 		dto.setJorei(jorei);

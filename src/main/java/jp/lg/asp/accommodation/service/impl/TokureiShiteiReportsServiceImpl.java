@@ -75,6 +75,7 @@ public class TokureiShiteiReportsServiceImpl implements TokureiShiteiReportsServ
 		reportsDto.setShitei_no(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
 		reportsDto.setBiko("");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
+		reportsDto.setShonin(dto.getShonin() != null ? dto.getShonin() : null);
 
 		List<TokureiShiteiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		return new JRBeanCollectionDataSource(dataSourceList, false);
