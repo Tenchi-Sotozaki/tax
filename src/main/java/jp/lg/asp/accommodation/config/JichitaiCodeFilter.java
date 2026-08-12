@@ -14,7 +14,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JichitaiCodeFilter extends OncePerRequestFilter {
@@ -33,11 +35,15 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
 
         if (param != null && !param.isBlank()) {
             String jichitaiCd = toJichitaiCd(param);
-            request.getSession().setAttribute(SESSION_KEY, jichitaiCd);
-            Cookie cookie = new Cookie(COOKIE_NAME, jichitaiCd);
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            response.addCookie(cookie);
+            if (jichitaiCd != null) {
+                request.getSession().setAttribute(SESSION_KEY, jichitaiCd);
+                Cookie cookie = new Cookie(COOKIE_NAME, jichitaiCd);
+                cookie.setPath("/");
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+            } else {
+                log.warn("該当する自治体が存在しません: param={}", param);
+            }
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
@@ -47,16 +53,14 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
 
     /**
      * クエリパラメータ文字列を自治体コードに変換する。
-     * 一致する自治体が m_jichitai に存在しない場合は、自治体コードが直接指定されたものとみなし、
-     * 受け取った値をそのまま返す（移行期の互換のため）。
      *
-     * @param param クエリパラメータで受け取った文字列
-     * @return 自治体コード
+     * @param param クエリパラメータで受け取った文字列（m_jichitai.param）
+     * @return 自治体コード。該当する自治体が存在しない場合は null
      */
     private String toJichitaiCd(String param) {
         return jichitaiRepository.findFirstByParam(param)
                 .map(Jichitai::getJichitaiCd)
                 .map(String::strip)
-                .orElse(param);
+                .orElse(null);
     }
 }
