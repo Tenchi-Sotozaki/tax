@@ -9,9 +9,19 @@ public interface TopPageService {
 
     /** トップページ表示用コンテンツ取得 */
 	List<TopPageContent> findShared();
+	
+	/** 一覧取得 */
+	List<TopPageContent> findAll();
 
     /** 編集フォーム初期値取得 */
-    TopPageConfigForm loadForm(String kbn, String jichitaiCd);
-
+    TopPageConfigForm loadForm();
+    
+    /** 編集対象取得 */
+    TopPageContent findBySeq(Integer seq);
+	
+    /** 保存 */
     void save(TopPageConfigForm form);
+    
+    /** 削除 */
+    void delete(Integer seq);
 }

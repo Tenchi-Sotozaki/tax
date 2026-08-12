@@ -15,8 +15,8 @@
 				
 		<!-- 全自治体共有エリア -->	
 		<div th:each="content : ${sharedList}">
-			<div th:utext="${content.title}"></div>
-			<div th:utext="${content.htmlContent}"></div>
+		    <div th:utext="${content.titleHtml}"></div>
+		    <div th:utext="${content.contentHtml}"></div>
 		</div>
 	</div>
 </body>
