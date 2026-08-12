@@ -84,8 +84,8 @@ class kofuKetteiTsuchiShinseiServiceImplTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getTokuName()).isEqualTo("テスト太郎");
-        assertThat(result.getNonyugaku()).isEqualTo("500000");
-        assertThat(result.getKofugaku()).isEqualTo("100000");
+        assertThat(result.getNonyugaku()).isEqualTo("500,000");
+        assertThat(result.getKofugaku()).isEqualTo("100,000");
     }
 
     @Test
