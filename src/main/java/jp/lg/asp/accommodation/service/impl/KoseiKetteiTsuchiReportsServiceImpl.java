@@ -276,14 +276,53 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
     private void setNofuAndKasan(
             KoseiKetteiTsuchiReportsDto dto, String shiteiNo, Fuka firstFuka, String[] ymArr) {
 
-        long totalZeigaku = Arrays.stream(ymArr)
-                .filter(ym -> ym != null && !ym.isEmpty())
-                .map(ym -> findFukaByTaishoYm(shiteiNo, ym))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .mapToLong(f -> f.getTotalZeigaku() != null ? f.getTotalZeigaku() : 0L)
-                .sum();
-        dto.setNofu_zeigaku(String.valueOf(totalZeigaku));
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
+        long totalSashihikiSum = 0L;
+
+        // b1, b2, b3 各月の差引増減額を合算して納入税額とする
+        for (String taishoYm : ymArr) {
+            if (taishoYm == null || taishoYm.isEmpty()) {
+                continue;
+            }
+
+            Optional<Fuka> fukaOpt = findFukaByTaishoYm(shiteiNo, taishoYm);
+            if (fukaOpt.isEmpty()) {
+                continue;
+            }
+
+            Fuka fuka = fukaOpt.get();
+            Integer rno = fukaRepository.findMaxRno(
+                    jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu()).orElse(1);
+
+            List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+                    jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
+
+            boolean isKosei = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
+            List<FukaUchi> prevUchiList = (isKosei && rno > 1)
+                    ? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+                            jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
+                    : Collections.emptyList();
+
+            // 月の差引増減額を計算
+            long blockSashihikiSum = 0L;
+            for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
+                final int k = kbn;
+                long zeigaku = uchiList.stream()
+                        .filter(u -> k == u.getKazeiKbn())
+                        .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L)
+                        .findFirst().orElse(0L);
+
+                long prevZeigaku = prevUchiList.stream()
+                        .filter(u -> k == u.getKazeiKbn())
+                        .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L)
+                        .findFirst().orElse(0L);
+
+                blockSashihikiSum += (zeigaku - prevZeigaku);
+            }
+            totalSashihikiSum += blockSashihikiSum;
+        }
+
+        dto.setNofu_zeigaku(String.valueOf(totalSashihikiSum));
 
         dto.setKasan_ritsu1(firstFuka.getKasanRitsu1() != null ? firstFuka.getKasanRitsu1().toPlainString() : "");
         dto.setKasan_gaku1(firstFuka.getKasanGaku1()  != null ? String.valueOf(firstFuka.getKasanGaku1())  : "");
@@ -336,21 +375,21 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                 ? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
                         jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
                 : Collections.emptyList();
-        long prevFukaZeigaku = prevUchiList.stream()
-                .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L).sum();
-
+        
         // kazei_kbn=1〜5 の内訳をDTOにセット
         for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
             final int k = kbn;
             Optional<FukaUchi> uchiOpt = uchiList.stream().filter(u -> k == u.getKazeiKbn()).findFirst();
 
             long sogaku = 0L, ryokin = 0L, zeigaku = 0L, hakusu = 0L;
+            boolean hasData = false;
             if (uchiOpt.isPresent()) {
                 FukaUchi u = uchiOpt.get();
                 sogaku  = u.getRyokinSogaku() != null ? u.getRyokinSogaku() : 0L;
                 ryokin  = u.getRyokin()       != null ? u.getRyokin()       : 0L;
                 zeigaku = u.getZeigaku()      != null ? u.getZeigaku()      : 0L;
                 hakusu  = u.getHakusu()       != null ? u.getHakusu()       : 0L;
+                hasData = true;
             }
 
             long prevZeigaku = prevUchiList.stream().filter(u -> k == u.getKazeiKbn())
@@ -362,31 +401,60 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                 setField(dto, "ryokin"        + kbn, String.valueOf(ryokin));
                 setField(dto, "b1_zeigaku"    + kbn, String.valueOf(zeigaku));
                 setField(dto, "b1_sashihiki"  + kbn, String.valueOf(sashihiki));
-                setField(dto, "hakusu"        + kbn, String.valueOf(hakusu));
-                // 定額の場合: 区分税額（1人あたり固定額 = zeigaku ÷ hakusu）をセット
+                setField(dto, "hakusu"        + kbn, hasData ? String.valueOf(hakusu) : "");
+                
+                // 定額の場合、区分税額をセット（nenが空白の場合は空白）
                 if (FukaConstants.TEIGAKU.getValue().equals(fuka.getFukaKbn())) {
-                    long kbnZeiGaku = hakusu > 0 ? zeigaku / hakusu : 0L;
-                    setField(dto, "kbn_zei_gaku" + kbn, String.valueOf(kbnZeiGaku));
+                    String nen = taishoYm.length() == 6 ? taishoYm.substring(0, 4) : "";
+                    String kbnZeiGakuField = blockNo == 1 ? "kbn_zei_gaku" + kbn : prefix + "kbn_zei_gaku" + kbn;
+                    if (nen.isEmpty()) {
+                        setField(dto, kbnZeiGakuField, "");
+                    } else {
+                        long kbnZeiGaku = (hasData && hakusu > 0) ? zeigaku / hakusu : 0L;
+                        setField(dto, kbnZeiGakuField, String.valueOf(kbnZeiGaku));
+                    }
                 }
             } else {
                 setField(dto, prefix + "sogaku"    + kbn, String.valueOf(sogaku));
                 setField(dto, prefix + "ryokin"    + kbn, String.valueOf(ryokin));
                 setField(dto, prefix + "zeigaku"   + kbn, String.valueOf(zeigaku));
                 setField(dto, prefix + "sashihiki" + kbn, String.valueOf(sashihiki));
-                setField(dto, prefix + "hakusu"    + kbn, String.valueOf(hakusu));
+                
+                // b2, b3の宿泊者数はデータがある場合は出力、なければ空白
+                setField(dto, prefix + "hakusu"     + kbn, hasData ? String.valueOf(hakusu) : "");
             }
         }
 
         setField(dto, prefix + "sogaku_sum",   fuka.getSogaku()      != null ? String.valueOf(fuka.getSogaku())       : "");
         setField(dto, prefix + "ryokin_sum",   fuka.getKazeiRyokin() != null ? String.valueOf(fuka.getKazeiRyokin())  : "");
-        setField(dto, prefix + "zeigaku_sum",  fuka.getZeigaku()     != null ? String.valueOf(fuka.getZeigaku())      : "");
-        setField(dto, prefix + "sashihiki_sum",
-                String.valueOf((fuka.getZeigaku() != null ? fuka.getZeigaku() : 0L) - prevFukaZeigaku));
-
-        // 宿泊者数合計
-        long hakusuSum = uchiList.stream()
-                .mapToLong(u -> u.getHakusu() != null ? u.getHakusu() : 0L).sum();
-        setField(dto, blockNo == 1 ? "b1_hakusu_sum" : prefix + "hakusu_sum", String.valueOf(hakusuSum));
+        
+        // 合計値
+        long hakusuSum = 0L; // 泊数
+        long zeigakuSum = 0L; // 税額
+        long sashihikiSum = 0L; // 差引増減額
+        
+        // 合計値の計算
+        for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
+            final int k = kbn;
+            Optional<FukaUchi> u = uchiList.stream().filter(x -> k == x.getKazeiKbn()).findFirst();
+            if (u.isPresent()) {
+                hakusuSum  += u.get().getHakusu()  != null ? u.get().getHakusu()  : 0L;
+                zeigakuSum += u.get().getZeigaku() != null ? u.get().getZeigaku() : 0L;
+            }
+            
+			// 各区分のsashihikiを算出・合算する
+			long zeigaku = u.map(x -> x.getZeigaku() != null ? x.getZeigaku() : 0L).orElse(0L);
+			long prevZeigaku = prevUchiList.stream()
+					.filter(x -> k == x.getKazeiKbn())
+					.mapToLong(x -> x.getZeigaku() != null ? x.getZeigaku() : 0L)
+					.findFirst().orElse(0L);
+			sashihikiSum += (zeigaku - prevZeigaku);
+        }
+     
+        // 合計値を設定
+        setField(dto, blockNo == 1 ? "b1_hakusu_sum"  : prefix + "hakusu_sum",  String.valueOf(hakusuSum)); // 泊数
+        setField(dto, blockNo == 1 ? "b1_zeigaku_sum" : prefix + "zeigaku_sum", String.valueOf(zeigakuSum)); // 税額
+        setField(dto, blockNo == 1 ? "b1_sashihiki_sum" : prefix + "sashihiki_sum", String.valueOf(sashihikiSum)); // 差引増減額
 
         // 定率の場合: 税率（zei_ritsu1〜5）をb1のみセット
         if (blockNo == 1 && FukaConstants.TEIRITSU.getValue().equals(fuka.getFukaKbn())) {
@@ -434,17 +502,22 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                 setField(dto, "ryokin"       + i, "");
                 setField(dto, "b1_zeigaku"   + i, "");
                 setField(dto, "b1_sashihiki" + i, "");
+                setField(dto, "hakusu"        + i, "");
+                setField(dto, "kbn_zei_gaku"  + i, "");
             } else {
                 setField(dto, prefix + "sogaku"    + i, "");
                 setField(dto, prefix + "ryokin"    + i, "");
                 setField(dto, prefix + "zeigaku"   + i, "");
                 setField(dto, prefix + "sashihiki" + i, "");
+                setField(dto, prefix + "hakusu"     + i, "");
+                setField(dto, prefix + "kbn_zei_gaku" + i, "");
             }
         }
         setField(dto, prefix + "sogaku_sum",    "");
         setField(dto, prefix + "ryokin_sum",    "");
         setField(dto, prefix + "zeigaku_sum",   "");
         setField(dto, prefix + "sashihiki_sum", "");
+        setField(dto, blockNo == 1 ? "b1_hakusu_sum" : prefix + "hakusu_sum", "");
     }
 
     /**

@@ -38,6 +38,20 @@ public class KoseiKetteiTsuchiReportsDto {
     private String kbn_zei_gaku4;
     private String kbn_zei_gaku5;
 
+    // b2用区分税額
+    private String b2_kbn_zei_gaku1;
+    private String b2_kbn_zei_gaku2;
+    private String b2_kbn_zei_gaku3;
+    private String b2_kbn_zei_gaku4;
+    private String b2_kbn_zei_gaku5;
+
+    // b3用区分税額
+    private String b3_kbn_zei_gaku1;
+    private String b3_kbn_zei_gaku2;
+    private String b3_kbn_zei_gaku3;
+    private String b3_kbn_zei_gaku4;
+    private String b3_kbn_zei_gaku5;
+
     // ── 期別1（b1）───────────────────────────────────
     private String b1_nen;
     private String b1_tsuki;
