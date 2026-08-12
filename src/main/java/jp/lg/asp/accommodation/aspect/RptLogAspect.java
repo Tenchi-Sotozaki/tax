@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.aspect;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,7 +17,9 @@ import org.springframework.stereotype.Component;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.ReportsLog;
+import jp.lg.asp.accommodation.entity.RptStatus;
 import jp.lg.asp.accommodation.repository.ReportsLogRepository;
+import jp.lg.asp.accommodation.repository.RptStatusRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RptLogAspect {
 
 	private final ReportsLogRepository reportsLogRepository;
+	private final RptStatusRepository rptStatusRepository;
 	private final JichitaiContext jichitaiContext;
 
 	/**
@@ -50,16 +54,31 @@ public class RptLogAspect {
 	private void saveLog(RptLog rptLog, ProceedingJoinPoint joinPoint) {
 		try {
 			String jichitaiCd = jichitaiContext.getJichitaiCd();
+			String shiteiNo = resolveShiteiNo(rptLog, joinPoint);
+
+			// 帳票ログ
 			ReportsLog entity = new ReportsLog();
 			entity.setJichitaiCd(jichitaiCd);
 			entity.setSeq(reportsLogRepository.findNextSeq(jichitaiCd));
 			entity.setRptId(rptLog.rptId());
 			entity.setSousa(rptLog.operation());
-			entity.setShiteiNo(resolveShiteiNo(rptLog, joinPoint));
+			entity.setShiteiNo(shiteiNo);
 			entity.setOpeUser(getCurrentUserId());
 			entity.setOpeDt(LocalDateTime.now());
 
 			reportsLogRepository.save(entity);
+
+			// 状況ステータス
+			Optional<RptStatus> rptStsOp = rptStatusRepository
+					.findByJichitaiCdAndShiteiNoAndRptId(jichitaiCd, shiteiNo, rptLog.rptId());
+			RptStatus rptStsEntity = rptStsOp.orElse(new RptStatus());
+			rptStsEntity.setJichitaiCd(jichitaiCd);
+			rptStsEntity.setShiteiNo(shiteiNo);
+			rptStsEntity.setRptId(rptLog.rptId());
+			rptStsEntity.setCreateDt(LocalDateTime.now());
+
+			rptStatusRepository.save(rptStsEntity);
+
 		} catch (Exception e) {
 			log.warn("帳票ログの保存に失敗しました", e);
 		}

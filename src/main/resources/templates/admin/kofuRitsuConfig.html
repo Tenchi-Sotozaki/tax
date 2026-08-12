@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>交付率登録</title>
+<title
+	th:text="${'交付率' + (mode == 'view' ? '照会' : mode == 'edit' ? '編集' : '登録')}">交付率登録</title>
 </head>
 
 <body>
@@ -12,62 +14,129 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-cash-coin me-2 text-primary"></i>交付率登録
+				<i class="bi bi-cash-coin me-2 text-primary"></i> <span
+					th:text="${'交付率' + (mode == 'view' ? '照会' : mode == 'edit' ? '編集' : '登録')}">交付率登録</span>
 			</h5>
+			<a th:if="${mode == 'view'}"
+				th:href="@{/admin/kofu-ritsu/edit/{rno}(rno=${rno})}"
+				class="btn btn-primary"> <i class="bi bi-pencil me-1"></i>編集する
+			</a>
 		</div>
-		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+
+		<div
+			th:if="${validationErrors != null and !validationErrors.isEmpty()}"
 			class="alert alert-danger alert-dismissible fade show" role="alert">
 			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
 				th:text="${validationErrors.size()}"></span> 件のエラーがあります。
 			<ul class="mb-0 mt-1">
-				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+				<li th:each="err : ${validationErrors}" th:text="${err}"
+					class="small"></li>
 			</ul>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<!-- 入力フォーム -->
 		<div class="card shadow-sm mb-4">
 			<div class="card-body">
-				<form th:action="@{/admin/kofu-ritsu/save}" method="post" th:object="${configForm}" novalidate>
+				<form id="configForm"
+					th:action="${mode == 'edit'} ? @{/admin/kofu-ritsu/edit/{rno}(rno=${rno})} : @{/admin/kofu-ritsu/save}"
+					method="post" th:object="${configForm}" th:data-mode="${mode}" novalidate>
 					<div class="row g-3">
 						<div class="col-md-4">
-							<label for="kofuRitsu" class="form-label">交付率（%） <span class="text-danger">*</span></label>
-							<input type="number" id="kofuRitsu" th:field="*{kofuRitsu}" step="0.01" min="0" max="999.99"
+							<label for="tekiyoStNendo" class="form-label">適用開始年度 <span
+								th:if="${mode == 'register'}" class="text-danger">*</span></label>
+							<input type="number" id="tekiyoStNendo" th:field="*{tekiyoStNendo}"
+								min="2000" max="2100"
+								th:readonly="${mode == 'view' or mode == 'edit'}"
+								th:classappend="${#fields.hasErrors('tekiyoStNendo')} ? 'is-invalid' : ''"
+								class="form-control">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('tekiyoStNendo')}"
+								th:errors="*{tekiyoStNendo}"></div>
+						</div>
+						<div class="col-md-4">
+							<label for="kofuRitsu" class="form-label">交付率（%） <span
+								th:if="${mode != 'view'}" class="text-danger">*</span></label>
+							<input type="number" id="kofuRitsu" th:field="*{kofuRitsu}"
+								step="0.01" min="0" max="999.99"
+								th:readonly="${mode == 'view'}"
+								th:data-initial-value="*{kofuRitsu}"
 								th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
 								class="form-control">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('kofuRitsu')}"
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('kofuRitsu')}"
 								th:errors="*{kofuRitsu}"></div>
 						</div>
 						<div class="col-md-4">
-							<label for="tekiyoStYmd" class="form-label">適用期間（FROM） <span
-									class="text-danger">*</span></label>
-							<input type="date" id="tekiyoStYmd" th:field="*{tekiyoStYmd}"
-								th:classappend="${#fields.hasErrors('tekiyoStYmd')} ? 'is-invalid' : ''"
+							<label for="sanshutsu" class="form-label">算出単位 <span
+								th:if="${mode != 'view'}" class="text-danger">*</span></label>
+							<input type="number" id="sanshutsu" th:field="*{sanshutsu}"
+								min="0" th:readonly="${mode == 'view'}"
+								th:data-initial-value="*{sanshutsu}"
+								th:classappend="${#fields.hasErrors('sanshutsu')} ? 'is-invalid' : ''"
 								class="form-control">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('tekiyoStYmd')}"
-								th:errors="*{tekiyoStYmd}"></div>
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('sanshutsu')}"
+								th:errors="*{sanshutsu}"></div>
 						</div>
 						<div class="col-md-4">
-							<label for="tekiyoEdYmd" class="form-label">適用期間（TO）</label>
-							<input type="date" class="form-control" id="tekiyoEdYmd" th:field="*{tekiyoEdYmd}">
+							<label for="kbn" class="form-label">区分 <span
+								th:if="${mode != 'view'}" class="text-danger">*</span></label>
+							<select id="kbn" th:field="*{kbn}" class="form-select"
+								th:disabled="${mode == 'view'}"
+								th:data-initial-value="*{kbn}"
+								th:classappend="${#fields.hasErrors('kbn')} ? 'is-invalid' : ''">
+								<option value="">選択してください</option>
+								<option value="1">切り捨て</option>
+								<option value="2">切り上げ</option>
+							</select>
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('kbn')}"
+								th:errors="*{kbn}"></div>
 						</div>
-					</div>
-
-					<div class="d-flex justify-content-end mt-3">
-						<button type="submit" class="btn btn-success">
-							<i class="bi bi-check-circle me-1"></i>登録する
-						</button>
+						<div class="col-md-4">
+							<label for="saiteigaku" class="form-label">最低額 <span
+								th:if="${mode != 'view'}" class="text-danger">*</span></label>
+							<input type="number" id="saiteigaku" th:field="*{saiteigaku}"
+								step="0.01" min="0" th:readonly="${mode == 'view'}"
+								th:data-initial-value="*{saiteigaku}"
+								th:classappend="${#fields.hasErrors('saiteigaku')} ? 'is-invalid' : ''"
+								class="form-control">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('saiteigaku')}"
+								th:errors="*{saiteigaku}"></div>
+						</div>
 					</div>
 				</form>
 			</div>
 		</div>
 
+		<div class="d-flex justify-content-center gap-2">
+			<a th:if="${mode == 'view'}" th:href="@{/admin/kofu-ritsu/list}" class="btn btn-secondary">
+				<i class="bi bi-arrow-left me-1"></i>一覧に戻る
+			</a>
+			<button th:if="${mode != 'view'}" type="button" class="btn btn-secondary"
+				data-bs-toggle="modal" data-bs-target="#discardModal">
+				<i class="bi bi-arrow-left me-1"></i>一覧に戻る
+			</button>
+			<button th:if="${mode != 'view'}" type="submit" form="configForm"
+				class="btn btn-success">
+				<i class="bi bi-check-circle me-1"></i> <span
+					th:text="${mode == 'edit'} ? '更新する' : '登録する'">登録する</span>
+			</button>
+		</div>
+
+			<div th:replace="~{layout/components :: linkConfirmModal('discardModal', '確認', '入力内容は破棄されます。よろしいですか？', @{/admin/kofu-ritsu/list}, '一覧に戻る')}"></div>
+
 	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/kofuRitsuConfig.js}"></script>
+	</th:block>
 </body>
 
 </html>

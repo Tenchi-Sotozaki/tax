@@ -30,8 +30,11 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
             cookie.setPath("/");
             cookie.setHttpOnly(true);
             response.addCookie(cookie);
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
+            
+			if (request.getUserPrincipal() == null) {
+				response.sendRedirect(request.getContextPath() + "/login");
+				return;
+			}
         }
 
         filterChain.doFilter(request, response);

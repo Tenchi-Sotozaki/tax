@@ -43,4 +43,7 @@ public class GassanNonyuTsuchiDto {
 	
 	/** 公印 */
 	private byte[] koin;
+
+	/** 納入期限 */
+	private String nonyuKigen;
 }
