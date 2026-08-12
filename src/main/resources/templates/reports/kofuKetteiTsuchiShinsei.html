@@ -24,48 +24,37 @@
 						<!-- 特別徴収義務者エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 						
-						<!-- エラーメッセージ -->
-						<div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert" id="errorAlert" style="display: none;">
-						    <i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="errorMessageText"></span>
-						    <button type="button" class="btn-close btn-sm" onclick="hideErrorMessage()"></button>
-						</div>
+						<!-- 帳票発行エラー表示エリア -->
+						<div th:replace="~{layout/components :: reportErrorAlert}"></div>
 						
-						<!-- 年度・発行年月日入力エリア -->
-						<div class="card mb-2">
+						<!-- 内容エリア -->
+						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">年度・発行年月日入力
-								</h5>
+								<h5 class="mb-0">内容</h5>
 							</div>
 							<div class="card-body">
-								<!-- 年度入力 -->
+								<!-- 年度・発行年月日入力 -->
 								<div class="row g-3">
 									<div class="col-md-1">
 										<label class="form-label">年度</label> <span class="text-danger">*</span>
 										<input type="text" class="form-control" th:field="*{nendo}" id="nendoInput" placeholder="年度を入力">
 									</div>
-									
+
 									<div class="col-md-2">
 										<label class="form-label">発行年月日</label> <span class="text-danger">*</span>
 										<input type="date" class="form-control" th:field="*{hakkoYmd}" id="hakkoYmdInput" onchange="updateDisplayDate()">
 									</div>
 								</div>
-							</div>
-						</div>
-						
-						<!-- 印刷対象選択エリア -->
-						<div class="card mb-4">
-							<div class="card-header">
-								<h5 class="mb-0">印刷対象</h5>
-							</div>
-							<!-- 印刷対象選択欄 -->
-							<div class="card-body">
+
+								<!-- 印刷対象 -->
+								<label class="form-label fw-bold mt-3">印刷対象</label>
 								<div class="form-check mb-2">
-								    <input type="checkbox" class="form-check-input" th:field="*{ketteiTsuchi}">
-								    <label class="form-check-label" th:for="${#ids.prev('ketteiTsuchi')}">決定通知書</label>
+									<input type="checkbox" class="form-check-input" th:field="*{ketteiTsuchi}">
+									<label class="form-check-label" th:for="${#ids.prev('ketteiTsuchi')}">決定通知書</label>
 								</div>
 								<div class="form-check">
-								    <input type="checkbox" class="form-check-input" th:field="*{shinsei}">
-								    <label class="form-check-label" th:for="${#ids.prev('shinsei')}">交付申請書</label>
+									<input type="checkbox" class="form-check-input" th:field="*{shinsei}">
+									<label class="form-check-label" th:for="${#ids.prev('shinsei')}">交付申請書</label>
 								</div>
 							</div>
 						</div>
@@ -83,7 +72,10 @@
 						<input type="hidden" th:field="*{koin}">
 
 						<!-- アクションボタン -->
-						<div class="d-flex gap-2">
+						<div class="d-flex justify-content-center gap-2">
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
 							<button type="button" class="btn btn-primary" onclick="generatePdf()">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
 							</button>
@@ -102,6 +94,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/kofuKetteiTsuchiShinsei.js}"></script>
+		<script th:src="@{/js/reportForm.js}"></script>
 	</th:block>
 </body>
 
