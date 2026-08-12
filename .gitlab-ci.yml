@@ -11,6 +11,8 @@ build_job:
   script:
     - chmod +x ./gradlew
     - ./gradlew clean build -x test -Dorg.gradle.java.home=$JAVA_HOME
+  except:
+    - master
 
 test_job:
   stage: test
@@ -42,10 +44,14 @@ spotbugs_job:
 deploy_local_job:
   stage: deploy
   script:
-    # 1. 生成されたjarファイルを配置フォルダへコピー（名前を app.jar に統一）
+    # 1. master ブランチのデプロイ時に、このジョブ内でビルドを行う
+    - chmod +x ./gradlew
+    - ./gradlew clean build -x test -Dorg.gradle.java.home=$JAVA_HOME
+
+    # 2. 生成されたjarファイルを配置フォルダへコピー（名前を app.jar に統一）
     - cp build/libs/*.jar /opt/acomo/app.jar
 
-    # 2. サービスを再起動（古いプロセスが自動で停止し、新しいjarで立ち上がります）
+    # 3. サービスを再起動（古いプロセスが自動で停止し、新しいjarで立ち上がります）
     - sudo systemctl restart acomo
   only:
     - master
