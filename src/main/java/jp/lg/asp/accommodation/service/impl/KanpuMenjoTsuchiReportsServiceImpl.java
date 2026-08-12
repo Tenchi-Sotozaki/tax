@@ -1,10 +1,13 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
+import java.text.NumberFormat;
+import java.time.chrono.JapaneseDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -67,8 +70,8 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
         reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
         reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
         reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
-        reportsDto.setZeigaku(dto.getZeigaku() != null ? dto.getZeigaku() : "");
-        reportsDto.setKanpuMenjoGaku(dto.getKanpuMenjoGaku() != null ? dto.getKanpuMenjoGaku() : "");
+        reportsDto.setZeigaku(formatMoney(dto.getZeigaku()));
+        reportsDto.setKanpuMenjoGaku(formatMoney(dto.getKanpuMenjoGaku()));
         reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
         reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
         reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
@@ -83,7 +86,13 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
 
         // 発行日
         if (dto.getHakkoYmd() != null) {
-            String strDate = dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
+        	// 和暦形式に変換
+        	JapaneseDate japaneseDate = JapaneseDate.from(dto.getHakkoYmd());
+        	
+        	// フォーマット定義
+        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE);
+        	String strDate = japaneseDate.format(formatter);
+        	
             reportsDto.setHakkoYmd(strDate);
         } else {
             reportsDto.setHakkoYmd("");
@@ -130,6 +139,31 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
         } catch (NumberFormatException e) {
             log.warn("申請年月の変換に失敗しました: {}", shinseiYm, e);
             return shinseiYm;
+        }
+    }
+    
+    /**
+     * 金額をカンマ区切り形式に変換
+     * @param money：金額
+     * @return 変換結果
+     */
+    private String formatMoney(String money) {
+    	
+    	// 金額なし
+        if (money == null || money.isEmpty()) {
+            return "";
+        }
+        
+        try {
+        	// カンマ区切り形式のインスタンスを取得
+        	NumberFormat nf = NumberFormat.getNumberInstance(Locale.JAPAN);
+        	
+            // 文字列を数値lpng型に変換してカンマ付き文字列に変換
+            long amount = Long.parseLong(money);
+            return nf.format(amount);
+        } catch (NumberFormatException e) {
+            // 数値変換できない場合はそのまま返す
+            return money;
         }
     }
 }
