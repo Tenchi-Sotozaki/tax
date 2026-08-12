@@ -212,19 +212,21 @@ public class TokugimuController {
 
 	/**
 	 * 合算申告納入承認通知書へ遷移する。
-	 * セッションが合算指定番号を保持していない場合は遷移せず、
+	 * 選択中の指定番号が合算対象でない場合は遷移せず、
 	 * 帳票発行画面にエラーメッセージを表示する。
 	 */
 	@GetMapping("/report/gassan")
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
 	public String showGassanReport(HttpSession session, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isBlank()) {
-			model.addAttribute("errorMessage", "合算対象外の特別徴収義務者です。");
-			return buildReportView(session, model);
+		String id = getShiteiNoFromSession(session);
+		if (id != null && tokugimuService.isGassanTarget(id)) {
+			return "redirect:/reports/gassanNonyuTsuchi";
 		}
-		return "redirect:/reports/gassanNonyuTsuchi";
+		if (id != null) {
+			model.addAttribute("errorMessage", "合算対象外の特別徴収義務者です。");
+		}
+		return buildReportView(session, model);
 	}
 
 	/**
