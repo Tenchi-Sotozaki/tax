@@ -47,7 +47,7 @@ deploy_local_job:
     # 1. master ブランチのデプロイ時に、このジョブ内でビルドを行う
     - ./gradlew clean build -x test -Dorg.gradle.java.home=$JAVA_HOME
 
-	# 2. 生成されたjarファイルを配置フォルダへコピー（名前を app.jar に統一）
+    # 2. 生成されたjarファイルを配置フォルダへコピー（名前を app.jar に統一）
     - cp build/libs/*.jar /opt/acomo/app.jar
 
     # 3. サービスを再起動（古いプロセスが自動で停止し、新しいjarで立ち上がります）
