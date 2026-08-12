@@ -11,10 +11,6 @@ build_job:
   script:
     - chmod +x ./gradlew
     - ./gradlew clean build -x test -Dorg.gradle.java.home=$JAVA_HOME
-  artifacts:
-    paths:
-      - build/libs/*.jar
-    expire_in: 1 week
 
 test_job:
   stage: test
