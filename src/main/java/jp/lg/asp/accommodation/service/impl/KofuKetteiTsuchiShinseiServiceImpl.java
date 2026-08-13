@@ -130,8 +130,8 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				Long kofuGaku = shoreikin.getKofuGaku();
 			
 				// 数値のみを設定（JRXMLで単位を付与）
-				dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
-				dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
+				dto.setNonyugaku(kofuZeigaku != null ? String.format("%,d", kofuZeigaku) : "0");
+				dto.setKofugaku(kofuGaku != null ? String.format("%,d", kofuGaku) : "0");
 				
 				if (shoreikin.getKofuYmd() != null) {
 					
@@ -214,8 +214,8 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 
 			Long kofuZeigaku = shoreikin.getKofuZeigaku();
 			Long kofuGaku = shoreikin.getKofuGaku();
-			dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
-			dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
+			dto.setNonyugaku(kofuZeigaku != null ? String.format("%,d", kofuZeigaku) : "0");
+			dto.setKofugaku(kofuGaku != null ? String.format("%,d", kofuGaku) : "0");
 			if (shoreikin.getKofuYmd() != null) {
 				dto.setKofuYmd(shoreikin.getKofuYmd().toString());
 			}

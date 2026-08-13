@@ -2,6 +2,9 @@ package jp.lg.asp.accommodation.controller;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.chrono.JapaneseDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -79,45 +82,10 @@ public class KofuKetteiTsuchiShinseiController {
 	@PostMapping("/kofuKetteiTsuchiShinsei/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
 	public ResponseEntity<byte[]> generatePdf(KofuKetteiTsuchiShinseiDto dto) {
-		try {
-			accessChecker.checkAccess(SCREEN_ID);
-
-			// 年度を取得
-			String nendo = dto.getNendo();
-
-			// 年度が入力されていない場合
-			if (nendo == null || nendo.isEmpty()) {
-				return ResponseEntity.badRequest().body("年度が入力されていません。".getBytes(StandardCharsets.UTF_8));
-			}
-
-			// 年度を指定して帳票データを取得
-			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
-					nendo);
-
-			if (reportData == null) {
-				// データが発見出来なかった時のエラーメッセージを送信
-				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
-			}
-
-			// 発行年月日を設定
-			reportData.setHakkoYmd(dto.getHakkoYmd());
-
-			// 印刷対象を設定
-			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
-			reportData.setShinsei(dto.isShinsei());
-			reportData.setOperation(ReportsConstants.SOUSA_PDF);
-
-			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.setContentDispositionFormData("inline", "kofu_shinsei.pdf");
-
-			return ResponseEntity.ok().headers(headers).body(pdfData);
-		} catch (Exception e) {
-			log.error("PDF生成中にエラーが発生しました", e);
-			return ResponseEntity.internalServerError().build();
-		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.setContentDispositionFormData("inline", "kofu_shinsei.pdf");
+		return processReport(dto, ReportsConstants.SOUSA_PDF, headers, "PDF生成中にエラーが発生しました");
 	}
 
 	/**
@@ -126,47 +94,11 @@ public class KofuKetteiTsuchiShinseiController {
 	@PostMapping("/kofuKetteiTsuchiShinsei/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
 	public ResponseEntity<byte[]> preview(KofuKetteiTsuchiShinseiDto dto) {
-		try {
-			accessChecker.checkAccess(SCREEN_ID);
-
-			/// 年度を取得
-			String nendo = dto.getNendo();
-
-			// 年度が入力されていない場合
-			if (nendo == null || nendo.isEmpty()) {
-				return ResponseEntity.badRequest().body("年度が入力されていません。".getBytes(StandardCharsets.UTF_8));
-			}
-
-			// 年度を指定して帳票データを取得
-			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
-					nendo);
-
-			if (reportData == null) {
-
-				// データが発見出来なかった時のエラーメッセージを送信
-				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
-			}
-
-			// 発行年月日を設定
-			reportData.setHakkoYmd(dto.getHakkoYmd());
-
-			// 印刷対象を設定
-			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
-			reportData.setShinsei(dto.isShinsei());
-			reportData.setOperation(ReportsConstants.SOUSA_PREVIEW);
-
-			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.add("Content-Disposition", "inline; filename=kofu_shinsei_preview.pdf");
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-
-			return ResponseEntity.ok().headers(headers).body(pdfData);
-		} catch (Exception e) {
-			log.error("プレビュー生成中にエラーが発生しました", e);
-			return ResponseEntity.internalServerError().build();
-		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.add("Content-Disposition", "inline; filename=kofu_shinsei_preview.pdf");
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		return processReport(dto, ReportsConstants.SOUSA_PREVIEW, headers, "プレビュー生成中にエラーが発生しました");
 	}
 
 	/**
@@ -175,6 +107,23 @@ public class KofuKetteiTsuchiShinseiController {
 	@PostMapping("/kofuKetteiTsuchiShinsei/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
 	public ResponseEntity<byte[]> print(KofuKetteiTsuchiShinseiDto dto) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.add("Content-Disposition", "inline; filename=kofu_shinsei_print.pdf");
+		headers.add("X-Print-Action", "true");
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		return processReport(dto, ReportsConstants.SOUSA_PRINT, headers, "印刷用PDF生成中にエラーが発生しました");
+	}
+	
+	/**
+	 * 帳票PDF生成の共通処理
+	 * @param dto：帳票データ
+	 * @param operation：操作
+	 * @param headers：HTTPレスポンスに付与するヘッダー情報
+	 * @param errorMessage：エラーメッセージ
+	 * @return 処理の結果
+	 */
+	private ResponseEntity<byte[]> processReport(KofuKetteiTsuchiShinseiDto dto, String operation, HttpHeaders headers, String errorMessage) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
@@ -186,35 +135,42 @@ public class KofuKetteiTsuchiShinseiController {
 				return ResponseEntity.badRequest().body("年度が入力されていません。".getBytes(StandardCharsets.UTF_8));
 			}
 
-			// 年度を指定して帳票データを取得
-			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
-					nendo);
-
+			// 帳票データの生成
+			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(), nendo);
 			if (reportData == null) {
-
-				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
+			
+			// 発行年月日を取得
+			String seirekiYmd = dto.getHakkoYmd();
 
-			// 発行年月日を設定
-			reportData.setHakkoYmd(dto.getHakkoYmd());
+			// 発行年月日の情報が存在する
+			if (seirekiYmd != null && !seirekiYmd.isEmpty()) {
+				// 西暦の文字列を LocalDate に変換
+				LocalDate localDate = LocalDate.parse(seirekiYmd, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-			// 印刷対象を設定
-			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
-			reportData.setShinsei(dto.isShinsei());
-			reportData.setOperation(ReportsConstants.SOUSA_PRINT);
+				// LocalDate から和暦に変換
+				JapaneseDate japaneseDate = JapaneseDate.from(localDate);
 
+				// フォーマット
+				DateTimeFormatter warekiFormatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPAN);
+				String warekiYmd = warekiFormatter.format(japaneseDate);
+
+				// reportData へ設定
+				reportData.setHakkoYmd(warekiYmd);
+			}
+			
+			// データの設定
+			reportData.setKetteiTsuchi(dto.isKetteiTsuchi()); // 決定通知書の生成フラグ
+			reportData.setShinsei(dto.isShinsei()); // 交付申請書の生成フラグ
+			reportData.setOperation(operation); // 操作
+
+			// PDF生成
 			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_PDF);
-			headers.add("Content-Disposition", "inline; filename=kofu_shinsei_print.pdf");
-			headers.add("X-Print-Action", "true");
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 
 			return ResponseEntity.ok().headers(headers).body(pdfData);
 		} catch (Exception e) {
-			log.error("印刷用PDF生成中にエラーが発生しました", e);
+			log.error(errorMessage, e);
 			return ResponseEntity.internalServerError().build();
 		}
 	}
