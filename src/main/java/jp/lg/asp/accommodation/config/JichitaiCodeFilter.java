@@ -44,8 +44,11 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
             } else {
                 log.warn("該当する自治体が存在しません: param={}", param);
             }
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
+
+            if (request.getUserPrincipal() == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);
