@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,12 +29,18 @@ public class KofuRitsu extends BaseEntity {
 	@Column(name = "kofu_ritsu", precision = 5, scale = 2)
 	private BigDecimal kofuRitsu;
 
-	@Column(name = "tekiyo_st_ymd")
-	private LocalDate tekiyoStYmd;
+	@Column(name = "sanshutsu")
+	private Integer sanshutsu;
 
-	@Column(name = "tekiyo_ed_ymd")
-	private LocalDate tekiyoEdYmd;
+	@Column(name = "kbn")
+	private String kbn;
 
-	@Column(name = "new_flg", precision = 1)
-	private Integer newFlg;
+	@Column(name = "saiteigaku", precision = 15, scale = 2)
+	private BigDecimal saiteigaku;
+
+	@Column(name = "tekiyo_st_nendo")
+	private Integer tekiyoStNendo;
+
+	@Column(name = "new_flg", length = 1)
+	private String newFlg;
 }

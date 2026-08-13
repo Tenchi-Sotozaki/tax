@@ -4,3 +4,24 @@ spring:
     username: postgres
     password: ${ACOMO_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+server:
+  address: localhost
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /var/log/acomo
+      prefix: access_log
+      suffix: .log
+      rotate: true
+      file-date-format: .yyyy-MM-dd
+      max-days: 30
+
+logging:
+  file:
+    name: /var/log/acomo/application.log
+  logback:
+    rollingpolicy:
+      max-history: 30
+  level:
+    jp.lg.asp: INFO

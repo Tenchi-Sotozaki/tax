@@ -1,11 +1,8 @@
 package jp.lg.asp.accommodation.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -20,12 +17,17 @@ public class KofuRitsuConfigDto {
 	@DecimalMax(value = "999.99", message = "交付率は0～999.99の範囲で入力してください")
 	private BigDecimal kofuRitsu;
 
-	@NotNull(message = "適用期間（FROM）は必須です")
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate tekiyoStYmd;
+	@NotNull(message = "算出単位は必須です")
+	private Integer sanshutsu;
 
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate tekiyoEdYmd;
+	@NotNull(message = "区分は必須です")
+	private String kbn;
+
+	@NotNull(message = "最低額は必須です")
+	private BigDecimal saiteigaku;
+
+	@NotNull(message = "適用開始年度は必須です")
+	private Integer tekiyoStNendo;
 
 	public static Map<String, String> validate(KofuRitsuConfigDto f) {
 		Map<String, String> errors = new LinkedHashMap<>();
@@ -33,8 +35,14 @@ public class KofuRitsuConfigDto {
 			errors.put("kofuRitsu", "交付率は必須です");
 		else if (f.getKofuRitsu().compareTo(BigDecimal.ZERO) < 0 || f.getKofuRitsu().compareTo(new BigDecimal("999.99")) > 0)
 			errors.put("kofuRitsu", "交付率は0～999.99の範囲で入力してください");
-		if (f.getTekiyoStYmd() == null)
-			errors.put("tekiyoStYmd", "適用期間（FROM）は必須です");
+		if (f.getSanshutsu() == null)
+			errors.put("sanshutsu", "算出単位は必須です");
+		if (f.getKbn() == null || f.getKbn().isBlank())
+			errors.put("kbn", "区分は必須です");
+		if (f.getSaiteigaku() == null)
+			errors.put("saiteigaku", "最低額は必須です");
+		if (f.getTekiyoStNendo() == null)
+			errors.put("tekiyoStNendo", "適用開始年度は必須です");
 		return errors;
 	}
 }
