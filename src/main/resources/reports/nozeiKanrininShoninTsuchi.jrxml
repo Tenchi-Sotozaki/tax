@@ -13,7 +13,7 @@
 	<field name="riyu" class="java.lang.String"/>
 	<field name="koin" class="java.lang.Object"/>
 	<field name="shonin" class="java.lang.String"/>
-	<field name="Yubin" class="java.lang.String"/>
+	<field name="yubin" class="java.lang.String"/>
 	<field name="Jusho" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<pageHeader height="100" splitType="Stretch">
@@ -92,8 +92,8 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="4a98e892-4e06-4add-88b4-cfd12a268d09" x="187" y="0" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA["   "+$F{Yubin}+"\n"+
-"   "+$F{Jusho}]]></expression>
+				<expression><![CDATA["   "+$F{yubin}+"\n"+
+"   "+$F{jusho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
