@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.repository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,16 +18,23 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 	@Query("SELECT k FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd ORDER BY k.rno DESC")
 	List<KofuRitsu> findAllByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 
-	@Query("SELECT k FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd AND k.newFlg = 1")
+	@Query("SELECT k FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd AND k.newFlg = '1'")
 	Optional<KofuRitsu> findCurrentByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 
 	@Query("SELECT COALESCE(MAX(k.rno), 0) + 1 FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd")
 	BigDecimal findNextRno(@Param("jichitaiCd") String jichitaiCd);
+
 	@Query("SELECT k.kofuRitsu FROM KofuRitsu k " +
 		       "WHERE k.jichitaiCd = :jichitaiCd " +
-		       "AND k.newFlg = 1 " +
-		       "AND k.tekiyoStYmd <= :nendoMatsubi " +
-		       "AND (k.tekiyoEdYmd IS NULL OR k.tekiyoEdYmd >= :nendoMatsubi) " +
+		       "AND k.newFlg = '1' " +
+		       "AND k.tekiyoStNendo <= :nendo " +
 		       "ORDER BY k.rno DESC")
-	List<BigDecimal> findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendoMatsubi") LocalDate nendoMatsubi);
+	List<BigDecimal> findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
+
+	@Query("SELECT k FROM KofuRitsu k " +
+		       "WHERE k.jichitaiCd = :jichitaiCd " +
+		       "AND k.newFlg = '1' " +
+		       "AND k.tekiyoStNendo <= :nendo " +
+		       "ORDER BY k.rno DESC")
+	List<KofuRitsu> findKofuRitsuEntityByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
 }

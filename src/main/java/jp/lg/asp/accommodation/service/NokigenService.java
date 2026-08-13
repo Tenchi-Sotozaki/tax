@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import java.util.List;
+import java.util.Map;
 
 import jp.lg.asp.accommodation.entity.Nokigen;
 
@@ -13,4 +14,6 @@ public interface NokigenService {
     boolean existsByNendo(String nendo);
 
     Nokigen save(Nokigen nokigen);
+    
+    public Map<String, String> getPrevDataWithShift(Nokigen prev, String targetNendo, String shiftMode);
 }
