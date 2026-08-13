@@ -921,6 +921,8 @@ CREATE TABLE IF NOT EXISTS m_screen (
   jichitai_cd char(5) NOT NULL,
   screen_id char(10) NOT NULL,
   screen_name text NOT NULL,
+  kbn text NOT NULL,
+  dsp_odr integer NOT NULL,
   add_dt timestamp NOT NULL,
   add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
@@ -932,6 +934,8 @@ COMMENT ON TABLE m_screen IS '画面管理マスタ';
 COMMENT ON COLUMN m_screen.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_screen.screen_id IS '画面ＩＤ';
 COMMENT ON COLUMN m_screen.screen_name IS '画面名称';
+COMMENT ON COLUMN m_screen.kbn IS '区分';
+COMMENT ON COLUMN m_screen.dsp_odr IS '表示順';
 COMMENT ON COLUMN m_screen.add_dt IS '作成日時';
 COMMENT ON COLUMN m_screen.add_user IS '作成者';
 COMMENT ON COLUMN m_screen.upd_dt IS '更新日時';
@@ -1020,12 +1024,12 @@ CREATE TABLE IF NOT EXISTS t_atena_renkei_def (
   version integer NOT NULL,
   CONSTRAINT t_atena_renkei_def_pkey PRIMARY KEY (jichitai_cd, seq, atena_no)
 );
-COMMENT ON TABLE t_atena_renkei_def IS '宛名連携詳細';
+COMMENT ON TABLE t_atena_renkei_def IS '宛名連携管理';
 COMMENT ON COLUMN t_atena_renkei_def.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN t_atena_renkei_def.seq IS '管理番号';
 COMMENT ON COLUMN t_atena_renkei_def.atena_no IS '宛名番号';
 COMMENT ON COLUMN t_atena_renkei_def.name IS '宛名名';
-COMMENT ON COLUMN t_atena_renkei_def.kbn IS '区分(1:差異なし/2:取込/3:スキップ)';
+COMMENT ON COLUMN t_atena_renkei_def.kbn IS '区分';
 COMMENT ON COLUMN t_atena_renkei_def.add_dt IS '作成日時';
 COMMENT ON COLUMN t_atena_renkei_def.add_user IS '作成者';
 COMMENT ON COLUMN t_atena_renkei_def.upd_dt IS '更新日時';
@@ -1037,10 +1041,11 @@ CREATE TABLE IF NOT EXISTS m_jichitai (
   jichitai_cd char(5) NOT NULL,
   name text NOT NULL,
   kbn_name text NOT NULL,
-  nendo_st_month char(2),
-  shitei_st_char char(3),
-  gassan_st_char char(3),
-  atena_st_no numeric(15),
+  nendo_st_month char(2) NOT NULL,
+  nozei_shuki char(1) NOT NULL,
+  shitei_st_char char(3) NOT NULL,
+  gassan_st_char char(3) NOT NULL,
+  atena_st_no numeric(15) NOT NULL,
   add_dt timestamp NOT NULL,
   add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
@@ -1053,6 +1058,7 @@ COMMENT ON COLUMN m_jichitai.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_jichitai.name IS '自治体名称';
 COMMENT ON COLUMN m_jichitai.kbn_name IS '自治体種別名';
 COMMENT ON COLUMN m_jichitai.nendo_st_month IS '年度開始月';
+COMMENT ON COLUMN m_jichitai.nozei_shuki IS 'デフォルト納税周期';
 COMMENT ON COLUMN m_jichitai.shitei_st_char IS '指定番号';
 COMMENT ON COLUMN m_jichitai.gassan_st_char IS '合算指定番号';
 COMMENT ON COLUMN m_jichitai.atena_st_no IS '宛名採番番号';
@@ -1111,9 +1117,11 @@ CREATE TABLE IF NOT EXISTS m_kofu_ritsu (
   jichitai_cd char(5) NOT NULL,
   rno numeric(3) NOT NULL,
   kofu_ritsu numeric(5, 2) NOT NULL,
-  tekiyo_st_ymd date NOT NULL,
-  tekiyo_ed_ymd date,
-  new_flg numeric(1),
+  sanshutsu integer NOT NULL,
+  kbn char(1) NOT NULL,
+  saiteigaku integer NOT NULL,
+  tekiyo_st_nendo char(4) NOT NULL,
+  new_flg char(1) NOT NULL,
   add_dt timestamp NOT NULL,
   add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
@@ -1125,8 +1133,10 @@ COMMENT ON TABLE m_kofu_ritsu IS '交付率情報マスタ';
 COMMENT ON COLUMN m_kofu_ritsu.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_kofu_ritsu.rno IS '履歴番号';
 COMMENT ON COLUMN m_kofu_ritsu.kofu_ritsu IS '交付率情報';
-COMMENT ON COLUMN m_kofu_ritsu.tekiyo_st_ymd IS '適用開始年月日';
-COMMENT ON COLUMN m_kofu_ritsu.tekiyo_ed_ymd IS '適用終了年月日';
+COMMENT ON COLUMN m_kofu_ritsu.sanshutsu IS '算出単位';
+COMMENT ON COLUMN m_kofu_ritsu.kbn IS '切り捨て区分';
+COMMENT ON COLUMN m_kofu_ritsu.saiteigaku IS '最低額';
+COMMENT ON COLUMN m_kofu_ritsu.tekiyo_st_nendo IS '適用開始年度';
 COMMENT ON COLUMN m_kofu_ritsu.new_flg IS '最新フラグ';
 COMMENT ON COLUMN m_kofu_ritsu.add_dt IS '作成日時';
 COMMENT ON COLUMN m_kofu_ritsu.add_user IS '作成者';
@@ -1159,6 +1169,32 @@ COMMENT ON COLUMN m_reports_def.add_user IS '作成者';
 COMMENT ON COLUMN m_reports_def.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_reports_def.upd_user IS '更新者';
 COMMENT ON COLUMN m_reports_def.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS t_koin_torikomi (
+  jichitai_cd char(5) NOT NULL,
+  seq numeric(8) NOT NULL,
+  file_name text NOT NULL,
+  torikomi_dt timestamp NOT NULL,
+  torikomi_user text NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user text NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user text NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT t_koin_torikomi_pkey PRIMARY KEY (jichitai_cd, seq)
+);
+COMMENT ON TABLE t_koin_torikomi IS '公印取込管理';
+COMMENT ON COLUMN t_koin_torikomi.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN t_koin_torikomi.seq IS '管理番号';
+COMMENT ON COLUMN t_koin_torikomi.file_name IS 'ファイル名';
+COMMENT ON COLUMN t_koin_torikomi.torikomi_dt IS '取込日時';
+COMMENT ON COLUMN t_koin_torikomi.torikomi_user IS '取込者';
+COMMENT ON COLUMN t_koin_torikomi.add_dt IS '作成日時';
+COMMENT ON COLUMN t_koin_torikomi.add_user IS '作成者';
+COMMENT ON COLUMN t_koin_torikomi.upd_dt IS '更新日時';
+COMMENT ON COLUMN t_koin_torikomi.upd_user IS '更新者';
+COMMENT ON COLUMN t_koin_torikomi.version IS 'バージョン';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_reports (
@@ -1307,4 +1343,54 @@ COMMENT ON COLUMN m_menu.add_user IS '作成者';
 COMMENT ON COLUMN m_menu.upd_dt IS '更新日時';
 COMMENT ON COLUMN m_menu.upd_user IS '更新者';
 COMMENT ON COLUMN m_menu.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_top_page (
+  jichitai_cd char(5) NOT NULL,
+  seq numeric(8) NOT NULL,
+  title text NOT NULL,
+  contents text NOT NULL,
+  up_st_ymd date NOT NULL,
+  up_ed_ymd date,
+  add_dt timestamp NOT NULL,
+  add_user text NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user text NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_top_page_pkey PRIMARY KEY (jichitai_cd, seq)
+);
+COMMENT ON TABLE m_top_page IS 'トップページ管理';
+COMMENT ON COLUMN m_top_page.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_top_page.seq IS '管理番号';
+COMMENT ON COLUMN m_top_page.title IS 'タイトル';
+COMMENT ON COLUMN m_top_page.contents IS '内容';
+COMMENT ON COLUMN m_top_page.up_st_ymd IS '掲載開始年月日';
+COMMENT ON COLUMN m_top_page.up_ed_ymd IS '掲載終了年月日';
+COMMENT ON COLUMN m_top_page.add_dt IS '作成日時';
+COMMENT ON COLUMN m_top_page.add_user IS '作成者';
+COMMENT ON COLUMN m_top_page.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_top_page.upd_user IS '更新者';
+COMMENT ON COLUMN m_top_page.version IS 'バージョン';
+
+------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS m_kyugyobi (
+  jichitai_cd char(5) NOT NULL,
+  nen char(4) NOT NULL,
+  kyugyobi date NOT NULL,
+  add_dt timestamp NOT NULL,
+  add_user text NOT NULL,
+  upd_dt timestamp NOT NULL,
+  upd_user text NOT NULL,
+  version integer NOT NULL,
+  CONSTRAINT m_kyugyobi_pkey PRIMARY KEY (jichitai_cd, nen, kyugyobi)
+);
+COMMENT ON TABLE m_kyugyobi IS '休業日マスタ';
+COMMENT ON COLUMN m_kyugyobi.jichitai_cd IS '自治体コード';
+COMMENT ON COLUMN m_kyugyobi.nen IS '対象年';
+COMMENT ON COLUMN m_kyugyobi.kyugyobi IS '休業日';
+COMMENT ON COLUMN m_kyugyobi.add_dt IS '作成日時';
+COMMENT ON COLUMN m_kyugyobi.add_user IS '作成者';
+COMMENT ON COLUMN m_kyugyobi.upd_dt IS '更新日時';
+COMMENT ON COLUMN m_kyugyobi.upd_user IS '更新者';
+COMMENT ON COLUMN m_kyugyobi.version IS 'バージョン';
 

@@ -51,7 +51,7 @@ public class ShoreikinBulkController {
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
 		dto.setNendo(nendo);
 
-		List<BigDecimal> kofuRitsuList = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now());
+		List<BigDecimal> kofuRitsuList = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now().getYear());
 		if (kofuRitsuList.isEmpty()) {
 			model.addAttribute("errorMessage", "交付率のシステム設定値が登録されていません。システム設定から交付率を設定してください。");
 		} else {

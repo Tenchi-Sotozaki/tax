@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+	<title>交付率一覧</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-cash-coin me-2 text-primary"></i>交付率一覧
+			</h5>
+		</div>
+
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div class="card shadow-sm mb-3">
+			<div class="card-body py-2 px-3">
+				<a th:href="@{/admin/kofu-ritsu}" class="btn btn-success btn-sm">
+					<i class="bi bi-plus-lg me-1"></i>新規登録
+				</a>
+			</div>
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body p-0">
+				<table class="table table-bordered table-hover table-sm align-middle mb-0">
+					<thead class="table-primary">
+						<tr>
+							<th>交付率（%）</th>
+							<th>算出単位</th>
+							<th>区分</th>
+							<th>最低額</th>
+							<th>適用開始年度</th>
+							<th style="width:80px" class="text-center"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${historyList}" th:classappend="${item.newFlg == '1'} ? 'table-success'">
+							<td th:text="${item.kofuRitsu}"></td>
+							<td th:text="${item.sanshutsu}"></td>
+							<td th:text="${item.kbn == '1'} ? '切り捨て' : (${item.kbn == '2'} ? '切り上げ' : ${item.kbn})"></td>
+							<td th:text="${item.saiteigaku}"></td>
+							<td th:text="${item.tekiyoStNendo}"></td>
+							<td class="text-center">
+								<a class="btn btn-outline-primary btn-sm" th:href="@{/admin/kofu-ritsu/view/{rno}(rno=${item.rno})}">
+									<i class="bi bi-eye me-1"></i>照会
+								</a>
+							</td>
+						</tr>
+						<tr th:if="${#lists.isEmpty(historyList)}">
+							<td colspan="6" class="text-center text-muted py-5">
+								<i class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+								登録されたデータがありません。
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

@@ -35,6 +35,7 @@ class KofuRitsuConfigControllerTest {
 
         assertThat(view).isEqualTo("admin/kofuRitsuConfig");
         assertThat(model.asMap()).containsKey("configForm");
+        assertThat(model.asMap().get("mode")).isEqualTo("register");
     }
 
     @Test
@@ -90,13 +91,18 @@ class KofuRitsuConfigControllerTest {
         KofuRitsu entity = new KofuRitsu();
         entity.setRno(rno);
         entity.setKofuRitsu(new BigDecimal("10.00"));
+        entity.setSanshutsu(1);
+        entity.setKbn("1");
+        entity.setSaiteigaku(BigDecimal.ZERO);
+        entity.setTekiyoStNendo(2024);
         when(kofuRitsuConfigService.findByRno(rno)).thenReturn(entity);
         Model model = new ExtendedModelMap();
 
         String view = controller.editForm(rno, model, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("admin/kofuRitsuEdit");
+        assertThat(view).isEqualTo("admin/kofuRitsuConfig");
         assertThat(model.asMap()).containsKeys("configForm", "rno");
+        assertThat(model.asMap().get("mode")).isEqualTo("edit");
     }
 
     @Test
@@ -122,7 +128,7 @@ class KofuRitsuConfigControllerTest {
 
         String view = controller.editSave(rno, form, bindingResult, model, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("admin/kofuRitsuEdit");
+        assertThat(view).isEqualTo("admin/kofuRitsuConfig");
         verify(kofuRitsuConfigService, never()).update(any(), any());
     }
 

@@ -55,10 +55,27 @@ public class ShunoRenkeiController {
 			@RequestParam(required = false, defaultValue = "partial") String nameMatchType,
 			@RequestParam(required = false, defaultValue = "0") int page,
 			@RequestParam(required = false, defaultValue = "10") int pageSize,
+			@RequestParam(required = false) String searched,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		accessChecker.checkAccess(SCREEN_ID);
+
+		int size = pageSize > 0 ? pageSize : 10;
+		Map<String, Object> searchForm = new HashMap<>();
+		searchForm.put("shinkokuFrom", shinkokuFrom);
+		searchForm.put("shinkokuTo", shinkokuTo);
+		searchForm.put("taishoMonth", taishoMonth);
+		searchForm.put("shiteiNo", shiteiNo);
+		searchForm.put("name", name);
+		searchForm.put("nameMatchType", nameMatchType);
+		searchForm.put("pageSize", size);
+		model.addAttribute("searchForm", searchForm);
+
+		if (searched == null) {
+			return "renkei/shunoRenkei";
+		}
+
 		LocalDate from = shinkokuFrom == null || shinkokuFrom.isEmpty() ? null
 				: LocalDate.parse(shinkokuFrom);
 		LocalDate to = shinkokuTo == null || shinkokuTo.isEmpty() ? null
@@ -66,7 +83,6 @@ public class ShunoRenkeiController {
 		List<ShunoDto> allItems = shunoRenkeiService.search(jichitaiCd, from, to, taishoMonth, shiteiNo, name,
 				nameMatchType);
 
-		int size = pageSize > 0 ? pageSize : 10;
 		int total = allItems.size();
 		int totalPages = (int) Math.ceil((double) total / size);
 		int current = page < 0 ? 0 : page;
@@ -79,16 +95,6 @@ public class ShunoRenkeiController {
 				PageRequest.of(current, size), total);
 
 		model.addAttribute("items", items);
-		Map<String, Object> searchForm = new HashMap<>();
-		searchForm.put("shinkokuFrom", shinkokuFrom);
-		searchForm.put("shinkokuTo", shinkokuTo);
-		searchForm.put("taishoMonth", taishoMonth);
-		searchForm.put("shiteiNo", shiteiNo);
-		searchForm.put("name", name);
-		searchForm.put("nameMatchType", nameMatchType);
-		searchForm.put("pageSize", size);
-		model.addAttribute("searchForm", searchForm);
-
 		return "renkei/shunoRenkei";
 	}
 
