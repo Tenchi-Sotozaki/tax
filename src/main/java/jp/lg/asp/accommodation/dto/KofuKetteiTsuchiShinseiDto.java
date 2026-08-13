@@ -58,4 +58,7 @@ public class KofuKetteiTsuchiShinseiDto {
 	
 	/** 印刷対象：交付申請書 */
 	private boolean shinsei = true;
+	
+	/** 操作（帳票ログ用） */
+	private String operation;
 }
