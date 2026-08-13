@@ -7,5 +7,21 @@ spring:
 
 server:
   address: localhost
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: ${ACOMO_LOG_PATH:C:/tomcat/logs}
+      prefix: access_log
+      suffix: .log
+      rotate: true
+      file-date-format: .yyyy-MM-dd
+      max-days: 7
 
-
+logging:
+  file:
+    name: ${ACOMO_LOG_PATH:C:/tomcat/logs}/application.log
+  logback:
+    rollingpolicy:
+      max-history: 7
+  level:
+    jp.lg.asp: DEBUG

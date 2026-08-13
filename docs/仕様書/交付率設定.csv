@@ -4,10 +4,12 @@
 ,,,,,,
 No.,項目名,DBテーブル,DBカラム,部品の種類,有効,備考
 1,交付率,m_kofu_ritsu,kofu_ritsu,テキストボックス,〇,
-2,適用時期(FROM),m_kofu_ritsu,tekiyo_st_ymd,カレンダー,○,
-3,適用時期(TO),m_kofu_ritsu,tekiyo_ed_ymd,カレンダー,○,
-4,登録する,ー,ー,ボタン,〇,履歴番号を+1して常にインサート
-5,一覧に戻る,ー,ー,ボタン,〇,
+2,算出単位,m_kofu_ritsu,sanshutsu,テキストボックス,○,
+3,区分,m_kofu_ritsu,kbn,セレクタ,○,
+4,最低額,m_kofu_ritsu,saiteigaku,テキストボックス,○,
+5,適用開始年度,m_kofu_ritsu,tekiyo_st_ymd,カレンダー,○,
+6,登録する,ー,ー,ボタン,〇,履歴番号を+1して常にインサート
+7,一覧に戻る,ー,ー,ボタン,〇,
 ,,,,,,
 ,,,,,,
 ,,,,,,

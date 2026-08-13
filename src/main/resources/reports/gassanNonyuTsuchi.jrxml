@@ -15,6 +15,7 @@
 	<parameter name="jorei" class="java.lang.String"/>
 	<parameter name="city" class="java.lang.String"/>
 	<parameter name="biko" class="java.lang.String"/>
+	<parameter name="nonyuKigen" class="java.lang.String"/>
 	<query language="SQL"><![CDATA[SELECT at.jusho,
 	at.name,
 	tg.gassan_shitei_no,
@@ -59,8 +60,8 @@ FROM t_tokugimu tkg
 			<element kind="textField" uuid="d5da7094-1c5b-4b82-b81b-431134420576" x="446" y="100" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$P{hakkoYmd}]]></expression>
 			</element>
-			<element kind="staticText" uuid="0ae2b475-d014-401b-82ca-82a0cf5e8f0a" x="2" y="121" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
-				<text><![CDATA[特別徴収義務者]]></text>
+			<element kind="staticText" uuid="0ae2b475-d014-401b-82ca-82a0cf5e8f0a" x="0" y="121" width="120" height="30" fontName="IPAex明朝" fontSize="12.0">
+				<text><![CDATA[（特別徴収義務者）]]></text>
 			</element>
 			<element kind="staticText" uuid="8bf225c9-4895-488b-9e43-412a60ff0191" x="0" y="151" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<text><![CDATA[住所（所在地）]]></text>
@@ -72,13 +73,13 @@ FROM t_tokugimu tkg
 				<expression><![CDATA[$F{jusho}]]></expression>
 			</element>
 			<element kind="textField" uuid="2003f29c-cba4-47e5-9fb9-c9b022e7f8df" x="120" y="180" width="200" height="30" fontName="IPAex明朝" fontSize="12.0">
-				<expression><![CDATA[$F{name}]]></expression>
+				<expression><![CDATA[$F{name} + "　様"]]></expression>
 			</element>
 			<element kind="textField" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda6b" x="20" y="20" width="500" height="50" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center">
 				<expression><![CDATA["宿泊税合算申告納入承認通知書"]]></expression>
 			</element>
 			<element kind="textField" uuid="12e8a4b9-46d1-4b20-80ac-310be7b75ec8" x="45" y="260" width="435" height="50" fontName="IPAex明朝" fontSize="12.0">
-				<expression><![CDATA["申請のありました宿泊税合算申告納入について承認しましたので、" + $P{city} + "宿泊税条例施行規則" + $P{jorei} + "の規定により通知します。"]]></expression>
+				<expression><![CDATA["　申請のありました宿泊税合算申告納入について承認しましたので、" + $P{city} + "宿泊税条例施行規則" + $P{jorei} + "の規定により通知します。"]]></expression>
 			</element>
 			<element kind="staticText" uuid="b2a7637f-f110-4bff-bb62-4821df8903bf" x="45" y="350" width="145" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[住所
@@ -145,7 +146,7 @@ FROM t_tokugimu tkg
 				</box>
 			</element>
 			<element kind="staticText" uuid="1f6c9ddc-0fc4-427f-b040-8d2df8687318" x="45" y="530" width="145" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
-				<text><![CDATA[適用年月日]]></text>
+				<text><![CDATA[適用開始年月]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -167,7 +168,7 @@ FROM t_tokugimu tkg
 				</box>
 			</element>
 			<element kind="textField" uuid="5aa72391-0594-40ca-adfa-d0f825182225" x="190" y="530" width="290" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
-				<expression><![CDATA[($F{tekiyo_st_ymd}.getYear() + 1900) + "年　" + ($F{tekiyo_st_ymd}.getMonth() + 1) + "月宿泊分(" + ($F{tekiyo_st_ymd}.getMonth() + 1) + "月末日納期分)から"]]></expression>
+				<expression><![CDATA[($F{tekiyo_st_ymd}.getYear() + 1900) + "年　" + ($F{tekiyo_st_ymd}.getMonth() + 1) + "月宿泊分(" + $P{nonyuKigen} + "納期分)から"]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
