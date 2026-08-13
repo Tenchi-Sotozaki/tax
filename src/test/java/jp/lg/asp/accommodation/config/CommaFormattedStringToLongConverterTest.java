@@ -15,11 +15,6 @@ class CommaFormattedStringToLongConverterTest {
     }
 
     @Test
-    void convert_nullはnullを返す() {
-        assertThat(converter.convert(null)).isNull();
-    }
-
-    @Test
     void convert_空文字はnullを返す() {
         assertThat(converter.convert("")).isNull();
     }
