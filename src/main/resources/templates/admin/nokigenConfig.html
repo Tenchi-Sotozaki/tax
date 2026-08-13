@@ -16,12 +16,8 @@
 					th:text="${mode == 'register' ? '納入期限登録' : (mode == 'edit' ? '納入期限編集' : '納入期限照会')}">納入期限設定</span>
 			</h5>
 			<div th:if="${mode == 'view'}" class="d-flex align-items-center gap-2">
-				<select class="form-select form-select-sm" id="nendoSelect" th:data-base-url="@{/admin/nokigen/view/}"
-					onchange="changeNendo(this)">
-					<option th:each="n : ${nendoList}" th:value="${n}" th:text="${n + '年度'}"
-						th:selected="${n == nokigen.nendo}"></option>
-				</select> <a th:href="@{/admin/nokigen/edit/{nendo}(nendo=${nokigen.nendo})}"
-					class="btn btn-sm btn-primary text-nowrap"> <i class="bi bi-pencil-square me-1"></i>編集する
+				<a th:href="@{/admin/nokigen/edit/{nendo}(nendo=${nokigen.nendo})}" class="btn btn-sm btn-primary text-nowrap">
+					<i class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
 		</div>
@@ -40,10 +36,13 @@
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
+
+		<!-- エラーメッセージ -->
 		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 			<span th:text="${errorMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
+
 		<div th:if="${warnMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
 			<span th:text="${warnMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -52,27 +51,56 @@
 		<!-- 入力フォーム -->
 		<div class="card shadow-sm">
 			<div class="card-body">
-				<form id="nokigenForm" th:action="@{/admin/nokigen/save}" method="post" th:object="${nokigen}">
-					<input type="hidden" th:field="*{jichitaiCd}"> <input type="hidden" th:field="*{addDt}"> <input
-						type="hidden" th:field="*{addUser}"> <input type="hidden" th:field="*{updDt}"> <input
-						type="hidden" th:field="*{updUser}"> <input type="hidden" th:field="*{version}">
+				<form id="nokigenForm" th:action="@{/admin/nokigen/save}" method="post" th:object="${nokigen}" novalidate>
+					<input type="hidden" th:field="*{addDt}"> 
+					<input type="hidden" th:field="*{addUser}">
+					<input type="hidden" th:field="*{updDt}">
+					<input type="hidden" th:field="*{updUser}"> 
+					<input type="hidden" th:field="*{version}">
 					<input type="hidden" name="mode" th:value="${mode}">
 					<div class="row mb-3 align-items-end">
 						<!-- 年度 -->
 						<div class="col-md-3">
 							<label for="nendo" class="form-label">
-								年度 <span　class="text-danger" th:if="${mode == 'register'}">*</span>
+								年度 <span class="text-danger" th:if="${mode == 'register'}">*</span>
 							</label>
-
-							<input type="text" class="form-control" th:field="*{nendo}" id="nendo" placeholder="例：2024"
-								th:readonly="${mode != 'register'}"
-								th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'"
-								th:data-initial-value="*{nendo}">
-
-							<div class="invalid-feedback"
-								th:if="${validationErrors != null and !validationErrors.isEmpty()}">
+					
+							<!-- 照会モードの場合はプルダウン -->
+							<select th:if="${mode == 'view'}" class="form-select" id="nendo" th:field="*{nendo}"
+								th:data-base-url="@{/admin/nokigen/view/}" onchange="changeNendo(this)">
+								<option th:each="n : ${nendoList}" th:value="${n}" th:text="${n + '年度'}"
+									th:selected="${n == nokigen.nendo}">
+								</option>
+							</select>
+					
+							<!-- 登録モードの場合はテキスト入力 -->
+							<input th:unless="${mode == 'view'}" type="text" class="form-control" th:field="*{nendo}" id="nendo"
+							    placeholder="例：2024" th:readonly="${mode != 'register'}"
+							    th:classappend="${validationErrors != null and !validationErrors.isEmpty()} ? 'is-invalid'"
+							    th:data-initial-value="*{nendo}">
+					
+							<div class="invalid-feedback" th:if="${validationErrors != null and !validationErrors.isEmpty()}">
 								<span th:each="err : ${validationErrors}" th:text="${err}"></span>
 							</div>
+						</div>
+					
+						<!-- 休業日・複写ボタン（登録モード時のみ表示） -->
+						<div class="col-md-9 d-flex align-items-center flex-wrap gap-2 mt-2 mt-md-0" th:if="${mode == 'register'}">
+							<span class="small text-muted me-1">休業日の場合：</span>
+							<div class="form-check form-check-inline mb-0">
+								<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend" id="shiftFriday"
+									value="friday" style="width:0.85em;height:0.85em;">
+								<label class="form-check-label small" for="shiftFriday">前営業日にずらす</label>
+							</div>
+							<div class="form-check form-check-inline mb-0">
+								<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend" id="shiftMonday"
+									value="monday" style="width:0.85em;height:0.85em;">
+								<label class="form-check-label small" for="shiftMonday">翌営業日にずらす</label>
+							</div>
+							<button type="button" class="btn btn-outline-primary btn-sm ms-2" th:data-url="@{/admin/nokigen/prev-data/}"
+								th:data-exists-url="@{/admin/nokigen/exists/}" onclick="copyPrevYear(this)">
+								<i class="bi bi-copy me-1"></i>前年度を複写する
+							</button>
 						</div>
 					</div>
 
@@ -198,36 +226,25 @@
 								th:readonly="${mode == 'view'}" th:data-initial-value="*{nokigen12th}">
 						</div>
 					</div>
-
-					<div class="d-flex justify-content-end align-items-center" th:if="${mode == 'register'}">
-						<span class="small text-muted me-2">土日の場合：</span>
-						<div class="form-check form-check-inline mb-0">
-							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
-								id="shiftFriday" value="friday" style="width:0.85em;height:0.85em;">
-							<label class="form-check-label small" for="shiftFriday">前の金曜にずらす</label>
-						</div>
-						<div class="form-check form-check-inline mb-0">
-							<input class="form-check-input rounded-circle" type="checkbox" name="shiftWeekend"
-								id="shiftMonday" value="monday" style="width:0.85em;height:0.85em;">
-							<label class="form-check-label small" for="shiftMonday">次の月曜にずらす</label>
-						</div>
-						<button type="button" class="btn btn-outline-primary btn-sm ms-3"
-							th:data-url="@{/admin/nokigen/prev-data/}" th:data-exists-url="@{/admin/nokigen/exists/}"
-							onclick="copyPrevYear(this)">
-							<i class="bi bi-copy me-1"></i>前年度を複写する
-						</button>
-					</div>
-
 				</form>
 			</div>
 		</div>
 
-		<!-- 登録/更新ボタン -->
+		<!-- ボタン -->
 		<div class="text-center mt-4" th:if="${mode != 'view'}">
-			<button type="submit" form="nokigenForm" class="btn btn-success btn-lg">
-				<i class="bi bi-check-circle me-1"></i> <span
-					th:text="${mode == 'register' ? '登録する' : '更新する'}">保存</span>
+			<!-- 戻る -->
+			<button type="button" class="btn btn-outline-secondary btn-lg" data-bs-toggle="modal" data-bs-target="#backModal">
+				<i class="bi bi-arrow-left me-1"></i> 戻る
 			</button>
+			<!-- 登録/更新 -->
+			<button type="submit" form="nokigenForm" class="btn btn-success btn-lg">
+				<i class="bi bi-check-circle me-1"></i> <span th:text="${mode == 'register' ? '登録する' : '更新する'}">保存</span>
+			</button>
+		</div>
+		
+		<!-- 入力内容破棄確認モーダル -->
+		<div
+			th:replace="~{layout/components :: linkConfirmModal('backModal','確認','入力内容が破棄されます。戻りますか？',@{/admin/nokigen/view/{nendo}(nendo=${mode == 'edit' ? nokigen.nendo : nendoList[0]})},'戻る')}">
 		</div>
 
 	</div>

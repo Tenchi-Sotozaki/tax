@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -9,11 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -54,6 +56,7 @@ public class NokigenController {
 	@GetMapping("/list")
 	public String list(RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+		redirectAttributes.addFlashAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
 		Nokigen latest = nokigenService.findAll().stream().findFirst().orElse(null);
 		if (latest == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "登録された納入期限がありません。");
@@ -67,6 +70,7 @@ public class NokigenController {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("nokigen", new Nokigen());
 		model.addAttribute("mode", "register");
+		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
 		addKiMonthLabels(model);
 		return "admin/nokigenConfig";
 	}
@@ -74,6 +78,9 @@ public class NokigenController {
 	@GetMapping("/view/{nendo}")
 	public String view(@PathVariable String nendo, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
+		
+		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
+		
 		Nokigen nokigen = nokigenService.findByNendo(nendo);
 		if (nokigen == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "指定されたデータが見つかりません。");
@@ -82,7 +89,6 @@ public class NokigenController {
 		toHtmlDate(nokigen);
 		model.addAttribute("nokigen", nokigen);
 		model.addAttribute("mode", "view");
-		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
 		addKiMonthLabels(model);
 		return "admin/nokigenConfig";
 	}
@@ -112,26 +118,20 @@ public class NokigenController {
 	/** 前年度データをJSONで返す（画面への複写用） */
 	@GetMapping("/prev-data/{nendo}")
 	@ResponseBody
-	public ResponseEntity<Map<String, String>> prevData(@PathVariable String nendo) {
+	public ResponseEntity<Map<String, String>> prevData(
+			@PathVariable String nendo,
+			@RequestParam(defaultValue = "none") String shiftMode) {
+		
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		int prevNendo = Integer.parseInt(nendo) - 1;
 		Nokigen prev = nokigenService.findByNendo(String.valueOf(prevNendo));
 		if (prev == null) {
 			return ResponseEntity.notFound().build();
 		}
-		Map<String, String> result = new java.util.LinkedHashMap<>();
-		result.put("nokigen1st", toHtml(prev.getNokigen1st()));
-		result.put("nokigen2nd", toHtml(prev.getNokigen2nd()));
-		result.put("nokigen3rd", toHtml(prev.getNokigen3rd()));
-		result.put("nokigen4th", toHtml(prev.getNokigen4th()));
-		result.put("nokigen5th", toHtml(prev.getNokigen5th()));
-		result.put("nokigen6th", toHtml(prev.getNokigen6th()));
-		result.put("nokigen7th", toHtml(prev.getNokigen7th()));
-		result.put("nokigen8th", toHtml(prev.getNokigen8th()));
-		result.put("nokigen9th", toHtml(prev.getNokigen9th()));
-		result.put("nokigen10th", toHtml(prev.getNokigen10th()));
-		result.put("nokigen11th", toHtml(prev.getNokigen11th()));
-		result.put("nokigen12th", toHtml(prev.getNokigen12th()));
+		
+		// サービス層で休業日（土日・m_kyugyobi）とシフトモードを考慮したマップを生成する
+		Map<String, String> result = nokigenService.getPrevDataWithShift(prev, nendo, shiftMode);
+		
 		return ResponseEntity.ok(result);
 	}
 
@@ -141,10 +141,14 @@ public class NokigenController {
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
+		// nendoListを取得する
+		List<String> nendoList = nokigenService.findAll().stream().map(Nokigen::getNendo).toList();
+
 		if (nokigen.getNendo() == null || nokigen.getNendo().isBlank()) {
 			model.addAttribute("nokigen", nokigen);
 			model.addAttribute("mode", mode);
 			model.addAttribute("validationErrors", java.util.List.of("年度は必須です"));
+			model.addAttribute("nendoList", nendoList);
 			addKiMonthLabels(model);
 			return "admin/nokigenConfig";
 		}
@@ -154,6 +158,7 @@ public class NokigenController {
 				model.addAttribute("nokigen", nokigen);
 				model.addAttribute("mode", "register");
 				model.addAttribute("errorMessage", "登録済みの年度です。編集画面から修正してください。");
+				model.addAttribute("nendoList", nendoList);
 				addKiMonthLabels(model);
 				return "admin/nokigenConfig";
 			}
@@ -164,6 +169,7 @@ public class NokigenController {
 			model.addAttribute("nokigen", nokigen);
 			model.addAttribute("mode", mode);
 			model.addAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+			model.addAttribute("nendoList", nendoList);
 			addKiMonthLabels(model);
 			return "admin/nokigenConfig";
 		}

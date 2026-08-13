@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
@@ -32,6 +33,7 @@ import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
+import jp.lg.asp.accommodation.service.NokigenService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +50,7 @@ public class FukaController {
 	private final FukaService fukaService;
 	private final ScreenAccessChecker accessChecker;
 	private final FukaValidatorService fukaValidatorService;
+	private final NokigenService nokigenService;
 
 	private static final String SCREEN_ID = ScreenManagement.FUKA_DAICHO;
 	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
@@ -106,6 +109,11 @@ public class FukaController {
 
 		// サービスを呼び出して表示用データを生成
 		FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo, status);
+		
+		// 納入期限が未登録の場合
+		if(nokigenService.findAll().isEmpty()) {
+			model.addAttribute("errorMessage", "納入期限が登録されていません。");
+		}
 
 		model.addAttribute("fukaDaichoForm", form);
 		model.addAttribute("searchForm", form);
