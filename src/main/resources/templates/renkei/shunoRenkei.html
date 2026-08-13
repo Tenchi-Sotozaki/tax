@@ -19,32 +19,34 @@
 			</span>
 		</div>
 
-		<!-- ========== 抽出条件（アコーディオン） ========== -->
+		<!-- ========== 検索条件（アコーディオン） ========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button"
 						data-bs-toggle="collapse" data-bs-target="#searchPanel">
-						<i class="bi bi-funnel me-2 text-primary"></i>抽出条件
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
 				<div id="searchPanel" class="accordion-collapse collapse show">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/shunoRenkei/list}" th:object="${searchForm}"
 							method="get">
+							<input type="hidden" name="searched" value="true">
 							<!-- SP:1列 / タブレット:2列 / PC:4列 -->
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
 								<div class="col">
 									<label for="shinkokuFrom"
-										class="form-label form-label-sm fw-medium mb-1">申告日（開始）</label>
+										class="form-label form-label-sm fw-medium mb-1">申告年月日（FROM）</label>
 									<input type="date" class="form-control form-control-sm"
-										id="shinkokuFrom" name="shinkokuFrom" th:value="*{shinkokuFrom}">
+										id="shinkokuFrom" name="shinkokuFrom" data-no-today
+										th:attr="value=${searchForm.shinkokuFrom}">
 								</div>
 								<div class="col">
 									<label for="shinkokuTo"
-										class="form-label form-label-sm fw-medium mb-1">申告日（終了）</label>
+										class="form-label form-label-sm fw-medium mb-1">申告年月日（TO）</label>
 									<input type="date" class="form-control form-control-sm"
-										id="shinkokuTo" name="shinkokuTo" th:value="*{shinkokuTo}">
+										id="shinkokuTo" name="shinkokuTo" data-no-today th:attr="value=${searchForm.shinkokuTo}">
 								</div>
 								<div class="col">
 									<label for="taishoMonth"
@@ -79,10 +81,7 @@
 								</div>
 							</div>
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-								<a th:href="@{/shunoRenkei/list}"
-									class="btn btn-outline-secondary btn-sm"> <i
-									class="bi bi-arrow-counterclockwise me-1"></i>リセット
-								</a>
+								<button type="reset" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化</button>
 								<button type="submit" class="btn btn-primary btn-sm px4">
 									<i class="bi bi-search me-1"></i>検索する
 								</button>
@@ -94,7 +93,7 @@
 		</div>
 
 		<!-- ボタンエリア -->
-		<div class="card shadow-sm mb-3">
+		<div class="card shadow-sm mb-4">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex flex-wrap align-items-center gap-1"
 					style="row-gap: 0.4rem;">
@@ -110,65 +109,67 @@
 			</div>
 		</div>
 
-		<div class="d-flex justify-content-end align-items-center mb-2">
-			<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-			<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-				<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
-				<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
-				<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
-			</select>
-		</div>
-
 		<!-- 一覧エリア -->
-		<div class="table-container">
-			<table
-				class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table"
-				id="shunoTable">
-				<thead class="table-primary">
-					<tr>
-						<th style="width: 20px;" class="text-center"><input
-							type="checkbox" id="selectAll"></th>
-						<th style="width: 100px;">指定番号</th>
-						<th style="width: 100px;">宛名番号</th>
-						<th style="width: 200px;">氏名/名称</th>
-						<th style="width: 100px;">対象年月</th>
-						<th style="width: 100px;">宿泊税額</th>
-						<th style="width: 150px;">登録年月日</th>
-						<th style="width: 150px;">申告年月日</th>
-					</tr>
-				</thead>
-				<tbody>
-					<th:block th:if="${items != null and !items.empty}">
-						<tr th:each="item : ${items.content}">
-							<td class="text-center"><input type="checkbox"
-								name="selectedIds" th:value="${item.shiteiNo}"
-								th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo},data-kibetsu=${item.kibetsu}" />
-							</td>
-							<td th:text="${item.shiteiNo}">指定番号</td>
-							<td th:text="${item.atenaNo}">宛名番号</td>
-							<td th:text="${item.name}">氏名/名称</td>
-							<td th:text="${item.taishoYm}">対象年月</td>
-							<td th:text="${item.totalZeigaku}">宿泊税額</td>
-							<td
-								th:text="${item.torokuYmd != null ? #temporals.format(item.torokuYmd, 'yyyy-MM-dd') : ''}">登録年月日</td>
-							<td
-								th:text="${item.shinkokuYmd != null ? #temporals.format(item.shinkokuYmd, 'yyyy-MM-dd') : ''}">申告年月日</td>
-						</tr>
-					</th:block>
-					<th:block th:if="${items == null or items.empty}">
-						<tr>
-							<td colspan="8" class="text-center py-4 text-muted">該当データがありません</td>
-						</tr>
-					</th:block>
-				</tbody>
-			</table>
-		</div>
+		<div id="listArea" th:classappend="${items == null} ? 'd-none' : ''" class="mt-2 mb-2">
 
-		<!-- ページネーション -->
-		<div class="card-footer bg-white py-2 border-top" th:if="${items != null and items.totalPages > 0}">
-			<nav>
-				<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
-			</nav>
+			<!-- ページネーション & 表示件数 -->
+			<div class="d-flex align-items-center justify-content-center position-relative mt-3 mb-3">
+				<nav class="pagination-container">
+					<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+				</nav>
+				<div class="d-flex align-items-center gap-2 position-absolute end-0">
+					<label for="pageSizeSelect" class="form-label form-label-sm fw-medium mb-0 text-nowrap">表示件数</label>
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
+						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
+						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="table-container">
+				<table
+					class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table"
+					id="shunoTable">
+					<thead class="table-primary">
+						<tr>
+							<th style="width: 20px;" class="text-center"><input
+								type="checkbox" id="selectAll"></th>
+							<th style="width: 100px;">指定番号</th>
+							<th style="width: 100px;">宛名番号</th>
+							<th style="width: 200px;">氏名/名称</th>
+							<th style="width: 100px;">対象年月</th>
+							<th style="width: 100px;">宿泊税額</th>
+							<th style="width: 150px;">登録年月日</th>
+							<th style="width: 150px;">申告年月日</th>
+						</tr>
+					</thead>
+					<tbody>
+						<th:block th:if="${items != null and !items.empty}">
+							<tr th:each="item : ${items.content}">
+								<td class="text-center"><input type="checkbox"
+									name="selectedIds" th:value="${item.shiteiNo}"
+									th:attr="data-shiteiNo=${item.shiteiNo},data-nendo=${item.nendo},data-kibetsu=${item.kibetsu}" />
+								</td>
+								<td th:text="${item.shiteiNo}">指定番号</td>
+								<td th:text="${item.atenaNo}">宛名番号</td>
+								<td th:text="${item.name}">氏名/名称</td>
+								<td th:text="${item.taishoYm}">対象年月</td>
+								<td th:text="${item.totalZeigaku}">宿泊税額</td>
+								<td
+									th:text="${item.torokuYmd != null ? #temporals.format(item.torokuYmd, 'yyyy-MM-dd') : ''}">登録年月日</td>
+								<td
+									th:text="${item.shinkokuYmd != null ? #temporals.format(item.shinkokuYmd, 'yyyy-MM-dd') : ''}">申告年月日</td>
+							</tr>
+						</th:block>
+						<th:block th:if="${items == null or items.empty}">
+							<tr>
+								<td colspan="8" class="text-center py-4 text-muted">該当データがありません</td>
+							</tr>
+						</th:block>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 

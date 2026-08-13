@@ -60,6 +60,7 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
 		parameters.put("city", dto.getCity() != null ? dto.getCity() : "");
 		parameters.put("biko", dto.getBiko() != null ? dto.getBiko() : "");
+		parameters.put("nonyuKigen", dto.getNonyuKigen() != null ? dto.getNonyuKigen() : "");
 		return parameters;
 	}
 
