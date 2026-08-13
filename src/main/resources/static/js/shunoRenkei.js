@@ -10,6 +10,19 @@
             pager.render(1);
             pageSizeSelect?.addEventListener('change', () => pager.render(1));
         }
+        // 検索後（listAreaが表示状態）はアコーディオンを閉じる
+        const listArea = document.getElementById('listArea');
+        if (listArea && !listArea.classList.contains('d-none')) {
+            const searchPanel = document.getElementById('searchPanel');
+            const searchBtn = document.querySelector('[data-bs-target="#searchPanel"]');
+            if (searchPanel && bootstrap?.Collapse) {
+                bootstrap.Collapse.getOrCreateInstance(searchPanel, { toggle: false }).hide();
+            } else if (searchPanel) {
+                searchPanel.classList.remove('show');
+                searchBtn?.classList.add('collapsed');
+                searchBtn?.setAttribute('aria-expanded', 'false');
+            }
+        }
     });
 
     // テンプレート側でサーバーから描画するため、クライアント側の初期描画は不要。
