@@ -177,4 +177,63 @@ class TokugimuControllerTest {
         assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
         verify(tokugimuService, never()).deleteByShiteiNo(any());
     }
+    
+	@Test
+	void showView_履歴番号指定ありで照会画面を返す() {
+
+		MockHttpSession session = sessionWith("00100001");
+		TokugimuForm form = new TokugimuForm();
+		when(tokugimuService.getTokugimuByShiteiNoAndRno("00100001", 2)).thenReturn(form);
+		Model model = new ExtendedModelMap();
+
+		String view = controller.showView(session, 2, model);
+
+		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
+		assertThat(model.asMap()).containsEntry("isView", true);
+		verify(tokugimuService, never()).getTokugimuByShiteiNo(any());
+	}
+
+	@Test
+	void register_サービス例外発生時にエラーハンドリングして登録画面に戻る() {
+		TokugimuForm form = new TokugimuForm();
+		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
+		Model model = new ExtendedModelMap();
+
+		// サービス層で例外が発生するケース
+		doThrow(new RuntimeException("DB登録エラー")).when(tokugimuService).register(any());
+
+		String view = controller.register(form, bindingResult, model, new RedirectAttributesModelMap());
+
+		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
+		assertThat(model.asMap()).containsEntry("errorMessage", "DB登録エラー");
+	}
+
+	@Test
+	void update_サービス例外発生時にエラーハンドリングして編集画面に戻る() {
+		MockHttpSession session = sessionWith("00100001");
+		TokugimuForm form = new TokugimuForm();
+		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
+		Model model = new ExtendedModelMap();
+
+		// 更新処理で例外が発生するケース
+		doThrow(new RuntimeException("DB更新エラー")).when(tokugimuService).updateByShiteiNo(eq("00100001"), any());
+
+		String view = controller.update(session, form, bindingResult, model, new RedirectAttributesModelMap());
+
+		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
+	}
+
+	@Test
+	void update_セッション未設定の場合は更新せずモーダル表示() {
+		MockHttpSession session = new MockHttpSession();
+		TokugimuForm form = new TokugimuForm();
+		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
+		Model model = new ExtendedModelMap();
+
+		String view = controller.update(session, form, bindingResult, model, new RedirectAttributesModelMap());
+
+		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
+		assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
+		verify(tokugimuService, never()).updateByShiteiNo(any(), any());
+	}
 }
