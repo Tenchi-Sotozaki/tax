@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
@@ -22,7 +21,6 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -81,13 +79,11 @@ public class KanpuMenjoTsuchiController {
             // 自治体情報をDBから取得
             Jichitai jichitai = jichitaiRepository.findById(jichitaiCode).orElse(null);
             String cityName = jichitai != null ? jichitai.getName() : "";
-            String jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
-
+            
             // DTO作成
             KanpuMenjoTsuchiDto dto = new KanpuMenjoTsuchiDto();
             dto.setShiteiNo(shiteiNo);
             dto.setCityName(cityName);
-            dto.setJorei(jorei);
             dto.setHakkoYmd(LocalDate.now());
             dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
 

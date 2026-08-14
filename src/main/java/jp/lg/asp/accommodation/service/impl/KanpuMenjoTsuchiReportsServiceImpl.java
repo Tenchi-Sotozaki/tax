@@ -66,13 +66,15 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
     }
 
     private JRDataSource buildParams(KanpuMenjoTsuchiDto dto) {
-    	String jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_SHITEI_JOREI);
+    	
+    	// 条例を取得
+    	String jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
     	
         KanpuMenjoTsuchiReportsDto reportsDto = new KanpuMenjoTsuchiReportsDto();
 
         // 基本情報
         reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
-        reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
+        reportsDto.setJorei(jorei != null ? jorei : "");
         reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
         reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
         reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
