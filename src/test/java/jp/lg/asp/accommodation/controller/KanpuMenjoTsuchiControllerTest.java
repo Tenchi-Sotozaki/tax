@@ -80,7 +80,7 @@ class KanpuMenjoTsuchiControllerTest {
     void index_指定番号が無ければ特別徴収義務者指定モーダルを表示する() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.index(new MockHttpSession(), model);
+        String view = controller.index(new MockHttpSession(), null, model);
 
         assertThat(view).isEqualTo("reports/kanpuMenjoTsuchi");
         assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
@@ -92,7 +92,7 @@ class KanpuMenjoTsuchiControllerTest {
         when(tokugimuService.getTokugimuByShiteiNo(SHITEI_NO)).thenReturn(null);
         Model model = new ExtendedModelMap();
 
-        String view = controller.index(sessionWith(SHITEI_NO), model);
+        String view = controller.index(sessionWith(SHITEI_NO), null, model);
 
         assertThat(view).isEqualTo("error");
         assertThat(model.asMap()).containsKey("errorMessage");
@@ -104,7 +104,7 @@ class KanpuMenjoTsuchiControllerTest {
                 .thenThrow(new RuntimeException("DB接続エラー"));
         Model model = new ExtendedModelMap();
 
-        String view = controller.index(sessionWith(SHITEI_NO), model);
+        String view = controller.index(sessionWith(SHITEI_NO), null, model);
 
         assertThat(view).isEqualTo("error");
         assertThat(model.asMap().get("errorMessage").toString()).contains("エラー");
