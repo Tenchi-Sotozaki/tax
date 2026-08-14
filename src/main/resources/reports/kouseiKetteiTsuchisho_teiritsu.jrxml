@@ -177,13 +177,13 @@
 			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000021" x="24" y="72" width="72" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[住所（所在地）]]></text>
 			</element>
-			<element kind="textField" uuid="11111111-2222-3333-4444-000000000028" x="100" y="72" width="435" height="15" fontName="IPAex明朝" blankWhenNull="true" vTextAlign="Middle">
+			<element kind="textField" uuid="11111111-2222-3333-4444-000000000028" x="100" y="72" width="260" height="15" fontName="IPAex明朝" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
 				<expression><![CDATA[($F{yubin_no}!=null?$F{yubin_no}:"") + " " + ($F{jusho}!=null?$F{jusho}:"")]]></expression>
 			</element>
 			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000022" x="24" y="89" width="65" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[氏名（名称）]]></text>
 			</element>
-			<element kind="textField" uuid="11111111-2222-3333-4444-000000000029" x="94" y="89" width="260" height="15" fontName="IPAex明朝" blankWhenNull="true" vTextAlign="Middle">
+			<element kind="textField" uuid="11111111-2222-3333-4444-000000000029" x="94" y="89" width="260" height="15" fontName="IPAex明朝" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
 				<expression><![CDATA[$F{name}+" 様"]]></expression>
 			</element>
 			<element kind="textField" uuid="3a3a3a3a-0000-4000-8000-000000000001" x="22" y="115" width="235" height="13" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Left" vTextAlign="Middle">
@@ -360,8 +360,7 @@
 					<expression><![CDATA[($F{b1_sashihiki_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_sashihiki_sum}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="1413a77d-895a-43ba-bbbb-a07ced2a4382" x="312" y="90" width="98" height="19" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2")?
-($F{b1_kino_zeigaku_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_kino_zeigaku_sum}))+"円") : ""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b1_kino_zeigaku_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_kino_zeigaku_sum}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="4148f2ba-9b07-4cb6-bc63-af7dc758dfb0" x="142" y="18" width="75" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
 					<expression><![CDATA[($F{b2_zei_ritsu2}!=null&&!$F{b2_zei_ritsu2}.isEmpty() ? "100分の"+$F{b2_zei_ritsu2} : "")]]></expression>
@@ -456,53 +455,52 @@
 					<expression><![CDATA[($F{b2_sashihiki_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_sashihiki_sum}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="dcfd4c9c-71d4-4fcd-b1c2-bfca72de61c9" x="313" y="90" width="97" height="19" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2")?
-($F{b2_kino_zeigaku_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_kino_zeigaku_sum}))+"円") : ""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b2_kino_zeigaku_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_kino_zeigaku_sum}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="8cf605a9-15cb-4c00-a776-6d94764ea4e8" x="314" y="-108" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b1_kino_zeigaku1}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b1_kino_zeigaku1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_kino_zeigaku1}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="4cb1a914-812b-4f61-91fd-2219cabdd440" x="314" y="-89" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b1_kino_zeigaku2}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b1_kino_zeigaku2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_kino_zeigaku2}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="27853f65-835b-4880-b158-3100ac4354b8" x="314" y="-71" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b1_kino_zeigaku3}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b1_kino_zeigaku3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_kino_zeigaku3}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="1276fbcd-f4f1-4715-863d-d3f7ca77448f" x="314" y="-54" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b1_kino_zeigaku4}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b1_kino_zeigaku4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_kino_zeigaku4}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="9618d2e7-4ab6-45b7-adec-5f1fd2b5359e" x="314" y="-35" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b1_kino_zeigaku5}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b1_kino_zeigaku5}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_kino_zeigaku5}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="dfa96dbc-b28f-4a7b-99ba-f40fc1dfba75" x="314" y="0" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b2_kino_zeigaku1}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b2_kino_zeigaku1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_kino_zeigaku1}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="4f0665b1-ccfa-40a9-9b22-7b6c6df10a4a" x="314" y="18" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b2_kino_zeigaku2}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b2_kino_zeigaku2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_kino_zeigaku2}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="e65c1942-c53b-425e-af54-fde727bc4037" x="314" y="37" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b2_kino_zeigaku3}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b2_kino_zeigaku3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_kino_zeigaku3}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="1053419c-7a05-47da-8f40-fc2fd9d78864" x="314" y="55" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b2_kino_zeigaku4}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b2_kino_zeigaku4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_kino_zeigaku4}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="3a66c35c-b8a3-4f98-be86-9c376ef8c188" x="314" y="72" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b2_kino_zeigaku5}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b2_kino_zeigaku5}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_kino_zeigaku5}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="bec8a6c9-e198-41c1-bfbd-517b8c18f035" x="313" y="109" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b3_kino_zeigaku1}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b3_kino_zeigaku1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_kino_zeigaku1}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="3967ec1b-7d32-4b1f-8a33-f8af8f301d80" x="313" y="126" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b3_kino_zeigaku2}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b3_kino_zeigaku2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_kino_zeigaku2}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="ff26fe21-d893-4b97-8712-322079306387" x="313" y="145" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b3_kino_zeigaku3}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b3_kino_zeigaku3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_kino_zeigaku3}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="b7d8ed77-06d3-4c17-bcb5-160c587dcd0f" x="313" y="162" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b3_kino_zeigaku4}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b3_kino_zeigaku4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_kino_zeigaku4}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="163d84df-7d5a-4ce6-9247-68fd8e50450d" x="313" y="180" width="96" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2") ? $F{b3_kino_zeigaku5}+"円":""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b3_kino_zeigaku5}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_kino_zeigaku5}))+"円"):""]]></expression>
 				</element>
 				<element kind="textField" uuid="ac65e694-ba13-49ab-a81d-e01ad4a39d94" x="142" y="18" width="75" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Center" vTextAlign="Middle">
 					<expression><![CDATA[($F{b2_zei_ritsu2}!=null&&!$F{b2_zei_ritsu2}.isEmpty() ? "100分の"+$F{b2_zei_ritsu2} : "")]]></expression>
@@ -609,8 +607,7 @@
 					<expression><![CDATA[($F{b3_sashihiki_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_sashihiki_sum}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="09d783d2-07a2-46ea-95e2-7a33e4835567" x="312" y="90" width="98" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[$F{henko_kbn}.equals("2")?
-($F{b3_kino_zeigaku_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_kino_zeigaku_sum}))+"円") : ""]]></expression>
+					<expression><![CDATA[$F{henko_kbn}.equals("2") ? ($F{b3_kino_zeigaku_sum}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_kino_zeigaku_sum}))+"円"):""]]></expression>
 				</element>
 			</element>
 			<element kind="line" uuid="8e8e8e8e-5555-4555-8555-ee01ee01ee01" x="18" y="654" width="517" height="1">
