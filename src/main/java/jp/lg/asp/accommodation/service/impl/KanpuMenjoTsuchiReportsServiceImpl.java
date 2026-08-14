@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.chrono.JapaneseDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -13,9 +15,11 @@ import java.util.Map;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiReportsDto;
 import jp.lg.asp.accommodation.service.KanpuMenjoTsuchiReportsService;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -35,6 +39,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiReportsService {
 
     private static final String JRXML_PATH = "reports/kanpuMenjoTsuchi.jrxml";
+    private final ReportsCommonService reportsCommonService;
 
     @Override
     public byte[] generateTsuchiPdf(KanpuMenjoTsuchiDto dto) {
@@ -61,6 +66,8 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
     }
 
     private JRDataSource buildParams(KanpuMenjoTsuchiDto dto) {
+    	String jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_SHITEI_JOREI);
+    	
         KanpuMenjoTsuchiReportsDto reportsDto = new KanpuMenjoTsuchiReportsDto();
 
         // 基本情報
@@ -76,10 +83,23 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
         reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
         reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
-        // 申請の年月をyyyy年M月形式に変換
+        // 申請の年月
         if (dto.getShinseiYm() != null && !dto.getShinseiYm().isEmpty()) {
-            String formattedShinseiYm = formatShinseiYm(dto.getShinseiYm());
-            reportsDto.setShinseiYm(formattedShinseiYm);
+        	// YearMonth型に変換
+        	YearMonth yearMonth = java.time.YearMonth.parse(dto.getShinseiYm());
+        	
+        	// 仮で日付を代入
+            LocalDate shinseiYm = yearMonth.atDay(1);
+        	
+        	// 和暦形式に変換
+        	JapaneseDate japaneseDate = JapaneseDate.from(shinseiYm);
+        	
+        	// フォーマット定義
+        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE);
+        	String strDate = japaneseDate.format(formatter);
+        	
+        	// 和暦形式の申請年月を設定
+            reportsDto.setShinseiYm(strDate);
         } else {
             reportsDto.setShinseiYm("");
         }
@@ -100,8 +120,15 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
 
         // 申請受理日
         if (dto.getJuriYmd() != null) {
-            String strDate = dto.getJuriYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
-            reportsDto.setJuriYmd(strDate);
+        	// 和暦形式に変換
+        	JapaneseDate japaneseDate = JapaneseDate.from(dto.getJuriYmd());
+        	
+        	// フォーマット定義
+        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE);
+        	String strDate = japaneseDate.format(formatter);
+        	
+        	// 和暦形式の申請受理日を設定
+        	reportsDto.setJuriYmd(strDate);
         } else {
             reportsDto.setJuriYmd("");
         }
