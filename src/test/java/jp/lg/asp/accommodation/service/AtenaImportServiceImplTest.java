@@ -147,6 +147,42 @@ class AtenaImportServiceImplTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("宛名番号");
     }
+    
+    @Test
+    void analyze_異常系_データ行の項目数が不足している場合() throws Exception {
+        // 8項目必要なところ、7項目しかない行
+        String csv = VALID_HEADER + "1001,,,テスト太郎,テストタロウ,060-0001,札幌市\n";
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes("UTF-8")));
+
+        assertThatThrownBy(() -> service.analyze(file, JICHITAI_CD))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("項目数が不足");
+    }
+
+    @Test
+    void analyze_異常系_氏名が空の場合() throws Exception {
+        // 氏名（4番目のカラム）が空
+        String csv = VALID_HEADER + "1001,,, ,テストタロウ,060-0001,札幌市,011-111-1111\n";
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes("UTF-8")));
+
+        assertThatThrownBy(() -> service.analyze(file, JICHITAI_CD))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("氏名が空");
+    }
+
+    @Test
+    void analyze_境界値_空白行が含まれている場合にスキップされること() throws Exception {
+        // ヘッダーの後に空行を挟んで有効なデータを1件配置
+        String csv = VALID_HEADER + "\n\n1001,,,テスト太郎,テストタロウ,060-0001,札幌市,011-111-1111\n";
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes("UTF-8")));
+        when(file.getOriginalFilename()).thenReturn("test.csv");
+        when(atenaRepository.findById(any(AtenaId.class))).thenReturn(Optional.empty());
+
+        AtenaImportPreviewDto preview = service.analyze(file, JICHITAI_CD);
+
+        // 空行がスキップされ、1件のみ正しく読み込まれること
+        assertThat(preview.getRows()).hasSize(1);
+    }
 
     // ============================================================
     // 確定フェーズ
