@@ -9,7 +9,7 @@ function validateForm() {
     const hakkoYmd = document.getElementById('hakkoYmd').value;
 
     if (!hakkoYmd) {
-        alert('発行日を入力してください。');
+        alert('発行年月日を入力してください。');
         document.getElementById('hakkoYmd').focus();
         return false;
     }
@@ -19,7 +19,7 @@ function validateForm() {
 
 // ページ読み込み時の初期化
 document.addEventListener('DOMContentLoaded', function() {
-    // 発行日のデフォルト値設定（今日の日付）
+    // 発行年月日のデフォルト値設定（今日の日付）
     const hakkoYmdInput = document.getElementById('hakkoYmd');
     if (!hakkoYmdInput.value) {
         const today = new Date();
