@@ -37,6 +37,7 @@ public class KoseiKetteiTsuchiReportsDto {
     private String kbn_zei_gaku3;
     private String kbn_zei_gaku4;
     private String kbn_zei_gaku5;
+    private String kbn_zei_gaku_sum;
 
     // b2用区分税額
     private String b2_kbn_zei_gaku1;
@@ -44,6 +45,7 @@ public class KoseiKetteiTsuchiReportsDto {
     private String b2_kbn_zei_gaku3;
     private String b2_kbn_zei_gaku4;
     private String b2_kbn_zei_gaku5;
+    private String b2_kbn_zei_gaku_sum;
 
     // b3用区分税額
     private String b3_kbn_zei_gaku1;
@@ -51,6 +53,8 @@ public class KoseiKetteiTsuchiReportsDto {
     private String b3_kbn_zei_gaku3;
     private String b3_kbn_zei_gaku4;
     private String b3_kbn_zei_gaku5;
+    private String b3_kbn_zei_gaku_sum;
+
 
     // ── 期別1（b1）───────────────────────────────────
     private String b1_nen;
@@ -145,6 +149,13 @@ public class KoseiKetteiTsuchiReportsDto {
     private String b2_sashihiki4;
     private String b2_sashihiki5;
     private String b2_sashihiki_sum;
+    
+    // b2用税率
+    private String b2_zei_ritsu1;
+    private String b2_zei_ritsu2;
+    private String b2_zei_ritsu3;
+    private String b2_zei_ritsu4;
+    private String b2_zei_ritsu5;
 
     // ── 期別3（b3）───────────────────────────────────
     private String b3_nen;
@@ -191,6 +202,13 @@ public class KoseiKetteiTsuchiReportsDto {
     private String b3_sashihiki4;
     private String b3_sashihiki5;
     private String b3_sashihiki_sum;
+    
+    // b3用税率
+    private String b3_zei_ritsu1;
+    private String b3_zei_ritsu2;
+    private String b3_zei_ritsu3;
+    private String b3_zei_ritsu4;
+    private String b3_zei_ritsu5;
 
     // ── 納入・加算金 ─────────────────────────────────
     private String nofu_zeigaku;
