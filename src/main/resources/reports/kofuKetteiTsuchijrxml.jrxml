@@ -43,7 +43,7 @@
 			</element>
 			<element kind="textField" uuid="6df4309f-3aec-49df-a518-79a8292fa07b" x="0" y="180" width="555" height="50" fontName="IPAex明朝" vTextAlign="Middle">
 				<paragraph firstLineIndent="5" leftIndent="0"/>
-				<expression><![CDATA[$F{kofuYmd}+"付けで申請のあった"+$F{cityName}+"宿泊税特別徴収義務者徴収奨励金について、次の通り交付することを決定しましたので、"+$F{cityName}+$F{jorei}+"の規程により通知します。"]]></expression>
+				<expression><![CDATA[$F{kofuYmd}+"付けで申請のあった"+$F{cityName}+"宿泊税特別徴収義務者徴収奨励金について、次の通り交付することを決定しましたので、"+$F{jorei}+"の規定により通知します。"]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.firstLineIndent" value="px"/>
 				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
