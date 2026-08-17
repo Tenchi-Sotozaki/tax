@@ -90,17 +90,19 @@ public class KanpuMenjoTsuchiController {
             // 特別徴収義務者情報設定
             if (tokugimuForm != null) {
                 dto.setTokuName(tokugimuForm.getName());
+                dto.setTokuYubin("〒" + tokugimuForm.getTokugimuYubinNo());
                 dto.setTokuJusho(tokugimuForm.getTokugimuAddress());
                 dto.setShisetsuName(tokugimuForm.getFacilityName());
-                
-                String shisetsuJusho = "";
+               
+                // 郵便番号
                 if (tokugimuForm.getFacilityAddressNo() != null && !tokugimuForm.getFacilityAddressNo().isEmpty()) {
-                    shisetsuJusho += "〒" + tokugimuForm.getFacilityAddressNo() + " ";
+                    dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
                 }
+                
+                // 住所
                 if (tokugimuForm.getFacilityAddress() != null && !tokugimuForm.getFacilityAddress().isEmpty()) {
-                    shisetsuJusho += tokugimuForm.getFacilityAddress();
+                	dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
                 }
-                dto.setShisetsuJusho(shisetsuJusho);
             }
 
             model.addAttribute("dto", dto);

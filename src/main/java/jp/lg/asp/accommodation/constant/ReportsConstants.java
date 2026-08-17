@@ -92,6 +92,8 @@ public final class ReportsConstants {
 	public static final String KOFU_HAKKO_YOSHIKI = "RPT0000009";
 	// 交付条件
 	public static final String KOFU_JOKEN = "RPT0000010";
+	// 徴収不能額等の還付又は納入義務の免除申請書
+	public static final String KANPU_MENJO_SHINSEI = "RPT0000019";
 
 	/* 
 	 * 操作名変換
