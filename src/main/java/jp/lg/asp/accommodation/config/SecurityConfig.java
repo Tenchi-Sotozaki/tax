@@ -41,7 +41,7 @@ public class SecurityConfig {
 	                    .successHandler((request, response, authentication) -> {
 	                        String target = InitialPasswordController.ADMIN_ID.equals(authentication.getName())
 	                                ? "/admin/user-search"
-	                                : "/tokugimu/list";
+	                                : "/top";
 	                        response.sendRedirect(request.getContextPath() + target);
 	                    })
 	                    .permitAll())

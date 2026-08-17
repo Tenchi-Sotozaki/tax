@@ -21,7 +21,7 @@
 					th:text="${(isView ?: false) ? '納税管理人照会' : ((isEdit ?: false) ? '納税管理人変更' : '納税管理人登録')}"></span>
 			</h5>
 
-			<a th:href="@{/tax-manager/edit/{id}(id=${taxManagerForm.shiteiNo})}"
+			<a th:href="@{/tax-manager/edit}"
 				class="btn btn-primary btn-sm" th:if="${isView ?: false}"> <i
 				class="bi bi-pencil-square me-2"></i>変更する
 			</a>
@@ -32,17 +32,17 @@
 			th:if="${(isView ?: false) and taxManagerForm.maxRno != null and taxManagerForm.maxRno > 1}"
 			class="d-flex align-items-center gap-2 mb-3">
 			<a
-				th:href="@{/tax-manager/view/{id}(id=${taxManagerForm.shiteiNo}, rno=${taxManagerForm.rno - 1})}"
+				th:href="@{/tax-manager/view(rno=${taxManagerForm.rno - 1})}"
 				class="btn btn-outline-secondary btn-sm"
 				th:classappend="${taxManagerForm.rno <= taxManagerForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a> <span class="text-muted small">履歴 <span
 				th:text="${taxManagerForm.rno}"></span> / <span
 				th:text="${taxManagerForm.maxRno}"></span></span> <a
-				th:href="@{/tax-manager/view/{id}(id=${taxManagerForm.shiteiNo}, rno=${taxManagerForm.rno + 1})}"
+				th:href="@{/tax-manager/view(rno=${taxManagerForm.rno + 1})}"
 				class="btn btn-outline-secondary btn-sm"
 				th:classappend="${taxManagerForm.rno >= taxManagerForm.maxRno} ? ' disabled'">
-				次の履歴 <i class="bi bi-chevron-right"></i>
+			次の履歴 <i class="bi bi-chevron-right"></i>
 			</a>
 		</div>
 
@@ -69,7 +69,7 @@
 		</div>
 
 		<form id="taxManagerForm"
-			th:action="@{/tax-manager/save/{id}(id=${taxManagerForm.shiteiNo})}"
+			th:action="@{/tax-manager/save}"
 			th:object="${taxManagerForm}" method="post">
 
 			<input type="hidden" th:field="*{collectorId}" /> 
@@ -106,7 +106,7 @@
 					<div class="row g-3">
 						<div class="col-md-2" th:if="${!(isView ?: false)}">
 							<label for="registrationDate" class="form-label fw-medium">
-								登録日 <span class="text-danger">*</span>
+								登録年月日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
 								th:field="*{registrationDate}" th:readonly="${isView ?: false}"
 								th:data-initial-value="*{registrationDate}"
@@ -118,7 +118,7 @@
 
 						<div class="col-md-2" th:if="${!(isView ?: false)}">
 							<label for="declarationDate" class="form-label fw-medium">
-								申告日 <span class="text-danger">*</span>
+								申告年月日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
 								th:field="*{declarationDate}" th:readonly="${isView ?: false}"
 								th:data-initial-value="*{declarationDate}"
@@ -130,13 +130,13 @@
 
 						<!-- 照会画面での表示 -->
 						<div class="col-md-2" th:if="${isView ?: false}">
-							<label class="form-label fw-medium">登録日</label> <input
+							<label class="form-label fw-medium">登録年月日</label> <input
 								type="text" class="form-control" readonly
 								th:value="*{registrationDate}">
 						</div>
 
 						<div class="col-md-2" th:if="${isView ?: false}">
-							<label class="form-label fw-medium">申告日</label> <input
+							<label class="form-label fw-medium">申告年月日</label> <input
 								type="text" class="form-control" readonly
 								th:value="*{declarationDate}">
 						</div>
@@ -242,14 +242,11 @@
 
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
-				<a th:href="@{/tokugimu/list}"
+				<a href="#"
 					class="btn btn-outline-primary btn-lg px-4"
-					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a href="#"
-					class="btn btn-outline-primary btn-lg px-4"
-					th:unless="${isView ?: false}"
+					th:if="${(isEdit ?: false) and !(isView ?: false)}"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
+					class="bi bi-arrow-left me-2"></i>戻る
 				</a>
 
 				<!-- 編集時のみ削除ボタンを表示 -->
@@ -268,11 +265,13 @@
 			</div>
 		</form>
 
-		<div th:unless="${isView ?: false}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/tokugimu/list}, '一覧に戻る')}"></div>
+		<div th:unless="${isView ?: false}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/tax-manager/view}, '戻る')}"></div>
 
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
 		<!-- 特別徴収義務者指定モーダル -->
 		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+		<!-- セッション未設定時にモーダルを自動オープンするフラグ -->
+		<div th:if="${showShiteiModal ?: false}" data-show-shitei-modal="true"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
