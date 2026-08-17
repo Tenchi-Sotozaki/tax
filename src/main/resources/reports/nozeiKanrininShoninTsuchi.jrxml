@@ -14,7 +14,7 @@
 	<field name="koin" class="java.lang.Object"/>
 	<field name="shonin" class="java.lang.String"/>
 	<field name="yubin" class="java.lang.String"/>
-	<field name="Jusho" class="java.lang.String"/>
+	<field name="jusho" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<pageHeader height="100" splitType="Stretch">
 		<element kind="staticText" uuid="8010567e-b9c9-4abd-bb05-8934c9779ea1" x="80" y="5" width="400" height="50" markup="none" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
@@ -39,13 +39,13 @@
 		<element kind="staticText" uuid="a398ae25-da70-4636-8eab-698303ab6abf" x="24" y="35" width="100" height="20" markup="none" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Center" vTextAlign="Middle">
 			<text><![CDATA[住所（所在地）]]></text>
 		</element>
-		<element kind="textField" uuid="998d1b60-a78e-4b6e-becf-5571a03d69fb" x="144" y="35" width="340" height="20" fontName="IPAex明朝" vTextAlign="Middle">
+		<element kind="textField" uuid="998d1b60-a78e-4b6e-becf-5571a03d69fb" x="144" y="35" width="236" height="20" fontName="IPAex明朝" textAdjust="ScaleFont" vTextAlign="Middle">
 			<expression><![CDATA[$F{tokuJusho}]]></expression>
 		</element>
 		<element kind="staticText" uuid="1b50a923-12a1-42b2-9c45-f3038fb1c684" x="24" y="60" width="100" height="20" markup="none" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Center" vTextAlign="Middle">
 			<text><![CDATA[氏名（名称）]]></text>
 		</element>
-		<element kind="textField" uuid="974e60ed-2f0d-4256-8eef-8fa54f8bc5ee" x="144" y="60" width="340" height="20" fontName="IPAex明朝" vTextAlign="Middle">
+		<element kind="textField" uuid="974e60ed-2f0d-4256-8eef-8fa54f8bc5ee" x="144" y="60" width="236" height="20" fontName="IPAex明朝" textAdjust="ScaleFont" vTextAlign="Middle">
 			<expression><![CDATA[$F{tokuName}+"様"]]></expression>
 		</element>
 		<element kind="textField" uuid="9df744ee-6750-40ea-83c4-7dd65b2eb1c0" x="380" y="76" width="100" height="20" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
@@ -92,8 +92,7 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="4a98e892-4e06-4add-88b4-cfd12a268d09" x="187" y="0" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA["   "+$F{yubin}+"\n"+
-"   "+$F{jusho}]]></expression>
+				<expression><![CDATA[" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -112,7 +111,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="9815b760-59c5-4439-8065-909d7e327f60" x="187" y="50" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
+			<element kind="textField" uuid="9815b760-59c5-4439-8065-909d7e327f60" x="187" y="50" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
 				<expression><![CDATA["   "+$F{tokuName}]]></expression>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -151,7 +150,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="cbe4f476-f1bd-4f79-9cbf-b9805735f830" x="187" y="100" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Left" vTextAlign="Middle">
+			<element kind="textField" uuid="cbe4f476-f1bd-4f79-9cbf-b9805735f830" x="187" y="100" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
 				<expression><![CDATA["   "+$F{shisetsuJusho}]]></expression>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -160,7 +159,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="389aac2e-e63f-42a6-b8b7-60fa3bde04f4" x="187" y="150" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
+			<element kind="textField" uuid="389aac2e-e63f-42a6-b8b7-60fa3bde04f4" x="187" y="150" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
 				<expression><![CDATA["   "+$F{shisetsuName}]]></expression>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -203,7 +202,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="d58762a6-7b18-4ec7-89b3-9dbcbd084622" x="187" y="200" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
+			<element kind="textField" uuid="d58762a6-7b18-4ec7-89b3-9dbcbd084622" x="187" y="200" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
 				<expression><![CDATA["   "+$F{nozeiKanriJusho}]]></expression>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -212,7 +211,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="b1088531-c062-4314-969f-3f8601ba6077" x="187" y="250" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
+			<element kind="textField" uuid="b1088531-c062-4314-969f-3f8601ba6077" x="187" y="250" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
 				<expression><![CDATA["   "+$F{nozeiKanriName}]]></expression>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -221,7 +220,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="44d03b3a-1687-4039-a3fa-ce56c405a2ef" x="187" y="300" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" vTextAlign="Middle">
+			<element kind="textField" uuid="44d03b3a-1687-4039-a3fa-ce56c405a2ef" x="187" y="300" width="340" height="50" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" vTextAlign="Middle">
 				<expression><![CDATA["   "+$F{riyu}]]></expression>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -238,6 +237,12 @@
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
+			</element>
+			<element kind="textField" uuid="ac6ffce6-2599-4e70-8ee5-0aaecb2283ad" x="200" y="2" width="322" height="20" markup="none" fontName="IPAex明朝" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$F{yubin}]]></expression>
+			</element>
+			<element kind="textField" uuid="a1fd9c54-d437-4abc-a0b0-1623db1a6330" x="200" y="20" width="322" height="30" markup="none" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
+				<expression><![CDATA[$F{jusho}]]></expression>
 			</element>
 		</band>
 	</detail>
