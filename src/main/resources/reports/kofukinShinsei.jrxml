@@ -483,7 +483,7 @@
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
 			<element kind="staticText" uuid="c506ff1a-93f8-4289-b69c-0272f4f236a6" x="43" y="670" width="250" height="15" fontName="IPAex明朝" vTextAlign="Middle">
-				<text><![CDATA[前年度から変更の場合]]></text>
+				<text><![CDATA[前年度から変更の場合は以下に記入してください]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 			</element>
