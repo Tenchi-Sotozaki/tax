@@ -10,10 +10,8 @@ import java.util.Map;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiReportsDto;
-import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +32,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoninTsuchiReportsService {
 
 	private static final String JRXML_PATH = "reports/nozeiKanrininShoninTsuchi.jrxml";
-	private final NokanRepository nokanRepository;
-	private final JichitaiContext jichitaiContext;
 	
 	@Override
 	public byte[] generateTsuchiPdf(NozeiKanriShoninTsuchiDto dto) {
@@ -71,16 +67,17 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
+		reportsDto.setShisetsuYubin(dto.getShisetsuYubin() != null ? dto.getShisetsuYubin() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
+		reportsDto.setNozeiKanriYubin(dto.getNozeiKanriYubin() != null ? dto.getNozeiKanriYubin() : "");
 		reportsDto.setNozeiKanriJusho(dto.getNozeiKanriJusho() != null ? dto.getNozeiKanriJusho() : "");
 		reportsDto.setNozeiKanriName(dto.getNozeiKanriName() != null ? dto.getNozeiKanriName() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 		reportsDto.setShonin(dto.getKbn() != null ? dto.getKbn() : "");
+		reportsDto.setTokuYubin(dto.getTokuYubin() != null ? dto.getTokuYubin() : "");
 		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
-		reportsDto.setYubin(dto.getYubin() != null ? dto.getYubin() : "");
-		reportsDto.setJusho(dto.getJusho() != null ? dto.getJusho() : "");
 		
 		// 発行日
 		if (dto.getHakkoYmd() != null) {

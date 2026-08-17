@@ -18,24 +18,30 @@ public class NozeiKanriShoninTsuchiDto {
 
     /** 条例 */
     private String jorei;
+    
+    /** 特別徴収義務者郵便番号 */
+    private String tokuYubin;
 
     /** 特別徴収義務者住所 */
     private String tokuJusho;
-    
-    /** 郵便番号 */
-    private String yubin;
     
     /** 住所 */
     private String jusho;
 
     /** 特別徴収義務者名 */
     private String tokuName;
+    
+    /** 施設郵便番号 */
+    private String shisetsuYubin;
 
     /** 所在地（施設住所） */
     private String shisetsuJusho;
 
     /** 名称（施設名） */
     private String shisetsuName;
+    
+    /** 納税管理人郵便番号 */
+    private String nozeiKanriYubin;
 
     /** 納税管理人住所 */
     private String nozeiKanriJusho;
