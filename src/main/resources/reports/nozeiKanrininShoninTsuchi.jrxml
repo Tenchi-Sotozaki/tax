@@ -51,8 +51,13 @@
 		<element kind="textField" uuid="9df744ee-6750-40ea-83c4-7dd65b2eb1c0" x="380" y="76" width="100" height="20" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
 			<expression><![CDATA[$F{cityName}+"長"]]></expression>
 		</element>
+<<<<<<< HEAD
 		<element kind="textField" uuid="c35f0ea1-6fa0-4bac-ab7d-6dc86e9c9d20" x="28" y="120" width="499" height="24" fontName="IPAex明朝" fontSize="10.0">
 			<expression><![CDATA["　"+$F{cityName}+"宿泊税条令施行規則"+$F{jorei}+"の規定により、宿泊税の納税管理人として次のとおり"+ "\n"+"（ 承認  不承認 ）することを決定しましたので通知します。"]]></expression>
+=======
+		<element kind="textField" uuid="c35f0ea1-6fa0-4bac-ab7d-6dc86e9c9d20" x="-10" y="120" width="560" height="25" fontName="IPAex明朝" fontSize="10.0">
+			<expression><![CDATA["　"+$F{cityName}+"宿泊税条例施行規則"+$F{jorei}+"の規定により、宿泊税の納税管理人として次のとおり（ 承認  不承認 ）することを決定しましたので通知します。"]]></expression>
+>>>>>>> master
 		</element>
 		<element kind="image" uuid="41c1e8c1-28a3-4cb1-b94e-5943bbf97d6e" x="495" y="57" width="50" height="50" onErrorType="Blank">
 			<expression><![CDATA[$F{koin}]]></expression>

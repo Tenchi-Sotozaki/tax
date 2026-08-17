@@ -20,7 +20,7 @@ public class KofuKetteiTsuchiShinseiDto {
 	/** 市区町村名 */
 	private String cityName;
 
-	/** 条令 */
+	/** 条例 */
 	private String jorei;
 
 	/** 施設住所 */
@@ -40,25 +40,25 @@ public class KofuKetteiTsuchiShinseiDto {
 
 	/** 特別徴収義務者名 */
 	private String tokuName;
-
+	
 	/** 発行年月日 */
 	private String hakkoYmd;
-
+	
 	/** 交付年月日 */
 	private String kofuYmd;
-
-	/** 条令 */
+	
+	/** 条例 */
 	private String hakkoJorei;
-
+	
 	/** 公印 */
 	private byte[] koin;
-
+	
 	/** 印刷対象：決定通知書 */
 	private boolean ketteiTsuchi = true;
-
+	
 	/** 印刷対象：交付申請書 */
 	private boolean shinsei = true;
-
+	
 	/** 操作（帳票ログ用） */
 	private String operation;
 }
