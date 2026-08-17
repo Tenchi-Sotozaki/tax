@@ -78,33 +78,10 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 		reportsDto.setShonin(dto.getKbn() != null ? dto.getKbn() : "");
+		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
+		reportsDto.setYubin(dto.getYubin() != null ? dto.getYubin() : "");
+		reportsDto.setJusho(dto.getJusho() != null ? dto.getJusho() : "");
 		
-		// 郵便番号と住所の間に改行を入れる
-		String tokujusho = dto.getTokuJusho();
-		if (tokujusho != null) {
-			// 最初に見つかったスペースを改行に
-		    String formattedJusho = tokujusho.replaceFirst(" ", "\n");
-		    reportsDto.setTokuJusho(formattedJusho);
-		    
-			// 最初に見つかった空白（半角・全角）を境界にして、最大2つの配列に分割する
-			String[] parts = formattedJusho.split("\n", 2);
-
-			if (parts.length > 0) {
-				reportsDto.setYubin(parts[0]); // 郵便番号
-			} else {
-				reportsDto.setYubin("");
-			}
-
-			if (parts.length > 1) {
-				reportsDto.setJusho(parts[1]); // 住所
-			} else {
-				reportsDto.setJusho("");
-			}
-		    
-		} else {
-		    reportsDto.setTokuJusho("");
-		}
-
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
 			String strDate = dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));

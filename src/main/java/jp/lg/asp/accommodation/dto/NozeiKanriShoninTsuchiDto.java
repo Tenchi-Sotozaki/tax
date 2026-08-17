@@ -21,6 +21,12 @@ public class NozeiKanriShoninTsuchiDto {
 
     /** 特別徴収義務者住所 */
     private String tokuJusho;
+    
+    /** 郵便番号 */
+    private String yubin;
+    
+    /** 住所 */
+    private String jusho;
 
     /** 特別徴収義務者名 */
     private String tokuName;

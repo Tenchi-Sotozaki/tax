@@ -1,9 +1,8 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
@@ -67,6 +66,8 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
 
         // 特別徴収義務者住所・名前を設定
         dto.setTokuJusho(buildAddress(atena.getYubinNo(), atena.getJusho()));
+        dto.setYubin("〒"+atena.getYubinNo());
+        dto.setJusho(atena.getJusho());
         dto.setTokuName(atena.getName());
 
         // 施設住所・名前を設定
