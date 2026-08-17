@@ -76,29 +76,28 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 		dto.setTokuName(atena.getName());
 		dto.setBiko(tokugimu.getBiko().isEmpty() ? "" : tokugimu.getBiko());
 
-		// 住所を郵便番号と住所で連結
+		// 住所を郵便番号と住所に分けて設定
+		String tokuYubin = "";
 		String tokuJusho = "";
-		String tokuJushoWithoutYubin = "";
 		if (atena.getYubinNo() != null && !atena.getYubinNo().isEmpty()) {
-			tokuJusho = "〒" + atena.getYubinNo() + "\r\n";
+			tokuYubin = "〒" + atena.getYubinNo();
 		}
 		if (atena.getJusho() != null) {
-			tokuJusho += atena.getJusho();
-			tokuJushoWithoutYubin = atena.getJusho();
+			tokuJusho = atena.getJusho();
 		}
 		dto.setTokuJusho(tokuJusho);
-		dto.setTokuJushoWithoutYubin(tokuJushoWithoutYubin);
-
-		dto.setShisetsuName(tokugimu.getShisetsuName());
-
-		// 施設所在地を郵便番号と住所で連結
+		dto.setTokuYubin(tokuYubin);
+		
+		// 施設所在地を郵便番号と住所に分けて設定
+		String shisetsuYubin = "";
 		String shisetsuJusho = "";
 		if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
-			shisetsuJusho = "〒" + tokugimu.getShisetsuYubinNo() + "\r\n";
+			shisetsuYubin = "〒" + tokugimu.getShisetsuYubinNo();
 		}
 		if (tokugimu.getShisetsuJusho() != null) {
-			shisetsuJusho += tokugimu.getShisetsuJusho();
+			shisetsuJusho = tokugimu.getShisetsuJusho();
 		}
+		dto.setShisetsuYubin(shisetsuYubin);
 		dto.setShisetsuJusho(shisetsuJusho);
 
 		// application.ymlから取得する値
@@ -108,4 +107,4 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 
 		return dto;
 	}
-}
+};

@@ -64,11 +64,11 @@ public class TokugimuJuriTsuchiReportsServiceImpl implements TokugimuJuriTsuchiR
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
 		reportsDto.setShiteiNo(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
+		reportsDto.setShisetsuYubin(dto.getShisetsuYubin() != null ? dto.getShisetsuYubin() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
+		reportsDto.setTokuYubin(dto.getTokuYubin() != null ? dto.getTokuYubin() : "");
 		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
-		reportsDto.setTokuJushoWithoutYubin(
-				dto.getTokuJushoWithoutYubin() != null ? dto.getTokuJushoWithoutYubin() : "");
 		reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
