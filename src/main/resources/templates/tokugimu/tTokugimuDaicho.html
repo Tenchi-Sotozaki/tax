@@ -155,54 +155,6 @@
 			</div>
 		</div>
 
-		<!-- ========== ツールバー（ボタンエリア） ==========
-			 サイドメニューからの導線が整うまでは残す方針のため削除しない -->
-		<div class="card shadow-sm mb-3">
-			<div class="card-body py-2 px-3">
-				<div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
-					<!-- グループ1: 基本操作
-						 照会・削除は一覧の「詳細」リンクから遷移できるため設置しない -->
-					<div class="d-flex flex-wrap gap-1">
-						<a th:href="@{/tokugimu/registration}" class="btn btn-success btn-sm"> <i
-								class="bi bi-plus-circle me-1"></i>新規登録
-						</a>
-					</div>
-					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ2: 納税管理人 -->
-					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnTaxManager" class="btn btn-success btn-sm">
-							<i class="bi bi-person-plus me-1"></i>納税管理人登録
-						</button>
-						<button type="button" id="btnTaxManagerView" class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-person me-1"></i>納税管理人照会
-						</button>
-					</div>
-					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ3: 納税周期(特例申請) -->
-					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnNozeiShuki" class="btn btn-success btn-sm">
-							<i class="bi bi-calendar-plus me-1"></i>納税周期登録
-						</button>
-						<button type="button" id="btnNozeiShukiView" class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-calendar-check me-1"></i>納税周期照会
-						</button>
-					</div>
-					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ4: 納入台帳 -->
-					<button type="button" id="btnPaymentLedger" class="btn btn-outline-primary btn-sm">
-						<i class="bi bi-currency-yen me-1"></i>納入申告管理台帳
-					</button>
-
-					<!-- グループ5: その他 -->
-					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnReport" class="btn btn-primary btn-sm">
-							<i class="bi bi-printer me-1"></i>帳票発行
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<!-- ========== 検索結果エリア（初期表示時は表示しない） ========== -->
 		<th:block th:if="${isSearched}">
 
