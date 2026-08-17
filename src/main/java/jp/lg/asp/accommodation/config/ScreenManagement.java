@@ -185,4 +185,7 @@ public final class ScreenManagement {
 
 	// 交付金帳票一括発行
 	public static final String KOFUKIN_REPORT_BULK = "ms00000028";
+
+	// 送付先CSV出力
+	public static final String SOFUSAKI_CSV = "mo00000005";
 }
