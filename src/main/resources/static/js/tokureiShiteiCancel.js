@@ -6,33 +6,43 @@
  * フォームバリデーション
  */
 function validateForm() {
-	
-	// エラーメッセージをクリア
+
 	window.ReportError.hide();
-	
+	clearInvalid();
+
     const hakkoYmd = document.getElementById('hakkoYmd').value;
     const tekiyoYmd = document.getElementById('tekiyoYmd').value;
     const riyu = document.getElementById('riyu').value;
 
     if (!hakkoYmd) {
+        setInvalid('hakkoYmd');
         window.ReportError.show('発行年月日を入力してください。');
-        document.getElementById('hakkoYmd').focus();
         return false;
     }
 
     if (!tekiyoYmd) {
+        setInvalid('tekiyoYmd');
         window.ReportError.show('適用年月を入力してください。');
-        document.getElementById('tekiyoYmd').focus();
         return false;
     }
 
     if (!riyu.trim()) {
+        setInvalid('riyu');
         window.ReportError.show('取消理由を入力してください。');
-        document.getElementById('riyu').focus();
         return false;
     }
 
     return true;
+}
+
+function setInvalid(id) {
+    const el = document.getElementById(id);
+    el.classList.add('is-invalid');
+    el.addEventListener('input', () => el.classList.remove('is-invalid'), { once: true });
+}
+
+function clearInvalid() {
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
 }
 
 document.addEventListener('DOMContentLoaded', function() {
