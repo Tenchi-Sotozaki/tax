@@ -6,6 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 public class AppUserDetails extends User {
+	
+	private static final long serialVersionUID = 1L;
 
     private final boolean mustChangePassword;
     private String displayName;
