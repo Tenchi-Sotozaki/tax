@@ -66,11 +66,37 @@
 			<element kind="textField" uuid="2003f29c-cba4-47e5-9fb9-c9b022e7f8df" x="165" y="181" width="315" height="30" fontName="IPAex明朝" fontSize="14.0">
 				<expression><![CDATA[$F{name}]]></expression>
 			</element>
-			<element kind="textField" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda6b" x="20" y="20" width="500" height="50" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center">
-				<expression><![CDATA["宿泊税納税管理人選定免除" + $P{nintei} + "通知書"]]></expression>
+			<!-- タイトル1行横並び: 宿泊税納税管理人選任免除 | 認定(縦)/不認定(縦) | 通知書 -->
+			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda5a" x="70" y="10" width="200" height="60" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[宿泊税納税管理人選任免除]]></text>
 			</element>
-			<element kind="textField" uuid="12e8a4b9-46d1-4b20-80ac-310be7b75ec8" x="50" y="260" width="425" height="50" fontName="IPAex明朝" fontSize="12.0">
-				<expression><![CDATA["　" + $P{city} + "宿泊税条例施行規則" + $P{jorei} + "の規定により、申請ありました納税管理人の選任免除について、次のとおり" + $P{nintei} + "することを決定しましたので通知します。"]]></expression>
+			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda6b" x="260" y="15" width="80" height="25" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[認定]]></text>
+			</element>
+			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda6c" x="260" y="40" width="80" height="25" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[不認定]]></text>
+			</element>
+			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c401" mode="Transparent" x="260" y="15" width="80" height="25">
+				<printWhenExpression><![CDATA[$P{nintei}.equals("認定")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
+			</element>
+			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c402" mode="Transparent" x="260" y="40" width="80" height="25">
+				<printWhenExpression><![CDATA[$P{nintei}.equals("不認定")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
+			</element>
+			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda7b" x="285" y="10" width="165" height="60" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[通知書]]></text>
+			</element>
+			<element kind="textField" uuid="12e8a4b9-46d1-4b20-80ac-310be7b75ec8" x="45" y="260" width="435" height="30" fontName="IPAex明朝" fontSize="12.0">
+				<expression><![CDATA["　" + $P{city} + "宿泊税条例施行規則" + $P{jorei} + "の規定により、申請ありました納税管理人の選任免除について、次のとおり（認定・不認定）することを決定しましたので通知します。"]]></expression>
+			</element>
+			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c403" mode="Transparent" x="256" y="270" width="34" height="16">
+				<printWhenExpression><![CDATA[$P{nintei}.equals("認定")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
+			</element>
+			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c404" mode="Transparent" x="292" y="270" width="48" height="16">
+				<printWhenExpression><![CDATA[$P{nintei}.equals("不認定")]]></printWhenExpression>
+				<pen lineWidth="1.5"/>
 			</element>
 			<element kind="staticText" uuid="b2a7637f-f110-4bff-bb62-4821df8903bf" x="141" y="350" width="109" height="80" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[所在地]]></text>
