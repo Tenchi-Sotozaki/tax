@@ -416,7 +416,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.stream().findFirst()
 				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + shiteiNo));
 		old.setNewFlg("0");
-		old.setAtenaNo(BigDecimal.valueOf(form.getAtenaNo()));
 		tokugimuRepository.save(old);
 
 		// 2. rno+1で新レコードをINSERT
@@ -427,7 +426,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setJichitaiCd(jichitaiCd);
 		t.setShiteiNo(shiteiNo);
 		t.setRno(newRno);
-		t.setAtenaNo(old.getAtenaNo());
+		t.setAtenaNo(BigDecimal.valueOf(form.getAtenaNo()));
 		t.setTorokuYmd(old.getTorokuYmd());
 		t.setShinkokuYmd(old.getShinkokuYmd());
 		t.setHenkoYmd(form.getRegistrationDate());
