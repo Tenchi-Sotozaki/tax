@@ -286,7 +286,7 @@
 			</element>
 			<element kind="textField" uuid="5218b789-da03-4150-b546-2aca6f0ab860" x="188" y="200" width="338" height="20" fontName="IPAex明朝" fontSize="9.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
 				<paragraph leftIndent="10" rightIndent="10"/>
-				<expression><![CDATA[$F{nozeiKanriJusho}]]></expression>
+				<expression><![CDATA[$F{nozeiKanriYubin}]]></expression>
 				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 			</element>
