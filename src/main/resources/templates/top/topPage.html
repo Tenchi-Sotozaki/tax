@@ -9,16 +9,15 @@
 
 <body>
 	<div layout:fragment="content" class="container-fluid p-4">
-
-		<!-- 全自治体共有エリア -->
-
-		<div th:utext="${sharedContent}"></div>
-
-
-		<!-- 自治体カスタマイズエリア -->
-
-		<div th:utext="${customContent}"></div>
-
+		<div th:if="${#lists.isEmpty(sharedList)}">
+			お知らせはありません
+		</div>
+				
+		<!-- 全自治体共有エリア -->	
+		<div th:each="content : ${sharedList}">
+		    <div th:utext="${content.titleHtml}"></div>
+		    <div th:utext="${content.contentHtml}"></div>
+		</div>
 	</div>
 </body>
 </html>
