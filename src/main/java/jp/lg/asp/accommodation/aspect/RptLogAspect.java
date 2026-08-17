@@ -20,6 +20,7 @@ import jp.lg.asp.accommodation.entity.ReportsLog;
 import jp.lg.asp.accommodation.entity.RptStatus;
 import jp.lg.asp.accommodation.repository.ReportsLogRepository;
 import jp.lg.asp.accommodation.repository.RptStatusRepository;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,7 +88,7 @@ public class RptLogAspect {
 	private String resolveShiteiNo(RptLog rptLog, ProceedingJoinPoint joinPoint) {
 		String shiteiNo = rptLog.shiteiNo();
 		if (shiteiNo.isEmpty()) {
-			return null;
+			return SessionHelper.getShiteiNoOrGassanShiteiNoFromCurrentRequest();
 		}
 		try {
 			MethodSignature sig = (MethodSignature) joinPoint.getSignature();
@@ -97,7 +98,8 @@ public class RptLogAspect {
 			for (int i = 0; i < paramNames.length; i++) {
 				context.setVariable(paramNames[i], args[i]);
 			}
-			return new SpelExpressionParser().parseExpression(shiteiNo).getValue(context, String.class);
+			String retShiteiNo = new SpelExpressionParser().parseExpression(shiteiNo).getValue(context, String.class);
+			return retShiteiNo == null ? SessionHelper.getShiteiNoOrGassanShiteiNoFromCurrentRequest() : retShiteiNo;
 		} catch (Exception e) {
 			log.warn("shiteiNoのSpEL評価に失敗しました: {}", shiteiNo, e);
 			return null;
