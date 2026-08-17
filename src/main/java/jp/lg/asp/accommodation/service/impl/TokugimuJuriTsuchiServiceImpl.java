@@ -74,6 +74,7 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 		TokugimuJuriTsuchiDto dto = new TokugimuJuriTsuchiDto();
 		dto.setShiteiNo(tokugimu.getShiteiNo());
 		dto.setTokuName(atena.getName());
+		dto.setShisetsuName(tokugimu.getShisetsuName());
 		dto.setBiko(tokugimu.getBiko().isEmpty() ? "" : tokugimu.getBiko());
 
 		// 住所を郵便番号と住所に分けて設定
