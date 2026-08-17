@@ -36,29 +36,43 @@ public final class ReportsConstants {
 	public static final String SOUSA_PREVIEW = "2";
 	public static final String SOUSA_PRINT = "3";
 
-	// 区分
+	// 区分（m_reports_def.kbn の値。値の格納先を表す）
 	public static final String KBN_TEXT = "1";
 	public static final String KBN_DATA = "2";
+
+	// 入力形式（設定画面に描画する入力欄の種類）
+	// kbn とは別物。kbn は def_text / def_data のどちらに値が入るかを表す
+	public static final int INPUT_TEXTBOX = 1;
+	public static final int INPUT_TEXTAREA = 2;
 
 	// 定義ID
 	public enum reportsOutputFiled {
 
-		TOKUGIMU_SHITEI_JOREI("RPT0000002", "特別徴収義務者指定通知条令", 1),
-		TOKUGIMU_JURI_JOREI("RPT0000003", "特別徴収義務者承認受理通知条令",1),
-		TOKUREI_SHITEI_JOREI("RPT0000005", "納入申告書の提出期限等の特例適用者指定通知条令", 1),
-		SHOREIKIN_KOFU_JOREI("RPT0000006", "特別徴収義務者奨励金交付要綱", 1),
-		KOSEI_KETTEI_HOREI_INYOU1("RPT0000007", "更正・決定通知書 法令引用文1",1),
-		KOSEI_KETTEI_HOREI_INYOU2("RPT0000008", "更正・決定通知書 法令引用文2", 1),
-		NONYUSHO_KOZA("RPT0000009", "納入書　納入場所", 2);
+		TOKUGIMU_SHITEI_JOREI("RPT0000002", "特別徴収義務者指定通知条例", INPUT_TEXTBOX),
+		TOKUGIMU_JURI_JOREI("RPT0000003", "特別徴収義務者承認受理通知条例", INPUT_TEXTBOX),
+		TOKUREI_SHITEI_JOREI("RPT0000005", "納入申告書の提出期限等の特例適用者指定通知条例", INPUT_TEXTBOX),
+		SHOREIKIN_KOFU_JOREI("RPT0000006", "特別徴収義務者奨励金交付要綱", INPUT_TEXTBOX),
+		KOSEI_KETTEI_HOREI_INYOU1("RPT0000007", "更正・決定通知書 法令引用文1", INPUT_TEXTBOX),
+		KOSEI_KETTEI_HOREI_INYOU2("RPT0000008", "更正・決定通知書 法令引用文2", INPUT_TEXTBOX),
+		NONYUSHO_KOZA("RPT0000011", "納入書　納入場所", INPUT_TEXTAREA),
+		NONYUSHO_KOZA_NO("RPT0000012", "納入書　口座番号", INPUT_TEXTBOX),
+		NONYUSHO_SHITEI_KINYU_NAME("RPT0000013", "納入書　指定金融機関名", INPUT_TEXTBOX),
+		NONYUSHO_TORIMATOME("RPT0000014", "納入書　取りまとめ店", INPUT_TEXTBOX),
+		KOFU_HAKKO_YOSHIKI("RPT0000009", "交付金　発行様式", INPUT_TEXTBOX),
+		KOFU_JOKEN("RPT0000010", "交付金　交付条件", INPUT_TEXTAREA),
+		GASSAN_NONYU_JOREI("RPT0000015", "合算申告納入承認通知条例", INPUT_TEXTBOX),
+		TOKUREI_CANCEL_JOREI("RPT0000016", "納入申告書の提出期限等の特例適用者指定取消通知条例", INPUT_TEXTBOX),
+		NOZEI_KANRININ_SHONIN_JOREI("RPT0000017", "納税管理人承認通知条例", INPUT_TEXTBOX),
+		NOZEI_KANRININ_NINTEI_JOREI("RPT0000018", "納税管理人選任免除認定通知条例", INPUT_TEXTBOX);
 
 		private final String id; // 帳票定義マスタのID
 		private final String name; // 設定画面に表示する定義名
-		private final Integer kbn; // 1:テキストボックス、2:テキストエリア
+		private final Integer inputType; // 1:テキストボックス、2:テキストエリア
 
-		reportsOutputFiled(String id, String name, Integer kbn) {
+		reportsOutputFiled(String id, String name, Integer inputType) {
 			this.id = id;
 			this.name = name;
-			this.kbn = kbn;
+			this.inputType = inputType;
 		}
 
 		public String getId() {
@@ -69,18 +83,18 @@ public final class ReportsConstants {
 			return name;
 		}
 
-		public Integer getKbn() {
-			return kbn;
+		public Integer getInputType() {
+			return inputType;
 		}
 	}
 
 	// 公印
 	public static final String KOIN = "RPT0000001";
-	// 特別徴収義務者指定通知条令
+	// 特別徴収義務者指定通知条例
 	public static final String TOKUGIMU_SHITEI_JOREI = "RPT0000002";
-	// 特別徴収義務者承認受理通知条令
+	// 特別徴収義務者承認受理通知条例
 	public static final String TOKUGIMU_JURI_JOREI = "RPT0000003";
-	// 納入申告書の提出期限等の特例適用者指定通知条令
+	// 納入申告書の提出期限等の特例適用者指定通知条例
 	public static final String TOKUREI_SHITEI_JOREI = "RPT0000005";
 	// 特別徴収義務者奨励金交付要綱
 	public static final String SHOREIKIN_KOFU_JOREI = "RPT0000006";
@@ -92,8 +106,27 @@ public final class ReportsConstants {
 	public static final String KOFU_HAKKO_YOSHIKI = "RPT0000009";
 	// 交付条件
 	public static final String KOFU_JOKEN = "RPT0000010";
+<<<<<<< HEAD
 	// 徴収不能額等の還付又は納入義務の免除申請書
 	public static final String KANPU_MENJO_SHINSEI = "RPT0000019";
+=======
+	// 納入書　納入場所
+	public static final String NONYUSHO_KOZA = "RPT0000011";
+	// 納入書　口座番号
+	public static final String NONYUSHO_KOZA_NO = "RPT0000012";
+	// 納入書　指定金融機関名
+	public static final String NONYUSHO_SHITEI_KINYU_NAME = "RPT0000013";
+	// 納入書　取りまとめ店
+	public static final String NONYUSHO_TORIMATOME = "RPT0000014";
+	// 合算申告納入承認通知条例
+	public static final String GASSAN_NONYU_JOREI = "RPT0000015";
+	// 納入申告書の提出期限等の特例適用者指定取消通知条例
+	public static final String TOKUREI_CANCEL_JOREI = "RPT0000016";
+	// 納税管理人承認通知条例
+	public static final String NOZEI_KANRININ_SHONIN_JOREI = "RPT0000017";
+	// 納税管理人選任免除認定通知条例
+	public static final String NOZEI_KANRININ_NINTEI_JOREI = "RPT0000018";
+>>>>>>> master
 
 	/* 
 	 * 操作名変換
