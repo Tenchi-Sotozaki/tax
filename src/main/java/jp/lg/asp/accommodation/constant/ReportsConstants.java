@@ -63,7 +63,8 @@ public final class ReportsConstants {
 		GASSAN_NONYU_JOREI("RPT0000015", "合算申告納入承認通知条例", INPUT_TEXTBOX),
 		TOKUREI_CANCEL_JOREI("RPT0000016", "納入申告書の提出期限等の特例適用者指定取消通知条例", INPUT_TEXTBOX),
 		NOZEI_KANRININ_SHONIN_JOREI("RPT0000017", "納税管理人承認通知条例", INPUT_TEXTBOX),
-		NOZEI_KANRININ_NINTEI_JOREI("RPT0000018", "納税管理人選任免除認定通知条例", INPUT_TEXTBOX);
+		NOZEI_KANRININ_NINTEI_JOREI("RPT0000018", "納税管理人選任免除認定通知条例", INPUT_TEXTBOX),
+		KANPU_MENJO_SHINSEI_JOREI("RPT0000019", "徴収不能額等の還付又は納入義務の免除申請書条例", INPUT_TEXTBOX);
 
 		private final String id; // 帳票定義マスタのID
 		private final String name; // 設定画面に表示する定義名
@@ -122,8 +123,8 @@ public final class ReportsConstants {
 	public static final String NOZEI_KANRININ_SHONIN_JOREI = "RPT0000017";
 	// 納税管理人選任免除認定通知条例
 	public static final String NOZEI_KANRININ_NINTEI_JOREI = "RPT0000018";
-	// 徴収不能額等の還付又は納入義務の免除申請書
-	public static final String KANPU_MENJO_SHINSEI = "RPT0000019";
+	// 徴収不能額等の還付又は納入義務の免除申請書条例
+	public static final String KANPU_MENJO_SHINSEI_JOREI = "RPT0000019";
 
 	/* 
 	 * 操作名変換

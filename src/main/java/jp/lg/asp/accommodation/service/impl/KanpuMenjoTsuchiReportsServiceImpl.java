@@ -68,7 +68,7 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
     private JRDataSource buildParams(KanpuMenjoTsuchiDto dto) {
     	
     	// 条例を取得
-    	String jorei = reportsCommonService.getReportsDefText(ReportsConstants.KANPU_MENJO_SHINSEI);
+    	String jorei = reportsCommonService.getReportsDefText(ReportsConstants.KANPU_MENJO_SHINSEI_JOREI);
     	
         KanpuMenjoTsuchiReportsDto reportsDto = new KanpuMenjoTsuchiReportsDto();
 
