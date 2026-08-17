@@ -51,13 +51,8 @@
 			<expression><![CDATA[$F{cityName}+"長"]]></expression>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 		</element>
-<<<<<<< HEAD
 		<element kind="textField" uuid="c4482dab-d238-499b-8fa0-4f420f7eadfd" x="1" y="120" width="555" height="32" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont">
 			<expression><![CDATA["　申請ありました宿泊税額に相当する額の還付又は宿泊税額の納入義務の免除について決定したので、"+$F{cityName}+"宿泊税条例施行規則"+$F{jorei}+"の規程により通知します。"]]></expression>
-=======
-		<element kind="textField" uuid="c4482dab-d238-499b-8fa0-4f420f7eadfd" x="0" y="120" width="550" height="32" fontName="IPAex明朝" fontSize="12.0">
-			<expression><![CDATA["　申請のありました宿泊税額に相当する額の還付又は宿泊税額の納入義務の免除について決定したので、"+$F{cityName}+"宿泊税条例施行規則"+$F{jorei}+"の規定により通知します。"]]></expression>
->>>>>>> master
 		</element>
 		<element kind="image" uuid="c80cdc36-efa4-4a39-b377-a6bc75f5cae0" x="506" y="56" width="50" height="50" onErrorType="Blank">
 			<expression><![CDATA[$F{koin}]]></expression>

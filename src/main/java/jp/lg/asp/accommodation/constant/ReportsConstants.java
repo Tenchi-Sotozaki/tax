@@ -106,10 +106,6 @@ public final class ReportsConstants {
 	public static final String KOFU_HAKKO_YOSHIKI = "RPT0000009";
 	// 交付条件
 	public static final String KOFU_JOKEN = "RPT0000010";
-<<<<<<< HEAD
-	// 徴収不能額等の還付又は納入義務の免除申請書
-	public static final String KANPU_MENJO_SHINSEI = "RPT0000019";
-=======
 	// 納入書　納入場所
 	public static final String NONYUSHO_KOZA = "RPT0000011";
 	// 納入書　口座番号
@@ -126,7 +122,8 @@ public final class ReportsConstants {
 	public static final String NOZEI_KANRININ_SHONIN_JOREI = "RPT0000017";
 	// 納税管理人選任免除認定通知条例
 	public static final String NOZEI_KANRININ_NINTEI_JOREI = "RPT0000018";
->>>>>>> master
+	// 徴収不能額等の還付又は納入義務の免除申請書
+	public static final String KANPU_MENJO_SHINSEI = "RPT0000019";
 
 	/* 
 	 * 操作名変換
