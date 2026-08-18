@@ -175,12 +175,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : ""); // 預金種目
 				dto.setFurigana(koza.getMeigi() != null ? convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
 				dto.setMeigi(koza.getMeigi() != null ? koza.getMeigi() : "****"); // 口座名義
-				dto.setKozaNo(koza.getKozaNo() != null ? // 口座番号（一文字ずつ格納）
-						koza.getKozaNo().codePoints()
-								.mapToObj(Character::toChars)
-								.map(String::new)
-								.collect(Collectors.toList())
-						: List.of());
+				dto.setKozaNo(formatKozaNo(koza.getKozaNo())); // 口座番号
 			}
 
 			// 口座情報が存在しない場合は **** でマスク
@@ -189,7 +184,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				dto.setBranchName("****");
 				dto.setFurigana("****");
 				dto.setMeigi("****");
-				dto.setKozaNo(List.of());
+				dto.setKozaNo(formatKozaNo(null));
 			}
 					
 			log.debug("交付申請書データ取得完了: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
@@ -280,12 +275,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : ""); // 預金種目
 				dto.setFurigana(koza.getMeigi() != null ? convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
 				dto.setMeigi(koza.getMeigi() != null ? koza.getMeigi() : "****"); // 口座名義
-				dto.setKozaNo(koza.getKozaNo() != null ? // 口座番号（一文字ずつ格納）
-						koza.getKozaNo().codePoints()
-								.mapToObj(Character::toChars)
-								.map(String::new)
-								.collect(Collectors.toList())
-						: List.of());
+				dto.setKozaNo(formatKozaNo(koza.getKozaNo())); // 口座番号
 			}
 
 			// 口座情報が存在しない場合は **** でマスク
@@ -294,7 +284,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				dto.setBranchName("****");
 				dto.setFurigana("****");
 				dto.setMeigi("****");
-				dto.setKozaNo(List.of());
+				dto.setKozaNo(formatKozaNo(null));
 			}
 			
 			result.add(dto);
@@ -375,5 +365,42 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 
 		// キーワードがいずれも含まれない場合はそのまま返す
 		return branchName;
+	}
+	
+	/**
+	 * 口座番号を7桁のリストに変換する（7桁未満の場合は * で埋める）
+	 */
+	private List<String> formatKozaNo(String kozaNoStr) {
+		List<String> kozaNoList = new ArrayList<>();
+
+		// 文字列がnullまたは空の場合は全て "*"
+		if (kozaNoStr == null || kozaNoStr.isBlank()) {
+			for (int i = 0; i < 7; i++) {
+				kozaNoList.add("*");
+			}
+			return kozaNoList;
+		}
+
+		// 1文字ずつリストに追加
+		List<String> chars = kozaNoStr.codePoints()
+				.mapToObj(Character::toChars)
+				.map(String::new)
+				.collect(Collectors.toList());
+
+		for (String c : chars) {
+			// 半角スペース、全角スペース、または空文字の場合は "*" に置き換え
+			if (c.equals(" ") || c.equals(" ") || c.isEmpty()) {
+				kozaNoList.add("*");
+			} else {
+				kozaNoList.add(c);
+			}
+		}
+
+		// 7桁未満なら "*" を追加して7桁にする
+		while (kozaNoList.size() < 7) {
+			kozaNoList.add("*");
+		}
+
+		return kozaNoList;
 	}
 }
