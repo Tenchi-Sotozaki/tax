@@ -1,10 +1,12 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
+import java.time.chrono.JapaneseChronology;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -62,19 +64,23 @@ public class TokugimuJuriTsuchiReportsServiceImpl implements TokugimuJuriTsuchiR
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
 		reportsDto.setShiteiNo(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
+		reportsDto.setShisetsuYubin(dto.getShisetsuYubin() != null ? dto.getShisetsuYubin() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
+		reportsDto.setTokuYubin(dto.getTokuYubin() != null ? dto.getTokuYubin() : "");
 		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
-		reportsDto.setTokuJushoWithoutYubin(
-				dto.getTokuJushoWithoutYubin() != null ? dto.getTokuJushoWithoutYubin() : "");
 		reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
-		// 発行日
 		if (dto.getHakkoYmd() != null) {
-			// フォーマット変換
-			String strDate = dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
-			reportsDto.setHakkoYmd(strDate);
+		    // 和暦用のフォーマッタを作成
+		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日")
+		            .withChronology(JapaneseChronology.INSTANCE)
+		            .withLocale(Locale.JAPAN);
+
+		    // フォーマット変換
+		    String strDate = dto.getHakkoYmd().format(formatter);
+		    reportsDto.setHakkoYmd(strDate);
 		} else {
 			reportsDto.setHakkoYmd("");
 		}

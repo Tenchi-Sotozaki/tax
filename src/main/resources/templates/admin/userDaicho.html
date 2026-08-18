@@ -140,7 +140,7 @@
 				<i class="bi bi-person-plus me-1"></i>ユーザー登録
 			</a>
 			<nav class="position-absolute start-50 translate-middle-x">
-				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+				<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows="tbody tr:has(td)"></ul>
 			</nav>
 			<div class="d-flex align-items-center gap-2">
 				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
@@ -192,18 +192,6 @@
 		</div>
 
 	</div>
-	<th:block layout:fragment="scripts">
-		<script>
-			document.addEventListener('DOMContentLoaded', () => {
-				const rows = Array.from(document.querySelectorAll('tbody tr')).filter(tr => tr.querySelector('td'));
-				const pageSizeSelect = document.getElementById('pageSizeSelect');
-				const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
-				if (rows.length > 0) {
-					pager.render(1);
-					pageSizeSelect?.addEventListener('change', () => pager.render(1));
-				}
-			});
-		</script>
-	</th:block>
+
 </body>
 </html>

@@ -1,9 +1,8 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
@@ -65,20 +64,25 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo())
                 .orElseThrow(() -> new RuntimeException("宛名情報が見つかりません: " + tokugimu.getAtenaNo()));
 
-        // 特別徴収義務者住所・名前を設定
-        dto.setTokuJusho(buildAddress(atena.getYubinNo(), atena.getJusho()));
+        // 特別徴収義務者郵便番号・住所・名前を設定
+        dto.setTokuYubin("〒"+atena.getYubinNo());
+        dto.setTokuJusho(atena.getJusho());
         dto.setTokuName(atena.getName());
 
-        // 施設住所・名前を設定
-        dto.setShisetsuJusho(buildAddress(tokugimu.getShisetsuYubinNo(), tokugimu.getShisetsuJusho()));
+        // 施設郵便番号・住所・名前を設定
+        dto.setShisetsuYubin("〒"+tokugimu.getShisetsuYubinNo());
+        dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
         dto.setShisetsuName(tokugimu.getShisetsuName());
 
         // 納税管理人情報を取得
-        nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-                .ifPresent(nokan -> {
-                    dto.setNozeiKanriJusho(buildAddress(nokan.getYubinNo(), nokan.getJusho()));
-                    dto.setNozeiKanriName(nokan.getName());
-                });
+		nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.ifPresent(nokan -> {
+					dto.setNozeiKanriYubin("〒"+nokan.getYubinNo());
+					dto.setNozeiKanriJusho(nokan.getJusho());
+					dto.setNozeiKanriName(nokan.getName());
+					dto.setKbn(nokan.getKbn());
+					dto.setRiyu(nokan.getRiyu());
+				});
 
         log.debug("納税管理人承認通知書情報取得完了: {}", dto);
         return dto;

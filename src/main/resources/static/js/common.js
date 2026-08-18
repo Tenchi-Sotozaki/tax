@@ -119,6 +119,29 @@ class SessionManager {
 }
 
 /**
+ * 全画面共通：#pagination[data-pagination-rows] があれば自動でページネーションを初期化
+ * data-pagination-rows  : 行要素のCSSセレクタ
+ * data-pagination-parent: (省略可) セレクタが行要素を直接指さない場合の親要素タグ名 (例: "tr")
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    const paginationEl = document.getElementById('pagination');
+    const rowSelector = paginationEl?.dataset.paginationRows;
+    if (!rowSelector) return;
+
+    const parentTag = paginationEl.dataset.paginationParent;
+    let rows = Array.from(document.querySelectorAll(rowSelector));
+    if (parentTag) rows = rows.map(el => el.closest(parentTag)).filter(Boolean);
+    rows = [...new Set(rows)];
+
+    const pageSizeSelect = document.getElementById('pageSizeSelect');
+    const pager = new Pagination(rows, pageSizeSelect, paginationEl);
+    if (rows.length > 0) {
+        pager.render(1);
+        pageSizeSelect?.addEventListener('change', () => pager.render(1));
+    }
+});
+
+/**
  * 全画面共通：Enterキーはボタンまたはセレクトにフォーカスがある場合のみ有効
  */
 document.addEventListener('keydown', function (e) {
@@ -135,7 +158,7 @@ document.addEventListener('keydown', function (e) {
 document.addEventListener('DOMContentLoaded', function () {
     const today = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
     document.querySelectorAll('input[type="date"]').forEach(function (input) {
-        if (!input.value && !input.disabled && !input.closest('#businessStatusBody') && !input.hasAttribute('data-no-today')) {
+        if (!input.value && !input.disabled && !input.closest('#collapseBusinessStatus') && !input.hasAttribute('data-no-today')) {
             input.value = today;
         }
     });

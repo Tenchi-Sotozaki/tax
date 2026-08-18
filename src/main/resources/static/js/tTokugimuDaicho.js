@@ -4,14 +4,6 @@ const SG_SELECT_API = '/accommodation-tax/api/shitei-gassan/select';
 
 document.addEventListener('DOMContentLoaded', function () {
 
-	const rows = Array.from(document.querySelectorAll('.row-select')).map(cb => cb.closest('tr'));
-	const pageSizeSelect = document.getElementById('pageSizeSelect');
-	const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
-	if (rows.length > 0) {
-		pager.render(1);
-		pageSizeSelect?.addEventListener('change', () => pager.render(1));
-	}
-
 	/**
 	 * 選択中の特別徴収義務者をセッションへ保存する。
 	 * @param {HTMLElement} el data属性を持つ要素（チェックボックスまたは詳細リンク）
