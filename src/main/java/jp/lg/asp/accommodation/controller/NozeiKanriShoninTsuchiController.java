@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +13,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.service.NokanService;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiService;
 import jp.lg.asp.accommodation.util.SessionHelper;
@@ -36,6 +37,7 @@ public class NozeiKanriShoninTsuchiController {
 
 	private final NozeiKanriShoninTsuchiService nozeiKanriShoninTsuchiService;
 	private final NozeiKanriShoninTsuchiReportsService reportsService;
+	private final NokanService nokanService;
 	private final ScreenAccessChecker accessChecker;
 	private static final String SCREEN_ID = ScreenManagement.NOZEI_KANRININ_SHONIN_TSUCHI;
 
@@ -48,8 +50,14 @@ public class NozeiKanriShoninTsuchiController {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 			String shiteiNo = SessionHelper.getShiteiNo(session);
+			
+			// 納税管理人情報が未登録
+			if(nokanService.findByJichitaiCdAndShiteiNo(shiteiNo).isEmpty()) {
+				model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
+				return "tokugimu/tTokugimuReport";
+			}
+			
 			NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
-
 			if (shiteiNo == null || shiteiNo.isEmpty()) {
 				model.addAttribute("showShiteiGassanModal", true);
 				dto.setHakkoYmd(LocalDate.now());
@@ -63,7 +71,7 @@ public class NozeiKanriShoninTsuchiController {
 				if (nozeiKanriInfo != null) {
 					dto = nozeiKanriInfo;
 					log.debug("納税管理人情報取得成功");
-				}
+				} 
 			} catch (RuntimeException e) {
 				log.error("納税管理人情報取得エラー: {}", e.getMessage(), e);
 				model.addAttribute("errorMessage", "指定番号: " + shiteiNo + " の情報が見つかりません。");
