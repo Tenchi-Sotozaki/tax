@@ -19,6 +19,7 @@ import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.NokanService;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiService;
@@ -51,6 +52,15 @@ public class NozeiKanriShoninTsuchiController {
 			accessChecker.checkAccess(SCREEN_ID);
 			String shiteiNo = SessionHelper.getShiteiNo(session);
 			
+			// 指定番号が存在しない場合
+			ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+			
+			if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+				// 画面を戻して検索モーダルを表示
+				model.addAttribute("showShiteiGassanModal", true);
+				return "tokugimu/tTokugimuReport";
+			}
+			
 			// 納税管理人情報が未登録
 			if(nokanService.findByJichitaiCdAndShiteiNo(shiteiNo).isEmpty()) {
 				model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
@@ -58,12 +68,6 @@ public class NozeiKanriShoninTsuchiController {
 			}
 			
 			NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
-			if (shiteiNo == null || shiteiNo.isEmpty()) {
-				model.addAttribute("showShiteiGassanModal", true);
-				dto.setHakkoYmd(LocalDate.now());
-				model.addAttribute("dto", dto);
-				return "reports/nozeiKanrininShoninTsuchi";
-			}
 
 			try {
 				log.debug("納税管理人情報取得開始: shiteiNo={}", shiteiNo);
