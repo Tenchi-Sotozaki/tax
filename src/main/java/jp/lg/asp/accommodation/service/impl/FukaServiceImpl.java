@@ -1049,7 +1049,7 @@ public class FukaServiceImpl implements FukaService {
 		}
 	}
 
-	private void setHakusuByIndex(ChoshuGenboUchi uchi, int index, Integer value) {
+	private void setHakusuByIndex(ChoshuGenboUchi uchi, int index, int value) {
 		try {
 			String methodName = "setHakusu" + index;
 			uchi.getClass().getMethod(methodName, Integer.class).invoke(uchi, value);
@@ -1087,8 +1087,8 @@ public class FukaServiceImpl implements FukaService {
 		}
 	}
 
-	private Long getLongValue(Long value) {
-		return value == null ? 0L : value;
+	private long getLongValue(Long value) {
+	    return value == null ? 0L : value;
 	}
 
 	/**
@@ -1108,7 +1108,9 @@ public class FukaServiceImpl implements FukaService {
 		}
 
 		List<DailyItem> dailyItems = form.getMonthlyTally().getDailyItems();
-		Long currentMaxIdx = choshuGenboUchiRepository.getMaxUchiIdx(jichitaiCd);
+		
+		Long maxIdxObj = choshuGenboUchiRepository.getMaxUchiIdx(jichitaiCd);
+		long currentMaxIdx = (maxIdxObj != null) ? maxIdxObj : 0L;
 
 		for (int i = 0; i < dailyItems.size() && i < MAX_DAYS; i++) {
 			DailyItem item = dailyItems.get(i);
