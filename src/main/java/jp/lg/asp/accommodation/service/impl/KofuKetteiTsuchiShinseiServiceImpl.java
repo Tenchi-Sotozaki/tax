@@ -112,15 +112,14 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 			dto.setTokuName(atena.getName());
 			dto.setShisetsuName(tokugimu.getShisetsuName());
 			
-			// 施設住所を郵便番号と住所で連結
-			StringBuilder shisetsuJusho = new StringBuilder();
+			// 施設郵便番号を設定
 			if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
-				shisetsuJusho.append("〒").append(tokugimu.getShisetsuYubinNo()).append("\n");
+				dto.setShisetsuYubin("〒" + tokugimu.getShisetsuYubinNo());
 			}
-			if (tokugimu.getShisetsuJusho() != null) {
-				shisetsuJusho.append(tokugimu.getShisetsuJusho());
+			// 施設住所を設定
+			if (tokugimu.getShisetsuJusho() != null && !tokugimu.getShisetsuJusho().isEmpty()) {
+				dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
 			}
-			dto.setShisetsuJusho(shisetsuJusho.toString());
 
 			// 奨励金情報設定（数値のみ）
 			if (shoreikinOpt.isPresent()) {
@@ -203,14 +202,14 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 			dto.setTokuName(atena.getName());
 			dto.setShisetsuName(tokugimu.getShisetsuName());
 
-			StringBuilder shisetsuJusho = new StringBuilder();
+			// 施設郵便番号を設定
 			if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
-				shisetsuJusho.append("〒").append(tokugimu.getShisetsuYubinNo()).append("\n");
+				dto.setShisetsuYubin("〒" + tokugimu.getShisetsuYubinNo());
 			}
-			if (tokugimu.getShisetsuJusho() != null) {
-				shisetsuJusho.append(tokugimu.getShisetsuJusho());
+			// 施設住所を設定
+			if (tokugimu.getShisetsuJusho() != null && !tokugimu.getShisetsuJusho().isEmpty()) {
+				dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
 			}
-			dto.setShisetsuJusho(shisetsuJusho.toString());
 
 			Long kofuZeigaku = shoreikin.getKofuZeigaku();
 			Long kofuGaku = shoreikin.getKofuGaku();

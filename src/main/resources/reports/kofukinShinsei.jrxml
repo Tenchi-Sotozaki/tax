@@ -13,6 +13,7 @@
 	<field name="kofuJoken" class="java.lang.String"/>
 	<field name="tokuName" class="java.lang.String"/>
 	<field name="koin" class="java.lang.Object"/>
+	<field name="shisetsuYubin" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<detail>
 		<band height="780" splitType="Stretch">
@@ -153,7 +154,7 @@
 			</element>
 			<element kind="textField" uuid="8719f37c-bd3d-4e07-b7d1-9cebe8db2542" x="240" y="225" width="280" height="30" fontName="IPAex明朝" vTextAlign="Middle">
 				<paragraph leftIndent="10" rightIndent="10"/>
-				<expression><![CDATA[$F{shisetsuJusho}]]></expression>
+				<expression><![CDATA[" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
@@ -628,6 +629,19 @@
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
+			</element>
+			<element kind="textField" uuid="9028e43d-740c-4b07-9441-75ff30615f22" x="240" y="236" width="280" height="19" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{shisetsuJusho}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="caec440e-6de5-4b84-bd4c-c82cf8c46db8" x="240" y="226" width="280" height="10" fontName="IPAex明朝" fontSize="8.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{shisetsuYubin}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
 		</band>
 	</detail>

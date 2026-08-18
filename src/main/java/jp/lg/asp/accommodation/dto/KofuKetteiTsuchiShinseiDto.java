@@ -22,6 +22,9 @@ public class KofuKetteiTsuchiShinseiDto {
 
 	/** 条例 */
 	private String jorei;
+	
+	/** 施設郵便番号 */
+	private String shisetsuYubin;
 
 	/** 施設住所 */
 	private String shisetsuJusho;
