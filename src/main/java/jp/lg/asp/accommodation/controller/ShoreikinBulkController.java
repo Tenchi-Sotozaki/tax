@@ -37,7 +37,7 @@ public class ShoreikinBulkController {
 	private final ScreenAccessChecker accessChecker;
 	private final KofuRitsuRepository kofuRitsuRepository;
 
-	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN;
+	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN_BULK;
 	private static final String BULK_VIEW = "shoreikin/shoreikinBulk";
 
 	private final JichitaiContext jichitaiContext;
