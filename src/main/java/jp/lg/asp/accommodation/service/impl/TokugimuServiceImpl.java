@@ -426,7 +426,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setJichitaiCd(jichitaiCd);
 		t.setShiteiNo(shiteiNo);
 		t.setRno(newRno);
-		t.setAtenaNo(old.getAtenaNo());
+		t.setAtenaNo(BigDecimal.valueOf(form.getAtenaNo()));
 		t.setTorokuYmd(old.getTorokuYmd());
 		t.setShinkokuYmd(old.getShinkokuYmd());
 		t.setHenkoYmd(form.getRegistrationDate());
@@ -434,16 +434,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setNewFlg("1");
 		t.setDelFlg("0");
 		tokugimuRepository.save(t);
-
-		// 3. Atena（事業者情報）を更新
-		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, old.getAtenaNo())
-				.orElseThrow(() -> new RuntimeException("宛名情報が見つかりません"));
-		atena.setName(form.getName());
-		atena.setNameKana(form.getNameKana());
-		atena.setYubinNo(form.getTokugimuAddressNo());
-		atena.setJusho(form.getTokugimuAddress());
-		atena.setTel1(form.getTokugimuPhone());
-		atenaRepository.save(atena);
 
 		// 4. 所有者情報の追加
 		saveShoyusha(shiteiNo, newRno, form, now, systemUser);
