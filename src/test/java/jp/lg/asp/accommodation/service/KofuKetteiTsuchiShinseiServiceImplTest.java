@@ -19,11 +19,13 @@ import org.mockito.quality.Strictness;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.FurikomiKoza;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.ReportsDef;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.FurikomiKozaRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -39,6 +41,7 @@ class kofuKetteiTsuchiShinseiServiceImplTest {
     @Mock ReportsDefRepository reportsDefRepository;
     @Mock ReportsCommonService reportsCommonService;
     @Mock JichitaiContext jichitaiContext;
+    @Mock FurikomiKozaRepository furikomiKozaRepository;
 
     @InjectMocks KofuKetteiTsuchiShinseiServiceImpl service;
 
@@ -79,6 +82,14 @@ class kofuKetteiTsuchiShinseiServiceImplTest {
         shoreikin.setKofuGaku(100000L);
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(Optional.of(shoreikin));
+        
+        FurikomiKoza koza = new FurikomiKoza();
+        koza.setBankName("テスト銀行");
+        koza.setBranchName("本店");
+        koza.setMeigi("テストタロウ");
+        koza.setKozaNo("1234567");
+        when(furikomiKozaRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Optional.of(koza));
 
         KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
 
