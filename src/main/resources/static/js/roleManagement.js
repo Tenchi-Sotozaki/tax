@@ -320,15 +320,6 @@ document.getElementById('deleteForm').addEventListener('submit', function(e) {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // 全件を描画済みのため、クライアント側でページングする
-    const rows = Array.from(document.querySelectorAll('#roleTableBody tr')).filter(tr => tr.querySelector('td'));
-    const pageSizeSelect = document.getElementById('pageSizeSelect');
-    const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
-    if (rows.length > 0) {
-        pager.render(1);
-        pageSizeSelect?.addEventListener('change', () => pager.render(1));
-    }
-
     const flash = sessionStorage.getItem('flashMessage');
     if (flash) {
         document.getElementById('flashMessageText').textContent = flash;
