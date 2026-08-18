@@ -252,12 +252,7 @@
 
 	</div>
 	<th:block layout:fragment="scripts">
-		<script>
-			document.getElementById('pageSizeSelect')?.addEventListener('change', function () {
-				const baseUrl = this.dataset.baseUrl;
-				window.location.href = baseUrl + '&pageSize=' + this.value + '&page=0';
-			});
-		</script>
+		<script th:src="@{/js/atenaDaicho.js}"></script>
 	</th:block>
 </body>
 </html>
