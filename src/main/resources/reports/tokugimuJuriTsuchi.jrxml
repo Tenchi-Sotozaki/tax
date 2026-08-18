@@ -105,8 +105,8 @@
 				<text><![CDATA[名 称]]></text>
 				<property name="com.jaspersoft.studio.unit.y" value="px"/>
 			</element>
-			<element kind="rectangle" uuid="a2ebfe34-3574-4174-84d0-2e9a23704537" x="250" y="370" width="270" height="64"/>
-			<element kind="rectangle" uuid="dd0957ae-94a9-4414-b315-aca96d15e96e" x="250" y="435" width="270" height="64"/>
+			<element kind="rectangle" uuid="a2ebfe34-3574-4174-84d0-2e9a23704537" x="250" y="370" width="270" height="65"/>
+			<element kind="rectangle" uuid="dd0957ae-94a9-4414-b315-aca96d15e96e" x="250" y="435" width="270" height="65"/>
 			<element kind="textField" uuid="71b283ec-5a8c-4684-a9c6-ffbb62390a9f" stretchType="NoStretch" x="250" y="254" width="270" height="46" rotation="None" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
 				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{tokuJusho}]]></expression>
@@ -117,7 +117,7 @@
 				<expression><![CDATA[$F{tokuName}]]></expression>
 				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 			</element>
-			<element kind="textField" uuid="40a8069f-c73a-4768-8039-dd31fd9f57e8" x="250" y="391" width="270" height="43" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
+			<element kind="textField" uuid="40a8069f-c73a-4768-8039-dd31fd9f57e8" x="250" y="381" width="270" height="43" fontName="IPAex明朝" fontSize="12.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Middle">
 				<paragraph leftIndent="10"/>
 				<expression><![CDATA[$F{shisetsuJusho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
