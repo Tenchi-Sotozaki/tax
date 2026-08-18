@@ -10,10 +10,12 @@ public class KanpuMenjoTsuchiDto {
     private String cityName;
     private String jorei;
     private LocalDate hakkoYmd;
+    private String tokuYubin;
     private String tokuJusho;
     private String tokuName;
     private String shinsei_kbn;
     private String kettei_naiyou;
+    private String shisetsuYubin;
     private String shisetsuJusho;
     private String shisetsuName;
     private LocalDate juriYmd;
