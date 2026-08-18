@@ -60,6 +60,9 @@ dependencies {
     // HTML Sanitizer
     implementation 'org.jsoup:jsoup:1.21.1'
 
+    // Kuromoji（形態素解析・漢字→カタカナ変換）
+    implementation 'com.atilika.kuromoji:kuromoji-ipadic:0.9.0'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 }
