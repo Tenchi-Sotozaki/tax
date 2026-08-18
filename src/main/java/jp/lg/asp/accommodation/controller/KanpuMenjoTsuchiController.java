@@ -21,6 +21,7 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -59,6 +60,15 @@ public class KanpuMenjoTsuchiController {
                        Model model) {
     	String jichitaiCode = jichitaiContext.getJichitaiCd();
     	String shiteiNo = SessionHelper.getShiteiNo(session);
+    	
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
+			model.addAttribute("showShiteiGassanModal", true);
+			return "tokugimu/tTokugimuReport";
+		}
+    	
         try {
             log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
 

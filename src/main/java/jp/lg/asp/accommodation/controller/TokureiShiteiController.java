@@ -47,6 +47,15 @@ public class TokureiShiteiController {
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		String shiteiNo = SessionHelper.getShiteiNo(session);
+		
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
+			model.addAttribute("showShiteiGassanModal", true);
+			return "tokugimu/tTokugimuReport";
+		}
+		
 		TokureiShiteiDto dto = new TokureiShiteiDto();
 
 		if (shiteiNo == null || shiteiNo.isEmpty()) {
