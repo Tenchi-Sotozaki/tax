@@ -72,6 +72,26 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<TokugimuListItem> searchAll(TokugimuSearchForm form) {
+		// page/pageSizeを無視して全件取得するためformを複製
+		TokugimuSearchForm all = new TokugimuSearchForm();
+		all.setShiteiNo(form.getShiteiNo());
+		all.setName(form.getName());
+		all.setNameMatchType(form.getNameMatchType());
+		all.setShisetsuName(form.getShisetsuName());
+		all.setShisetsuNameMatchType(form.getShisetsuNameMatchType());
+		all.setKyokaShu(form.getKyokaShu());
+		all.setGasanTaisho(form.getGasanTaisho());
+		all.setStatus(form.getStatus());
+		all.setKojinNo(form.getKojinNo());
+		all.setHojinNo(form.getHojinNo());
+		all.setPage(0);
+		all.setPageSize(Integer.MAX_VALUE);
+		return search(all).getContent();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public Page<TokugimuListItem> search(TokugimuSearchForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		
