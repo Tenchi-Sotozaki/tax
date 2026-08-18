@@ -21,23 +21,26 @@ public class TokugimuJuriTsuchiDto {
 
 	/** 特別徴収義務者名 */
 	private String tokuName;
-
+	
+	/** 特別徴収義務者郵便番号 */
+	private String tokuYubin;
+	
 	/** 特別徴収義務者住所 */
 	private String tokuJusho;
 
-	/** 特別徴収義務者住所（郵便番号なし） */
-	private String tokuJushoWithoutYubin;
-
 	/** 施設名称 */
 	private String shisetsuName;
+	
+	/** 施設郵便番号 */
+	private String shisetsuYubin;
 
-	/** 施設所在地 */
+	/** 施設住所 */
 	private String shisetsuJusho;
 
 	/** 市区町村名 */
 	private String cityName;
 
-	/** 条令 */
+	/** 条例 */
 	private String jorei;
 
 	/** 備考 */

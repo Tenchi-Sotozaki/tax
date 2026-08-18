@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
@@ -22,7 +21,6 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -81,30 +79,30 @@ public class KanpuMenjoTsuchiController {
             // 自治体情報をDBから取得
             Jichitai jichitai = jichitaiRepository.findById(jichitaiCode).orElse(null);
             String cityName = jichitai != null ? jichitai.getName() : "";
-            String jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
-
+            
             // DTO作成
             KanpuMenjoTsuchiDto dto = new KanpuMenjoTsuchiDto();
             dto.setShiteiNo(shiteiNo);
             dto.setCityName(cityName);
-            dto.setJorei(jorei);
             dto.setHakkoYmd(LocalDate.now());
             dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
 
             // 特別徴収義務者情報設定
             if (tokugimuForm != null) {
                 dto.setTokuName(tokugimuForm.getName());
+                dto.setTokuYubin("〒" + tokugimuForm.getTokugimuYubinNo());
                 dto.setTokuJusho(tokugimuForm.getTokugimuAddress());
                 dto.setShisetsuName(tokugimuForm.getFacilityName());
-                
-                String shisetsuJusho = "";
+               
+                // 郵便番号
                 if (tokugimuForm.getFacilityAddressNo() != null && !tokugimuForm.getFacilityAddressNo().isEmpty()) {
-                    shisetsuJusho += "〒" + tokugimuForm.getFacilityAddressNo() + " ";
+                    dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
                 }
+                
+                // 住所
                 if (tokugimuForm.getFacilityAddress() != null && !tokugimuForm.getFacilityAddress().isEmpty()) {
-                    shisetsuJusho += tokugimuForm.getFacilityAddress();
+                	dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
                 }
-                dto.setShisetsuJusho(shisetsuJusho);
             }
 
             model.addAttribute("dto", dto);

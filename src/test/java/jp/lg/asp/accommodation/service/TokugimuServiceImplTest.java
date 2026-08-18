@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
@@ -84,7 +83,7 @@ class TokugimuServiceImplTest {
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
         when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
 
-        Page<?> result = service.search(form);
+        var result = service.search(form);
 
         assertThat(result.getTotalElements()).isEqualTo(1);
     }
@@ -96,9 +95,23 @@ class TokugimuServiceImplTest {
         form.setPageSize(10);
         when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of());
 
-        Page<?> result = service.search(form);
+        var result = service.search(form);
 
         assertThat(result.isEmpty()).isTrue();
+    }
+
+    @Test
+    void searchAll_returnsAllItems() {
+        TokugimuSearchForm form = new TokugimuSearchForm();
+
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
+
+        var result = service.searchAll(form);
+
+        assertThat(result).hasSize(1);
     }
 
     @Test

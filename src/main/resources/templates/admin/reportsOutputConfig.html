@@ -44,9 +44,9 @@
 							<tr th:each="entry : ${defTextMap}">
 								<td class="align-middle fw-semibold" th:text="${entry.key.name}"></td>
 								<td>
-									<input th:if="${entry.key.kbn == 1}" type="text" class="form-control"
+									<input th:if="${entry.key.inputType == 1}" type="text" class="form-control"
 										th:name="${entry.key.id}" th:value="${entry.value}">
-									<textarea th:if="${entry.key.kbn == 2}" class="form-control" rows="4"
+									<textarea th:if="${entry.key.inputType == 2}" class="form-control" rows="4"
 										th:name="${entry.key.id}" th:text="${entry.value}"></textarea>
 								</td>
 							</tr>
