@@ -58,10 +58,10 @@
 		<element kind="image" uuid="41c1e8c1-28a3-4cb1-b94e-5943bbf97d6e" x="495" y="57" width="50" height="50" onErrorType="Blank">
 			<expression><![CDATA[$F{koin}]]></expression>
 		</element>
-		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="33" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+		<element kind="ellipse" uuid="74f3ed94-f30b-45ce-8665-19bbe88fa95c" x="35" y="128" width="30" height="15" backcolor="rgba(255, 255, 255, 0.0)">
 			<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
 		</element>
-		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="59" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+		<element kind="ellipse" uuid="a1e23157-8b16-4734-b3c7-0a93dd45959d" x="61" y="128" width="40" height="15" backcolor="rgba(255, 255, 255, 0.0)">
 			<printWhenExpression><![CDATA["2".equals($F{shonin})]]></printWhenExpression>
 		</element>
 		<element kind="textField" uuid="42aa6fa0-d0a2-4954-a9a6-b46aa37047c8" x="144" y="13" width="236" height="20" fontName="IPAex明朝" fontSize="8.0" textAdjust="ScaleFont" vTextAlign="Middle">
