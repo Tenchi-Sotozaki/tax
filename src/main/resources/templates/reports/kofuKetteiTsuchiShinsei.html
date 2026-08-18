@@ -21,6 +21,9 @@
 					<form id="kofuForm" th:object="${dto}" method="post">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						
+						<!-- 特別徴収義務者指定モーダルの読み込み -->
+						<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+						
 						<!-- 特別徴収義務者エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 						
@@ -94,6 +97,7 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/kofuKetteiTsuchiShinsei.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 		<script th:src="@{/js/reportForm.js}"></script>
 	</th:block>
 </body>
