@@ -63,10 +63,6 @@ public class NonyushoController {
         
         log.debug("納入書発行画面表示: shiteiNo={}", shiteiNo);
         
-        if (shiteiNo == null || shiteiNo.trim().isEmpty()) {
-            model.addAttribute("showShiteiGassanModal", true);
-            return "reports/nonyusho";
-        }
         try {
             TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
             model.addAttribute("shiteiNo", shiteiNo);

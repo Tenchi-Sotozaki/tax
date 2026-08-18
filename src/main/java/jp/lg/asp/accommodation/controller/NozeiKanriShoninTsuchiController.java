@@ -54,6 +54,7 @@ public class NozeiKanriShoninTsuchiController {
 			
 			// 指定番号が存在しない場合
 			ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+			
 			if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
 				// 画面を戻して検索モーダルを表示
 				model.addAttribute("showShiteiGassanModal", true);
@@ -67,12 +68,6 @@ public class NozeiKanriShoninTsuchiController {
 			}
 			
 			NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
-			if (shiteiNo == null || shiteiNo.isEmpty()) {
-				model.addAttribute("showShiteiGassanModal", true);
-				dto.setHakkoYmd(LocalDate.now());
-				model.addAttribute("dto", dto);
-				return "reports/nozeiKanrininShoninTsuchi";
-			}
 
 			try {
 				log.debug("納税管理人情報取得開始: shiteiNo={}", shiteiNo);

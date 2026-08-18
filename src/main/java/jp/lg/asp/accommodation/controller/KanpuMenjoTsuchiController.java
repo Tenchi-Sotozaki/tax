@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -71,12 +72,6 @@ public class KanpuMenjoTsuchiController {
     	
         try {
             log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
-
-            if (shiteiNo == null || shiteiNo.isEmpty()) {
-                model.addAttribute("showShiteiGassanModal", true);
-                model.addAttribute("dto", new KanpuMenjoTsuchiDto());
-                return "reports/kanpuMenjoTsuchi";
-            }
 
             // 特別徴収義務者情報取得
             TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);

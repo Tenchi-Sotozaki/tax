@@ -21,8 +21,8 @@ import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiCancelDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
-import jp.lg.asp.accommodation.service.TokureiShiteiCancelReportsService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
+import jp.lg.asp.accommodation.service.TokureiShiteiCancelReportsService;
 import jp.lg.asp.accommodation.service.TokureiShiteiService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
@@ -61,12 +61,6 @@ public class TokureiShiteiCancelController {
 		}
 		
 		TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
-
-		if (shiteiNo == null || shiteiNo.isEmpty()) {
-			model.addAttribute("showShiteiGassanModal", true);
-			model.addAttribute("dto", dto);
-			return "reports/tokureiShiteiCancel";
-		}
 
 		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(shiteiNo);
 		if (shiteiDto != null) {
