@@ -477,7 +477,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isEdit) return;
 
     // 対象となる入力要素を取得
-    const inputs = document.querySelectorAll('.form-control, .form-select, .form-check-input');
+    const inputs = document.querySelectorAll(
+        '.form-control:not(#addressSearchModal .form-control), ' +
+        '.form-select:not(#addressSearchModal .form-select), ' +
+        '.form-check-input:not(#addressSearchModal .form-check-input)'
+    );
 
     /**
      * 値が変わったかどうかを判定し、枠線を黄色にする
