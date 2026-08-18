@@ -163,40 +163,21 @@
 		<div th:if="${isSearched}">
 
 			<!-- 表示件数 + ページネーション（同一行） -->
-			<div class="d-flex align-items-center mb-1"
-				th:with="baseUrl=@{/atena/list(atenaNo=${searchForm.atenaNo},name=${searchForm.name},nameMatchType=${searchForm.nameMatchType},nameKana=${searchForm.nameKana},nameKanaMatchType=${searchForm.nameKanaMatchType},yubinNo=${searchForm.yubinNo},jusho=${searchForm.jusho},jushoMatchType=${searchForm.jushoMatchType},tel=${searchForm.tel},kojinNo=${searchForm.kojinNo},hojinNo=${searchForm.hojinNo},pageSize=${searchForm.pageSize})}">
-				<div style="min-width: 130px;">
+			<div class="d-flex justify-content-center align-items-center mb-1 position-relative">
+				<div class="position-absolute start-0">
 					<a th:href="@{/atena/register}" class="btn btn-primary btn-sm">
 						<i class="bi bi-plus-circle me-1"></i>新規登録
 					</a>
 				</div>
-				<nav class="flex-grow-1">
-					<ul class="pagination pagination-sm justify-content-center mb-0">
-						<!-- 前へ -->
-						<li class="page-item" th:classappend="${items.first} ? 'disabled'">
-							<a class="page-link" th:href="${baseUrl} + '&page=' + ${items.number - 1}">前へ</a>
-						</li>
-						<!-- ページ番号 -->
-						<th:block th:with="cur=${items.number}, total=${items.totalPages}">
-							<th:block th:each="i : ${#numbers.sequence(0, total - 1)}"
-								th:if="${i == 0 or i == total - 1 or (i >= cur - 2 and i <= cur + 2)}">
-								<li class="page-item disabled" th:if="${i == cur - 2 and i > 1}"><span class="page-link">…</span></li>
-								<li class="page-item" th:classappend="${i == cur} ? 'active'">
-									<a class="page-link" th:href="${baseUrl} + '&page=' + ${i}" th:text="${i + 1}"></a>
-								</li>
-								<li class="page-item disabled" th:if="${i == cur + 2 and i < total - 2}"><span class="page-link">…</span></li>
-							</th:block>
-						</th:block>
-						<!-- 次へ -->
-						<li class="page-item" th:classappend="${items.last} ? 'disabled'">
-							<a class="page-link" th:href="${baseUrl} + '&page=' + ${items.number + 1}">次へ</a>
-						</li>
-					</ul>
+				<nav>
+					<ul class="pagination pagination-sm justify-content-center mb-0"
+						id="pagination"
+						th:data-current-page="${items.number}"
+						th:data-total-pages="${items.totalPages}"></ul>
 				</nav>
-				<div class="d-flex align-items-center" style="min-width: 130px; justify-content: flex-end;">
+				<div class="d-flex align-items-center position-absolute end-0">
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
-					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;"
-						th:data-base-url="@{/atena/list(atenaNo=${searchForm.atenaNo},name=${searchForm.name},nameMatchType=${searchForm.nameMatchType},nameKana=${searchForm.nameKana},nameKanaMatchType=${searchForm.nameKanaMatchType},yubinNo=${searchForm.yubinNo},jusho=${searchForm.jusho},jushoMatchType=${searchForm.jushoMatchType},tel=${searchForm.tel},kojinNo=${searchForm.kojinNo},hojinNo=${searchForm.hojinNo})}">
+					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
 						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
 						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
 						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
