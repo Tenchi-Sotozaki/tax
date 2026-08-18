@@ -14,6 +14,8 @@ public interface AdminUserService {
 
     Page<User> search(UserSearchForm form);
 
+    List<User> searchAll(UserSearchForm form);
+
     List<Role> selectableRoles(String jichitaiCd, BigDecimal currentRoleId);
 
     User findById(String id);
