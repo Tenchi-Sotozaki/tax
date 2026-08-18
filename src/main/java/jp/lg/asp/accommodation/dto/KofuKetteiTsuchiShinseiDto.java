@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.dto;
 
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -64,4 +66,32 @@ public class KofuKetteiTsuchiShinseiDto {
 	
 	/** 操作（帳票ログ用） */
 	private String operation;
+	
+	//======================================
+	// 口座情報
+	//======================================
+	
+	/** 金融機関コード */
+	private String bankCd;
+
+	/** 金融機関名 */
+	private String bankName;
+	
+	/** 支店名 */
+	private String branchName;
+	
+	/** 支店種別 */
+	private String branchShubetsu;
+
+	/** 預金種目 */
+	private String shumoku;
+
+	/** 口座番号 */
+	private List<String> kozaNo;
+	
+	/** フリガナ */
+	private String furigana;
+
+	/** 口座名義 */
+	private String meigi;
 }

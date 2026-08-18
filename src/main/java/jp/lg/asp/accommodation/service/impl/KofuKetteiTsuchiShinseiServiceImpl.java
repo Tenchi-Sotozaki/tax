@@ -9,15 +9,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.atilika.kuromoji.ipadic.Tokenizer;
+
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.FurikomiKoza;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.ReportsDef;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.FurikomiKozaRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -39,6 +43,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 	private final ShoreikinRepository shoreikinRepository;
 	private final ReportsDefRepository reportsDefRepository;
 	private final ReportsCommonService reportsCommonService;
+	private final FurikomiKozaRepository furikomiKozaRepository;
 
 	private final JichitaiContext jichitaiContext;
 
@@ -153,7 +158,40 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 			dto.setHakkoYoshiki(hakkoYoshiki);
 			dto.setKofuJoken(kofuJoken);
 			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
+			
+			// 口座情報を取得
+			Optional<FurikomiKoza> furikomiKoza = furikomiKozaRepository.findByJichitaiCdAndShiteiNo(jichitaiCode,
+					tokugimu.getShiteiNo());
 
+			// 口座情報が存在する
+			if (furikomiKoza.isPresent()) {
+
+				FurikomiKoza koza = furikomiKoza.get();
+
+				// 口座情報を設定
+				dto.setBankCd(koza.getBankCd() != null ? koza.getBankCd() : ""); // 金融機関コード
+				dto.setBankName(koza.getBankName() != null ? processBankName(koza.getBankName()) : "****"); // 金融機関名
+				dto.setBranchName(koza.getBranchName() != null ? processBranchName(koza.getBranchName(), dto) : "****"); // 支店名
+				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : ""); // 預金種目
+				dto.setFurigana(koza.getMeigi() != null ? convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
+				dto.setMeigi(koza.getMeigi() != null ? koza.getMeigi() : "****"); // 口座名義
+				dto.setKozaNo(koza.getKozaNo() != null ? // 口座番号（一文字ずつ格納）
+						koza.getKozaNo().codePoints()
+								.mapToObj(Character::toChars)
+								.map(String::new)
+								.collect(Collectors.toList())
+						: List.of());
+			}
+
+			// 口座情報が存在しない場合は **** でマスク
+			else {
+				dto.setBankName("****");
+				dto.setBranchName("****");
+				dto.setFurigana("****");
+				dto.setMeigi("****");
+				dto.setKozaNo(List.of());
+			}
+					
 			log.debug("交付申請書データ取得完了: {}, 年度: {}", dto.getShiteiNo(), dto.getNendo());
 			return dto;
 
@@ -225,7 +263,40 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 			dto.setHakkoYoshiki(hakkoYoshiki);
 			dto.setKofuJoken(kofuJoken);
 			dto.setKoin(koin != null && koin.length > 0 ? koin : null);
+			
+			// 口座情報を取得
+			Optional<FurikomiKoza> furikomiKoza = furikomiKozaRepository.findByJichitaiCdAndShiteiNo(jichitaiCode,
+					tokugimu.getShiteiNo());
 
+			// 口座情報が存在する
+			if (furikomiKoza.isPresent()) {
+
+				FurikomiKoza koza = furikomiKoza.get();
+
+				// 口座情報を設定
+				dto.setBankCd(koza.getBankCd() != null ? koza.getBankCd() : ""); // 金融機関コード
+				dto.setBankName(koza.getBankName() != null ? processBankName(koza.getBankName()) : "****"); // 金融機関名
+				dto.setBranchName(koza.getBranchName() != null ? processBranchName(koza.getBranchName(), dto) : "****"); // 支店名
+				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : ""); // 預金種目
+				dto.setFurigana(koza.getMeigi() != null ? convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
+				dto.setMeigi(koza.getMeigi() != null ? koza.getMeigi() : "****"); // 口座名義
+				dto.setKozaNo(koza.getKozaNo() != null ? // 口座番号（一文字ずつ格納）
+						koza.getKozaNo().codePoints()
+								.mapToObj(Character::toChars)
+								.map(String::new)
+								.collect(Collectors.toList())
+						: List.of());
+			}
+
+			// 口座情報が存在しない場合は **** でマスク
+			else {
+				dto.setBankName("****");
+				dto.setBranchName("****");
+				dto.setFurigana("****");
+				dto.setMeigi("****");
+				dto.setKozaNo(List.of());
+			}
+			
 			result.add(dto);
 		}
 		return result;
@@ -251,5 +322,58 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 			log.error("帳票定義取得中にエラーが発生しました: id={}", id, e);
 			return "";
 		}
+	}
+	
+	/**
+	 * 漢字からカタカナへの変換
+	 */
+	private String convertToKatakana(String text) {
+		return new Tokenizer().tokenize(text).stream()
+				.map(token -> {
+					String reading = token.getReading();
+					return (reading != null && !reading.equals("*")) ? reading : token.getSurface();
+				})
+				.collect(Collectors.joining());
+	}
+
+	/**
+	 * 金融機関名からキーワードを除いた部分を抽出する処理
+	 */
+	private String processBankName(String bankName) {
+		// 判定したいキーワード
+		String[] keywords = { "信用金庫", "信用組合", "銀行", "農協" };
+
+		for (String keyword : keywords) {
+			int index = bankName.indexOf(keyword);
+			if (index != -1) {
+				// キーワードが含まれている位置まで切り取る（キーワードは含めない）
+				return bankName.substring(0, index);
+			}
+		}
+
+		// キーワードがいずれも含まれない場合はそのまま返す
+		return bankName;
+	}
+	
+	/**
+	 * 支店名からキーワードを除いた部分を抽出する処理
+	 */
+	private String processBranchName(String branchName, KofuKetteiTsuchiShinseiDto dto) {
+		// 判定したいキーワード
+		String[] keywords = { "本店", "支店", "出張所" };
+
+		for (String keyword : keywords) {
+			int index = branchName.indexOf(keyword);
+			if (index != -1) {
+				// 切り取ったキーワードを帳票フィールドへ設定（丸印の判別用）
+				dto.setBranchShubetsu(keyword);
+				
+				// キーワードが含まれている位置まで切り取る（キーワードは含めない）
+				return branchName.substring(0, index);
+			}
+		}
+
+		// キーワードがいずれも含まれない場合はそのまま返す
+		return branchName;
 	}
 }

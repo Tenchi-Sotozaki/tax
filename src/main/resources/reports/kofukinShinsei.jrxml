@@ -14,9 +14,17 @@
 	<field name="tokuName" class="java.lang.String"/>
 	<field name="koin" class="java.lang.Object"/>
 	<field name="shisetsuYubin" class="java.lang.String"/>
+	<field name="bankName" class="java.lang.String"/>
+	<field name="branchName" class="java.lang.String"/>
+	<field name="furigana" class="java.lang.String"/>
+	<field name="meigi" class="java.lang.String"/>
+	<field name="shumoku" class="java.lang.String"/>
+	<field name="kozaNo" class="java.util.List"/>
+	<field name="bankCd" class="java.lang.String"/>
+	<field name="branchShubetsu" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<detail>
-		<band height="780" splitType="Stretch">
+		<band height="781" splitType="Stretch">
 			<element kind="textField" uuid="0bd6acf3-f22c-4520-89ce-9f3779a2456f" x="0" y="10" width="160" height="20" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{hakkoYoshiki}]]></expression>
 			</element>
@@ -641,6 +649,113 @@
 				<expression><![CDATA[$F{shisetsuYubin}]]></expression>
 				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="textField" uuid="ea226084-0b29-4d31-b9c7-4021702136a9" x="200" y="538" width="93" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{bankName}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="a0d87763-d5bc-4248-a3c8-cbf2af9ce6a4" x="360" y="538" width="115" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{branchName}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="31307dd4-115e-4d1c-80c7-5ab48ae541bc" x="200" y="568" width="160" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{furigana}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="c77ff1c8-f0b2-4690-9e42-e85f7a5e62e2" x="200" y="598" width="160" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{meigi}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="37249a79-d400-4524-a533-987ca7976674" x="439" y="574" width="26" height="18" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["1".equals($F{shumoku})]]></printWhenExpression>
+			</element>
+			<element kind="ellipse" uuid="55493f39-e2c8-4283-9262-83566be10859" x="470" y="574" width="26" height="18" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA["2".equals($F{shumoku})]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="672239a2-d8b9-48a6-9f74-d8ca1f164a2e" x="415" y="598" width="15" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph leftIndent="0" rightIndent="0"/>
+				<expression><![CDATA[$F{kozaNo}.get(0)]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="2e6bf471-dfd7-4027-9393-9540469344e0" x="430" y="598" width="15" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph leftIndent="0" rightIndent="0"/>
+				<expression><![CDATA[$F{kozaNo}.get(1)]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="9b1bde4a-d861-4603-96fc-0e37a36714f7" x="445" y="598" width="15" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph leftIndent="0" rightIndent="0"/>
+				<expression><![CDATA[$F{kozaNo}.get(2)]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="f9a2e234-f4c2-4067-b8c6-e825d05ae41a" x="460" y="598" width="15" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph leftIndent="0" rightIndent="0"/>
+				<expression><![CDATA[$F{kozaNo}.get(3)]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="d2c4e04c-5e90-4045-beaf-3ded5d1c1a89" x="475" y="598" width="15" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph leftIndent="0" rightIndent="0"/>
+				<expression><![CDATA[$F{kozaNo}.get(4)]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="b18d62f9-6b65-4a0f-a810-670355ab1fdc" x="490" y="598" width="15" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph leftIndent="0" rightIndent="0"/>
+				<expression><![CDATA[$F{kozaNo}.get(5)]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="textField" uuid="75eba752-76bf-40a5-823f-2055c191a6dc" x="505" y="598" width="15" height="30" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Center" vTextAlign="Middle">
+				<paragraph leftIndent="0" rightIndent="0"/>
+				<expression><![CDATA[$F{kozaNo}.get(6)]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="dd669ad3-5bc0-4111-9283-6c6ba8e903bc" x="282" y="541" width="25" height="14" backcolor="rgba(255, 255, 255, 0.0)" printInFirstWholeBand="true">
+				<printWhenExpression><![CDATA[Integer.parseInt($F{bankCd}) >= 0 && Integer.parseInt($F{bankCd}) <= 999]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="faf694d3-5abb-40cd-9f7c-cbe5a7447153" x="312" y="540" width="45" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA[Integer.parseInt($F{bankCd}) >= 1000 && Integer.parseInt($F{bankCd}) <= 1999]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="fd555388-b021-490b-8cff-42ecddb2f5c8" x="282" y="550" width="45" height="15" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA[Integer.parseInt($F{bankCd}) >= 2000 && Integer.parseInt($F{bankCd}) <= 2949]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="5bf4af66-3694-4c56-ba40-3c81c52be18d" x="333" y="551" width="25" height="14" backcolor="rgba(255, 255, 255, 0.0)">
+				<printWhenExpression><![CDATA[Integer.parseInt($F{bankCd}) >= 3050 && Integer.parseInt($F{bankCd}) <= 9449]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="79984154-95ca-4221-ae0a-ff2c25fb190f" x="462" y="541" width="25" height="14" backcolor="rgba(255, 255, 255, 0.0)" printInFirstWholeBand="true">
+				<printWhenExpression><![CDATA["本店".equals($F{branchShubetsu})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="9e1d46fd-9497-4d2b-b85a-d14323451f9e" x="493" y="541" width="25" height="14" backcolor="rgba(255, 255, 255, 0.0)" printInFirstWholeBand="true">
+				<printWhenExpression><![CDATA["支店".equals($F{branchShubetsu})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="ellipse" uuid="f02151b7-a7c6-404c-817f-0ad9b585b141" x="481" y="551" width="38" height="14" backcolor="rgba(255, 255, 255, 0.0)" printInFirstWholeBand="true">
+				<printWhenExpression><![CDATA["出張所".equals($F{branchShubetsu})]]></printWhenExpression>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
 		</band>
