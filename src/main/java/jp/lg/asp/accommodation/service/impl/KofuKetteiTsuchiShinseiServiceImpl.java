@@ -271,12 +271,24 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				FurikomiKoza koza = furikomiKoza.get();
 
 				// 口座情報を設定
-				dto.setBankCd(koza.getBankCd() != null ? koza.getBankCd() : "-1"); // 金融機関コード
-				dto.setBankName(koza.getBankName() != null ? processBankName(koza.getBankName()) : "****"); // 金融機関名
-				dto.setBranchName(koza.getBranchName() != null ? processBranchName(koza.getBranchName(), dto) : "****"); // 支店名
-				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : "0"); // 預金種目
-				dto.setFurigana(koza.getMeigi() != null ? convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
-				dto.setMeigi(koza.getMeigi() != null ? koza.getMeigi() : "****"); // 口座名義
+				dto.setBankCd(koza.getBankCd() != null && !koza.getBankCd().isEmpty() ? 
+						koza.getBankCd() : "-1"); // 金融機関コード
+				
+				dto.setBankName(koza.getBankName() != null && !koza.getBankName().isEmpty() ?
+						processBankName(koza.getBankName()) : "****"); // 金融機関名
+				
+				dto.setBranchName(koza.getBranchName() != null && !koza.getBranchName().isEmpty() ? 
+						processBranchName(koza.getBranchName(), dto) : "****"); // 支店名
+				
+				dto.setShumoku(koza.getShumoku() != null && !koza.getShumoku().isEmpty() ?
+						koza.getShumoku() : "0"); // 預金種目
+				
+				dto.setFurigana(koza.getMeigi() != null && !koza.getMeigi().isEmpty() ?
+						convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
+				
+				dto.setMeigi(koza.getMeigi() != null && !koza.getMeigi().isEmpty() ?
+						koza.getMeigi() : "****"); // 口座名義
+				
 				dto.setKozaNo(formatKozaNo(koza.getKozaNo())); // 口座番号
 			}
 
