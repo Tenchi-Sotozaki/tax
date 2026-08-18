@@ -51,6 +51,20 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    public java.util.List<User> searchAll(UserSearchForm form) {
+
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
+
+        return userRepository.searchAll(
+                jichitaiCd,
+                emptyToNull(form.getId()),
+                toLikePattern(form.getName(), form.getNameMatchType()),
+                toLikePattern(form.getNameKana(), form.getNameKanaMatchType()),
+                toLikePattern(form.getBusho(), form.getBushoMatchType()),
+                form.getRoleId());
+    }
+
+    @Override
     public List<Role> selectableRoles(String jichitaiCd, BigDecimal currentRoleId) {
 
         Long current = currentRoleId != null ? currentRoleId.longValue() : null;
