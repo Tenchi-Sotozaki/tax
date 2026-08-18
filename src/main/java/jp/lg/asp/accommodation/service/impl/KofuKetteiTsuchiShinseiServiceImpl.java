@@ -169,10 +169,10 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				FurikomiKoza koza = furikomiKoza.get();
 
 				// 口座情報を設定
-				dto.setBankCd(koza.getBankCd() != null ? koza.getBankCd() : ""); // 金融機関コード
+				dto.setBankCd(koza.getBankCd() != null ? koza.getBankCd() : "-1"); // 金融機関コード
 				dto.setBankName(koza.getBankName() != null ? processBankName(koza.getBankName()) : "****"); // 金融機関名
 				dto.setBranchName(koza.getBranchName() != null ? processBranchName(koza.getBranchName(), dto) : "****"); // 支店名
-				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : ""); // 預金種目
+				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : "0"); // 預金種目
 				dto.setFurigana(koza.getMeigi() != null ? convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
 				dto.setMeigi(koza.getMeigi() != null ? koza.getMeigi() : "****"); // 口座名義
 				dto.setKozaNo(formatKozaNo(koza.getKozaNo())); // 口座番号
@@ -180,8 +180,10 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 
 			// 口座情報が存在しない場合は **** でマスク
 			else {
+				dto.setBankCd("-1");
 				dto.setBankName("****");
 				dto.setBranchName("****");
+				dto.setShumoku("0");
 				dto.setFurigana("****");
 				dto.setMeigi("****");
 				dto.setKozaNo(formatKozaNo(null));
@@ -269,10 +271,10 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				FurikomiKoza koza = furikomiKoza.get();
 
 				// 口座情報を設定
-				dto.setBankCd(koza.getBankCd() != null ? koza.getBankCd() : ""); // 金融機関コード
+				dto.setBankCd(koza.getBankCd() != null ? koza.getBankCd() : "-1"); // 金融機関コード
 				dto.setBankName(koza.getBankName() != null ? processBankName(koza.getBankName()) : "****"); // 金融機関名
 				dto.setBranchName(koza.getBranchName() != null ? processBranchName(koza.getBranchName(), dto) : "****"); // 支店名
-				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : ""); // 預金種目
+				dto.setShumoku(koza.getShumoku() != null ? koza.getShumoku() : "0"); // 預金種目
 				dto.setFurigana(koza.getMeigi() != null ? convertToKatakana(koza.getMeigi()) : "****"); // フリガナ
 				dto.setMeigi(koza.getMeigi() != null ? koza.getMeigi() : "****"); // 口座名義
 				dto.setKozaNo(formatKozaNo(koza.getKozaNo())); // 口座番号
@@ -280,8 +282,10 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 
 			// 口座情報が存在しない場合は **** でマスク
 			else {
+				dto.setBankCd("-1");
 				dto.setBankName("****");
 				dto.setBranchName("****");
+				dto.setShumoku("0");
 				dto.setFurigana("****");
 				dto.setMeigi("****");
 				dto.setKozaNo(formatKozaNo(null));
