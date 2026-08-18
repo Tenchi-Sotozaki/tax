@@ -135,7 +135,7 @@ document.addEventListener('keydown', function (e) {
 document.addEventListener('DOMContentLoaded', function () {
     const today = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
     document.querySelectorAll('input[type="date"]').forEach(function (input) {
-        if (!input.value && !input.disabled && !input.closest('#businessStatusBody') && !input.hasAttribute('data-no-today')) {
+        if (!input.value && !input.disabled && !input.closest('#collapseBusinessStatus') && !input.hasAttribute('data-no-today')) {
             input.value = today;
         }
     });
