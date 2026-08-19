@@ -141,15 +141,12 @@ public class TokureiShiteiCancelController {
 		dest.setShisetsuName(src.getShisetsuName());
 		dest.setShisetsuJusho(src.getShisetsuJusho());
 		dest.setCity(src.getCity());
-<<<<<<< HEAD
-		dest.setJorei(src.getJorei());
 		dest.setBiko(src.getBiko());
 		dest.setKoin(src.getKoin());
-=======
+		
 		// 条例は指定通知書とは別の条項になるため、取消通知書専用の定義を読む
 		dest.setJorei(reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_CANCEL_JOREI));
-		dest.setBiko("");
->>>>>>> master
+	
 		return dest;
 	}
 }
