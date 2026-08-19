@@ -38,7 +38,8 @@ public class ReportsCommonServiceImpl implements ReportsCommonService {
 		id.setId(Id);
 
 		ReportsDef entity = reportsDefRepository.findById(id).orElse(null);
-		if (entity == null || !entity.getKbn().equals(ReportsConstants.KBN_TEXT) || entity.getDefText().isEmpty()) {
+		if (entity == null || !ReportsConstants.KBN_TEXT.equals(entity.getKbn())
+				|| entity.getDefText() == null || entity.getDefText().isEmpty()) {
 			return "";
 		}
 		return entity.getDefText();

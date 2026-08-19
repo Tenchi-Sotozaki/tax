@@ -43,7 +43,7 @@ public class TokugimuShiteiTsuchiDto {
 	/** 市区町村名 */
 	private String cityName;
 
-	/** 条令 */
+	/** 条例 */
 	private String jorei;
 
 	/** 市区町村 */

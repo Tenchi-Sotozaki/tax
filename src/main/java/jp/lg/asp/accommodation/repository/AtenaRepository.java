@@ -18,6 +18,23 @@ import org.springframework.lang.Nullable;
 @Repository
 public interface AtenaRepository extends JpaRepository<Atena, AtenaId> {
 
+    @Query("SELECT COUNT(a) > 0 FROM Atena a WHERE a.jichitaiCd = :jichitaiCd AND a.kojinNo = :kojinNo AND (:excludeAtenaNo IS NULL OR a.atenaNo <> :excludeAtenaNo)")
+    boolean existsByKojinNo(
+        @Param("jichitaiCd") String jichitaiCd,
+        @Param("kojinNo") String kojinNo,
+        @Param("excludeAtenaNo") @Nullable BigDecimal excludeAtenaNo
+    );
+
+    @Query("SELECT COUNT(a) > 0 FROM Atena a WHERE a.jichitaiCd = :jichitaiCd AND a.hojinNo = :hojinNo AND (:excludeAtenaNo IS NULL OR a.atenaNo <> :excludeAtenaNo)")
+    boolean existsByHojinNo(
+        @Param("jichitaiCd") String jichitaiCd,
+        @Param("hojinNo") String hojinNo,
+        @Param("excludeAtenaNo") @Nullable BigDecimal excludeAtenaNo
+    );
+
+    @Query("SELECT MAX(a.atenaNo) FROM Atena a WHERE a.jichitaiCd = :jichitaiCd")
+    Optional<BigDecimal> findMaxAtenaNoByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
+
     @Query("SELECT a FROM Atena a WHERE a.jichitaiCd = :jichitaiCd AND a.atenaNo IN :atenaNos")
     List<Atena> findByJichitaiCdAndAtenaNoIn(
         @Param("jichitaiCd") String jichitaiCd,

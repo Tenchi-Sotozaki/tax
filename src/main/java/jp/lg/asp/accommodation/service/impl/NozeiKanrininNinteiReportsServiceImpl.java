@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import jp.lg.asp.accommodation.service.NozeiKanrininNinteiReportsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -34,43 +36,48 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 
 	@Override
 	public byte[] generatePdf(NozeiKanrininNinteiDto dto) {
-		try {
-			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
-			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+		if (dto == null) {
+	        throw new IllegalArgumentException("帳票データ（DTO）がnullです。");
+	    }
 
-			Map<String, Object> parameters = new HashMap<>();
-			parameters.put("net.sf.jasperreports.default.font.name", "IPAex明朝");
-			parameters.put("net.sf.jasperreports.default.pdf.font.name", "IPAex明朝");
-			parameters.put("net.sf.jasperreports.default.pdf.encoding", "Identity-H");
-			parameters.put("net.sf.jasperreports.default.pdf.embedded", "true");
+	    try {
+	        JasperReport jasperReport;
+	        try (InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream()) {
+	            jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+	        }
 
-			if (dto.getHakkoYmd() != null) {
-				parameters.put("hakkoYmd", dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")));
-			} else {
-				parameters.put("hakkoYmd", "");
-			}
-			parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
-			parameters.put("city", dto.getCityName() != null ? dto.getCityName() : "");
-			parameters.put("biko", dto.getBiko() != null ? dto.getBiko() : "");
-			parameters.put("nintei", dto.getNintei() != null ? dto.getNintei() : "認定");
+	        Map<String, Object> parameters = new HashMap<>();
+	        parameters.put("net.sf.jasperreports.default.font.name", "IPAex明朝");
+	        parameters.put("net.sf.jasperreports.default.pdf.font.name", "IPAex明朝");
+	        parameters.put("net.sf.jasperreports.default.pdf.encoding", "Identity-H");
+	        parameters.put("net.sf.jasperreports.default.pdf.embedded", "true");
 
-			// jrxmlのフィールド名に合わせたMap
-			Map<String, Object> row = new HashMap<>();
-			row.put("jusho", dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
-			row.put("name", dto.getTokuName() != null ? dto.getTokuName() : "");
-			row.put("shisetsu_jusho", dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
-			row.put("shisetsu_name", dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
-			row.put("koin", dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
+	        if (dto.getHakkoYmd() != null) {
+	            parameters.put("hakkoYmd", dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")));
+	        } else {
+	            parameters.put("hakkoYmd", "");
+	        }
+	        parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
+	        parameters.put("city", dto.getCityName() != null ? dto.getCityName() : "");
+	        parameters.put("biko", dto.getBiko() != null ? dto.getBiko() : "");
+	        parameters.put("nintei", dto.getNintei() != null ? dto.getNintei() : "認定");
 
-			List<Map<String, ?>> dataSourceList = Arrays.asList(row);
-			JRDataSource dataSource = new JRMapCollectionDataSource(dataSourceList);
+	        Map<String, Object> row = new HashMap<>();
+	        row.put("jusho", dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
+	        row.put("name", dto.getTokuName() != null ? dto.getTokuName() : "");
+	        row.put("shisetsu_jusho", dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
+	        row.put("shisetsu_name", dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
+	        row.put("koin", dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 
-			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
-			return JasperExportManager.exportReportToPdf(jasperPrint);
+	        List<Map<String, ?>> dataSourceList = Arrays.asList(row);
+	        JRDataSource dataSource = new JRMapCollectionDataSource(dataSourceList);
 
-		} catch (Exception e) {
-			log.error("納税管理人選任免除認定通知書PDF生成エラー: shiteiNo={}", dto.getShiteiNo(), e);
-			throw new RuntimeException("PDF生成に失敗しました: " + e.getMessage(), e);
-		}
+	        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+	        return JasperExportManager.exportReportToPdf(jasperPrint);
+
+	    } catch (IOException | JRException e) {
+	        log.error("納税管理人選任免除認定通知書PDF生成エラー: shiteiNo={}", dto.getShiteiNo(), e);
+	        throw new RuntimeException("PDF生成に失敗しました: " + e.getMessage(), e);
+	    }
 	}
 }

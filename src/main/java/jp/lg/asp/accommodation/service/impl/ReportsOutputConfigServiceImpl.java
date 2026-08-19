@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.constant.ReportsConstants.reportsOutputFiled;
+import jp.lg.asp.accommodation.constant.ReportsConstants.ReportsOutputField;
 import jp.lg.asp.accommodation.entity.ReportsDef;
 import jp.lg.asp.accommodation.entity.ReportsDefId;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
@@ -22,9 +22,9 @@ public class ReportsOutputConfigServiceImpl implements ReportsOutputConfigServic
 	private final ReportsDefRepository reportsDefRepository;
 
 	@Override
-	public Map<reportsOutputFiled, String> getDefTextMap(String jichitaiCd) {
-		Map<reportsOutputFiled, String> map = new LinkedHashMap<>();
-		for (reportsOutputFiled field : reportsOutputFiled.values()) {
+	public Map<ReportsOutputField, String> getDefTextMap(String jichitaiCd) {
+		Map<ReportsOutputField, String> map = new LinkedHashMap<>();
+		for (ReportsOutputField field : ReportsOutputField.values()) {
 			ReportsDefId id = new ReportsDefId();
 			id.setJichitaiCd(jichitaiCd);
 			id.setId(field.getId());
@@ -40,7 +40,7 @@ public class ReportsOutputConfigServiceImpl implements ReportsOutputConfigServic
 	@Transactional
 	public void saveDefText(String jichitaiCd, String userId, Map<String, String> defTextMap) {
 		LocalDateTime now = LocalDateTime.now();
-		for (reportsOutputFiled field : reportsOutputFiled.values()) {
+		for (ReportsOutputField field : ReportsOutputField.values()) {
 			String defText = defTextMap.getOrDefault(field.getId(), "");
 			ReportsDefId id = new ReportsDefId();
 			id.setJichitaiCd(jichitaiCd);
@@ -49,11 +49,12 @@ public class ReportsOutputConfigServiceImpl implements ReportsOutputConfigServic
 				ReportsDef newDef = new ReportsDef();
 				newDef.setJichitaiCd(jichitaiCd);
 				newDef.setId(field.getId());
-				newDef.setKbn(String.valueOf(field.getKbn()));
 				newDef.setAddDt(now);
 				newDef.setAddUser(userId);
 				return newDef;
 			});
+			// 既存行の区分が誤っていると帳票側で読み出せないため、毎回設定し直す
+			def.setKbn(ReportsConstants.KBN_TEXT);
 			def.setDefText(defText);
 			def.setUpdDt(now);
 			def.setUpdUser(userId);
