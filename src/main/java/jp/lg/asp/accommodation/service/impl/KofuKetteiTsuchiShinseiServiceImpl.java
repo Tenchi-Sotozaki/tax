@@ -418,7 +418,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 
 		for (String c : chars) {
 			// 半角スペース、全角スペース、または空文字の場合は "*" に置き換え
-			if (c.equals(" ") || c.equals(" ") || c.isEmpty()) {
+			if (c.equals(" ") || c.isEmpty()) {
 				kozaNoList.add("*");
 			} else {
 				kozaNoList.add(c);

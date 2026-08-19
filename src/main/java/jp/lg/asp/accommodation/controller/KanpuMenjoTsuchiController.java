@@ -92,23 +92,21 @@ public class KanpuMenjoTsuchiController {
             dto.setHakkoYmd(LocalDate.now());
             dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
 
-            // 特別徴収義務者情報設定
-            if (tokugimuForm != null) {
-                dto.setTokuName(tokugimuForm.getName());
-                dto.setTokuYubin("〒" + tokugimuForm.getTokugimuYubinNo());
-                dto.setTokuJusho(tokugimuForm.getTokugimuAddress());
-                dto.setShisetsuName(tokugimuForm.getFacilityName());
-               
-                // 郵便番号
-                if (tokugimuForm.getFacilityAddressNo() != null && !tokugimuForm.getFacilityAddressNo().isEmpty()) {
-                    dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
-                }
-                
-                // 住所
-                if (tokugimuForm.getFacilityAddress() != null && !tokugimuForm.getFacilityAddress().isEmpty()) {
-                	dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
-                }
-            }
+			// 特別徴収義務者情報設定
+			dto.setTokuName(tokugimuForm.getName());
+			dto.setTokuYubin("〒" + tokugimuForm.getTokugimuYubinNo());
+			dto.setTokuJusho(tokugimuForm.getTokugimuAddress());
+			dto.setShisetsuName(tokugimuForm.getFacilityName());
+
+			// 郵便番号
+			if (tokugimuForm.getFacilityAddressNo() != null && !tokugimuForm.getFacilityAddressNo().isEmpty()) {
+				dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
+			}
+
+			// 住所
+			if (tokugimuForm.getFacilityAddress() != null && !tokugimuForm.getFacilityAddress().isEmpty()) {
+				dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
+			}
 
             model.addAttribute("dto", dto);
             

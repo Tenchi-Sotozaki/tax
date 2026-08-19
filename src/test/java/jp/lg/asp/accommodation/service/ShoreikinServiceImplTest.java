@@ -75,8 +75,6 @@ class ShoreikinServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
 
         Shoreikin shoreikin = new Shoreikin();
         shoreikin.setShiteiNo(SHITEI_NO);
@@ -116,8 +114,6 @@ class ShoreikinServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
                 .thenReturn(List.of()); // 奨励金なし
 
@@ -143,8 +139,6 @@ class ShoreikinServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), any()))
                 .thenReturn(List.of());
 
@@ -168,8 +162,6 @@ class ShoreikinServiceImplTest {
                 .thenReturn(tokugimuList);
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
                 .thenReturn(List.of());
 
