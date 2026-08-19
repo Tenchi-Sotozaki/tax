@@ -135,10 +135,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const pageSizeSelect = document.getElementById('pageSizeSelect');
     const pager = new Pagination(rows, pageSizeSelect, paginationEl);
-    if (rows.length > 0) {
-        pager.render(1);
-        pageSizeSelect?.addEventListener('change', () => pager.render(1));
-    }
+    pager.render(1);
+    pageSizeSelect?.addEventListener('change', () => pager.render(1));
 });
 
 /**
