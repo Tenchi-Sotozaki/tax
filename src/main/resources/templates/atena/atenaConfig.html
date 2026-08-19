@@ -53,10 +53,10 @@
 						</div>
 
 						<!-- 個人番号 -->
-						<div class="col-md-4">
+						<div class="col-md-4" th:if="${mode != 'view'}">
 							<label class="form-label fw-medium">個人番号</label> <input
 								type="text" class="form-control" th:field="*{kojinNo}"
-								th:readonly="${mode == 'view'}" placeholder="個人番号か法人番号どちらか一方を入力">
+								placeholder="個人番号か法人番号どちらか一方を入力">
 						</div>
 
 						<!-- 法人番号 -->

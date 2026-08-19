@@ -12,6 +12,7 @@ import jp.lg.asp.accommodation.exception.ResourceNotFoundException;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.AtenaConfigService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -20,6 +21,7 @@ public class AtenaConfigServiceImpl implements AtenaConfigService {
 
     private final AtenaRepository atenaRepository;
     private final JichitaiRepository jichitaiRepository;
+    private final HashUtil hashUtil;
 
     @Override
     public Atena findByAtenaNo(String jichitaiCd, BigDecimal atenaNo) {
@@ -42,7 +44,12 @@ public class AtenaConfigServiceImpl implements AtenaConfigService {
 
         atena.setJichitaiCd(jichitaiCd);
         atena.setAtenaNo(nextNo);
-        atena.setKbn(atena.getKojinNo() != null && !atena.getKojinNo().isBlank() ? "1" : "2");
+        if (atena.getKojinNo() != null && !atena.getKojinNo().isBlank()) {
+            atena.setKojinNo(hashUtil.sha256(atena.getKojinNo()));
+            atena.setKbn("1");
+        } else {
+            atena.setKbn("2");
+        }
 
         return atenaRepository.save(atena);
     }
@@ -53,11 +60,17 @@ public class AtenaConfigServiceImpl implements AtenaConfigService {
         AtenaId id = new AtenaId();
         id.setJichitaiCd(jichitaiCd);
         id.setAtenaNo(atena.getAtenaNo());
-        atenaRepository.findById(id)
+        Atena existing = atenaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("宛名が見つかりません。"));
 
         atena.setJichitaiCd(jichitaiCd);
-        atena.setKbn(atena.getKojinNo() != null && !atena.getKojinNo().isBlank() ? "1" : "2");
+        if (atena.getKojinNo() != null && !atena.getKojinNo().isBlank()) {
+            atena.setKojinNo(hashUtil.sha256(atena.getKojinNo()));
+            atena.setKbn("1");
+        } else {
+            atena.setKojinNo(existing.getKojinNo());
+            atena.setKbn(existing.getKbn());
+        }
 
         return atenaRepository.save(atena);
     }

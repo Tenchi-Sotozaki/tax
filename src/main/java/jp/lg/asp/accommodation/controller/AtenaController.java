@@ -239,7 +239,9 @@ public class AtenaController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
 		Atena atena = atenaConfigService.findByAtenaNo(jichitaiCd, atenaNo);
-		model.addAttribute("form", toForm(atena));
+		AtenaConfigForm form = toForm(atena);
+		form.setKojinNo(null);
+		model.addAttribute("form", form);
 		model.addAttribute("mode", "edit");
 		return "atena/atenaConfig";
 	}
@@ -251,11 +253,6 @@ public class AtenaController {
 			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
-		if (isBlank(form.getKojinNo()) && isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号または法人番号のいずれかを入力してください。");
-			model.addAttribute("mode", "edit");
-			return "atena/atenaConfig";
-		}
 		if (!isBlank(form.getKojinNo()) && !isBlank(form.getHojinNo())) {
 			model.addAttribute("errorMessage", "個人番号と法人番号は同時に入力できません。");
 			model.addAttribute("mode", "edit");
