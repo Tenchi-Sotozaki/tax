@@ -12,11 +12,6 @@ import jp.lg.asp.accommodation.entity.ReportsDefId;
 public interface ReportsDefRepository extends JpaRepository<ReportsDef, ReportsDefId> {
 
 	/**
-	 * 自治体コードと定義テキストで検索
-	 */
-	Optional<ReportsDef> findByJichitaiCdAndDefText(String jichitaiCd, String defText);
-	
-	/**
 	 * IDと自治体コードで検索
 	 */
 	Optional<ReportsDef> findByIdAndJichitaiCd(String id, String jichitaiCd);

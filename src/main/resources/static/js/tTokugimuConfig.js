@@ -150,8 +150,6 @@ function onDeclarationTypeChange(e) {
     const undecided = document.getElementById('suspensionEndDateUndecided');
     const resumeClose = document.getElementById('resumptionOrAbolitionDate');
     const reason = document.getElementById('suspensionOrAbolitionReason');
-    const today = new Date().toLocaleDateString('sv-SE');
-
     // 全て非活性にしてクリア
     [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
         if (el) { el.disabled = true; el.value = ''; }
@@ -162,15 +160,12 @@ function onDeclarationTypeChange(e) {
         [suspendStart, suspendEnd, undecided, reason].forEach(el => {
             if (el) el.disabled = false;
         });
-        if (suspendStart && !suspendStart.value) suspendStart.value = today;
-        if (suspendEnd && !suspendEnd.value) suspendEnd.value = today;
     } else if (value === '再開') {
-        if (resumeClose) { resumeClose.disabled = false; if (!resumeClose.value) resumeClose.value = today; }
+        if (resumeClose) resumeClose.disabled = false;
     } else if (value === '廃止') {
         [resumeClose, reason].forEach(el => {
             if (el) el.disabled = false;
         });
-        if (resumeClose && !resumeClose.value) resumeClose.value = today;
     }
 }
 
@@ -422,11 +417,11 @@ function applyDeclarationState() {
     const resumeClose = document.getElementById('resumptionOrAbolitionDate');
     const reason = document.getElementById('suspensionOrAbolitionReason');
 
-    // ラジオ未選択時は全て非活性
+    // ラジオ未選択時は全て非活性かつ値をクリア
     [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
-        if (el) el.disabled = true;
+        if (el) { el.disabled = true; el.value = ''; }
     });
-    if (undecided) undecided.disabled = true;
+    if (undecided) { undecided.disabled = true; undecided.checked = false; }
 
     if (!checked) return;
     const value = checked.value;
@@ -477,7 +472,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isEdit) return;
 
     // 対象となる入力要素を取得
-    const inputs = document.querySelectorAll('.form-control, .form-select, .form-check-input');
+    const inputs = document.querySelectorAll(
+        '.form-control:not(#addressSearchModal .form-control), ' +
+        '.form-select:not(#addressSearchModal .form-select), ' +
+        '.form-check-input:not(#addressSearchModal .form-check-input)'
+    );
 
     /**
      * 値が変わったかどうかを判定し、枠線を黄色にする

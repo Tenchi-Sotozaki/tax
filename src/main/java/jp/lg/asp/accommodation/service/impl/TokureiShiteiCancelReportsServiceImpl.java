@@ -56,10 +56,15 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 	private Map<String, Object> buildParameters(TokureiShiteiCancelDto dto) {
 		Map<String, Object> parameters = new HashMap<>();
 		parameters.put("hakkoYmd", dto.getHakkoYmd() != null
+<<<<<<< HEAD
 			    ? JapaneseDate.from(dto.getHakkoYmd()).format(DateTimeFormatter.ofPattern("GGGGy年M月d日", java.util.Locale.JAPANESE))
 			    : "");
 		parameters.put("tekiyoYmd", dto.getTekiyoYmd() != null
 				? dto.getTekiyoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")) : "");
+=======
+				? dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")) : "");
+		parameters.put("tekiyoYmd", dto.getTekiyoYmd() != null ? dto.getTekiyoYmd() : "");
+>>>>>>> master
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
 		parameters.put("city", dto.getCity() != null ? dto.getCity() : "");
 		parameters.put("riyu", dto.getRiyu() != null ? dto.getRiyu() : "");

@@ -68,30 +68,28 @@ public class AtenaController {
 	@GetMapping("/list")
 	@OpeLog(screenId = ATENA_DAICHO, operation = "照会")
 	public String list(@ModelAttribute AtenaSearchForm searchForm,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "false") boolean searched,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_DAICHO);
-		searchForm.setPage(page);
-		searchForm.setPageSize(pageSize);
-		Page<Atena> atenaPage = atenaRepository.searchPage(
-				jichitaiCd,
-				toLikePattern(searchForm.getAtenaNo(), "exact"),
-				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
-				toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
-				toLikePattern(searchForm.getYubinNo(), "exact"),
-				toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
-				toLikePattern(searchForm.getTel(), "exact"),
-				toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
-				toLikePattern(searchForm.getHojinNo(), "exact"),
-				PageRequest.of(page, pageSize));
 		BigDecimal atenaStNo = jichitaiRepository.findById(jichitaiCd)
 				.map(Jichitai::getAtenaStNo).orElse(null);
-		org.springframework.data.domain.Page<AtenaDaichoItem> items = atenaPage
-				.map(a -> new AtenaDaichoItem(a, atenaStNo));
+		List<AtenaDaichoItem> items = searched
+				? atenaRepository.search(
+						jichitaiCd,
+						toLikePattern(searchForm.getAtenaNo(), "exact"),
+						toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
+						toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
+						toLikePattern(searchForm.getYubinNo(), "exact"),
+						toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
+						toLikePattern(searchForm.getTel(), "exact"),
+						toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
+						toLikePattern(searchForm.getHojinNo(), "exact"))
+						.stream().map(a -> new AtenaDaichoItem(a, atenaStNo)).toList()
+				: List.of();
 		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
+		model.addAttribute("isSearched", searched);
 		return "atena/atenaDaicho";
 	}
 

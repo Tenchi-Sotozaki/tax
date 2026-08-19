@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -48,15 +49,16 @@ public class NozeiKanrininNinteiController {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 			String shiteiNo = SessionHelper.getShiteiNo(session);
-			NozeiKanrininNinteiDto dto = new NozeiKanrininNinteiDto();
-
-			if (shiteiNo == null || shiteiNo.isEmpty()) {
+			
+			// 指定番号が存在しない場合
+			ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+			if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+				// 画面を戻して検索モーダルを表示
 				model.addAttribute("showShiteiGassanModal", true);
-				dto.setHakkoYmd(LocalDate.now());
-				dto.setNintei("認定");
-				model.addAttribute("dto", dto);
-				return "reports/nozeiKanrininNintei";
+				return "tokugimu/tTokugimuReport";
 			}
+			
+			NozeiKanrininNinteiDto dto = new NozeiKanrininNinteiDto();
 
 			try {
 				log.debug("納税管理人選任免除認定情報取得開始: shiteiNo={}", shiteiNo);

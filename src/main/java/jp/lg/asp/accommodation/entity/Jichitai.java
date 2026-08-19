@@ -41,4 +41,8 @@ public class Jichitai extends BaseEntity {
 	@Column(name = "atena_st_no", precision = 15)
 	private BigDecimal atenaStNo;
 
+	/** ログインURLのクエリパラメータ文字列 */
+	@Column(name = "param", nullable = false)
+	private String param;
+
 }

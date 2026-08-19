@@ -32,7 +32,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoninTsuchiReportsService {
 
 	private static final String JRXML_PATH = "reports/nozeiKanrininShoninTsuchi.jrxml";
-
+	
 	@Override
 	public byte[] generateTsuchiPdf(NozeiKanriShoninTsuchiDto dto) {
 		try {
@@ -40,6 +40,7 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
 
 			Map<String, Object> parameters = new HashMap<>();
+			
 			// フォント設定を明示的に追加
 			parameters.put("net.sf.jasperreports.default.font.name", "IPAex明朝");
 			parameters.put("net.sf.jasperreports.default.pdf.font.name", "IPAex明朝");
@@ -66,14 +67,18 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
 		reportsDto.setJorei(dto.getJorei() != null ? dto.getJorei() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
-		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
+		reportsDto.setShisetsuYubin(dto.getShisetsuYubin() != null ? dto.getShisetsuYubin() : "");
 		reportsDto.setShisetsuJusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsuName(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
+		reportsDto.setNozeiKanriYubin(dto.getNozeiKanriYubin() != null ? dto.getNozeiKanriYubin() : "");
 		reportsDto.setNozeiKanriJusho(dto.getNozeiKanriJusho() != null ? dto.getNozeiKanriJusho() : "");
 		reportsDto.setNozeiKanriName(dto.getNozeiKanriName() != null ? dto.getNozeiKanriName() : "");
 		reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
-
+		reportsDto.setShonin(dto.getKbn() != null ? dto.getKbn() : "");
+		reportsDto.setTokuYubin(dto.getTokuYubin() != null ? dto.getTokuYubin() : "");
+		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
+		
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
 			String strDate = dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
@@ -81,7 +86,7 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		} else {
 			reportsDto.setHakkoYmd("");
 		}
-
+		
 		List<NozeiKanriShoninTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		JRDataSource params = new JRBeanCollectionDataSource(dataSourceList);
 

@@ -84,6 +84,9 @@ class GassanDaichoServiceImplTest {
         return new GassanDaichoSearchForm();
     }
 
+	//=====================================================
+	// Search
+	//=====================================================
     @Test
     void search_条件なしで全件返す() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
@@ -159,6 +162,48 @@ class GassanDaichoServiceImplTest {
         GassanDaichoSearchForm form = emptyForm();
         form.setName("テスト");
         form.setNameMatchType("prefix");
+
+        Page<GassanDaichoItem> result = service.search(form);
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+    }
+
+    @Test
+    void search_名前フィルタexact一致で絞り込まれる() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        Gassan g = createGassan("G001", BigDecimal.ONE);
+        when(gassanRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(g));
+        when(gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, "G001"))
+                .thenReturn(List.of(createGassanUchi("G001", "S001", BigDecimal.ONE)));
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S001"))
+                .thenReturn(List.of(createTokugimu("S001")));
+        when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.valueOf(1001)))
+                .thenReturn(Optional.of(createAtena("テスト太郎")));
+
+        GassanDaichoSearchForm form = emptyForm();
+        form.setName("テスト太郎");
+        form.setNameMatchType("exact");
+
+        Page<GassanDaichoItem> result = service.search(form);
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+    }
+
+    @Test
+    void search_名前フィルタdefault部分一致で絞り込まれる() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        Gassan g = createGassan("G001", BigDecimal.ONE);
+        when(gassanRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(g));
+        when(gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, "G001"))
+                .thenReturn(List.of(createGassanUchi("G001", "S001", BigDecimal.ONE)));
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S001"))
+                .thenReturn(List.of(createTokugimu("S001")));
+        when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.valueOf(1001)))
+                .thenReturn(Optional.of(createAtena("テスト太郎")));
+
+        GassanDaichoSearchForm form = emptyForm();
+        form.setName("テス");
+        form.setNameMatchType("other");
 
         Page<GassanDaichoItem> result = service.search(form);
 
@@ -258,16 +303,26 @@ class GassanDaichoServiceImplTest {
         assertThat(result.getTotalElements()).isEqualTo(0);
         assertThat(result.getContent()).isEmpty();
     }
-
+    
+	//=====================================================
+	// getByGassanShiteiNo
+	//=====================================================
     @Test
     void getByGassanShiteiNo_存在する場合はアイテムを返す() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
         Gassan g = createGassan("G001", BigDecimal.ONE);
         when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, "G001")).thenReturn(List.of(g));
+        
+        // GassanUchiが複数件かつrno=1を含むケース
+        GassanUchi uchi1 = createGassanUchi("G001", "S001", BigDecimal.valueOf(2));
+        GassanUchi uchi2 = createGassanUchi("G001", "S002", BigDecimal.ONE);
         when(gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, "G001"))
-                .thenReturn(List.of(createGassanUchi("G001", "S001", BigDecimal.ONE)));
+                .thenReturn(List.of(uchi1, uchi2));
+        
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S001"))
                 .thenReturn(List.of(createTokugimu("S001")));
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S002"))
+                .thenReturn(List.of(createTokugimu("S002")));
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.valueOf(1001)))
                 .thenReturn(Optional.of(createAtena("テスト太郎")));
 
@@ -276,6 +331,7 @@ class GassanDaichoServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getGassanShiteiNo()).isEqualTo("G001");
         assertThat(result.getName()).isEqualTo("テスト太郎");
+        assertThat(result.getFacilityList()).hasSize(2);
     }
 
     @Test

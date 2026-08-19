@@ -50,6 +50,21 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // Markdown
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+
+    // HTML Sanitizer
+    implementation 'org.jsoup:jsoup:1.21.1'
+
+    // Kuromoji（形態素解析・漢字→カタカナ変換）
+    implementation 'com.atilika.kuromoji:kuromoji-ipadic:0.9.0'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 }
 
 jar {
