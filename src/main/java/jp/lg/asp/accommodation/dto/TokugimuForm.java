@@ -16,6 +16,11 @@ import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import org.springframework.util.StringUtils;
@@ -33,71 +38,84 @@ public class TokugimuForm {
 	private LocalDate registrationDate;
 	private LocalDate shinseiDate;
 	private LocalDate henkoDate;
-	@Size(max = 10)
+	@Size(max = 10, message = "特別徴収義務者情報の郵便番号は10文字以内で入力してください")
 	private String tokugimuAddressNo;
+	@Size(max = 200, message = "特別徴収義務者情報の住所は200文字以内で入力してください")
 	private String tokugimuAddress;
+	@Size(max = 200, message = "特別徴収義務者情報の氏名または名称は200文字以内で入力してください")
 	private String name;
-	@Size(max = 200)
+	@Size(max = 200, message = "特別徴収義務者情報の氏名(ふりがな)は200文字以内で入力してください")
 	private String nameKana;
+	@Size(max = 64, message = "特別徴収義務者情報の個人番号は64文字以内で入力してください")
 	private String personalNumber;
+	@Size(max = 13, message = "特別徴収義務者情報の法人番号は13文字以内で入力してください")
 	private String corporateNumber;
+	@Size(max = 20, message = "特別徴収義務者情報の電話番号は20文字以内で入力してください")
 	private String tokugimuPhone;
 
 	// ===== 宿泊施設情報 =====
-	@Size(max = 10)
+	@Size(max = 10, message = "宿泊施設情報の郵便番号は10文字以内で入力してください")
 	private String facilityAddressNo;
-	@Size(max = 200)
+	@Size(max = 200, message = "宿泊施設情報の住所は200文字以内で入力してください")
 	private String facilityAddress;
-	@Size(max = 200)
+	@Size(max = 200, message = "宿泊施設情報の施設名称は200文字以内で入力してください")
 	private String facilityName;
-	@Size(max = 200)
+	@Size(max = 200, message = "宿泊施設情報の施設名称(ふりがな)は200文字以内で入力してください")
 	private String facilityNameKana;
-	@Size(max = 20)
+	@Size(max = 20, message = "宿泊施設情報の電話番号は20文字以内で入力してください")
 	private String facilityPhone;
+	@DecimalMin(value = "0", message = "宿泊施設情報の延床面積は0以上で入力してください")
+	@Digits(integer = 7, fraction = 2, message = "宿泊施設情報の延床面積は半角数字とピリオドで、整数部7桁、小数部2桁以内で入力してください")
 	private BigDecimal floorArea;
+	@Pattern(regexp = "^[0-9]{0,3}$", message = "宿泊施設情報の階層(地上)は半角数字3桁以内で入力してください")
 	private String aboveGroundFloor;
+	@Pattern(regexp = "^[0-9]{0,2}$", message = "宿泊施設情報の階層(地下)は半角数字2桁以内で入力してください")
 	private String basementFloor;
+	@Min(value = 0, message = "宿泊施設情報の客室数は0以上で入力してください")
+	@Max(value = 99999, message = "宿泊施設情報の客室数は5桁以内で入力してください")
 	private Integer roomCount;
+	@Min(value = 0, message = "宿泊施設情報の収容人数は0以上で入力してください")
+	@Max(value = 9999999, message = "宿泊施設情報の収容人数は7桁以内で入力してください")
 	private Integer capacity;
 	private LocalDate businessStartDate;
 
 	// ===== 営業許可等情報 =====
-	@Size(max = 10)
+	@Size(max = 10, message = "営業許可等情報の郵便番号は10文字以内で入力してください")
 	private String licenseAddressNo;
-	@Size(max = 200)
+	@Size(max = 200, message = "営業許可等情報の住所は200文字以内で入力してください")
 	private String licenseAddress;
-	@Size(max = 200)
+	@Size(max = 200, message = "営業許可等情報の氏名は200文字以内で入力してください")
 	private String licenseName;
-	@Size(max = 200)
+	@Size(max = 200, message = "営業許可等情報の氏名(ふりがな)は200文字以内で入力してください")
 	private String licenseNameKana;
-	@Size(max = 20)
+	@Size(max = 20, message = "営業許可等情報の電話番号は20文字以内で入力してください")
 	private String licensePhone;
 	private String businessType;
-	@Size(max = 200)
+	@Size(max = 200, message = "営業許可等情報の許可番号は200文字以内で入力してください")
 	private String licenseNumber;
 
 	// ===== 施設所有者情報 =====
-	@Size(max = 10)
+	@Size(max = 10, message = "施設所有者情報の郵便番号は10文字以内で入力してください")
 	private String ownerAddressNo;
-	@Size(max = 200)
+	@Size(max = 200, message = "施設所有者情報の住所は200文字以内で入力してください")
 	private String ownerAddress;
-	@Size(max = 200)
+	@Size(max = 200, message = "施設所有者情報の氏名は200文字以内で入力してください")
 	private String ownerName;
-	@Size(max = 200)
+	@Size(max = 200, message = "施設所有者情報の氏名(ふりがな)は200文字以内で入力してください")
 	private String ownerNameKana;
-	@Size(max = 20)
+	@Size(max = 20, message = "施設所有者情報の電話番号は20文字以内で入力してください")
 	private String ownerPhone;
 
 	// ===== 書類送付先情報 =====
-	@Size(max = 10)
+	@Size(max = 10, message = "書類送付先情報の郵便番号は10文字以内で入力してください")
 	private String mailAddressNo;
-	@Size(max = 200)
+	@Size(max = 200, message = "書類送付先情報の住所は200文字以内で入力してください")
 	private String mailAddress;
-	@Size(max = 200)
+	@Size(max = 200, message = "書類送付先情報の氏名は200文字以内で入力してください")
 	private String mailName;
-	@Size(max = 200)
+	@Size(max = 200, message = "書類送付先情報の氏名(ふりがな)は200文字以内で入力してください")
 	private String mailNameKana;
-	@Size(max = 20)
+	@Size(max = 20, message = "書類送付先情報の電話番号は20文字以内で入力してください")
 	private String mailPhone;
 
 	// ===== 共同事業者情報 =====
@@ -106,6 +124,7 @@ public class TokugimuForm {
 
 	// ===== その他の情報 =====
 	private String eltaxUmu;
+	@Size(max = 400, message = "その他の情報の備考は400文字以内で入力してください")
 	private String remarks;
 
 	// ===== 施設営業休止/再開/廃止情報 =====
@@ -115,6 +134,7 @@ public class TokugimuForm {
 	private LocalDate suspensionEndDate;
 	private boolean suspensionEndDateUndecided;
 	private LocalDate resumptionOrAbolitionDate;
+	@Size(max = 400, message = "施設営業休止/再開/廃止情報の休止または廃止理由は400文字以内で入力してください")
 	private String suspensionOrAbolitionReason;
 
 	private String shiteiNo;

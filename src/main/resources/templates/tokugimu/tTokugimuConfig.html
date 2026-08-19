@@ -264,6 +264,9 @@
 							<input type="text" class="form-control" id="corporateNumber"
 								th:field="*{corporateNumber}" placeholder="自動入力されます" readonly
 								th:data-initial-value="*{corporateNumber}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('corporateNumber')}"
+								th:errors="*{corporateNumber}"></div>
 						</div>
 
 						<!-- 電話番号 -->
@@ -383,6 +386,9 @@
 									th:errorclass="is-invalid" step="0.01"
 									th:data-initial-value="*{floorArea}"> <span
 									class="input-group-text">㎡</span>
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('floorArea')}"
+									th:errors="*{floorArea}"></div>
 							</div>
 
 						</div>
@@ -397,6 +403,9 @@
 									placeholder="施設の地上階数を入力する" th:readonly="${isView}"
 									th:data-initial-value="*{aboveGroundFloor}"> <span
 									class="input-group-text">階</span>
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('aboveGroundFloor')}"
+									th:errors="*{aboveGroundFloor}"></div>
 							</div>
 
 						</div>
@@ -411,6 +420,9 @@
 									placeholder="施設の地下階数を入力する" th:readonly="${isView}"
 									th:data-initial-value="*{basementFloor}"> <span
 									class="input-group-text">階</span>
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('basementFloor')}"
+									th:errors="*{basementFloor}"></div>
 							</div>
 						</div>
 
@@ -426,6 +438,9 @@
 									th:errorclass="is-invalid" min="1"
 									th:data-initial-value="*{roomCount}"> <span
 									class="input-group-text">室</span>
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('roomCount')}"
+									th:errors="*{roomCount}"></div>
 							</div>
 						</div>
 
@@ -439,6 +454,9 @@
 									th:errorclass="is-invalid" min="1"
 									th:data-initial-value="*{capacity}"> <span
 									class="input-group-text">人</span>
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('capacity')}"
+									th:errors="*{capacity}"></div>
 							</div>
 						</div>
 
@@ -534,6 +552,9 @@
 								<option value="3">簡易宿所</option>
 								<option value="4">民泊</option>
 							</select>
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('businessType')}"
+								th:errors="*{businessType}"></div>
 						</div>
 
 						<!-- 許可番号 -->
@@ -834,6 +855,9 @@
 									th:disabled="${isView}" th:data-initial-value="*{eltaxUmu}">
 								<label class="form-check-label" for="eltaxUmu">有</label>
 							</div>
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('eltaxUmu')}"
+								th:errors="*{eltaxUmu}"></div>
 						</div>
 
 						<!-- 備考 -->
@@ -842,6 +866,9 @@
 							<textarea class="form-control" id="remarks" rows="3"
 								th:field="*{remarks}" placeholder="特記事項があれば入力してください"
 								th:readonly="${isView}" th:data-initial-value="*{remarks}"></textarea>
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('remarks')}"
+								th:errors="*{remarks}"></div>
 						</div>
 
 					</div>
@@ -958,6 +985,9 @@
 										th:field="*{suspensionOrAbolitionReason}"
 										th:readonly="${isView}"
 										th:data-initial-value="*{suspensionOrAbolitionReason}"></textarea>
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('suspensionOrAbolitionReason')}"
+										th:errors="*{suspensionOrAbolitionReason}"></div>
 								</div>
 
 							</div>
