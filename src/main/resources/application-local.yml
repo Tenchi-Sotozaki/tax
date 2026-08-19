@@ -1,4 +1,6 @@
 spring:
+  session:
+    store-type: none
   datasource:
     url: jdbc:postgresql://localhost:5432/accommodation_tax_db
     username: postgres
