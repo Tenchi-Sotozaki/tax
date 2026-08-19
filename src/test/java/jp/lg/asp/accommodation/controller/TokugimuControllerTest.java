@@ -11,9 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
@@ -48,11 +45,10 @@ class TokugimuControllerTest {
 
     @Test
     void list_検索済みの場合は一覧を表示する() {
-        Page<TokugimuListItem> page = new PageImpl<>(List.of(), PageRequest.of(0, 10), 0);
-        when(tokugimuService.search(any())).thenReturn(page);
+        when(tokugimuService.searchAll(any())).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new TokugimuSearchForm(), 0, 10, true, model);
+        String view = controller.list(new TokugimuSearchForm(), true, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
         assertThat(model.asMap()).containsKey("items");
@@ -63,11 +59,11 @@ class TokugimuControllerTest {
     void list_初期表示では検索を実行しない() {
         Model model = new ExtendedModelMap();
 
-        String view = controller.list(new TokugimuSearchForm(), 0, 10, false, model);
+        String view = controller.list(new TokugimuSearchForm(), false, model);
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
         assertThat(model.asMap()).containsEntry("isSearched", false);
-        verify(tokugimuService, never()).search(any());
+        verify(tokugimuService, never()).searchAll(any());
     }
 
     @Test

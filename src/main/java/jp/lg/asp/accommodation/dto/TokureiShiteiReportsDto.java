@@ -7,12 +7,18 @@ import lombok.Data;
  */
 @Data
 public class TokureiShiteiReportsDto {
+	
+	/** 郵便番号 */
+	private String yubin;
 
 	/** 住所 */
 	private String jusho;
 
 	/** 名称 */
 	private String name;
+	
+	/** 郵便番号 */ 
+	private String shisetsu_yubin;
 
 	/** 施設所在地 */
 	private String shisetsu_jusho;

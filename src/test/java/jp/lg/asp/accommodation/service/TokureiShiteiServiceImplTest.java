@@ -77,9 +77,18 @@ class TokureiShiteiServiceImplTest {
         assertThat(result.getShiteiNo()).isEqualTo(SHITEI_NO);
         assertThat(result.getTokuName()).isEqualTo("テスト事業者");
         assertThat(result.getCity()).isEqualTo("占冠村");
+<<<<<<< HEAD
         assertThat(result.getShonin()).isEqualTo("承認");
         assertThat(result.getTokuJusho()).contains("〒060-0001");
         assertThat(result.getShisetsuJusho()).contains("〒060-0001");
+=======
+        
+        assertThat(result.getTokuYubin()).isEqualTo("〒060-0001");
+        assertThat(result.getTokuJusho()).isEqualTo("北海道");
+
+        assertThat(result.getShisetsuYubin()).isEqualTo("〒060-0001");
+        assertThat(result.getShisetsuJusho()).isEqualTo("北海道");
+>>>>>>> master
     }
 
     @Test

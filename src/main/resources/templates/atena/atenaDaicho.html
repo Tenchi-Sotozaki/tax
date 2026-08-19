@@ -6,8 +6,7 @@
 <title>宛名管理台帳</title>
 </head>
 <body>
-	<div layout:fragment="content" class="container-fluid px-4 py-3"
-		th:with="isSearched=${param.atenaNo != null or param.name != null or param.nameKana != null or param.yubinNo != null or param.jusho != null or param.tel != null or param.kojinNo != null or param.hojinNo != null or param.page != null}">
+	<div layout:fragment="content" class="container-fluid px-4 py-3">
 
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3 pb-2 border-bottom">
@@ -16,7 +15,7 @@
 			</h5>
 			<div class="d-flex align-items-center gap-3">
 				<span class="text-muted small" th:if="${isSearched}">検索結果：<span
-					th:text="${items.totalElements}">0</span> 件
+					th:text="${items.size()}">0</span> 件
 				</span>
 
 			</div>
@@ -144,6 +143,7 @@
 										th:field="*{hojinNo}" placeholder="法人番号">
 								</div>
 							</div>
+							<input type="hidden" name="searched" value="true">
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/atena/list}"
 									class="btn btn-outline-secondary btn-sm"> <i
@@ -160,24 +160,22 @@
 		</div>
 
 		<!-- 検索結果エリア -->
-		<div th:if="${isSearched}">
+		<th:block th:if="${isSearched}">
 
-			<!-- 表示件数 + ページネーション（同一行） -->
-			<div class="d-flex align-items-center mb-1">
-				<div style="min-width: 130px;">
-					<a th:href="@{/atena/register}" class="btn btn-primary btn-sm">
-						<i class="bi bi-plus-circle me-1"></i>新規登録
-					</a>
+			<!-- ページネーション（中央固定）＆表示件数 -->
+			<div class="d-flex justify-content-between align-items-center mb-1 position-relative">
+				<div class="d-flex align-items-center gap-2">
+					
 				</div>
-				<nav class="flex-grow-1">
-					<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
+				<nav class="position-absolute start-50 translate-middle-x">
+					<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".daicho-row"></ul>
 				</nav>
-				<div class="d-flex align-items-center" style="min-width: 130px; justify-content: flex-end;">
+				<div class="d-flex align-items-center gap-2">
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
-						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
-						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
+						<option value="10">10件</option>
+						<option value="50">50件</option>
+						<option value="100">100件</option>
 					</select>
 				</div>
 			</div>
@@ -199,10 +197,10 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr th:if="${items.totalElements == 0}">
+							<tr th:if="${items.isEmpty()}">
 								<td colspan="7" class="text-center text-muted py-4">該当する宛名が見つかりません</td>
 							</tr>
-							<tr th:each="item : ${items.content}">
+							<tr class="daicho-row" th:each="item : ${items}">
 								<td th:text="${item.atena.atenaNo}"></td>
 								<td th:text="${item.atena.name}"></td>
 								<td class="text-muted" th:text="${item.atena.nameKana}"></td>
@@ -226,21 +224,8 @@
 				</div>
 			</div>
 
-		</div>
+		</th:block>
 
 	</div>
-	<th:block layout:fragment="scripts">
-		<script>
-			document.addEventListener('DOMContentLoaded', () => {
-				const rows = Array.from(document.querySelectorAll('tbody tr')).filter(tr => tr.querySelector('td'));
-				const pageSizeSelect = document.getElementById('pageSizeSelect');
-				const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
-				if (rows.length > 0) {
-					pager.render(1);
-					pageSizeSelect?.addEventListener('change', () => pager.render(1));
-				}
-			});
-		</script>
-	</th:block>
 </body>
 </html>
