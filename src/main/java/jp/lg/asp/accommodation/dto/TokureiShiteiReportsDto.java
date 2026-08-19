@@ -7,6 +7,9 @@ import lombok.Data;
  */
 @Data
 public class TokureiShiteiReportsDto {
+	
+	/** 郵便番号 */
+	private String yubin;
 
 	/** 住所 */
 	private String jusho;

@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
+import java.time.YearMonth;
 import java.time.chrono.JapaneseDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -59,7 +60,14 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 			    ? JapaneseDate.from(dto.getHakkoYmd()).format(DateTimeFormatter.ofPattern("GGGGy年M月d日", java.util.Locale.JAPANESE))
 			    : "");
 		
-		parameters.put("tekiyoYmd", dto.getTekiyoYmd() != null ? dto.getTekiyoYmd() : "");
+		// YYYY年M月形式に変換
+		String formattedYmd = "";
+		if (dto.getTekiyoYmd() != null && !dto.getTekiyoYmd().isEmpty()) {
+			YearMonth yearMonth = YearMonth.parse(dto.getTekiyoYmd(), DateTimeFormatter.ofPattern("yyyy-MM"));
+			formattedYmd = yearMonth.format(DateTimeFormatter.ofPattern("yyyy年M月"));
+		}
+
+		parameters.put("tekiyoYmd", formattedYmd);
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
 		parameters.put("city", dto.getCity() != null ? dto.getCity() : "");
 		parameters.put("riyu", dto.getRiyu() != null ? dto.getRiyu() : "");
@@ -68,8 +76,10 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 
 	private JRDataSource buildDataSource(TokureiShiteiCancelDto dto) {
 		TokureiShiteiReportsDto reportsDto = new TokureiShiteiReportsDto();
+		reportsDto.setYubin(dto.getTokuYubin() != null ? dto.getTokuYubin() : "");
 		reportsDto.setJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setName(dto.getTokuName() != null ? dto.getTokuName() : "");
+		reportsDto.setShisetsu_yubin(dto.getShisetsuYubin() != null ? dto.getShisetsuYubin() : "");
 		reportsDto.setShisetsu_jusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsu_name(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
 		reportsDto.setShitei_no(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");

@@ -137,8 +137,10 @@ public class TokureiShiteiCancelController {
 		TokureiShiteiCancelDto dest = new TokureiShiteiCancelDto();
 		dest.setShiteiNo(src.getShiteiNo());
 		dest.setTokuName(src.getTokuName());
+		dest.setTokuYubin(src.getTokuYubin());
 		dest.setTokuJusho(src.getTokuJusho());
 		dest.setShisetsuName(src.getShisetsuName());
+		dest.setShisetsuYubin(src.getShisetsuYubin());
 		dest.setShisetsuJusho(src.getShisetsuJusho());
 		dest.setCity(src.getCity());
 		dest.setBiko(src.getBiko());

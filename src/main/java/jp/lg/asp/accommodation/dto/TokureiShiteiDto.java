@@ -31,12 +31,18 @@ public class TokureiShiteiDto {
 
 	/** 特別徴収義務者名 */
 	private String tokuName;
+	
+	/** 特別徴収義務者郵便番号 */
+	private String tokuYubin;
 
 	/** 特別徴収義務者住所 */
 	private String tokuJusho;
 
 	/** 施設名称 */
 	private String shisetsuName;
+	
+	/** 施設郵便番号 */
+	private String shisetsuYubin;
 
 	/** 施設所在地 */
 	private String shisetsuJusho;
