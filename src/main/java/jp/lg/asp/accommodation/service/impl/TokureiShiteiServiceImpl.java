@@ -85,14 +85,9 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 		TokureiShiteiDto dto = new TokureiShiteiDto();
 		dto.setShiteiNo(shiteiNo);
 		dto.setTokuName(atena.getName());
-<<<<<<< HEAD
 		dto.setShonin(nokan.getKbn());
 		
-		String tokuJusho = "";
-=======
-
 		// 特別徴収義務者の郵便番号の設定
->>>>>>> master
 		if (atena.getYubinNo() != null && !atena.getYubinNo().isEmpty()) {
 			dto.setTokuYubin("〒" + atena.getYubinNo());
 		}
@@ -113,7 +108,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 		if (tokugimu.getShisetsuJusho() != null) {
 			dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
 		}
-<<<<<<< HEAD
+		
 		dto.setShisetsuJusho(shisetsuJusho);
 		
 		// 備考を設定
@@ -122,8 +117,6 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 			biko = tokugimu.getBiko();
 		}
 		dto.setBiko(biko);
-=======
->>>>>>> master
 
 		dto.setCity(cityName);
 		dto.setJorei(jorei);
