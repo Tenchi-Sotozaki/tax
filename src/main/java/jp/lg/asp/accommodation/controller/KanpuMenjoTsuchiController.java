@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -61,14 +61,17 @@ public class KanpuMenjoTsuchiController {
                        Model model) {
     	String jichitaiCode = jichitaiContext.getJichitaiCd();
     	String shiteiNo = SessionHelper.getShiteiNo(session);
+    	
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
+			model.addAttribute("showShiteiGassanModal", true);
+			return "tokugimu/tTokugimuReport";
+		}
+    	
         try {
             log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
-
-            if (shiteiNo == null || shiteiNo.isEmpty()) {
-                model.addAttribute("showShiteiGassanModal", true);
-                model.addAttribute("dto", new KanpuMenjoTsuchiDto());
-                return "reports/kanpuMenjoTsuchi";
-            }
 
             // 特別徴収義務者情報取得
             TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
@@ -81,30 +84,30 @@ public class KanpuMenjoTsuchiController {
             // 自治体情報をDBから取得
             Jichitai jichitai = jichitaiRepository.findById(jichitaiCode).orElse(null);
             String cityName = jichitai != null ? jichitai.getName() : "";
-            String jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
-
+            
             // DTO作成
             KanpuMenjoTsuchiDto dto = new KanpuMenjoTsuchiDto();
             dto.setShiteiNo(shiteiNo);
             dto.setCityName(cityName);
-            dto.setJorei(jorei);
             dto.setHakkoYmd(LocalDate.now());
             dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
 
             // 特別徴収義務者情報設定
             if (tokugimuForm != null) {
                 dto.setTokuName(tokugimuForm.getName());
+                dto.setTokuYubin("〒" + tokugimuForm.getTokugimuYubinNo());
                 dto.setTokuJusho(tokugimuForm.getTokugimuAddress());
                 dto.setShisetsuName(tokugimuForm.getFacilityName());
-                
-                String shisetsuJusho = "";
+               
+                // 郵便番号
                 if (tokugimuForm.getFacilityAddressNo() != null && !tokugimuForm.getFacilityAddressNo().isEmpty()) {
-                    shisetsuJusho += "〒" + tokugimuForm.getFacilityAddressNo() + " ";
+                    dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
                 }
+                
+                // 住所
                 if (tokugimuForm.getFacilityAddress() != null && !tokugimuForm.getFacilityAddress().isEmpty()) {
-                    shisetsuJusho += tokugimuForm.getFacilityAddress();
+                	dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
                 }
-                dto.setShisetsuJusho(shisetsuJusho);
             }
 
             model.addAttribute("dto", dto);

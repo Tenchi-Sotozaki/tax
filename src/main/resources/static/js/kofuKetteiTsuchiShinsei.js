@@ -282,26 +282,19 @@ function updateDisplayDate() {
  * 画面上部にエラーメッセージを表示する
  */
 function showErrorMessage(message) {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = message;
-        errorAlert.style.display = 'block';
-        errorAlert.classList.add('show');
+    // 画面上部のalert-danger領域に表示する（reportForm.jsで定義）
+    if (window.ReportError) {
+        window.ReportError.show(message);
+        return;
     }
+    alert(message);
 }
 
 /**
  * 画面上部のエラーメッセージを非表示にする
  */
 function hideErrorMessage() {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = '';
-        errorAlert.style.display = 'none';
-        errorAlert.classList.remove('show');
+    if (window.ReportError) {
+        window.ReportError.hide();
     }
 }

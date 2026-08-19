@@ -57,6 +57,11 @@
 
 						<!-- アクションボタン -->
 						<div class="d-flex justify-content-center gap-2">
+							<!-- 戻る -->
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
+
 							<!-- PDF発行 -->
 							<button type="button" onclick="submitReport('pdf')" class="btn btn-primary">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF

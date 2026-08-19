@@ -25,6 +25,7 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
 import jp.lg.asp.accommodation.dto.NonyushoDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.service.NonyushoReportsService;
 import jp.lg.asp.accommodation.service.TokugimuService;
@@ -51,12 +52,17 @@ public class NonyushoController {
     @GetMapping
     public String index(Model model, HttpSession session) {
         String shiteiNo = SessionHelper.getShiteiNo(session);
+        
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
+			model.addAttribute("showShiteiGassanModal", true);
+			return "tokugimu/tTokugimuReport";
+		}
+        
         log.debug("納入書発行画面表示: shiteiNo={}", shiteiNo);
         
-        if (shiteiNo == null || shiteiNo.trim().isEmpty()) {
-            model.addAttribute("showShiteiGassanModal", true);
-            return "reports/nonyusho";
-        }
         try {
             TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
             model.addAttribute("shiteiNo", shiteiNo);

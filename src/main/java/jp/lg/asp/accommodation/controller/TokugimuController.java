@@ -1,7 +1,5 @@
 package jp.lg.asp.accommodation.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,7 +18,6 @@ import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
-import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
@@ -49,20 +46,16 @@ public class TokugimuController {
 	@GetMapping("/list")
 	@OpeLog(screenId = TOKUGIMU_DAICHO, operation = "一覧表示")
 	public String list(@ModelAttribute TokugimuSearchForm searchForm,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int pageSize,
 			@RequestParam(defaultValue = "false") boolean searched,
 			Model model) {
 		accessChecker.checkAccess(TOKUGIMU_DAICHO);
-		searchForm.setPage(page);
-		searchForm.setPageSize(pageSize);
 
 		// 初期表示時は検索結果一覧を表示しない
-		Page<TokugimuListItem> pageResult = searched
-				? tokugimuService.search(searchForm)
-				: Page.empty(PageRequest.of(page, pageSize));
+		java.util.List<jp.lg.asp.accommodation.dto.TokugimuListItem> items = searched
+				? tokugimuService.searchAll(searchForm)
+				: java.util.List.of();
 
-		model.addAttribute("items", pageResult);
+		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
 		model.addAttribute("isSearched", searched);
 		return LIST_VIEW;
@@ -207,6 +200,33 @@ public class TokugimuController {
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "帳票出力")
 	public String showReport(HttpSession session, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		return buildReportView(session, model);
+	}
+
+	/**
+	 * 合算申告納入承認通知書へ遷移する。
+	 * 選択中の指定番号が合算対象でない場合は遷移せず、
+	 * 帳票発行画面にエラーメッセージを表示する。
+	 */
+	@GetMapping("/report/gassan")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
+	public String showGassanReport(HttpSession session, Model model) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		String id = getShiteiNoFromSession(session);
+		if (id != null && tokugimuService.isGassanTarget(id)) {
+			return "redirect:/reports/gassanNonyuTsuchi";
+		}
+		if (id != null) {
+			model.addAttribute("errorMessage", "合算対象外の特別徴収義務者です。");
+		}
+		return buildReportView(session, model);
+	}
+
+	/**
+	 * 帳票発行画面を表示する。
+	 * 指定番号が未選択の場合は指定番号選択モーダルを開いた状態で表示する。
+	 */
+	private String buildReportView(HttpSession session, Model model) {
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
 			return showSelectModalOnReport(model);
@@ -217,19 +237,6 @@ public class TokugimuController {
 		model.addAttribute("tokugimuName", form.getName());
 		model.addAttribute("shisetsuName", form.getFacilityName());
 		return REPORT_VIEW;
-	}
-
-	@GetMapping("/report/gassan")
-	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
-	public String showGassanReport(HttpSession session,
-			Model model, RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
-			return "redirect:/tokugimu/report";
-		}
-		return "redirect:/reports/gassanNonyuTsuchi";
 	}
 
 	// ========== 削除 ==========

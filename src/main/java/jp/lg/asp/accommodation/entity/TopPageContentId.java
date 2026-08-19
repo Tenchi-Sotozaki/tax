@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TopPageContentId implements Serializable {
-    private String kbn;
     private String jichitaiCd;
+    private Integer seq;
 }
