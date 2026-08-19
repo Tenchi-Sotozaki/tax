@@ -30,17 +30,24 @@
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
-			<span th:text="${errorMessage}"></span>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
 
 		<div class="card shadow-sm">
 			<div class="card-body">
 				<form id="atenaForm"
 					th:action="@{${mode == 'register' ? '/atena/register' : '/atena/edit'}}"
 					method="post" th:object="${form}">
+
+					<div
+						th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+						class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+						<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
+							th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+						<ul class="mb-0 mt-1">
+							<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+						</ul>
+						<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+					</div>
+
 					<input type="hidden" th:field="*{atenaNo}"> <input
 						type="hidden" th:field="*{version}">
 
@@ -53,25 +60,31 @@
 						</div>
 
 						<!-- 個人番号 -->
-						<div class="col-md-4">
-							<label class="form-label fw-medium">個人番号</label> <input
-								type="text" class="form-control" th:field="*{kojinNo}"
-								th:readonly="${mode == 'view'}" placeholder="個人番号か法人番号どちらか一方を入力">
+						<div class="col-md-4" th:if="${mode != 'view'}">
+							<label class="form-label fw-medium">個人番号</label>
+							<input type="text" class="form-control" th:field="*{kojinNo}"
+								th:errorclass="is-invalid"
+								placeholder="個人番号か法人番号どちらか一方を入力">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('kojinNo')}" th:errors="*{kojinNo}"></div>
 						</div>
 
 						<!-- 法人番号 -->
 						<div class="col-md-4">
-							<label class="form-label fw-medium">法人番号</label> <input
-								type="text" class="form-control" th:field="*{hojinNo}"
+							<label class="form-label fw-medium">法人番号</label>
+							<input type="text" class="form-control" th:field="*{hojinNo}"
+								th:errorclass="is-invalid"
 								th:readonly="${mode == 'view'}" placeholder="個人番号か法人番号どちらか一方を入力">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('hojinNo')}" th:errors="*{hojinNo}"></div>
 						</div>
 
 						<!-- 氏名/名称 -->
 						<div class="col-md-4">
 							<label class="form-label fw-medium">氏名/名称 <span
-								class="text-danger" th:if="${mode != 'view'}">*</span></label> <input
-								type="text" class="form-control" th:field="*{name}"
+								class="text-danger" th:if="${mode != 'view'}">*</span></label>
+							<input type="text" class="form-control" th:field="*{name}"
+								th:errorclass="is-invalid"
 								th:readonly="${mode == 'view'}" placeholder="氏名または名称">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 						</div>
 
 						<!-- ふりがな -->
@@ -133,8 +146,10 @@
 				class="bi bi-arrow-left me-1"></i>戻る
 			</a>
 			<!-- 登録・編集モード：登録する/更新するボタン -->
-			<button th:if="${mode != 'view'}" type="submit" form="atenaForm"
-				class="btn btn-success">
+			<button th:if="${mode != 'view'}" type="button"
+				class="btn btn-success"
+				data-bs-toggle="modal"
+				th:data-bs-target="${mode == 'register' ? '#registerConfirmModal' : '#editConfirmModal'}">
 				<i class="bi bi-check-circle me-1"></i> <span
 					th:text="${mode == 'register' ? '登録する' : '更新する'}">保存</span>
 			</button>
@@ -142,6 +157,8 @@
 
 		<div th:if="${mode == 'register'}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/atena/list}, '一覧に戻る')}"></div>
 		<div th:if="${mode == 'edit'}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/atena/view/{atenaNo}(atenaNo=${form.atenaNo})}, '戻る')}"></div>
+		<div th:if="${mode == 'register'}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '登録します。よろしいですか？', 'atenaForm', 'btn-primary', '登録する')}"></div>
+		<div th:if="${mode == 'edit'}" th:replace="~{layout/components :: confirmModal('editConfirmModal', '更新確認', '更新します。よろしいですか？', 'atenaForm', 'btn-primary', '更新する')}"></div>
 	</div>
 </body>
 </html>
