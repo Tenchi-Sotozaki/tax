@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
+import jp.lg.asp.accommodation.repository.HolidayRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.service.impl.NokigenServiceImpl;
 
@@ -23,6 +25,8 @@ import jp.lg.asp.accommodation.service.impl.NokigenServiceImpl;
 class NokigenServiceImplTest {
 
     @Mock NokigenRepository nokigenRepository;
+    @Mock HolidayRepository holidayRepository;
+    @Mock JichitaiRepository jichitaiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks NokigenServiceImpl service;
 

@@ -1,5 +1,4 @@
 package jp.lg.asp.accommodation.controller;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import jakarta.validation.Valid;
 
@@ -13,11 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.JichitaiConfigDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.service.JichitaiConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/admin/jichitai-config")
 public class JichitaiConfigController {
 
-	private final JichitaiRepository jichitaiRepository;
+	private final JichitaiConfigService jichitaiConfigService;
 	private final ScreenAccessChecker accessChecker;
 	private final JichitaiContext jichitaiContext;
 
@@ -38,7 +38,7 @@ public class JichitaiConfigController {
 	public String index(Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElseThrow();
+		Jichitai jichitai = jichitaiConfigService.findById(jichitaiCd);
 		JichitaiConfigDto form = new JichitaiConfigDto();
 		form.setJichitaiCd(jichitai.getJichitaiCd());
 		form.setName(jichitai.getName());
@@ -61,7 +61,7 @@ public class JichitaiConfigController {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		String currentJichitaiCd = jichitaiContext.getJichitaiCd();
 		if (bindingResult.hasErrors()) {
-			Jichitai jichitai = jichitaiRepository.findById(currentJichitaiCd).orElseThrow();
+			Jichitai jichitai = jichitaiConfigService.findById(currentJichitaiCd);
 			model.addAttribute("jichitai", jichitai);
 			model.addAttribute("validationErrors",
 					bindingResult.getAllErrors().stream()
@@ -70,33 +70,7 @@ public class JichitaiConfigController {
 			return "admin/jichitaiConfig";
 		}
 		try {
-			Jichitai jichitai = jichitaiRepository.findById(currentJichitaiCd).orElseThrow();
-			String newJichitaiCd = configForm.getJichitaiCd();
-			boolean cdChanged = !currentJichitaiCd.equals(newJichitaiCd);
-
-			if (cdChanged) {
-				// PKが変わる場合：新レコード作成→旧レコード削除
-				Jichitai newJichitai = new Jichitai();
-				newJichitai.setJichitaiCd(newJichitaiCd);
-				newJichitai.setName(configForm.getName());
-				newJichitai.setKbnName(configForm.getKbnName());
-				newJichitai.setNendoStMonth(configForm.getNendoStMonth());
-				newJichitai.setNozeiShuki(configForm.getNozeiShuki());
-				newJichitai.setShiteiStChar(configForm.getShiteiStChar());
-				newJichitai.setGassanStChar(configForm.getGassanStChar());
-				newJichitai.setAtenaStNo(configForm.getAtenaStNo());
-				jichitaiRepository.save(newJichitai);
-				jichitaiRepository.delete(jichitai);
-			} else {
-				jichitai.setName(configForm.getName());
-				jichitai.setKbnName(configForm.getKbnName());
-				jichitai.setNendoStMonth(configForm.getNendoStMonth());
-				jichitai.setNozeiShuki(configForm.getNozeiShuki());
-				jichitai.setShiteiStChar(configForm.getShiteiStChar());
-				jichitai.setGassanStChar(configForm.getGassanStChar());
-				jichitai.setAtenaStNo(configForm.getAtenaStNo());
-				jichitaiRepository.save(jichitai);
-			}
+			jichitaiConfigService.save(currentJichitaiCd, configForm);
 			redirectAttributes.addFlashAttribute("successMessage", "自治体情報を保存しました。");
 		} catch (Exception e) {
 			log.error("自治体情報保存エラー", e);
