@@ -166,11 +166,12 @@
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
-				<!-- 一覧に戻る（照会画面は入力破棄の確認を出さない） -->
+				<!-- 戻る（編集は照会画面へ、登録は一覧へ。照会画面は入力破棄の確認を出さない） -->
 				<a th:if="${isView != true}" href="#"
 					class="btn btn-outline-primary btn-lg px-4"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
+					class="bi bi-arrow-left me-2"></i><span
+					th:text="${isEdit == true} ? '照会に戻る' : '一覧に戻る'">一覧に戻る</span>
 				</a>
 				<a th:if="${isView}" th:href="@{/admin/user-search}"
 					class="btn btn-outline-primary btn-lg px-4"> <i
@@ -204,7 +205,7 @@
 			</div>
 		</th:block>
 
-		<div th:if="${isView != true}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/user-search}, '一覧に戻る')}"></div>
+		<div th:if="${isView != true}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', ${isEdit == true} ? @{/admin/user-view/{id}(id=${userForm.originalId})} : @{/admin/user-search}, ${isEdit == true} ? '照会に戻る' : '一覧に戻る')}"></div>
 
 	</div>
 
