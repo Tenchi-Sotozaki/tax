@@ -62,16 +62,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public boolean isGassanTarget(String shiteiNo) {
-		if (shiteiNo == null || shiteiNo.isBlank()) {
-			return false;
-		}
-		return gassanUchiRepository.existsByJichitaiCdAndShiteiNo(
-				jichitaiContext.getJichitaiCd(), shiteiNo);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
 	public Page<TokugimuListItem> search(TokugimuSearchForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		

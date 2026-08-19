@@ -207,33 +207,6 @@ public class TokugimuController {
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "帳票出力")
 	public String showReport(HttpSession session, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		return buildReportView(session, model);
-	}
-
-	/**
-	 * 合算申告納入承認通知書へ遷移する。
-	 * 選択中の指定番号が合算対象でない場合は遷移せず、
-	 * 帳票発行画面にエラーメッセージを表示する。
-	 */
-	@GetMapping("/report/gassan")
-	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
-	public String showGassanReport(HttpSession session, Model model) {
-		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		String id = getShiteiNoFromSession(session);
-		if (id != null && tokugimuService.isGassanTarget(id)) {
-			return "redirect:/reports/gassanNonyuTsuchi";
-		}
-		if (id != null) {
-			model.addAttribute("errorMessage", "合算対象外の特別徴収義務者です。");
-		}
-		return buildReportView(session, model);
-	}
-
-	/**
-	 * 帳票発行画面を表示する。
-	 * 指定番号が未選択の場合は指定番号選択モーダルを開いた状態で表示する。
-	 */
-	private String buildReportView(HttpSession session, Model model) {
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
 			return showSelectModalOnReport(model);
@@ -244,6 +217,19 @@ public class TokugimuController {
 		model.addAttribute("tokugimuName", form.getName());
 		model.addAttribute("shisetsuName", form.getFacilityName());
 		return REPORT_VIEW;
+	}
+
+	@GetMapping("/report/gassan")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
+	public String showGassanReport(HttpSession session,
+			Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
+			return "redirect:/tokugimu/report";
+		}
+		return "redirect:/reports/gassanNonyuTsuchi";
 	}
 
 	// ========== 削除 ==========
