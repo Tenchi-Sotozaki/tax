@@ -199,23 +199,41 @@ public class AtenaController {
 	@PostMapping("/register")
 	@OpeLog(screenId = ATENA_CONFIG, operation = "登録")
 	public String register(@ModelAttribute("form") AtenaConfigForm form,
-			org.springframework.validation.BindingResult result,
+			org.springframework.validation.BindingResult bindingResult,
 			Model model,
 			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
 		if (isBlank(form.getKojinNo()) && isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号または法人番号のいずれかを入力してください。");
-			model.addAttribute("mode", "register");
-			return "atena/atenaConfig";
+			bindingResult.rejectValue("kojinNo", "", "個人番号または法人番号のいずれかを入力してください。");
+			bindingResult.rejectValue("hojinNo", "", "個人番号または法人番号のいずれかを入力してください。");
 		}
 		if (!isBlank(form.getKojinNo()) && !isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("kojinNo", "", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("hojinNo", "", "個人番号と法人番号は同時に入力できません。");
+		}
+		if (isBlank(form.getName())) {
+			bindingResult.rejectValue("name", "", "氏名/名称は必須です。");
+		}
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
 			model.addAttribute("mode", "register");
 			return "atena/atenaConfig";
 		}
 		Atena atena = toEntity(form);
-		atenaConfigService.register(atena, jichitaiCd);
+		try {
+			atenaConfigService.register(atena, jichitaiCd);
+		} catch (jp.lg.asp.accommodation.exception.BusinessException e) {
+			String field = e.getCode().equals("DUPLICATE_KOJIN_NO") ? "kojinNo" : "hojinNo";
+			bindingResult.rejectValue(field, "", e.getMessage());
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
+			model.addAttribute("mode", "register");
+			return "atena/atenaConfig";
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "宛名を登録しました。");
 		return "redirect:/atena/list";
 	}
@@ -247,17 +265,37 @@ public class AtenaController {
 	@PostMapping("/edit")
 	@OpeLog(screenId = ATENA_CONFIG, operation = "更新")
 	public String edit(@ModelAttribute("form") AtenaConfigForm form,
+			org.springframework.validation.BindingResult bindingResult,
 			Model model,
 			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
 		if (!isBlank(form.getKojinNo()) && !isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("kojinNo", "", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("hojinNo", "", "個人番号と法人番号は同時に入力できません。");
+		}
+		if (isBlank(form.getName())) {
+			bindingResult.rejectValue("name", "", "氏名/名称は必須です。");
+		}
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
 			model.addAttribute("mode", "edit");
 			return "atena/atenaConfig";
 		}
 		Atena atena = toEntity(form);
-		atenaConfigService.update(atena, jichitaiCd);
+		try {
+			atenaConfigService.update(atena, jichitaiCd);
+		} catch (jp.lg.asp.accommodation.exception.BusinessException e) {
+			String field = e.getCode().equals("DUPLICATE_KOJIN_NO") ? "kojinNo" : "hojinNo";
+			bindingResult.rejectValue(field, "", e.getMessage());
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
+			model.addAttribute("mode", "edit");
+			return "atena/atenaConfig";
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "宛名を更新しました。");
 		return "redirect:/atena/view/" + form.getAtenaNo();
 	}
