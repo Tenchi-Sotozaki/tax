@@ -1040,13 +1040,15 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	private Long getSogakuValue(ChoshuGenboUchi uchi, int index) {
-		try {
-			String methodName = "getSogaku" + index;
-			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
-			return (val != null) ? (Long) val : 0L;
-		} catch (Exception e) {
-			return 0L;
-		}
+	    if (uchi == null) return 0L;
+	    
+	    try {
+	        String methodName = "getSogaku" + index;
+	        Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
+	        return (val != null) ? (Long) val : 0L;
+	    } catch (ReflectiveOperationException e) {
+	        return 0L;
+	    }
 	}
 
 	private void setHakusuByIndex(ChoshuGenboUchi uchi, int index, int value) {
@@ -1059,11 +1061,14 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	private Integer getHakusuValue(ChoshuGenboUchi uchi, int index) {
+		if (uchi == null) return 0;
+		
 		try {
 			String methodName = "getHakusu" + index;
 			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
 			return (val != null) ? (Integer) val : 0;
-		} catch (Exception e) {
+		} catch (ReflectiveOperationException e) {
+			// メソッドが存在しない場合やアクセスできない場合は0を返す
 			return 0;
 		}
 	}
@@ -1078,13 +1083,15 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	private Long getRyokinValue(ChoshuGenboUchi uchi, int index) {
-		try {
-			String methodName = "getRyokin" + index;
-			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
-			return (val != null) ? (Long) val : 0L;
-		} catch (Exception e) {
-			return 0L;
-		}
+		if (uchi == null) return 0L;
+	    
+	    try {
+	        String methodName = "getRyokin" + index;
+	        Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
+	        return (val != null) ? (Long) val : 0L;
+	    } catch (ReflectiveOperationException e) {
+	        return 0L;
+	    }
 	}
 
 	private long getLongValue(Long value) {
@@ -1226,7 +1233,6 @@ public class FukaServiceImpl implements FukaService {
 	public long calculateTax(String fukaKbn, long baseValue, BigDecimal cityRate, BigDecimal kenRate) {
 
 		BigDecimal city = (cityRate != null) ? cityRate : BigDecimal.ZERO;
-		BigDecimal ken = (kenRate != null) ? kenRate : BigDecimal.ZERO;
 
 		if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
 			// 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
