@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -82,7 +81,6 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 	@Transactional
 	public NozeiShuki save(NozeiShuki nozeiShuki) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		LocalDateTime now = LocalDateTime.now();
 
 		if (nozeiShuki.getSeq() == null) {
 			// 新規登録の場合、SEQを自動採番
