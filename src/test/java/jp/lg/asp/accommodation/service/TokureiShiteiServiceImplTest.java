@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -68,8 +69,12 @@ class TokureiShiteiServiceImplTest {
         assertThat(result.getShiteiNo()).isEqualTo(SHITEI_NO);
         assertThat(result.getTokuName()).isEqualTo("テスト事業者");
         assertThat(result.getCity()).isEqualTo("占冠村");
-        assertThat(result.getTokuJusho()).contains("〒060-0001");
-        assertThat(result.getShisetsuJusho()).contains("〒060-0001");
+        
+        assertThat(result.getTokuYubin()).isEqualTo("〒060-0001");
+        assertThat(result.getTokuJusho()).isEqualTo("北海道");
+
+        assertThat(result.getShisetsuYubin()).isEqualTo("〒060-0001");
+        assertThat(result.getShisetsuJusho()).isEqualTo("北海道");
     }
 
     @Test
