@@ -2,11 +2,13 @@ package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
 import java.time.YearMonth;
+import java.time.chrono.JapaneseChronology;
 import java.time.chrono.JapaneseDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -63,8 +65,19 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 		// YYYY年M月形式に変換
 		String formattedYmd = "";
 		if (dto.getTekiyoYmd() != null && !dto.getTekiyoYmd().isEmpty()) {
+
 			YearMonth yearMonth = YearMonth.parse(dto.getTekiyoYmd(), DateTimeFormatter.ofPattern("yyyy-MM"));
-			formattedYmd = yearMonth.format(DateTimeFormatter.ofPattern("yyyy年M月"));
+
+			// 和暦変換のために仮の日を代入
+			JapaneseDate japaneseDate = JapaneseDate.from(yearMonth.atDay(1));
+			
+			// 和暦用のフォーマッターを設定
+			DateTimeFormatter jpFormatter = DateTimeFormatter.ofPattern("Gy年M月")
+					.withChronology(JapaneseChronology.INSTANCE)
+					.withLocale(Locale.JAPAN);
+
+			// 和暦にフォーマット
+			formattedYmd = japaneseDate.format(jpFormatter);
 		}
 
 		parameters.put("tekiyoYmd", formattedYmd);
