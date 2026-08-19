@@ -72,6 +72,10 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		} catch (IOException e) {
 			throw new UncheckedIOException("CSVファイルの解析に失敗しました。", e);
 		}
+		
+		if (dataRow.length == 0 || (dataRow.length == 1 && dataRow[0].isBlank())) {
+			throw new RuntimeException("ファイルの解析に失敗しました：ファイルが空です。");
+		}
 
 		String tetsuzukiId = dataRow.length > 2 ? dataRow[2].trim() : "";
 		String shubetsu = EltaxConstants.TETSUZUKI_SHUBETSU_MAP.getOrDefault(tetsuzukiId, "");
