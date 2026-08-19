@@ -177,14 +177,12 @@ class TaxManagerServiceImplTest {
     }
 
     @Test
-    void getByShiteiNo_特別徴収義務者の情報がフォームに載る() {
+    void getByShiteiNo_特別徴収義務者の宛名番号がフォームに載る() {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(tokugimu()));
 
         TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
 
-        assertThat(form.getObligorName()).isEqualTo("株式会社ホテルA");
-        assertThat(form.getFacilityName()).isEqualTo("ホテルA 札幌");
         assertThat(form.getObligorAtenaNo()).isEqualTo("1001");
     }
 
@@ -200,19 +198,17 @@ class TaxManagerServiceImplTest {
     }
 
     /**
-     * 現状の実装は例外を握りつぶして新規扱いのフォームを返す。
-     * 仕様の是非は別途確認が必要だが、ここでは現状の挙動を固定する。
+     * リポジトリの例外は握りつぶさず、そのまま呼び出し元へ伝播させる。
+     * 「該当データ無し」は Optional.empty で表現され、新規扱いのフォームが返る（上のテスト）。
      */
     @Test
-    void getByShiteiNo_リポジトリが例外を投げても新規扱いのフォームを返す() {
+    void getByShiteiNo_リポジトリが例外を投げたらそのまま伝播する() {
         when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenThrow(new RuntimeException("DB接続エラー"));
 
-        TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
-
-        assertThat(form).isNotNull();
-        assertThat(form.isEdit()).isFalse();
-        assertThat(form.getShiteiNo()).isEqualTo(SHITEI_NO);
+        assertThatThrownBy(() -> service.getByShiteiNo(SHITEI_NO))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("DB接続エラー");
     }
 
     // ===================================================================
@@ -250,6 +246,27 @@ class TaxManagerServiceImplTest {
 
         verify(taxManagerRepository).findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 2);
         verify(taxManagerRepository, never()).findLatestByJichitaiCdAndShiteiNo(any(), any());
+    }
+
+    @Test
+    void getByShiteiNoAndRno_特別徴収義務者の宛名番号がフォームに載る() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(tokugimu()));
+
+        TaxManagerForm form = service.getByShiteiNoAndRno(SHITEI_NO, 2);
+
+        assertThat(form.getObligorAtenaNo()).isEqualTo("1001");
+    }
+
+    /** getByShiteiNo と同様、リポジトリの例外は伝播させる。 */
+    @Test
+    void getByShiteiNoAndRno_リポジトリが例外を投げたらそのまま伝播する() {
+        when(taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 2))
+                .thenThrow(new RuntimeException("DB接続エラー"));
+
+        assertThatThrownBy(() -> service.getByShiteiNoAndRno(SHITEI_NO, 2))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("DB接続エラー");
     }
 
     // ===================================================================
