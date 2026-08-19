@@ -109,8 +109,6 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 			dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
 		}
 		
-		dto.setShisetsuJusho(shisetsuJusho);
-		
 		// 備考を設定
 		String biko = "";
 		if(tokugimu.getBiko() != null && !tokugimu.getBiko().isEmpty()) {

@@ -58,7 +58,4 @@ public class TokureiShiteiDto {
 	
 	/** 公印 */
 	private byte[] koin;
-	
-	/** 備考 */
-	private String biko;
 }
