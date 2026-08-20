@@ -57,22 +57,20 @@ public class TokureiShiteiController {
 			return "tokugimu/tTokugimuReport";
 		}
 		
-		TokureiShiteiDto dto = new TokureiShiteiDto();
-
 		TokureiShiteiDto tokugimuInfo = tokureiShiteiService.getTokugimuInfo(shiteiNo);
-		if (tokugimuInfo != null) {
-			dto = tokugimuInfo;
-		} else {
-			model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
-			return "tokugimu/tTokugimuReport";
-		}
+	    if (tokugimuInfo == null) {
+	        model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
+	        return "tokugimu/tTokugimuReport";
+	    }
+	    
+	    TokureiShiteiDto dto = tokugimuInfo;
 
-		if (dto.getHakkoYmd() == null) {
-			dto.setHakkoYmd(LocalDate.now());
-		}
+	    if (dto.getHakkoYmd() == null) {
+	        dto.setHakkoYmd(LocalDate.now());
+	    }
 
-		model.addAttribute("dto", dto);
-		return "reports/tokureiShitei";
+	    model.addAttribute("dto", dto);
+	    return "reports/tokureiShitei";
 	}
 
 	/**
