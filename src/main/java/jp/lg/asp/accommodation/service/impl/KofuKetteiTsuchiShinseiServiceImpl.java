@@ -133,11 +133,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 				Long kofuZeigaku = shoreikin.getKofuZeigaku();
 				Long kofuGaku = shoreikin.getKofuGaku();
 			
-<<<<<<< HEAD
-				// 数値のみを設定（JRXMLで単位を付与）
-=======
 				// カンマ区切りの文字列に変換
->>>>>>> master
 				dto.setNonyugaku(kofuZeigaku != null ? String.format("%,d", kofuZeigaku) : "0");
 				dto.setKofugaku(kofuGaku != null ? String.format("%,d", kofuGaku) : "0");
 				
