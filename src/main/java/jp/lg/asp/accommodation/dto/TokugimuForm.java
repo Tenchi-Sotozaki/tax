@@ -5,7 +5,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -16,10 +15,6 @@ import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -64,19 +59,22 @@ public class TokugimuForm {
 	private String facilityNameKana;
 	@Size(max = 20, message = "宿泊施設情報の電話番号は20文字以内で入力してください")
 	private String facilityPhone;
-	@DecimalMin(value = "0", message = "宿泊施設情報の延床面積は0以上で入力してください")
-	@Digits(integer = 7, fraction = 2, message = "宿泊施設情報の延床面積は半角数字とピリオドで、整数部7桁、小数部2桁以内で入力してください")
-	private BigDecimal floorArea;
+	/** 半角数字とピリオドのみ。yuka_menseki numeric(9,2) に合わせて整数部7桁・小数部2桁まで */
+	@Pattern(regexp = "^[0-9]{0,7}(\\.[0-9]{1,2})?$",
+			message = "宿泊施設情報の延床面積は半角数字とピリオドで、整数部7桁、小数部2桁以内で入力してください")
+	private String floorArea;
+	/** 半角数字のみ。chijo_kai numeric(3) に合わせて3桁まで */
 	@Pattern(regexp = "^[0-9]{0,3}$", message = "宿泊施設情報の階層(地上)は半角数字3桁以内で入力してください")
 	private String aboveGroundFloor;
+	/** 半角数字のみ。chika_kai numeric(2) に合わせて2桁まで */
 	@Pattern(regexp = "^[0-9]{0,2}$", message = "宿泊施設情報の階層(地下)は半角数字2桁以内で入力してください")
 	private String basementFloor;
-	@Min(value = 0, message = "宿泊施設情報の客室数は0以上で入力してください")
-	@Max(value = 99999, message = "宿泊施設情報の客室数は5桁以内で入力してください")
-	private Integer roomCount;
-	@Min(value = 0, message = "宿泊施設情報の収容人数は0以上で入力してください")
-	@Max(value = 9999999, message = "宿泊施設情報の収容人数は7桁以内で入力してください")
-	private Integer capacity;
+	/** 半角数字のみ。kyakushitsu_su numeric(5) に合わせて5桁まで */
+	@Pattern(regexp = "^[0-9]{0,5}$", message = "宿泊施設情報の客室数は半角数字5桁以内で入力してください")
+	private String roomCount;
+	/** 半角数字のみ。shuyo_su numeric(7) に合わせて7桁まで */
+	@Pattern(regexp = "^[0-9]{0,7}$", message = "宿泊施設情報の収容人数は半角数字7桁以内で入力してください")
+	private String capacity;
 	private LocalDate businessStartDate;
 
 	// ===== 営業許可等情報 =====
