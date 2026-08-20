@@ -1,42 +1,53 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>特別徴収義務者台帳</title>
-	<link rel="stylesheet" th:href="@{/css/tokugimu-daicho.css}">
+<title>特別徴収義務者台帳</title>
+<link rel="stylesheet" th:href="@{/css/tokugimu-daicho.css}">
 </head>
 
 <body>
 	<div layout:fragment="content" class="container-fluid px-4 py-3">
 
 		<!-- ページヘッダー -->
-		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+		<div
+			class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-building text-primary me-2"></i>特別徴収義務者台帳
 			</h5>
 			<span class="text-muted small" th:if="${isSearched}"> 検索結果: <strong
-					th:text="${items.totalElements}">0</strong> 件
+				th:text="${items.size()}">0</strong> 件
 			</span>
 		</div>
 
 		<!-- フラッシュメッセージ -->
-		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
-			<i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMessage}"></span>
-			<button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+		<div th:if="${successMessage}"
+			class="alert alert-success alert-dismissible fade show py-2 mb-3"
+			role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i> <span
+				th:text="${successMessage}"></span>
+			<button type="button" class="btn-close btn-sm"
+				data-bs-dismiss="alert"></button>
 		</div>
 
-		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
-			<i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
-			<button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show py-2 mb-3"
+			role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> <span
+				th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close btn-sm"
+				data-bs-dismiss="alert"></button>
 		</div>
 
 		<!-- ========== 検索条件（アコーディオン） ========== -->
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
-					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
-						data-bs-target="#searchPanel" th:classappend="${isSearched} ? 'collapsed' : ''">
+					<button class="accordion-button py-2 fw-semibold" type="button"
+						data-bs-toggle="collapse" data-bs-target="#searchPanel"
+						th:classappend="${isSearched} ? 'collapsed' : ''">
 						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
@@ -44,61 +55,68 @@
 				<div id="searchPanel" class="accordion-collapse collapse"
 					th:classappend="${isSearched} ? '' : 'show'">
 					<div class="accordion-body pt-3 pb-2 px-3">
-						<form th:action="@{/tokugimu/list}" th:object="${searchForm}" method="get">
+						<form th:action="@{/tokugimu/list}" th:object="${searchForm}"
+							method="get">
 							<!-- SP:1列 / タブレット:2列 / PC:4列 -->
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mb-2">
 								<div class="col">
 									<label class="form-label form-label-sm fw-medium mb-1">指定番号</label>
-									<input type="text" class="form-control form-control-sm" th:field="*{shiteiNo}"
-										placeholder="指定番号">
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{shiteiNo}" placeholder="指定番号">
 								</div>
 								<div class="col">
-									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<div class="d-flex align-items-center gap-2 mb-1"
+										style="white-space: nowrap;">
 										<label class="form-label form-label-sm fw-medium mb-0">氏名/名称</label>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}"
-												value="prefix" id="namePrefix">
+											<input class="form-check-input" type="radio"
+												th:field="*{nameMatchType}" value="prefix" id="namePrefix">
 											<label class="form-check-label small" for="namePrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}"
-												value="partial" id="namePartial">
+											<input class="form-check-input" type="radio"
+												th:field="*{nameMatchType}" value="partial" id="namePartial">
 											<label class="form-check-label small" for="namePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{nameMatchType}"
-												value="exact" id="nameExact">
+											<input class="form-check-input" type="radio"
+												th:field="*{nameMatchType}" value="exact" id="nameExact">
 											<label class="form-check-label small" for="nameExact">完全</label>
 										</div>
 									</div>
-									<input type="text" class="form-control form-control-sm" th:field="*{name}"
-										placeholder="氏名または名称">
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{name}" placeholder="氏名または名称">
 								</div>
 								<div class="col">
-									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+									<div class="d-flex align-items-center gap-2 mb-1"
+										style="white-space: nowrap;">
 										<label class="form-label form-label-sm fw-medium mb-0">施設名称</label>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
-												value="prefix" id="shisetsuNamePrefix">
-											<label class="form-check-label small" for="shisetsuNamePrefix">前方</label>
+											<input class="form-check-input" type="radio"
+												th:field="*{shisetsuNameMatchType}" value="prefix"
+												id="shisetsuNamePrefix"> <label
+												class="form-check-label small" for="shisetsuNamePrefix">前方</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
-												value="partial" id="shisetsuNamePartial">
-											<label class="form-check-label small" for="shisetsuNamePartial">部分</label>
+											<input class="form-check-input" type="radio"
+												th:field="*{shisetsuNameMatchType}" value="partial"
+												id="shisetsuNamePartial"> <label
+												class="form-check-label small" for="shisetsuNamePartial">部分</label>
 										</div>
 										<div class="form-check form-check-inline me-0">
-											<input class="form-check-input" type="radio" th:field="*{shisetsuNameMatchType}"
-												value="exact" id="shisetsuNameExact">
-											<label class="form-check-label small" for="shisetsuNameExact">完全</label>
+											<input class="form-check-input" type="radio"
+												th:field="*{shisetsuNameMatchType}" value="exact"
+												id="shisetsuNameExact"> <label
+												class="form-check-label small" for="shisetsuNameExact">完全</label>
 										</div>
 									</div>
-									<input type="text" class="form-control form-control-sm" th:field="*{shisetsuName}"
-										placeholder="施設名称">
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{shisetsuName}" placeholder="施設名称">
 								</div>
 								<div class="col">
 									<label class="form-label form-label-sm fw-medium mb-1">営業種別</label>
-									<select class="form-select form-select-sm" th:field="*{kyokaShu}">
+									<select class="form-select form-select-sm"
+										th:field="*{kyokaShu}">
 										<option value="999">すべて</option>
 										<option value="1">ホテル</option>
 										<option value="2">旅館</option>
@@ -108,7 +126,8 @@
 								</div>
 								<div class="col">
 									<label class="form-label form-label-sm fw-medium mb-1">合算対象</label>
-									<select class="form-select form-select-sm" th:field="*{gasanTaisho}">
+									<select class="form-select form-select-sm"
+										th:field="*{gasanTaisho}">
 										<option value="999">すべて</option>
 										<option value="1">非対象</option>
 										<option value="2">対象</option>
@@ -125,24 +144,26 @@
 								</div>
 								<div class="col">
 									<label class="form-label form-label-sm fw-medium mb-1">個人番号</label>
-									<input type="text" class="form-control form-control-sm" th:field="*{kojinNo}"
-										placeholder="個人番号">
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{kojinNo}" placeholder="個人番号">
 								</div>
 								<div class="col">
 									<label class="form-label form-label-sm fw-medium mb-1">法人番号</label>
-									<input type="text" class="form-control form-control-sm" th:field="*{hojinNo}"
-										placeholder="法人番号">
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{hojinNo}" placeholder="法人番号">
 								</div>
 							</div>
 							<!-- 検索実行を判別するためのフラグ。初期表示時は一覧を表示しない -->
 							<input type="hidden" name="searched" value="true">
-							<div class="d-flex justify-content-between align-items-center gap-2 pt-1 border-top">
-								<span class="text-muted small">
-									<i class="bi bi-info-circle me-1"></i>複数の条件を入力した場合は、すべてを満たすデータを検索します。
+							<div
+								class="d-flex justify-content-between align-items-center gap-2 pt-1 border-top">
+								<span class="text-muted small"> <i
+									class="bi bi-info-circle me-1"></i>複数の条件を入力した場合は、すべてを満たすデータを検索します。
 								</span>
 								<div class="d-flex gap-2">
-									<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-sm"> <i
-											class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
+									<a th:href="@{/tokugimu/list}"
+										class="btn btn-outline-secondary btn-sm"> <i
+										class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 									</a>
 									<button type="submit" class="btn btn-primary btn-sm px-4">
 										<i class="bi bi-search me-1"></i>検索する
@@ -155,68 +176,20 @@
 			</div>
 		</div>
 
-		<!-- ========== ツールバー（ボタンエリア） ==========
-			 サイドメニューからの導線が整うまでは残す方針のため削除しない -->
-		<div class="card shadow-sm mb-3">
-			<div class="card-body py-2 px-3">
-				<div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
-					<!-- グループ1: 基本操作
-						 照会・削除は一覧の「詳細」リンクから遷移できるため設置しない -->
-					<div class="d-flex flex-wrap gap-1">
-						<a th:href="@{/tokugimu/registration}" class="btn btn-success btn-sm"> <i
-								class="bi bi-plus-circle me-1"></i>新規登録
-						</a>
-					</div>
-					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ2: 納税管理人 -->
-					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnTaxManager" class="btn btn-success btn-sm">
-							<i class="bi bi-person-plus me-1"></i>納税管理人登録
-						</button>
-						<button type="button" id="btnTaxManagerView" class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-person me-1"></i>納税管理人照会
-						</button>
-					</div>
-					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ3: 納税周期(特例申請) -->
-					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnNozeiShuki" class="btn btn-success btn-sm">
-							<i class="bi bi-calendar-plus me-1"></i>納税周期登録
-						</button>
-						<button type="button" id="btnNozeiShukiView" class="btn btn-outline-primary btn-sm">
-							<i class="bi bi-calendar-check me-1"></i>納税周期照会
-						</button>
-					</div>
-					<div class="vr mx-1 toolbar-divider"></div>
-					<!-- グループ4: 納入台帳 -->
-					<button type="button" id="btnPaymentLedger" class="btn btn-outline-primary btn-sm">
-						<i class="bi bi-currency-yen me-1"></i>納入申告管理台帳
-					</button>
-
-					<!-- グループ5: その他 -->
-					<div class="d-flex flex-wrap gap-1">
-						<button type="button" id="btnReport" class="btn btn-primary btn-sm">
-							<i class="bi bi-printer me-1"></i>帳票発行
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<!-- ========== 検索結果エリア（初期表示時は表示しない） ========== -->
 		<th:block th:if="${isSearched}">
 
 			<!-- ページネーション（中央固定）＆表示件数 -->
-			<div class="d-flex justify-content-center align-items-center mb-1 position-relative">
-				<nav>
-					<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
+			<div class="position-relative mb-1 d-flex align-items-center">
+				<nav class="position-absolute start-50 translate-middle-x">
+					<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".daicho-row"></ul>
 				</nav>
-				<div class="d-flex align-items-center position-absolute end-0">
+				<div class="d-flex align-items-center gap-2 ms-auto">
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-						<option value="10" th:selected="${searchForm.pageSize == 10}">10件</option>
-						<option value="50" th:selected="${searchForm.pageSize == 50}">50件</option>
-						<option value="100" th:selected="${searchForm.pageSize == 100}">100件</option>
+						<option value="10">10件</option>
+						<option value="50">50件</option>
+						<option value="100">100件</option>
 					</select>
 				</div>
 			</div>
@@ -225,10 +198,10 @@
 			<div class="card shadow-sm">
 				<div class="card-body p-0">
 					<div class="table-scroll">
-						<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
+						<table
+							class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
 							<thead class="table-primary">
 								<tr>
-									<th style="width: 40px" class="text-center"></th>
 									<th style="min-width: 100px">指定番号</th>
 									<th style="min-width: 110px">合算指定番号</th>
 									<th style="min-width: 140px">氏名/名称</th>
@@ -241,49 +214,40 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:each="item : ${items.content}">
-									<td class="text-center"><input type="checkbox" class="form-check-input row-select"
-											th:data-shitei-no="${item.shiteiNo}"
-											th:data-atena-no="${item.id}"
-											th:data-name="${item.name}"
-											th:data-shisetsu-name="${item.shisetsuName}"></td>
+								<tr class="daicho-row" th:each="item : ${items}">
 									<td class="fw-bold text-primary" th:text="${item.shiteiNo}"></td>
 									<td th:text="${item.gassanShiteiNo}"></td>
 									<td th:text="${item.name}"></td>
 									<td th:text="${item.shisetsuName}"></td>
 									<td class="text-center"><span class="badge bg-success"
-											th:if="${item.status == '1'}">営業中</span> <span
-											class="badge bg-warning text-dark" th:if="${item.status == '2'}">休止</span> <span
-											class="badge bg-secondary" th:if="${item.status == '3'}">廃止</span>
+										th:if="${item.status == '1'}">営業中</span> <span
+										class="badge bg-warning text-dark"
+										th:if="${item.status == '2'}">休止</span> <span
+										class="badge bg-secondary" th:if="${item.status == '3'}">廃止</span>
 										<span class="text-muted small"
-											th:if="${item.status == null or item.status == ''}">-</span>
-									</td>
+										th:if="${item.status == null or item.status == ''}">-</span></td>
 									<td class="text-center"><span class="badge bg-primary"
-											th:if="${item.consolidationTarget == 'target'}">対象</span> <span
-											class="badge bg-light text-muted border"
-											th:unless="${item.consolidationTarget == 'target'}">非対象</span>
+										th:if="${item.consolidationTarget == 'target'}">対象</span> <span
+										class="badge bg-light text-muted border"
+										th:unless="${item.consolidationTarget == 'target'}">非対象</span>
 									</td>
 									<!-- 最終申告日（申告実績が無い場合は空欄） -->
 									<td class="text-center"
 										th:text="${item.lastShinkokuYmd != null ? #temporals.format(item.lastShinkokuYmd, 'yyyy/MM/dd') : ''}"></td>
 									<!-- 最終申告分の納付状況（記号は納入申告管理と共通） -->
-									<td class="text-center">
-										<span th:if="${item.lastNonyuStatus == 'paid'}">〇</span>
-										<span th:if="${item.lastNonyuStatus == 'partial'}">△</span>
-										<span th:if="${item.lastNonyuStatus == 'unpaid'}">ー</span>
-									</td>
+									<td class="text-center"><span
+										th:if="${item.lastNonyuStatus == 'paid'}">〇</span> <span
+										th:if="${item.lastNonyuStatus == 'partial'}">△</span> <span
+										th:if="${item.lastNonyuStatus == 'unpaid'}">ー</span></td>
 									<!-- 指定番号はパラメータでは渡さず、セッションに保存してから照会画面へ遷移する -->
-									<td class="text-center">
-										<a href="#" class="detail-link"
-											th:data-shitei-no="${item.shiteiNo}"
-											th:data-atena-no="${item.id}"
-											th:data-name="${item.name}"
-											th:data-shisetsu-name="${item.shisetsuName}">詳細</a>
-									</td>
+									<td class="text-center"><a href="#" class="detail-link"
+										th:data-shitei-no="${item.shiteiNo}"
+										th:data-atena-no="${item.id}" th:data-name="${item.name}"
+										th:data-shisetsu-name="${item.shisetsuName}">詳細</a></td>
 								</tr>
-								<tr th:if="${items.totalElements == 0}">
+								<tr th:if="${items.isEmpty()}">
 									<td colspan="10" class="text-center text-muted py-5"><i
-											class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
+										class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
 										該当するデータが見つかりませんでした。</td>
 								</tr>
 							</tbody>

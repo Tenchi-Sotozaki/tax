@@ -9,11 +9,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import jakarta.servlet.http.HttpSession;
+import jp.lg.asp.accommodation.util.SessionHelper;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -63,42 +65,80 @@ public class TaxManagerController {
 		}
 	}
 
-	@GetMapping("/edit/{id}")
-	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
-	public String edit(@PathVariable("id") String id, @RequestParam(required = false) String from, Model model) {
+	@GetMapping("/register")
+	@OpeLog(screenId = SCREEN_ID, operation = "登録画面表示")
+	public String register(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
-		TaxManagerForm form = taxManagerService.getByShiteiNo(id);
-		
-		// 既に納税管理人が登録されている場合の処理
-		if (form.isEdit()) {
-			// 納税管理人登録ボタンからの遷移の場合は照会画面にリダイレクト
-			if ("register".equals(from)) {
-				return "redirect:/tax-manager/view/" + id + "?from=register";
-			}
-			// 納税管理人照会ボタンからの遷移の場合は編集画面を表示
-			model.addAttribute("taxManagerForm", form);
-			model.addAttribute("isEdit", true);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) {
+			model.addAttribute("taxManagerForm", new TaxManagerForm());
+			model.addAttribute("showShiteiModal", true);
+			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
 			return FORM_VIEW;
 		}
-		
+		TaxManagerForm form = taxManagerService.getByShiteiNo(shiteiNo);
+
+		// 登録済みの場合は照会画面にリダイレクト
+		if (form.isEdit()) {
+			redirectAttributes.addFlashAttribute("infoMessage", "納税管理人が登録済みのため、照会画面に遷移しました。");
+			return "redirect:/tax-manager/view";
+		}
+
 		model.addAttribute("taxManagerForm", form);
-		model.addAttribute("isEdit", form.isEdit());
+		model.addAttribute("isEdit", false);
 		model.addAttribute("isView", false);
 		return FORM_VIEW;
 	}
 
-	@GetMapping("/view/{id}")
-	@OpeLog(screenId = SCREEN_ID, operation = "照会")
-	public String view(@PathVariable("id") String id, @RequestParam(required = false) String from,
-			@RequestParam(required = false) Integer rno, Model model) {
-		accessChecker.checkAccess(SCREEN_ID);
-		TaxManagerForm form = (rno != null)
-				? taxManagerService.getByShiteiNoAndRno(id, rno)
-				: taxManagerService.getByShiteiNo(id);
+	@GetMapping("/edit")
+	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
+	public String edit(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) {
+			model.addAttribute("taxManagerForm", new TaxManagerForm());
+			model.addAttribute("showShiteiModal", true);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
+		}
+		TaxManagerForm form = taxManagerService.getByShiteiNo(shiteiNo);
 
-		if ("register".equals(from)) {
-			model.addAttribute("infoMessage", "この特別徴収義務者には既に納税管理人が登録されています。");
+		// 未登録の場合は登録画面にリダイレクト
+		if (!form.isEdit()) {
+			redirectAttributes.addFlashAttribute("infoMessage", "納税管理人が未登録のため、登録画面に遷移しました。");
+			return "redirect:/tax-manager/register";
+		}
+
+		model.addAttribute("taxManagerForm", form);
+		model.addAttribute("isEdit", true);
+		model.addAttribute("isView", false);
+		return FORM_VIEW;
+	}
+
+	@GetMapping("/view")
+	@OpeLog(screenId = SCREEN_ID, operation = "照会")
+	public String view(@RequestParam(required = false) String from,
+			@RequestParam(required = false) Integer rno, Model model, HttpSession session,
+			RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) {
+			model.addAttribute("taxManagerForm", new TaxManagerForm());
+			model.addAttribute("showShiteiModal", true);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", true);
+			return FORM_VIEW;
+		}
+		TaxManagerForm form = (rno != null)
+				? taxManagerService.getByShiteiNoAndRno(shiteiNo, rno)
+				: taxManagerService.getByShiteiNo(shiteiNo);
+
+		// 未登録の場合は登録画面にリダイレクト
+		if (!form.isEdit()) {
+			redirectAttributes.addFlashAttribute("infoMessage", "納税管理人が未登録のため、登録画面に遷移しました。");
+			return "redirect:/tax-manager/register";
 		}
 
 		model.addAttribute("taxManagerForm", form);
@@ -107,18 +147,26 @@ public class TaxManagerController {
 		return FORM_VIEW;
 	}
 
-	@PostMapping("/save/{id}")
+	@PostMapping("/save")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録")
-	public String save(@PathVariable("id") String id,
+	public String save(
 			@Validated @ModelAttribute("taxManagerForm") TaxManagerForm form,
 			BindingResult bindingResult,
 			Model model,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes,
+			HttpSession session) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) {
+			model.addAttribute("taxManagerForm", new TaxManagerForm());
+			model.addAttribute("showShiteiModal", true);
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
+		}
 
-		// デバッグ情報を出力
 		log.debug("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, kbn={}", 
-				id, form.getAtenaNo(), form.getManagerName(), form.getKbn());
+				shiteiNo, form.getAtenaNo(), form.getManagerName(), form.getKbn());
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", form.isEdit());
@@ -128,8 +176,8 @@ public class TaxManagerController {
 		}
 
 		try {
-			taxManagerService.saveByShiteiNo(id, form);
-			log.debug("納税管理人情報を保存しました。collectorId: {}", id);
+			taxManagerService.saveByShiteiNo(shiteiNo, form);
+			log.debug("納税管理人情報を保存しました。shiteiNo: {}", shiteiNo);
 			redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");
 			return "redirect:/tokugimu/list";
 		} catch (Exception e) {
@@ -141,21 +189,25 @@ public class TaxManagerController {
 		}
 	}
 
-	@PostMapping("/delete/{id}")
-	public String delete(@PathVariable("id") String id, RedirectAttributes redirectAttributes) {
+	@PostMapping("/delete")
+	public String delete(RedirectAttributes redirectAttributes, HttpSession session) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		if (shiteiNo == null) {
+			return "redirect:/tax-manager/edit";
+		}
 
-		log.debug("納税管理人削除処理: shiteiNo={}", id);
+		log.debug("納税管理人削除処理: shiteiNo={}", shiteiNo);
 
 		try {
-			taxManagerService.deleteByShiteiNo(id);
-			log.debug("納税管理人を削除しました。shiteiNo: {}", id);
+			taxManagerService.deleteByShiteiNo(shiteiNo);
+			log.debug("納税管理人を削除しました。shiteiNo: {}", shiteiNo);
 			redirectAttributes.addFlashAttribute("successMessage", "納税管理人を削除しました。");
 			return "redirect:/tokugimu/list";
 		} catch (Exception e) {
 			log.error("納税管理人削除エラー: {}", e.getMessage());
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-			return "redirect:/tax-manager/edit/" + id;
+			return "redirect:/tax-manager/edit";
 		}
 	}
 }

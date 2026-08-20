@@ -22,8 +22,6 @@ import lombok.Data;
 public class TaxManagerForm {
 
 	private Long collectorId;
-	private String obligorName;
-	private String facilityName;
 	private String obligorAtenaNo;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")

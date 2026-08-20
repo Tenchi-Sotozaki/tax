@@ -174,6 +174,9 @@ public final class ScreenManagement {
 	// 帳票出力項目編集/照会
 	public static final String REPORTS_OUTPUT_CONFIG = "sc00000011";
 
+	// 金融機関コード取込
+	public static final String BANK_IMPORT = "sc00000012";
+
 	// 自治体情報設定
 	public static final String JICHITAI_CONFIG = "sc00000008";
 
@@ -182,4 +185,7 @@ public final class ScreenManagement {
 
 	// 交付金帳票一括発行
 	public static final String KOFUKIN_REPORT_BULK = "ms00000028";
+
+	// 送付先CSV出力
+	public static final String SOFUSAKI_CSV = "mo00000005";
 }

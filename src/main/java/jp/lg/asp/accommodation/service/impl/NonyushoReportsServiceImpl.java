@@ -12,12 +12,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
 import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.dto.NonyushoReportsDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.ReportsDef;
+import jp.lg.asp.accommodation.entity.ReportsDefId;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
@@ -167,10 +169,10 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 			}
 
 			// m_reports_defテーブルからデータ取得
-			response.setKozaNo(getReportsDefData("口座番号"));
-			response.setNonyuBasho(getReportsDefData("納入場所"));
-			response.setShiteiKinyuName(getReportsDefData("指定金融機関名"));
-			response.setTorimatome(getReportsDefData("取りまとめ店"));
+			response.setKozaNo(getReportsDefText(ReportsConstants.NONYUSHO_KOZA_NO));
+			response.setNonyuBasho(getReportsDefText(ReportsConstants.NONYUSHO_KOZA));
+			response.setShiteiKinyuName(getReportsDefText(ReportsConstants.NONYUSHO_SHITEI_KINYU_NAME));
+			response.setTorimatome(getReportsDefText(ReportsConstants.NONYUSHO_TORIMATOME));
 
 			log.debug("納入書動的データ取得完了: shiteiNo={}, nendo={}", shiteiNo, nendo);
 			return response;
@@ -192,21 +194,25 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	}
 
 	/**
-	 * m_reports_defテーブルから指定したテキストのdef_dataを取得
+	 * m_reports_defテーブルから定義IDに対応するdef_textを取得
 	 */
-	private String getReportsDefData(String defText) {
+	private String getReportsDefText(String defId) {
 		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
-			Optional<ReportsDef> reportsDefOpt = reportsDefRepository.findByJichitaiCdAndDefText(jichitaiCode, defText);
+			ReportsDefId id = new ReportsDefId();
+			id.setJichitaiCd(jichitaiCode);
+			id.setId(defId);
+
+			Optional<ReportsDef> reportsDefOpt = reportsDefRepository.findById(id);
 			if (reportsDefOpt.isPresent()) {
-				byte[] defData = reportsDefOpt.get().getDefData();
-				return defData != null ? new String(defData, "UTF-8") : "";
+				String defText = reportsDefOpt.get().getDefText();
+				return defText != null ? defText : "";
 			} else {
-				log.error("該当するm_reports_defレコードが見つかりません: defText={}", defText);
+				log.error("該当するm_reports_defレコードが見つかりません: defId={}", defId);
 				return "";
 			}
 		} catch (Exception e) {
-			log.error("m_reports_defデータ取得エラー: defText={}", defText, e);
+			log.error("m_reports_defデータ取得エラー: defId={}", defId, e);
 			return "";
 		}
 	}

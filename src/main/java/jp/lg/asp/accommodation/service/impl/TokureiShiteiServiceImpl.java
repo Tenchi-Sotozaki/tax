@@ -69,28 +69,30 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 		Atena atena = atenaOpt.get();
 
 		TokureiShiteiDto dto = new TokureiShiteiDto();
-		dto.setShiteiNo(tokugimu.getShiteiNo());
+		dto.setShiteiNo(shiteiNo);
 		dto.setTokuName(atena.getName());
 
-		String tokuJusho = "";
+		// 特別徴収義務者の郵便番号の設定
 		if (atena.getYubinNo() != null && !atena.getYubinNo().isEmpty()) {
-			tokuJusho = "〒" + atena.getYubinNo() + "\r\n";
+			dto.setTokuYubin("〒" + atena.getYubinNo());
 		}
+	
+		// 特別徴収義務者の住所の設定
 		if (atena.getJusho() != null) {
-			tokuJusho += atena.getJusho();
+			dto.setTokuJusho(atena.getJusho());
 		}
-		dto.setTokuJusho(tokuJusho);
 
 		dto.setShisetsuName(tokugimu.getShisetsuName());
 
-		String shisetsuJusho = "";
+		// 施設郵便番号の設定
 		if (tokugimu.getShisetsuYubinNo() != null && !tokugimu.getShisetsuYubinNo().isEmpty()) {
-			shisetsuJusho = "〒" + tokugimu.getShisetsuYubinNo() + "\r\n";
+			dto.setShisetsuYubin("〒" + tokugimu.getShisetsuYubinNo());
 		}
+		
+		// 施設住所の設定
 		if (tokugimu.getShisetsuJusho() != null) {
-			shisetsuJusho += tokugimu.getShisetsuJusho();
+			dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
 		}
-		dto.setShisetsuJusho(shisetsuJusho);
 
 		dto.setCity(cityName);
 		dto.setJorei(jorei);

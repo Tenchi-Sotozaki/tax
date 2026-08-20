@@ -54,4 +54,21 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 			@Param("roleId") java.math.BigDecimal roleId,
 			Pageable pageable);
 
+	@Query("SELECT u FROM User u WHERE u.jichitaiCd = :jichitaiCd" +
+			" AND u.delFlg = '0'" +
+			" AND u.roleId <> " + DEFAULT_USER_ROLE_ID +
+			" AND (:id IS NULL OR u.id LIKE %:id%)" +
+			" AND (:name IS NULL OR u.name LIKE :name)" +
+			" AND (:nameKana IS NULL OR u.nameKana LIKE :nameKana)" +
+			" AND (:busho IS NULL OR u.busho LIKE :busho)" +
+			" AND (:roleId IS NULL OR u.roleId = :roleId)" +
+			" ORDER BY u.id")
+	java.util.List<User> searchAll(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("id") String id,
+			@Param("name") String name,
+			@Param("nameKana") String nameKana,
+			@Param("busho") String busho,
+			@Param("roleId") java.math.BigDecimal roleId);
+
 }

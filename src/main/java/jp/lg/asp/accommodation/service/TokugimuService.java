@@ -11,8 +11,11 @@ import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
  */
 public interface TokugimuService {
 
-	// 検索条件に合致する一覧を返す
+	// 検索条件に合致する一覧を返す（サーバーサイドページング）
 	Page<TokugimuListItem> search(TokugimuSearchForm form);
+
+	// 検索条件に合致する全件を返す（クライアントサイドページング用）
+	java.util.List<TokugimuListItem> searchAll(TokugimuSearchForm form);
 
 	// 指定番号で1件取得してフォームに変換する
 	TokugimuForm getTokugimuByShiteiNo(String shiteiNo);
