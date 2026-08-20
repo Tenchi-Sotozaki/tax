@@ -19,7 +19,9 @@ import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.repository.FukaRepository;
+import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
+import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.service.impl.ShoreikinBulkServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +29,8 @@ class ShoreikinBulkServiceImplTest {
 
     @Mock ShoreikinRepository shoreikinRepository;
     @Mock FukaRepository fukaRepository;
+    @Mock ShunoRirekiRepository shunoRirekiRepository;
+    @Mock KofuRitsuRepository kofuRitsuRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks ShoreikinBulkServiceImpl service;
 
@@ -35,7 +39,7 @@ class ShoreikinBulkServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        lenient().when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
     }
 
     @Test
@@ -56,6 +60,10 @@ class ShoreikinBulkServiceImplTest {
         dto.setKofuRitsu(BigDecimal.valueOf(10));
         when(fukaRepository.findByJichitaiCdAndNendoAndNewFlgAndDelFlg(JICHITAI_CD, NENDO, "1", "0"))
                 .thenReturn(List.of());
+        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
+                .thenReturn(List.of());
+        when(shunoRirekiRepository.sumNonyugakuByShiteiNoIn(eq(JICHITAI_CD), anyList()))
+                .thenReturn(List.of());
 
         ShoreikinBulkDto result = service.executeBulkSanshutsu(dto);
 
@@ -70,12 +78,18 @@ class ShoreikinBulkServiceImplTest {
         fuka.setKibetsu(1);
         fuka.setRno(1);
         fuka.setTotalZeigaku(10000L);
+        fuka.setShinkokuYmd(java.time.LocalDate.of(2024, 1, 1));
 
         when(fukaRepository.findByJichitaiCdAndNendoAndNewFlgAndDelFlg(JICHITAI_CD, NENDO, "1", "0"))
                 .thenReturn(List.of(fuka));
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(
                 JICHITAI_CD, "00000001", NENDO, "0", "1"))
                 .thenReturn(List.of(fuka));
+        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
+                .thenReturn(List.of());
+        // 納付済み: 納入額合計 >= totalZeigaku
+        when(shunoRirekiRepository.sumNonyugakuByShiteiNoIn(eq(JICHITAI_CD), anyList()))
+                .thenReturn(List.<Object[]>of(new Object[]{"00000001", NENDO, 1, 10000L}));
         when(shoreikinRepository.findById(any())).thenReturn(Optional.empty());
         when(shoreikinRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -100,6 +114,10 @@ class ShoreikinBulkServiceImplTest {
 
         when(fukaRepository.findByJichitaiCdAndNendoAndNewFlgAndDelFlg(JICHITAI_CD, NENDO, "1", "0"))
                 .thenReturn(List.of(fuka));
+        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
+                .thenReturn(List.of());
+        when(shunoRirekiRepository.sumNonyugakuByShiteiNoIn(eq(JICHITAI_CD), anyList()))
+                .thenReturn(List.of());
 
         Shoreikin existing = new Shoreikin();
         existing.setShiteiNo("00000001");

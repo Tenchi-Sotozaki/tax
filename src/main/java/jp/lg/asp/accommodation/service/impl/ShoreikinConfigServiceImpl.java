@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jp.lg.asp.accommodation.dto.ShoreikinConfigDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Fuka;
+import jp.lg.asp.accommodation.entity.KofuRitsu;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.ShoreikinId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -21,6 +23,7 @@ import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
+import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.ShoreikinConfigService;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +43,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	private final AtenaRepository atenaRepository;
 	private final FukaRepository fukaRepository;
 	private final KofuRitsuRepository kofuRitsuRepository;
+	private final ShunoRirekiRepository shunoRirekiRepository;
 
 	private final JichitaiContext jichitaiContext;
 
@@ -171,23 +175,23 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	@Transactional(readOnly = true)
 	public ShoreikinConfigDto calculateShoreikin(ShoreikinConfigDto dto) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+
+		// 交付率設定を取得
+		List<KofuRitsu> kofuRitsuList = kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(
+				jichitaiCd, LocalDate.now().getYear());
+		KofuRitsu kofuRitsuEntity = kofuRitsuList.isEmpty() ? null : kofuRitsuList.get(0);
+
+		if (dto.getKofuRitsu() == null) {
+			dto.setKofuRitsu(kofuRitsuEntity != null ? kofuRitsuEntity.getKofuRitsu() : null);
+		}
+
 		// 納入税額を算出
 		Long kofuZeigaku = calculateKofuZeigaku(dto.getShiteiNo(), dto.getNendo());
 		dto.setKofuZeigaku(kofuZeigaku);
 
-		// デフォルト交付率を設定
-		if (dto.getKofuRitsu() == null) {
-			List<BigDecimal> ritsuList = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now().getYear());
-			dto.setKofuRitsu(ritsuList.isEmpty() ? null : ritsuList.get(0));
-		}
-
-		// 交付額を算出（納入税額 × 交付率 ÷ 100）
+		// 交付額を算出
 		if (kofuZeigaku != null && dto.getKofuRitsu() != null) {
-			Long kofuGaku = new BigDecimal(kofuZeigaku)
-					.multiply(dto.getKofuRitsu())
-					.divide(new BigDecimal("100"), RoundingMode.DOWN)
-					.longValue();
-			dto.setKofuGaku(kofuGaku);
+			dto.setKofuGaku(calculateKofuGaku(kofuZeigaku, dto.getKofuRitsu(), kofuRitsuEntity));
 		}
 
 		return dto;
@@ -197,15 +201,50 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	@Transactional(readOnly = true)
 	public Long calculateKofuZeigaku(String shiteiNo, String nendo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		// 指定年度の賦課情報を取得（del_flg='0', new_flg='1'）
 		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(
 				jichitaiCd, shiteiNo, nendo, "0", "1");
+
+		// 納入額を取得（期別ごとの合計）
+		Map<Integer, Long> shunoByKibetsu = shunoRirekiRepository
+				.sumNonyugakuByShiteiNoIn(jichitaiCd, List.of(shiteiNo))
+				.stream()
+				.filter(row -> nendo.equals(row[1]))
+				.collect(Collectors.toMap(
+						row -> ((Number) row[2]).intValue(),
+						row -> ((Number) row[3]).longValue()));
 
 		return fukaList.stream()
 				.collect(Collectors.toMap(Fuka::getKibetsu, f -> f, (a, b) -> a.getRno() > b.getRno() ? a : b)).values()
 				.stream()
+				.filter(f -> f.getShinkokuYmd() != null) // 申告済み
+				.filter(f -> {
+					if (f.getTotalZeigaku() == null || f.getTotalZeigaku() == 0L) return false;
+					long nonyugaku = shunoByKibetsu.getOrDefault(f.getKibetsu(), 0L);
+					return nonyugaku >= f.getTotalZeigaku(); // 納付済み
+				})
 				.map(Fuka::getTotalZeigaku)
-				.filter(zeigaku -> zeigaku != null)
 				.reduce(0L, Long::sum);
+	}
+
+	/**
+	 * 交付額を算出（算出単位・切り捨て/切り上げ・最低額を考慮）
+	 */
+	private Long calculateKofuGaku(Long kofuZeigaku, BigDecimal kofuRitsu, KofuRitsu kofuRitsuEntity) {
+		BigDecimal raw = new BigDecimal(kofuZeigaku).multiply(kofuRitsu).divide(new BigDecimal("100"), 10, RoundingMode.DOWN);
+
+		int sanshutsu = (kofuRitsuEntity != null && kofuRitsuEntity.getSanshutsu() != null)
+				? kofuRitsuEntity.getSanshutsu() : 1;
+		String kbn = (kofuRitsuEntity != null) ? kofuRitsuEntity.getKbn() : "1";
+		BigDecimal saiteigaku = (kofuRitsuEntity != null) ? kofuRitsuEntity.getSaiteigaku() : null;
+
+		RoundingMode roundingMode = "2".equals(kbn) ? RoundingMode.CEILING : RoundingMode.FLOOR;
+		BigDecimal unit = new BigDecimal(sanshutsu);
+		long kofuGaku = raw.divide(unit, 0, roundingMode).multiply(unit).longValue();
+
+		// 最低額適用（0円の場合を除く）
+		if (kofuGaku > 0 && saiteigaku != null && saiteigaku.compareTo(BigDecimal.ZERO) > 0) {
+			kofuGaku = Math.max(kofuGaku, saiteigaku.longValue());
+		}
+		return kofuGaku;
 	}
 }

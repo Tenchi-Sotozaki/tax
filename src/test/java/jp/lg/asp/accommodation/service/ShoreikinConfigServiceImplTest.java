@@ -25,6 +25,7 @@ import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
+import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.ShoreikinConfigServiceImpl;
 
@@ -36,6 +37,7 @@ class ShoreikinConfigServiceImplTest {
     @Mock AtenaRepository atenaRepository;
     @Mock FukaRepository fukaRepository;
     @Mock KofuRitsuRepository kofuRitsuRepository;
+    @Mock ShunoRirekiRepository shunoRirekiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks ShoreikinConfigServiceImpl service;
 
@@ -45,7 +47,7 @@ class ShoreikinConfigServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        lenient().when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
     }
 
     @Test
@@ -132,15 +134,22 @@ class ShoreikinConfigServiceImplTest {
         f1.setKibetsu(1);
         f1.setRno(1);
         f1.setTotalZeigaku(5000L);
+        f1.setShinkokuYmd(java.time.LocalDate.of(2024, 1, 1));
 
         Fuka f2 = new Fuka();
         f2.setKibetsu(2);
         f2.setRno(1);
         f2.setTotalZeigaku(3000L);
+        f2.setShinkokuYmd(java.time.LocalDate.of(2024, 2, 1));
 
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(
                 JICHITAI_CD, SHITEI_NO, NENDO, "0", "1"))
                 .thenReturn(List.of(f1, f2));
+        // 両期別とも納付済み
+        when(shunoRirekiRepository.sumNonyugakuByShiteiNoIn(eq(JICHITAI_CD), anyList()))
+                .thenReturn(List.<Object[]>of(
+                        new Object[]{SHITEI_NO, NENDO, 1, 5000L},
+                        new Object[]{SHITEI_NO, NENDO, 2, 3000L}));
 
         Long result = service.calculateKofuZeigaku(SHITEI_NO, NENDO);
 
@@ -158,8 +167,14 @@ class ShoreikinConfigServiceImplTest {
         f.setKibetsu(1);
         f.setRno(1);
         f.setTotalZeigaku(10000L);
+        f.setShinkokuYmd(java.time.LocalDate.of(2024, 1, 1));
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(any(), any(), any(), any(), any()))
                 .thenReturn(List.of(f));
+        // 納付済み
+        when(shunoRirekiRepository.sumNonyugakuByShiteiNoIn(eq(JICHITAI_CD), anyList()))
+                .thenReturn(List.<Object[]>of(new Object[]{SHITEI_NO, NENDO, 1, 10000L}));
+        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
+                .thenReturn(List.of());
 
         ShoreikinConfigDto result = service.calculateShoreikin(dto);
 

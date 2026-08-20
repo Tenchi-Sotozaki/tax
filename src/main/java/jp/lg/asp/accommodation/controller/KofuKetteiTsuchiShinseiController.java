@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
-import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiReportsService;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
@@ -53,7 +53,7 @@ public class KofuKetteiTsuchiShinseiController {
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
-		
+
 		// 現在の日付を取得
 		LocalDate now = LocalDate.now();
 
@@ -67,6 +67,14 @@ public class KofuKetteiTsuchiShinseiController {
 		// YYYY形式の年度をDTOにセット
 		dto.setNendo(targetNendo);
 		
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
+			model.addAttribute("showShiteiGassanModal", true);
+			return "tokugimu/tTokugimuReport";
+		}
+
 		// 指定番号を設定
 		dto.setShiteiNo(SessionHelper.getShiteiNo(session));
 
@@ -79,11 +87,10 @@ public class KofuKetteiTsuchiShinseiController {
 	 */
 	@PostMapping("/kofuKetteiTsuchiShinsei/pdf")
 	@OpeLog(screenId = SCREEN_ID, operation = "PDF")
-	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PDF, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> generatePdf(KofuKetteiTsuchiShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 年度を取得
 			String nendo = dto.getNendo();
 
@@ -95,18 +102,19 @@ public class KofuKetteiTsuchiShinseiController {
 			// 年度を指定して帳票データを取得
 			KofuKetteiTsuchiShinseiDto reportData = KofuKetteiTsuchiShinseiService.getReportData(dto.getShiteiNo(),
 					nendo);
-			
+
 			if (reportData == null) {
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
-			
+
 			// 発行年月日を設定
 			reportData.setHakkoYmd(dto.getHakkoYmd());
 
 			// 印刷対象を設定
 			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
 			reportData.setShinsei(dto.isShinsei());
+			reportData.setOperation(ReportsConstants.SOUSA_PDF);
 
 			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
 
@@ -126,11 +134,10 @@ public class KofuKetteiTsuchiShinseiController {
 	 */
 	@PostMapping("/kofuKetteiTsuchiShinsei/preview")
 	@OpeLog(screenId = SCREEN_ID, operation = "プレビュー")
-	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PREVIEW, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> preview(KofuKetteiTsuchiShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			/// 年度を取得
 			String nendo = dto.getNendo();
 
@@ -144,17 +151,18 @@ public class KofuKetteiTsuchiShinseiController {
 					nendo);
 
 			if (reportData == null) {
-				
+
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
-			
+
 			// 発行年月日を設定
 			reportData.setHakkoYmd(dto.getHakkoYmd());
 
 			// 印刷対象を設定
 			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
 			reportData.setShinsei(dto.isShinsei());
+			reportData.setOperation(ReportsConstants.SOUSA_PREVIEW);
 
 			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
 
@@ -175,11 +183,10 @@ public class KofuKetteiTsuchiShinseiController {
 	 */
 	@PostMapping("/kofuKetteiTsuchiShinsei/print")
 	@OpeLog(screenId = SCREEN_ID, operation = "印刷")
-	@RptLog(rptId = ReportsConstants.KOFU_SHINSEI, operation = ReportsConstants.SOUSA_PRINT, shiteiNo = "#dto.shiteiNo")
 	public ResponseEntity<byte[]> print(KofuKetteiTsuchiShinseiDto dto) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			
+
 			// 年度を取得
 			String nendo = dto.getNendo();
 
@@ -193,17 +200,18 @@ public class KofuKetteiTsuchiShinseiController {
 					nendo);
 
 			if (reportData == null) {
-				
+
 				// データが発見出来なかった時のエラーメッセージを送信
 				return ResponseEntity.badRequest().body("指定された条件のデータが見つかりません。".getBytes(StandardCharsets.UTF_8));
 			}
-			
+
 			// 発行年月日を設定
 			reportData.setHakkoYmd(dto.getHakkoYmd());
-			
+
 			// 印刷対象を設定
 			reportData.setKetteiTsuchi(dto.isKetteiTsuchi());
 			reportData.setShinsei(dto.isShinsei());
+			reportData.setOperation(ReportsConstants.SOUSA_PRINT);
 
 			byte[] pdfData = shinseiReportsService.generatekofuKetteiTsuchiShinseiPdf(reportData);
 

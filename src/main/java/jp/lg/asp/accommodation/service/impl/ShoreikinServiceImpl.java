@@ -78,12 +78,6 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 				.stream()
 				.collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
 
-		// 合算対象判定用
-		Map<String, Boolean> gassanMap = gassanUchiRepository
-				.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos)
-				.stream()
-				.collect(Collectors.toMap(GassanUchi::getShiteiNo, g -> true, (a, b) -> a));
-
 		// t_shoreikin を shitei_no、nendo をキーに取得
 		Map<String, List<Shoreikin>> shoreikinMap = shoreikinRepository
 				.findByJichitaiCdAndShiteiNoInAndNendo(jichitaiCd, shiteiNos, form.getNendo())

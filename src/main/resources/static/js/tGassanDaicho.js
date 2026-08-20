@@ -1,14 +1,6 @@
 // DOMの読み込み待ち
 document.addEventListener('DOMContentLoaded', function() {
 
-    const rows = Array.from(document.querySelectorAll('.row-select')).map(cb => cb.closest('tr'));
-    const pageSizeSelect = document.getElementById('pageSizeSelect');
-    const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
-    if (rows.length > 0) {
-        pager.render(1);
-        pageSizeSelect?.addEventListener('change', () => pager.render(1));
-    }
-
     function requireSelected(msg) {
         const cb = document.querySelector('.row-select:checked');
         if (!cb) { 
