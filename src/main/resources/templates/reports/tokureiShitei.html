@@ -53,8 +53,8 @@
 									<div class="col-md-1">
 										<label class="form-label">区分 <span class="text-danger">*</span></label>
 										<select class="form-select" id="shonin" th:field="*{shonin}" onchange="toggleBikoState()">
-											<option value="承認">承認</option>
-											<option value="不承認">不承認</option>
+											<option value="1">承認</option>
+											<option value="2">不承認</option>
 										</select>
 									</div>
 								</div>
@@ -63,7 +63,7 @@
 										<label for="riyu" class="form-label">不承認理由</label>
 										<textarea class="form-control" id="riyu" th:field="*{riyu}" rows="3"
 											placeholder="不承認理由を入力してください"
-											th:disabled="${dto.shonin == '承認'}"></textarea>
+											th:disabled="${dto.shonin == '1'}"></textarea>
 									</div>
 								</div>
 							</div>
@@ -71,13 +71,21 @@
 
 						<input type="hidden" th:field="*{city}">
 						<input type="hidden" th:field="*{jorei}">
+						<input type="hidden" th:field="*{tokuYubin}">
 						<input type="hidden" th:field="*{tokuJusho}">
+						<input type="hidden" th:field="*{tokuName}">
+						<input type="hidden" th:field="*{shisetsuYubin}">
 						<input type="hidden" th:field="*{shisetsuJusho}">
+						<input type="hidden" th:field="*{shisetsuName}">
+						<input type="hidden" th:field="*{shiteiNo}">
 						<input type="hidden" th:field="*{koin}">
-						<input type="hidden" th:filed="*{biko}">
+						<input type="hidden" th:field="*{biko}">
 
 						<!-- アクションボタン -->
 						<div class="d-flex justify-content-center gap-2">
+							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
+								<i class="bi bi-arrow-left me-1"></i> 戻る
+							</a>
 							<button type="submit" class="btn btn-primary"
 								th:formaction="@{/reports/tokureiShitei/pdf}"
 								onclick="hideErrorMessage()">
@@ -93,9 +101,6 @@
 								onclick="hideErrorMessage()">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
-							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
-								<i class="bi bi-arrow-left me-1"></i> 戻る
-							</a>
 						</div>
 					</form>
 				</div>
