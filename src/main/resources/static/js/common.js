@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter') return;
     const tag = document.activeElement?.tagName?.toLowerCase();
-    if (tag === 'button' || tag === 'select') return;
+    if (tag === 'button' || tag === 'select' || tag == 'textarea') return;
     e.preventDefault();
 }, true);
 
