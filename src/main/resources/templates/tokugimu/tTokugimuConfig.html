@@ -138,7 +138,8 @@
 								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}"
 								th:data-initial-value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
 							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{registrationDate}">
+								readonly
+								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('registrationDate')}"
 								th:errors="*{registrationDate}"></div>
@@ -168,7 +169,8 @@
 								th:value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}"
 								th:data-initial-value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}">
 							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{shinseiDate}">
+								readonly
+								th:value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('shinseiDate')}"
 								th:errors="*{shinseiDate}"></div>
@@ -208,10 +210,9 @@
 						<!-- 郵便番号 -->
 						<div class="col-md-3">
 							<label for="tokugimuAddressNo" class="form-label fw-medium">
-								郵便番号<span class="text-danger" th:if="!${isView}">*</span>
-							</label> <input type="text" class="form-control" id="tokugimuAddressNo"
-								th:field="*{tokugimuAddressNo}" th:errorclass="is-invalid"
-								placeholder="自動入力されます" readonly
+								郵便番号 </label> <input type="text" class="form-control"
+								id="tokugimuAddressNo" th:field="*{tokugimuAddressNo}"
+								th:errorclass="is-invalid" placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuAddressNo}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tokugimuAddressNo')}"
@@ -221,8 +222,7 @@
 						<!-- 住所 -->
 						<div class="col-md-5">
 							<label for="tokugimuAddress" class="form-label fw-medium">
-								住所 <span class="text-danger" th:if="!${isView}">*</span>
-							</label> <input type="text" class="form-control" id="tokugimuAddress"
+								住所 </label> <input type="text" class="form-control" id="tokugimuAddress"
 								th:field="*{tokugimuAddress}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuAddress}">
@@ -236,11 +236,10 @@
 
 						<!-- 氏名 -->
 						<div class="col-md-3">
-							<label for="name" class="form-label fw-medium"> 氏名 <span
-								class="text-danger" th:if="!${isView}">*</span>
-							</label> <input type="text" class="form-control" id="name"
-								th:field="*{name}" th:errorclass="is-invalid"
-								placeholder="自動入力されます" readonly th:data-initial-value="*{name}">
+							<label for="name" class="form-label fw-medium"> 氏名 </label> <input
+								type="text" class="form-control" id="name" th:field="*{name}"
+								th:errorclass="is-invalid" placeholder="自動入力されます" readonly
+								th:data-initial-value="*{name}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
 							</div>
@@ -249,8 +248,7 @@
 						<!-- 氏名(ふりがな) -->
 						<div class="col-md-5">
 							<label for="nameKana" class="form-label fw-medium">
-								氏名(ふりがな) <span class="text-danger" th:if="!${isView}">*</span>
-							</label> <input type="text" class="form-control" id="nameKana"
+								氏名(ふりがな) </label> <input type="text" class="form-control" id="nameKana"
 								th:field="*{nameKana}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{nameKana}">
@@ -271,8 +269,7 @@
 						<!-- 電話番号 -->
 						<div class="col-md-5">
 							<label for="tokugimuPhone" class="form-label fw-medium">
-								電話番号 <span class="text-danger" th:if="!${isView}">*</span>
-							</label> <input type="tel" class="form-control" id="tokugimuPhone"
+								電話番号 </label> <input type="tel" class="form-control" id="tokugimuPhone"
 								th:field="*{tokugimuPhone}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuPhone}">
@@ -312,7 +309,8 @@
 								th:value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy-MM-dd') : ''}"
 								th:data-initial-value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy-MM-dd') : ''}">
 							<input th:if="${isView}" type="text" class="form-control"
-								readonly th:value="*{businessStartDate}">
+								readonly
+								th:value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('businessStartDate')}"
 								th:errors="*{businessStartDate}"></div>
@@ -571,8 +569,9 @@
 
 							<div class="d-flex justify-content-end mb-2" th:if="!${isView}">
 								<div class="form-check" onclick="event.stopPropagation()">
-									<input class="form-check-input" type="checkbox" id="copyToOwner">
-									<label class="form-check-label fw-medium" for="copyToOwner">特別徴収義務者情報と同じ</label>
+									<input class="form-check-input" type="checkbox"
+										id="copyToOwner"> <label
+										class="form-check-label fw-medium" for="copyToOwner">特別徴収義務者情報と同じ</label>
 								</div>
 							</div>
 							<div class="row g-3">
@@ -902,10 +901,12 @@
 									<label for="suspensionStartDate" class="form-label fw-medium">休止開始年月日</label>
 									<input th:if="!${isView}" type="date" class="form-control"
 										id="suspensionStartDate" name="suspensionStartDate"
+										th:disabled="*{declarationCategory == null or declarationCategory != '休止'}"
 										th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}"
 										th:data-initial-value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
 									<input th:if="${isView}" type="text" class="form-control"
-										readonly th:value="*{suspensionStartDate}">
+										readonly
+										th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy/MM/dd') : ''}">
 								</div>
 
 								<!-- 休止期間(終了日) -->
@@ -913,10 +914,12 @@
 									<label for="suspensionEndDate" class="form-label fw-medium">休止終了年月日</label>
 									<input th:if="!${isView}" type="date" class="form-control"
 										id="suspensionEndDate" name="suspensionEndDate"
+										th:disabled="*{declarationCategory == null or declarationCategory != '休止'}"
 										th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}"
 										th:data-initial-value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
 									<input th:if="${isView}" type="text" class="form-control"
-										readonly th:value="*{suspensionEndDate}">
+										readonly
+										th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy/MM/dd') : ''}">
 								</div>
 
 								<div class="col-md-1 d-flex align-items-end">
@@ -929,19 +932,21 @@
 									</div>
 								</div>
 
-								<div class="col-md-3"></div>
+								<div class="col-md-5"></div>
 
 								<!-- 再開または廃止日 -->
 								<div class="col-md-2">
 									<label for="resumptionOrAbolitionDate"
-										class="form-label fw-medium">再開または廃止日</label> <input
+										class="form-label fw-medium">再開または廃止年月日</label> <input
 										th:if="!${isView}" type="date" class="form-control"
 										id="resumptionOrAbolitionDate"
 										name="resumptionOrAbolitionDate"
+										th:disabled="*{declarationCategory == null or (declarationCategory != '再開' and declarationCategory != '廃止')}"
 										th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}"
 										th:data-initial-value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
 									<input th:if="${isView}" type="text" class="form-control"
-										readonly th:value="*{resumptionOrAbolitionDate}">
+										readonly
+										th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy/MM/dd') : ''}">
 								</div>
 
 								<!-- 休止または廃止理由 -->
@@ -962,7 +967,6 @@
 			</div>
 
 			<!-- ===== アクションボタン ===== -->
-			<!-- 並び順は左から「一覧に戻る」「削除する」「登録する/更新する」 -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 				<a th:href="@{/tokugimu/list}"
 					class="btn btn-outline-primary btn-lg px-4"
@@ -970,10 +974,10 @@
 				</a> <a href="#" class="btn btn-outline-primary btn-lg px-4"
 					th:unless="${isView ?: false}" data-bs-toggle="modal"
 					data-bs-target="#backConfirmModal"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
+					class="bi bi-arrow-left me-2"></i>戻る
 				</a>
 
-				<!-- 編集時のみ削除ボタンを表示（台帳から移設） -->
+				<!-- 編集時のみ削除ボタンを表示 -->
 				<button type="button" class="btn btn-danger btn-lg px-5"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
 					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
@@ -1006,7 +1010,7 @@
 		</div>
 
 		<div th:if="!${isView}"
-			th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容は破棄されます。よろしいですか？', @{/tokugimu/list}, '一覧に戻る')}"></div>
+			th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容は破棄されます。よろしいですか？', @{/tokugimu/view}, '戻る')}"></div>
 
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>

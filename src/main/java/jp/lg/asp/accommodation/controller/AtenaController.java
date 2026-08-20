@@ -68,30 +68,28 @@ public class AtenaController {
 	@GetMapping("/list")
 	@OpeLog(screenId = ATENA_DAICHO, operation = "照会")
 	public String list(@ModelAttribute AtenaSearchForm searchForm,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "false") boolean searched,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_DAICHO);
-		searchForm.setPage(page);
-		searchForm.setPageSize(pageSize);
-		Page<Atena> atenaPage = atenaRepository.searchPage(
-				jichitaiCd,
-				toLikePattern(searchForm.getAtenaNo(), "exact"),
-				toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
-				toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
-				toLikePattern(searchForm.getYubinNo(), "exact"),
-				toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
-				toLikePattern(searchForm.getTel(), "exact"),
-				toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
-				toLikePattern(searchForm.getHojinNo(), "exact"),
-				PageRequest.of(page, pageSize));
 		BigDecimal atenaStNo = jichitaiRepository.findById(jichitaiCd)
 				.map(Jichitai::getAtenaStNo).orElse(null);
-		org.springframework.data.domain.Page<AtenaDaichoItem> items = atenaPage
-				.map(a -> new AtenaDaichoItem(a, atenaStNo));
+		List<AtenaDaichoItem> items = searched
+				? atenaRepository.search(
+						jichitaiCd,
+						toLikePattern(searchForm.getAtenaNo(), "exact"),
+						toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
+						toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
+						toLikePattern(searchForm.getYubinNo(), "exact"),
+						toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
+						toLikePattern(searchForm.getTel(), "exact"),
+						toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
+						toLikePattern(searchForm.getHojinNo(), "exact"))
+						.stream().map(a -> new AtenaDaichoItem(a, atenaStNo)).toList()
+				: List.of();
 		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
+		model.addAttribute("isSearched", searched);
 		return "atena/atenaDaicho";
 	}
 
@@ -201,23 +199,41 @@ public class AtenaController {
 	@PostMapping("/register")
 	@OpeLog(screenId = ATENA_CONFIG, operation = "登録")
 	public String register(@ModelAttribute("form") AtenaConfigForm form,
-			org.springframework.validation.BindingResult result,
+			org.springframework.validation.BindingResult bindingResult,
 			Model model,
 			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
 		if (isBlank(form.getKojinNo()) && isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号または法人番号のいずれかを入力してください。");
-			model.addAttribute("mode", "register");
-			return "atena/atenaConfig";
+			bindingResult.rejectValue("kojinNo", "", "個人番号または法人番号のいずれかを入力してください。");
+			bindingResult.rejectValue("hojinNo", "", "個人番号または法人番号のいずれかを入力してください。");
 		}
 		if (!isBlank(form.getKojinNo()) && !isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("kojinNo", "", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("hojinNo", "", "個人番号と法人番号は同時に入力できません。");
+		}
+		if (isBlank(form.getName())) {
+			bindingResult.rejectValue("name", "", "氏名/名称は必須です。");
+		}
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
 			model.addAttribute("mode", "register");
 			return "atena/atenaConfig";
 		}
 		Atena atena = toEntity(form);
-		atenaConfigService.register(atena, jichitaiCd);
+		try {
+			atenaConfigService.register(atena, jichitaiCd);
+		} catch (jp.lg.asp.accommodation.exception.BusinessException e) {
+			String field = e.getCode().equals("DUPLICATE_KOJIN_NO") ? "kojinNo" : "hojinNo";
+			bindingResult.rejectValue(field, "", e.getMessage());
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
+			model.addAttribute("mode", "register");
+			return "atena/atenaConfig";
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "宛名を登録しました。");
 		return "redirect:/atena/list";
 	}
@@ -239,7 +255,9 @@ public class AtenaController {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
 		Atena atena = atenaConfigService.findByAtenaNo(jichitaiCd, atenaNo);
-		model.addAttribute("form", toForm(atena));
+		AtenaConfigForm form = toForm(atena);
+		form.setKojinNo(null);
+		model.addAttribute("form", form);
 		model.addAttribute("mode", "edit");
 		return "atena/atenaConfig";
 	}
@@ -247,22 +265,37 @@ public class AtenaController {
 	@PostMapping("/edit")
 	@OpeLog(screenId = ATENA_CONFIG, operation = "更新")
 	public String edit(@ModelAttribute("form") AtenaConfigForm form,
+			org.springframework.validation.BindingResult bindingResult,
 			Model model,
 			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
-		if (isBlank(form.getKojinNo()) && isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号または法人番号のいずれかを入力してください。");
-			model.addAttribute("mode", "edit");
-			return "atena/atenaConfig";
-		}
 		if (!isBlank(form.getKojinNo()) && !isBlank(form.getHojinNo())) {
-			model.addAttribute("errorMessage", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("kojinNo", "", "個人番号と法人番号は同時に入力できません。");
+			bindingResult.rejectValue("hojinNo", "", "個人番号と法人番号は同時に入力できません。");
+		}
+		if (isBlank(form.getName())) {
+			bindingResult.rejectValue("name", "", "氏名/名称は必須です。");
+		}
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
 			model.addAttribute("mode", "edit");
 			return "atena/atenaConfig";
 		}
 		Atena atena = toEntity(form);
-		atenaConfigService.update(atena, jichitaiCd);
+		try {
+			atenaConfigService.update(atena, jichitaiCd);
+		} catch (jp.lg.asp.accommodation.exception.BusinessException e) {
+			String field = e.getCode().equals("DUPLICATE_KOJIN_NO") ? "kojinNo" : "hojinNo";
+			bindingResult.rejectValue(field, "", e.getMessage());
+			model.addAttribute("validationErrors", bindingResult.getAllErrors().stream()
+					.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+					.distinct().toList());
+			model.addAttribute("mode", "edit");
+			return "atena/atenaConfig";
+		}
 		redirectAttributes.addFlashAttribute("successMessage", "宛名を更新しました。");
 		return "redirect:/atena/view/" + form.getAtenaNo();
 	}

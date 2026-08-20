@@ -36,31 +36,26 @@
 						<!-- 特別徴収義務者情報エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
-						<!-- 発行区分エリア -->
+						<!-- 内容エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
-								<h5 class="mb-0">発行区分 <span class="text-danger">*</span></h5>
+								<h5 class="mb-0">内容</h5>
 							</div>
 							<div class="card-body">
-								<div class="d-flex gap-4">
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="henkoKbn" id="henkoKbnKosei" value="2" checked>
-										<label class="form-check-label" for="henkoKbnKosei">更正</label>
-									</div>
-									<div class="form-check">
-										<input class="form-check-input" type="radio" name="henkoKbn" id="henkoKbnKettei" value="3">
-										<label class="form-check-label" for="henkoKbnKettei">決定</label>
+								<!-- 発行区分 -->
+								<div class="row g-3">
+									<div class="col-md-3">
+										<label for="henkoKbn" class="form-label fw-bold">発行区分 <span
+											class="text-danger">*</span></label>
+										<select id="henkoKbn" name="henkoKbn" class="form-select" required>
+											<option value="2">更正</option>
+											<option value="3">決定</option>
+										</select>
 									</div>
 								</div>
-							</div>
-						</div>
 
-						<!-- 対象月選択エリア -->
-						<div class="card mb-4">
-							<div class="card-header">
-								<h5 class="mb-0">対象月(最大3ヵ月間まで出力可能)</h5>
-							</div>
-							<div class="card-body">
+								<!-- 対象月 -->
+								<label class="form-label fw-bold mt-3">対象月(最大3ヵ月間まで出力可能)</label>
 								<div class="row g-3 align-items-end">
 
 

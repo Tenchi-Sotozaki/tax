@@ -44,11 +44,14 @@ class OpeLogAspectTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp() throws Exception {
-        // ObjectMapperをフィールドインジェクション
-        var field = OpeLogAspect.class.getDeclaredField("objectMapper");
-        field.setAccessible(true);
-        field.set(aspect, objectMapper);
+    void setUp() {
+        try {
+            var field = OpeLogAspect.class.getDeclaredField("objectMapper");
+            field.setAccessible(true);
+            field.set(aspect, objectMapper);
+        } catch (Exception e) {
+            fail("初期化処理に失敗しました", e);
+        }
 
         lenient().when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
         lenient().when(operationLogRepository.findNextSeq(JICHITAI_CD)).thenReturn(1L);

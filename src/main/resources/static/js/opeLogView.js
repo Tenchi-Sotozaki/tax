@@ -32,14 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('\n');
     }
 
-    // ページネーション
-    const rows = Array.from(document.querySelectorAll('.log-row'));
-    const pageSizeSelect = document.getElementById('pageSizeSelect');
-    const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
-
-    if (rows.length > 0) {
-        pager.render(1);
-        pageSizeSelect?.addEventListener('change', () => pager.render(1));
-        bootstrap.Collapse.getOrCreateInstance(document.getElementById('searchPanel')).hide();
+    const paginationEl = document.getElementById('pagination');
+    if (paginationEl?.dataset.paginationRows) {
+        const rows = Array.from(document.querySelectorAll(paginationEl.dataset.paginationRows));
+        if (rows.length > 0) {
+            bootstrap.Collapse.getOrCreateInstance(document.getElementById('searchPanel')).hide();
+        }
     }
 });

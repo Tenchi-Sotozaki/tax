@@ -23,6 +23,7 @@ import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KofuKetteiTsuchiShinseiDto;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiReportsService;
 import jp.lg.asp.accommodation.service.KofuKetteiTsuchiShinseiService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
@@ -68,6 +69,14 @@ public class KofuKetteiTsuchiShinseiController {
 
 		// YYYY形式の年度をDTOにセット
 		dto.setNendo(targetNendo);
+		
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
+			model.addAttribute("showShiteiGassanModal", true);
+			return "tokugimu/tTokugimuReport";
+		}
 
 		// 指定番号を設定
 		dto.setShiteiNo(SessionHelper.getShiteiNo(session));

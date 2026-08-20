@@ -47,4 +47,12 @@ public class Nokan {
     /** 削除フラグ */
     @Column(name = "del_flg")
     private String delFlg;
+    
+    /** 区分 */
+    @Column(name = "kbn")
+    private String kbn;
+    
+    /** 理由 */
+    @Column(name="riyu")
+    private String riyu;
 }
