@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,15 +39,13 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<ShoreikinDto> search(ShoreikinDto form) {
+	public List<ShoreikinDto> search(ShoreikinDto form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		List<Tokugimu> tokugimuList;
 		if (form.getGassanShiteiNo() != null && !form.getGassanShiteiNo().isBlank()) {
-			// 合算指定番号で検索
 			tokugimuList = findTokugimuByGassanShiteiNo(form.getGassanShiteiNo());
 		} else if (form.getShiteiNo() != null && form.getShiteiNo().startsWith("9")) {
-			// 指定番号が9で始まる場合、t_gassanから検索
 			tokugimuList = findTokugimuByGassanShiteiNo(form.getShiteiNo());
 		} else {
 			tokugimuList = tokugimuRepository.findBySearchConditions(
@@ -66,19 +61,17 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 		}
 
 		if (tokugimuList.isEmpty()) {
-			return Page.empty(PageRequest.of(form.getPage(), form.getPageSize()));
+			return List.of();
 		}
 
 		List<BigDecimal> atenaNos = tokugimuList.stream().map(Tokugimu::getAtenaNo).distinct().toList();
 		List<String> shiteiNos = tokugimuList.stream().map(Tokugimu::getShiteiNo).toList();
 
-		// m_atena を atena_no をキーに取得
 		Map<BigDecimal, Atena> atenaMap = atenaRepository
 				.findByJichitaiCdAndAtenaNoIn(jichitaiCd, atenaNos)
 				.stream()
 				.collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
 
-		// t_shoreikin を shitei_no、nendo をキーに取得
 		Map<String, List<Shoreikin>> shoreikinMap = shoreikinRepository
 				.findByJichitaiCdAndShiteiNoInAndNendo(jichitaiCd, shiteiNos, form.getNendo())
 				.stream()
@@ -89,39 +82,22 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 							return a;
 						}));
 
-		List<ShoreikinDto> result = tokugimuList.stream()
+		return tokugimuList.stream()
 				.<ShoreikinDto> flatMap(t -> {
 					List<Shoreikin> shoreikinList = shoreikinMap.get(t.getShiteiNo());
 					Atena atena = atenaMap.get(t.getAtenaNo());
-					// shoreikinListがnullまたは空の場合の処理
 					if (shoreikinList == null || shoreikinList.isEmpty()) {
-						// 交付金算出有無フィルタ（算出無のみ表示する場合）
 						if ("1".equals(form.getKofuSanshutsuUmu())) {
-							// 算出有のみ表示する場合は除外
 							return Stream.empty();
-						} else {
-							// 算出無のみ、またはすべて表示する場合
-							ShoreikinDto dto = new ShoreikinDto();
-							dto.setListShiteiNo(t.getShiteiNo());
-							dto.setListShisetsuName(t.getShisetsuName());
-							dto.setShimei(atena != null ? atena.getName() : null);
-							dto.setKofuGaku(null);
-							dto.setKofuNendo(null);
-							dto.setKofuYmd(null);
-							return Stream.of(dto);
 						}
+						ShoreikinDto dto = new ShoreikinDto();
+						dto.setListShiteiNo(t.getShiteiNo());
+						dto.setListShisetsuName(t.getShisetsuName());
+						dto.setShimei(atena != null ? atena.getName() : null);
+						return Stream.of(dto);
 					}
-
-					// shoreikinListから複数のDTOを生成
 					return shoreikinList.stream()
-							.filter(s -> {
-								// 交付金算出有無フィルタ
-								if ("2".equals(form.getKofuSanshutsuUmu())) {
-									// 算出無のみ表示する場合は除外
-									return false;
-								}
-								return true;
-							})
+							.filter(s -> !"2".equals(form.getKofuSanshutsuUmu()))
 							.map(s -> {
 								ShoreikinDto dto = new ShoreikinDto();
 								dto.setListShiteiNo(t.getShiteiNo());
@@ -134,14 +110,6 @@ public class ShoreikinServiceImpl implements ShoreikinService {
 							});
 				})
 				.toList();
-
-		// ページ分割
-		PageRequest pageable = PageRequest.of(form.getPage(), form.getPageSize());
-		int start = (int) pageable.getOffset();
-		int end = Math.min(start + pageable.getPageSize(), result.size());
-		List<ShoreikinDto> pageContent = start >= result.size() ? List.of() : result.subList(start, end);
-		return new PageImpl<>(pageContent, pageable, result.size());
-
 	}
 
 	private String toLikePattern(String value, String matchType) {

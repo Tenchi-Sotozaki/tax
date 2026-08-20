@@ -12,6 +12,9 @@
 			<div
 				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 				<h5 class="mb-0 fw-bold text-dark">特別徴収事務交付金</h5>
+				<div class="d-flex align-items-center gap-3">
+					<span class="text-muted small" th:if="${items != null}">検索結果：<span th:text="${items.size()}">0</span> 件</span>
+				</div>
 			</div>
 
 			<!-- 成功・エラーメッセージ -->
@@ -153,7 +156,7 @@
 				<div style="min-width: 120px;"></div>
 				<div class="flex-grow-1 d-flex justify-content-center">
 					<nav>
-						<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination"></ul>
+						<ul class="pagination pagination-sm justify-content-center mb-0" id="pagination" data-pagination-rows=".daicho-row"></ul>
 					</nav>
 				</div>
 				<div class="d-flex align-items-center" style="min-width: 120px; justify-content: flex-end;">
@@ -186,12 +189,12 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr th:if="${items.totalElements == 0}">
+									<tr th:if="${items.isEmpty()}">
 										<td colspan="8" class="text-center text-muted py-5"><i
 												class="bi bi-inbox fs-2 d-block mb-2 text-secondary"></i>
 											該当するデータが見つかりませんでした。</td>
 									</tr>
-									<tr th:each="item : ${items.content}">
+									<tr class="daicho-row" th:each="item : ${items}">
 										<td class="fw-bold text-primary" th:text="${item.listShiteiNo}"></td>
 										<td th:text="${item.listShisetsuName}"></td>
 										<td th:text="${item.shimei}"></td>
@@ -228,10 +231,7 @@
 							</table>
 						</div>
 					</div>
-					<div class="card-footer bg-white py-2 border-top">
-						<span class="text-muted small"> 検索結果: <strong th:text="${items.totalElements}">0</strong> 件
-						</span>
-					</div>
+
 				</div>
 			</form>
 		</div>
