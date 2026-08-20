@@ -130,27 +130,6 @@
 				</div>
 			</div>
 
-			<!-- 情報一覧エリア -->
-			<!-- ========== ツールバー（ボタンエリア） ========== -->
-			<div class="card shadow-sm mb-2">
-				<div class="card-body py-2 px-3">
-					<div class="d-flex flex-wrap align-items-center gap-1" style="row-gap: 0.4rem;">
-						<!-- グループ1: 基本操作 -->
-						<div class="d-flex flex-wrap gap-1">
-							<form th:action="@{/shoreikin/bulkCalculate}" th:object="${searchForm}" method="post"
-								class="d-inline">
-								<input type="hidden" th:field="*{nendo}"> <input type="hidden"
-									th:field="*{shisetsuName}">
-								<button type="submit" class="btn btn-primary btn-sm">
-									<i class="bi bi-calculator me-1"></i>一括算出
-								</button>
-							</form>
-
-						</div>
-					</div>
-				</div>
-			</div>
-
 			<!-- 表示件数・ページネーション行 -->
 			<div th:if="${items != null}" class="d-flex align-items-center mb-1">
 				<div style="min-width: 120px;"></div>
