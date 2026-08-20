@@ -21,11 +21,14 @@
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
 					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
-						data-bs-target="#searchPanel">
+						data-bs-target="#searchPanel"
+						th:classappend="${isSearched} ? 'collapsed' : ''">
 						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
 					</button>
 				</h2>
-				<div id="searchPanel" class="accordion-collapse collapse show">
+				<!-- 初期表示時は開き、検索後は折りたたむ -->
+				<div id="searchPanel" class="accordion-collapse collapse"
+					th:classappend="${isSearched} ? '' : 'show'">
 					<div class="accordion-body pt-3 pb-2 px-3">
 						<form th:action="@{/tokugimu/reports-status/search}" th:object="${searchForm}" method="post">
 							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
