@@ -360,7 +360,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                     for (ZeiritsuTeiritsu t : teiritsuList) {
                         int tSeq = t.getTeiritsuSeq().intValue();
                         if (tSeq >= 1 && tSeq <= MAX_KBN) {
-                            setField(dto, pfx + "kbn_name" + tSeq, nvl(t.getKbnName()).trim());
+                            setField(dto, "kbn_name" + tSeq, nvl(t.getKbnName()).trim());
                         }
                     }
                 });
