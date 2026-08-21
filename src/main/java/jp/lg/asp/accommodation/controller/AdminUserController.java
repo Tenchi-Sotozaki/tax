@@ -173,7 +173,7 @@ public class AdminUserController {
                 "successMessage",
                 "ユーザーを登録しました。");
 
-        return "redirect:/admin/user-search";
+        return "redirect:/admin/user-view/" + form.getId();
     }
 
     @GetMapping("/user-edit/{id}")
@@ -298,7 +298,7 @@ public class AdminUserController {
                 "successMessage",
                 "ユーザー情報を更新しました。");
 
-        return "redirect:/admin/user-search";
+        return "redirect:/admin/user-view/" + id;
     }
 
     @PostMapping("/user-delete/{id}")

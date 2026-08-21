@@ -31,7 +31,7 @@ function toggleBikoState() {
     const shonin = document.getElementById('shonin');
     const riyu = document.getElementById('riyu');
 
-    if (shonin.value === '承認') { // 承認
+    if (shonin.value === '1') { // 承認
 		// 承認に変更された場合は理由をクリア
         riyu.value = '';
         riyu.disabled = true;

@@ -14,8 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
@@ -37,8 +35,7 @@ class ShoreikinControllerTest {
 
     @BeforeEach
     void setUp() {
-        when(shoreikinService.search(any())).thenReturn(
-                new PageImpl<>(List.of(), PageRequest.of(0, 10), 0));
+        when(shoreikinService.search(any())).thenReturn(List.of());
     }
 
     @Test
@@ -65,12 +62,12 @@ class ShoreikinControllerTest {
     void search_検索後一覧画面を返す() {
         Model model = new ExtendedModelMap();
         ShoreikinDto form = new ShoreikinDto();
-        form.setPage(5);
 
         String view = controller.search(form, model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikin");
-        assertThat(form.getPage()).isEqualTo(0); // ページリセット確認
+        assertThat(model.asMap()).containsKey("items");
+        assertThat(model.asMap()).containsKey("searchForm");
     }
 
     @Test
@@ -95,8 +92,33 @@ class ShoreikinControllerTest {
 		String view = controller.viewKofu(List.of("00100001"), "テスト施設", "テスト太郎", "2024", session, new RedirectAttributesModelMap());
 
 		assertThat(view).isEqualTo("redirect:/shoreikin/config");
-		// SessionHelper経由で正しく取得できることを確認
 		assertThat(SessionHelper.getShiteiNo(session)).isEqualTo("00100001");
+	}
+
+	@Test
+	void viewKofu_nendoなしはリダイレクトパラメータなし() {
+		MockHttpSession session = new MockHttpSession();
+		RedirectAttributesModelMap redirectAttrs = new RedirectAttributesModelMap();
+		String view = controller.viewKofu(List.of("00100001"), "テスト施設", "テスト太郎", null, session, redirectAttrs);
+
+		assertThat(view).isEqualTo("redirect:/shoreikin/config");
+		assertThat(redirectAttrs.asMap()).doesNotContainKey("nendo");
+	}
+
+	@Test
+	void viewKoza_未選択はエラー() {
+		MockHttpSession session = new MockHttpSession();
+		String view = controller.viewKoza(List.of(), null, null, session, new RedirectAttributesModelMap());
+
+		assertThat(view).isEqualTo("redirect:/shoreikin/list");
+	}
+
+	@Test
+	void viewKoza_複数選択はエラー() {
+		MockHttpSession session = new MockHttpSession();
+		String view = controller.viewKoza(List.of("A", "B"), null, null, session, new RedirectAttributesModelMap());
+
+		assertThat(view).isEqualTo("redirect:/shoreikin/list");
 	}
 
 	@Test
@@ -105,7 +127,6 @@ class ShoreikinControllerTest {
 		String view = controller.viewKoza(List.of("00100001"), "テスト施設", "テスト太郎", session, new RedirectAttributesModelMap());
 
 		assertThat(view).isEqualTo("redirect:/shoreikin/furikomiKoza");
-		// SessionHelper経由で正しく取得できることを確認
 		assertThat(SessionHelper.getShiteiNo(session)).isEqualTo("00100001");
 	}
 }
