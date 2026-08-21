@@ -199,19 +199,28 @@
 			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000026" x="85" y="192" width="60" height="27" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[名称]]></text>
 			</element>
-			<element kind="textField" uuid="11111111-2222-3333-4444-000000000030" x="150" y="165" width="371" height="12" fontName="IPAex明朝" fontSize="8.0" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
+			<element kind="textField" uuid="11111111-2222-3333-4444-000000000030" x="146" y="165" width="385" height="12" fontName="IPAex明朝" fontSize="8.0" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
 				<expression><![CDATA[$F{shisetsu_yubin_no}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 			</element>
-			<element kind="textField" uuid="11111111-2222-3333-4444-000000000031" x="150" y="192" width="371" height="27" fontName="IPAex明朝" blankWhenNull="true" vTextAlign="Middle">
+			<element kind="textField" uuid="11111111-2222-3333-4444-000000000031" x="146" y="193" width="385" height="28" fontName="IPAex明朝" blankWhenNull="true" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
 				<expression><![CDATA[$F{shisetsu_name}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 			</element>
 			<element kind="line" uuid="11111111-2222-3333-4444-000000000017" x="14" y="258" width="517" height="1"/>
 			<element kind="staticText" uuid="11111111-2222-3333-4444-000000000027" x="16" y="221" width="130" height="37" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[更正・決定の理由]]></text>
 			</element>
-			<element kind="textField" uuid="11111111-2222-3333-4444-000000000032" x="150" y="221" width="380" height="37" fontName="IPAex明朝" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
+			<element kind="textField" uuid="11111111-2222-3333-4444-000000000032" x="146" y="221" width="385" height="37" fontName="IPAex明朝" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
 				<expression><![CDATA[$F{henko_riyu}]]></expression>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 			</element>
 			<element kind="line" uuid="db280757-b8ba-42f5-b718-bf28f9cf7507" x="145" y="221" width="1" height="37"/>
 			<element kind="rectangle" uuid="2a2a2a2a-9999-4999-8999-000000000001" mode="Transparent" x="15" y="270" width="517" height="502">
@@ -725,9 +734,12 @@
 			<element kind="staticText" uuid="4eafc80a-9ed2-434b-83cb-5030ab139a64" x="516" y="734" width="16" height="21" fontName="IPAex明朝" fontSize="8.0" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[④]]></text>
 			</element>
-			<element kind="textField" uuid="db351aad-ebfb-4020-aeda-16cb8bc70565" x="150" y="177" width="371" height="16" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
+			<element kind="textField" uuid="db351aad-ebfb-4020-aeda-16cb8bc70565" x="145" y="177" width="386" height="16" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
 				<expression><![CDATA[$F{shisetsu_jusho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 			</element>
 			<element kind="textField" uuid="8a692992-f02f-4cc9-b6fa-a473ca917057" x="96" y="52" width="209" height="10" fontName="IPAex明朝" fontSize="8.0" textAdjust="ScaleFont" blankWhenNull="true" vTextAlign="Bottom">
 				<expression><![CDATA[$F{yubin_no}]]></expression>
