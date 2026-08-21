@@ -753,9 +753,8 @@
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			</element>
-			<element kind="ellipse" uuid="c1b831af-1216-4a98-a664-ebee8f75e145" x="471" y="101" width="30" height="30" backcolor="rgba(255, 255, 255, 0.0)">
-				<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<element kind="staticText" uuid="eb9cdcf2-9411-4346-a9e4-afae2d4f6e3a" x="475" y="100" width="30" height="30" fontName="IPAex明朝" fontSize="24.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[㊞]]></text>
 			</element>
 		</band>
 	</detail>
