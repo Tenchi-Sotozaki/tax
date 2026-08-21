@@ -140,6 +140,30 @@ public class TokugimuForm {
 	private Integer maxRno;
 	private Integer minRno;
 
+	/**
+	 * エラーサマリの表示順。tTokugimuConfig.html の項目順に並べる。
+	 * 画面に項目を追加したときは、ここにも追加すること。
+	 */
+	private static final List<String> FIELD_ORDER = List.of(
+			"registrationDate", "henkoDate", "shinseiDate", "tokugimuAddressNo",
+			"tokugimuAddress", "name", "nameKana", "personalNumber",
+			"corporateNumber", "tokugimuPhone", "businessStartDate", "facilityAddressNo",
+			"facilityAddress", "facilityName", "facilityNameKana", "facilityPhone",
+			"floorArea", "aboveGroundFloor", "basementFloor", "roomCount",
+			"capacity", "licenseAddressNo", "licenseAddress", "licenseName",
+			"licenseNameKana", "licensePhone", "businessType", "licenseNumber",
+			"ownerAddressNo", "ownerAddress", "ownerName", "ownerNameKana",
+			"ownerPhone", "mailAddressNo", "mailAddress", "mailName",
+			"mailNameKana", "mailPhone", "kyodoName", "kyodoNameKana",
+			"eltaxUmu", "remarks", "declarationCategory", "suspensionStartDate",
+			"suspensionEndDate", "resumptionOrAbolitionDate", "suspensionOrAbolitionReason");
+
+	/** FIELD_ORDER 上の位置を返す。未登録の項目は末尾に回す */
+	public static int fieldOrder(String field) {
+		int index = FIELD_ORDER.indexOf(field);
+		return index < 0 ? FIELD_ORDER.size() : index;
+	}
+
 	public String getTokugimuYubinNo() {
 		return mailAddressNo != null && !mailAddressNo.isBlank() ? mailAddressNo : tokugimuAddressNo;
 	}

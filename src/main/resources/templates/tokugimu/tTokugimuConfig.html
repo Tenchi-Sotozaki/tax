@@ -326,7 +326,9 @@
 								id="facilityAddressNo" th:field="*{facilityAddressNo}"
 								th:errorclass="is-invalid" th:readonly="${isView}"
 								th:data-initial-value="*{facilityAddressNo}">
-
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('facilityAddressNo')}"
+								th:errors="*{facilityAddressNo}"></div>
 						</div>
 
 						<!-- 所在地(住所) -->
@@ -336,7 +338,9 @@
 								id="facilityAddress" th:field="*{facilityAddress}"
 								th:errorclass="is-invalid" th:readonly="${isView}"
 								th:data-initial-value="*{facilityAddress}">
-
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('facilityAddress')}"
+								th:errors="*{facilityAddress}"></div>
 						</div>
 
 						<!-- 施設名称 -->
@@ -373,7 +377,9 @@
 								th:field="*{facilityPhone}" th:errorclass="is-invalid"
 								placeholder="例）03-1234-5678" th:readonly="${isView}"
 								th:data-initial-value="*{facilityPhone}">
-
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('facilityPhone')}"
+								th:errors="*{facilityPhone}"></div>
 						</div>
 
 						<!-- 延床面積 -->
@@ -489,6 +495,9 @@
 								th:field="*{licenseAddressNo}" th:errorclass="is-invalid"
 								th:readonly="${isView}"
 								th:data-initial-value="*{licenseAddressNo}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('licenseAddressNo')}"
+								th:errors="*{licenseAddressNo}"></div>
 						</div>
 
 						<!-- 住所 -->
@@ -499,6 +508,9 @@
 								th:field="*{licenseAddress}" th:errorclass="is-invalid"
 								th:readonly="${isView}"
 								th:data-initial-value="*{licenseAddress}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('licenseAddress')}"
+								th:errors="*{licenseAddress}"></div>
 						</div>
 
 						<div class="col-md-4"></div>
@@ -537,6 +549,9 @@
 								th:field="*{licensePhone}" th:errorclass="is-invalid"
 								placeholder="例）03-1234-5678" th:readonly="${isView}"
 								th:data-initial-value="*{licensePhone}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('licensePhone')}"
+								th:errors="*{licensePhone}"></div>
 						</div>
 
 						<!-- 営業種別 -->
@@ -564,6 +579,9 @@
 							</label> <input type="text" class="form-control" id="licenseNumber"
 								th:field="*{licenseNumber}" th:errorclass="is-invalid"
 								th:readonly="${isView}" th:data-initial-value="*{licenseNumber}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('licenseNumber')}"
+								th:errors="*{licenseNumber}"></div>
 						</div>
 
 					</div>
@@ -603,6 +621,9 @@
 										th:field="*{ownerAddressNo}" th:errorclass="is-invalid"
 										th:readonly="${isView}"
 										th:data-initial-value="*{ownerAddressNo}">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('ownerAddressNo')}"
+										th:errors="*{ownerAddressNo}"></div>
 								</div>
 
 								<!-- 住所 -->
@@ -612,6 +633,9 @@
 										th:field="*{ownerAddress}" th:errorclass="is-invalid"
 										th:readonly="${isView}"
 										th:data-initial-value="*{ownerAddress}">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('ownerAddress')}"
+										th:errors="*{ownerAddress}"></div>
 								</div>
 
 								<div class="col-md-4"></div>
@@ -650,6 +674,9 @@
 										th:field="*{ownerPhone}" th:errorclass="is-invalid"
 										placeholder="例）03-1234-5678" th:readonly="${isView}"
 										th:data-initial-value="*{ownerPhone}">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('ownerPhone')}"
+										th:errors="*{ownerPhone}"></div>
 								</div>
 
 							</div>
@@ -682,6 +709,9 @@
 								id="mailAddressNo" th:field="*{mailAddressNo}"
 								th:errorclass="is-invalid" th:readonly="${isView}"
 								th:data-initial-value="*{mailAddressNo}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('mailAddressNo')}"
+								th:errors="*{mailAddressNo}"></div>
 						</div>
 
 						<!-- 住所 -->
@@ -690,6 +720,9 @@
 							</label> <input type="text" class="form-control" id="mailAddress"
 								th:field="*{mailAddress}" th:errorclass="is-invalid"
 								th:readonly="${isView}" th:data-initial-value="*{mailAddress}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('mailAddress')}"
+								th:errors="*{mailAddress}"></div>
 						</div>
 
 						<div class="col-md-4"></div>
@@ -726,6 +759,9 @@
 								th:field="*{mailPhone}" th:errorclass="is-invalid"
 								placeholder="例）03-1234-5678" th:readonly="${isView}"
 								th:data-initial-value="*{mailPhone}">
+							<div class="invalid-feedback"
+								th:if="${#fields.hasErrors('mailPhone')}"
+								th:errors="*{mailPhone}"></div>
 						</div>
 					</div>
 				</div>

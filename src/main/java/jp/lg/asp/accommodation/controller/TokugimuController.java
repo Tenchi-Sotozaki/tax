@@ -1,11 +1,13 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -311,6 +313,7 @@ public class TokugimuController {
 	 */
 	private List<String> buildValidationMessages(BindingResult bindingResult) {
 		return bindingResult.getFieldErrors().stream()
+				.sorted(Comparator.comparingInt((FieldError e) -> TokugimuForm.fieldOrder(e.getField())))
 				.map(e -> e.isBindingFailure()
 						? TYPE_MISMATCH_MESSAGES.getOrDefault(e.getField(), TYPE_MISMATCH_DEFAULT_MESSAGE)
 						: e.getDefaultMessage())
