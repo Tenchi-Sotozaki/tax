@@ -210,7 +210,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 			
 			dto.setShitei_no(shiteiNo);
 			// 各期別ブロックの数値をセット
-			setKibetsuBlockByFuka(dto, fuka, blockNo);
+			setKibetsuBlockByFuka(dto, fuka, blockNo, henkoKbn);
 		}
 
 		// 賦課区分が特定できなかった場合のデフォルト値設定（定額）
@@ -220,7 +220,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 
 		// 納入税額・加算金・納期限などの共通項目を設定
 		if (firstFuka != null) {
-			setNofuAndKasan(dto, shiteiNo, firstFuka, ymArr);
+			setNofuAndKasan(dto, shiteiNo, firstFuka, ymArr, henkoKbn);
 			dto.setHenko_kbn(henkoKbn != null && !henkoKbn.isEmpty() ? henkoKbn : firstFuka.getHenkoKbn());
 		}
 
@@ -236,7 +236,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	/**
 	 * Fukaエンティティを元に期別ブロック（b1/b2/b3）の各項目をDTOに設定する
 	 */
-	private void setKibetsuBlockByFuka(KoseiKetteiTsuchiReportsDto dto, Fuka fuka, int blockNo) {
+	private void setKibetsuBlockByFuka(KoseiKetteiTsuchiReportsDto dto, Fuka fuka, int blockNo, String henkoKbn) {
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         String pfx = "b" + blockNo + "_"; // ブロックごとのフィールド接頭辞（b1_, b2_, b3_）
 
@@ -260,7 +260,8 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                 jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
 
         // 更正の場合、前回（rno - 1）の内訳リストを比較用として取得
-        boolean isKosei = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
+        boolean isKosei = FukaConstants.KOSEI.getValue().equals(henkoKbn);
+      
         List<FukaUchi> prevUchiList = (isKosei && rno > 1)
                 ? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
                         jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
@@ -272,21 +273,21 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             Optional<FukaUchi> uchiOpt = uchiList.stream().filter(u -> k == u.getKazeiKbn()).findFirst();
 
             long sogaku = 0L, ryokin = 0L, zeigaku = 0L, hakusu = 0L;
-            boolean hasData = false;
             if (uchiOpt.isPresent()) {
                 FukaUchi u = uchiOpt.get();
                 sogaku  = u.getRyokinSogaku() != null ? u.getRyokinSogaku() : 0L;
                 ryokin  = u.getRyokin() != null ? u.getRyokin() : 0L;
                 zeigaku = u.getZeigaku() != null ? u.getZeigaku() : 0L;
                 hakusu  = u.getHakusu() != null ? u.getHakusu() : 0L;
-                hasData = true;
             }
 
             // 前回申告等の税額を取得し、差引増減額を算出
-            long prevZeigaku = prevUchiList.stream().filter(u -> k == u.getKazeiKbn())
-                    .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L).findFirst().orElse(0L);
-            long sashihiki   = zeigaku - prevZeigaku;
-
+            long prevZeigaku = (prevUchiList != null && !prevUchiList.isEmpty()) ? 
+            		prevUchiList.stream().filter(u -> k == u.getKazeiKbn())
+                    .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L).findFirst().orElse(0L)
+                    : 0L;
+            long sashihiki = zeigaku - prevZeigaku;
+           
             // 各フィールドに数値をセット
             setField(dto, pfx + "sogaku" + kbn, String.valueOf(sogaku));
             setField(dto, pfx + "ryokin" + kbn, String.valueOf(ryokin));
@@ -294,18 +295,17 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             setField(dto, pfx + "sashihiki" + kbn, String.valueOf(sashihiki));
             setField(dto, pfx + "hakusu" + kbn, nen.isEmpty() ? "" : String.valueOf(hakusu));
             setField(dto, pfx + "kino_zeigaku" + kbn, nen.isEmpty() ? "" : String.valueOf(prevZeigaku));
-
+         
             // 【税率（zei_ritsu）の区分別設定】
             if (isTeigaku) {
-                if (taishoYm.length() != 6 || !hasData || hakusu <= 0) {
-                    setField(dto, pfx + "zei_ritsu" + kbn, "0");
-                } else {
-                    setField(dto, pfx + "zei_ritsu" + kbn, String.valueOf(zeigaku / hakusu));
-                }
+            	String amount = uchiOpt.map(u -> u.getZeigaku() != null ? String.valueOf(u.getZeigaku()) : "")
+                        .orElse("");
+                setField(dto, pfx + "zei_ritsu" + kbn, amount);
             } else if (isTeiritsu) {
-                String rate = uchiOpt.map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().toPlainString() : "").orElse("");
-                setField(dto, pfx + "zei_ritsu" + kbn, rate);
-            }
+				String rate = uchiOpt.map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().toPlainString() : "")
+						.orElse("");
+				setField(dto, pfx + "zei_ritsu" + kbn, rate);
+			}
         }
 
         // 各種合計値の計算用変数
@@ -391,7 +391,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	 * 納入税額・加算金・納期限を計算してDTOに設定する
 	 */
 	private void setNofuAndKasan(
-			KoseiKetteiTsuchiReportsDto dto, String shiteiNo, Fuka firstFuka, String[] ymArr) {
+			KoseiKetteiTsuchiReportsDto dto, String shiteiNo, Fuka firstFuka, String[] ymArr, String henkoKbn) {
 
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		long totalSashihikiSum = 0L;
@@ -414,7 +414,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 			List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
 					jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
 
-			boolean isKosei = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
+			boolean isKosei = FukaConstants.KOSEI.getValue().equals(henkoKbn);
 			List<FukaUchi> prevUchiList = (isKosei && rno > 1)
 					? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
 							jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
