@@ -109,20 +109,15 @@
 		<!-- ========== 検索結果エリア（初期表示時は表示しない） ========== -->
 		<th:block th:if="${isSearched}">
 
-			<div class="d-flex justify-content-between align-items-center mb-2 position-relative">
-				<!-- ======== 件数 ======== -->
-				<span class="text-muted small">検索結果：<span id="totalCount" th:text="${items.size()}">0</span> 件</span>
-				<!-- ======== ページネーション ======== -->
+			<!-- ページネーション（中央固定）＆表示件数 -->
+			<div class="position-relative mb-1 d-flex align-items-center">
 				<nav class="position-absolute start-50 translate-middle-x">
-					<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+					<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".log-row"></ul>
 				</nav>
-				<!-- ======== 表示件数 ======== -->
-				<div class="d-flex align-items-center gap-2">
-					<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
+				<div class="d-flex align-items-center gap-2 ms-auto">
+					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-						<option value="5">5件</option>
-						<option value="10" selected>10件</option>
-						<option value="20">20件</option>
+						<option value="10">10件</option>
 						<option value="50">50件</option>
 						<option value="100">100件</option>
 					</select>
@@ -171,9 +166,6 @@
 
 		</th:block>
 	</div>
-	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/opeLogView.js}"></script>
-	</th:block>
 </body>
 
 </html>
