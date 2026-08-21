@@ -53,7 +53,8 @@ class kofuKetteiTsuchiShinseiServiceImplTest {
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
         Jichitai jichitai = new Jichitai();
-        jichitai.setName("テスト市");
+        jichitai.setName("テスト");
+        jichitai.setKbnName("市");;
         when(reportsCommonService.getJichitaiInfo()).thenReturn(jichitai);
         when(reportsCommonService.getReportsDefText(any())).thenReturn("テスト条例");
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
