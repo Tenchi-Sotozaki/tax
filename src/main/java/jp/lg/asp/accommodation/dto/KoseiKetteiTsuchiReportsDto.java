@@ -19,67 +19,33 @@ public class KoseiKetteiTsuchiReportsDto {
     private String shisetsu_name;
     private String henko_riyu;
 
-    // ── 通知日 ──────────────────────────────────────
-    private String tsuchi_nen;
-    private String tsuchi_tsuki;
-    private String tsuchi_hi;
-
-    // ── 税率（定率用）──────────────────────────────────
-    private String zei_ritsu1;
-    private String zei_ritsu2;
-    private String zei_ritsu3;
-    private String zei_ritsu4;
-    private String zei_ritsu5;
-
-    // ── 区分税額（定額用: m_zeiritsu_teigaku.zeigaku）──────
-    private String kbn_zei_gaku1;
-    private String kbn_zei_gaku2;
-    private String kbn_zei_gaku3;
-    private String kbn_zei_gaku4;
-    private String kbn_zei_gaku5;
-    private String kbn_zei_gaku_sum;
-
-    // b2用区分税額
-    private String b2_kbn_zei_gaku1;
-    private String b2_kbn_zei_gaku2;
-    private String b2_kbn_zei_gaku3;
-    private String b2_kbn_zei_gaku4;
-    private String b2_kbn_zei_gaku5;
-    private String b2_kbn_zei_gaku_sum;
-
-    // b3用区分税額
-    private String b3_kbn_zei_gaku1;
-    private String b3_kbn_zei_gaku2;
-    private String b3_kbn_zei_gaku3;
-    private String b3_kbn_zei_gaku4;
-    private String b3_kbn_zei_gaku5;
-    private String b3_kbn_zei_gaku_sum;
-
+    // ── 通知日 ─────────────────────────────────────
+    private String tsuchi_Ymd;
 
     // ── 期別1（b1）───────────────────────────────────
     private String b1_nen;
     private String b1_tsuki;
 
     // 宿泊者数（定額用）
-    private String hakusu1;
-    private String hakusu2;
-    private String hakusu3;
-    private String hakusu4;
-    private String hakusu5;
+    private String b1_hakusu1;
+    private String b1_hakusu2;
+    private String b1_hakusu3;
+    private String b1_hakusu4;
+    private String b1_hakusu5;
     private String b1_hakusu_sum;
 
-    private String sogaku1;
-    private String sogaku2;
-    private String sogaku3;
-    private String sogaku4;
-    private String sogaku5;
+    private String b1_sogaku1;
+    private String b1_sogaku2;
+    private String b1_sogaku3;
+    private String b1_sogaku4;
+    private String b1_sogaku5;
     private String b1_sogaku_sum;
 
-    private String ryokin1;
-    private String ryokin2;
-    private String ryokin3;
-    private String ryokin4;
-    private String ryokin5;
+    private String b1_ryokin1;
+    private String b1_ryokin2;
+    private String b1_ryokin3;
+    private String b1_ryokin4;
+    private String b1_ryokin5;
     private String b1_ryokin_sum;
 
     private String b1_zeigaku1;
@@ -103,6 +69,13 @@ public class KoseiKetteiTsuchiReportsDto {
     private String b1_sashihiki4;
     private String b1_sashihiki5;
     private String b1_sashihiki_sum;
+    
+    // b1 税率
+    private String b1_zei_ritsu1;
+    private String b1_zei_ritsu2;
+    private String b1_zei_ritsu3;
+    private String b1_zei_ritsu4;
+    private String b1_zei_ritsu5;
 
     // ── 期別2（b2）───────────────────────────────────
     private String b2_nen;

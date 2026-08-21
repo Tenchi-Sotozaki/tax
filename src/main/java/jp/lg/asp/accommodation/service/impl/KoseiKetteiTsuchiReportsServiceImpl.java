@@ -1,9 +1,12 @@
 package jp.lg.asp.accommodation.service.impl;
 import java.time.LocalDate;
+import java.time.chrono.JapaneseDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -71,8 +74,11 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	 * 起動時初期化（フォント設定・自治体情報・法令引用文キャッシュ）
 	 */
 	private void init() {
+		// JasperReportsで使用するフォントや欠落フォントの無視設定
 		System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
 		System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
+		
+		// 共通サービスから自治体情報を取得しメンバ変数にキャッシュ
 		Jichitai jichitai = reportsCommonService.getJichitaiInfo();
 		cityName = jichitai.getName();
 		todoufuken = jichitai.getKbnName();
@@ -90,9 +96,11 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 		init();
 		KoseiKetteiTsuchiReportsDto dto = null;
 		try {
+			// 対象月の情報をもとに帳票用DTOを構築
 			dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 			log.debug("PDF生成開始 - 指定番号: {}, b1Ym: {}, b2Ym: {}, b3Ym: {}", shiteiNo, b1Ym, b2Ym, b3Ym);
 
+			// 課税区分（定率か定額か）によって使用するJRXMLテンプレートを切り替える
 			String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(dto.getFukaKbn())
 					? JRXML_TEIRITSU
 					: JRXML_TEIGAKU;
@@ -102,15 +110,20 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 				throw new RuntimeException("JRXMLファイルが見つかりません: " + jrxmlPath);
 			}
 
+			// JasperReportsのテンプレートをコンパイル
 			JasperReport jasperReport = JasperCompileManager.compileReport(resource.getInputStream());
 			log.debug("JRXMLコンパイル完了: {}", jrxmlPath);
 
+			// 帳票に渡すパラメータを設定
 			Map<String, Object> parameters = new HashMap<>();
 			parameters.put("city", cityName);
 			parameters.put("horei_inyou1", horeiInyou1);
 			parameters.put("horei_inyou2", horeiInyou2);
+			
+			// DTOをコレクションDataSourceとしてラップ
 			JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(Arrays.asList(dto));
 
+			// 帳票データの流し込み（Fill）とPDFのエクスポート
 			JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 			byte[] pdfData = JasperExportManager.exportReportToPdf(jasperPrint);
 			log.debug("PDF出力完了 - サイズ: {} bytes", pdfData.length);
@@ -131,109 +144,12 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	public List<String> findTaishoYmList(String shiteiNo) {
 		init();
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		// 指定番号に紐づく対象年月の一覧を取得する
 		return fukaRepository.findTaishoYmListByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Transactional(readOnly = true)
-	public KoseiKetteiTsuchiReportsDto buildDtoForDisplay(String shiteiNo) {
-		init();
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		KoseiKetteiTsuchiReportsDto dto = new KoseiKetteiTsuchiReportsDto();
-		dto.setShitei_no(shiteiNo);
-
-		tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(
-				jichitaiCd, shiteiNo, "1", "0")
-				.ifPresent(toku -> {
-					dto.setShisetsu_name(nvl(toku.getShisetsuName()));
-					String yubinNo = nvl(toku.getShisetsuYubinNo());
-					String jusho = nvl(toku.getShisetsuJusho());
-					dto.setShisetsu_jusho(yubinNo.isEmpty() ? jusho : yubinNo + " " + jusho);
-				});
-
-		return dto;
-	}
-
-	/**
-	 * b1Ym/b2Ym/b3Ym（taisho_ym）でt_fukaを特定してDTOを構築する
-	 * @param shiteiNo 指定番号
-	 * @param b1Ym     対象月b1（YYYYMM）
-	 * @param b2Ym     対象月b2（YYYYMM、任意）
-	 * @param b3Ym     対象月b3（YYYYMM、任意）
-	 * @return 構築済みDTO
-	 */
-	@Transactional(readOnly = true)
-	private KoseiKetteiTsuchiReportsDto buildDtoByTaishoYm(
-			String shiteiNo, String b1Ym, String b2Ym, String b3Ym, String henkoKbn) {
-
-		KoseiKetteiTsuchiReportsDto dto = new KoseiKetteiTsuchiReportsDto();
-
-		// 通知日（システム日付）
-		LocalDate today = LocalDate.now();
-		dto.setTsuchi_nen(String.valueOf(today.getYear()));
-		dto.setTsuchi_tsuki(String.valueOf(today.getMonthValue()));
-		dto.setTsuchi_hi(String.valueOf(today.getDayOfMonth()));
-
-		// b1/b2/b3 各月のブロック設定
-		String[] ymArr = { b1Ym, b2Ym, b3Ym };
-		boolean fukaKbnSet = false;
-		Fuka firstFuka = null;
-
-		for (int i = 0; i < ymArr.length; i++) {
-			String taishoYm = ymArr[i];
-			int blockNo = i + 1;
-
-			// 対象月がnullまたは空文字の場合はブロック全体を空白にする
-			if (taishoYm == null || taishoYm.trim().isEmpty()) {
-				setBlockEmpty(dto, blockNo);
-				continue;
-			}
-
-			Optional<Fuka> fukaOpt = findFukaByTaishoYm(shiteiNo, taishoYm);
-			if (fukaOpt.isEmpty()) {
-				// データが見つからない場合もブロック全体を空白にする
-				setBlockEmpty(dto, blockNo);
-				continue;
-			}
-
-			Fuka fuka = fukaOpt.get();
-			if (!fukaKbnSet) {
-				dto.setFukaKbn(fuka.getFukaKbn());
-				dto.setHenko_riyu(nvl(fuka.getHenkoRiyu()));
-				firstFuka = fuka;
-				fukaKbnSet = true;
-			}
-			
-			dto.setShitei_no(shiteiNo);
-
-			// 有効なデータが存在する場合のみブロックの値を設定
-			setKibetsuBlockByFuka(dto, fuka, blockNo);
-		}
-
-		if (!fukaKbnSet) {
-			dto.setFukaKbn(FukaConstants.TEIGAKU.getValue());
-		}
-
-		// 納入税額・加算金・納期限の設定
-		if (firstFuka != null) {
-			setNofuAndKasan(dto, shiteiNo, firstFuka, ymArr);
-			dto.setHenko_kbn(henkoKbn != null && !henkoKbn.isEmpty() ? henkoKbn : firstFuka.getHenkoKbn());
-		}
-
-		// 都道府県名（m_jichitai.kbn_name）
-		dto.setTodoufuken(todoufuken);
-
-		// 公印
-		dto.setKoin(koin != null && koin.length > 0 ? koin : null);
-
-		return dto;
-	}
-
-	/**
-	 * taishoYmからFukaを検索する
+	 * 指定番号と対象月からFukaエンティティを検索する
 	 */
 	private Optional<Fuka> findFukaByTaishoYm(String shiteiNo, String taishoYm) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
@@ -246,7 +162,233 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	}
 
 	/**
-	 * 納入税額・加算金・納期限をDTOに設定する
+	 * 対象年月（b1/b2/b3）を元にFukaデータを特定し、通知書用DTOを構築する
+	 */
+	@Transactional(readOnly = true)
+	private KoseiKetteiTsuchiReportsDto buildDtoByTaishoYm(
+			String shiteiNo, String b1Ym, String b2Ym, String b3Ym, String henkoKbn) {
+
+		KoseiKetteiTsuchiReportsDto dto = new KoseiKetteiTsuchiReportsDto();
+
+		// 通知日（システム日付）を和暦文字列（例: 令和8年8月20日）に変換してDTOにセット
+		LocalDate today = LocalDate.now();
+		JapaneseDate japaneseDate = JapaneseDate.from(today);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", new Locale("ja", "JP", "JP"));
+		dto.setTsuchi_Ymd(formatter.format(japaneseDate));
+		
+		// 各ブロックの対象年月配列
+		String[] ymArr = { b1Ym, b2Ym, b3Ym };
+		boolean fukaKbnSet = false;
+		Fuka firstFuka = null;
+
+		// b1〜b3の各ブロックに対してデータを設定
+		for (int i = 0; i < ymArr.length; i++) {
+			String taishoYm = ymArr[i];
+			int blockNo = i + 1;
+
+			// 対象月が未指定の場合はブロックを空文字で初期化
+			if (taishoYm == null || taishoYm.trim().isEmpty()) {
+				setBlockEmpty(dto, blockNo);
+				continue;
+			}
+
+			// 対象月に一致するFukaデータを検索
+			Optional<Fuka> fukaOpt = findFukaByTaishoYm(shiteiNo, taishoYm);
+			if (fukaOpt.isEmpty()) {
+				setBlockEmpty(dto, blockNo);
+				continue;
+			}
+
+			Fuka fuka = fukaOpt.get();
+			// 最初にヒットしたデータの賦課区分や変更理由などを代表値として保持
+			if (!fukaKbnSet) {
+				dto.setFukaKbn(fuka.getFukaKbn());
+				dto.setHenko_riyu(nvl(fuka.getHenkoRiyu()));
+				firstFuka = fuka;
+				fukaKbnSet = true;
+			}
+			
+			dto.setShitei_no(shiteiNo);
+			// 各期別ブロックの数値をセット
+			setKibetsuBlockByFuka(dto, fuka, blockNo);
+		}
+
+		// 賦課区分が特定できなかった場合のデフォルト値設定（定額）
+		if (!fukaKbnSet) {
+			dto.setFukaKbn(FukaConstants.TEIGAKU.getValue());
+		}
+
+		// 納入税額・加算金・納期限などの共通項目を設定
+		if (firstFuka != null) {
+			setNofuAndKasan(dto, shiteiNo, firstFuka, ymArr);
+			dto.setHenko_kbn(henkoKbn != null && !henkoKbn.isEmpty() ? henkoKbn : firstFuka.getHenkoKbn());
+		}
+
+		// 自治体の都道府県名と公印データをセット
+		dto.setTodoufuken(todoufuken);
+
+		// 公印
+		dto.setKoin(koin != null && koin.length > 0 ? koin : null);
+
+		return dto;
+	}
+
+	/**
+	 * Fukaエンティティを元に期別ブロック（b1/b2/b3）の各項目をDTOに設定する
+	 */
+	private void setKibetsuBlockByFuka(KoseiKetteiTsuchiReportsDto dto, Fuka fuka, int blockNo) {
+        String jichitaiCd = jichitaiContext.getJichitaiCd();
+        String pfx = "b" + blockNo + "_"; // ブロックごとのフィールド接頭辞（b1_, b2_, b3_）
+
+        String taishoYm = nvl(fuka.getTaishoYm());
+        String nen = taishoYm.length() == 6 ? taishoYm.substring(0, 4) : "";
+        
+        // 判定フラグの定義
+        boolean isTeigaku = FukaConstants.TEIGAKU.getValue().equals(fuka.getFukaKbn());
+        boolean isTeiritsu = FukaConstants.TEIRITSU.getValue().equals(fuka.getFukaKbn());
+        
+        // 対象月の年・月をDTOに設定
+        setField(dto, pfx + "nen", (nen != null && !nen.isEmpty()) ? nen : "");
+        setField(dto, pfx + "tsuki", (nen != null && taishoYm.length() == 6) ? taishoYm.substring(4, 6) : "");
+
+        // 履歴番号（Rno）の取得
+        Integer rno = fukaRepository.findMaxRno(
+                jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu()).orElse(1);
+
+        // 現在の内訳リストを取得
+        List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+                jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
+
+        // 更正の場合、前回（rno - 1）の内訳リストを比較用として取得
+        boolean isKosei = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
+        List<FukaUchi> prevUchiList = (isKosei && rno > 1)
+                ? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+                        jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
+                : Collections.emptyList();
+        
+        // 課税区分（1〜5）ごとの内訳項目をセット
+        for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
+            final int k = kbn;
+            Optional<FukaUchi> uchiOpt = uchiList.stream().filter(u -> k == u.getKazeiKbn()).findFirst();
+
+            long sogaku = 0L, ryokin = 0L, zeigaku = 0L, hakusu = 0L;
+            boolean hasData = false;
+            if (uchiOpt.isPresent()) {
+                FukaUchi u = uchiOpt.get();
+                sogaku  = u.getRyokinSogaku() != null ? u.getRyokinSogaku() : 0L;
+                ryokin  = u.getRyokin() != null ? u.getRyokin() : 0L;
+                zeigaku = u.getZeigaku() != null ? u.getZeigaku() : 0L;
+                hakusu  = u.getHakusu() != null ? u.getHakusu() : 0L;
+                hasData = true;
+            }
+
+            // 前回申告等の税額を取得し、差引増減額を算出
+            long prevZeigaku = prevUchiList.stream().filter(u -> k == u.getKazeiKbn())
+                    .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L).findFirst().orElse(0L);
+            long sashihiki   = zeigaku - prevZeigaku;
+
+            // 各フィールドに数値をセット
+            setField(dto, pfx + "sogaku" + kbn, String.valueOf(sogaku));
+            setField(dto, pfx + "ryokin" + kbn, String.valueOf(ryokin));
+            setField(dto, pfx + "zeigaku" + kbn, String.valueOf(zeigaku));
+            setField(dto, pfx + "sashihiki" + kbn, String.valueOf(sashihiki));
+            setField(dto, pfx + "hakusu" + kbn, nen.isEmpty() ? "" : String.valueOf(hakusu));
+            setField(dto, pfx + "kino_zeigaku" + kbn, nen.isEmpty() ? "" : String.valueOf(prevZeigaku));
+
+            // 【税率（zei_ritsu）の区分別設定】
+            if (isTeigaku) {
+                if (taishoYm.length() != 6 || !hasData || hakusu <= 0) {
+                    setField(dto, pfx + "zei_ritsu" + kbn, "0");
+                } else {
+                    setField(dto, pfx + "zei_ritsu" + kbn, String.valueOf(zeigaku / hakusu));
+                }
+            } else if (isTeiritsu) {
+                String rate = uchiOpt.map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().toPlainString() : "").orElse("");
+                setField(dto, pfx + "zei_ritsu" + kbn, rate);
+            }
+        }
+
+        // 各種合計値の計算用変数
+        long hakusuSum = 0L, zeigakuSum = 0L, sashihikiSum = 0L, kbnZeiGakuSum = 0L, kinoZeigakuSum = 0L;
+        
+        for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
+            final int k = kbn;
+            Optional<FukaUchi> u = uchiList.stream().filter(x -> k == x.getKazeiKbn()).findFirst();
+            if (u.isPresent()) {
+                hakusuSum  += u.get().getHakusu()  != null ? u.get().getHakusu()  : 0L;
+                zeigakuSum += u.get().getZeigaku() != null ? u.get().getZeigaku() : 0L;
+            }
+            
+            long zeigaku = u.map(x -> x.getZeigaku() != null ? x.getZeigaku() : 0L).orElse(0L);
+            long prevZeigaku = prevUchiList.stream()
+                    .filter(x -> k == x.getKazeiKbn())
+                    .mapToLong(x -> x.getZeigaku() != null ? x.getZeigaku() : 0L)
+                    .findFirst().orElse(0L);
+            sashihikiSum  += (zeigaku - prevZeigaku);
+            kinoZeigakuSum += prevZeigaku;
+
+            if (isTeigaku) {
+                long hakusu = u.map(x -> x.getHakusu() != null ? x.getHakusu() : 0L).orElse(0L);
+                if (!nen.isEmpty() && u.isPresent() && hakusu > 0) {
+                    kbnZeiGakuSum += (zeigaku / hakusu);
+                }
+            }
+        }
+
+        // 合計値をDTOにセット
+        setField(dto, pfx + "hakusu_sum",    nen.isEmpty() ? "" : String.valueOf(hakusuSum));
+        setField(dto, pfx + "zeigaku_sum",   String.valueOf(zeigakuSum));
+        setField(dto, pfx + "sashihiki_sum", String.valueOf(sashihikiSum));
+        setField(dto, pfx + "kino_zeigaku_sum", nen.isEmpty() ? "" : String.valueOf(kinoZeigakuSum));
+        
+        // 【定額・定率ごとの追加情報処理】
+        if (isTeigaku) {
+            // 定額の場合の合計税率処理
+            if (kbnZeiGakuSum > 0) {
+                setField(dto, pfx + "zei_ritsu_sum", String.valueOf(kbnZeiGakuSum));
+            } else {
+                setField(dto, pfx + "zei_ritsu_sum", "");
+            }
+        } else if (isTeiritsu) {
+            // 定率の場合の区分名取得処理
+            uchiList.stream()
+                .map(FukaUchi::getZeiritsuSeq)
+                .filter(seq -> seq != null)
+                .findFirst()
+                .ifPresent(zeiritsuSeq -> {
+                    List<ZeiritsuTeiritsu> teiritsuList = zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, zeiritsuSeq);
+                    for (ZeiritsuTeiritsu t : teiritsuList) {
+                        int tSeq = t.getTeiritsuSeq().intValue();
+                        if (tSeq >= 1 && tSeq <= MAX_KBN) {
+                            setField(dto, pfx + "kbn_name" + tSeq, nvl(t.getKbnName()).trim());
+                        }
+                    }
+                });
+        }
+        
+		// 特別徴収義務者情報を取得してDTOにセット
+		List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, dto.getShitei_no());
+		if (tokugimuList.isEmpty()) {
+			log.error("t_tokugimuが見つかりません: shiteiNo={}", dto.getShitei_no());
+		}
+
+		Tokugimu toku = tokugimuList.get(0);
+		dto.setShitei_no(toku.getShiteiNo());
+		dto.setShisetsu_yubin_no("〒" + nvl(toku.getShisetsuYubinNo()));
+		dto.setShisetsu_jusho(nvl(toku.getShisetsuJusho()));
+		dto.setShisetsu_name(nvl(toku.getShisetsuName()));
+
+		// 宛先情報を取得してDTOにセット
+		atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, toku.getAtenaNo())
+				.ifPresent(atena -> {
+					dto.setYubin_no("〒" + nvl(atena.getYubinNo()));
+					dto.setJusho(nvl(atena.getJusho()));
+					dto.setName(nvl(atena.getName()));
+				});
+    }
+	
+	/**
+	 * 納入税額・加算金・納期限を計算してDTOに設定する
 	 */
 	private void setNofuAndKasan(
 			KoseiKetteiTsuchiReportsDto dto, String shiteiNo, Fuka firstFuka, String[] ymArr) {
@@ -254,7 +396,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		long totalSashihikiSum = 0L;
 
-		// b1, b2, b3 各月の差引増減額を合算して納入税額とする
+		// 全対象月の差引増減額を合算してトータルの納入税額を算出
 		for (String taishoYm : ymArr) {
 			if (taishoYm == null || taishoYm.isEmpty()) {
 				continue;
@@ -278,7 +420,6 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 							jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
 					: Collections.emptyList();
 
-			// 月の差引増減額を計算
 			long blockSashihikiSum = 0L;
 			for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
 				final int k = kbn;
@@ -297,21 +438,22 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 			totalSashihikiSum += blockSashihikiSum;
 		}
 
+		// 算出された納入税額をセット
 		dto.setNofu_zeigaku(String.valueOf(totalSashihikiSum));
 
+		// 加算金の利率・金額・区分をセット
 		dto.setKasan_ritsu1(firstFuka.getKasanRitsu1() != null ? firstFuka.getKasanRitsu1().toPlainString() : "");
 		dto.setKasan_gaku1(firstFuka.getKasanGaku1() != null ? String.valueOf(firstFuka.getKasanGaku1()) : "");
 		dto.setKasan_ritsu2(firstFuka.getKasanRitsu2() != null ? firstFuka.getKasanRitsu2().toPlainString() : "");
 		dto.setKasan_gaku2(firstFuka.getKasanGaku2() != null ? String.valueOf(firstFuka.getKasanGaku2()) : "");
 		dto.setKasan_ritsu3(firstFuka.getKasanRitsu3() != null ? firstFuka.getKasanRitsu3().toPlainString() : "");
 		dto.setKasan_gaku3(firstFuka.getKasanGaku3() != null ? String.valueOf(firstFuka.getKasanGaku3()) : "");
-		// 加算金区分（kasan_kbn）のセット
-		// DBのカラム値 "1"=過少申告加算金, "2"=不申告加算金, "3"=重加算金
-		// nullの場合は空文字（blankWhenNull="true" により帳票上は何も印字されない）
+		
 		dto.setKasan_kbn1(nvl(firstFuka.getKasanKbn1()));
 		dto.setKasan_kbn2(nvl(firstFuka.getKasanKbn2()));
 		dto.setKasan_kbn3(nvl(firstFuka.getKasanKbn3()));
 
+		// 納期限をセット
 		if (firstFuka.getNokigen() != null) {
 			dto.setNofu_kigen_nen(String.valueOf(firstFuka.getNokigen().getYear()));
 			dto.setNofu_kigen_tsuki(String.valueOf(firstFuka.getNokigen().getMonthValue()));
@@ -323,167 +465,6 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 		}
 	}
 
-	/**
-	 * Fukaエンティティを元に期別ブロック（b1/b2/b3）をDTOに設定する
-	 * @param dto     設定先DTO
-	 * @param fuka    対象Fukaエンティティ
-	 * @param blockNo ブロック番号（1=b1, 2=b2, 3=b3）
-	 */
-	private void setKibetsuBlockByFuka(KoseiKetteiTsuchiReportsDto dto, Fuka fuka, int blockNo) {
-        String jichitaiCd = jichitaiContext.getJichitaiCd();
-        String pfx = "b" + blockNo + "_";
-
-        String taishoYm = nvl(fuka.getTaishoYm());
-        String nen = taishoYm.length() == 6 ? taishoYm.substring(0, 4) : "";
-        
-        setField(dto, pfx + "nen",   nen);
-        setField(dto, pfx + "tsuki", taishoYm.length() == 6 ? taishoYm.substring(4, 6) : "");
-
-        Integer rno = fukaRepository.findMaxRno(
-                jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu()).orElse(1);
-
-        List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-                jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
-
-        boolean isKosei = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
-        List<FukaUchi> prevUchiList = (isKosei && rno > 1)
-                ? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-                        jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
-                : Collections.emptyList();
-        
-        // kazei_kbn=1〜5 の内訳をDTOにセット
-        for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
-            final int k = kbn;
-            Optional<FukaUchi> uchiOpt = uchiList.stream().filter(u -> k == u.getKazeiKbn()).findFirst();
-
-            long sogaku = 0L, ryokin = 0L, zeigaku = 0L, hakusu = 0L;
-            boolean hasData = false;
-            if (uchiOpt.isPresent()) {
-                FukaUchi u = uchiOpt.get();
-                sogaku  = u.getRyokinSogaku() != null ? u.getRyokinSogaku() : 0L;
-                ryokin  = u.getRyokin()       != null ? u.getRyokin()       : 0L;
-                zeigaku = u.getZeigaku()      != null ? u.getZeigaku()      : 0L;
-                hakusu  = u.getHakusu()       != null ? u.getHakusu()       : 0L;
-                hasData = true;
-            }
-
-            long prevZeigaku = prevUchiList.stream().filter(u -> k == u.getKazeiKbn())
-                    .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L).findFirst().orElse(0L);
-            long sashihiki   = zeigaku - prevZeigaku;
-
-            // DTOの定義に合わせてb1のみフィールド名が特殊（hakusu1, b1_zeigaku1 等）なのを吸収
-            String hakusuField    = (blockNo == 1) ? "hakusu" + kbn          : pfx + "hakusu" + kbn;
-            String zeigakuField   = (blockNo == 1) ? "b1_zeigaku" + kbn      : pfx + "zeigaku" + kbn;
-            String sashihikiField = (blockNo == 1) ? "b1_sashihiki" + kbn    : pfx + "sashihiki" + kbn;
-            String kbnZeiField    = (blockNo == 1) ? "kbn_zei_gaku" + kbn    : pfx + "kbn_zei_gaku" + kbn;
-            String kinoZeiField   = (blockNo == 1) ? "b1_kino_zeigaku" + kbn : pfx + "kino_zeigaku" + kbn;
-
-            setField(dto, pfx + "sogaku" + kbn, String.valueOf(sogaku));
-            setField(dto, pfx + "ryokin" + kbn, String.valueOf(ryokin));
-            setField(dto, zeigakuField,         String.valueOf(zeigaku));
-            setField(dto, sashihikiField,       String.valueOf(sashihiki));
-            setField(dto, hakusuField,          nen.isEmpty() ? "" : String.valueOf(hakusu));
-            setField(dto, kinoZeiField,         nen.isEmpty() ? "" : String.valueOf(prevZeigaku));
-
-            // 定額の場合の区分税額セット
-            if (FukaConstants.TEIGAKU.getValue().equals(fuka.getFukaKbn())) {
-                if (taishoYm.length() != 6 || !hasData || hakusu <= 0) {
-                    setField(dto, kbnZeiField, "");
-                } else {
-                    setField(dto, kbnZeiField, String.valueOf(zeigaku / hakusu));
-                }
-            }
-        }
-
-        // 合計値の計算
-        long hakusuSum = 0L, zeigakuSum = 0L, sashihikiSum = 0L, kbnZeiGakuSum = 0L, kinoZeigakuSum = 0L;
-        
-        for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
-            final int k = kbn;
-            Optional<FukaUchi> u = uchiList.stream().filter(x -> k == x.getKazeiKbn()).findFirst();
-            if (u.isPresent()) {
-                hakusuSum  += u.get().getHakusu()  != null ? u.get().getHakusu()  : 0L;
-                zeigakuSum += u.get().getZeigaku() != null ? u.get().getZeigaku() : 0L;
-            }
-            
-            long zeigaku = u.map(x -> x.getZeigaku() != null ? x.getZeigaku() : 0L).orElse(0L);
-            long prevZeigaku = prevUchiList.stream()
-                    .filter(x -> k == x.getKazeiKbn())
-                    .mapToLong(x -> x.getZeigaku() != null ? x.getZeigaku() : 0L)
-                    .findFirst().orElse(0L);
-            sashihikiSum  += (zeigaku - prevZeigaku);
-            kinoZeigakuSum += prevZeigaku;
-
-            if (FukaConstants.TEIGAKU.getValue().equals(fuka.getFukaKbn())) {
-                long hakusu = u.map(x -> x.getHakusu() != null ? x.getHakusu() : 0L).orElse(0L);
-                if (!nen.isEmpty() && u.isPresent() && hakusu > 0) {
-                    kbnZeiGakuSum += (zeigaku / hakusu);
-                }
-            }
-        }
-     
-        // 合計値の設定
-        String hakusuSumField    = (blockNo == 1) ? "b1_hakusu_sum"    : pfx + "hakusu_sum";
-        String zeigakuSumField   = (blockNo == 1) ? "b1_zeigaku_sum"   : pfx + "zeigaku_sum";
-        String sashihikiSumField = (blockNo == 1) ? "b1_sashihiki_sum" : pfx + "sashihiki_sum";
-        String kbnSumField       = (blockNo == 1) ? "kbn_zei_gaku_sum"      : pfx + "kbn_zei_gaku_sum";
-        String kinoSumField      = (blockNo == 1) ? "b1_kino_zeigaku_sum"   : pfx + "kino_zeigaku_sum";
-
-        setField(dto, hakusuSumField,    nen.isEmpty() ? "" : String.valueOf(hakusuSum));
-        setField(dto, zeigakuSumField,   String.valueOf(zeigakuSum));
-        setField(dto, sashihikiSumField, String.valueOf(sashihikiSum));
-        setField(dto, kinoSumField,      nen.isEmpty() ? "" : String.valueOf(kinoZeigakuSum));
-
-        if (FukaConstants.TEIGAKU.getValue().equals(fuka.getFukaKbn()) && kbnZeiGakuSum > 0) {
-            setField(dto, kbnSumField, String.valueOf(kbnZeiGakuSum));
-        } else {
-            setField(dto, kbnSumField, "");
-        }
-        
-        // 定率の場合の税率・区分名セット（blockNo == 1 のみ）
-        if (blockNo == 1 && FukaConstants.TEIRITSU.getValue().equals(fuka.getFukaKbn())) {
-            for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
-                final int k = kbn;
-                String rate = uchiList.stream().filter(u -> k == u.getKazeiKbn())
-                        .map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().toPlainString() : "")
-                        .findFirst().orElse("");
-                setField(dto, "zei_ritsu" + kbn, rate);
-            }
-
-            uchiList.stream()
-                .map(FukaUchi::getZeiritsuSeq)
-                .filter(seq -> seq != null)
-                .findFirst()
-                .ifPresent(zeiritsuSeq -> {
-                    List<ZeiritsuTeiritsu> teiritsuList = zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, zeiritsuSeq);
-                    for (ZeiritsuTeiritsu t : teiritsuList) {
-                        int tSeq = t.getTeiritsuSeq().intValue();
-                        if (tSeq >= 1 && tSeq <= MAX_KBN) {
-                            setField(dto, "kbn_name" + tSeq, nvl(t.getKbnName()).trim());
-                        }
-                    }
-                });
-        }
-        
-		List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, dto.getShitei_no());
-		if (tokugimuList.isEmpty()) {
-			log.error("t_tokugimuが見つかりません: shiteiNo={}", dto.getShitei_no());
-		}
-
-		Tokugimu toku = tokugimuList.get(0);
-		dto.setShitei_no(toku.getShiteiNo());
-		dto.setShisetsu_yubin_no(nvl(toku.getShisetsuYubinNo()));
-		dto.setShisetsu_jusho(nvl(toku.getShisetsuJusho()));
-		dto.setShisetsu_name(nvl(toku.getShisetsuName()));
-
-		atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, toku.getAtenaNo())
-				.ifPresent(atena -> {
-					dto.setYubin_no(nvl(atena.getYubinNo()));
-					dto.setJusho(nvl(atena.getJusho()));
-					dto.setName(nvl(atena.getName()));
-				});
-    }
-
     /**
      * 指定ブロックのDTOフィールドを全て空文字に初期化する
      */
@@ -493,42 +474,27 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         setField(dto, pfx + "tsuki", "");
 
         for (int i = 1; i <= MAX_KBN; i++) {
-            String hakusuField   = (blockNo == 1) ? "hakusu" + i       : pfx + "hakusu" + i;
-            String zeigakuField  = (blockNo == 1) ? "b1_zeigaku" + i   : pfx + "zeigaku" + i;
-            String sashihikiField = (blockNo == 1) ? "b1_sashihiki" + i : pfx + "sashihiki" + i;
-            String kbnZeiField   = (blockNo == 1) ? "kbn_zei_gaku" + i : pfx + "kbn_zei_gaku" + i;
-
             setField(dto, pfx + "sogaku" + i, "");
             setField(dto, pfx + "ryokin" + i, "");
-            String kinoZeiField   = (blockNo == 1) ? "b1_kino_zeigaku" + i : pfx + "kino_zeigaku" + i;
-            setField(dto, zeigakuField,       "");
-            setField(dto, sashihikiField,     "");
-            setField(dto, hakusuField,        "");
-            setField(dto, kbnZeiField,        "");
-            setField(dto, kinoZeiField,       "");
+            setField(dto, pfx + "zeigaku" + i, "");
+            setField(dto, pfx + "sashihiki" + i, "");
+            setField(dto, pfx + "hakusu" + i, "");
+            setField(dto, pfx + "kino_zeigaku" + i, "");
+            setField(dto, pfx + "zei_ritsu" + i, "");
+            setField(dto, pfx + "kbn_name" + i, "");
         }
         
-        String hakusuSumField    = (blockNo == 1) ? "b1_hakusu_sum"    : pfx + "hakusu_sum";
-        String zeigakuSumField   = (blockNo == 1) ? "b1_zeigaku_sum"   : pfx + "zeigaku_sum";
-        String sashihikiSumField = (blockNo == 1) ? "b1_sashihiki_sum" : pfx + "sashihiki_sum";
-        String kbnSumField       = (blockNo == 1) ? "kbn_zei_gaku_sum" : pfx + "kbn_zei_gaku_sum";
-
         setField(dto, pfx + "sogaku_sum",    "");
         setField(dto, pfx + "ryokin_sum",    "");
-        String kinoSumField      = (blockNo == 1) ? "b1_kino_zeigaku_sum" : pfx + "kino_zeigaku_sum";
-        setField(dto, zeigakuSumField,   "");
-        setField(dto, sashihikiSumField, "");
-        setField(dto, hakusuSumField,    "");
-        setField(dto, kbnSumField,       "");
-        setField(dto, kinoSumField,      "");
+        setField(dto, pfx + "zeigaku_sum",   "");
+        setField(dto, pfx + "sashihiki_sum", "");
+        setField(dto, pfx + "hakusu_sum",    "");
+        setField(dto, pfx + "kino_zeigaku_sum", "");
+        setField(dto, pfx + "zei_ritsu_sum", "");
     }
 
 	/**
-	 * DTOのフィールドに値をセットする
-	 * ※ JRXMLとの整合性維持のためsnake_caseフィールドを直接操作
-	 * @param dto   設定先DTO
-	 * @param field フィールド名
-	 * @param value 設定値
+	 * リフレクションを利用してDTOのフィールドに値を動的にセットする
 	 */
 	private void setField(KoseiKetteiTsuchiReportsDto dto, String field, String value) {
 		try {
@@ -541,9 +507,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	}
 
 	/**
-	 * null安全な文字列変換
-	 * @param value 対象文字列
-	 * @return nullの場合は空文字、それ以外はそのまま返す
+	 * null安全な文字列変換（nullの場合は空文字を返す）
 	 */
 	private String nvl(String value) {
 		return value != null ? value : "";
