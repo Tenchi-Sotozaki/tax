@@ -247,9 +247,9 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         boolean isTeigaku = FukaConstants.TEIGAKU.getValue().equals(fuka.getFukaKbn());
         boolean isTeiritsu = FukaConstants.TEIRITSU.getValue().equals(fuka.getFukaKbn());
         
-        // 対象月の年・月をDTOに設定
-        setField(dto, pfx + "nen", (nen != null && !nen.isEmpty()) ? nen : "");
-        setField(dto, pfx + "tsuki", (nen != null && taishoYm.length() == 6) ? taishoYm.substring(4, 6) : "");
+		// 対象月の年・月をDTOに設定
+		setField(dto, pfx + "nen", !nen.isEmpty() ? nen : "");
+		setField(dto, pfx + "tsuki", (taishoYm.length() == 6) ? taishoYm.substring(4, 6) : "");
 
         // 履歴番号（Rno）の取得
         Integer rno = fukaRepository.findMaxRno(
