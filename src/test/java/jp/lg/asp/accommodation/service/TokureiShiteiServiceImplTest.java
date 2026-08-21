@@ -42,7 +42,8 @@ class TokureiShiteiServiceImplTest {
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
         Jichitai jichitai = new Jichitai();
-        jichitai.setName("占冠村");
+        jichitai.setName("占冠");
+        jichitai.setKbnName("村");
         when(reportsCommonService.getJichitaiInfo()).thenReturn(jichitai);
         when(reportsCommonService.getReportsDefText(any())).thenReturn("宿泊税条例");
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
