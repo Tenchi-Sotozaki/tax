@@ -50,6 +50,7 @@ public class RptLogViewController {
 		}
 		List<RptLogViewDto> items = rptLogViewService.search(form);
 		model.addAttribute("items", items);
+		model.addAttribute("searched", true);
 		return "log/rptLogView";
 	}
 }
