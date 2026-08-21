@@ -18,8 +18,10 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.Nokan;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.NokanRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TokureiShiteiServiceImpl;
 
@@ -28,6 +30,7 @@ class TokureiShiteiServiceImplTest {
 
     @Mock TokugimuRepository tokugimuRepository;
     @Mock AtenaRepository atenaRepository;
+    @Mock NokanRepository nokanRepository;
     @Mock ReportsCommonService reportsCommonService;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks TokureiShiteiServiceImpl service;
@@ -39,7 +42,8 @@ class TokureiShiteiServiceImplTest {
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
         Jichitai jichitai = new Jichitai();
-        jichitai.setName("占冠村");
+        jichitai.setName("占冠");
+        jichitai.setKbnName("村");
         when(reportsCommonService.getJichitaiInfo()).thenReturn(jichitai);
         when(reportsCommonService.getReportsDefText(any())).thenReturn("宿泊税条例");
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
@@ -62,6 +66,11 @@ class TokureiShiteiServiceImplTest {
         atena.setJusho("北海道");
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
                 .thenReturn(Optional.of(atena));
+        
+        Nokan nokan = new Nokan();
+        nokan.setKbn("承認");
+        when(nokanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Optional.of(nokan));
 
         TokureiShiteiDto result = service.getTokugimuInfo(SHITEI_NO);
 
@@ -69,6 +78,7 @@ class TokureiShiteiServiceImplTest {
         assertThat(result.getShiteiNo()).isEqualTo(SHITEI_NO);
         assertThat(result.getTokuName()).isEqualTo("テスト事業者");
         assertThat(result.getCity()).isEqualTo("占冠村");
+        assertThat(result.getShonin()).isEqualTo("承認");
         
         assertThat(result.getTokuYubin()).isEqualTo("〒060-0001");
         assertThat(result.getTokuJusho()).isEqualTo("北海道");
