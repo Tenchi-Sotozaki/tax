@@ -104,7 +104,7 @@
 
 			<div class="card shadow-sm mb-4">
 				<div class="card-header bg-primary bg-opacity-10 py-2">
-					<h6 class="mb-0 fw-bold text-primary">
+					<h6 class="mb-0 fw-bold">
 						<i class="bi bi-calculator me-2"></i>申告情報
 					</h6>
 				</div>
@@ -461,202 +461,201 @@
 				</div>
 			</div>
 
-			<div class="card shadow-sm mb-4">
-				<div class="card-header bg-warning bg-opacity-10 py-2" role="button"
-					data-bs-toggle="collapse" data-bs-target="#kasanCollapse"
-					aria-expanded="false" aria-controls="kasanCollapse"
-					style="cursor: pointer;">
-					<h6 class="mb-0 fw-bold text-warning-emphasis">
-						<i class="bi bi-plus-slash-minus me-2"></i>加算額・延滞金 <i
-							class="bi bi-chevron-down ms-2 small"></i>
-					</h6>
-				</div>
-				<div id="kasanCollapse" class="collapse">
+			<div id="kasan-info" class="accordion mb-4 shadow-sm">
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="kasanHeading">
+						<button class="accordion-button collapsed py-2 fw-semibold"
+							type="button" data-bs-toggle="collapse"
+							data-bs-target="#kasanCollapse" aria-expanded="false"
+							aria-controls="kasanCollapse">
+							<i class="bi bi-plus-slash-minus me-2"></i>加算額・延滞金
+						</button>
+					</h2>
+					<div id="kasanCollapse" class="accordion-collapse collapse"
+						aria-labelledby="kasanHeading" data-bs-parent="#kasan-info">
+						<div class="accordion-body py-3">
 
-					<!-- 1行目 -->
-					<div class="card-body py-3">
-						<div class="row g-3 align-items-end">
+							<!-- 1行目 -->
+							<div class="row g-3 align-items-end mb-3">
 
-							<!-- 区分-->
-							<div class="col-md-3">
-								<label class="form-label form-label-sm fw-medium mb-1">区分<span
-									class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
-								<select class="form-select form-select-sm"
-									th:field="*{additionalCategory1}"
-									th:disabled="${fukaDeclarationForm.view}"
-									th:data-initial-value="*{additionalCategory1}">
-									<option value="">区分を選択してください</option>
-									<option value="1">過少申告加算金</option>
-									<option value="2">不申告加算金</option>
-									<option value="3">重加算金</option>
-								</select>
-							</div>
-
-							<!-- 割合 -->
-							<div class="col-md-2">
-								<label class="form-label form-label-sm fw-medium mb-1">割合
-									(%)</label> <input type="text"
-									class="form-control form-control-sm text-end"
-									th:field="*{additionalRate1}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
-									th:data-initial-value="*{additionalRate1}">
-							</div>
-
-							<!-- 金額 -->
-							<div class="col-md-3">
-								<label class="form-label form-label-sm fw-medium mb-1">金額
-									(円)</label>
-								<div class="input-group input-group-sm js-comma-format">
-									<input type="text"
-										class="form-control text-end js-comma-format"
-										th:field="*{additionalAmount1}"
-										th:readonly="${fukaDeclarationForm.view}" placeholder="0"
-										th:data-initial-value="*{additionalAmount1}">
+								<div class="col-md-3">
+									<label class="form-label form-label-sm fw-medium mb-1">区分<span
+										class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
+									<select class="form-select form-select-sm"
+										th:field="*{additionalCategory1}"
+										th:disabled="${fukaDeclarationForm.view}"
+										th:data-initial-value="*{additionalCategory1}">
+										<option value="">区分を選択してください</option>
+										<option value="1">過少申告加算金</option>
+										<option value="2">不申告加算金</option>
+										<option value="3">重加算金</option>
+									</select>
 								</div>
-							</div>
-							<!-- 延滞金 -->
-							<div class="col-md-4">
-								<label class="form-label form-label-sm fw-medium mb-1">延滞金
-									(円)</label>
-								<div class="input-group input-group-sm js-comma-format">
-									<input type="text"
-										class="form-control text-end js-comma-format"
-										th:field="*{entaikin}"
-										th:readonly="${fukaDeclarationForm.view}" placeholder="0"
-										th:data-initial-value="*{entaikin}">
+
+								<div class="col-md-2">
+									<label class="form-label form-label-sm fw-medium mb-1">割合
+										(%)</label> <input type="text"
+										class="form-control form-control-sm text-end"
+										th:field="*{additionalRate1}"
+										th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
+										th:data-initial-value="*{additionalRate1}">
 								</div>
-							</div>
 
-						</div>
-					</div>
-
-					<!-- 2行目 -->
-					<div class="card-body py-3">
-						<div class="row g-3 align-items-end">
-
-							<!-- 区分-->
-							<div class="col-md-3">
-								<label class="form-label form-label-sm fw-medium mb-1">区分<span
-									class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
-								<select class="form-select form-select-sm"
-									th:field="*{additionalCategory2}"
-									th:disabled="${fukaDeclarationForm.view}"
-									th:data-initial-value="*{additionalCategory2}">
-									<option value="">区分を選択してください</option>
-									<option value="1">過少申告加算金</option>
-									<option value="2">不申告加算金</option>
-									<option value="3">重加算金</option>
-								</select>
-							</div>
-
-							<!-- 割合 -->
-							<div class="col-md-2">
-								<label class="form-label form-label-sm fw-medium mb-1">割合
-									(%)</label> <input type="text"
-									class="form-control form-control-sm text-end"
-									th:field="*{additionalRate2}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
-									th:data-initial-value="*{additionalRate2}">
-							</div>
-
-							<!-- 金額 -->
-							<div class="col-md-3">
-								<label class="form-label form-label-sm fw-medium mb-1">金額
-									(円)</label>
-								<div class="input-group input-group-sm js-comma-format">
-									<input type="text"
-										class="form-control text-end js-comma-format"
-										th:field="*{additionalAmount2}"
-										th:readonly="${fukaDeclarationForm.view}" placeholder="0"
-										th:data-initial-value="*{additionalAmount2}">
+								<div class="col-md-3">
+									<label class="form-label form-label-sm fw-medium mb-1">金額
+										(円)</label>
+									<div class="input-group input-group-sm js-comma-format">
+										<input type="text"
+											class="form-control text-end js-comma-format"
+											th:field="*{additionalAmount1}"
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{additionalAmount1}">
+									</div>
 								</div>
-							</div>
-							<!-- 納入期限 -->
-							<div class="col-md-4">
-								<label class="form-label form-label-sm fw-medium mb-1">納入期限</label>
-								<input type="date" class="form-control form-control-sm"
-									th:field="*{nokigen}" th:readonly="${fukaDeclarationForm.view}"
-									th:data-initial-value="*{nokigen}">
+
 							</div>
 
-						</div>
-					</div>
+							<!-- 2行目 -->
+							<div class="row g-3 align-items-end mb-3">
 
-					<!-- 3行目 -->
-					<div class="card-body py-3">
-						<div class="row g-3 align-items-end">
-
-							<!-- 区分-->
-							<div class="col-md-3">
-								<label class="form-label form-label-sm fw-medium mb-1">区分<span
-									class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
-								<select class="form-select form-select-sm"
-									th:field="*{additionalCategory3}"
-									th:disabled="${fukaDeclarationForm.view}"
-									th:data-initial-value="*{additionalCategory3}">
-									<option value="">区分を選択してください</option>
-									<option value="1">過少申告加算金</option>
-									<option value="2">不申告加算金</option>
-									<option value="3">重加算金</option>
-								</select>
-							</div>
-
-							<!-- 割合 -->
-							<div class="col-md-2">
-								<label class="form-label form-label-sm fw-medium mb-1">割合
-									(%)</label> <input type="text"
-									class="form-control form-control-sm text-end"
-									th:field="*{additionalRate3}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
-									th:data-initial-value="*{additionalRate3}">
-							</div>
-
-							<!-- 金額 -->
-							<div class="col-md-3">
-								<label class="form-label form-label-sm fw-medium mb-1">金額
-									(円)</label>
-								<div class="input-group input-group-sm js-comma-format">
-									<input type="text"
-										class="form-control text-end js-comma-format"
-										th:field="*{additionalAmount3}"
-										th:readonly="${fukaDeclarationForm.view}" placeholder="0"
-										th:data-initial-value="*{additionalAmount3}">
+								<div class="col-md-3">
+									<label class="form-label form-label-sm fw-medium mb-1">区分<span
+										class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
+									<select class="form-select form-select-sm"
+										th:field="*{additionalCategory2}"
+										th:disabled="${fukaDeclarationForm.view}"
+										th:data-initial-value="*{additionalCategory2}">
+										<option value="">区分を選択してください</option>
+										<option value="1">過少申告加算金</option>
+										<option value="2">不申告加算金</option>
+										<option value="3">重加算金</option>
+									</select>
 								</div>
+
+								<div class="col-md-2">
+									<label class="form-label form-label-sm fw-medium mb-1">割合
+										(%)</label> <input type="text"
+										class="form-control form-control-sm text-end"
+										th:field="*{additionalRate2}"
+										th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
+										th:data-initial-value="*{additionalRate2}">
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label form-label-sm fw-medium mb-1">金額
+										(円)</label>
+									<div class="input-group input-group-sm js-comma-format">
+										<input type="text"
+											class="form-control text-end js-comma-format"
+											th:field="*{additionalAmount2}"
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{additionalAmount2}">
+									</div>
+								</div>
+
 							</div>
 
+							<!-- 3行目 -->
+							<div class="row g-3 align-items-end mb-3">
+
+								<div class="col-md-3">
+									<label class="form-label form-label-sm fw-medium mb-1">区分<span
+										class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span></label>
+									<select class="form-select form-select-sm"
+										th:field="*{additionalCategory3}"
+										th:disabled="${fukaDeclarationForm.view}"
+										th:data-initial-value="*{additionalCategory3}">
+										<option value="">区分を選択してください</option>
+										<option value="1">過少申告加算金</option>
+										<option value="2">不申告加算金</option>
+										<option value="3">重加算金</option>
+									</select>
+								</div>
+
+								<div class="col-md-2">
+									<label class="form-label form-label-sm fw-medium mb-1">割合
+										(%)</label> <input type="text"
+										class="form-control form-control-sm text-end"
+										th:field="*{additionalRate3}"
+										th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
+										th:data-initial-value="*{additionalRate3}">
+								</div>
+
+								<div class="col-md-3">
+									<label class="form-label form-label-sm fw-medium mb-1">金額
+										(円)</label>
+									<div class="input-group input-group-sm js-comma-format">
+										<input type="text"
+											class="form-control text-end js-comma-format"
+											th:field="*{additionalAmount3}"
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{additionalAmount3}">
+									</div>
+								</div>
+
+							</div>
+
+							<!-- 4行目 -->
+							<div class="row g-3 align-items-end">
+
+								<div class="col-md-4">
+									<label class="form-label form-label-sm fw-medium mb-1">延滞金
+										(円)</label>
+									<div class="input-group input-group-sm js-comma-format">
+										<input type="text"
+											class="form-control text-end js-comma-format"
+											th:field="*{entaikin}"
+											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
+											th:data-initial-value="*{entaikin}">
+									</div>
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label form-label-sm fw-medium mb-1">納入期限</label>
+									<input type="date" class="form-control form-control-sm"
+										th:field="*{nokigen}" th:readonly="${fukaDeclarationForm.view}"
+										th:data-initial-value="*{nokigen}">
+								</div>
+
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- 納入情報 -->
-			<div class="card shadow-sm mb-4">
-				<div class="card-header bg-success bg-opacity-10 py-2" role="button"
-					data-bs-toggle="collapse" data-bs-target="#shunoCollapse"
-					aria-expanded="false" aria-controls="shunoCollapse"
-					style="cursor: pointer;">
-					<h6 class="mb-0 fw-bold text-success">
-						<i class="bi bi-cash-coin me-2"></i>納入情報 <i
-							class="bi bi-chevron-down ms-2 small"></i>
-					</h6>
-				</div>
-				<div id="shunoCollapse" class="collapse">
-					<div class="card-body py-3">
-						<div class="row g-3 align-items-end">
-							<div class="col-md-4">
-								<label class="form-label form-label-sm fw-medium mb-1">納入年月日</label>
-								<input type="date" class="form-control form-control-sm"
-									th:field="*{shunoYmd}"
-									th:data-initial-value="*{shunoYmd}"
-									th:readonly="${fukaDeclarationForm.view}">
-							</div>
-							<div class="col-md-4">
-								<label class="form-label form-label-sm fw-medium mb-1">納入金額(円)</label>
-								<input type="text"
-									class="form-control form-control-sm text-end js-comma-format"
-									th:field="*{shunoKingaku}"
-									th:data-initial-value="*{shunoKingaku}"
-									th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+			<div id="shuno-info" class="accordion mb-4 shadow-sm">
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="shunoHeading">
+						<button class="accordion-button collapsed py-2 fw-semibold"
+							type="button" data-bs-toggle="collapse"
+							data-bs-target="#shunoCollapse" aria-expanded="false"
+							aria-controls="shunoCollapse">
+							<i class="bi bi-cash-coin me-2"></i>納入情報
+						</button>
+					</h2>
+					<div id="shunoCollapse" class="accordion-collapse collapse"
+						aria-labelledby="shunoHeading" data-bs-parent="#shuno-info">
+						<div class="accordion-body py-3">
+							<div class="row g-3 align-items-end">
+
+								<div class="col-md-4">
+									<label class="form-label form-label-sm fw-medium mb-1">納入年月日</label>
+									<input type="date" class="form-control form-control-sm"
+										th:field="*{shunoYmd}"
+										th:data-initial-value="*{shunoYmd}"
+										th:readonly="${fukaDeclarationForm.view}">
+								</div>
+
+								<div class="col-md-4">
+									<label class="form-label form-label-sm fw-medium mb-1">納入金額(円)</label>
+									<input type="text"
+										class="form-control form-control-sm text-end js-comma-format"
+										th:field="*{shunoKingaku}"
+										th:data-initial-value="*{shunoKingaku}"
+										th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+								</div>
+
 							</div>
 						</div>
 					</div>

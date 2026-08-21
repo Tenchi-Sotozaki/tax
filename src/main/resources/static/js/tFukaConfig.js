@@ -1,4 +1,31 @@
+// -----------------------------------------------------------------------
+// 中身のあるアコーディオンを開いた状態にする
+// ・登録済みのデータがある場合 … たたまれていると気づけないため
+// ・エラーがある場合           … 項目直下のメッセージが見えないため
+// 日付欄は common.js が当日を自動セットするため、値ではなく
+// data-initial-value（サーバから渡ってきた値）で判定する
+// -----------------------------------------------------------------------
+function openAccordionsWithContent() {
+    document.querySelectorAll('.accordion-collapse').forEach(el => {
+        const hasError = el.querySelector('.is-invalid') !== null;
+        const hasValue = Array.from(el.querySelectorAll('input, textarea, select')).some(hasInputValue);
+        if (!hasError && !hasValue) return;
+        bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+    });
+}
+
+/** 入力欄に値が入っているか。ボタン類と hidden は対象外 */
+function hasInputValue(el) {
+    if (el.type === 'checkbox' || el.type === 'radio') return el.checked;
+    if (el.type === 'hidden' || el.type === 'button' || el.type === 'submit') return false;
+    // 日付欄は common.js が当日を自動セットするため value では判定できない。
+    // サーバから渡ってきた値（data-initial-value）だけを見る
+    if (el.type === 'date') return (el.dataset.initialValue ?? '').trim() !== '';
+    return (el.value ?? '').trim() !== '';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    openAccordionsWithContent();
 
     const fukaKbnEl = document.getElementById('fukaKbnHidden');
     const fukaKbn = fukaKbnEl ? fukaKbnEl.value : '';
