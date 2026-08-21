@@ -547,10 +547,9 @@ public class TokugimuServiceImpl implements TokugimuService {
 				});
 
 		// 共同事業者情報
-		List<KyodoJigyosha> kyodoList = kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd,
-				t.getShiteiNo());
+		List<KyodoJigyosha> kyodoList = kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNoAndRno(jichitaiCd,
+				t.getShiteiNo(), t.getRno());
 		if (!kyodoList.isEmpty()) {
-			form.setKyodoFlg(true);
 			form.setKyodoList(kyodoList.stream().map(k -> {
 				KyodoJigyoshaDto dto = new KyodoJigyoshaDto();
 				dto.setKyodoName(k.getKyodoJigyoshaName());
@@ -613,7 +612,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		if (!form.isKyodoFlg() || form.getKyodoList() == null)
+		if (form.getKyodoList() == null)
 			return;
 		for (int i = 0; i < form.getKyodoList().size(); i++) {
 			KyodoJigyoshaDto dto = form.getKyodoList().get(i);

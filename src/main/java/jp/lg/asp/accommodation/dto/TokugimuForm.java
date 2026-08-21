@@ -15,6 +15,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -117,7 +118,7 @@ public class TokugimuForm {
 	private String mailPhone;
 
 	// ===== 共同事業者情報 =====
-	private boolean kyodoFlg;
+	@Valid
 	private List<KyodoJigyoshaDto> kyodoList = new ArrayList<>();
 
 	// ===== その他の情報 =====
@@ -160,7 +161,9 @@ public class TokugimuForm {
 
 	/** FIELD_ORDER 上の位置を返す。未登録の項目は末尾に回す */
 	public static int fieldOrder(String field) {
-		int index = FIELD_ORDER.indexOf(field);
+		// kyodoList[0].kyodoName のような添字付きの項目は、末尾の項目名で引く
+		int dot = field.lastIndexOf('.');
+		int index = FIELD_ORDER.indexOf(dot < 0 ? field : field.substring(dot + 1));
 		return index < 0 ? FIELD_ORDER.size() : index;
 	}
 
@@ -231,14 +234,32 @@ public class TokugimuForm {
 			}
 			if (!StringUtils.hasText(f.getMailName()))
 				errors.put("mailName", "書類送付先情報の氏名は必須です");
-			if (f.isKyodoFlg()) {
-				if (f.getKyodoList().stream().anyMatch(k -> !StringUtils.hasText(k.getKyodoName())))
-					errors.put("kyodoName", "共同事業者情報の氏名は必須です");
-				if (f.getKyodoList().stream().anyMatch(k -> !StringUtils.hasText(k.getKyodoNameKana())))
-					errors.put("kyodoNameKana", "共同事業者情報の氏名(ふりがな)は必須です");
+			// 1行でも入力があれば、その行の氏名・氏名(ふりがな)を必須とする。
+			// 完全に空の行は入力なしとみなして無視する（施設所有者情報と同じ扱い）。
+			// エラーのキーは画面の th:field と揃えるため添字付きにする。
+			List<KyodoJigyoshaDto> kyodoList = f.getKyodoList();
+			if (kyodoList != null) {
+				for (int i = 0; i < kyodoList.size(); i++) {
+					KyodoJigyoshaDto k = kyodoList.get(i);
+					if (!hasAnyInput(k))
+						continue;
+					if (!StringUtils.hasText(k.getKyodoName()))
+						errors.put("kyodoList[" + i + "].kyodoName", "共同事業者情報の氏名は必須です");
+					if (!StringUtils.hasText(k.getKyodoNameKana()))
+						errors.put("kyodoList[" + i + "].kyodoNameKana", "共同事業者情報の氏名(ふりがな)は必須です");
+				}
 			}
 
 			return errors;
+		}
+
+		/** 共同事業者の1行に何か入力されているか */
+		private static boolean hasAnyInput(KyodoJigyoshaDto k) {
+			return StringUtils.hasText(k.getKyodoName())
+					|| StringUtils.hasText(k.getKyodoNameKana())
+					|| StringUtils.hasText(k.getKyodoAddressNo())
+					|| StringUtils.hasText(k.getKyodoAddress())
+					|| StringUtils.hasText(k.getKyodoPhone());
 		}
 
 		@Override

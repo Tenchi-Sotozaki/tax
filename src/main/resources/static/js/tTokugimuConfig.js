@@ -219,18 +219,6 @@ function initCopyCheckboxes() {
         });
     }
 
-    // 共同事業者情報の表示切替
-    const kyodoCheck = document.getElementById('kyodoCheck');
-    if (kyodoCheck) {
-        kyodoCheck.addEventListener('change', () => {
-            const kyodoBody = document.getElementById('kyodoBody');
-            kyodoBody.style.display = kyodoCheck.checked ? '' : 'none';
-            if (!kyodoCheck.checked) {
-                kyodoBody.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
-            }
-        });
-    }
-
     // 営業状況情報の表示切替
     const businessStatusCheck = document.getElementById('businessStatusCheck');
     if (businessStatusCheck) {
@@ -386,10 +374,6 @@ function renumberKyodoRows() {
 // 共同事業者セクション初期化（編集・照会時にデータがあれば表示）
 // -----------------------------------------------------------------------
 function initKyodoSection() {
-    const kyodoCheck = document.getElementById('kyodoCheck');
-    if (kyodoCheck && kyodoCheck.checked) {
-        document.getElementById('kyodoBody').style.display = '';
-    }
     // 保存済みデータがない場合は初期行を追加
     const rows = document.getElementById('kyodoRows');
     if (rows && rows.querySelectorAll('.kyodo-row').length === 0) {

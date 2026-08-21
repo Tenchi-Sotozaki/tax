@@ -811,8 +811,12 @@
 													<label class="form-label fw-medium">郵便番号</label> <input
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoAddressNo}"
+														th:errorclass="is-invalid"
 														th:readonly="${isView}"
 														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddressNo}">
+													<div class="invalid-feedback"
+														th:if="${#fields.hasErrors('kyodoList[__${stat.index}__].kyodoAddressNo')}"
+														th:errors="*{kyodoList[__${stat.index}__].kyodoAddressNo}"></div>
 												</div>
 
 												<!-- 住所 -->
@@ -820,8 +824,12 @@
 													<label class="form-label fw-medium">住所</label> <input
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoAddress}"
+														th:errorclass="is-invalid"
 														th:readonly="${isView}"
 														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddress}">
+													<div class="invalid-feedback"
+														th:if="${#fields.hasErrors('kyodoList[__${stat.index}__].kyodoAddress')}"
+														th:errors="*{kyodoList[__${stat.index}__].kyodoAddress}"></div>
 												</div>
 
 												<div class="col-md-4"></div>
@@ -832,8 +840,12 @@
 														class="text-danger" th:if="!${isView}">*</span></label> <input
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoName}"
+														th:errorclass="is-invalid"
 														th:readonly="${isView}"
 														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoName}">
+													<div class="invalid-feedback"
+														th:if="${#fields.hasErrors('kyodoList[__${stat.index}__].kyodoName')}"
+														th:errors="*{kyodoList[__${stat.index}__].kyodoName}"></div>
 												</div>
 
 												<!-- 氏名(ふりがな) -->
@@ -842,8 +854,12 @@
 														class="text-danger" th:if="!${isView}">*</span></label> <input
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
+														th:errorclass="is-invalid"
 														placeholder="ひらがなで入力" th:readonly="${isView}"
 														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoNameKana}">
+													<div class="invalid-feedback"
+														th:if="${#fields.hasErrors('kyodoList[__${stat.index}__].kyodoNameKana')}"
+														th:errors="*{kyodoList[__${stat.index}__].kyodoNameKana}"></div>
 												</div>
 
 												<div class="col-md-4"></div>
@@ -853,8 +869,12 @@
 													<label class="form-label fw-medium">電話番号</label> <input
 														type="tel" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoPhone}"
+														th:errorclass="is-invalid"
 														placeholder="例）03-1234-5678" th:readonly="${isView}"
 														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoPhone}">
+													<div class="invalid-feedback"
+														th:if="${#fields.hasErrors('kyodoList[__${stat.index}__].kyodoPhone')}"
+														th:errors="*{kyodoList[__${stat.index}__].kyodoPhone}"></div>
 												</div>
 											</div>
 										</div>
