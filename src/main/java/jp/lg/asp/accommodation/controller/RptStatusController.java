@@ -34,6 +34,7 @@ public class RptStatusController {
         model.addAttribute("searchForm", new RptStatusSearchForm());
         model.addAttribute("reports", rptStatusService.findAllReports());
         model.addAttribute("items", List.of());
+        model.addAttribute("isSearched", false);
         return VIEW;
     }
 
@@ -45,6 +46,7 @@ public class RptStatusController {
         model.addAttribute("searchForm", form);
         model.addAttribute("reports", rptStatusService.findAllReports());
         model.addAttribute("items", items);
+        model.addAttribute("isSearched", true);
         return VIEW;
     }
 }
