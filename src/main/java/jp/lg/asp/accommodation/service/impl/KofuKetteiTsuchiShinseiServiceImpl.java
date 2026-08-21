@@ -54,7 +54,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
-			jichitaiName = jichitaiInfo.getName();
+			jichitaiName = jichitaiInfo.getName() + jichitaiInfo.getKbnName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.SHOREIKIN_KOFU_JOREI);
 		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
