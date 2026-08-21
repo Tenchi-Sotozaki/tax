@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>特別徴収義務者状況照会</title>
+	<title>発行状況一覧</title>
 </head>
 
 <body>
@@ -11,7 +11,7 @@
 
 		<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-clipboard-check text-primary me-2"></i>特別徴収義務者状況照会
+				<i class="bi bi-clipboard-check text-primary me-2"></i>発行状況一覧
 			</h5>
 			<span class="text-muted small" th:if="${isSearched}">検索結果: <strong th:text="${items.size()}">0</strong> 件</span>
 		</div>
