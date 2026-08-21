@@ -61,12 +61,10 @@ public class RptStatusServiceImpl implements RptStatusService {
 					.put(s.getRptId(), s.getCreateDt());
 		}
 
-		// 該当 shiteiNo のみに絞る
+		// 検索条件に合致した特別徴収義務者はすべて返す。
+		// 帳票の発行実績が無い場合は空のマップを持たせ、画面側で「-」を表示する。
 		List<RptStatusListItem> result = new ArrayList<>();
 		for (Tokugimu t : tokugimuList) {
-			if (!statusMap.containsKey(t.getShiteiNo())) {
-				continue;
-			}
 			RptStatusListItem item = new RptStatusListItem();
 			item.setShiteiNo(t.getShiteiNo());
 			item.setName(t.getAtena() != null ? t.getAtena().getName() : "");
