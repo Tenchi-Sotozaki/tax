@@ -238,7 +238,7 @@ and tkg.atena_no = at.atena_no ]]></query>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="03be05e0-09eb-470c-868c-1a73d8e1b57f" x="390" y="130" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
+			<element kind="textField" uuid="03be05e0-09eb-470c-868c-1a73d8e1b57f" x="389" y="130" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$P{city} + "長"]]></expression>
 			</element>
 			<element kind="image" uuid="02009659-a234-49be-a557-049e0beef967" x="480" y="110" width="50" height="50" onErrorType="Blank">
@@ -257,16 +257,16 @@ and tkg.atena_no = at.atena_no ]]></query>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="ellipse" uuid="24c50c40-f436-4fd9-9679-26e90e5e3b7f" x="367" y="180" width="40" height="20" backcolor="rgba(255, 255, 255, 0.0)" printRepeatedValues="false">
+			<element kind="ellipse" uuid="24c50c40-f436-4fd9-9679-26e90e5e3b7f" x="366" y="180" width="40" height="20" backcolor="rgba(255, 255, 255, 0.0)" printRepeatedValues="false">
 				<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
 			</element>
-			<element kind="ellipse" uuid="270e6431-0b7c-43b0-9f41-b3c9d6309f3e" x="401" y="180" width="50" height="20" backcolor="rgba(255, 255, 255, 0.0)">
+			<element kind="ellipse" uuid="270e6431-0b7c-43b0-9f41-b3c9d6309f3e" x="400" y="180" width="50" height="20" backcolor="rgba(255, 255, 255, 0.0)">
 				<printWhenExpression><![CDATA["2".equals($F{shonin})]]></printWhenExpression>
 			</element>
-			<element kind="ellipse" uuid="b8e7abb7-e35e-46de-9160-adb0b787bef2" x="70" y="261" width="40" height="20" backcolor="rgba(255, 255, 255, 0.0)" printRepeatedValues="false">
+			<element kind="ellipse" uuid="b8e7abb7-e35e-46de-9160-adb0b787bef2" x="69" y="261" width="40" height="20" backcolor="rgba(255, 255, 255, 0.0)" printRepeatedValues="false">
 				<printWhenExpression><![CDATA["1".equals($F{shonin})]]></printWhenExpression>
 			</element>
-			<element kind="ellipse" uuid="730f983d-35cf-4b88-b90b-86ee4c3fa5ce" x="104" y="261" width="50" height="20" backcolor="rgba(255, 255, 255, 0.0)">
+			<element kind="ellipse" uuid="730f983d-35cf-4b88-b90b-86ee4c3fa5ce" x="103" y="261" width="50" height="20" backcolor="rgba(255, 255, 255, 0.0)">
 				<printWhenExpression><![CDATA["2".equals($F{shonin})]]></printWhenExpression>
 			</element>
 			<element kind="textField" uuid="5ea6b807-18c6-487b-be60-b89bd54d39f9" x="243" y="287" width="250" height="23" fontName="IPAex明朝" fontSize="10.0" textAdjust="ScaleFont" hTextAlign="Left" vTextAlign="Bottom">

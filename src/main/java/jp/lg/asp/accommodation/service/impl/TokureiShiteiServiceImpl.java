@@ -40,7 +40,7 @@ public class TokureiShiteiServiceImpl implements TokureiShiteiService {
 	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
-			cityName = jichitaiInfo.getName();
+			cityName = jichitaiInfo.getName() + jichitaiInfo.getKbnName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_SHITEI_JOREI);
 		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
