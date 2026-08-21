@@ -229,9 +229,9 @@
 										<td class="text-center fw-medium bg-light"><span
 											th:text="${detail.label}">区分</span></td>
 
-										<td class="text-center fw-medium bg-light"><span
-											th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA') + ' 円'}">税率</span>
-										</td>
+											<td class="text-center fw-medium bg-light"><span
+											    th:text="${#numbers.formatInteger((detail.taxRate ?: 0) + (detail.taxKenRate ?: 0), 1, 'COMMA') + ' 円'}">税率</span>
+											</td>
 
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].hakusu}"
@@ -346,8 +346,8 @@
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
 										<td class="text-center fw-medium bg-light"><span
 											th:text="${detail.label}">区分</span></td>
-										<td class="text-center fw-medium bg-light"><span
-											th:text="${detail.taxRate + ' %'}">税率</span></td>
+										<td class="text-center fw-medium bg-light"><span 
+											th:text="|${detail.taxRate ?: 0}%|">税率</span></td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].ryokinSogaku}"
 											class="form-control form-control-sm text-end js-comma-format"
@@ -721,9 +721,9 @@
 									<thead class="table-light">
 										<tr>
 											<th rowspan="2" class="align-middle" style="width: 60px;">日付</th>
-
-
-											<th th:colspan="*{monthlyDetail.taxDetails.size()+1}">宿泊数</th>
+											<th th:colspan="*{monthlyDetail.taxDetails != null and monthlyDetail.taxDetails.size() != null ? monthlyDetail.taxDetails.size() + 1 : 1}">
+												宿泊数
+											</th>
 											<th rowspan="2" class="align-middle" style="width: 120px;">税額(円)</th>
 										</tr>
 										<tr>
@@ -785,17 +785,17 @@
 												readonly></td>
 										</tr>
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
-											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"
-												class="text-end align-middle"><span
-												th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA')}">0</span>
-												円 <input type="hidden"
-												th:id="|modal-tax-rate-${stat.index}|"
-												th:value="${detail.taxRate + detail.taxKenRate}" /></td>
-											<td class="bg-light text-center text-muted align-middle"><i
-												class="bi bi-slash-lg"></i></td>
-											<td class="bg-light text-center text-muted align-middle"><i
-												class="bi bi-slash-lg"></i></td>
+										    <td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
+										    <td th:each="detail, stat : *{monthlyDetail.taxDetails}"
+										        class="text-end align-middle">
+										        <span th:text="${#numbers.formatInteger((detail.taxRate != null ? detail.taxRate : 0) + (detail.taxKenRate != null ? detail.taxKenRate : 0), 1, 'COMMA')}">0</span>
+										        円 
+										        <input type="hidden"
+										               th:id="|modal-tax-rate-${stat.index}|"
+										               th:value="${(detail.taxRate != null ? detail.taxRate : 0) + (detail.taxKenRate != null ? detail.taxKenRate : 0)}" />
+										    </td>
+										    <td class="bg-light text-center text-muted align-middle"><i class="bi bi-slash-lg"></i></td>
+										    <td class="bg-light text-center text-muted align-middle"><i class="bi bi-slash-lg"></i></td>
 										</tr>
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">税額(円)</td>
