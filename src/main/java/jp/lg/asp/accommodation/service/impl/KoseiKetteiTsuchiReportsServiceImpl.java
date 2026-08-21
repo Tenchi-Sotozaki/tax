@@ -80,7 +80,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 		
 		// 共通サービスから自治体情報を取得しメンバ変数にキャッシュ
 		Jichitai jichitai = reportsCommonService.getJichitaiInfo();
-		cityName = jichitai.getName();
+		cityName = jichitai.getName() + jichitai.getKbnName();
 		todoufuken = jichitai.getKbnName();
 		horeiInyou1 = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
 		horeiInyou2 = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
