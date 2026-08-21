@@ -20,13 +20,13 @@
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
-					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
+					<button class="accordion-button py-2 fw-semibold" th:classappend="${searched == true} ? 'collapsed' : ''" type="button" data-bs-toggle="collapse"
 						data-bs-target="#searchPanel">
 						<i class="bi bi-funnel me-2"></i>検索条件
 					</button>
 				</h2>
 			</div>
-			<div id="searchPanel" class="accordion-collapse collapse show">
+			<div id="searchPanel" class="accordion-collapse collapse" th:classappend="${searched != true} ? 'show' : ''">
 				<div class="accordion-body pt-3 pb-2 px-3">
 					<form th:action="@{/log/rpt-log/search}" th:object="${form}" method="post" id="searchForm">
 						<input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}"
@@ -109,9 +109,9 @@
 			<div class="d-flex align-items-center gap-2">
 				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
 				<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-					<option value="5">5件</option>
 					<option value="10" selected>10件</option>
-					<option value="20">20件</option>
+					<option value="50">50件</option>
+					<option value="100">100件</option>
 				</select>
 			</div>
 		</div>
