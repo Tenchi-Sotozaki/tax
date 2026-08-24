@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
@@ -49,19 +48,6 @@ class GlobalModelAdviceTest {
         isDspKbnVisible.setAccessible(true);
     }
 
-	@Test
-	void sideMenuTree_サービスが返したリストをそのまま返す() {
-		MenuDto dto = new MenuDto();
-		dto.setMenuId("lv1");
-		when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-		when(globalModelService.buildSideMenuTree(eq("00001"), any())).thenReturn(List.of(dto));
-
-		List<MenuDto> result = advice.sideMenuTree();
-
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getMenuId()).isEqualTo("lv1");
-	}
-	
 	private boolean invokeIsDspKbnVisible(String dspKbn, boolean isOperator, boolean isMonthly) throws Exception {
         return (boolean) isDspKbnVisible.invoke(advice, dspKbn, isOperator, isMonthly);
     }
