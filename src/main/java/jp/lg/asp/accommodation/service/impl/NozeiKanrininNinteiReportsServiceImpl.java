@@ -2,10 +2,12 @@ package jp.lg.asp.accommodation.service.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.chrono.JapaneseChronology;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -53,7 +55,10 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 	        parameters.put("net.sf.jasperreports.default.pdf.embedded", "true");
 
 	        if (dto.getHakkoYmd() != null) {
-	            parameters.put("hakkoYmd", dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")));
+	            DateTimeFormatter warekiFormatter = DateTimeFormatter
+	                    .ofPattern("GGGGy年M月d日", Locale.JAPANESE)
+	                    .withChronology(JapaneseChronology.INSTANCE);
+	            parameters.put("hakkoYmd", dto.getHakkoYmd().format(warekiFormatter));
 	        } else {
 	            parameters.put("hakkoYmd", "");
 	        }
@@ -63,8 +68,10 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 	        parameters.put("nintei", dto.getNintei() != null ? dto.getNintei() : "認定");
 
 	        Map<String, Object> row = new HashMap<>();
+	        row.put("yubin_no", dto.getTokuYubinNo() != null ? dto.getTokuYubinNo() : "");
 	        row.put("jusho", dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 	        row.put("name", dto.getTokuName() != null ? dto.getTokuName() : "");
+	        row.put("shisetsu_yubin_no", dto.getShisetsuYubinNo() != null ? dto.getShisetsuYubinNo() : "");
 	        row.put("shisetsu_jusho", dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 	        row.put("shisetsu_name", dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
 	        row.put("koin", dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
