@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,12 +57,11 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
                 });
 
         List<TekiyoNozeiShuki> allRecords = tekiyoNozeiShukiRepository
-                .findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+                .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 
         if (!allRecords.isEmpty()) {
             TekiyoNozeiShuki latest = allRecords.get(0);
             form.setEdit(true);
-            form.setSeq(latest.getSeq());
             if (latest.getTekiyoStYmd() != null) {
                 form.setTekiyoStMonth(latest.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy-MM")));
             }
@@ -72,16 +69,8 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
                 form.setTekiyoEdMonth(latest.getTekiyoEdYmd().format(DateTimeFormatter.ofPattern("yyyy-MM")));
             }
 
-            Map<String, String> shukiLabelMap = nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd)
-                    .stream().collect(Collectors.toMap(
-                            n -> n.getSeq().toPlainString(),
-                            n -> new NozeiShukiDto(n.getSeq(), n.getShuki()).getLabel(),
-                            (a, b) -> a));
-
             form.setHistories(allRecords.stream()
                     .map(t -> new TekiyoNozeiShukiHistoryDto(
-                            t.getIdx(),
-                            shukiLabelMap.getOrDefault(t.getSeq().toPlainString(), ""),
                             t.getTekiyoStYmd() != null ? t.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : "",
                             t.getTekiyoEdYmd() != null ? t.getTekiyoEdYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : ""))
                     .toList());
@@ -112,20 +101,15 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         }
         checkAndResolveOverlap(shiteiNo, stYmd, edYmd);
 
-        Integer maxIdx = tekiyoNozeiShukiRepository.findMaxIdxByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-        Integer newIdx = maxIdx + 1;
-
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setJichitaiCd(jichitaiCd);
         entity.setShiteiNo(shiteiNo);
-        entity.setIdx(newIdx);
-        entity.setSeq(form.getSeq());
         entity.setTekiyoStYmd(stYmd);
         entity.setTekiyoEdYmd(edYmd);
         entity.setDelFlg(FLG_OFF);
 
         tekiyoNozeiShukiRepository.save(entity);
-        log.debug("適用納税周期保存完了: shiteiNo={}, idx={}", shiteiNo, newIdx);
+        log.debug("適用納税周期保存完了: shiteiNo={}", shiteiNo);
     }
 
     private void checkAndResolveOverlap(String shiteiNo, LocalDate newStYmd, LocalDate newEdYmd) {
@@ -160,13 +144,13 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
     public void delete(String shiteiNo) {
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         TekiyoNozeiShuki latest = tekiyoNozeiShukiRepository
-                .findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
                 .stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("削除対象のレコードが見つかりません。"));
 
         latest.setDelFlg(FLG_ON);
         tekiyoNozeiShukiRepository.save(latest);
 
-        log.debug("適用納税周期削除完了: shiteiNo={}, idx={}", shiteiNo, latest.getIdx());
+        log.debug("適用納税周期削除完了: shiteiNo={}", shiteiNo);
     }
 }
