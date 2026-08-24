@@ -34,10 +34,16 @@
 					<h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>HTML入力エリア</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
+					<label for="registrationDate1" class="form-label fw-medium">
+					    タイトル<span class="text-danger">*</span>
+					</label>
 					<input class="form-control font-monospace" id="htmlContent" th:field="*{title}"
 						rows="15" placeholder="タイトルを入力してください"></input>
 				</div>				
 				<div class="card-body bg-light-subtle">
+					<label for="registrationDate1" class="form-label fw-medium">
+					    内容 <span class="text-danger">*</span>
+					</label>
 					<textarea class="form-control font-monospace" id="htmlContent" th:field="*{htmlContent}"
 						rows="15" placeholder="本文を入力してください"></textarea>
 				</div>
