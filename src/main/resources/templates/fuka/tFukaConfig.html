@@ -21,7 +21,7 @@
 
 			<a th:if="${fukaDeclarationForm.view}"
 				th:href="@{/declaration/edit(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
-				class="btn btn-primary btn-sm"> <i
+				class="btn btn-primary"> <i
 				class="bi bi-pencil-square me-2"></i>編集する
 			</a>
 		</div>
@@ -32,14 +32,14 @@
 			class="d-flex align-items-center gap-2 mb-3">
 			<a
 				th:href="@{/declaration/view(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno - 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${fukaDeclarationForm.rno <= fukaDeclarationForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a> <span class="text-muted small">履歴 <span
 				th:text="${fukaDeclarationForm.rno}"></span> / <span
 				th:text="${fukaDeclarationForm.maxRno}"></span></span> <a
 				th:href="@{/declaration/view(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno + 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${fukaDeclarationForm.rno >= fukaDeclarationForm.maxRno} ? ' disabled'">
 				次の履歴 <i class="bi bi-chevron-right"></i>
 			</a>
@@ -143,20 +143,20 @@
 						<!-- 月計表 -->
 						<div class="col-md-4 d-flex justify-content-end align-items-end">
 							<div th:if="${fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-outline-primary btn-sm"
+								<button type="button" class="btn btn-outline-primary"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
 									<i class="bi bi-eye me-1"></i>月計表を表示
 								</button>
 							</div>
 							<div th:if="${fukaDeclarationForm.edit}">
-								<button type="button" class="btn btn-outline-primary btn-sm"
+								<button type="button" class="btn btn-outline-primary"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
 									<i class="bi bi-pencil-square me-1"></i>月計表を編集
 								</button>
 							</div>
 							<div
 								th:if="${!fukaDeclarationForm.view and !fukaDeclarationForm.edit}">
-								<button type="button" class="btn btn-outline-primary btn-sm"
+								<button type="button" class="btn btn-outline-primary"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
 									<i class="bi bi-calendar3 me-1"></i>月計表を登録
 								</button>
@@ -314,7 +314,7 @@
 							</table>
 							<div class="d-flex justify-content-end mt-2"
 								th:unless="${fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-primary btn-sm"
+								<button type="button" class="btn btn-primary"
 									id="btnEstimateBreakdownTeigaku">
 									<i class="bi bi-calculator me-1"></i>内訳試算
 								</button>
@@ -450,7 +450,7 @@
 							</table>
 							<div class="d-flex justify-content-end mt-2"
 								th:unless="${fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-primary btn-sm"
+								<button type="button" class="btn btn-primary"
 									id="btnEstimateBreakdownTeiritsu">
 									<i class="bi bi-calculator me-1"></i>内訳試算
 								</button>
@@ -671,11 +671,11 @@
 				</button>
 
 				<a th:href="@{/declaration/payment-ledger}"
-					class="btn btn-outline-primary px-4 shadow-sm"
+					class="btn btn-outline-secondary px-4 shadow-sm"
 					th:if="${fukaDeclarationForm.view}"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:href="@{/declaration/payment-ledger}"
-					class="btn btn-outline-primary px-4 shadow-sm"
+					class="btn btn-outline-secondary px-4 shadow-sm"
 					th:unless="${fukaDeclarationForm.view}"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る

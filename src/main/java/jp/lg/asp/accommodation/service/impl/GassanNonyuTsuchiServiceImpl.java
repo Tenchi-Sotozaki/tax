@@ -100,7 +100,7 @@ public class GassanNonyuTsuchiServiceImpl implements GassanNonyuTsuchiService {
 			// 納入期限を取得
 			Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 			if (jichitaiInfo != null && tekiyoStYmd != null) {
-				int nendoStMonth = Integer.parseInt(jichitaiInfo.getNendoStMonth());
+				int nendoStMonth = Integer.parseInt(jichitaiInfo.getNendoStMonth().trim());
 				int targetMonth = tekiyoStYmd.getMonthValue();
 				int ki = ((targetMonth - nendoStMonth + 12) % 12) + 1;
 				int nendo = tekiyoStYmd.getYear();

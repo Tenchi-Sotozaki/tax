@@ -25,7 +25,7 @@
 			<!-- 照会モード -->
 			<a th:if="${isView}"
 				th:href="@{/admin/zeiritsu/edit/{seq}(seq=${seq})}"
-				class="btn btn-primary btn-sm"> <i
+				class="btn btn-primary"> <i
 				class="bi bi-pencil-square me-2"></i>編集する
 			</a>
 		</div>
@@ -399,34 +399,34 @@
 
 				<!-- 一覧に戻る（照会・編集） / 一覧に戻る（新規） -->
 				<a th:if="${isView}" th:href="@{/admin/zeiritsu/list}"
-					class="btn btn-outline-primary btn-lg px-4"> <i
+					class="btn btn-outline-secondary px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:if="${isEdit}" th:href="#"
-					class="btn btn-outline-primary btn-lg px-4"
+					class="btn btn-outline-secondary px-4"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:unless="${isView or isEdit}"
 					th:href="#"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"
-					class="btn btn-outline-primary btn-lg px-4"> <i
+					class="btn btn-outline-secondary px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 				<!-- 削除ボタン（編集モードのみ） -->
 				<button th:if="${isEdit}" type="button"
-					class="btn btn-danger btn-lg px-4" data-bs-toggle="modal"
+					class="btn btn-danger px-4" data-bs-toggle="modal"
 					data-bs-target="#deleteConfirmModal">
 					<i class="bi bi-trash me-2"></i>削除する
 				</button>
 				<!-- 新規登録モード -->
 				<button th:unless="${isView or isEdit}" type="button"
-					id="registerBtn" class="btn btn-success btn-lg px-5">
+					id="registerBtn" class="btn btn-success px-5">
 					<i class="bi bi-save me-2"></i>登録する
 				</button>
 				<input type="hidden" name="confirmAutoUpdate" id="confirmAutoUpdate"
 					value="false">
 				<!-- 編集モード -->
 				<button th:if="${isEdit}" type="submit"
-					class="btn btn-success btn-lg px-5">
+					class="btn btn-success px-5">
 					<i class="bi bi-save me-2"></i>更新する
 				</button>
 			</div>

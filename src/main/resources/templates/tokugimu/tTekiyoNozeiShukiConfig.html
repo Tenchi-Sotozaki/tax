@@ -20,7 +20,7 @@
 			</h5>
 			<a
 				th:href="@{/tekiyo-nozei-shuki/edit/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}"
-				class="btn btn-primary btn-sm" th:if="${isView ?: false}"> <i
+				class="btn btn-primary" th:if="${isView ?: false}"> <i
 				class="bi bi-pencil-square me-2"></i>編集する
 			</a>
 		</div>
@@ -127,26 +127,28 @@
 			</div>
 
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<button type="submit" class="btn btn-success btn-lg px-5"
+				<button type="submit" class="btn btn-success px-5"
 					th:if="${!(isView ?: false)}">
 					<i class="bi bi-save me-2"></i> <span
 						th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
 				</button>
 
 				<a href="#"
-					class="btn btn-danger btn-lg px-4"
+					class="btn btn-danger px-4"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
 					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"> <i
 					class="bi bi-trash me-2"></i>
-				</a> <a th:href="@{/tokugimu/list}"削除してもよろしいですか？')"> <i
+				</a> 
+				<a th:href="@{/tokugimu/list}"削除してもよろしいですか？')"> <i
 					class="bi bi-trash me-2"></i>削除する
-				</a> <a th:href="@{/tokugimu/list}"
-					class="btn btn-outline-primary btn-lg px-4"
+				</a> 
+				<a th:href="@{/tokugimu/list}"
+					class="btn btn-outline-secondary px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a href="#" class="btn btn-outline-primary btn-lg px-4"
+				</a> <a href="#" class="btn btn-outline-secondary px-4"
 					th:unless="${isView ?: false}"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
-					class="bi bi-arrow-left me-2"></i>照会に戻る
+					class="bi bi-arrow-left me-2"></i>戻る
 				</a>
 			</div>
 		</form>

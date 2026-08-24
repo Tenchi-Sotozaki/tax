@@ -25,10 +25,10 @@
 				</h5>
 				<div class="d-flex gap-2 ms-auto" th:if="${isView}">
 					<a th:href="@{/reports/tokugimuShiteiTsuchi}"
-						class="btn btn-outline-primary btn-sm"> <i
+						class="btn btn-outline-primary"> <i
 						class="bi bi-printer me-1"></i>特別徴収義務者指定通知書
 					</a> <a th:href="@{/reports/tokugimuJuriTsuchi}"
-						class="btn btn-outline-primary btn-sm"> <i
+						class="btn btn-outline-primary"> <i
 						class="bi bi-printer me-1"></i>特別徴収義務者申請受理通知書
 					</a>
 				</div>
@@ -46,7 +46,7 @@
 
 				<th:block th:if="${isView}">
 					<a th:href="@{/tokugimu/edit}"
-						class="btn btn-primary btn-sm ms-auto"> <i
+						class="btn btn-primary ms-auto"> <i
 						class="bi bi-pencil-square me-2"></i>編集する
 					</a>
 				</th:block>
@@ -54,16 +54,16 @@
 
 			<!-- 3段目：アンカーリンク -->
 			<div class="d-flex gap-2 flex-wrap mt-2 justify-content-end">
-				<a href="#hiduke-info" class="btn btn-outline-primary btn-sm">日付情報</a>
-				<a href="#tokugimu-info" class="btn btn-outline-primary btn-sm">特別徴収義務者情報</a>
-				<a href="#facility-info" class="btn btn-outline-primary btn-sm">宿泊施設情報</a>
-				<a href="#license-info" class="btn btn-outline-primary btn-sm">営業許可等情報</a>
-				<a href="#owner-info" class="btn btn-outline-primary btn-sm">施設所有者情報</a>
-				<a href="#mail-info" class="btn btn-outline-primary btn-sm">書類送付先情報</a>
-				<a href="#kyodo-info" class="btn btn-outline-primary btn-sm">共同事業者情報</a>
-				<a href="#other-info" class="btn btn-outline-primary btn-sm">その他の情報</a>
+				<a href="#hiduke-info" class="btn btn-outline-primary">日付情報</a>
+				<a href="#tokugimu-info" class="btn btn-outline-primary">特別徴収義務者情報</a>
+				<a href="#facility-info" class="btn btn-outline-primary">宿泊施設情報</a>
+				<a href="#license-info" class="btn btn-outline-primary">営業許可等情報</a>
+				<a href="#owner-info" class="btn btn-outline-primary">施設所有者情報</a>
+				<a href="#mail-info" class="btn btn-outline-primary">書類送付先情報</a>
+				<a href="#kyodo-info" class="btn btn-outline-primary">共同事業者情報</a>
+				<a href="#other-info" class="btn btn-outline-primary">その他の情報</a>
 				<a href="#business-status-info"
-					class="btn btn-outline-primary btn-sm"
+					class="btn btn-outline-primary"
 					th:if="${isEdit} or ${isView}">宿泊施設営業状況情報</a>
 			</div>
 		</div>
@@ -81,14 +81,14 @@
 			th:if="${(isView ?: false) and TokugimuForm.maxRno != null and TokugimuForm.maxRno > 1}"
 			class="d-flex align-items-center gap-2 mb-3">
 			<a th:href="@{/tokugimu/view(rno=${TokugimuForm.rno - 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${TokugimuForm.rno <= TokugimuForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a> <span class="text-muted small">履歴 <span
 				th:text="${TokugimuForm.rno}"></span> / <span
 				th:text="${TokugimuForm.maxRno}"></span></span> <a
 				th:href="@{/tokugimu/view(rno=${TokugimuForm.rno + 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${TokugimuForm.rno >= TokugimuForm.maxRno} ? ' disabled'">
 				次の履歴 <i class="bi bi-chevron-right"></i>
 			</a>
@@ -742,7 +742,7 @@
 												<span class="fw-medium">共同事業者 <span
 													th:text="${stat.index + 1}"></span></span>
 												<button type="button"
-													class="btn btn-sm btn-outline-danger kyodo-remove-btn"
+													class="btn btn-outline-danger kyodo-remove-btn"
 													th:if="!${isView}">
 													<i class="bi bi-trash"></i>
 												</button>
@@ -805,7 +805,7 @@
 								</div>
 								<div th:if="!${isView}" class="mt-2">
 									<button type="button" id="kyodoAddBtn"
-										class="btn btn-outline-secondary btn-sm">
+										class="btn btn-outline-secondary">
 										<i class="bi bi-plus-circle me-1"></i>共同事業者を追加
 									</button>
 								</div>
@@ -969,16 +969,17 @@
 			<!-- ===== アクションボタン ===== -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 				<a th:href="@{/tokugimu/list}"
-					class="btn btn-outline-primary btn-lg px-4"
+					class="btn outline-secondary px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a href="#" class="btn btn-outline-primary btn-lg px-4"
+				</a> 
+				<a href="#" class="btn outline-secondary px-4"
 					th:unless="${isView ?: false}" data-bs-toggle="modal"
 					data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>戻る
 				</a>
 
 				<!-- 編集時のみ削除ボタンを表示 -->
-				<button type="button" class="btn btn-danger btn-lg px-5"
+				<button type="button" class="btn btn-danger px-5"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
 					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
 					<i class="bi bi-trash me-2"></i>削除する
@@ -986,7 +987,7 @@
 
 				<th:block th:if="!${isView}">
 					<button type="button" id="openConfirmModalBtn"
-						class="btn btn-success btn-lg px-5">
+						class="btn btn-success px-5">
 						<i
 							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>

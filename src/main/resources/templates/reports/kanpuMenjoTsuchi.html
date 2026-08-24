@@ -127,21 +127,18 @@
 
 						<!-- アクションボタン -->
 						<div class="d-flex justify-content-center gap-2">
-							<button type="submit" class="btn btn-primary"
-								th:formaction="@{/kanpuMenjoTsuchi/generatePdf}">
-								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
-							</button>
-							<button type="submit" class="btn btn-outline-primary"
-								th:formaction="@{/kanpuMenjoTsuchi/preview}" formtarget="_blank">
-								<i class="bi bi-eye me-1"></i> プレビュー
-							</button>
-							<button type="submit" class="btn btn-primary"
-								th:formaction="@{/kanpuMenjoTsuchi/print}" formtarget="_blank">
-								<i class="bi bi-printer me-1"></i> 印刷
-							</button>
 							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
 								<i class="bi bi-arrow-left me-1"></i> 戻る
 							</a>
+							<button type="submit" class="btn btn-primary" th:formaction="@{/kanpuMenjoTsuchi/preview}" formtarget="_blank">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
+							<button type="submit" class="btn btn-primary" th:formaction="@{/kanpuMenjoTsuchi/generatePdf}">
+								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
+							</button>
+							<button type="submit" class="btn btn-primary" th:formaction="@{/kanpuMenjoTsuchi/print}" formtarget="_blank">
+								<i class="bi bi-printer me-1"></i> 印刷
+							</button>
 						</div>
 					</form>
 				</div>
