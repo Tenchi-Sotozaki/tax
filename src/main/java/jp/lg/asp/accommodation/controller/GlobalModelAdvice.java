@@ -20,10 +20,12 @@ import jp.lg.asp.accommodation.config.AppUserDetails;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.MenuDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Menu;
 import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.exception.AccessDeniedException;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.MenuRepository;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
@@ -39,8 +41,11 @@ public class GlobalModelAdvice {
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final MenuRepository menuRepository;
+	private final JichitaiRepository jichitaiRepository;
 
 	private final JichitaiContext jichitaiContext;
+
+	private static final String OPERATOR_JICHITAI_CD = "99999";
 
 	@ModelAttribute("loginUserName")
 	public String loginUserName() {
@@ -115,10 +120,17 @@ public class GlobalModelAdvice {
 	public List<MenuDto> sideMenuTree() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		try {
-			Set<String> screens = accessibleScreens();
-			List<Menu> menus = menuRepository.findByJichitaiCdOrderByDspOdr(jichitaiCd);
+			boolean isOperator = OPERATOR_JICHITAI_CD.equals(jichitaiCd);
+			boolean isMonthly = jichitaiRepository.findById(jichitaiCd)
+					.map(Jichitai::getNozeiShuki)
+					.map("1"::equals)
+					.orElse(false);
+			// 運用者は全画面許可として扱う
+			Set<String> screens = isOperator ? Set.of("*") : accessibleScreens();
+			List<Menu> menus = menuRepository.findAllOrderByDspOdr();
 			Map<String, MenuDto> map = new LinkedHashMap<>();
 			for (Menu m : menus) {
+				if (!isDspKbnVisible(m.getDspKbn(), isOperator, isMonthly)) continue;
 				MenuDto dto = new MenuDto();
 				dto.setMenuId(m.getMenuId());
 				dto.setLevel(m.getLevel());
@@ -167,6 +179,13 @@ public class GlobalModelAdvice {
 
 	private boolean isAccessible(MenuDto menu, Set<String> screens) {
 		return screens.contains("*") || menu.getScreenId() == null || screens.contains(menu.getScreenId().strip());
+	}
+
+	private boolean isDspKbnVisible(String dspKbn, boolean isOperator, boolean isMonthly) {
+		if ("1".equals(dspKbn)) return true;
+		if ("2".equals(dspKbn)) return isMonthly;
+		if ("3".equals(dspKbn)) return isOperator;
+		return false;
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)

@@ -12,6 +12,20 @@ function confirmUserDelete() {
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    // 登録／更新の確認モーダル。登録画面でも動くよう、編集判定より前に登録する
+    const openConfirmModalBtn = document.getElementById('openConfirmModalBtn');
+    if (openConfirmModalBtn) {
+        openConfirmModalBtn.addEventListener('click', () => {
+            const form = document.getElementById('userConfigForm');
+            if (!form) return;
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            new bootstrap.Modal(document.getElementById('registerModal')).show();
+        });
+    }
+
     // 編集モードでなければ処理を行わない
     const contentContainer = document.querySelector('[data-is-edit]');
     const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
