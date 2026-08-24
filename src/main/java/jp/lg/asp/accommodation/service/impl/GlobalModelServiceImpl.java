@@ -62,7 +62,7 @@ public class GlobalModelServiceImpl implements GlobalModelService {
     @Transactional(readOnly = true)
     public List<MenuDto> buildSideMenuTree(String jichitaiCd, Set<String> screens) {
         try {
-            List<Menu> menus = menuRepository.findByJichitaiCdOrderByDspOdr(jichitaiCd);
+            List<Menu> menus = menuRepository.findAllOrderByDspOdr();
             Map<String, MenuDto> map = new LinkedHashMap<>();
             for (Menu m : menus) {
                 MenuDto dto = new MenuDto();
