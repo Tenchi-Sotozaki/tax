@@ -218,6 +218,24 @@
 }
 
 /*
+  読み取り専用の入力欄
+  readonly 属性だけでは入力できるように見えるため、見た目でも区別する
+*/
+.form-control-readonly {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+    cursor: default;
+}
+
+/* フォーカスしても入力できるようには見せない */
+.form-control-readonly:focus {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+    border-color: var(--acomo-border);
+    box-shadow: none;
+}
+
+/*
   特別徴収義務者情報表示エリア：固定幅＋省略表示
 */
 .tokugimu-info-value {

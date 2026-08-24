@@ -12,7 +12,8 @@
 		<div class="container-fluid p-4">
 			<div
 				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-				th:data-is-edit="${configForm.editMode}">
+				th:data-is-edit="${configForm.editMode}"
+				th:data-editable="${configForm.editable}">
 
 				<h5 class="mb-0 fw-bold text-dark">
 					特別徴収事務交付金 <span th:if="${configForm.viewMode}" class="text-muted">-
@@ -53,12 +54,25 @@
 			</div>
 
 			<!-- 統合メインフォーム -->
-			<form
+			<form id="mainForm"
 				th:action="${configForm.createMode ? '/accommodation-tax/shoreikin/config/create' : ''}"
-				th:object="${configForm}" method="post">
+				th:object="${configForm}" method="post" novalidate>
 				<input type="hidden" th:field="*{shiteiNo}"> <input
 					type="hidden" th:field="*{mode}"> <input type="hidden"
 					th:field="*{version}">
+
+				<!-- バリデーションエラーサマリー -->
+				<div
+					th:if="${validationErrors != null and !validationErrors.isEmpty()}"
+					class="alert alert-danger alert-dismissible fade show" role="alert">
+					<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span
+						th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+					<ul class="mb-0 mt-1">
+						<li th:each="err : ${validationErrors}" th:text="${err}"
+							class="small"></li>
+					</ul>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+				</div>
 
 				<!-- 交付金情報エリア -->
 				<div class="card mb-4">
@@ -76,15 +90,11 @@
 								</label> <input type="text" class="form-control" id="nendo"
 									th:field="*{nendo}"
 									th:readonly="${configForm.viewMode or configForm.editMode}"
-									maxlength="4"
-									th:classappend="${#fields.hasErrors('nendo')} ? 'is-invalid' : ''"
-									pattern="[0-9]{4}" title="4桁の数字で入力してください" required
+									maxlength="4" th:errorclass="is-invalid"
 									th:data-initial-value="*{nendo}">
 
-								<div th:if="${#fields.hasErrors('nendo')}"
-									class="invalid-feedback">
-									<span th:errors="*{nendo}"></span>
-								</div>
+								<div class="invalid-feedback"
+									th:if="${#fields.hasErrors('nendo')}" th:errors="*{nendo}"></div>
 
 							</div>
 
@@ -100,15 +110,14 @@
 									<input type="number" class="form-control text-end"
 										id="kofuZeigaku" th:field="*{kofuZeigaku}"
 										th:readonly="${configForm.viewMode}"
-										th:classappend="${#fields.hasErrors('kofuZeigaku')} ? 'is-invalid' : ''"
-										step="1" min="0" max="99999999999999" required
+										th:errorclass="is-invalid" step="1" min="0"
+										max="99999999999999"
 										th:data-initial-value="*{kofuZeigaku}"> <span
 										class="input-group-text">円</span>
-								</div>
 
-								<div th:if="${#fields.hasErrors('kofuZeigaku')}"
-									class="invalid-feedback">
-									<span th:errors="*{kofuZeigaku}"></span>
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('kofuZeigaku')}"
+										th:errors="*{kofuZeigaku}"></div>
 								</div>
 
 							</div>
@@ -116,24 +125,20 @@
 							<!-- 交付率 -->
 							<div class="col-md-3">
 
-								<label for="kofuRitsu" class="form-label"> 交付率 <span
-									class="text-danger">*</span>
-								</label>
+								<label for="kofuRitsu" class="form-label"> 交付率 </label>
 
 								<div class="input-group">
 
-									<input type="number" class="form-control text-end"
+									<input type="number"
+										class="form-control form-control-readonly text-end"
 										id="kofuRitsu" th:field="*{kofuRitsu}" readonly
-										th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
-										step="0.01" min="0" max="99999.99" required
-										th:data-initial-value="*{kofuRitsu}"> <span
+										th:errorclass="is-invalid" step="0.01" min="0"
+										max="99999.99" th:data-initial-value="*{kofuRitsu}"> <span
 										class="input-group-text">%</span>
 
-								</div>
-
-								<div th:if="${#fields.hasErrors('kofuRitsu')}"
-									class="invalid-feedback">
-									<span th:errors="*{kofuRitsu}"></span>
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('kofuRitsu')}"
+										th:errors="*{kofuRitsu}"></div>
 								</div>
 
 							</div>
@@ -150,15 +155,14 @@
 									<input type="number" class="form-control text-end"
 										id="kofuGaku" th:field="*{kofuGaku}"
 										th:readonly="${configForm.viewMode}"
-										th:classappend="${#fields.hasErrors('kofuGaku')} ? 'is-invalid' : ''"
-										step="1" min="0" max="9999999999999" required
+										th:errorclass="is-invalid" step="1" min="0"
+										max="9999999999999"
 										th:data-initial-value="*{kofuGaku}"> <span
 										class="input-group-text">円</span>
-								</div>
 
-								<div th:if="${#fields.hasErrors('kofuGaku')}"
-									class="invalid-feedback">
-									<span th:errors="*{kofuGaku}"></span>
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('kofuGaku')}"
+										th:errors="*{kofuGaku}"></div>
 								</div>
 
 							</div>
@@ -207,7 +211,7 @@
 					<!-- 登録モード -->
 					<div th:if="${configForm.createMode}">
 						<button type="button" class="btn btn-success"
-							onclick="createShoreikin()">
+							data-bs-toggle="modal" data-bs-target="#createConfirmModal">
 							<i class="bi bi-check-circle"></i> 登録する
 						</button>
 					</div>
@@ -215,7 +219,7 @@
 					<!-- 編集モード -->
 					<div th:if="${configForm.editMode}">
 						<button type="button" class="btn btn-success"
-							onclick="updateShoreikin()">
+							data-bs-toggle="modal" data-bs-target="#updateConfirmModal">
 							<i class="bi bi-arrow-repeat"></i> 更新する
 						</button>
 					</div>
@@ -273,26 +277,23 @@
 			<!-- 特別徴収義務者指定モーダル -->
 			<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
-			<!-- ハイパーリンク付きメッセージ用モーダル -->
-			<div class="modal fade" id="customAlertModal" tabindex="-1"
-				aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header bg-dark text-white border-bottom-0">
-							<h5 class="modal-title">入力エラー</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal"
-								aria-label="閉じる"></button>
-						</div>
-						<div class="modal-body" id="customAlertBody">
-							<!-- HTMLメッセージが挿入箇所 -->
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary btn-sm"
-								data-bs-dismiss="modal">閉じる</button>
-						</div>
-					</div>
-				</div>
-			</div>
+			<!-- 交付率未設定の誘導モーダル -->
+			<th:block th:if="${configForm.editable}">
+				<div
+					th:replace="~{layout/components :: linkConfirmModal('kofuRitsuGuideModal', '確認', '交付率が設定されていません。交付率設定画面で登録してください。', @{/admin/kofu-ritsu/list}, '交付率設定へ')}"></div>
+			</th:block>
+
+			<!-- 登録確認モーダル -->
+			<th:block th:if="${configForm.createMode}">
+				<div
+					th:replace="~{layout/components :: confirmModal('createConfirmModal', '登録確認', '交付金情報を登録します。よろしいですか？', 'mainForm', 'btn-success', '登録する')}"></div>
+			</th:block>
+
+			<!-- 更新確認モーダル -->
+			<th:block th:if="${configForm.editMode}">
+				<div
+					th:replace="~{layout/components :: confirmModal('updateConfirmModal', '更新確認', '交付金情報を更新します。よろしいですか？', 'updateForm', 'btn-success', '更新する')}"></div>
+			</th:block>
 		</div>
 
 		<th:block layout:fragment="scripts">

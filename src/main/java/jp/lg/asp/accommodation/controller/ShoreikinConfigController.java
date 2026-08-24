@@ -109,6 +109,7 @@ public class ShoreikinConfigController {
 		if (bindingResult.hasErrors()) {
 			configForm.setMode("create");
 			model.addAttribute("configForm", configForm);
+			model.addAttribute("validationErrors", ShoreikinConfigDto.validate(configForm).values());
 			return CONFIG_VIEW;
 		}
 
@@ -134,6 +135,7 @@ public class ShoreikinConfigController {
 		if (bindingResult.hasErrors()) {
 			configForm.setMode("edit");
 			model.addAttribute("configForm", configForm);
+			model.addAttribute("validationErrors", ShoreikinConfigDto.validate(configForm).values());
 			return CONFIG_VIEW;
 		}
 
