@@ -255,7 +255,7 @@ public class FukaServiceImpl implements FukaService {
 				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
 				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
 				.findFirst()
-				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd, t.getSeq())))
+				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd)))
 				.map(n -> n.getShuki().intValue())
 				.orElse(3);
 	}
