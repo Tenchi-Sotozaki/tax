@@ -3,10 +3,7 @@ package jp.lg.asp.accommodation.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-<<<<<<< HEAD
-=======
 import jp.lg.asp.accommodation.config.JichitaiContext;
->>>>>>> master
 import jp.lg.asp.accommodation.dto.JichitaiConfigDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -17,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JichitaiConfigServiceImpl implements JichitaiConfigService {
 
-<<<<<<< HEAD
     private final JichitaiRepository jichitaiRepository;
+    private final JichitaiContext jichitaiContext;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,10 +53,6 @@ public class JichitaiConfigServiceImpl implements JichitaiConfigService {
             jichitaiRepository.save(jichitai);
         }
     }
-}
-=======
-	private final JichitaiRepository jichitaiRepository;
-	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -134,4 +127,3 @@ public class JichitaiConfigServiceImpl implements JichitaiConfigService {
 	    target.setParam(src.getParam());
 	}
 }
->>>>>>> master

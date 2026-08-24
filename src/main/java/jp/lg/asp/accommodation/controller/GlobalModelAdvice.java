@@ -1,7 +1,9 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jakarta.servlet.RequestDispatcher;
@@ -17,20 +19,12 @@ import jp.lg.asp.accommodation.config.AppUserDetails;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.MenuDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
-<<<<<<< HEAD
-import jp.lg.asp.accommodation.exception.AccessDeniedException;
-import jp.lg.asp.accommodation.service.GlobalModelService;
-=======
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Menu;
-import jp.lg.asp.accommodation.entity.User;
-import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.exception.AccessDeniedException;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.MenuRepository;
-import jp.lg.asp.accommodation.repository.RoleRepository;
-import jp.lg.asp.accommodation.repository.UserRepository;
->>>>>>> master
+import jp.lg.asp.accommodation.service.GlobalModelService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,15 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class GlobalModelAdvice {
 
-<<<<<<< HEAD
 	private final GlobalModelService globalModelService;
-=======
-	private final UserRepository userRepository;
-	private final RoleRepository roleRepository;
 	private final MenuRepository menuRepository;
 	private final JichitaiRepository jichitaiRepository;
-
->>>>>>> master
 	private final JichitaiContext jichitaiContext;
 
 	private static final String OPERATOR_JICHITAI_CD = "99999";
@@ -97,10 +85,7 @@ public class GlobalModelAdvice {
 	@ModelAttribute("sideMenuTree")
 	public List<MenuDto> sideMenuTree() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-<<<<<<< HEAD
-		Set<String> screens = accessibleScreens();
-		return globalModelService.buildSideMenuTree(jichitaiCd, screens);
-=======
+
 		try {
 			boolean isOperator = OPERATOR_JICHITAI_CD.equals(jichitaiCd);
 			boolean isMonthly = jichitaiRepository.findById(jichitaiCd)
@@ -161,7 +146,6 @@ public class GlobalModelAdvice {
 
 	private boolean isAccessible(MenuDto menu, Set<String> screens) {
 		return screens.contains("*") || menu.getScreenId() == null || screens.contains(menu.getScreenId().strip());
->>>>>>> master
 	}
 
 	private boolean isDspKbnVisible(String dspKbn, boolean isOperator, boolean isMonthly) {

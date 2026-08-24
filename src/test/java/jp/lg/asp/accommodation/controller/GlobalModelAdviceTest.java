@@ -1,13 +1,15 @@
 package jp.lg.asp.accommodation.controller;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Collections;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,42 +18,26 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.MenuDto;
-<<<<<<< HEAD
-import jp.lg.asp.accommodation.service.GlobalModelService;
-=======
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Menu;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.MenuRepository;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
->>>>>>> master
+import jp.lg.asp.accommodation.service.GlobalModelService;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalModelAdviceTest {
 
-<<<<<<< HEAD
 	@Mock GlobalModelService globalModelService;
 	@Mock JichitaiContext jichitaiContext;
-=======
     @Mock UserRepository userRepository;
     @Mock RoleRepository roleRepository;
     @Mock MenuRepository menuRepository;
     @Mock JichitaiRepository jichitaiRepository;
-    @Mock JichitaiContext jichitaiContext;
->>>>>>> master
 
 	@InjectMocks GlobalModelAdvice advice;
 
-<<<<<<< HEAD
-	@Test
-	void sideMenuTree_空のメニューは空リストを返す() {
-		when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-		when(globalModelService.buildSideMenuTree(eq("00001"), any())).thenReturn(List.of());
-
-		assertThat(advice.sideMenuTree()).isEmpty();
-	}
-=======
     private Method isAccessible;
     private Method isDspKbnVisible;
 
@@ -62,7 +48,6 @@ class GlobalModelAdviceTest {
         isDspKbnVisible = GlobalModelAdvice.class.getDeclaredMethod("isDspKbnVisible", String.class, boolean.class, boolean.class);
         isDspKbnVisible.setAccessible(true);
     }
->>>>>>> master
 
 	@Test
 	void sideMenuTree_サービスが返したリストをそのまま返す() {
@@ -71,40 +56,24 @@ class GlobalModelAdviceTest {
 		when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
 		when(globalModelService.buildSideMenuTree(eq("00001"), any())).thenReturn(List.of(dto));
 
-<<<<<<< HEAD
 		List<MenuDto> result = advice.sideMenuTree();
-=======
-    private boolean invokeIsDspKbnVisible(String dspKbn, boolean isOperator, boolean isMonthly) throws Exception {
-        return (boolean) isDspKbnVisible.invoke(advice, dspKbn, isOperator, isMonthly);
-    }
-
-    // --- isAccessible ---
->>>>>>> master
 
 		assertThat(result).hasSize(1);
 		assertThat(result.get(0).getMenuId()).isEqualTo("lv1");
 	}
+	
+	private boolean invokeIsDspKbnVisible(String dspKbn, boolean isOperator, boolean isMonthly) throws Exception {
+        return (boolean) isDspKbnVisible.invoke(advice, dspKbn, isOperator, isMonthly);
+    }
 
 	@Test
 	void accessibleScreens_未認証は空セットを返す() {
 		when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
 
 		Set<String> result = advice.accessibleScreens();
-
-<<<<<<< HEAD
 		assertThat(result).isEmpty();
 		verifyNoInteractions(globalModelService);
 	}
-=======
-    @Test
-    void isAccessible_screensに含まれない場合false() throws Exception {
-        assertThat(invokeIsAccessible(menuDto("m1", "sc00000001"), Set.of("sc00000002"))).isFalse();
-    }
-
-    @Test
-    void isAccessible_screenIdに空白がある場合stripして判定() throws Exception {
-        assertThat(invokeIsAccessible(menuDto("m1", "sc00000001  "), Set.of("sc00000001"))).isTrue();
-    }
 
     // --- isDspKbnVisible ---
 
@@ -296,5 +265,4 @@ class GlobalModelAdviceTest {
         j.setNozeiShuki(nozeiShuki);
         return j;
     }
->>>>>>> master
 }

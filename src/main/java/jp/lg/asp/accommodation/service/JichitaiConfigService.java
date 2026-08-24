@@ -5,12 +5,10 @@ import jp.lg.asp.accommodation.entity.Jichitai;
 
 public interface JichitaiConfigService {
 
-<<<<<<< HEAD
     Jichitai findById(String jichitaiCd);
 
     void save(String currentJichitaiCd, JichitaiConfigDto configForm);
-}
-=======
+
 	/**
 	 * 現在の自治体情報を取得
 	 */
@@ -26,4 +24,3 @@ public interface JichitaiConfigService {
 	 */
 	void saveJichitaiConfig(JichitaiConfigDto configForm);
 }
->>>>>>> master
