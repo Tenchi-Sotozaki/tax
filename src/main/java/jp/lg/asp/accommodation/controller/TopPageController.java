@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TopPageConfigForm;
@@ -32,7 +31,6 @@ public class TopPageController {
 	private final TopPageService topPageService;
 	private final MarkdownService markdownService;
 	private final ScreenAccessChecker accessChecker;
-	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.TOP_PAGE;
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.TOP_PAGE_CONFIG;

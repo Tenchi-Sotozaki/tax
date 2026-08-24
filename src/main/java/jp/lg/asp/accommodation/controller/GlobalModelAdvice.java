@@ -22,9 +22,9 @@ import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Menu;
 import jp.lg.asp.accommodation.exception.AccessDeniedException;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
-import jp.lg.asp.accommodation.repository.MenuRepository;
 import jp.lg.asp.accommodation.service.GlobalModelService;
+import jp.lg.asp.accommodation.service.JichitaiConfigService;
+import jp.lg.asp.accommodation.service.MenuService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalModelAdvice {
 
 	private final GlobalModelService globalModelService;
-	private final MenuRepository menuRepository;
-	private final JichitaiRepository jichitaiRepository;
+	private final JichitaiConfigService jichitaiConfigService;
+	private final MenuService menuService;
 	private final JichitaiContext jichitaiContext;
 
 	private static final String OPERATOR_JICHITAI_CD = "99999";
@@ -88,13 +88,13 @@ public class GlobalModelAdvice {
 
 		try {
 			boolean isOperator = OPERATOR_JICHITAI_CD.equals(jichitaiCd);
-			boolean isMonthly = jichitaiRepository.findById(jichitaiCd)
+			boolean isMonthly = jichitaiConfigService.findById(jichitaiCd)
 					.map(Jichitai::getNozeiShuki)
 					.map("1"::equals)
 					.orElse(false);
 			// 運用者は全画面許可として扱う
 			Set<String> screens = isOperator ? Set.of("*") : accessibleScreens();
-			List<Menu> menus = menuRepository.findAllOrderByDspOdr();
+			List<Menu> menus = menuService.findAllOrderByDspOdr();
 			Map<String, MenuDto> map = new LinkedHashMap<>();
 			for (Menu m : menus) {
 				if (!isDspKbnVisible(m.getDspKbn(), isOperator, isMonthly)) continue;

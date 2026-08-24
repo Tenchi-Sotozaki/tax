@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,8 +21,8 @@ public class JichitaiConfigServiceImpl implements JichitaiConfigService {
 
     @Override
     @Transactional(readOnly = true)
-    public Jichitai findById(String jichitaiCd) {
-        return jichitaiRepository.findById(jichitaiCd).orElseThrow();
+    public Optional<Jichitai> findById(String jichitaiCd) {
+        return jichitaiRepository.findById(jichitaiCd);
     }
 
     @Override
