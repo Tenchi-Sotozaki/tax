@@ -26,15 +26,26 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
     public static final String COOKIE_NAME = "jichitaiCd";
 
     private final JichitaiRepository jichitaiRepository;
-
+  
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                     FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(    		
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
+            throws ServletException, IOException {
+
+        // ログイン画面以外は処理しない
+        if (!request.getRequestURI().equals(request.getContextPath() + "/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String param = request.getParameter(PARAM_NAME);
 
         if (param != null && !param.isBlank()) {
+
             String jichitaiCd = toJichitaiCd(param);
+
             if (jichitaiCd != null) {
                 request.getSession().setAttribute(SESSION_KEY, jichitaiCd);
                 Cookie cookie = new Cookie(COOKIE_NAME, jichitaiCd);
@@ -53,6 +64,8 @@ public class JichitaiCodeFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+    
+    
 
     /**
      * クエリパラメータ文字列を自治体コードに変換する。

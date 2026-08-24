@@ -17,8 +17,20 @@ import jp.lg.asp.accommodation.config.AppUserDetails;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.MenuDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+<<<<<<< HEAD
 import jp.lg.asp.accommodation.exception.AccessDeniedException;
 import jp.lg.asp.accommodation.service.GlobalModelService;
+=======
+import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.Menu;
+import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.entity.UserId;
+import jp.lg.asp.accommodation.exception.AccessDeniedException;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.repository.MenuRepository;
+import jp.lg.asp.accommodation.repository.RoleRepository;
+import jp.lg.asp.accommodation.repository.UserRepository;
+>>>>>>> master
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +40,18 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class GlobalModelAdvice {
 
+<<<<<<< HEAD
 	private final GlobalModelService globalModelService;
+=======
+	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
+	private final MenuRepository menuRepository;
+	private final JichitaiRepository jichitaiRepository;
+
+>>>>>>> master
 	private final JichitaiContext jichitaiContext;
+
+	private static final String OPERATOR_JICHITAI_CD = "99999";
 
 	@ModelAttribute("loginUserName")
 	public String loginUserName() {
@@ -75,8 +97,78 @@ public class GlobalModelAdvice {
 	@ModelAttribute("sideMenuTree")
 	public List<MenuDto> sideMenuTree() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+<<<<<<< HEAD
 		Set<String> screens = accessibleScreens();
 		return globalModelService.buildSideMenuTree(jichitaiCd, screens);
+=======
+		try {
+			boolean isOperator = OPERATOR_JICHITAI_CD.equals(jichitaiCd);
+			boolean isMonthly = jichitaiRepository.findById(jichitaiCd)
+					.map(Jichitai::getNozeiShuki)
+					.map("1"::equals)
+					.orElse(false);
+			// 運用者は全画面許可として扱う
+			Set<String> screens = isOperator ? Set.of("*") : accessibleScreens();
+			List<Menu> menus = menuRepository.findAllOrderByDspOdr();
+			Map<String, MenuDto> map = new LinkedHashMap<>();
+			for (Menu m : menus) {
+				if (!isDspKbnVisible(m.getDspKbn(), isOperator, isMonthly)) continue;
+				MenuDto dto = new MenuDto();
+				dto.setMenuId(m.getMenuId());
+				dto.setLevel(m.getLevel());
+				dto.setPMenuId(m.getPMenuId());
+				dto.setName(m.getName());
+				dto.setScreenId(m.getScreenId());
+				dto.setIconLink(m.getIconLink());
+				dto.setLink(m.getLink());
+				map.put(m.getMenuId(), dto);
+			}
+			// ツリー構築
+			List<MenuDto> roots = new java.util.ArrayList<>();
+			for (MenuDto dto : map.values()) {
+				if (dto.getLevel() == 1) {
+					roots.add(dto);
+				} else {
+					MenuDto parent = map.get(dto.getPMenuId());
+					if (parent != null) {
+						parent.getChildren().add(dto);
+					}
+				}
+			}
+			// 権限フィルタリング：下位から上位へ不要ノードを除去
+			for (MenuDto lv1 : roots) {
+				for (MenuDto lv2 : lv1.getChildren()) {
+					for (MenuDto lv3 : lv2.getChildren()) {
+						lv3.getChildren().removeIf(lv4 -> !isAccessible(lv4, screens));
+					}
+					lv2.getChildren().removeIf(lv3 ->
+						!isAccessible(lv3, screens) ||
+						(lv3.getLink() == null && lv3.getChildren().isEmpty())
+					);
+				}
+				lv1.getChildren().removeIf(lv2 ->
+					!isAccessible(lv2, screens) ||
+					(lv2.getLink() == null && lv2.getChildren().isEmpty())
+				);
+			}
+			roots.removeIf(lv1 -> lv1.getChildren().isEmpty());
+			return roots;
+		} catch (Exception e) {
+			log.error("sideMenuTree取得エラー: {}", e.getMessage());
+			return Collections.emptyList();
+		}
+	}
+
+	private boolean isAccessible(MenuDto menu, Set<String> screens) {
+		return screens.contains("*") || menu.getScreenId() == null || screens.contains(menu.getScreenId().strip());
+>>>>>>> master
+	}
+
+	private boolean isDspKbnVisible(String dspKbn, boolean isOperator, boolean isMonthly) {
+		if ("1".equals(dspKbn)) return true;
+		if ("2".equals(dspKbn)) return isMonthly;
+		if ("3".equals(dspKbn)) return isOperator;
+		return false;
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)
