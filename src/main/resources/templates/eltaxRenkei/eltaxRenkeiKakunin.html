@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>電子申告情報取込確認</title>
+	<title>eLTAX(電子申告)取込プレビュー</title>
 </head>
 
 <body>
@@ -12,13 +12,15 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-file-earmark-check me-2 text-primary"></i> 電子申告情報取込確認
+				<i class="bi bi-file-earmark-check me-2 text-primary"></i> eLTAX(電子申告)取込プレビュー
 			</h5>
 		</div>
 
 		<!-- 施設情報エリア -->
 		<div class="card shadow-sm mb-4">
-			<div class="card-header fw-bold">施設情報</div>
+			<div class="card-header fw-bold">対象施設
+				<button type="button" id="openAddrSearchBtn" class="btn btn-sm btn-outline-primary ms-2"><i class="bi bi-search me-1"></i>宛名検索</button>
+			</div>
 			<div class="card-body">
 				<div class="row g-3">
 					<div class="col-md-3">
@@ -69,12 +71,10 @@
 						</tr>
 						<tr th:each="row : ${kakuninDto.diffRows}"
 							th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue)} ? 'table-warning' : ''">
-							<td th:text="${row.itemName}"></td>
-							<td th:text="${row.beforeValue}"></td>
-							<td>
-								<span th:text="${row.afterValue}"
-									th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue)} ? 'fw-bold text-danger' : ''">
-								</span>
+							<td th:text="${row.itemName}" th:style="${'1'.equals(row.dispFlag)} ? 'background-color: #dee2e6 !important;' : ''"></td>
+							<td th:text="${row.beforeValue}" th:style="${'1'.equals(row.dispFlag)} ? 'background-color: #dee2e6 !important;' : ''"></td>
+							<td th:style="${'1'.equals(row.dispFlag)} ? 'background-color: #dee2e6 !important;' : ''">
+								<span th:text="${row.afterValue}"></span>
 							</td>
 						</tr>
 					</tbody>

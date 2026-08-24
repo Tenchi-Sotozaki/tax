@@ -35,5 +35,6 @@ public class EltaxRenkeiKakuninDto {
 		private String itemName;
 		private String beforeValue;
 		private String afterValue;
+		private String dispFlag;
 	}
 }

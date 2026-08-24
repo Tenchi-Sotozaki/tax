@@ -1,6 +1,6 @@
 'use strict';
 (function() {
-    const ADDR_API = '/accommodation-tax/api/address/search';
+    const ADDR_API = '/accommodation-tax/api/address/search-or';
 
     document.addEventListener('DOMContentLoaded', () => {
         const meta = document.getElementById('kakuninMeta');
@@ -18,8 +18,17 @@
             document.getElementById('addrSearchPhone').value = tokugimuTel;
             document.getElementById('addrSearchKojinNo').value = kojinNo;
             document.getElementById('addrSearchHojinNo').value = hojinNo;
-            new bootstrap.Modal(document.getElementById('addressSearchModal')).show();
+            const modal = new bootstrap.Modal(document.getElementById('addressSearchModal'));
+            modal.show();
+            document.getElementById('addressSearchModal').addEventListener('shown.bs.modal', () => {
+                document.getElementById('addrSearchBtn').click();
+            }, { once: true });
         }
+
+        // 宛名検索ボタン（施設情報エリア）
+        document.getElementById('openAddrSearchBtn').addEventListener('click', () => {
+            new bootstrap.Modal(document.getElementById('addressSearchModal')).show();
+        });
 
         // 検索ボタン
         document.getElementById('addrSearchBtn').addEventListener('click', async () => {
