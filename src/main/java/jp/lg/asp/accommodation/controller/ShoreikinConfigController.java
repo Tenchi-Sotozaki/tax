@@ -68,7 +68,7 @@ public class ShoreikinConfigController {
 	@PostMapping("/config/switch-mode")
 	@OpeLog(screenId = SCREEN_ID, operation = "モード切替")
 	public String switchMode(@RequestParam("mode") String mode, 
-	                         @ModelAttribute ShoreikinConfigDto configForm, 
+	                         @ModelAttribute("configForm") ShoreikinConfigDto configForm, 
 	                         Model model) {
 	    accessChecker.checkWriteAccess(SCREEN_ID);
 
@@ -83,7 +83,7 @@ public class ShoreikinConfigController {
 
 	@PostMapping("/config/calculate")
 	@OpeLog(screenId = SCREEN_ID, operation = "算出")
-	public String calculate(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
+	public String calculate(@ModelAttribute("configForm") ShoreikinConfigDto configForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		try {
@@ -100,7 +100,7 @@ public class ShoreikinConfigController {
 
 	@PostMapping("/config/create")
 	@OpeLog(screenId = SCREEN_ID, operation = "新規登録")
-	public String create(@Valid @ModelAttribute ShoreikinConfigDto configForm,
+	public String create(@Valid @ModelAttribute("configForm") ShoreikinConfigDto configForm,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
@@ -126,7 +126,7 @@ public class ShoreikinConfigController {
 
 	@PostMapping("/config/update")
 	@OpeLog(screenId = SCREEN_ID, operation = "更新")
-	public String update(@Valid @ModelAttribute ShoreikinConfigDto configForm,
+	public String update(@Valid @ModelAttribute("configForm") ShoreikinConfigDto configForm,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
