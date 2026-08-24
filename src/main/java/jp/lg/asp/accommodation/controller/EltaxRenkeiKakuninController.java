@@ -16,6 +16,7 @@ import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto;
+import jp.lg.asp.accommodation.exception.EltaxRenkeiKakuninValidationException;
 import jp.lg.asp.accommodation.service.EltaxRenkeiKakuninService;
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +53,12 @@ public class EltaxRenkeiKakuninController {
 			session.setAttribute(SESSION_KEY_FILE, file.getBytes());
 			session.setAttribute(SESSION_KEY_FILE_NAME, file.getOriginalFilename());
 			model.addAttribute("kakuninDto", dto);
+			return "eltaxRenkei/eltaxRenkeiKakunin";
+		} catch (EltaxRenkeiKakuninValidationException e) {
+			try { session.setAttribute(SESSION_KEY_FILE, file.getBytes()); } catch (Exception ignored) {}
+			session.setAttribute(SESSION_KEY_FILE_NAME, file.getOriginalFilename());
+			model.addAttribute("kakuninDto", e.getDto());
+			model.addAttribute("errorMessages", e.getErrorMessages());
 			return "eltaxRenkei/eltaxRenkeiKakunin";
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

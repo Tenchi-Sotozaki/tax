@@ -16,10 +16,24 @@
 			</h5>
 		</div>
 
+		<!-- エラーメッセージ -->
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${not #lists.isEmpty(errorMessages)}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<ul class="mb-0">
+				<li th:each="msg : ${errorMessages}" th:text="${msg}"></li>
+			</ul>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
 		<!-- 施設情報エリア -->
 		<div class="card shadow-sm mb-4">
 			<div class="card-header fw-bold">対象施設
-				<button type="button" id="openAddrSearchBtn" class="btn btn-sm btn-outline-primary ms-2"><i class="bi bi-search me-1"></i>宛名検索</button>
+				<button type="button" id="openAddrSearchBtn" class="btn btn-sm btn-outline-primary ms-2" th:if="${kakuninDto.atenaSearchRequired}"><i class="bi bi-search me-1"></i>宛名検索</button>
 			</div>
 			<div class="card-body">
 				<div class="row g-3">
@@ -72,8 +86,8 @@
 						<tr th:each="row : ${kakuninDto.diffRows}"
 							th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue)} ? 'table-warning' : ''">
 							<td th:text="${row.itemName}" th:style="${'1'.equals(row.dispFlag)} ? 'background-color: #dee2e6 !important;' : ''"></td>
-							<td th:text="${row.beforeValue}" th:style="${'1'.equals(row.dispFlag)} ? 'background-color: #dee2e6 !important;' : ''"></td>
-							<td th:style="${'1'.equals(row.dispFlag)} ? 'background-color: #dee2e6 !important;' : ''">
+							<td th:text="${row.beforeValue}" th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''"></td>
+							<td th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''">
 								<span th:text="${row.afterValue}"></span>
 							</td>
 						</tr>

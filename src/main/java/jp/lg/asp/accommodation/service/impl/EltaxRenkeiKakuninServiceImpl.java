@@ -44,6 +44,7 @@ import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
+import jp.lg.asp.accommodation.exception.EltaxRenkeiKakuninValidationException;
 import jp.lg.asp.accommodation.service.EltaxRenkeiKakuninService;
 import lombok.RequiredArgsConstructor;
 
@@ -183,12 +184,25 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			throw new RuntimeException("システム対応外の手続き種別です: " + shubetsu);
 		}
 
-		return new EltaxRenkeiKakuninDto(
+		EltaxRenkeiKakuninDto dto = new EltaxRenkeiKakuninDto(
 				shiteiNo, shisetsuName, shisetsuJusho,
 				atenaName, atenaJusho,
 				file.getOriginalFilename(), shubetsu, shubetsuName,
 				atenaSearchRequired, tokugimuName, tokugimuJusho, tokugimuTel, kojinNo, hojinNo,
 				diffRows);
+
+		// 必須項目チェック（全件チェック）
+		List<String> errorMessages = new ArrayList<>();
+		for (Map.Entry<Integer, YoshikiItem> entry : yoshikiMap.entrySet()) {
+			if ("1".equals(entry.getValue().requiredFlg()) && getDataValue(dataRow, entry.getKey() - 1).isBlank()) {
+				errorMessages.add("必須項目「" + entry.getValue().itemName() + "」が入力されていません。");
+			}
+		}
+		if (!errorMessages.isEmpty()) {
+			throw new EltaxRenkeiKakuninValidationException(errorMessages, dto);
+		}
+
+		return dto;
 	}
 
 	@Override
@@ -253,13 +267,13 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		}
 	}
 
-	record YoshikiItem(String itemName, String dispFlag) {
+	record YoshikiItem(String itemName, String dispFlg, String requiredFlg) {
 	}
 
 	/**
 	 * 手続IDに対応する様式定義CSVを読み込み、No.（1始まり）→YoshikiItemのマップを返す。
 	 * 様式定義CSVはヘッダー行を含むため、No.列が数値の行のみ対象とする。
-	 * CSVフォーマット: no, itemName, dispFlag
+	 * CSVフォーマット: no, itemName, dispFlg, requiredFlg
 	 */
 	private Map<Integer, YoshikiItem> loadYoshikiMap(String tetsuzukiId) throws IOException {
 		String resourcePath = EltaxConstants.TETSUZUKI_YOSHIKI_MAP.get(tetsuzukiId);
@@ -274,11 +288,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			String line;
 			while ((line = reader.readLine()) != null) {
 				String[] cols = line.split(",", -1);
-				if (cols.length < 3)
+				if (cols.length < 4)
 					continue;
 				try {
 					int no = Integer.parseInt(cols[0].trim());
-					map.put(no, new YoshikiItem(cols[1].trim(), cols[2].trim()));
+					map.put(no, new YoshikiItem(cols[1].trim(), cols[2].trim(), cols[3].trim()));
 				} catch (NumberFormatException ignored) {
 				}
 			}
@@ -319,15 +333,15 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 				.findFirst().orElse(null);
 
 		for (Map.Entry<Integer, YoshikiItem> entry : yoshikiMap.entrySet()) {
-			if (entry.getValue().dispFlag().equals("0"))
+			if (entry.getValue().dispFlg().equals("0"))
 				continue;
 			String itemName = entry.getValue().itemName();
 			String afterValue = getDataValue(dataRow, entry.getKey() - 1);
 			String beforeValue = resolveBeforeValueTokugimu(prevTokugimu, prevSyoyusha, itemName);
 			if (itemName.equals("特別徴収義務者【申請区分】")) {
-				beforeValue = EltaxConstants.SHINSEI_KBN_NAME_MAP.getOrDefault(beforeValue, beforeValue);
+				afterValue = EltaxConstants.SHINSEI_KBN_NAME_MAP.getOrDefault(afterValue, afterValue);
 			}
-			diffRows.add(new DiffRow(itemName, beforeValue, afterValue, entry.getValue().dispFlag()));
+			diffRows.add(new DiffRow(itemName, beforeValue, afterValue, entry.getValue().dispFlg(), entry.getValue().requiredFlg()));
 		}
 		return diffRows;
 	}
@@ -420,7 +434,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		}
 
 		for (Map.Entry<Integer, YoshikiItem> entry : yoshikiMap.entrySet()) {
-			if (entry.getValue().dispFlag().equals("0"))
+			if (entry.getValue().dispFlg().equals("0"))
 				continue;
 			String itemName = entry.getValue().itemName();
 			String afterValue = getDataValue(dataRow, entry.getKey() - 1);
@@ -434,7 +448,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			} else if (EltaxConstants.SHUBETSU_TOKU_TEIRITSU.equals(shubetsu)) {
 				beforeValue = resolveBeforeValueFuka(prevFukaList, prevUchiList, itemName, true, false);
 			}
-			diffRows.add(new DiffRow(itemName, beforeValue, afterValue, entry.getValue().dispFlag()));
+			diffRows.add(new DiffRow(itemName, beforeValue, afterValue, entry.getValue().dispFlg(), entry.getValue().requiredFlg()));
 		}
 		return diffRows;
 	}
