@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -22,7 +23,6 @@ import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
-import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.impl.NozeiKanrininNinteiServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +46,8 @@ class NozeiKanrininNinteiServiceImplTest {
     @Test
     void getNinteiInfo_success() {
         Jichitai jichitai = new Jichitai();
-        jichitai.setName("占冠村");
+        jichitai.setName("占冠");
+        jichitai.setKbnName("村");
         when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai));
 
         Tokugimu tokugimu = new Tokugimu();
