@@ -30,7 +30,6 @@ import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
-import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -251,12 +250,12 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, LocalDate targetDate) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return tekiyoList.stream()
-				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
-				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
-				.findFirst()
-				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd, t.getSeq())))
-				.map(n -> n.getShuki().intValue())
+		boolean inPeriod = tekiyoList.stream()
+				.anyMatch(t -> (t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
+						&& (t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd())));
+		if (!inPeriod) return 3;
+		return jichitaiRepository.findById(jichitaiCd)
+				.map(j -> j.getNozeiShuki() != null ? Integer.parseInt(j.getNozeiShuki().trim()) : 3)
 				.orElse(3);
 	}
 

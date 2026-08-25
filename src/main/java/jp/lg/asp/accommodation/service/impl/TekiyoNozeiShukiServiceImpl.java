@@ -64,7 +64,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         if (!allRecords.isEmpty()) {
             TekiyoNozeiShuki latest = allRecords.get(0);
             form.setEdit(true);
-            form.setSeq(latest.getRno());
+            form.setRno(latest.getRno());
             if (latest.getTekiyoStYmd() != null) {
                 form.setTekiyoStMonth(latest.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy-MM")));
             }
