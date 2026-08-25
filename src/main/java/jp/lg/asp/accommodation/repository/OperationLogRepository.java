@@ -24,7 +24,6 @@ public interface OperationLogRepository extends JpaRepository<OperationLog, Oper
 			AND (:opeUser IS NULL OR :opeUser = '' OR o.opeUser LIKE CONCAT(:opeUser, '%'))
 			AND (:opeDtFrom IS NULL OR :opeDtFrom = '' OR o.opeDt >= TO_TIMESTAMP(:opeDtFrom, 'YYYY-MM-DD"T"HH24:MI'))
 			AND (:opeDtTo IS NULL OR :opeDtTo = '' OR o.opeDt <= TO_TIMESTAMP(:opeDtTo, 'YYYY-MM-DD"T"HH24:MI'))
-			AND (:param IS NULL OR :param = '' OR o.path LIKE CONCAT('%', :param, '%') OR o.param LIKE CONCAT('%', :param, '%'))
 			ORDER BY o.opeDt DESC
 			""")
 	List<OperationLog> findByConditions(
@@ -33,6 +32,5 @@ public interface OperationLogRepository extends JpaRepository<OperationLog, Oper
 			@Param("sousa") String sousa,
 			@Param("opeUser") String opeUser,
 			@Param("opeDtFrom") String opeDtFrom,
-			@Param("opeDtTo") String opeDtTo,
-			@Param("param") String param);
+			@Param("opeDtTo") String opeDtTo);
 }

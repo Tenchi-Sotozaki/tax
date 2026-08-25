@@ -25,7 +25,6 @@ public class TekiyoNozeiShuki extends BaseEntity {
 	@Id
 	@Column(name = "shitei_no", length = 8, nullable = false)
 	private String shiteiNo;
-
 	@Id
 	@Column(name = "rno", nullable = false)
 	private Integer rno;

@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +57,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
                 });
 
         List<TekiyoNozeiShuki> allRecords = tekiyoNozeiShukiRepository
-                .findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+                .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 
         if (!allRecords.isEmpty()) {
             TekiyoNozeiShuki latest = allRecords.get(0);
@@ -71,12 +69,6 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
             if (latest.getTekiyoEdYmd() != null) {
                 form.setTekiyoEdMonth(latest.getTekiyoEdYmd().format(DateTimeFormatter.ofPattern("yyyy-MM")));
             }
-
-            Map<String, String> shukiLabelMap = nozeiShukiRepository.findActiveByJichitaiCd(jichitaiCd)
-                    .stream().collect(Collectors.toMap(
-                            n -> n.getSeq().toPlainString(),
-                            n -> new NozeiShukiDto(n.getSeq(), n.getShuki()).getLabel(),
-                            (a, b) -> a));
 
             form.setHistories(allRecords.stream()
                     .map(t -> new TekiyoNozeiShukiHistoryDto(
@@ -159,7 +151,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
     public void delete(String shiteiNo) {
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         TekiyoNozeiShuki latest = tekiyoNozeiShukiRepository
-                .findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
                 .stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("削除対象のレコードが見つかりません。"));
 

@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -54,7 +55,7 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void getByShiteiNo_noHistory_returnsEmptyForm() {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
         TekiyoNozeiShukiForm form = service.getByShiteiNo(SHITEI_NO);
@@ -66,7 +67,6 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_startAfterEnd_throwsException() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setRno(1);
         form.setTekiyoStMonth("2024-06");
         form.setTekiyoEdMonth("2024-03");
 
@@ -81,7 +81,6 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_overlappingPeriod_throwsException() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setRno(1);
         form.setTekiyoStMonth("2024-04");
         form.setTekiyoEdMonth("2024-09");
 
@@ -99,7 +98,6 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_validPeriod_savesEntity() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setRno(1);
         form.setTekiyoStMonth("2024-10");
 
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
@@ -129,7 +127,7 @@ class TekiyoNozeiShukiServiceImplTest {
 
     @Test
     void delete_notFound_throwsException() {
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
         assertThatThrownBy(() -> service.delete(SHITEI_NO))

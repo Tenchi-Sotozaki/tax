@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.dto;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.Data;

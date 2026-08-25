@@ -335,7 +335,9 @@ async function showDetail(seq, fileName) {
             const tdKbn = document.createElement('td');
             tdKbn.className = 'text-center';
             tdKbn.textContent = kbnLabel(d.kbn);
-            if (d.kbn === '3') {
+            if (d.kbn === '2') {
+                tdKbn.classList.add('text-success');
+            } else if (d.kbn === '3') {
                 tdKbn.classList.add('text-danger');
             }
             tr.appendChild(tdKbn);
