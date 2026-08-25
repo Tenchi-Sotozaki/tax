@@ -73,7 +73,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
             form.setHistories(allRecords.stream()
                     .map(t -> new TekiyoNozeiShukiHistoryDto(
                             t.getRno(),
-                            shukiLabelMap.getOrDefault(String.valueOf(t.getRno()), ""),
+                            "",
                             t.getTekiyoStYmd() != null ? t.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : "",
                             t.getTekiyoEdYmd() != null ? t.getTekiyoEdYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : ""))
                     .toList());

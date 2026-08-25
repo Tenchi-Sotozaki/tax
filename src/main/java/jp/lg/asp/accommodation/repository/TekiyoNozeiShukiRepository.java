@@ -32,3 +32,4 @@ public interface TekiyoNozeiShukiRepository extends JpaRepository<TekiyoNozeiShu
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo,
             @Param("rno") Integer rno);
+}
