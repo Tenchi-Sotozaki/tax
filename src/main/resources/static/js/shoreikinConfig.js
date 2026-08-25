@@ -55,17 +55,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const contentContainer = document.querySelector('[data-is-edit]');
     const isEdit = contentContainer ? contentContainer.dataset.isEdit === 'true' : false;
-    const isEditable = contentContainer ? contentContainer.dataset.editable === 'true' : false;
 
     // -------------------------------------------------------------------
-    // 交付率が未設定のときは交付率設定画面へ誘導する
-    // 交付率は画面で入力する項目ではなく交付率設定から取得するため、
-    // 未設定のまま入力させても登録できない。画面を開いた時点で知らせる。
+    // 交付率が未設定のときは交付率設定画面へ誘導する。
+    // 表示要否はサーバ側（テンプレートの th:if）で判定しているため、
+    // モーダルが描画されていれば開くだけでよい。
     // -------------------------------------------------------------------
-    const kofuRitsuInput = document.getElementById('kofuRitsu');
     const kofuRitsuGuideModal = document.getElementById('kofuRitsuGuideModal');
-    if (isEditable && kofuRitsuGuideModal && kofuRitsuInput
-            && kofuRitsuInput.value.trim() === '') {
+    if (kofuRitsuGuideModal) {
         bootstrap.Modal.getOrCreateInstance(kofuRitsuGuideModal).show();
     }
 

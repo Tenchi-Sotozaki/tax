@@ -12,8 +12,7 @@
 		<div class="container-fluid p-4">
 			<div
 				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
-				th:data-is-edit="${configForm.editMode}"
-				th:data-editable="${configForm.editable}">
+				th:data-is-edit="${configForm.editMode}">
 
 				<h5 class="mb-0 fw-bold text-dark">
 					特別徴収事務交付金 <span th:if="${configForm.viewMode}" class="text-muted">-
@@ -277,8 +276,8 @@
 			<!-- 特別徴収義務者指定モーダル -->
 			<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
-			<!-- 交付率未設定の誘導モーダル -->
-			<th:block th:if="${configForm.editable}">
+			<!-- 交付率未設定の誘導モーダル。表示要否はサーバ側で判定する -->
+			<th:block th:if="${configForm.editable and configForm.kofuRitsu == null}">
 				<div
 					th:replace="~{layout/components :: linkConfirmModal('kofuRitsuGuideModal', '確認', '交付率が設定されていません。交付率設定画面で登録してください。', @{/admin/kofu-ritsu/list}, '交付率設定へ')}"></div>
 			</th:block>
