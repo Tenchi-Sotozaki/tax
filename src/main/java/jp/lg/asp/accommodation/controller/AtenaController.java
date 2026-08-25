@@ -180,7 +180,13 @@ public class AtenaController {
 	public ResponseEntity<?> importDetail(@PathVariable BigDecimal seq) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_INSERT);
-		return ResponseEntity.ok(atenaImportService.findDetail(jichitaiCd, seq));
+		var result = atenaImportService.findDetail(jichitaiCd, seq).stream()
+				.map(d -> Map.of(
+						"atenaNo", d.getAtenaNo().toPlainString(),
+						"name", d.getName(),
+						"kbn", d.getKbn()))
+				.toList();
+		return ResponseEntity.ok(result);
 	}
 
 	private ResponseEntity<Map<String, String>> badRequest(String message) {

@@ -401,12 +401,17 @@
 				<a th:if="${isView}" th:href="@{/admin/zeiritsu/list}"
 					class="btn btn-outline-secondary px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
+<<<<<<< HEAD
 				</a> <a th:if="${isEdit}" th:href="#"
 					class="btn btn-outline-secondary px-4"
+=======
+				</a> <a th:if="${isEdit}" href="#"
+					class="btn btn-outline-primary btn-lg px-4"
+>>>>>>> master
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> <a th:unless="${isView or isEdit}"
-					th:href="#"
+					href="#"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"
 					class="btn btn-outline-secondary px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -433,7 +438,7 @@
 		</form>
 
 		<!-- 戻る確認モーダル -->
-		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。一覧画面に戻りますか？', @{/admin/zeiritsu/list}, '戻る')}"></div>
+		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/zeiritsu/list}, '戻る')}"></div>
 
 		<!-- 削除フォーム（隠し） -->
 		<form th:if="${isEdit}" id="deleteZeiritsuForm"
