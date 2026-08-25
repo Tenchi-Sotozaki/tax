@@ -64,6 +64,10 @@
 		</div>
 
 		<!-- 取込ファイル情報エリア -->
+		<div class="d-flex gap-3 mb-2 small">
+			<span><span class="d-inline-block me-1" style="width:1em;height:1em;background-color:#dee2e6;vertical-align:middle;"></span>更新対象外の項目</span>
+			<span><span class="d-inline-block me-1" style="width:1em;height:1em;background-color:#fff3cd;vertical-align:middle;"></span>更新前情報と取込情報に差分がある項目</span>
+		</div>
 		<div class="card shadow-sm mb-4">
 			<div class="card-header fw-bold">
 				取込ファイル情報
@@ -84,8 +88,8 @@
 							<td colspan="3" class="text-center p-3">取込結果がありません</td>
 						</tr>
 						<tr th:each="row : ${kakuninDto.diffRows}"
-							th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue)} ? 'table-warning' : ''">
-							<td th:text="${row.itemName}" th:style="${'1'.equals(row.dispFlag)} ? 'background-color: #dee2e6 !important;' : ''"></td>
+							th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue) and !(row.beforeValue == '－' and #strings.isEmpty(row.afterValue))} ? 'table-warning' : ''">
+							<td th:text="${row.itemName}" th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''"></td>
 							<td th:text="${row.beforeValue}" th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''"></td>
 							<td th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''">
 								<span th:text="${row.afterValue}"></span>
