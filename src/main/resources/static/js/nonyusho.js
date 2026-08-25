@@ -327,77 +327,42 @@ async function loadDynamicData(shiteiNo, nendo, taishoYmValue) {
  * フォームバリデーション
  */
 function validateForm() {
-	
-	// 処理開始時に古いエラーをクリアする
-	hideErrorMessage();
-	
+    const taishoYm = document.getElementById('taishoYm');
+    taishoYm.classList.remove('is-invalid');
+    document.getElementById('taishoYmError').textContent = '';
+
     const shiteiNo = document.getElementById('shiteiNo')?.value;
-    const taishoYmValue = document.getElementById('taishoYm')?.value;
-    
     if (!shiteiNo) {
         showErrorMessage('指定番号を入力してください。');
         return false;
     }
-   
-    if (!taishoYmValue) {
-        showErrorMessage('対象年月を入力してください。');
+
+    if (!taishoYm.value) {
+        taishoYm.classList.add('is-invalid');
+        document.getElementById('taishoYmError').textContent = '対象年月を入力してください。';
+        taishoYm.focus();
         return false;
     }
-    
-    // 年度の妥当性チェック（YYYY-MM形式から年を抽出）
-    const taishoYm = taishoYmValue.split('-')[0];
-    const taishoYmNum = parseInt(taishoYm, 10);
-    if (isNaN(taishoYmNum) || taishoYmNum < 1900 || taishoYmNum > 2100) {
-        showErrorMessage('年度は1900年から2100年の間で選択してください。');
+
+    const year = parseInt(taishoYm.value.split('-')[0], 10);
+    if (isNaN(year) || year < 1900 || year > 2100) {
+        taishoYm.classList.add('is-invalid');
+        document.getElementById('taishoYmError').textContent = '年度は1900年から2100年の間で選択してください。';
+        taishoYm.focus();
         return false;
     }
-    
+
     return true;
 }
 
-/**
- * 画面上部にエラーメッセージを表示する
- */
 function showErrorMessage(message) {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = message;
-        errorAlert.style.display = 'block';
-        errorAlert.classList.add('show');
-    }
+    if (window.ReportError) window.ReportError.show(message);
 }
 
-/**
- * 画面上部のエラーメッセージを非表示にする
-    // 画面上部のalert-danger領域に表示する（reportForm.jsで定義）
-    if (window.ReportError) {
-        window.ReportError.show(message);
-        return;
-    }
-    alert(message);
-}
-
-/**
- * エラーメッセージを消す
- */
-function clearErrorMessage() {
-    if (window.ReportError) {
-        window.ReportError.hide();
-    }
-}
-
-/**
- * 成功メッセージ表示
- */
 function hideErrorMessage() {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = '';
-        errorAlert.style.display = 'none';
-        errorAlert.classList.remove('show');
-    }
+    if (window.ReportError) window.ReportError.hide();
+}
+
+function clearErrorMessage() {
+    hideErrorMessage();
 }

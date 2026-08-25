@@ -32,12 +32,7 @@
 						<!-- 特別徴収義務者情報 -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 						
-						<!-- エラーメッセージ -->
-						<div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert" id="errorAlert"
-							style="display: none;">
-							<i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="errorMessageText"></span>
-							<button type="button" class="btn-close btn-sm" onclick="hideErrorMessage()"></button>
-						</div>
+						<!-- エラーメッセージは reportErrorAlert に統一 -->
 						
 						<!-- 内容エリア -->
 						<div class="card mb-4">
@@ -48,8 +43,9 @@
 								<div class="row g-3">
 									<div class="col-md-4">
 										<label for="taishoYm" class="form-label">対象年月 <span
-												class="text-danger">*</span></label> <input type="month"
-											class="form-control" id="taishoYm" name="shinkokuYmd" required>
+												class="text-danger">*</span></label>
+										<input type="month" class="form-control" id="taishoYm" name="shinkokuYmd">
+										<div class="invalid-feedback" id="taishoYmError"></div>
 									</div>
 								</div>
 							</div>
