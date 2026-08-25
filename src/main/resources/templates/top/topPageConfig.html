@@ -88,23 +88,23 @@
 
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
+				
+				<a th:href="@{/top/topPageConfigDaicho}" class="btn btn-outline-secondary px-4">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
 
 				<button type="submit" form="configForm"
 					formaction="/accommodation-tax/top/config/preview"
-					class="btn btn-outline-primary btn-lg px-4">
+					class="btn btn-outline-primary px-4">
 					<i class="bi bi-eye me-2"></i>プレビュー
 				</button>
 
 				<button type="submit" form="configForm"
 					formaction="/accommodation-tax/top/config/save"
-					class="btn btn-success btn-lg px-5">
+					class="btn btn-success px-5">
 					<i class="bi bi-check-circle me-2"></i>
 					<span th:text="${form.htmlContent != null and !#strings.isEmpty(form.htmlContent)} ? '更新' : '登録'">保存</span>
 				</button>
-
-				<a th:href="@{/top/topPageConfigDaicho}" class="btn btn-outline-secondary btn-lg px-4">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
 
 			</div>
 		</form>
