@@ -194,7 +194,9 @@ public class TokugimuForm {
 			Map<String, String> errors = new LinkedHashMap<>();
 
 			if (f.getRegistrationDate() == null)
-				errors.put("registrationDate", "特別徴収義務者情報の登録日は必須です");
+				errors.put("registrationDate", "特別徴収義務者情報の登録年月日は必須です");
+			if (f.getShinseiDate() == null)
+				errors.put("shinseiDate", "特別徴収義務者情報の申請年月日は必須です");
 			if (f.getAtenaNo() == null) {
 				errors.put("atenaNo", "宛名が選択されていません");
 			} else {
