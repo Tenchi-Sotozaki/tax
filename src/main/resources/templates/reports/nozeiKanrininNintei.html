@@ -27,9 +27,6 @@
 						<!-- 特別徴収義務者情報エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 						
-						<!-- エラーメッセージ -->
-						<div th:replace="~{layout/components :: reportErrorAlert}"></div>
-						
 						<!-- 通知書情報エリア -->
 						<div class="card mb-4">
 							<div class="card-header">
@@ -41,7 +38,8 @@
 										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label> <input type="date"
 											class="form-control" id="hakkoYmd" name="hakkoYmd"
-											th:value="${dto.hakkoYmd != null ? dto.hakkoYmd.toString() : ''}" required>
+											th:value="${dto.hakkoYmd != null ? dto.hakkoYmd.toString() : ''}">
+										<div class="invalid-feedback" id="hakkoYmdError"></div>
 									</div>
 									<div class="col-md-4">
 										<label for="nintei" class="form-label">区分 <span

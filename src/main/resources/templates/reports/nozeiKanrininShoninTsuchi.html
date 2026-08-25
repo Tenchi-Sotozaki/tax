@@ -64,7 +64,8 @@
 									<div class="col-md-6">
 										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label> <input type="date"
-											class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}" required>
+											class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}">
+										<div class="invalid-feedback" id="hakkoYmdError"></div>
 									</div>
 								</div>
 							</div>
