@@ -3,6 +3,7 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,8 +19,10 @@ import jp.lg.asp.accommodation.entity.KofuRitsu;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.ShoreikinId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
@@ -43,6 +46,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	private final FukaRepository fukaRepository;
 	private final KofuRitsuRepository kofuRitsuRepository;
 	private final ShunoRirekiRepository shunoRirekiRepository;
+	private final JichitaiRepository jichitaiRepository;
 
 	private final JichitaiContext jichitaiContext;
 
@@ -96,9 +100,13 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				dto.setKofuRitsu(ritsuList1.isEmpty() ? null : ritsuList1.get(0));
 			}
 		} else {
-			// 新規登録モード
+			// 新規登録モード（nendo未指定 → 年度開始月から今年度を算出）
 			dto.setExists(false);
 			dto.setMode("create");
+			int currentNendo = resolveCurrentNendo(jichitaiCd);
+			dto.setNendo(String.valueOf(currentNendo));
+			List<BigDecimal> ritsuList2 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, currentNendo);
+			dto.setKofuRitsu(ritsuList2.isEmpty() ? null : ritsuList2.get(0));
 		}
 
 		return dto;
@@ -215,6 +223,18 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				})
 				.map(Fuka::getTotalZeigaku)
 				.reduce(0L, Long::sum);
+	}
+
+	/**
+	 * 年度開始月をもとに現在の年度を算出する
+	 */
+	private int resolveCurrentNendo(String jichitaiCd) {
+		LocalDate today = LocalDate.now();
+		int stMonth = jichitaiRepository.findById(jichitaiCd)
+				.map(Jichitai::getNendoStMonth)
+				.map(Integer::parseInt)
+				.orElse(4);
+		return today.getMonthValue() >= stMonth ? today.getYear() : today.getYear() - 1;
 	}
 
 	/**
