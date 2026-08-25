@@ -34,4 +34,7 @@ public class TokureiShiteiReportsDto {
 	
 	/** 公印 */
 	private byte[] koin;
+	
+	/** 承認 */
+	private String shonin;
 }
