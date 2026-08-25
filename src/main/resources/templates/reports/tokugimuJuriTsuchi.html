@@ -61,16 +61,14 @@
 							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
 								<i class="bi bi-arrow-left me-1"></i> 戻る
 							</a>
-							<button type="submit" class="btn btn-primary"
-								th:formaction="@{/reports/tokugimuJuriTsuchi/pdf}">
-								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
-							</button>
-							<button type="submit" class="btn btn-outline-primary"
-								th:formaction="@{/reports/tokugimuJuriTsuchi/preview}" formtarget="_blank">
+							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/tokugimuJuriTsuchi/preview}"
+								formtarget="_blank">
 								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
-							<button type="submit" class="btn btn-primary"
-								th:formaction="@{/reports/tokugimuJuriTsuchi/print}" formtarget="_blank">
+							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/tokugimuJuriTsuchi/pdf}">
+								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
+							</button>
+							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/tokugimuJuriTsuchi/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
 						</div>
