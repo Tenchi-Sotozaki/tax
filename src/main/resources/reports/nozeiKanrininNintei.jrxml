@@ -42,7 +42,7 @@
 		<property name="com.jaspersoft.studio.field.label" value="shisetsu_name"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="t_tokugimu"/>
 	</field>
-	<field name="koin" class="java.io.InputStream"/>
+	<field name="koin" class="java.lang.Object"/>
 	<detail>
 		<band height="715" splitType="Stretch">
 			<element kind="textField" uuid="d5da7094-1c5b-4b82-b81b-431134420576" x="330" y="100" width="150" height="30" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
@@ -58,7 +58,7 @@
 				<text><![CDATA[氏名（名称）]]></text>
 			</element>
 			<element kind="textField" uuid="b5a479e8-b855-47bd-a417-ac734870d11e" x="165" y="150" width="315" height="15" fontName="IPAex明朝" fontSize="12.0">
-				<expression><![CDATA[$F{yubin_no}]]></expression>
+				<expression><![CDATA["〒"+$F{yubin_no}]]></expression>
 			</element>
 			<element kind="textField" uuid="b5a479e8-b855-47bd-a417-ac734870d11f" x="165" y="165" width="315" height="15" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$F{jusho}]]></expression>
@@ -136,7 +136,7 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="12b06915-de53-4126-933c-b08245936076" x="250" y="350" width="230" height="30" fontName="IPAex明朝" fontSize="11.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA[$F{shisetsu_yubin_no}]]></expression>
+				<expression><![CDATA["〒"+$F{shisetsu_yubin_no}]]></expression>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box leftPadding="5">
@@ -167,7 +167,7 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="7487ca62-251f-4a75-9da8-464f4aec1bb3" x="250" y="490" width="230" height="30" fontName="IPAex明朝" fontSize="11.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA[$F{yubin_no}]]></expression>
+				<expression><![CDATA["〒"+$F{yubin_no}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<box leftPadding="5">
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
