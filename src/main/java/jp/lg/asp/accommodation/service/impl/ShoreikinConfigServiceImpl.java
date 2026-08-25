@@ -3,7 +3,6 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -91,24 +90,15 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				dto.setExists(false);
 				dto.setMode("create");
 
-				LocalDate today = LocalDate.now();
-				dto.setNendo(String.valueOf(today.getYear()));
-
-				// 交付率を取得して設定 ( 処理日を指定 )
-				List<BigDecimal> ritsuList1 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today.getYear());
+				// 交付率を取得して設定 ( 画面の交付金年度を指定 )
+				Integer nendoInt = Integer.parseInt(nendo);
+				List<BigDecimal> ritsuList1 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, nendoInt);
 				dto.setKofuRitsu(ritsuList1.isEmpty() ? null : ritsuList1.get(0));
 			}
 		} else {
 			// 新規登録モード
 			dto.setExists(false);
 			dto.setMode("create");
-
-			LocalDate today = LocalDate.now();
-			dto.setNendo(String.valueOf(today.getYear()));
-
-			// 交付率を取得して設定 ( 処理日を指定 )
-			List<BigDecimal> ritsuList2 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today.getYear());
-			dto.setKofuRitsu(ritsuList2.isEmpty() ? null : ritsuList2.get(0));
 		}
 
 		return dto;
@@ -176,9 +166,10 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	public ShoreikinConfigDto calculateShoreikin(ShoreikinConfigDto dto) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
-		// 交付率設定を取得
+		// 交付率設定を取得（画面の交付金年度を指定）
+		Integer nendoInt = Integer.parseInt(dto.getNendo());
 		List<KofuRitsu> kofuRitsuList = kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(
-				jichitaiCd, LocalDate.now().getYear());
+				jichitaiCd, nendoInt);
 		KofuRitsu kofuRitsuEntity = kofuRitsuList.isEmpty() ? null : kofuRitsuList.get(0);
 
 		if (dto.getKofuRitsu() == null) {
