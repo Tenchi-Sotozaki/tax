@@ -18,6 +18,9 @@ public class NozeiKanrininNinteiDto {
 
     /** 条例 */
     private String jorei;
+    
+    /** 特別徴収義務者郵便番号 */
+    private String tokuYubin;
 
     /** 特別徴収義務者郵便番号 */
     private String tokuYubinNo;
@@ -27,6 +30,9 @@ public class NozeiKanrininNinteiDto {
 
     /** 特別徴収義務者名 */
     private String tokuName;
+    
+    /** 施設郵便番号 */
+    private String shisetsuYubin;
 
     /** 施設郵便番号 */
     private String shisetsuYubinNo;

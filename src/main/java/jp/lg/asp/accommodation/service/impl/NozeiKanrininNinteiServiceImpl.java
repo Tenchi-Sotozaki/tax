@@ -62,12 +62,12 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo())
                 .orElseThrow(() -> new RuntimeException("宛名情報が見つかりません: " + tokugimu.getAtenaNo()));
 
-        dto.setTokuYubinNo(atena.getYubinNo() != null ? atena.getYubinNo() : "");
-        dto.setTokuJusho(atena.getJusho() != null ? atena.getJusho() : "");
-        dto.setTokuName(atena.getName());
-        dto.setShisetsuYubinNo(tokugimu.getShisetsuYubinNo() != null ? tokugimu.getShisetsuYubinNo() : "");
-        dto.setShisetsuJusho(tokugimu.getShisetsuJusho() != null ? tokugimu.getShisetsuJusho() : "");
-        dto.setShisetsuName(tokugimu.getShisetsuName());
+		dto.setTokuYubin("〒" + atena.getYubinNo());
+		dto.setTokuJusho(atena.getJusho());
+		dto.setTokuName(atena.getName());
+		dto.setShisetsuYubin("〒" + tokugimu.getShisetsuYubinNo());
+		dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
+		dto.setShisetsuName(tokugimu.getShisetsuName());
 
         log.debug("納税管理人選任免除認定通知書情報取得完了: {}", dto);
         return dto;

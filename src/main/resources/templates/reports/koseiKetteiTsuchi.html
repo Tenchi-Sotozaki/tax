@@ -27,12 +27,11 @@
 					<!-- 帳票発行エラー表示エリア -->
 					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
 
-					<form id="koseiKetteiForm" method="post">
+					<form id="koseiKetteiForm" method="post" th:object="${dto}">
 
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						<input type="hidden" name="shiteiNo" th:value="${selectedShiteiGassan?.shiteiNo}" />
-						<input type="hidden" name="koin" th:value="${dto.koin}">
-
+					
 						<!-- 特別徴収義務者情報エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 

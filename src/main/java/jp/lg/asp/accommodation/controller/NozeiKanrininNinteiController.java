@@ -20,6 +20,7 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanrininNinteiDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.service.NokanService;
 import jp.lg.asp.accommodation.service.NozeiKanrininNinteiReportsService;
 import jp.lg.asp.accommodation.service.NozeiKanrininNinteiService;
 import jp.lg.asp.accommodation.util.SessionHelper;
@@ -37,6 +38,7 @@ public class NozeiKanrininNinteiController {
 
 	private final NozeiKanrininNinteiService nozeiKanrininNinteiService;
 	private final NozeiKanrininNinteiReportsService reportsService;
+	private final NokanService nokanService;
 	private final ScreenAccessChecker accessChecker;
 	private static final String SCREEN_ID = ScreenManagement.NOZEI_KANRININ_NINTEI;
 
@@ -55,6 +57,12 @@ public class NozeiKanrininNinteiController {
 			if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
 				// 画面を戻して検索モーダルを表示
 				model.addAttribute("showShiteiGassanModal", true);
+				return "tokugimu/tTokugimuReport";
+			}
+			
+			// 納税管理人情報が未登録
+			if (nokanService.findByJichitaiCdAndShiteiNo(shiteiNo).isEmpty()) {
+				model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
 				return "tokugimu/tTokugimuReport";
 			}
 			

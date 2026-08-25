@@ -101,11 +101,14 @@
 				</div>
 			</div>
 		</div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/nozeiKanrininShoninTsuchi.js}"></script>
 		<script th:src="@{/js/reportForm.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
 </body>
 
