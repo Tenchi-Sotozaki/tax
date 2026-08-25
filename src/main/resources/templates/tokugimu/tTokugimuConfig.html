@@ -969,10 +969,10 @@
 			<!-- ===== アクションボタン ===== -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 				<a th:href="@{/tokugimu/list}"
-					class="btn outline-secondary px-4"
+					class="btn btn-outline-secondary px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a> 
-				<a href="#" class="btn outline-secondary px-4"
+				<a href="#" class="btn btn-outline-secondary px-4"
 					th:unless="${isView ?: false}" data-bs-toggle="modal"
 					data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>戻る
