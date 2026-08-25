@@ -119,8 +119,9 @@
 			<a th:if="${mode == 'view'}" th:href="@{/admin/kofu-ritsu/list}" class="btn btn-outline-secondary">
 				<i class="bi bi-arrow-left me-1"></i>一覧に戻る
 			</a>
-			<a th:if="${mode != 'view'}" th:href="@{/admin/kofu-ritsu/view/{rno}(rno=${rno})}" class="btn btn-outline-secondary">
-				<i class="bi bi-arrow-left me-1"></i>一覧に戻る
+			<a th:if="${mode != 'view'}" class="btn btn-outline-secondary"
+				data-bs-toggle="modal" data-bs-target="#discardModal">
+				<i class="bi bi-arrow-left me-1"></i>戻る
 			</a>
 			<button th:if="${mode != 'view'}" type="submit" form="configForm"
 				class="btn btn-success">
@@ -128,9 +129,10 @@
 					th:text="${mode == 'edit'} ? '更新する' : '登録する'">登録する</span>
 			</button>
 		</div>
-
-			<div th:replace="~{layout/components :: linkConfirmModal('discardModal', '確認', '入力内容は破棄されます。よろしいですか？', @{/admin/kofu-ritsu/list}, '一覧に戻る')}"></div>
-
+		
+		<div class="d-flex justify-content-center"
+			th:replace="~{layout/components :: linkConfirmModal('discardModal', '確認', '入力内容は破棄されます。よろしいですか？', @{/admin/kofu-ritsu/view/{rno}(rno=${rno})}, '戻る')}">
+		</div>
 	</div>
 
 	<th:block layout:fragment="scripts">
