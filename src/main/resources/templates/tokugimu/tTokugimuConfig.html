@@ -198,17 +198,21 @@
 						</div>
 
 						<!-- 宛名検索 -->
-						<div class="col-md-2" th:if="!${isView}">
+						<div class="col-md-2 d-flex align-items-end" th:if="!${isView}">
 							<button type="button" class="btn btn-primary"
 								data-bs-toggle="modal" data-bs-target="#addressSearchModal">
 								<i class="bi bi-search me-1"></i>宛名検索
 							</button>
-							<div class="text-danger small mt-1"
-								th:if="${#fields.hasErrors('atenaNo')}"
-								th:errors="*{atenaNo}"></div>
 						</div>
 
 						<div class="col-md-7"></div>
+
+						<!-- 宛名未選択エラー -->
+						<div class="col-12 text-danger small"
+							th:if="${isView != true and #fields.hasErrors('atenaNo')}">
+							<i class="bi bi-exclamation-circle me-1"></i>
+							<th:block th:each="err : ${#fields.errors('atenaNo')}" th:text="${err}"></th:block>
+						</div>
 
 						<!-- 郵便番号 -->
 						<div class="col-md-3">
