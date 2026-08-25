@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -49,16 +50,19 @@ public class FukaDeclarationForm {
 
 	// ========== 加算金額入力エリア ==========
 	private String additionalCategory1;
+	@Pattern(regexp = "^$|^[0-9]+(\\.[0-9]+)?$", message = "割合は数値で入力してください")
 	private String additionalRate1;
 	private Long additionalAmount1;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate1;
 	private String additionalCategory2;
+	@Pattern(regexp = "^$|^[0-9]+(\\.[0-9]+)?$", message = "割合は数値で入力してください")
 	private String additionalRate2;
 	private Long additionalAmount2;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate2;
 	private String additionalCategory3;
+	@Pattern(regexp = "^$|^[0-9]+(\\.[0-9]+)?$", message = "割合は数値で入力してください")
 	private String additionalRate3;
 	private Long additionalAmount3;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
