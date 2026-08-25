@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class menuServiceImpl implements MenuService{
+public class MenuServiceImpl implements MenuService{
 	
 	private final MenuRepository menuRepository;
 	
