@@ -13,7 +13,7 @@ public class TekiyoNozeiShukiForm {
     private String facilityName;
     private boolean edit;
 
-    private BigDecimal seq;
+    private Integer rno;
 
     private String tekiyoStMonth;
     private String tekiyoEdMonth;

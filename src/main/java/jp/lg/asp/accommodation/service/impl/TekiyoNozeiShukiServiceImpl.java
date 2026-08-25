@@ -64,7 +64,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         if (!allRecords.isEmpty()) {
             TekiyoNozeiShuki latest = allRecords.get(0);
             form.setEdit(true);
-            form.setSeq(latest.getSeq());
+            form.setSeq(latest.getRno());
             if (latest.getTekiyoStYmd() != null) {
                 form.setTekiyoStMonth(latest.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy-MM")));
             }
@@ -80,8 +80,8 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
 
             form.setHistories(allRecords.stream()
                     .map(t -> new TekiyoNozeiShukiHistoryDto(
-                            t.getIdx(),
-                            shukiLabelMap.getOrDefault(t.getSeq().toPlainString(), ""),
+                            t.getRno(),
+                            shukiLabelMap.getOrDefault(String.valueOf(t.getRno()), ""),
                             t.getTekiyoStYmd() != null ? t.getTekiyoStYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : "",
                             t.getTekiyoEdYmd() != null ? t.getTekiyoEdYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月")) : ""))
                     .toList());
@@ -112,20 +112,19 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         }
         checkAndResolveOverlap(shiteiNo, stYmd, edYmd);
 
-        Integer maxIdx = tekiyoNozeiShukiRepository.findMaxIdxByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-        Integer newIdx = maxIdx + 1;
+        Integer maxRno = tekiyoNozeiShukiRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+        Integer newRno = maxRno + 1;
 
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setJichitaiCd(jichitaiCd);
         entity.setShiteiNo(shiteiNo);
-        entity.setIdx(newIdx);
-        entity.setSeq(form.getSeq());
+        entity.setRno(newRno);
         entity.setTekiyoStYmd(stYmd);
         entity.setTekiyoEdYmd(edYmd);
         entity.setDelFlg(FLG_OFF);
 
         tekiyoNozeiShukiRepository.save(entity);
-        log.debug("適用納税周期保存完了: shiteiNo={}, idx={}", shiteiNo, newIdx);
+        log.debug("適用納税周期保存完了: shiteiNo={}, rno={}", shiteiNo, newRno);
     }
 
     private void checkAndResolveOverlap(String shiteiNo, LocalDate newStYmd, LocalDate newEdYmd) {
@@ -167,6 +166,6 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         latest.setDelFlg(FLG_ON);
         tekiyoNozeiShukiRepository.save(latest);
 
-        log.debug("適用納税周期削除完了: shiteiNo={}, idx={}", shiteiNo, latest.getIdx());
+        log.debug("適用納税周期削除完了: shiteiNo={}, rno={}", shiteiNo, latest.getRno());
     }
 }
