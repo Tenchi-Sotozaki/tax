@@ -26,6 +26,8 @@ public class EltaxRenkeiKakuninDto {
 	private String kojinNo;
 	private String hojinNo;
 
+	private String errorMessage;
+
 	private List<DiffRow> diffRows;
 
 	@Data

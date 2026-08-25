@@ -63,19 +63,34 @@
             }
         });
 
-        // 取込ボタン：宛名検索必要な場合は選択必須
+        // 取込ボタン：宛名検索必要な場合は選択必須、問題なければ確認モーダル表示
         document.getElementById('commitBtn').addEventListener('click', () => {
             if (atenaSearchRequired && !document.getElementById('commitAtenaNo').value) {
                 alert('宛名を選択してください。');
                 new bootstrap.Modal(document.getElementById('addressSearchModal')).show();
                 return;
             }
-            document.getElementById('commitForm').submit();
+            new bootstrap.Modal(document.getElementById('commitConfirmModal')).show();
         });
     });
 
     const SG_SEARCH_API = '/accommodation-tax/api/shitei-gassan/search';
     let _sgResults = [];
+
+    function showErrorMessage(msg) {
+        const area = document.querySelector('.alert.alert-danger')
+            ?? (() => {
+                const div = document.createElement('div');
+                div.className = 'alert alert-danger alert-dismissible fade show';
+                div.setAttribute('role', 'alert');
+                div.innerHTML = '<span></span><button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                document.querySelector('.container-fluid').prepend(div);
+                return div;
+            })();
+        area.querySelector('span').textContent = msg;
+        area.classList.add('show');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     async function executeSgSearch() {
         const params = new URLSearchParams();
@@ -138,13 +153,13 @@
                             'Content-Type': 'application/json',
                             [document.querySelector('meta[name="_csrf_header"]')?.content]: document.querySelector('meta[name="_csrf"]')?.content
                         },
-                        body: JSON.stringify({ shiteiNo: d.shiteiNo ?? '' })
+                        body: JSON.stringify({ shiteiNo: d.gassanShiteiNo ?? d.shiteiNo ?? '' })
                     });
-                    if (!res.ok) { alert(await res.text()); return; }
+                    if (!res.ok) { showErrorMessage(await res.text()); return; }
                     const dto = await res.json();
                     applyRepreviewDto(dto);
                 } catch {
-                    alert('通信エラーが発生しました。');
+                    showErrorMessage('通信エラーが発生しました。');
                 }
             });
         });
@@ -153,6 +168,7 @@
     function applyRepreviewDto(dto) {
         // 施設情報エリア更新
         document.getElementById('shiteiNoText').value = dto.shiteiNo ?? '';
+        document.getElementById('commitShiteiNo').value = dto.shiteiNo ?? '';
         document.getElementById('shisetsuNameText').value = dto.shisetsuName ?? '';
         document.getElementById('shisetsuJushoText').value = dto.shisetsuJusho ?? '';
         document.getElementById('tokugimuNameText').value = dto.atenaName ?? '';

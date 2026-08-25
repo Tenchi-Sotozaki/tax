@@ -56,9 +56,15 @@ public class EltaxRenkeiKakuninController {
 			session.setAttribute(SESSION_KEY_FILE, file.getBytes());
 			session.setAttribute(SESSION_KEY_FILE_NAME, file.getOriginalFilename());
 			model.addAttribute("kakuninDto", dto);
+			if (dto.getErrorMessage() != null) {
+				model.addAttribute("errorMessage", dto.getErrorMessage());
+			}
 			return "eltaxRenkei/eltaxRenkeiKakunin";
 		} catch (EltaxRenkeiKakuninValidationException e) {
-			try { session.setAttribute(SESSION_KEY_FILE, file.getBytes()); } catch (Exception ignored) {}
+			try {
+				session.setAttribute(SESSION_KEY_FILE, file.getBytes());
+			} catch (Exception ignored) {
+			}
 			session.setAttribute(SESSION_KEY_FILE_NAME, file.getOriginalFilename());
 			model.addAttribute("kakuninDto", e.getDto());
 			model.addAttribute("errorMessages", e.getErrorMessages());
@@ -97,6 +103,7 @@ public class EltaxRenkeiKakuninController {
 	@OpeLog(screenId = SCREEN_ID, operation = "取込")
 	public String commit(
 			@RequestParam(required = false) String atenaNo,
+			@RequestParam(required = false) String shiteiNo,
 			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 
@@ -110,9 +117,12 @@ public class EltaxRenkeiKakuninController {
 		try {
 			BigDecimal atenaNoDecimal = null;
 			if (atenaNo != null && !atenaNo.isBlank()) {
-				try { atenaNoDecimal = new BigDecimal(atenaNo); } catch (NumberFormatException ignored) {}
+				try {
+					atenaNoDecimal = new BigDecimal(atenaNo);
+				} catch (NumberFormatException ignored) {
+				}
 			}
-			eltaxRenkeiKakuninService.commit(fileBytes, fileName, atenaNoDecimal);
+			eltaxRenkeiKakuninService.commit(fileBytes, fileName, atenaNoDecimal, shiteiNo);
 			redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

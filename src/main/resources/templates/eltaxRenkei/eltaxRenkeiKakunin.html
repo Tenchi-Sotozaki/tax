@@ -103,11 +103,12 @@
 
 		<!-- アクションボタン -->
 		<div class="d-flex gap-2">
-			<a th:href="@{/eltax-renkei}" class="btn btn-secondary">
+			<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#backConfirmModal">
 				<i class="bi bi-arrow-left me-1"></i>戻る
-			</a>
+			</button>
 			<form id="commitForm" th:action="@{/eltax-renkei/kakunin/commit}" method="post">
 				<input type="hidden" id="commitAtenaNo" name="atenaNo" value="">
+				<input type="hidden" id="commitShiteiNo" name="shiteiNo" th:value="${kakuninDto.shiteiNo}">
 				<button type="button" id="commitBtn" class="btn btn-primary">
 					<i class="bi bi-upload me-1"></i>取込
 				</button>
@@ -121,6 +122,10 @@
 			th:data-hojin-no="${kakuninDto.hojinNo}">
 		</span>
 
+		<!-- 取込確認モーダル -->
+		<div th:replace="~{layout/components :: confirmModal('commitConfirmModal', '取込確認', 'この内容で取込します。よろしいですか？', 'commitForm', 'btn-primary', '取込')}"></div>
+		<!-- 戻る確認モーダル -->
+		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '取込はキャンセルされます。よろしいですか？', @{/eltax-renkei}, '戻る')}"></div>
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
 		<!-- 特別徴収義務者指定モーダル -->

@@ -12,5 +12,5 @@ public interface EltaxRenkeiKakuninService {
 
 	EltaxRenkeiKakuninDto repreview(byte[] fileBytes, String overrideShiteiNo);
 
-	void commit(byte[] fileBytes, String fileName, BigDecimal atenaNoFromSession);
+	void commit(byte[] fileBytes, String fileName, BigDecimal atenaNoFromSession, String shiteiNo);
 }
