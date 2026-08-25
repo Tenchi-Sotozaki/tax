@@ -19,21 +19,17 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.MenuDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Menu;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
-import jp.lg.asp.accommodation.repository.MenuRepository;
-import jp.lg.asp.accommodation.repository.RoleRepository;
-import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.GlobalModelService;
+import jp.lg.asp.accommodation.service.JichitaiConfigService;
+import jp.lg.asp.accommodation.service.MenuService;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalModelAdviceTest {
 
 	@Mock GlobalModelService globalModelService;
 	@Mock JichitaiContext jichitaiContext;
-    @Mock UserRepository userRepository;
-    @Mock RoleRepository roleRepository;
-    @Mock MenuRepository menuRepository;
-    @Mock JichitaiRepository jichitaiRepository;
+	@Mock MenuService menuService;
+	@Mock JichitaiConfigService jichitaiConfigService;
 
 	@InjectMocks GlobalModelAdvice advice;
 
@@ -94,16 +90,16 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_空のメニューは空リストを返す() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of());
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of());
         assertThat(advice.sideMenuTree()).isEmpty();
     }
 
     @Test
     void sideMenuTree_ツリー構造が正しく構築される() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, null, 2, "1"),
             menu("lv3", 3, "lv2", null, "/path", 3, "1")
@@ -119,8 +115,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_lv3が全除去されたlv2はlv1も連鎖除去される() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, null, 2, "1"),
             menu("lv3", 3, "lv2", "sc00000001", "/path", 3, "1")
@@ -132,8 +128,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_screenIdがnullのlv2直接リンクは残る() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, "/path", 2, "1")
         ));
@@ -146,8 +142,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_screenIdがnullのlv3は認証なしでも残る() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, null, 2, "1"),
             menu("lv3", 3, "lv2", null, "/path", 3, "1")
@@ -160,8 +156,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_アクセス可能なlv3が1件でもあればlv2とlv1は残る() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, null, 2, "1"),
             menu("lv3a", 3, "lv2", "sc00000001", "/path1", 3, "1"),
@@ -177,8 +173,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_dspKbn2は納税周期1の自治体のみ表示() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", "1")));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", "1")));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, "/path", 2, "2")
         ));
@@ -190,8 +186,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_dspKbn2は納税周期1以外の自治体では非表示() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", "3")));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", "3")));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, "/path", 2, "2")
         ));
@@ -201,8 +197,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_dspKbn3は運用者アカウントのみ表示() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("99999");
-        when(jichitaiRepository.findById("99999")).thenReturn(Optional.of(jichitai("99999", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("99999")).thenReturn(Optional.of(jichitai("99999", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", "sc00000001", "/path", 2, "3")
         ));
@@ -215,8 +211,8 @@ class GlobalModelAdviceTest {
     @Test
     void sideMenuTree_dspKbn3は一般自治体では非表示() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("00001");
-        when(jichitaiRepository.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
-        when(menuRepository.findAllOrderByDspOdr()).thenReturn(List.of(
+        when(jichitaiConfigService.findById("00001")).thenReturn(Optional.of(jichitai("00001", null)));
+        when(menuService.findAllOrderByDspOdr()).thenReturn(List.of(
             menu("lv1", 1, "lv1", null, null, 1, "1"),
             menu("lv2", 2, "lv1", null, "/path", 2, "3")
         ));
@@ -224,13 +220,6 @@ class GlobalModelAdviceTest {
     }
 
     // --- helpers ---
-
-    private MenuDto menuDto(String menuId, String screenId) {
-        MenuDto dto = new MenuDto();
-        dto.setMenuId(menuId);
-        dto.setScreenId(screenId);
-        return dto;
-    }
 
     private Menu menu(String menuId, int level, String pMenuId, String screenId, String link, int dspOdr, String dspKbn) {
         Menu m = new Menu();
