@@ -486,11 +486,6 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid"/>
 				</box>
 			</element>
-			<element kind="image" uuid="2769c6f8-6a9b-4461-98a7-16d8a1067bc8" x="467" y="96" width="40" height="40" onErrorType="Blank">
-				<expression><![CDATA[$F{koin}]]></expression>
-				<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			</element>
 			<element kind="staticText" uuid="c506ff1a-93f8-4289-b69c-0272f4f236a6" x="43" y="670" width="474" height="15" fontName="IPAex明朝" vTextAlign="Middle">
 				<text><![CDATA[新規申請または前年度から変更の場合は以下に記入してください]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -757,6 +752,9 @@
 				<printWhenExpression><![CDATA["出張所".equals($F{branchShubetsu})]]></printWhenExpression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="staticText" uuid="eb9cdcf2-9411-4346-a9e4-afae2d4f6e3a" x="475" y="100" width="30" height="30" fontName="IPAex明朝" fontSize="24.0" hTextAlign="Center" vTextAlign="Middle">
+				<text><![CDATA[㊞]]></text>
 			</element>
 		</band>
 	</detail>
