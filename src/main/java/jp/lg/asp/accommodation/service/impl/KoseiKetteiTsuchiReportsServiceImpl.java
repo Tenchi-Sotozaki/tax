@@ -297,7 +297,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             setField(dto, pfx + "kino_zeigaku" + kbn, nen.isEmpty() ? "" : String.valueOf(prevZeigaku));
          
 			// 【税率（zei_ritsu）の区分別設定】
-            String rate = uchiOpt.map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().toPlainString() : "")
+            String rate = uchiOpt.map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().stripTrailingZeros().toPlainString() : "")
                     .orElse("");
             setField(dto, pfx + "zei_ritsu" + kbn, rate);
         }
