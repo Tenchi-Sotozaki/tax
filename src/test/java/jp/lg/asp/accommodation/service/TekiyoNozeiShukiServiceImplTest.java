@@ -116,7 +116,7 @@ class TekiyoNozeiShukiServiceImplTest {
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setDelFlg("0");
         entity.setRno(1);
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(entity));
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
