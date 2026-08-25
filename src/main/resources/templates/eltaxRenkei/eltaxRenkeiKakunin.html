@@ -34,20 +34,21 @@
 		<div class="card shadow-sm mb-4">
 			<div class="card-header fw-bold">対象施設
 				<button type="button" id="openAddrSearchBtn" class="btn btn-sm btn-outline-primary ms-2" th:if="${kakuninDto.atenaSearchRequired}"><i class="bi bi-search me-1"></i>宛名検索</button>
+			<button type="button" class="btn btn-sm btn-outline-primary ms-2" th:unless="${kakuninDto.atenaSearchRequired}" data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal"><i class="bi bi-search me-1"></i>特別徴収義務者指定</button>
 			</div>
 			<div class="card-body">
 				<div class="row g-3">
 					<div class="col-md-3">
 						<label class="form-label text-muted small">指定番号</label>
-						<input type="text" class="form-control" readonly th:value="${kakuninDto.shiteiNo}">
+						<input type="text" id="shiteiNoText" class="form-control" readonly th:value="${kakuninDto.shiteiNo}">
 					</div>
 					<div class="col-md-9">
 						<label class="form-label text-muted small">施設名称</label>
-						<input type="text" class="form-control" readonly th:value="${kakuninDto.shisetsuName}">
+						<input type="text" id="shisetsuNameText" class="form-control" readonly th:value="${kakuninDto.shisetsuName}">
 					</div>
 					<div class="col-md-12">
 						<label class="form-label text-muted small">施設住所</label>
-						<input type="text" class="form-control" readonly th:value="${kakuninDto.shisetsuJusho}">
+						<input type="text" id="shisetsuJushoText" class="form-control" readonly th:value="${kakuninDto.shisetsuJusho}">
 					</div>
 					<div class="col-md-6">
 						<label class="form-label text-muted small">特別徴収義務者名称</label>
@@ -122,6 +123,8 @@
 
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
 	</div>
 </body>

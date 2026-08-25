@@ -66,11 +66,25 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	@Override
 	@Transactional(readOnly = true)
 	public EltaxRenkeiKakuninDto preview(MultipartFile file) {
+		try {
+			return buildPreviewDto(file.getBytes(), file.getOriginalFilename(), null);
+		} catch (IOException e) {
+			throw new UncheckedIOException("CSVファイルの解析に失敗しました。", e);
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public EltaxRenkeiKakuninDto repreview(byte[] fileBytes, String overrideShiteiNo) {
+		return buildPreviewDto(fileBytes, null, overrideShiteiNo);
+	}
+
+	private EltaxRenkeiKakuninDto buildPreviewDto(byte[] fileBytes, String fileName, String overrideShiteiNo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
 		String[] dataRow;
 		try {
-			dataRow = parseCsv(file);
+			dataRow = parseBytesAsCsv(fileBytes);
 		} catch (IOException e) {
 			throw new UncheckedIOException("CSVファイルの解析に失敗しました。", e);
 		}
@@ -120,7 +134,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		default:
 			throw new RuntimeException("システム対応外の手続き種別です: " + shubetsu);
 		}
-		String shiteiNo = getDataValue(dataRow, shisetsuNoIdx);
+		String shiteiNo = overrideShiteiNo != null ? overrideShiteiNo : getDataValue(dataRow, shisetsuNoIdx);
 
 		String atenaName = "";
 		String atenaJusho = "";
@@ -187,7 +201,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		EltaxRenkeiKakuninDto dto = new EltaxRenkeiKakuninDto(
 				shiteiNo, shisetsuName, shisetsuJusho,
 				atenaName, atenaJusho,
-				file.getOriginalFilename(), shubetsu, shubetsuName,
+				fileName, shubetsu, shubetsuName,
 				atenaSearchRequired, tokugimuName, tokugimuJusho, tokugimuTel, kojinNo, hojinNo,
 				diffRows);
 

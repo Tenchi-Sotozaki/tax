@@ -1,12 +1,15 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,6 +66,27 @@ public class EltaxRenkeiKakuninController {
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 			return "redirect:/eltax-renkei";
+		}
+	}
+
+	/**
+	 * 指定番号を上書きして確認画面の情報を再構築する（Ajax）
+	 */
+	@PostMapping("/repreview")
+	public ResponseEntity<?> repreview(
+			@RequestBody Map<String, String> body,
+			HttpSession session) {
+
+		byte[] fileBytes = (byte[]) session.getAttribute(SESSION_KEY_FILE);
+		if (fileBytes == null || fileBytes.length == 0) {
+			return ResponseEntity.badRequest().body("セッションが切れました。再度ファイルを選択してください。");
+		}
+		try {
+			String shiteiNo = body.get("shiteiNo");
+			EltaxRenkeiKakuninDto dto = eltaxRenkeiKakuninService.repreview(fileBytes, shiteiNo);
+			return ResponseEntity.ok(dto);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
 
