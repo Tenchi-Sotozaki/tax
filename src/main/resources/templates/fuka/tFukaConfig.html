@@ -171,7 +171,7 @@
 						<!-- 変更区分-->
 						<div class="col-md-3">
 							<label class="form-label form-label-sm fw-medium mb-1">
-								変更の区分<span class="badge bg-danger ms-1"
+								変更の区分<span class="text-danger ms-1"
 								th:if="${fukaDeclarationForm.edit}">*</span>
 							</label> <select id="modificationCategory"
 								class="form-select form-select-sm"
@@ -497,8 +497,12 @@
 										(%)</label> <input type="text"
 										class="form-control form-control-sm text-end"
 										th:field="*{additionalRate1}"
+										th:errorclass="is-invalid"
 										th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
 										th:data-initial-value="*{additionalRate1}">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('additionalRate1')}"
+										th:errors="*{additionalRate1}"></div>
 								</div>
 
 								<div class="col-md-3">
@@ -537,8 +541,12 @@
 										(%)</label> <input type="text"
 										class="form-control form-control-sm text-end"
 										th:field="*{additionalRate2}"
+										th:errorclass="is-invalid"
 										th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
 										th:data-initial-value="*{additionalRate2}">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('additionalRate2')}"
+										th:errors="*{additionalRate2}"></div>
 								</div>
 
 								<div class="col-md-3">
@@ -577,8 +585,12 @@
 										(%)</label> <input type="text"
 										class="form-control form-control-sm text-end"
 										th:field="*{additionalRate3}"
+										th:errorclass="is-invalid"
 										th:readonly="${fukaDeclarationForm.view}" placeholder="0.0"
 										th:data-initial-value="*{additionalRate3}">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('additionalRate3')}"
+										th:errors="*{additionalRate3}"></div>
 								</div>
 
 								<div class="col-md-3">

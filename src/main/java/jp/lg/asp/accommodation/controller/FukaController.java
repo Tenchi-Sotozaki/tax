@@ -273,6 +273,7 @@ public class FukaController {
 			java.util.List<String> fieldOrder = java.util.List.of(
 					"torokuDate", "shinkokuDate",
 					"modificationCategory",
+					"additionalRate1", "additionalRate2", "additionalRate3",
 					"additionalAmountValid1", "additionalAmountValid2", "additionalAmountValid3");
 			for (String field : fieldOrder) {
 				bindingResult.getAllErrors().stream()
