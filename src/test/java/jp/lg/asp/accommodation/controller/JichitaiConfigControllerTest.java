@@ -3,8 +3,6 @@
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,13 +20,13 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.JichitaiConfigDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.service.JichitaiConfigService;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class JichitaiConfigControllerTest {
 
-    @Mock JichitaiRepository jichitaiRepository;
+    @Mock JichitaiConfigService jichitaiConfigService;
     @Mock ScreenAccessChecker accessChecker;
     @Mock JichitaiContext jichitaiContext;
 
@@ -39,7 +37,7 @@ class JichitaiConfigControllerTest {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
         Jichitai jichitai = new Jichitai();
         jichitai.setNendoStMonth("4");
-        when(jichitaiRepository.findById("011002")).thenReturn(Optional.of(jichitai));
+        when(jichitaiConfigService.findById("011002")).thenReturn(jichitai);
     }
 
     @Test
@@ -74,6 +72,6 @@ class JichitaiConfigControllerTest {
         String view = controller.save(form, bindingResult, new ExtendedModelMap(), new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/jichitai-config");
-        verify(jichitaiRepository).save(any(Jichitai.class));
+        verify(jichitaiConfigService).save("011002", form);
     }
 }*/
