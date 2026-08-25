@@ -265,7 +265,7 @@
 			</form>
 		</div>
 
-		<div th:if="${kozaForm.createMode}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '振込先口座情報を登録しますか？', 'createForm', 'btn-success', '登録する')}"></div>
+		<div th:if="${kozaForm.createMode}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '振込先口座情報を登録します。よろしいですか？', 'createForm', 'btn-success', '登録する')}"></div>
 		<div th:unless="${kozaForm.viewMode}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/shoreikin/list}, '戻る')}"></div>
 
 		<!-- 特別徴収義務者指定モーダル -->
