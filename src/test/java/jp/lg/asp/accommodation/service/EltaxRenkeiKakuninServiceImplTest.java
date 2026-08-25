@@ -58,7 +58,7 @@ class EltaxRenkeiKakuninServiceImplTest {
 
     @Test
     void preview_空ファイルは例外() throws Exception {
-        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        when(file.getBytes()).thenReturn(new byte[0]);
         when(file.getOriginalFilename()).thenReturn("test.csv");
 
         assertThatThrownBy(() -> service.preview(file))
