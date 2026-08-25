@@ -146,7 +146,7 @@ public class TokugimuForm {
 	 * 画面に項目を追加したときは、ここにも追加すること。
 	 */
 	private static final List<String> FIELD_ORDER = List.of(
-			"registrationDate", "henkoDate", "shinseiDate", "tokugimuAddressNo",
+			"atenaNo", "registrationDate", "henkoDate", "shinseiDate", "tokugimuAddressNo",
 			"tokugimuAddress", "name", "nameKana", "personalNumber",
 			"corporateNumber", "tokugimuPhone", "businessStartDate", "facilityAddressNo",
 			"facilityAddress", "facilityName", "facilityNameKana", "facilityPhone",
@@ -195,16 +195,20 @@ public class TokugimuForm {
 
 			if (f.getRegistrationDate() == null)
 				errors.put("registrationDate", "特別徴収義務者情報の登録日は必須です");
-			if (!StringUtils.hasText(f.getTokugimuAddressNo()))
-				errors.put("tokugimuAddressNo", "特別徴収義務者情報の郵便番号は必須です");
-			if (!StringUtils.hasText(f.getTokugimuAddress()))
-				errors.put("tokugimuAddress", "特別徴収義務者情報の住所は必須です");
-			if (!StringUtils.hasText(f.getName()))
-				errors.put("name", "特別徴収義務者情報の氏名または名称は必須です");
-			if (!StringUtils.hasText(f.getNameKana()))
-				errors.put("nameKana", "特別徴収義務者情報の氏名(ふりがな)は必須です");
-			if (!StringUtils.hasText(f.getTokugimuPhone()))
-				errors.put("tokugimuPhone", "特別徴収義務者情報の電話番号は必須です");
+			if (f.getAtenaNo() == null) {
+				errors.put("atenaNo", "宛名が選択されていません");
+			} else {
+				if (!StringUtils.hasText(f.getTokugimuAddressNo()))
+					errors.put("tokugimuAddressNo", "特別徴収義務者情報の郵便番号は必須です");
+				if (!StringUtils.hasText(f.getTokugimuAddress()))
+					errors.put("tokugimuAddress", "特別徴収義務者情報の住所は必須です");
+				if (!StringUtils.hasText(f.getName()))
+					errors.put("name", "特別徴収義務者情報の氏名または名称は必須です");
+				if (!StringUtils.hasText(f.getNameKana()))
+					errors.put("nameKana", "特別徴収義務者情報の氏名(ふりがな)は必須です");
+				if (!StringUtils.hasText(f.getTokugimuPhone()))
+					errors.put("tokugimuPhone", "特別徴収義務者情報の電話番号は必須です");
+			}
 			if (!StringUtils.hasText(f.getFacilityName()))
 				errors.put("facilityName", "宿泊施設情報の施設名称は必須です");
 			if (!StringUtils.hasText(f.getFacilityNameKana()))
