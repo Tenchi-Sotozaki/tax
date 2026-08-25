@@ -35,6 +35,11 @@ public class ShoreikinBulkServiceImpl implements ShoreikinBulkService {
 	private final JichitaiContext jichitaiContext;
 
 	@Override
+	public List<BigDecimal> findKofuRitsuList(String jichitaiCd, int year) {
+		return kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, year);
+	}
+
+	@Override
 	@Transactional
 	public ShoreikinBulkDto executeBulkSanshutsu(ShoreikinBulkDto dto) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
