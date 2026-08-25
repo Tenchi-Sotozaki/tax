@@ -277,7 +277,7 @@
 					<text><![CDATA[小  計]]></text>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-00000000000d" x="70" y="0" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b1_zei_ritsu1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_zei_ritsu1})))]]></expression>
+					<expression><![CDATA[($F{b1_zei_ritsu1}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b1_zei_ritsu1})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-00000000000e" x="135" y="0" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[$F{b1_hakusu1} + "泊"]]></expression>
@@ -289,7 +289,7 @@
 					<expression><![CDATA[($F{b1_sashihiki1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_sashihiki1}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-000000000011" x="70" y="18" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b1_zei_ritsu2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_zei_ritsu2})))]]></expression>
+					<expression><![CDATA[($F{b1_zei_ritsu2}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b1_zei_ritsu2})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-000000000012" x="135" y="18" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[$F{b1_hakusu2} + "泊"]]></expression>
@@ -301,7 +301,7 @@
 					<expression><![CDATA[($F{b1_sashihiki2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_sashihiki2}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-000000000015" x="70" y="36" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b1_zei_ritsu3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_zei_ritsu3})))]]></expression>
+					<expression><![CDATA[($F{b1_zei_ritsu3}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b1_zei_ritsu3})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-000000000016" x="135" y="36" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[$F{b1_hakusu3} + "泊"]]></expression>
@@ -313,7 +313,7 @@
 					<expression><![CDATA[($F{b1_sashihiki3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_sashihiki3}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-000000000019" x="70" y="54" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b1_zei_ritsu4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_zei_ritsu4})))]]></expression>
+					<expression><![CDATA[($F{b1_zei_ritsu4}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b1_zei_ritsu4})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-00000000001a" x="135" y="54" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[$F{b1_hakusu4} + "泊"]]></expression>
@@ -325,7 +325,7 @@
 					<expression><![CDATA[($F{b1_sashihiki4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_sashihiki4}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-00000000001d" x="70" y="72" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b1_zei_ritsu5}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b1_zei_ritsu5})))]]></expression>
+					<expression><![CDATA[($F{b1_zei_ritsu5}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b1_zei_ritsu5})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7b7b7b7b-2222-4222-8222-00000000001e" x="135" y="72" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[$F{b1_hakusu5} + "泊"]]></expression>
@@ -411,7 +411,7 @@
 					<text><![CDATA[小  計]]></text>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-00000000000d" x="70" y="0" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b2_zei_ritsu1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_zei_ritsu1})))]]></expression>
+					<expression><![CDATA[($F{b2_zei_ritsu1}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b2_zei_ritsu1})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-00000000000e" x="135" y="0" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b2_hakusu1}.isEmpty()?"":($F{b2_hakusu1})+"泊")]]></expression>
@@ -423,7 +423,7 @@
 					<expression><![CDATA[($F{b2_sashihiki1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_sashihiki1}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-000000000011" x="70" y="18" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b2_zei_ritsu2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_zei_ritsu2})))]]></expression>
+					<expression><![CDATA[($F{b2_zei_ritsu2}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b2_zei_ritsu2})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-000000000012" x="135" y="18" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b2_hakusu2}.isEmpty()?"":($F{b2_hakusu2})+"泊")]]></expression>
@@ -435,7 +435,7 @@
 					<expression><![CDATA[($F{b2_sashihiki2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_sashihiki2}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-000000000015" x="70" y="36" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b2_zei_ritsu3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_zei_ritsu3})))]]></expression>
+					<expression><![CDATA[($F{b2_zei_ritsu3}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b2_zei_ritsu3})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-000000000016" x="135" y="36" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b2_hakusu3}.isEmpty()?"":($F{b2_hakusu3})+"泊")]]></expression>
@@ -447,7 +447,7 @@
 					<expression><![CDATA[($F{b2_sashihiki3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_sashihiki3}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-000000000019" x="70" y="54" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b2_zei_ritsu4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_zei_ritsu4})))]]></expression>
+					<expression><![CDATA[($F{b2_zei_ritsu4}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b2_zei_ritsu4})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-00000000001a" x="135" y="54" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b2_hakusu4}.isEmpty()?"":($F{b2_hakusu4})+"泊")]]></expression>
@@ -459,7 +459,7 @@
 					<expression><![CDATA[($F{b2_sashihiki4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_sashihiki4}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-00000000001d" x="70" y="72" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b2_zei_ritsu5}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b2_zei_ritsu5})))]]></expression>
+					<expression><![CDATA[($F{b2_zei_ritsu5}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b2_zei_ritsu5})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7c7c7c7c-3333-4333-8333-00000000001e" x="135" y="72" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b2_hakusu5}.isEmpty()?"":($F{b2_hakusu5})+"泊")]]></expression>
@@ -517,7 +517,7 @@
 					<text><![CDATA[小  計]]></text>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-00000000000d" x="70" y="0" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b3_zei_ritsu1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_zei_ritsu1})))]]></expression>
+					<expression><![CDATA[($F{b3_zei_ritsu1}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b3_zei_ritsu1})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-00000000000e" x="135" y="0" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b3_hakusu1}.isEmpty()?"":($F{b3_hakusu1})+"泊")]]></expression>
@@ -529,7 +529,7 @@
 					<expression><![CDATA[($F{b3_sashihiki1}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_sashihiki1}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-000000000011" x="70" y="18" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b3_zei_ritsu2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_zei_ritsu2})))]]></expression>
+					<expression><![CDATA[($F{b3_zei_ritsu2}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b3_zei_ritsu2})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-000000000012" x="135" y="18" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b3_hakusu2}.isEmpty()?"":($F{b3_hakusu2})+"泊")]]></expression>
@@ -541,7 +541,7 @@
 					<expression><![CDATA[($F{b3_sashihiki2}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_sashihiki2}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-000000000015" x="70" y="36" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b3_zei_ritsu3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_zei_ritsu3})))]]></expression>
+					<expression><![CDATA[($F{b3_zei_ritsu3}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b3_zei_ritsu3})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-000000000016" x="135" y="36" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b3_hakusu3}.isEmpty()?"":($F{b3_hakusu3})+"泊")]]></expression>
@@ -553,7 +553,7 @@
 					<expression><![CDATA[($F{b3_sashihiki3}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_sashihiki3}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-000000000019" x="70" y="54" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b3_zei_ritsu4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_zei_ritsu4})))]]></expression>
+					<expression><![CDATA[($F{b3_zei_ritsu4}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b3_zei_ritsu4})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-00000000001a" x="135" y="54" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b3_hakusu4}.isEmpty()?"":($F{b3_hakusu4})+"泊")]]></expression>
@@ -565,7 +565,7 @@
 					<expression><![CDATA[($F{b3_sashihiki4}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_sashihiki4}))+"円")]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-00000000001d" x="70" y="72" width="65" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
-					<expression><![CDATA[($F{b3_zei_ritsu5}.isEmpty()?"":new java.text.DecimalFormat("#,###").format(Long.parseLong($F{b3_zei_ritsu5})))]]></expression>
+					<expression><![CDATA[($F{b3_zei_ritsu5}.isEmpty()?"":new java.text.DecimalFormat("#,##0.00").format(Double.parseDouble($F{b3_zei_ritsu5})))]]></expression>
 				</element>
 				<element kind="textField" uuid="7d7d7d7d-4444-4444-8444-00000000001e" x="135" y="72" width="90" height="18" fontName="IPAex明朝" blankWhenNull="true" hTextAlign="Right" vTextAlign="Middle">
 					<expression><![CDATA[($F{b3_hakusu5}.isEmpty()?"":($F{b3_hakusu5})+"泊")]]></expression>

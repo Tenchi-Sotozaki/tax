@@ -296,16 +296,10 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             setField(dto, pfx + "hakusu" + kbn, nen.isEmpty() ? "" : String.valueOf(hakusu));
             setField(dto, pfx + "kino_zeigaku" + kbn, nen.isEmpty() ? "" : String.valueOf(prevZeigaku));
          
-            // 【税率（zei_ritsu）の区分別設定】
-            if (isTeigaku) {
-            	String amount = uchiOpt.map(u -> u.getZeigaku() != null ? String.valueOf(u.getZeigaku()) : "")
-                        .orElse("");
-                setField(dto, pfx + "zei_ritsu" + kbn, amount);
-            } else if (isTeiritsu) {
-				String rate = uchiOpt.map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().toPlainString() : "")
-						.orElse("");
-				setField(dto, pfx + "zei_ritsu" + kbn, rate);
-			}
+			// 【税率（zei_ritsu）の区分別設定】
+            String rate = uchiOpt.map(u -> u.getZeiRitsu() != null ? u.getZeiRitsu().toPlainString() : "")
+                    .orElse("");
+            setField(dto, pfx + "zei_ritsu" + kbn, rate);
         }
 
         // 各種合計値の計算用変数
@@ -455,13 +449,17 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 
 		// 納期限をセット
 		if (firstFuka.getNokigen() != null) {
-			dto.setNofu_kigen_nen(String.valueOf(firstFuka.getNokigen().getYear()));
-			dto.setNofu_kigen_tsuki(String.valueOf(firstFuka.getNokigen().getMonthValue()));
-			dto.setNofu_kigen_hi(String.valueOf(firstFuka.getNokigen().getDayOfMonth()));
+			// LocalDate から和暦（JapaneseDate）に変換
+		    JapaneseDate japaneseDate = JapaneseDate.from(firstFuka.getNokigen());
+		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy");
+		    
+		    dto.setNofu_kigen_nen(formatter.format(japaneseDate));
+		    dto.setNofu_kigen_tsuki(String.valueOf(firstFuka.getNokigen().getMonthValue()));
+		    dto.setNofu_kigen_hi(String.valueOf(firstFuka.getNokigen().getDayOfMonth()));
 		} else {
-			dto.setNofu_kigen_nen("");
-			dto.setNofu_kigen_tsuki("");
-			dto.setNofu_kigen_hi("");
+		    dto.setNofu_kigen_nen("");
+		    dto.setNofu_kigen_tsuki("");
+		    dto.setNofu_kigen_hi("");
 		}
 	}
 
