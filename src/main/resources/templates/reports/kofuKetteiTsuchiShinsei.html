@@ -41,11 +41,13 @@
 									<div class="col-md-1">
 										<label class="form-label">年度</label> <span class="text-danger">*</span>
 										<input type="text" class="form-control" th:field="*{nendo}" id="nendoInput" placeholder="年度を入力">
+										<div class="invalid-feedback" id="nendoInputError"></div>
 									</div>
 
 									<div class="col-md-2">
 										<label class="form-label">発行年月日</label> <span class="text-danger">*</span>
 										<input type="date" class="form-control" th:field="*{hakkoYmd}" id="hakkoYmdInput" onchange="updateDisplayDate()">
+										<div class="invalid-feedback" id="hakkoYmdInputError"></div>
 									</div>
 								</div>
 

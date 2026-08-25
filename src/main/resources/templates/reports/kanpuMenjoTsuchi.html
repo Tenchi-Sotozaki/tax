@@ -50,20 +50,20 @@
 									<div class="col-md-2">
 										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label>
-										<input type="date" class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}"
-											required>
+										<input type="date" class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}">
+										<div class="invalid-feedback" id="hakkoYmdError"></div>
 									</div>
 									<div class="col-md-2">
 										<label for="juriYmd" class="form-label">申請受理年月日 <span
 												class="text-danger">*</span></label>
-										<input type="date" class="form-control" id="juriYmd" th:field="*{juriYmd}"
-											required>
+										<input type="date" class="form-control" id="juriYmd" th:field="*{juriYmd}">
+										<div class="invalid-feedback" id="juriYmdError"></div>
 									</div>
 									<div class="col-md-2">
 										<label for="shinseiYm" class="form-label">対象年月 <span
 												class="text-danger">*</span></label>
-										<input type="month" class="form-control" id="shinseiYm" th:field="*{shinseiYm}"
-											required>
+										<input type="month" class="form-control" id="shinseiYm" th:field="*{shinseiYm}">
+										<div class="invalid-feedback" id="shinseiYmError"></div>
 									</div>
 								</div>
 								<div class="row g-3 mt-2">
@@ -72,9 +72,10 @@
 												class="text-danger">*</span></label>
 										<div class="input-group">
 											<input type="number" class="form-control" id="zeigaku" th:field="*{zeigaku}"
-												min="0" step="1" placeholder="0" required>
+												min="0" step="1" placeholder="0">
 											<span class="input-group-text">円</span>
 										</div>
+										<div class="invalid-feedback" id="zeigakuError"></div>
 									</div>
 									<div class="col-md-3">
 									    <label for="kanpuMenjoGaku" class="form-label">還付又は納入義務の免除を決定した額 <span class="text-danger">*</span></label>
@@ -83,6 +84,7 @@
 									            th:field="*{kanpuMenjoGaku}" min="0" step="1" placeholder="0">
 									        <span class="input-group-text">円</span>
 									    </div>
+										<div class="invalid-feedback" id="kanpuMenjoGakuError"></div>
 									</div>
 								</div>
 								
