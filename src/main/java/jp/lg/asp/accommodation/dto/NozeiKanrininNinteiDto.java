@@ -22,9 +22,6 @@ public class NozeiKanrininNinteiDto {
     /** 特別徴収義務者郵便番号 */
     private String tokuYubin;
 
-    /** 特別徴収義務者郵便番号 */
-    private String tokuYubinNo;
-
     /** 特別徴収義務者住所 */
     private String tokuJusho;
 
@@ -33,9 +30,6 @@ public class NozeiKanrininNinteiDto {
     
     /** 施設郵便番号 */
     private String shisetsuYubin;
-
-    /** 施設郵便番号 */
-    private String shisetsuYubinNo;
 
     /** 所在地（施設住所） */
     private String shisetsuJusho;
