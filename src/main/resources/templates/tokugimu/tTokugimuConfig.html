@@ -101,6 +101,8 @@
 			<input th:if="${isEdit}" type="hidden" th:field="*{id}">
 			<!-- 宛名番号保持 -->
 			<input type="hidden" th:field="*{atenaNo}" id="atenaNo">
+			<!-- 申請年月日は編集画面に入力欄が無いため、hidden で値を往復させる -->
+			<input th:if="${isEdit}" type="hidden" th:field="*{shinseiDate}">
 
 			<!-- バリデーションエラーサマリー -->
 			<div
