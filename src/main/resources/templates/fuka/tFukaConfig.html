@@ -512,8 +512,12 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{additionalAmount1}"
+											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount1}">
+										<div class="invalid-feedback"
+											th:if="${#fields.hasErrors('additionalAmount1')}"
+											th:errors="*{additionalAmount1}"></div>
 									</div>
 								</div>
 
@@ -556,8 +560,12 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{additionalAmount2}"
+											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount2}">
+										<div class="invalid-feedback"
+											th:if="${#fields.hasErrors('additionalAmount2')}"
+											th:errors="*{additionalAmount2}"></div>
 									</div>
 								</div>
 
@@ -600,8 +608,12 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{additionalAmount3}"
+											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount3}">
+										<div class="invalid-feedback"
+											th:if="${#fields.hasErrors('additionalAmount3')}"
+											th:errors="*{additionalAmount3}"></div>
 									</div>
 								</div>
 

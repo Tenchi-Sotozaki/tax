@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.controller;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.IntStream;
@@ -56,6 +57,23 @@ public class FukaController {
 	private static final String DAICHO_VIEW = "fuka/tFukaDaicho";
 
 	private static final String CONFIG_VIEW = "fuka/tFukaConfig";
+
+	/** 入力欄の下に出す必須エラーの文言。行の中に置くので短くする */
+	private static final String MSG_RATE_REQUIRED = "割合を入力してください";
+	private static final String MSG_AMOUNT_REQUIRED = "金額を入力してください";
+
+	/**
+	 * サマリに出す必須エラーの文言。
+	 * 加算金額は3行あり、短い文言のままだと同じ文字列が並んでどの行か分からないため、
+	 * サマリ側だけ項目名を付ける。
+	 */
+	private static final Map<String, String> SUMMARY_REQUIRED_MESSAGES = Map.of(
+			"additionalRate1", "加算割合1を入力してください",
+			"additionalRate2", "加算割合2を入力してください",
+			"additionalRate3", "加算割合3を入力してください",
+			"additionalAmount1", "加算金額1を入力してください",
+			"additionalAmount2", "加算金額2を入力してください",
+			"additionalAmount3", "加算金額3を入力してください");
 
 	/**
 	 * 納入金額管理台帳を表示し、検索処理を行う。
@@ -267,17 +285,34 @@ public class FukaController {
 		if (StringUtils.hasText(form.getAdditionalCategory1())
 				&& !StringUtils.hasText(form.getAdditionalRate1())) {
 			bindingResult.rejectValue("additionalRate1", "error.additionalRate1",
-					"区分を選択した場合は、割合を入力してください");
+					MSG_RATE_REQUIRED);
 		}
 		if (StringUtils.hasText(form.getAdditionalCategory2())
 				&& !StringUtils.hasText(form.getAdditionalRate2())) {
 			bindingResult.rejectValue("additionalRate2", "error.additionalRate2",
-					"区分を選択した場合は、割合を入力してください");
+					MSG_RATE_REQUIRED);
 		}
 		if (StringUtils.hasText(form.getAdditionalCategory3())
 				&& !StringUtils.hasText(form.getAdditionalRate3())) {
 			bindingResult.rejectValue("additionalRate3", "error.additionalRate3",
-					"区分を選択した場合は、割合を入力してください");
+					MSG_RATE_REQUIRED);
+		}
+
+		// 加算金額区分を選択した場合は、加算金額の入力も必須（0は未入力として扱う）
+		if (StringUtils.hasText(form.getAdditionalCategory1())
+				&& (form.getAdditionalAmount1() == null || form.getAdditionalAmount1() <= 0)) {
+			bindingResult.rejectValue("additionalAmount1", "error.additionalAmount1",
+					MSG_AMOUNT_REQUIRED);
+		}
+		if (StringUtils.hasText(form.getAdditionalCategory2())
+				&& (form.getAdditionalAmount2() == null || form.getAdditionalAmount2() <= 0)) {
+			bindingResult.rejectValue("additionalAmount2", "error.additionalAmount2",
+					MSG_AMOUNT_REQUIRED);
+		}
+		if (StringUtils.hasText(form.getAdditionalCategory3())
+				&& (form.getAdditionalAmount3() == null || form.getAdditionalAmount3() <= 0)) {
+			bindingResult.rejectValue("additionalAmount3", "error.additionalAmount3",
+					MSG_AMOUNT_REQUIRED);
 		}
 
 		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
@@ -290,15 +325,16 @@ public class FukaController {
 			java.util.List<String> fieldOrder = java.util.List.of(
 					"torokuDate", "shinkokuDate",
 					"modificationCategory",
-					"additionalRate1", "additionalAmountValid1",
-					"additionalRate2", "additionalAmountValid2",
-					"additionalRate3", "additionalAmountValid3");
+					"additionalRate1", "additionalAmount1",
+					"additionalRate2", "additionalAmount2",
+					"additionalRate3", "additionalAmount3");
 			for (String field : fieldOrder) {
 				bindingResult.getAllErrors().stream()
 						.filter(e -> e instanceof org.springframework.validation.FieldError
 								? ((org.springframework.validation.FieldError) e).getField().equals(field)
 								: e.getCode() != null && e.getCode().contains(field))
 						.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
+						.map(msg -> toSummaryMessage(field, msg))
 						.forEach(validationErrors::add);
 			}
 			model.addAttribute("validationErrors", validationErrors);
@@ -361,5 +397,18 @@ public class FukaController {
 			return ResponseEntity.internalServerError()
 					.body(Collections.singletonMap("message", "内訳試算に失敗しました：" + e.getMessage()));
 		}
+	}
+
+	/**
+	 * サマリ用にメッセージを差し替える。
+	 * 入力欄の下は「割合を入力してください」のように短く出し、
+	 * サマリは3行分が並ぶのでどの行かが分かるよう項目名を付ける。
+	 * 差し替えるのは必須エラーだけで、形式エラー（@Pattern）はそのまま通す。
+	 */
+	private String toSummaryMessage(String field, String message) {
+		if (MSG_RATE_REQUIRED.equals(message) || MSG_AMOUNT_REQUIRED.equals(message)) {
+			return SUMMARY_REQUIRED_MESSAGES.getOrDefault(field, message);
+		}
+		return message;
 	}
 }

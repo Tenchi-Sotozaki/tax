@@ -3,7 +3,6 @@ package jp.lg.asp.accommodation.dto;
 import java.time.LocalDate;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
@@ -91,33 +90,4 @@ public class FukaDeclarationForm {
 	// ========== バリデーション制御用フィールド ==========
 	private boolean taxCheckBypassed = false;
 	private Boolean showTaxWarningModal = false;
-
-	// ========== 相関チェック ==========
-
-	/**
-	 * 加算金額区分が選択されている場合、加算金額の入力を必須とする。
-	 */
-	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
-	public boolean isAdditionalAmountValid1() {
-		if (additionalCategory1 == null || additionalCategory1.isEmpty()) {
-			return true;
-		}
-		return additionalAmount1 != null && additionalAmount1 > 0;
-	}
-
-	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
-	public boolean isAdditionalAmountValid2() {
-		if (additionalCategory2 == null || additionalCategory2.isEmpty()) {
-			return true;
-		}
-		return additionalAmount2 != null && additionalAmount2 > 0;
-	}
-
-	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
-	public boolean isAdditionalAmountValid3() {
-		if (additionalCategory3 == null || additionalCategory3.isEmpty()) {
-			return true;
-		}
-		return additionalAmount3 != null && additionalAmount3 > 0;
-	}
 }
