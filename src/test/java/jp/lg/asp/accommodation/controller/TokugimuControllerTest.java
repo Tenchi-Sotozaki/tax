@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -333,25 +334,32 @@ class TokugimuControllerTest {
 	//===========================================
 
 	@Test
-	void showGassanReport_合算指定番号の場合は専用処理で帳票画面を返す() {
-		MockHttpSession session = new MockHttpSession();
-		ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
-		dto.setShiteiNo("00100001");
-		SessionHelper.saveShiteiGassan(session, dto);
-		Model model = new ExtendedModelMap();
+	void showGassanReport_合算指定番号が存在する場合は合算納入通知書の画面へリダイレクトする() {
+	    MockHttpSession session = new MockHttpSession();
+	    ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+	    dto.setGassanShiteiNo("00100001"); // 合算指定番号を設定
+	    SessionHelper.saveShiteiGassan(session, dto);
+	    Model model = new ExtendedModelMap();
+	    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-		String view = controller.showGassanReport(session, model);
+	    String view = controller.showGassanReport(session, model, redirectAttributes);
 
-		assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
+	    assertThat(view).isEqualTo("redirect:/reports/gassanNonyuTsuchi");
 	}
 
 	@Test
-	void showGassanReport_それ以外の場合は通常処理またはモーダル表示() {
-		MockHttpSession session = sessionWith("00100001"); // 合算ではない通常指定
-		Model model = new ExtendedModelMap();
+	void showGassanReport_合算指定番号が存在しない場合はエラーメッセージを設定して一覧へリダイレクトする() {
+	    MockHttpSession session = new MockHttpSession();
+	    // DTOがnull、または gassanShiteiNo が空の状態
+	    ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+	    dto.setGassanShiteiNo(""); 
+	    SessionHelper.saveShiteiGassan(session, dto);
+	    Model model = new ExtendedModelMap();
+	    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-		String view = controller.showGassanReport(session, model);
+	    String view = controller.showGassanReport(session, model, redirectAttributes);
 
-		assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
+	    assertThat(view).isEqualTo("redirect:/tokugimu/report");
+	    assertThat(redirectAttributes.getFlashAttributes()).containsKey("errorMessage");
 	}
 }
