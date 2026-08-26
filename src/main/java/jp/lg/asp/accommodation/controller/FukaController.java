@@ -345,6 +345,7 @@ public class FukaController {
 					"additionalRate1", "additionalAmount1",
 					"additionalRate2", "additionalAmount2",
 					"additionalRate3", "additionalAmount3",
+					"entaikin",
 					"shunoYmd", "shunoKingaku");
 			for (String field : fieldOrder) {
 				bindingResult.getAllErrors().stream()

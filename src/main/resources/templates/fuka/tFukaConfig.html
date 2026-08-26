@@ -116,10 +116,13 @@
 								class="form-label form-label-sm fw-medium mb-1">登録年月日 <span
 								class="text-danger" th:if="${!fukaDeclarationForm.view}">*
 							</span>
-							</label> <input type="date" class="form-control form-control-sm"
+							</label> <input th:unless="${fukaDeclarationForm.view}" type="date"
+								class="form-control form-control-sm"
 								th:field="*{torokuDate}"
-								th:readonly="${fukaDeclarationForm.view}"
 								th:errorclass="is-invalid" th:data-initial-value="*{torokuDate}">
+							<input th:if="${fukaDeclarationForm.view}" type="text"
+								class="form-control form-control-sm" readonly
+								th:value="*{torokuDate != null ? #temporals.format(torokuDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('torokuDate')}"
 								th:errors="*{torokuDate}"></div>
@@ -130,11 +133,14 @@
 							<label id="registrationDateLabel"
 								class="form-label form-label-sm fw-medium mb-1">申告年月日 <span
 								class="text-danger" th:if="${!fukaDeclarationForm.view}">*</span>
-							</label> <input type="date" class="form-control form-control-sm"
+							</label> <input th:unless="${fukaDeclarationForm.view}" type="date"
+								class="form-control form-control-sm"
 								th:field="*{shinkokuDate}"
-								th:readonly="${fukaDeclarationForm.view}"
 								th:errorclass="is-invalid"
 								th:data-initial-value="*{shinkokuDate}">
+							<input th:if="${fukaDeclarationForm.view}" type="text"
+								class="form-control form-control-sm" readonly
+								th:value="*{shinkokuDate != null ? #temporals.format(shinkokuDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('shinkokuDate')}"
 								th:errors="*{shinkokuDate}"></div>
@@ -629,17 +635,24 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{entaikin}"
+											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{entaikin}">
+										<div class="invalid-feedback"
+											th:if="${#fields.hasErrors('entaikin')}"
+											th:errors="*{entaikin}"></div>
 									</div>
 								</div>
 
 								<div class="col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">納入期限</label>
-									<input type="date" class="form-control form-control-sm"
-										th:field="*{nokigen}" th:readonly="${fukaDeclarationForm.view}"
-										data-no-today
+									<input th:unless="${fukaDeclarationForm.view}" type="date"
+										class="form-control form-control-sm"
+										th:field="*{nokigen}" data-no-today
 										th:data-initial-value="*{nokigen}">
+									<input th:if="${fukaDeclarationForm.view}" type="text"
+										class="form-control form-control-sm" readonly
+										th:value="*{nokigen != null ? #temporals.format(nokigen, 'yyyy/MM/dd') : ''}">
 								</div>
 
 							</div>
@@ -667,11 +680,14 @@
 
 								<div class="col-md-4">
 									<label class="form-label form-label-sm fw-medium mb-1">納入年月日</label>
-									<input type="date" class="form-control form-control-sm"
+									<input th:unless="${fukaDeclarationForm.view}" type="date"
+										class="form-control form-control-sm"
 										th:field="*{shunoYmd}"
 										th:errorclass="is-invalid"
-										th:data-initial-value="*{shunoYmd}"
-										th:readonly="${fukaDeclarationForm.view}">
+										th:data-initial-value="*{shunoYmd}">
+									<input th:if="${fukaDeclarationForm.view}" type="text"
+										class="form-control form-control-sm" readonly
+										th:value="*{shunoYmd != null ? #temporals.format(shunoYmd, 'yyyy/MM/dd') : ''}">
 									<div class="invalid-feedback"
 										th:if="${#fields.hasErrors('shunoYmd')}"
 										th:errors="*{shunoYmd}"></div>
