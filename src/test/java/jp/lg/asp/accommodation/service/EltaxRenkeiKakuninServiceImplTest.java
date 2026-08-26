@@ -58,7 +58,7 @@ class EltaxRenkeiKakuninServiceImplTest {
 
     @Test
     void preview_空ファイルは例外() throws Exception {
-        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        when(file.getBytes()).thenReturn(new byte[0]);
         when(file.getOriginalFilename()).thenReturn("test.csv");
 
         assertThatThrownBy(() -> service.preview(file))
@@ -84,7 +84,7 @@ class EltaxRenkeiKakuninServiceImplTest {
         when(eltaxRenkeiRepository.findNextSeq(JICHITAI_CD)).thenReturn(BigDecimal.ONE);
         when(eltaxRenkeiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        assertThatCode(() -> service.commit(new byte[0], "test.csv", null))
+        assertThatCode(() -> service.commit(new byte[0], "test.csv", null, null))
                 .doesNotThrowAnyException();
 
         verify(eltaxRenkeiRepository).save(any(EltaxRenkei.class));
@@ -95,7 +95,7 @@ class EltaxRenkeiKakuninServiceImplTest {
         when(eltaxRenkeiRepository.findNextSeq(JICHITAI_CD)).thenReturn(BigDecimal.valueOf(5));
         when(eltaxRenkeiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        service.commit(new byte[0], "upload.csv", null);
+        service.commit(new byte[0], "upload.csv", null, null);
 
         verify(eltaxRenkeiRepository).save(argThat(e ->
                 "011002".equals(e.getJichitaiCd()) &&

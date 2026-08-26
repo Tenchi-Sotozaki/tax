@@ -41,7 +41,7 @@ class EltaxRenkeiKakuninControllerTest {
     void preview_正常処理は確認画面を返す() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.csv", "text/csv", "data".getBytes());
         EltaxRenkeiKakuninDto dto = new EltaxRenkeiKakuninDto(
-                null, null, null, null, null, "test.csv", null, null, false, null, null, null, null, null, null);
+                null, null, null, null, null, "test.csv", null, null, false, null, null, null, null, null, null, null);
         when(eltaxRenkeiKakuninService.preview(file)).thenReturn(dto);
         Model model = new ExtendedModelMap();
 
@@ -66,7 +66,7 @@ class EltaxRenkeiKakuninControllerTest {
     void commit_セッションなしはリダイレクト() {
         MockHttpSession session = new MockHttpSession();
 
-        String view = controller.commit(null, session, new RedirectAttributesModelMap());
+        String view = controller.commit(null, null, session, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/eltax-renkei");
     }
@@ -77,9 +77,9 @@ class EltaxRenkeiKakuninControllerTest {
         session.setAttribute("eltaxUploadedFile", "data".getBytes());
         session.setAttribute("eltaxUploadedFileName", "test.csv");
 
-        String view = controller.commit(null, session, new RedirectAttributesModelMap());
+        String view = controller.commit(null, null, session, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/eltax-renkei");
-        verify(eltaxRenkeiKakuninService).commit(any(), eq("test.csv"), isNull());
+        verify(eltaxRenkeiKakuninService).commit(any(), eq("test.csv"), isNull(), isNull());
     }
 }
