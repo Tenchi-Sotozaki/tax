@@ -8,7 +8,7 @@ import lombok.Data;
 public class KyodoJigyoshaDto {
 
     @Size(max = 10, message = "10文字以内で入力してください")
-    @Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
+    @Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
     private String kyodoAddressNo;
 
     @Size(max = 200, message = "200文字以内で入力してください")

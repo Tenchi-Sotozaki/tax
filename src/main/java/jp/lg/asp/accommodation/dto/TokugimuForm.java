@@ -35,7 +35,7 @@ public class TokugimuForm {
 	private LocalDate shinseiDate;
 	private LocalDate henkoDate;
 	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
 	private String tokugimuAddressNo;
 	@Size(max = 200, message = "200文字以内で入力してください")
 	private String tokugimuAddress;
@@ -55,7 +55,7 @@ public class TokugimuForm {
 
 	// ===== 宿泊施設情報 =====
 	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
 	private String facilityAddressNo;
 	@Size(max = 200, message = "200文字以内で入力してください")
 	private String facilityAddress;
@@ -87,7 +87,7 @@ public class TokugimuForm {
 
 	// ===== 営業許可等情報 =====
 	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
 	private String licenseAddressNo;
 	@Size(max = 200, message = "200文字以内で入力してください")
 	private String licenseAddress;
@@ -105,7 +105,7 @@ public class TokugimuForm {
 
 	// ===== 施設所有者情報 =====
 	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
 	private String ownerAddressNo;
 	@Size(max = 200, message = "200文字以内で入力してください")
 	private String ownerAddress;
@@ -120,7 +120,7 @@ public class TokugimuForm {
 
 	// ===== 書類送付先情報 =====
 	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
 	private String mailAddressNo;
 	@Size(max = 200, message = "200文字以内で入力してください")
 	private String mailAddress;
