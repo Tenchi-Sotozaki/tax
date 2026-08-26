@@ -85,11 +85,15 @@
 
 								<label for="bankName" class="form-label"> 金融機関名 <span
 									class="text-danger">*</span>
-								</label> <input type="text" class="form-control" id="bankName"
-									th:field="*{bankName}" th:readonly="${kozaForm.viewMode}"
-									maxlength="30"
-									th:classappend="${#fields.hasErrors('bankName')} ? 'is-invalid' : ''"
-									required th:data-initial-value="*{bankName}">
+								</label>
+								<div class="position-relative">
+									<input type="text" class="form-control" id="bankName"
+										th:field="*{bankName}" th:readonly="${kozaForm.viewMode}"
+										maxlength="30" autocomplete="off"
+										th:classappend="${#fields.hasErrors('bankName')} ? 'is-invalid' : ''"
+										required th:data-initial-value="*{bankName}">
+									<ul id="bankNameSuggestions" class="list-group position-absolute w-100 shadow" style="z-index:1000;display:none;max-height:100px;overflow-y:auto;"></ul>
+								</div>
 
 								<div th:if="${#fields.hasErrors('bankName')}"
 									class="invalid-feedback">
@@ -122,11 +126,15 @@
 
 								<label for="branchName" class="form-label"> 支店名 <span
 									class="text-danger">*</span>
-								</label> <input type="text" class="form-control" id="branchName"
-									th:field="*{branchName}" th:readonly="${kozaForm.viewMode}"
-									maxlength="30"
-									th:classappend="${#fields.hasErrors('branchName')} ? 'is-invalid' : ''"
-									required th:data-initial-value="*{branchName}">
+								</label>
+								<div class="position-relative">
+									<input type="text" class="form-control" id="branchName"
+										th:field="*{branchName}" th:readonly="${kozaForm.viewMode}"
+										maxlength="30" autocomplete="off"
+										th:classappend="${#fields.hasErrors('branchName')} ? 'is-invalid' : ''"
+										required th:data-initial-value="*{branchName}">
+									<ul id="branchNameSuggestions" class="list-group position-absolute w-100 shadow" style="z-index:1000;display:none;max-height:100px;overflow-y:auto;"></ul>
+								</div>
 
 								<div th:if="${#fields.hasErrors('branchName')}"
 									class="invalid-feedback">
@@ -273,6 +281,10 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
+		<script th:inline="javascript">
+			const BANK_SEARCH_URL = /*[[@{/api/bank/search}]]*/ '/api/bank/search';
+			const BRANCH_SEARCH_URL = /*[[@{/api/bank/branch/search}]]*/ '/api/bank/branch/search';
+		</script>
 		<script th:src="@{/js/furikomiKoza.js}"></script>
 		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
