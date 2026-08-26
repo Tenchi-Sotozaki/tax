@@ -518,7 +518,7 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{additionalAmount1}"
-											th:errorclass="is-invalid"
+											th:classappend="${fieldErrorMessages != null and fieldErrorMessages.containsKey('additionalAmount1')} ? 'is-invalid'"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount1}">
 										<div class="text-danger small mt-1"
@@ -566,7 +566,7 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{additionalAmount2}"
-											th:errorclass="is-invalid"
+											th:classappend="${fieldErrorMessages != null and fieldErrorMessages.containsKey('additionalAmount2')} ? 'is-invalid'"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount2}">
 										<div class="text-danger small mt-1"
@@ -614,7 +614,7 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{additionalAmount3}"
-											th:errorclass="is-invalid"
+											th:classappend="${fieldErrorMessages != null and fieldErrorMessages.containsKey('additionalAmount3')} ? 'is-invalid'"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount3}">
 										<div class="text-danger small mt-1"
@@ -635,7 +635,7 @@
 										<input type="text"
 											class="form-control text-end js-comma-format"
 											th:field="*{entaikin}"
-											th:errorclass="is-invalid"
+											th:classappend="${fieldErrorMessages != null and fieldErrorMessages.containsKey('entaikin')} ? 'is-invalid'"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{entaikin}">
 										<div class="text-danger small mt-1"
