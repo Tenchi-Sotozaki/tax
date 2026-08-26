@@ -661,8 +661,8 @@ public class FukaServiceImpl implements FukaService {
 			saveChoshuGenboDataWithRno(form, parentFuka, jichitaiCd, targetRno);
 		}
 
-		// 納入情報の保存（納入年月日・納入金額の両方に入力がある場合のみ登録処理を行う）
-		if (form.getShunoYmd() != null && form.getShunoKingaku() != null) {
+		// 納入情報の保存（納入年月日と、0より大きい納入金額の両方に入力がある場合のみ登録処理を行う）
+		if (form.getShunoYmd() != null && form.getShunoKingaku() != null && form.getShunoKingaku() > 0) {
 			Integer shunoRno = shunoRirekiRepository.findMaxRno(jichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
 					.map(r -> r + 1).orElse(1);
 			ShunoRireki shuno = new ShunoRireki();

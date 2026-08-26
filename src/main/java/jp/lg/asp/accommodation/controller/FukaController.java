@@ -323,6 +323,15 @@ public class FukaController {
 					MSG_AMOUNT_REQUIRED);
 		}
 
+		// 納入金額を入力した場合は、納入年月日も必須とする。
+		// t_shuno_rireki.nonyu_ymd が NOT NULL のため、日付なしでは金額を保存できない。
+		// 逆（日付だけ入力）は「納入なし」とみなし、エラーにしない。
+		// 0以下は未入力扱い（加算金額と同じ扱い）。
+		if (form.getShunoKingaku() != null && form.getShunoKingaku() > 0 && form.getShunoYmd() == null) {
+			bindingResult.rejectValue("shunoYmd", "error.shunoYmd",
+					"納入金額を入力する場合は、納入年月日も入力してください");
+		}
+
 		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
 		if (bindingResult.hasErrors()) {
 			bindingResult.getAllErrors().forEach(error -> {
@@ -335,7 +344,8 @@ public class FukaController {
 					"modificationCategory",
 					"additionalRate1", "additionalAmount1",
 					"additionalRate2", "additionalAmount2",
-					"additionalRate3", "additionalAmount3");
+					"additionalRate3", "additionalAmount3",
+					"shunoYmd", "shunoKingaku");
 			for (String field : fieldOrder) {
 				bindingResult.getAllErrors().stream()
 						.filter(e -> e instanceof org.springframework.validation.FieldError

@@ -638,6 +638,7 @@
 									<label class="form-label form-label-sm fw-medium mb-1">納入期限</label>
 									<input type="date" class="form-control form-control-sm"
 										th:field="*{nokigen}" th:readonly="${fukaDeclarationForm.view}"
+										data-no-today
 										th:data-initial-value="*{nokigen}">
 								</div>
 
@@ -668,8 +669,12 @@
 									<label class="form-label form-label-sm fw-medium mb-1">納入年月日</label>
 									<input type="date" class="form-control form-control-sm"
 										th:field="*{shunoYmd}"
+										th:errorclass="is-invalid"
 										th:data-initial-value="*{shunoYmd}"
 										th:readonly="${fukaDeclarationForm.view}">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('shunoYmd')}"
+										th:errors="*{shunoYmd}"></div>
 								</div>
 
 								<div class="col-md-4">
@@ -677,8 +682,12 @@
 									<input type="text"
 										class="form-control form-control-sm text-end js-comma-format"
 										th:field="*{shunoKingaku}"
+										th:errorclass="is-invalid"
 										th:data-initial-value="*{shunoKingaku}"
 										th:readonly="${fukaDeclarationForm.view}" placeholder="0">
+									<div class="invalid-feedback"
+										th:if="${#fields.hasErrors('shunoKingaku')}"
+										th:errors="*{shunoKingaku}"></div>
 								</div>
 
 							</div>
