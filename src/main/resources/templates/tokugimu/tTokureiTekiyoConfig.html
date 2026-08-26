@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title th:text="${isView} ? '特例適用照会' : (${isEdit} ? '特例適用編集' : '特例適用登録')">特例適用登録</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-calendar-check me-2 text-success"></i>
+				<span th:text="${isView} ? '特例適用照会' : (${isEdit} ? '特例適用編集' : '特例適用登録')"></span>
+			</h5>
+			<a th:if="${isView}"
+				th:href="@{/tekiyo-nozei-shuki/edit/{id}/{rno}(id=${tokureiTekiyoForm.shiteiNo},rno=${tokureiTekiyoForm.rno})}"
+				class="btn btn-primary">
+				<i class="bi bi-pencil-square me-2"></i>編集する
+			</a>
+		</div>
+
+		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<form th:if="${!isView}"
+			th:action="${isEdit} ? @{/tekiyo-nozei-shuki/edit/{id}/{rno}(id=${tokureiTekiyoForm.shiteiNo},rno=${tokureiTekiyoForm.rno})} : @{/tekiyo-nozei-shuki/register/{id}(id=${tokureiTekiyoForm.shiteiNo})}"
+			th:object="${tokureiTekiyoForm}" method="post" id="mainForm">
+
+			<input type="hidden" th:field="*{shiteiNo}" />
+			<input type="hidden" th:field="*{rno}" />
+
+			<div class="card mb-4 shadow-sm">
+				<div class="card-header py-3">
+					<h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>特例適用期間</h5>
+				</div>
+				<div class="card-body bg-light-subtle">
+					<div class="row g-3">
+						<div class="col-md-4">
+							<label class="form-label fw-medium">
+								適用開始年月 <span class="text-danger">*</span>
+							</label>
+							<input type="month" class="form-control" th:field="*{tekiyoStMonth}">
+						</div>
+						<div class="col-md-4">
+							<label class="form-label fw-medium">適用終了年月</label>
+							<input type="month" class="form-control" th:field="*{tekiyoEdMonth}">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="d-flex justify-content-center gap-3 py-4">
+				<!-- 戻るボタン（確認ダイアログ） -->
+				<a href="#" class="btn btn-outline-secondary btn-lg px-4"
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal">
+					<i class="bi bi-arrow-left me-2"></i>戻る
+				</a>
+				<!-- 削除ボタン（編集時のみ・確認ダイアログ） -->
+				<a th:if="${isEdit}" href="#" class="btn btn-danger btn-lg px-4"
+					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+					<i class="bi bi-trash me-2"></i>削除する
+				</a>
+				<!-- 登録/更新ボタン（確認ダイアログ） -->
+				<button type="button" class="btn btn-success btn-lg px-5"
+					data-bs-toggle="modal" data-bs-target="#saveConfirmModal">
+					<i class="bi bi-save me-2"></i>
+					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
+				</button>
+			</div>
+		</form>
+
+		<!-- 照会時の表示 -->
+		<div th:if="${isView}" class="card mb-4 shadow-sm">
+			<div class="card-header py-3">
+				<h5 class="mb-0"><i class="bi bi-calendar3 me-2"></i>特例適用期間</h5>
+			</div>
+			<div class="card-body bg-light-subtle">
+				<div class="row g-3">
+					<div class="col-md-4">
+						<label class="form-label fw-medium">適用開始年月</label>
+						<input type="text" class="form-control" readonly
+							th:value="${tokureiTekiyoForm.tekiyoStMonth}">
+					</div>
+					<div class="col-md-4">
+						<label class="form-label fw-medium">適用終了年月</label>
+						<input type="text" class="form-control" readonly
+							th:value="${tokureiTekiyoForm.tekiyoEdMonth}">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div th:if="${isView}" class="d-flex justify-content-center gap-3 py-4">
+			<a th:href="@{/tekiyo-nozei-shuki/list/{id}(id=${tokureiTekiyoForm.shiteiNo})}"
+				class="btn btn-outline-secondary btn-lg px-4">
+				<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+			</a>
+		</div>
+
+		<!-- 登録/更新確認モーダル -->
+		<div th:if="${!isView}" class="modal fade" id="saveConfirmModal" tabindex="-1"
+			data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div th:classappend="${isEdit} ? 'bg-success text-white' : 'bg-primary text-white'" class="modal-header">
+						<h5 class="modal-title">
+							<i class="bi bi-check2-square me-2"></i>
+							<span th:text="${isEdit} ? '更新確認' : '登録確認'"></span>
+						</h5>
+					</div>
+					<div class="modal-body">
+						<p class="mb-0" th:text="${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？'"></p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="button" class="btn btn-primary"
+							onclick="document.getElementById('mainForm').requestSubmit()">
+							<i class="bi bi-check-lg me-1"></i>はい
+						</button>
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>いいえ
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 削除確認モーダル（編集時のみ） -->
+		<div th:if="${isEdit}" class="modal fade" id="deleteConfirmModal" tabindex="-1"
+			data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div class="modal-header bg-danger text-white">
+						<h5 class="modal-title">
+							<i class="bi bi-exclamation-triangle me-2"></i>削除確認
+						</h5>
+					</div>
+					<div class="modal-body">
+						<p class="mb-0">削除してもよろしいですか？</p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<a class="btn btn-danger"
+							th:href="@{/tekiyo-nozei-shuki/delete/{id}/{rno}(id=${tokureiTekiyoForm.shiteiNo},rno=${tokureiTekiyoForm.rno})}">
+							<i class="bi bi-check-lg me-1"></i>はい
+						</a>
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>いいえ
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 戻る確認モーダル（登録/編集時のみ） -->
+		<div th:if="${!isView}" class="modal fade" id="backConfirmModal" tabindex="-1"
+			data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title">
+							<i class="bi bi-check2-square me-2"></i>確認
+						</h5>
+					</div>
+					<div class="modal-body">
+						<p class="mb-0">入力内容が破棄されます。よろしいですか？</p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<a class="btn btn-primary"
+							th:href="@{/tekiyo-nozei-shuki/list/{id}(id=${tokureiTekiyoForm.shiteiNo})}">
+							<i class="bi bi-check-lg me-1"></i>はい
+						</a>
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>いいえ
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
+	</th:block>
+</body>
+</html>

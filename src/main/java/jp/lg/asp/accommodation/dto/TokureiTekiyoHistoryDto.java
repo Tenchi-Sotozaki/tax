@@ -5,7 +5,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TekiyoNozeiShukiHistoryDto {
+public class TokureiTekiyoHistoryDto {
+    private Integer idx;
     private String tekiyoStMonth;
     private String tekiyoEdMonth;
 }
