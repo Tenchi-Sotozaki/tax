@@ -281,6 +281,14 @@ public class FukaController {
 
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
+		// 申告を受けてから登録するため、申告年月日は登録年月日以前とする。
+		// 未入力のときは @NotNull 側に任せ、ここでは比較しない。
+		if (form.getShinkokuDate() != null && form.getTorokuDate() != null
+				&& form.getShinkokuDate().isAfter(form.getTorokuDate())) {
+			bindingResult.rejectValue("shinkokuDate", "error.shinkokuDate",
+					"申告年月日は登録年月日以前の日付を入力してください");
+		}
+
 		// 加算金額区分を選択した場合は、割合の入力も必須
 		if (StringUtils.hasText(form.getAdditionalCategory1())
 				&& !StringUtils.hasText(form.getAdditionalRate1())) {
