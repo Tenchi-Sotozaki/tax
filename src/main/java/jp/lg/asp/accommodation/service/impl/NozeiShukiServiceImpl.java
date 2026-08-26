@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -60,7 +59,7 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 	@Transactional(readOnly = true)
 	public NozeiShuki findBySeq(BigDecimal seq) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		NozeiShukiId id = new NozeiShukiId(jichitaiCd, seq);
+		NozeiShukiId id = new NozeiShukiId(jichitaiCd);
 		return nozeiShukiRepository.findById(id).orElse(null);
 	}
 
@@ -82,7 +81,6 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 	@Transactional
 	public NozeiShuki save(NozeiShuki nozeiShuki) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		LocalDateTime now = LocalDateTime.now();
 
 		if (nozeiShuki.getSeq() == null) {
 			// 新規登録の場合、SEQを自動採番
@@ -99,7 +97,7 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 	@Transactional
 	public void delete(BigDecimal seq) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		NozeiShukiId id = new NozeiShukiId(jichitaiCd, seq);
+		NozeiShukiId id = new NozeiShukiId(jichitaiCd);
 		NozeiShuki nozeiShuki = nozeiShukiRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("削除対象のデータが見つかりません"));
 

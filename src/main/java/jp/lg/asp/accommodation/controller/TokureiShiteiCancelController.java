@@ -18,10 +18,11 @@ import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiCancelDto;
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
-import jp.lg.asp.accommodation.service.TokureiShiteiCancelReportsService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
+import jp.lg.asp.accommodation.service.TokureiShiteiCancelReportsService;
 import jp.lg.asp.accommodation.service.TokureiShiteiService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
@@ -50,13 +51,16 @@ public class TokureiShiteiCancelController {
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		String shiteiNo = SessionHelper.getShiteiNo(session);
-		TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
-
-		if (shiteiNo == null || shiteiNo.isEmpty()) {
+		
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
 			model.addAttribute("showShiteiGassanModal", true);
-			model.addAttribute("dto", dto);
-			return "reports/tokureiShiteiCancel";
+			return "tokugimu/tTokugimuReport";
 		}
+		
+		TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
 
 		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(shiteiNo);
 		if (shiteiDto != null) {
@@ -133,13 +137,18 @@ public class TokureiShiteiCancelController {
 		TokureiShiteiCancelDto dest = new TokureiShiteiCancelDto();
 		dest.setShiteiNo(src.getShiteiNo());
 		dest.setTokuName(src.getTokuName());
+		dest.setTokuYubin(src.getTokuYubin());
 		dest.setTokuJusho(src.getTokuJusho());
 		dest.setShisetsuName(src.getShisetsuName());
+		dest.setShisetsuYubin(src.getShisetsuYubin());
 		dest.setShisetsuJusho(src.getShisetsuJusho());
 		dest.setCity(src.getCity());
+		dest.setBiko(src.getBiko());
+		dest.setKoin(src.getKoin());
+		
 		// 条例は指定通知書とは別の条項になるため、取消通知書専用の定義を読む
 		dest.setJorei(reportsCommonService.getReportsDefText(ReportsConstants.TOKUREI_CANCEL_JOREI));
-		dest.setBiko("");
+	
 		return dest;
 	}
 }

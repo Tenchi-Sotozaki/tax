@@ -25,12 +25,12 @@
 				<div class="d-flex gap-2" th:if="${configForm.viewMode}">
 					<!-- 特別徴収事務交付金交付申請・決定通知ボタン -->
 					<a th:href="@{/reports/kofuKetteiTsuchiShinsei}"
-						class="btn btn-outline-primary btn-sm"> <i
+						class="btn btn-outline-primary"> <i
 						class="bi bi-pencil-square me-2"></i>特別徴収事務交付金交付申請・決定通知
 					</a>
 
 					<!-- 編集するボタン -->
-					<button type="button" class="btn btn-primary btn-sm"
+					<button type="button" class="btn btn-primary"
 						onclick="editMode()">
 						<i class="bi bi-pencil"></i> 編集する
 					</button>
@@ -195,10 +195,11 @@
 				<!-- アクションボタン -->
 				<div class="d-flex justify-content-center gap-2">
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary"
 						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a href="#" class="btn btn-outline-primary"
+					</a> 
+					<a href="#" class="btn btn-outline-secondary"
 						th:unless="${configForm.viewMode}" data-bs-toggle="modal"
 						data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る
@@ -269,7 +270,7 @@
 
 			<!-- 戻る確認モーダル -->
 			<div
-				th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。一覧画面に戻りますか？', @{/shoreikin/list}, '戻る')}"></div>
+				th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/shoreikin/list}, '戻る')}"></div>
 			<!-- 特別徴収義務者指定モーダル -->
 			<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
@@ -287,7 +288,7 @@
 							<!-- HTMLメッセージが挿入箇所 -->
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary btn-sm"
+							<button type="button" class="btn btn-secondary"
 								data-bs-dismiss="modal">閉じる</button>
 						</div>
 					</div>

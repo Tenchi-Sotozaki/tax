@@ -323,8 +323,8 @@ public class AtenaImportServiceImpl implements AtenaImportService {
 			String expected = normalizeHeader(expectedHeaders[i]);
 			if (!actual.equals(expected)) {
 				throw new RuntimeException(
-						String.format("ヘッダーの%d番目の項目が不正です。\n" +
-								"期待値: [%s], 実際の値: [%s]\n" +
+						String.format("ヘッダーの%d番目の項目が不正です。%n" +
+								"期待値: [%s], 実際の値: [%s]%n" +
 								"元のヘッダー: [%s]", i + 1, expected, actual, headers[i]));
 			}
 		}

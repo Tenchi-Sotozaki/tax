@@ -39,10 +39,6 @@
 					<p class="mb-0" th:text="${message}">よろしいですか？</p>
 				</div>
 				<div class="modal-footer justify-content-center">
-					<button type="button" class="btn btn-outline-secondary"
-						data-bs-dismiss="modal">
-						<i class="bi bi-x-lg me-1"></i>キャンセル
-					</button>
 					<button type="button" class="btn" th:classappend="${btnClass}"
 						th:data-form-id="${formId}"
 						onclick="
@@ -55,8 +51,11 @@
 							}
 						">
 						<i
-							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>
-						<span th:text="${btnLabel}">実行</span>
+							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>はい
+					</button>
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>いいえ
 					</button>
 				</div>
 			</div>
@@ -95,14 +94,13 @@
 					<p class="mb-0" th:text="${message}">よろしいですか？</p>
 				</div>
 				<div class="modal-footer justify-content-center">
+					<a class="btn btn-primary" th:href="${href}">
+						<i class="bi bi-check-lg me-1"></i>はい
+					</a>
 					<button type="button" class="btn btn-outline-secondary"
 						data-bs-dismiss="modal">
-						<i class="bi bi-x-lg me-1"></i>キャンセル
+						<i class="bi bi-x-lg me-1"></i>いいえ
 					</button>
-					<a class="btn btn-primary" th:href="${href}">
-						<i class="bi bi-check-lg me-1"></i>
-						<span th:text="${btnLabel}">実行</span>
-					</a>
 				</div>
 			</div>
 		</div>
@@ -186,7 +184,7 @@
 					</div>
 					<div class="d-flex justify-content-end mb-3">
 						<button type="button" id="addrSearchBtn"
-							class="btn btn-primary btn-sm px-4">
+							class="btn btn-primary px-4">
 							<i class="bi bi-search me-1"></i>検索
 						</button>
 					</div>
@@ -196,7 +194,7 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-secondary btn-sm px-4"
+					<button type="button" class="btn btn-outline-secondary px-4"
 						data-bs-dismiss="modal">
 						<i class="bi bi-x-lg me-1"></i>閉じる
 					</button>
@@ -230,7 +228,7 @@
 			data-bs-toggle="tooltip" data-bs-placement="bottom"
 			th:attr="title=${selectedShiteiGassan?.shisetsuName}"
 			th:text="${selectedShiteiGassan?.shisetsuName}"></span>
-		<button type="button" class="btn btn-outline-primary btn-sm flex-shrink-0"
+		<button type="button" class="btn btn-outline-primary flex-shrink-0"
 			data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal">
 			<i class="bi bi-search me-1"></i>特別徴収義務者指定
 		</button>
@@ -344,7 +342,7 @@
 					</div>
 					<div class="d-flex justify-content-end mb-3">
 						<button type="button" id="sgSearchBtn"
-							class="btn btn-primary btn-sm px-4">
+							class="btn btn-primary px-4">
 							<i class="bi bi-search me-1"></i>検索する
 						</button>
 					</div>

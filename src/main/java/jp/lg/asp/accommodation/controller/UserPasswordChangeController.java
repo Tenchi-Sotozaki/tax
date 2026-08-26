@@ -13,12 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.User;
-import jp.lg.asp.accommodation.entity.UserId;
-import jp.lg.asp.accommodation.repository.UserRepository;
+import jp.lg.asp.accommodation.service.UserPasswordChangeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserPasswordChangeController {
 
-    private final UserRepository userRepository;
+    private final UserPasswordChangeService userPasswordChangeService;
     private final PasswordEncoder passwordEncoder;
     private final JichitaiContext jichitaiContext;
 
@@ -67,11 +65,7 @@ public class UserPasswordChangeController {
         model.addAttribute("backUrl", backUrl != null ? backUrl : DEFAULT_BACK);
 
         String jichitaiCd = jichitaiContext.getJichitaiCd();
-        UserId pk = new UserId();
-        pk.setJichitaiCd(jichitaiCd);
-        pk.setId(authentication.getName());
-        User user = userRepository.findById(pk)
-                .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+        User user = userPasswordChangeService.findUser(jichitaiCd, authentication.getName());
 
         if (!passwordEncoder.matches(nowPassword, user.getPassword() != null ? user.getPassword().trim() : "")) {
             model.addAttribute("error", "現在のパスワードが正しくありません");
@@ -85,14 +79,12 @@ public class UserPasswordChangeController {
             model.addAttribute("error", "新しいパスワードが一致しません");
             return VIEW;
         }
-
         if (passwordEncoder.matches(newPassword, user.getPassword() != null ? user.getPassword().trim() : "")) {
             model.addAttribute("error", "登録済みパスワードと同一のパスワードは登録できません");
             return VIEW;
         }
 
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        userPasswordChangeService.changePassword(user, newPassword);
 
         log.info("パスワード変更が完了しました: userId={}, jichitaiCd={}", authentication.getName(), jichitaiCd);
 

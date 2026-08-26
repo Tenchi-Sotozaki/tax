@@ -54,7 +54,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
-			jichitaiName = jichitaiInfo.getName();
+			jichitaiName = jichitaiInfo.getName() + jichitaiInfo.getKbnName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.SHOREIKIN_KOFU_JOREI);
 		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
@@ -261,8 +261,8 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 
 			Long kofuZeigaku = shoreikin.getKofuZeigaku();
 			Long kofuGaku = shoreikin.getKofuGaku();
-			dto.setNonyugaku(kofuZeigaku != null ? String.valueOf(kofuZeigaku) : "0");
-			dto.setKofugaku(kofuGaku != null ? String.valueOf(kofuGaku) : "0");
+			dto.setNonyugaku(kofuZeigaku != null ? String.format("%,d", kofuZeigaku) : "0");
+			dto.setKofugaku(kofuGaku != null ? String.format("%,d", kofuGaku) : "0");
 			if (shoreikin.getKofuYmd() != null) {
 				dto.setKofuYmd(shoreikin.getKofuYmd().toString());
 			}
@@ -418,7 +418,7 @@ public class KofuKetteiTsuchiShinseiServiceImpl implements KofuKetteiTsuchiShins
 
 		for (String c : chars) {
 			// 半角スペース、全角スペース、または空文字の場合は "*" に置き換え
-			if (c.equals(" ") || c.equals(" ") || c.isEmpty()) {
+			if (c.equals(" ") || c.isEmpty()) {
 				kozaNoList.add("*");
 			} else {
 				kozaNoList.add(c);

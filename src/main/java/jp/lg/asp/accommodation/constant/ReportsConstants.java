@@ -46,7 +46,7 @@ public final class ReportsConstants {
 	public static final int INPUT_TEXTAREA = 2;
 
 	// 定義ID
-	public enum reportsOutputFiled {
+	public enum ReportsOutputField {
 
 		TOKUGIMU_SHITEI_JOREI("RPT0000002", "特別徴収義務者指定通知条例", INPUT_TEXTBOX),
 		TOKUGIMU_JURI_JOREI("RPT0000003", "特別徴収義務者承認受理通知条例", INPUT_TEXTBOX),
@@ -57,8 +57,7 @@ public final class ReportsConstants {
 		NONYUSHO_KOZA("RPT0000011", "納入書　納入場所", INPUT_TEXTAREA),
 		NONYUSHO_KOZA_NO("RPT0000012", "納入書　口座番号", INPUT_TEXTBOX),
 		NONYUSHO_SHITEI_KINYU_NAME("RPT0000013", "納入書　指定金融機関名", INPUT_TEXTBOX),
-		NONYUSHO_TORIMATOME("RPT0000014", "納入書　取りまとめ店", INPUT_TEXTBOX),
-		KOFU_HAKKO_YOSHIKI("RPT0000009", "交付金　発行様式", INPUT_TEXTBOX),
+		NONYUSHO_TORIMATOME("RPT0000014", "納入書　取りまとめ店", INPUT_TEXTAREA),
 		KOFU_JOKEN("RPT0000010", "交付金　交付条件", INPUT_TEXTAREA),
 		GASSAN_NONYU_JOREI("RPT0000015", "合算申告納入承認通知条例", INPUT_TEXTBOX),
 		TOKUREI_CANCEL_JOREI("RPT0000016", "納入申告書の提出期限等の特例適用者指定取消通知条例", INPUT_TEXTBOX),
@@ -70,7 +69,7 @@ public final class ReportsConstants {
 		private final String name; // 設定画面に表示する定義名
 		private final Integer inputType; // 1:テキストボックス、2:テキストエリア
 
-		reportsOutputFiled(String id, String name, Integer inputType) {
+		ReportsOutputField(String id, String name, Integer inputType) {
 			this.id = id;
 			this.name = name;
 			this.inputType = inputType;

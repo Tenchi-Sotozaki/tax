@@ -6,23 +6,30 @@
  * フォームバリデーション
  */
 function validateForm() {
-	
-	// 処理開始時に古いエラーをクリアする
-	window.ReportError.hide();
-	
-    const hakkoYmd = document.getElementById('hakkoYmd').value;
-    const tekiyoYmd = document.getElementById('tekiyoYmd').value;
+    const hakkoYmd = document.getElementById('hakkoYmd');
+    const tekiyoYmd = document.getElementById('tekiyoYmd');
+    let hasError = false;
 
-    if (!hakkoYmd) {
-        window.ReportError.show('発行年月日を入力してください。')
-		return false;
+    [hakkoYmd, tekiyoYmd].forEach(el => {
+        el.classList.remove('is-invalid');
+        document.getElementById(el.id + 'Error').textContent = '';
+    });
+
+    if (!hakkoYmd.value) {
+        hakkoYmd.classList.add('is-invalid');
+        document.getElementById('hakkoYmdError').textContent = '発行年月日を入力してください。';
+        hasError = true;
+    }
+    if (!tekiyoYmd.value) {
+        tekiyoYmd.classList.add('is-invalid');
+        document.getElementById('tekiyoYmdError').textContent = '適用年月を入力してください。';
+        hasError = true;
     }
 
-    if (!tekiyoYmd) {
-        window.ReportError.show('適用年月を入力してください。');
+    if (hasError) {
+        (hakkoYmd.classList.contains('is-invalid') ? hakkoYmd : tekiyoYmd).focus();
         return false;
     }
-
     return true;
 }
 
@@ -31,7 +38,7 @@ function toggleBikoState() {
     const shonin = document.getElementById('shonin');
     const riyu = document.getElementById('riyu');
 
-    if (shonin.value === '承認') { // 承認
+    if (shonin.value === '1') { // 承認
 		// 承認に変更された場合は理由をクリア
         riyu.value = '';
         riyu.disabled = true;

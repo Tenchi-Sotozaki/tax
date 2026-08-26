@@ -22,7 +22,7 @@
 				</h5>
 
 				<div th:if="${kozaForm.viewMode}">
-					<button type="button" class="btn btn-primary btn-sm"
+					<button type="button" class="btn btn-primary"
 						onclick="editMode()">
 						<i class="bi bi-pencil"></i> 編集する
 					</button>
@@ -217,10 +217,11 @@
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary"
 						th:if="${kozaForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a href="#" class="btn btn-outline-primary"
+					</a> 
+					<a href="#" class="btn btn-outline-secondary"
 						th:unless="${kozaForm.viewMode}"
 						data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る
@@ -264,7 +265,7 @@
 			</form>
 		</div>
 
-		<div th:if="${kozaForm.createMode}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '振込先口座情報を登録しますか？', 'createForm', 'btn-success', '登録する')}"></div>
+		<div th:if="${kozaForm.createMode}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '振込先口座情報を登録します。よろしいですか？', 'createForm', 'btn-success', '登録する')}"></div>
 		<div th:unless="${kozaForm.viewMode}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/shoreikin/list}, '戻る')}"></div>
 
 		<!-- 特別徴収義務者指定モーダル -->

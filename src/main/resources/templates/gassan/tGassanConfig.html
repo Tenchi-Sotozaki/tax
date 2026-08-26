@@ -25,13 +25,13 @@
 			<div class="d-flex gap-2" th:if="${isView}">
 				<!-- 合算申告納入承認通知書ボタン -->
 				<a th:href="@{/reports/gassanNonyuTsuchi}"
-					class="btn btn-outline-primary btn-sm"> <i
+					class="btn btn-outline-primary"> <i
 					class="bi bi-pencil-square me-2"></i>合算申告納入承認通知書
 				</a>
 
 				<!-- 編集するボタン -->
 				<a th:href="@{/gassan/edit/{id}(id=${editId})}"
-					class="btn btn-primary btn-sm"> <i
+					class="btn btn-primary"> <i
 					class="bi bi-pencil-square me-2"></i>編集する
 				</a>
 			</div>
@@ -43,14 +43,14 @@
 			class="d-flex align-items-center gap-2 mb-3">
 			<a
 				th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno - 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${GassanForm.rno <= GassanForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a> <span class="text-muted small">履歴 <span
 				th:text="${GassanForm.rno}"></span> / <span
 				th:text="${GassanForm.maxRno}"></span></span> <a
 				th:href="@{/gassan/view-form/{id}(id=${editId}, rno=${GassanForm.rno + 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${GassanForm.rno >= GassanForm.maxRno} ? ' disabled'">
 				次の履歴 <i class="bi bi-chevron-right"></i>
 			</a>
@@ -185,7 +185,7 @@
 
 						<!-- 宛名検索 -->
 						<button th:if="!${isView}" type="button"
-							class="btn btn-primary btn-sm ms-auto" data-bs-toggle="modal"
+							class="btn btn-primary ms-auto" data-bs-toggle="modal"
 							data-bs-target="#addressSearchModal">
 							<i class="bi bi-search me-1"></i>宛名検索
 						</button>
@@ -262,9 +262,10 @@
 			<!-- ===== アクションボタン ===== -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 				<a th:href="@{/gassan/list}"
-					class="btn btn-outline-primary btn-lg px-4"
+					class="btn btn-outline-secondary px-4"
 					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a href="#" class="btn btn-outline-primary btn-lg px-4"
+				</a> 
+				<a href="#" class="btn btn-outline-secondary px-4"
 					th:unless="${isView ?: false}" data-bs-toggle="modal"
 					data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
@@ -273,7 +274,7 @@
 				<!-- 削除ボタン -->
 				<th:block th:if="${!isView and isEdit}">
 					<button type="button" id="openDeleteModalBtn"
-						class="btn btn-danger btn-lg px-5"
+						class="btn btn-danger px-5"
 						th:disabled="${GassanForm.gassanShiteiNo == null or #strings.isEmpty(GassanForm.gassanShiteiNo)}">
 						<span>削除する</span>
 					</button>
@@ -281,7 +282,7 @@
 
 				<th:block th:if="!${isView}">
 					<button type="button" id="openConfirmModalBtn"
-						class="btn btn-success btn-lg px-5">
+						class="btn btn-success px-5">
 						<i
 							th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 						<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
@@ -294,7 +295,7 @@
 		<!-- 確認モーダル -->
 		<div th:if="!${isView}"
 			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', 
-			${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', 
+			${isEdit} ? '合算申請を更新します。よろしいですか？' : '合算申請を登録します。よろしいですか？', 'gassanForm', 
 			'btn-success', ${isEdit} ? '更新する' : '登録する')}">
 		</div>
 
@@ -307,7 +308,7 @@
 		<!-- 削除確認モーダル -->
 		<div th:if="!${isView} && ${isEdit}"
 			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', 
-			'このデータを削除します。よろしいですか？', 'deleteForm', 
+			'合算申請を削除します。よろしいですか？', 'deleteForm', 
 			'btn-danger', '削除する')}">
 		</div>
 

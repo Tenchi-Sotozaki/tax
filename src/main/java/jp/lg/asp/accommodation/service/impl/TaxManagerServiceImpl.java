@@ -41,41 +41,34 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 	@Override
 	@Transactional(readOnly = true)
 	public TaxManagerForm getByShiteiNoAndRno(String shiteiNo, Integer rno) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		TaxManagerForm form = new TaxManagerForm();
 		form.setCollectorId(null);
 		form.setShiteiNo(shiteiNo);
 		form.setRegistrationDate(LocalDate.now());
 		form.setDeclarationDate(LocalDate.now());
 
-		try {
-			String jichitaiCd = jichitaiContext.getJichitaiCd();
-			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-					.stream().findFirst().ifPresent(tokugimu -> {
-						form.setObligorName(tokugimu.getKyokaName());
-						form.setFacilityName(tokugimu.getShisetsuName());
-						form.setObligorAtenaNo(tokugimu.getAtenaNo().toString());
-					});
+		tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream().findFirst()
+				.ifPresent(tokugimu -> form.setObligorAtenaNo(tokugimu.getAtenaNo().toString()));
 
-			taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(jichitaiCd, shiteiNo, rno).ifPresent(nokan -> {
-				form.setEdit(true);
-				form.setRno(nokan.getRno());
-				form.setRegistrationDate(nokan.getTorokuYmd());
-				form.setDeclarationDate(nokan.getShinkokuYmd());
-				form.setAtenaNo(nokan.getAtenaNo());
-				form.setManagerName(nokan.getName());
-				form.setManagerNameKana(nokan.getNameKana());
-				form.setManagerYubinNo(nokan.getYubinNo());
-				form.setManagerAddress(nokan.getJusho());
-				form.setManagerPhone(nokan.getTel());
-				form.setKbn(nokan.getKbn());
-				form.setReason(nokan.getRiyu());
-			});
+		taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(jichitaiCd, shiteiNo, rno).ifPresent(nokan -> {
+			form.setEdit(true);
+			form.setRno(nokan.getRno());
+			form.setRegistrationDate(nokan.getTorokuYmd());
+			form.setDeclarationDate(nokan.getShinkokuYmd());
+			form.setAtenaNo(nokan.getAtenaNo());
+			form.setManagerName(nokan.getName());
+			form.setManagerNameKana(nokan.getNameKana());
+			form.setManagerYubinNo(nokan.getYubinNo());
+			form.setManagerAddress(nokan.getJusho());
+			form.setManagerPhone(nokan.getTel());
+			form.setKbn(nokan.getKbn());
+			form.setReason(nokan.getRiyu());
+		});
 
-			form.setMaxRno(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
-			form.setMinRno(taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
-		} catch (Exception e) {
-			log.error("データの取得中にエラーが発生しました: {}", e.getMessage());
-		}
+		form.setMaxRno(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
+		form.setMinRno(taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
 
 		return form;
 	}
@@ -90,34 +83,27 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 		form.setRegistrationDate(LocalDate.now());
 		form.setDeclarationDate(LocalDate.now());
 
-		try {
-			tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-					.stream().findFirst().ifPresent(tokugimu -> {
-						form.setObligorName(tokugimu.getKyokaName());
-						form.setFacilityName(tokugimu.getShisetsuName());
-						form.setObligorAtenaNo(tokugimu.getAtenaNo().toString());
-					});
+		tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+				.stream().findFirst()
+				.ifPresent(tokugimu -> form.setObligorAtenaNo(tokugimu.getAtenaNo().toString()));
 
-			taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).ifPresent(nokan -> {
-				form.setEdit(true);
-				form.setRno(nokan.getRno());
-				form.setRegistrationDate(nokan.getTorokuYmd());
-				form.setDeclarationDate(nokan.getShinkokuYmd());
-				form.setAtenaNo(nokan.getAtenaNo());
-				form.setManagerName(nokan.getName());
-				form.setManagerNameKana(nokan.getNameKana());
-				form.setManagerYubinNo(nokan.getYubinNo());
-				form.setManagerAddress(nokan.getJusho());
-				form.setManagerPhone(nokan.getTel());
-				form.setKbn(nokan.getKbn());
-				form.setReason(nokan.getRiyu());
-			});
+		taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).ifPresent(nokan -> {
+			form.setEdit(true);
+			form.setRno(nokan.getRno());
+			form.setRegistrationDate(nokan.getTorokuYmd());
+			form.setDeclarationDate(nokan.getShinkokuYmd());
+			form.setAtenaNo(nokan.getAtenaNo());
+			form.setManagerName(nokan.getName());
+			form.setManagerNameKana(nokan.getNameKana());
+			form.setManagerYubinNo(nokan.getYubinNo());
+			form.setManagerAddress(nokan.getJusho());
+			form.setManagerPhone(nokan.getTel());
+			form.setKbn(nokan.getKbn());
+			form.setReason(nokan.getRiyu());
+		});
 
-			form.setMaxRno(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
-			form.setMinRno(taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
-		} catch (Exception e) {
-			log.error("データの取得中にエラーが発生しました。新規登録として処理します: {}", e.getMessage());
-		}
+		form.setMaxRno(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
+		form.setMinRno(taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo));
 
 		return form;
 	}

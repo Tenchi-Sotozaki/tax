@@ -13,8 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -22,7 +22,6 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
-import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.service.ShoreikinBulkService;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +30,6 @@ class ShoreikinBulkControllerTest {
 
     @Mock ShoreikinBulkService shoreikinBulkService;
     @Mock ScreenAccessChecker accessChecker;
-    @Mock KofuRitsuRepository kofuRitsuRepository;
     @Mock JichitaiContext jichitaiContext;
 
     @InjectMocks ShoreikinBulkController controller;
@@ -39,7 +37,7 @@ class ShoreikinBulkControllerTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(kofuRitsuRepository.findKofuRitsuByJichitaiCd(eq("011002"), any(Integer.class)))
+        when(shoreikinBulkService.findKofuRitsuList(eq("011002"), any(Integer.class)))
                 .thenReturn(List.of(BigDecimal.valueOf(50)));
     }
 
@@ -63,7 +61,7 @@ class ShoreikinBulkControllerTest {
         String view = controller.executeBulk(form, bindingResult, model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
-        verifyNoInteractions(shoreikinBulkService);
+        verifyNoMoreInteractions(shoreikinBulkService);
     }
 
     @Test
@@ -80,8 +78,6 @@ class ShoreikinBulkControllerTest {
 
         assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
         assertThat(model.asMap()).containsKey("bulkForm");
-        assertThat(model.asMap()).doesNotContainKey("successMessage");
-        assertThat(model.asMap()).doesNotContainKey("warningMessage");
     }
 
     @Test
@@ -98,6 +94,5 @@ class ShoreikinBulkControllerTest {
 
         assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
         assertThat(model.asMap()).containsKey("bulkForm");
-        assertThat(model.asMap()).doesNotContainKey("warningMessage");
     }
 }

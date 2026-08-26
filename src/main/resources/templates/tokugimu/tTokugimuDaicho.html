@@ -28,7 +28,7 @@
 			role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i> <span
 				th:text="${successMessage}"></span>
-			<button type="button" class="btn-close btn-sm"
+			<button type="button" class="btn-close"
 				data-bs-dismiss="alert"></button>
 		</div>
 
@@ -37,7 +37,7 @@
 			role="alert">
 			<i class="bi bi-exclamation-triangle-fill me-2"></i> <span
 				th:text="${errorMessage}"></span>
-			<button type="button" class="btn-close btn-sm"
+			<button type="button" class="btn-close"
 				data-bs-dismiss="alert"></button>
 		</div>
 
@@ -162,10 +162,10 @@
 								</span>
 								<div class="d-flex gap-2">
 									<a th:href="@{/tokugimu/list}"
-										class="btn btn-outline-secondary btn-sm"> <i
+										class="btn btn-outline-secondary"> <i
 										class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 									</a>
-									<button type="submit" class="btn btn-primary btn-sm px-4">
+									<button type="submit" class="btn btn-primary px-4">
 										<i class="bi bi-search me-1"></i>検索する
 									</button>
 								</div>
@@ -180,11 +180,11 @@
 		<th:block th:if="${isSearched}">
 
 			<!-- ページネーション（中央固定）＆表示件数 -->
-			<div class="d-flex justify-content-between align-items-center mb-1 position-relative">
+			<div class="position-relative mb-1 d-flex align-items-center">
 				<nav class="position-absolute start-50 translate-middle-x">
 					<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".daicho-row"></ul>
 				</nav>
-				<div class="d-flex align-items-center gap-2">
+				<div class="d-flex align-items-center gap-2 ms-auto">
 					<label class="form-label form-label-sm mb-0 me-2">表示件数</label>
 					<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
 						<option value="10">10件</option>

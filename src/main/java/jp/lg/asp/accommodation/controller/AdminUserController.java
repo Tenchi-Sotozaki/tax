@@ -49,20 +49,22 @@ public class AdminUserController {
     @OpeLog(screenId = SCREEN_ID, operation = "照会")
     public String list(
             @ModelAttribute UserSearchForm searchForm,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "false") boolean searched,
             Model model) {
 
         String jichitaiCd = jichitaiContext.getJichitaiCd();
 
         accessChecker.checkAccess(SCREEN_ID);
 
-        searchForm.setPage(page);
-        searchForm.setPageSize(pageSize);
+        searchForm.setPage(0);
+        searchForm.setPageSize(Integer.MAX_VALUE);
 
-        Page<User> items = adminUserService.search(searchForm);
+        java.util.List<User> items = searched
+                ? adminUserService.searchAll(searchForm)
+                : java.util.List.of();
 
         model.addAttribute("items", items);
+        model.addAttribute("searched", searched);
 
         List<Role> roles =
                 adminUserService.selectableRoles(
@@ -171,7 +173,7 @@ public class AdminUserController {
                 "successMessage",
                 "ユーザーを登録しました。");
 
-        return "redirect:/admin/user-search";
+        return "redirect:/admin/user-view/" + form.getId();
     }
 
     @GetMapping("/user-edit/{id}")
@@ -296,7 +298,7 @@ public class AdminUserController {
                 "successMessage",
                 "ユーザー情報を更新しました。");
 
-        return "redirect:/admin/user-search";
+        return "redirect:/admin/user-view/" + id;
     }
 
     @PostMapping("/user-delete/{id}")
