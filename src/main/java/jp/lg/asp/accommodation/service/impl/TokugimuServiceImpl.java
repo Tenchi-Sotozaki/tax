@@ -119,7 +119,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.stream().collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
 
 		// 指定番号 -> 合算指定番号。合算対象かどうかの判定にも利用する
-		Map<String, String> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos)
+		Map<String, String> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos, null)
 				.stream().collect(Collectors.toMap(GassanUchi::getShiteiNo,
 						GassanUchi::getGassanShiteiNo, (a, b) -> a));
 

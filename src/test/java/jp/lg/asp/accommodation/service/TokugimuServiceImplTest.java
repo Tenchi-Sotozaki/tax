@@ -80,7 +80,7 @@ class TokugimuServiceImplTest {
         Tokugimu t = buildTokugimu(SHITEI_NO);
         when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any(), any())).thenReturn(List.of());
 
         var result = service.search(form);
 
@@ -106,7 +106,7 @@ class TokugimuServiceImplTest {
         Tokugimu t = buildTokugimu(SHITEI_NO);
         when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any(), any())).thenReturn(List.of());
 
         var result = service.searchAll(form);
 

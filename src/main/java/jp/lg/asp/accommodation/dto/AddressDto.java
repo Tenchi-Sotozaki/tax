@@ -21,4 +21,5 @@ public class AddressDto {
     
     private boolean alreadyRegistered;
     private String gassanShiteiNo;
+    private String tekiyoEdYmd;
 }

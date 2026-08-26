@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,9 +36,6 @@ public class GassanServiceImpl implements GassanService {
     private final AtenaRepository atenaRepository;
     private final TokugimuRepository tokugimuRepository;
     private final JichitaiRepository jichitaiRepository;
-    
-    @PersistenceContext
-    private EntityManager entityManager;
 
     private final JichitaiContext jichitaiContext;
 
@@ -163,7 +157,7 @@ public class GassanServiceImpl implements GassanService {
         
         // 合算指定済みの指定番号を取得
         List<String> allShiteiNos = tokugimuList.stream().map(Tokugimu::getShiteiNo).toList();
-        List<GassanUchi> assignedList = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, allShiteiNos);
+        List<GassanUchi> assignedList = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, allShiteiNos, null);
         Map<String, String> assignedMap = new HashMap<>();
         for (GassanUchi uchi : assignedList) {
             assignedMap.put(uchi.getShiteiNo(), uchi.getGassanShiteiNo());
@@ -194,44 +188,74 @@ public class GassanServiceImpl implements GassanService {
 
     @Override
     @Transactional
-    public void register(GassanForm form) {
+    public String register(GassanForm form, String gassanShiteiNo) {
     	String jichitaiCd = jichitaiContext.getJichitaiCd();
         try {
-            // 既に合算指定済みの指定番号が含まれていないかチェック
-            validateNotAlreadyAssigned(form.getShiteiNoList());
-            
-            // 代表施設を取得（最初の施設または指定された代表施設）
-            String daihyoShiteiNo = form.getDaihyoShiteiNo() != null ? form.getDaihyoShiteiNo() 
+            String daihyoShiteiNo = form.getDaihyoShiteiNo() != null ? form.getDaihyoShiteiNo()
                     : (form.getShiteiNoList() != null && !form.getShiteiNoList().isEmpty() ? form.getShiteiNoList().get(0) : null);
-            
             if (daihyoShiteiNo == null) {
                 throw new RuntimeException("代表施設を選択してください。");
             }
-            
-            String gassanShiteiNo = generateGassanShiteiNo();
 
-            Gassan gassan = new Gassan();
-            gassan.setJichitaiCd(jichitaiCd);
-            gassan.setGassanShiteiNo(gassanShiteiNo);
-            gassan.setRno(BigDecimal.ONE);
-            gassan.setAtenaNo(form.getAtenaNo());
-            gassan.setShiteiNo(daihyoShiteiNo); // 代表施設の指定番号を設定
-            gassan.setTorokuYmd(form.getTorokuYmd());
-            gassan.setShinkokuYmd(form.getShinkokuYmd());
-            gassan.setTekiyoStYmd(form.getTekiyoStYmd());
-            gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
-            gassan.setNewFlg("1");
-            gassan.setDelFlg("0");
-            gassanRepository.save(gassan);
-
-            saveGassanUchi(gassanShiteiNo, BigDecimal.ONE, form.getShiteiNoList());
-            log.debug("合算申告登録完了: gassanShiteiNo={}", gassanShiteiNo);
+            if (gassanShiteiNo != null) {
+                // ③再登録：セッションに合算指定番号あり
+                reRegister(jichitaiCd, gassanShiteiNo, daihyoShiteiNo, form);
+                return gassanShiteiNo;
+            } else {
+                // ①新規登録
+                validateNotAlreadyAssigned(form.getShiteiNoList(), null);
+                String newGassanShiteiNo = generateGassanShiteiNo();
+                Gassan gassan = buildGassan(jichitaiCd, newGassanShiteiNo, BigDecimal.ONE, daihyoShiteiNo, form, "1");
+                gassanRepository.save(gassan);
+                saveGassanUchi(newGassanShiteiNo, BigDecimal.ONE, form.getShiteiNoList());
+                log.debug("合算申告登録完了: gassanShiteiNo={}", newGassanShiteiNo);
+                return newGassanShiteiNo;
+            }
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             log.error("合算申告登録エラー", e);
             throw new RuntimeException(convertDatabaseErrorToJapanese(e.getMessage()), e);
         }
+    }
+
+    /** ③再登録：前履歴の適用終了年月以降の開始年月で新履歴を追加 */
+    private void reRegister(String jichitaiCd, String gassanShiteiNo, String daihyoShiteiNo, GassanForm form) {
+        Gassan prev = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
+                .stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("前履歴が見つかりません: " + gassanShiteiNo));
+
+        if (prev.getTekiyoEdYmd() != null && form.getTekiyoStYmd() != null
+                && form.getTekiyoStYmd().isBefore(prev.getTekiyoEdYmd())) {
+            throw new RuntimeException("適用開始年月は前履歴の適用終了年月（" + prev.getTekiyoEdYmd() + "）以降で入力してください。");
+        }
+
+        BigDecimal nextRno = gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo).add(BigDecimal.ONE);
+        // 前履歴の newFlg をクリア
+        gassanRepository.clearNewFlgByRno(jichitaiCd, gassanShiteiNo, prev.getRno());
+
+        Gassan gassan = buildGassan(jichitaiCd, gassanShiteiNo, nextRno, daihyoShiteiNo, form, "1");
+        gassanRepository.save(gassan);
+        saveGassanUchi(gassanShiteiNo, nextRno, form.getShiteiNoList());
+        log.debug("合算申告再登録完了: gassanShiteiNo={}, rno={}", gassanShiteiNo, nextRno);
+    }
+
+    /** 登録・再登録共通の Gassan エンティティ構築 */
+    private Gassan buildGassan(String jichitaiCd, String gassanShiteiNo, BigDecimal rno,
+            String daihyoShiteiNo, GassanForm form, String newFlg) {
+        Gassan gassan = new Gassan();
+        gassan.setJichitaiCd(jichitaiCd);
+        gassan.setGassanShiteiNo(gassanShiteiNo);
+        gassan.setRno(rno);
+        gassan.setAtenaNo(form.getAtenaNo());
+        gassan.setShiteiNo(daihyoShiteiNo);
+        gassan.setTorokuYmd(form.getTorokuYmd());
+        gassan.setShinkokuYmd(form.getShinkokuYmd());
+        gassan.setTekiyoStYmd(form.getTekiyoStYmd());
+        gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
+        gassan.setNewFlg(newFlg);
+        gassan.setDelFlg("0");
+        return gassan;
     }
 
     @Override
@@ -243,46 +267,26 @@ public class GassanServiceImpl implements GassanService {
                     .stream().findFirst()
                     .orElseThrow(() -> new RuntimeException("合算申告が見つかりません: " + gassanShiteiNo));
 
-            // 編集時は現在のレコードを除外して重複チェック
-            validateNotAlreadyAssignedForUpdate(gassanShiteiNo, form.getShiteiNoList());
-            
-            // 代表施設を取得（最初の施設または指定された代表施設）
-            String daihyoShiteiNo = form.getDaihyoShiteiNo() != null ? form.getDaihyoShiteiNo() 
-                    : (form.getShiteiNoList() != null && !form.getShiteiNoList().isEmpty() ? form.getShiteiNoList().get(0) : null);
-            
-            if (daihyoShiteiNo == null) {
-                throw new RuntimeException("代表施設を選択してください。");
+            // ③編集：適用開始年月は前履歴の適用終了年月より後であれば編集可
+            if (form.getTekiyoStYmd() != null && gassan.getRno() != null && gassan.getRno().compareTo(BigDecimal.ONE) > 0) {
+                BigDecimal prevRno = gassan.getRno().subtract(BigDecimal.ONE);
+                gassanRepository.findByJichitaiCdAndGassanShiteiNoAndRno(jichitaiCd, gassanShiteiNo, prevRno)
+                        .ifPresent(prev -> {
+                            if (prev.getTekiyoEdYmd() != null
+                                    && !form.getTekiyoStYmd().isAfter(prev.getTekiyoEdYmd())) {
+                                throw new RuntimeException(
+                                        "適用開始年月は前履歴の適用終了年月（" + prev.getTekiyoEdYmd() + "）より後の日付を入力してください。");
+                            }
+                        });
             }
-            
-            // メインテーブルの更新
-            gassan.setShiteiNo(daihyoShiteiNo); // 代表施設の指定番号を設定
+
+            // 施設は編集不可—現在の内訳をそのまま維持
             gassan.setTekiyoStYmd(form.getTekiyoStYmd());
             gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
             gassan.setShinkokuYmd(form.getShinkokuYmd());
             gassan.setTorokuYmd(form.getTorokuYmd());
             gassanRepository.save(gassan);
 
-            // 内訳テーブルの更新（完全にセッションをクリア）
-            gassanUchiRepository.deleteByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
-            entityManager.flush();
-            entityManager.clear(); // セッションを完全にクリア
-            
-            // 新しい内訳データを一括作成・保存
-            if (form.getShiteiNoList() != null && !form.getShiteiNoList().isEmpty()) {
-                List<GassanUchi> newUchiList = form.getShiteiNoList().stream()
-                        .map(shiteiNo -> {
-                            GassanUchi uchi = new GassanUchi();
-                            uchi.setJichitaiCd(jichitaiCd);
-                            uchi.setGassanShiteiNo(gassanShiteiNo);
-                            uchi.setRno(gassan.getRno());
-                            uchi.setShiteiNo(shiteiNo);
-                            return uchi;
-                        })
-                        .toList();
-                
-                gassanUchiRepository.saveAll(newUchiList);
-            }
-            
             log.debug("合算申告更新完了: gassanShiteiNo={}", gassanShiteiNo);
         } catch (RuntimeException e) {
             throw e;
@@ -296,8 +300,20 @@ public class GassanServiceImpl implements GassanService {
     @Transactional
     public void deleteByGassanShiteiNo(String gassanShiteiNo) {
     	String jichitaiCd = jichitaiContext.getJichitaiCd();
-        gassanRepository.deleteLogicallyByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
-        log.debug("合算申告論理削除完了: gassanShiteiNo={}", gassanShiteiNo);
+        // 全履歴を rno 降順で取得
+        List<Gassan> all = gassanRepository.findAllRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        if (all.isEmpty()) return;
+
+        Gassan latest = all.get(0); // rno 最大（最新）
+        // ⑤削除：最新履歴を論理削除
+        gassanRepository.deleteLogicallyByRno(jichitaiCd, gassanShiteiNo, latest.getRno());
+
+        // 前履歴があれば newFlg を '1' に戻す
+        if (all.size() > 1) {
+            Gassan prev = all.get(1);
+            gassanRepository.setNewFlgByRno(jichitaiCd, gassanShiteiNo, prev.getRno());
+        }
+        log.debug("合算申告削除完了: gassanShiteiNo={}, rno={}", gassanShiteiNo, latest.getRno());
     }
 
     @Override
@@ -334,45 +350,21 @@ public class GassanServiceImpl implements GassanService {
 
     @Override
     @Transactional(readOnly = true)
-    public void validateNotAlreadyAssigned(List<String> shiteiNoList) {
+    public void validateNotAlreadyAssigned(List<String> shiteiNoList, String excludeGassanShiteiNo) {
     	String jichitaiCd = jichitaiContext.getJichitaiCd();
         if (shiteiNoList == null || shiteiNoList.isEmpty()) {
             return;
         }
         
-        // 現在有効な合算申告内訳から該当する指定番号を検索
-        List<GassanUchi> existingAssignments = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNoList);
+        List<GassanUchi> existingAssignments = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNoList, excludeGassanShiteiNo);
         
         if (!existingAssignments.isEmpty()) {
-            // 重複している指定番号のリストを作成
             List<String> duplicateShiteiNos = existingAssignments.stream()
                     .map(GassanUchi::getShiteiNo)
                     .distinct()
                     .toList();
             
             throw new RuntimeException("以下の指定番号は既に合算申告に登録されています: " + String.join(", ", duplicateShiteiNos));
-        }
-    }
-    
-    private void validateNotAlreadyAssignedForUpdate(String currentGassanShiteiNo, List<String> shiteiNoList) {
-    	String jichitaiCd = jichitaiContext.getJichitaiCd();
-        if (shiteiNoList == null || shiteiNoList.isEmpty()) {
-            return;
-        }
-        
-        // 現在編集中のレコード以外で重複チェック
-        List<GassanUchi> existingAssignments = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNoList)
-                .stream()
-                .filter(uchi -> !uchi.getGassanShiteiNo().equals(currentGassanShiteiNo))
-                .toList();
-        
-        if (!existingAssignments.isEmpty()) {
-            List<String> duplicateShiteiNos = existingAssignments.stream()
-                    .map(GassanUchi::getShiteiNo)
-                    .distinct()
-                    .toList();
-            
-            throw new RuntimeException("以下の指定番号は既に他の合算申告に登録されています: " + String.join(", ", duplicateShiteiNos));
         }
     }
     

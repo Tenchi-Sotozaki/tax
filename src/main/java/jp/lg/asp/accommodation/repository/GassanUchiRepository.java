@@ -27,8 +27,8 @@ public interface GassanUchiRepository extends JpaRepository<GassanUchi, GassanUc
     @Query("SELECT g FROM GassanUchi g WHERE g.jichitaiCd = :jichitaiCd AND g.shiteiNo = :shiteiNo")
     List<GassanUchi> findByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNo") String shiteiNo);
     
-    @Query("SELECT g FROM GassanUchi g JOIN Gassan gs ON g.jichitaiCd = gs.jichitaiCd AND g.gassanShiteiNo = gs.gassanShiteiNo WHERE g.jichitaiCd = :jichitaiCd AND g.shiteiNo IN :shiteiNos AND gs.delFlg = '0'")
-    List<GassanUchi> findByJichitaiCdAndShiteiNoIn(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNos") List<String> shiteiNos);
+    @Query("SELECT g FROM GassanUchi g JOIN Gassan gs ON g.jichitaiCd = gs.jichitaiCd AND g.gassanShiteiNo = gs.gassanShiteiNo WHERE g.jichitaiCd = :jichitaiCd AND g.shiteiNo IN :shiteiNos AND gs.delFlg = '0' AND (gs.tekiyoEdYmd IS NULL OR gs.tekiyoEdYmd >= CURRENT_DATE) AND (:excludeGassanShiteiNo IS NULL OR g.gassanShiteiNo <> :excludeGassanShiteiNo)")
+    List<GassanUchi> findByJichitaiCdAndShiteiNoIn(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNos") List<String> shiteiNos, @Param("excludeGassanShiteiNo") String excludeGassanShiteiNo);
     
     @Query("SELECT CASE WHEN COUNT(g) > 0 THEN true ELSE false END FROM GassanUchi g WHERE g.jichitaiCd = :jichitaiCd AND g.shiteiNo = :shiteiNo")
     boolean existsByJichitaiCdAndShiteiNo(@Param("jichitaiCd") String jichitaiCd, @Param("shiteiNo") String shiteiNo);

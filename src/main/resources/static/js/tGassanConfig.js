@@ -38,20 +38,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // チェックされた行をハイライト
     setupFacilityEventListeners();
 
-    // 確認モーダルを開く前にチェック済み施設が2件以上あるか検証
+    // 確認モーダルを開く前にチェック済み施設が2件以上あるか検証（登録時のみ）
     document.getElementById('openConfirmModalBtn')?.addEventListener('click', () => {
-        const checked = document.querySelectorAll('.facility-check:checked');
-        if (checked.length === 0) {
-            alert('合算対象施設を2件以上選択してください。');
-            return;
+        const container = document.querySelector('[data-is-edit]');
+        const isEdit = container ? container.getAttribute('data-is-edit') === 'true' : false;
+        if (!isEdit) {
+            const checked = document.querySelectorAll('.facility-check:checked');
+            if (checked.length < 2) {
+                alert('合算対象施設を2件以上選択してください。');
+                return;
+            }
         }
         const modal = document.getElementById('registerModal');
         if (modal) new bootstrap.Modal(modal).show();
     });
 
-    // 確認モーダルの実行ボタンでフォーム送信
-    document.querySelector('#registerModal .btn-confirm')?.addEventListener('click', () => {
-        document.getElementById('gassanForm')?.submit();
+    // フォーム送信前に type=month の値を yyyy-MM-dd 形式に変換
+    document.getElementById('gassanForm')?.addEventListener('formdata', (e) => {
+        const stYmd = document.getElementById('tekiyoStYmd');
+        if (stYmd && stYmd.type === 'month' && stYmd.value) {
+            e.formData.set('tekiyoStYmd', stYmd.value + '-01');
+        }
+
+        const edYmd = document.getElementById('tekiyoEdYmd');
+        if (edYmd && edYmd.type === 'month' && edYmd.value) {
+            const [year, month] = edYmd.value.split('-').map(Number);
+            const lastDay = new Date(year, month, 0).getDate();
+            e.formData.set('tekiyoEdYmd', `${year}-${String(month).padStart(2, '0')}-${lastDay}`);
+        }
     });
 
     // 編集モードでなければ変更検知処理を行わない
@@ -63,20 +77,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkValue(input) {
         if (input.type === 'checkbox' || input.type === 'radio') return;
         if (input.closest('.modal')) return;
+        if (input.readOnly || input.classList.contains('form-control-readonly')) return;
         const initialValue = input.getAttribute('data-initial-value') || '';
         let initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
         let currentStr = String(input.value).trim();
         if (currentStr !== initialStr) {
-            input.style.border = '3px solid #ffeb3b';
+            input.classList.add('form-control-edited');
         } else {
-            input.style.border = '';
+            input.classList.remove('form-control-edited');
         }
     }
 
     const inputs = document.querySelectorAll('.form-control, .form-select');
     inputs.forEach(input => {
-        checkValue(input);
-        input.addEventListener('input', () => checkValue(input));
         input.addEventListener('change', () => checkValue(input));
         input.addEventListener('blur', () => checkValue(input));
     });
@@ -147,45 +160,67 @@ async function selectAddress(d) {
     const searchModal = bootstrap.Modal.getInstance(searchModalEl) || new bootstrap.Modal(searchModalEl);
 
     if (d.alreadyRegistered) {
-        // 宛名検索モーダルを閉じる
-        searchModal.hide();
+        const edYmd = d.tekiyoEdYmd ? new Date(d.tekiyoEdYmd) : null;
+        const isExpired = edYmd && edYmd < new Date();
 
-        // モーダルが完全に閉じたタイミングで、確認用モーダルを表示する
+        if (isExpired) {
+            // 適用終了年月が過ぎている→セッションに合算指定番号を保存して再登録画面へ遷移
+            searchModal.hide();
+            fetch('/accommodation-tax/gassan/select', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    [document.querySelector('meta[name="_csrf_header"]')?.content]: document.querySelector('meta[name="_csrf"]')?.content
+                },
+                body: new URLSearchParams({ gassanShiteiNo: d.gassanShiteiNo })
+            }).then(() => {
+                const atenaNoInput = document.getElementById('atenaNo');
+                const atenaNameDisplay = document.getElementById('atenaNameDisplay');
+                if (atenaNoInput) atenaNoInput.value = d.addressNumber;
+                if (atenaNameDisplay) atenaNameDisplay.value = d.name ?? '';
+                const titleSpan = document.getElementById('pageTitleSpan');
+                if (titleSpan) titleSpan.textContent = '合算申請 再登録';
+                document.getElementById('sessionInfoArea')?.classList.remove('d-none');
+                loadFacilitiesByAtena(d.addressNumber);
+            });
+            return;
+        }
+
+        // 適用終了年月が未来または未設定→照会確認モーダル
+        searchModal.hide();
         searchModalEl.addEventListener('hidden.bs.modal', function handler() {
-			
-            // 多重イベント発火を防止
             searchModalEl.removeEventListener('hidden.bs.modal', handler);
 
             const confirmModalEl = document.getElementById('alreadyRegisteredModal');
             const confirmModal = new bootstrap.Modal(confirmModalEl);
             confirmModal.show();
 
-            // 「はい」の処理
             const yesBtn = document.getElementById('alreadyRegisteredYesBtn');
-			
-            // 既存のイベント重複防止で一度クローンして置き換え
             const newYesBtn = yesBtn.cloneNode(true);
             yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
             newYesBtn.addEventListener('click', () => {
-                window.location.href = `/accommodation-tax/gassan/view-form/${d.gassanShiteiNo}`;
+                // セッションに合算指定番号を保存してから照会画面へ
+                fetch('/accommodation-tax/gassan/select', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        [document.querySelector('meta[name="_csrf_header"]')?.content]: document.querySelector('meta[name="_csrf"]')?.content
+                    },
+                    body: new URLSearchParams({ gassanShiteiNo: d.gassanShiteiNo })
+                }).then(() => {
+                    window.location.href = '/accommodation-tax/gassan/view-form';
+                });
             });
 
-            // 「いいえ」の処理
             const noBtn = document.getElementById('alreadyRegisteredNoBtn');
             const newNoBtn = noBtn.cloneNode(true);
             noBtn.parentNode.replaceChild(newNoBtn, noBtn);
             newNoBtn.addEventListener('click', () => {
                 confirmModal.hide();
                 resetAtenaSelection();
-
-                // 確認用モーダルが完全に閉じた後、宛名検索モーダルを再表示する
                 confirmModalEl.addEventListener('hidden.bs.modal', function searchModalHandler() {
                     confirmModalEl.removeEventListener('hidden.bs.modal', searchModalHandler);
-
-                    const addressSearchModalEl = document.getElementById('addressSearchModal');
-                    if (addressSearchModalEl) {
-                        new bootstrap.Modal(addressSearchModalEl).show();
-                    }
+                    new bootstrap.Modal(document.getElementById('addressSearchModal')).show();
                 }, { once: true });
             });
         }, { once: true });
@@ -309,10 +344,17 @@ function updateDeleteButtonState() {
     const deleteBtn = document.getElementById('openDeleteModalBtn');
     if (!deleteBtn) return;
 
-    // チェックされている施設の数をカウント
-    const checkedCount = document.querySelectorAll('.facility-check:checked').length;
+    const container = document.querySelector('[data-is-edit]');
+    const isEdit = container ? container.getAttribute('data-is-edit') === 'true' : false;
 
-    // 0件の場合は削除ボタンを無効化（disabled属性の付与とクラス調整）
+    // 編集モードでは常に有効
+    if (isEdit) {
+        deleteBtn.removeAttribute('disabled');
+        deleteBtn.classList.remove('disabled');
+        return;
+    }
+
+    const checkedCount = document.querySelectorAll('.facility-check:checked').length;
     if (checkedCount <= 1) {
         deleteBtn.setAttribute('disabled', 'disabled');
         deleteBtn.classList.add('disabled');
