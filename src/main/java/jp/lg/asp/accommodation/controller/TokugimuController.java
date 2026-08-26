@@ -3,6 +3,7 @@ package jp.lg.asp.accommodation.controller;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.AbstractMap;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,10 +46,18 @@ public class TokugimuController {
 	 * 型変換に失敗した項目の表示メッセージ。
 	 * 画面の入力欄はいずれもテキストのため、数値項目で起こりうる。
 	 */
-	private static final Map<String, String> TYPE_MISMATCH_MESSAGES = Map.of(
-			"floorArea", "宿泊施設情報の延床面積は半角数字とピリオドで入力してください",
-			"roomCount", "宿泊施設情報の客室数は半角数字で入力してください",
-			"capacity", "宿泊施設情報の収容人数は半角数字で入力してください");
+	private static final Map<String, String> TYPE_MISMATCH_MESSAGES = Map.ofEntries(
+			new AbstractMap.SimpleEntry<>("floorArea", "宿泊施設情報の延床面積は半角数字とピリオドで入力してください"),
+			new AbstractMap.SimpleEntry<>("roomCount", "宿泊施設情報の客室数は半角数字で入力してください"),
+			new AbstractMap.SimpleEntry<>("capacity", "宿泊施設情報の収容人数は半角数字で入力してください"),
+			new AbstractMap.SimpleEntry<>("registrationDate", "特別徴収義務者情報の登録年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("shinseiDate", "特別徴収義務者情報の申請年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("henkoDate", "特別徴収義務者情報の変更年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("businessStartDate", "宿泊施設情報の営業開始(予定)日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("suspensionStartDate", "施設営業休止/再開/廃止情報の休止開始年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は正しい日付を入力してください")
+	);
 
 	private static final String TYPE_MISMATCH_DEFAULT_MESSAGE = "入力形式が正しくない項目があります";
 

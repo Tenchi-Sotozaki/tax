@@ -35,30 +35,37 @@ public class TokugimuForm {
 	private LocalDate shinseiDate;
 	private LocalDate henkoDate;
 	@Size(max = 10, message = "特別徴収義務者情報の郵便番号は10文字以内で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "特別徴収義務者情報の郵便番号は半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
 	private String tokugimuAddressNo;
 	@Size(max = 200, message = "特別徴収義務者情報の住所は200文字以内で入力してください")
 	private String tokugimuAddress;
 	@Size(max = 200, message = "特別徴収義務者情報の氏名または名称は200文字以内で入力してください")
 	private String name;
 	@Size(max = 200, message = "特別徴収義務者情報の氏名(ふりがな)は200文字以内で入力してください")
+	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "特別徴収義務者情報の氏名(ふりがな)はひらがなまたはカタカナで入力してください")
 	private String nameKana;
 	@Size(max = 64, message = "特別徴収義務者情報の個人番号は64文字以内で入力してください")
 	private String personalNumber;
 	@Size(max = 13, message = "特別徴収義務者情報の法人番号は13文字以内で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{13}$", message = "特別徴収義務者情報の法人番号は半角数字13桁で入力してください")
 	private String corporateNumber;
 	@Size(max = 20, message = "特別徴収義務者情報の電話番号は20文字以内で入力してください")
+	@Pattern(regexp = "^[0-9-]*$", message = "特別徴収義務者情報の電話番号は半角数字とハイフンで入力してください")
 	private String tokugimuPhone;
 
 	// ===== 宿泊施設情報 =====
 	@Size(max = 10, message = "宿泊施設情報の郵便番号は10文字以内で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "宿泊施設情報の所在地(郵便番号)は半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
 	private String facilityAddressNo;
 	@Size(max = 200, message = "宿泊施設情報の住所は200文字以内で入力してください")
 	private String facilityAddress;
 	@Size(max = 200, message = "宿泊施設情報の施設名称は200文字以内で入力してください")
 	private String facilityName;
 	@Size(max = 200, message = "宿泊施設情報の施設名称(ふりがな)は200文字以内で入力してください")
+	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "宿泊施設情報の施設名称(ふりがな)はひらがなまたはカタカナで入力してください")
 	private String facilityNameKana;
 	@Size(max = 20, message = "宿泊施設情報の電話番号は20文字以内で入力してください")
+	@Pattern(regexp = "^[0-9-]*$", message = "宿泊施設情報の電話番号は半角数字とハイフンで入力してください")
 	private String facilityPhone;
 	/** 半角数字とピリオドのみ。yuka_menseki numeric(9,2) に合わせて整数部7桁・小数部2桁まで */
 	@Pattern(regexp = "^[0-9]{0,7}(\\.[0-9]{1,2})?$",
@@ -80,14 +87,17 @@ public class TokugimuForm {
 
 	// ===== 営業許可等情報 =====
 	@Size(max = 10, message = "営業許可等情報の郵便番号は10文字以内で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "営業許可等情報の郵便番号は半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
 	private String licenseAddressNo;
 	@Size(max = 200, message = "営業許可等情報の住所は200文字以内で入力してください")
 	private String licenseAddress;
 	@Size(max = 200, message = "営業許可等情報の氏名は200文字以内で入力してください")
 	private String licenseName;
 	@Size(max = 200, message = "営業許可等情報の氏名(ふりがな)は200文字以内で入力してください")
+	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "営業許可等情報の氏名(ふりがな)はひらがなまたはカタカナで入力してください")
 	private String licenseNameKana;
 	@Size(max = 20, message = "営業許可等情報の電話番号は20文字以内で入力してください")
+	@Pattern(regexp = "^[0-9-]*$", message = "営業許可等情報の電話番号は半角数字とハイフンで入力してください")
 	private String licensePhone;
 	private String businessType;
 	@Size(max = 200, message = "営業許可等情報の許可番号は200文字以内で入力してください")
@@ -95,26 +105,32 @@ public class TokugimuForm {
 
 	// ===== 施設所有者情報 =====
 	@Size(max = 10, message = "施設所有者情報の郵便番号は10文字以内で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "施設所有者情報の郵便番号は半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
 	private String ownerAddressNo;
 	@Size(max = 200, message = "施設所有者情報の住所は200文字以内で入力してください")
 	private String ownerAddress;
 	@Size(max = 200, message = "施設所有者情報の氏名は200文字以内で入力してください")
 	private String ownerName;
 	@Size(max = 200, message = "施設所有者情報の氏名(ふりがな)は200文字以内で入力してください")
+	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "施設所有者情報の氏名(ふりがな)はひらがなまたはカタカナで入力してください")
 	private String ownerNameKana;
 	@Size(max = 20, message = "施設所有者情報の電話番号は20文字以内で入力してください")
+	@Pattern(regexp = "^[0-9-]*$", message = "施設所有者情報の電話番号は半角数字とハイフンで入力してください")
 	private String ownerPhone;
 
 	// ===== 書類送付先情報 =====
 	@Size(max = 10, message = "書類送付先情報の郵便番号は10文字以内で入力してください")
+	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "書類送付先情報の住所(郵便番号)は半角数字とハイフンで、1234567 または 123-4567 の形式で入力してください")
 	private String mailAddressNo;
 	@Size(max = 200, message = "書類送付先情報の住所は200文字以内で入力してください")
 	private String mailAddress;
 	@Size(max = 200, message = "書類送付先情報の氏名は200文字以内で入力してください")
 	private String mailName;
 	@Size(max = 200, message = "書類送付先情報の氏名(ふりがな)は200文字以内で入力してください")
+	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "書類送付先情報の氏名(ふりがな)はひらがなまたはカタカナで入力してください")
 	private String mailNameKana;
 	@Size(max = 20, message = "書類送付先情報の電話番号は20文字以内で入力してください")
+	@Pattern(regexp = "^[0-9-]*$", message = "書類送付先情報の電話番号は半角数字とハイフンで入力してください")
 	private String mailPhone;
 
 	// ===== 共同事業者情報 =====
@@ -227,6 +243,8 @@ public class TokugimuForm {
 				errors.put("licenseNameKana", "営業許可等情報の氏名(ふりがな)は必須です");
 			if (!StringUtils.hasText(f.getBusinessType()))
 				errors.put("businessType", "営業許可等情報の営業種別は必須です");
+			else if (!List.of("1", "2", "3", "4").contains(f.getBusinessType()))
+				errors.put("businessType", "営業許可等情報の営業種別が不正です");
 			if (!StringUtils.hasText(f.getLicenseNumber()))
 				errors.put("licenseNumber", "営業許可等情報の許可番号は必須です");
 			boolean ownerAnyInput = StringUtils.hasText(f.getOwnerName()) || StringUtils.hasText(f.getOwnerNameKana())
@@ -255,6 +273,14 @@ public class TokugimuForm {
 						errors.put("kyodoList[" + i + "].kyodoNameKana", "共同事業者情報の氏名(ふりがな)は必須です");
 				}
 			}
+
+			if (f.getDeclarationCategory() != null
+					&& !List.of("休止", "再開", "廃止").contains(f.getDeclarationCategory()))
+				errors.put("declarationCategory", "施設営業休止/再開/廃止情報の申告区分が不正です");
+
+			String eltax = f.getEltaxUmu();
+			if (eltax != null && !eltax.isEmpty() && !eltax.equals("1"))
+				errors.put("eltaxUmu", "その他の情報のELTAX有無が不正です");
 
 			return errors;
 		}
