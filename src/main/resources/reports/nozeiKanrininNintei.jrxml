@@ -226,7 +226,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="03be05e0-09eb-470c-868c-1a73d8e1b57f" x="330" y="210" width="150" height="30" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
+			<element kind="textField" uuid="03be05e0-09eb-470c-868c-1a73d8e1b57f" x="280" y="210" width="150" height="30" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
 				<expression><![CDATA[$P{city} + "長"]]></expression>
 			</element>
 			<element kind="staticText" uuid="1edc8c33-f912-4d44-a327-14453cf26b0d" x="45" y="490" width="96" height="140" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
@@ -247,7 +247,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="image" uuid="6276b85c-f50c-4ac4-84d1-c68c80e64c73" x="400" y="190" width="50" height="50" onErrorType="Blank">
+			<element kind="image" uuid="6276b85c-f50c-4ac4-84d1-c68c80e64c73" x="430" y="190" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>
