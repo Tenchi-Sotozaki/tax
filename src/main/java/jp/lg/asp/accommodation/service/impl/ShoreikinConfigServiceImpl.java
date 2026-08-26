@@ -178,18 +178,21 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 		Integer nendoInt = Integer.parseInt(dto.getNendo());
 		List<KofuRitsu> kofuRitsuList = kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(
 				jichitaiCd, nendoInt);
-		KofuRitsu kofuRitsuEntity = kofuRitsuList.isEmpty() ? null : kofuRitsuList.get(0);
-
-		if (dto.getKofuRitsu() == null) {
-			dto.setKofuRitsu(kofuRitsuEntity != null ? kofuRitsuEntity.getKofuRitsu() : null);
+		// 交付率が取得できない場合は算出できないためエラーとする
+		if (kofuRitsuList.isEmpty()) {
+			throw new IllegalStateException("交付率が設定されていません。交付率設定画面で登録してください");
 		}
+		KofuRitsu kofuRitsuEntity = kofuRitsuList.get(0);
+
+		// 交付率は画面で入力せず交付率設定から取得するため、常にマスタの値で上書きする
+		dto.setKofuRitsu(kofuRitsuEntity.getKofuRitsu());
 
 		// 納入税額を算出
 		Long kofuZeigaku = calculateKofuZeigaku(dto.getShiteiNo(), dto.getNendo());
 		dto.setKofuZeigaku(kofuZeigaku);
 
-		// 交付額を算出
-		if (kofuZeigaku != null && dto.getKofuRitsu() != null) {
+		// 交付額を算出（交付率は上で必ず設定されている）
+		if (kofuZeigaku != null) {
 			dto.setKofuGaku(calculateKofuGaku(kofuZeigaku, dto.getKofuRitsu(), kofuRitsuEntity));
 		}
 

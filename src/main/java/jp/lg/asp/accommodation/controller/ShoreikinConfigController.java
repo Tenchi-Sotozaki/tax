@@ -89,6 +89,11 @@ public class ShoreikinConfigController {
 		try {
 			ShoreikinConfigDto result = shoreikinConfigService.calculateShoreikin(configForm);
 			model.addAttribute("configForm", result);
+		} catch (IllegalStateException e) {
+			// 交付率未設定など、利用者に直してもらえる事由。文言をそのまま出す
+			log.warn("交付金情報算出エラー: {}", e.getMessage());
+			model.addAttribute("configForm", configForm);
+			model.addAttribute("errorMessage", e.getMessage());
 		} catch (Exception e) {
 			log.error("交付金情報算出エラー", e);
 			model.addAttribute("configForm", configForm);
