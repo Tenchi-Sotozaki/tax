@@ -34,23 +34,12 @@ public class TokugimuForm {
 	private LocalDate registrationDate;
 	private LocalDate shinseiDate;
 	private LocalDate henkoDate;
-	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
 	private String tokugimuAddressNo;
-	@Size(max = 200, message = "200文字以内で入力してください")
 	private String tokugimuAddress;
-	@Size(max = 200, message = "200文字以内で入力してください")
 	private String name;
-	@Size(max = 200, message = "200文字以内で入力してください")
-	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "氏名(ふりがな)はひらがなまたはカタカナで入力してください")
 	private String nameKana;
-	@Size(max = 64, message = "64文字以内で入力してください")
 	private String personalNumber;
-	@Size(max = 13, message = "13文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{13}$", message = "半角数字13桁で入力してください")
 	private String corporateNumber;
-	@Size(max = 20, message = "20文字以内で入力してください")
-	@Pattern(regexp = "^[0-9-]*$", message = "半角数字とハイフンで入力してください")
 	private String tokugimuPhone;
 
 	// ===== 宿泊施設情報 =====
