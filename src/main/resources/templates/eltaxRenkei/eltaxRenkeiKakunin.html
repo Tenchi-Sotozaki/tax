@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}" lang="ja">
 
 <head>
-	<title>電子申告情報取込確認</title>
+	<title>eLTAX(電子申告)取込プレビュー</title>
 </head>
 
 <body>
@@ -12,26 +12,43 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-file-earmark-check me-2 text-primary"></i> 電子申告情報取込確認
+				<i class="bi bi-file-earmark-check me-2 text-primary"></i> eLTAX(電子申告)取込プレビュー
 			</h5>
+		</div>
+
+		<!-- エラーメッセージ -->
+		<div th:if="${errorMessage}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${not #lists.isEmpty(errorMessages)}"
+			class="alert alert-danger alert-dismissible fade show" role="alert">
+			<ul class="mb-0">
+				<li th:each="msg : ${errorMessages}" th:text="${msg}"></li>
+			</ul>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 		<!-- 施設情報エリア -->
 		<div class="card shadow-sm mb-4">
-			<div class="card-header fw-bold">施設情報</div>
+			<div class="card-header fw-bold">対象施設
+				<button type="button" id="openAddrSearchBtn" class="btn btn-sm btn-outline-primary ms-2" th:if="${kakuninDto.atenaSearchRequired}"><i class="bi bi-search me-1"></i>宛名検索</button>
+			<button type="button" class="btn btn-sm btn-outline-primary ms-2" th:unless="${kakuninDto.atenaSearchRequired}" data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal"><i class="bi bi-search me-1"></i>特別徴収義務者指定</button>
+			</div>
 			<div class="card-body">
 				<div class="row g-3">
 					<div class="col-md-3">
 						<label class="form-label text-muted small">指定番号</label>
-						<input type="text" class="form-control" readonly th:value="${kakuninDto.shiteiNo}">
+						<input type="text" id="shiteiNoText" class="form-control" readonly th:value="${kakuninDto.shiteiNo}">
 					</div>
 					<div class="col-md-9">
 						<label class="form-label text-muted small">施設名称</label>
-						<input type="text" class="form-control" readonly th:value="${kakuninDto.shisetsuName}">
+						<input type="text" id="shisetsuNameText" class="form-control" readonly th:value="${kakuninDto.shisetsuName}">
 					</div>
 					<div class="col-md-12">
 						<label class="form-label text-muted small">施設住所</label>
-						<input type="text" class="form-control" readonly th:value="${kakuninDto.shisetsuJusho}">
+						<input type="text" id="shisetsuJushoText" class="form-control" readonly th:value="${kakuninDto.shisetsuJusho}">
 					</div>
 					<div class="col-md-6">
 						<label class="form-label text-muted small">特別徴収義務者名称</label>
@@ -48,6 +65,10 @@
 		</div>
 
 		<!-- 取込ファイル情報エリア -->
+		<div class="d-flex gap-3 mb-2 small">
+			<span><span class="d-inline-block me-1" style="width:1em;height:1em;background-color:#dee2e6;vertical-align:middle;"></span>更新対象外の項目</span>
+			<span><span class="d-inline-block me-1" style="width:1em;height:1em;background-color:#fff3cd;vertical-align:middle;"></span>更新前情報と取込情報に差分がある項目</span>
+		</div>
 		<div class="card shadow-sm mb-4">
 			<div class="card-header fw-bold">
 				取込ファイル情報
@@ -68,13 +89,11 @@
 							<td colspan="3" class="text-center p-3">取込結果がありません</td>
 						</tr>
 						<tr th:each="row : ${kakuninDto.diffRows}"
-							th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue)} ? 'table-warning' : ''">
-							<td th:text="${row.itemName}"></td>
-							<td th:text="${row.beforeValue}"></td>
-							<td>
-								<span th:text="${row.afterValue}"
-									th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue)} ? 'fw-bold text-danger' : ''">
-								</span>
+							th:classappend="${row.beforeValue != row.afterValue and !#strings.isEmpty(row.beforeValue) and !(row.beforeValue == '－' and #strings.isEmpty(row.afterValue))} ? 'table-warning' : ''">
+							<td th:text="${row.itemName}" th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''"></td>
+							<td th:text="${row.beforeValue}" th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''"></td>
+							<td th:style="${'1'.equals(row.dispFlg)} ? 'background-color: #dee2e6 !important;' : ''">
+								<span th:text="${row.afterValue}"></span>
 							</td>
 						</tr>
 					</tbody>
@@ -84,11 +103,12 @@
 
 		<!-- アクションボタン -->
 		<div class="d-flex gap-2">
-			<a th:href="@{/eltax-renkei}" class="btn btn-secondary">
+			<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#backConfirmModal">
 				<i class="bi bi-arrow-left me-1"></i>戻る
-			</a>
+			</button>
 			<form id="commitForm" th:action="@{/eltax-renkei/kakunin/commit}" method="post">
 				<input type="hidden" id="commitAtenaNo" name="atenaNo" value="">
+				<input type="hidden" id="commitShiteiNo" name="shiteiNo" th:value="${kakuninDto.shiteiNo}">
 				<button type="button" id="commitBtn" class="btn btn-primary">
 					<i class="bi bi-upload me-1"></i>取込
 				</button>
@@ -102,8 +122,14 @@
 			th:data-hojin-no="${kakuninDto.hojinNo}">
 		</span>
 
+		<!-- 取込確認モーダル -->
+		<div th:replace="~{layout/components :: confirmModal('commitConfirmModal', '取込確認', 'この内容で取込します。よろしいですか？', 'commitForm', 'btn-primary', '取込')}"></div>
+		<!-- 戻る確認モーダル -->
+		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '取込はキャンセルされます。よろしいですか？', @{/eltax-renkei}, '戻る')}"></div>
 		<!-- 宛名検索モーダル -->
 		<div th:replace="~{layout/components :: addressSearchModal}"></div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 
 	</div>
 </body>

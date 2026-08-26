@@ -38,7 +38,7 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         log.debug("納税管理人選任免除認定通知書情報取得開始: shiteiNo={}", shiteiNo);
 
         Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
-        String cityName = jichitai != null ? jichitai.getName() : "";
+        String cityName = jichitai != null ? jichitai.getName() + jichitai.getKbnName() : "自治体名不明";
         // 条項を含む条例文は自治体ごとに異なるため設定値を優先し、
         // 未設定の場合のみ従来どおり自治体名からの組み立てにフォールバックする
         String jorei = reportsCommonService.getReportsDefText(ReportsConstants.NOZEI_KANRININ_NINTEI_JOREI);
