@@ -38,17 +38,17 @@
 									<!-- 承認・不承認 -->
 									<div class="col-md-1">
 										<label class="form-label">区分</label>
-										<input th:if="*{kbn} == 1" type="text" class="form-control" value="承認" readonly>
-										<input th:if="*{kbn} == 2" type="text" class="form-control" value="不承認" readonly>
+										<input th:if="*{kbn} == 1" type="text" class="form-control form-control-readonly" value="承認" readonly>
+										<input th:if="*{kbn} == 2" type="text" class="form-control form-control-readonly" value="不承認" readonly>
 									</div>
 									
 									<div class="col-md-5">
-										<label class="form-label">納税管理人名</label> <input type="text" class="form-control"
+										<label class="form-label">納税管理人名</label> <input type="text" class="form-control form-control-readonly"
 											th:field="*{nozeiKanriName}" readonly>
 									</div>
 									<div class="col-md-6">
 										<label class="form-label">納税管理人住所</label> <input type="text"
-											class="form-control" th:field="*{nozeiKanriJusho}" readonly>
+											class="form-control form-control-readonly" th:field="*{nozeiKanriJusho}" readonly>
 									</div>
 								</div>
 							</div>

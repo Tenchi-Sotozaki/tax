@@ -68,7 +68,7 @@
 							</label> <input th:if="${!(isView ?: false)}" type="month"
 								class="form-control" th:field="*{tekiyoStMonth}"
 								th:data-initial-value="*{tekiyoStMonth}"> <input
-								th:if="${isView ?: false}" type="text" class="form-control"
+								th:if="${isView ?: false}" type="text" class="form-control form-control-readonly"
 								readonly th:value="${tekiyoNozeiShukiForm.tekiyoStMonth != null ? tekiyoNozeiShukiForm.tekiyoStMonth.substring(0,4) + '年' + tekiyoNozeiShukiForm.tekiyoStMonth.substring(5) + '月' : ''}">
 						</div>
 
@@ -77,7 +77,7 @@
 								th:if="${!(isView ?: false)}" type="month" class="form-control"
 								th:field="*{tekiyoEdMonth}" th:data-initial-value="*{tekiyoEdMonth}">
 							<input th:if="${isView ?: false}" type="text"
-								class="form-control" readonly th:value="${tekiyoNozeiShukiForm.tekiyoEdMonth != null ? tekiyoNozeiShukiForm.tekiyoEdMonth.substring(0,4) + '年' + tekiyoNozeiShukiForm.tekiyoEdMonth.substring(5) + '月' : ''}">
+								class="form-control form-control-readonly" readonly th:value="${tekiyoNozeiShukiForm.tekiyoEdMonth != null ? tekiyoNozeiShukiForm.tekiyoEdMonth.substring(0,4) + '年' + tekiyoNozeiShukiForm.tekiyoEdMonth.substring(5) + '月' : ''}">
 						</div>
 
 						<div class="col-md-4">

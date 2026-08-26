@@ -62,7 +62,8 @@
 
 							<input type="text" class="form-control" th:field="*{shiteiStChar}" id="shiteiStChar"
 								maxlength="3" placeholder="例：001" th:readonly="${mode == 'view'}"
-								th:data-initial-value="*{shiteiStChar}">
+								th:data-initial-value="*{shiteiStChar}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''">
 
 							<div th:if="${#fields.hasErrors('shiteiStChar')}" class="text-danger small mt-1">
 								<span th:errors="*{shiteiStChar}"></span>
@@ -79,7 +80,8 @@
 
 							<input type="text" class="form-control" th:field="*{gassanStChar}" id="gassanStChar"
 								maxlength="3" placeholder="例：001" th:readonly="${mode == 'view'}"
-								th:data-initial-value="*{gassanStChar}">
+								th:data-initial-value="*{gassanStChar}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''">>
 
 							<div th:if="${#fields.hasErrors('gassanStChar')}" class="text-danger small mt-1">
 								<span th:errors="*{gassanStChar}"></span>

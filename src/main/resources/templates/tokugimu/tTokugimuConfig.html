@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
@@ -137,7 +137,7 @@
 								th:errorclass="is-invalid"
 								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}"
 								th:data-initial-value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
+							<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 								readonly
 								th:value="*{registrationDate != null ? #temporals.format(registrationDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
@@ -153,7 +153,7 @@
 								id="henkoDate" name="henkoDate" th:errorclass="is-invalid"
 								th:value="*{henkoDate != null ? #temporals.format(henkoDate, 'yyyy-MM-dd') : ''}"
 								th:data-initial-value="*{henkoDate != null ? #temporals.format(henkoDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
+							<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 								readonly th:value="*{henkoDate}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('henkoDate')}"
@@ -168,7 +168,7 @@
 								id="shinseiDate" name="shinseiDate" th:errorclass="is-invalid"
 								th:value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}"
 								th:data-initial-value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
+							<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 								readonly
 								th:value="*{shinseiDate != null ? #temporals.format(shinseiDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
@@ -192,7 +192,7 @@
 						<!-- 指定番号 -->
 						<div class="col-md-3">
 							<label for="shiteiNo" class="form-label fw-medium">指定番号</label> <input
-								type="text" class="form-control" id="shiteiNo"
+								type="text" class="form-control form-control-readonly" id="shiteiNo"
 								th:field="*{shiteiNo}" placeholder="自動で設定されます" readonly
 								th:data-initial-value="*{shiteiNo}">
 						</div>
@@ -210,7 +210,7 @@
 						<!-- 郵便番号 -->
 						<div class="col-md-3">
 							<label for="tokugimuAddressNo" class="form-label fw-medium">
-								郵便番号 </label> <input type="text" class="form-control"
+								郵便番号 </label> <input type="text" class="form-control form-control-readonly"
 								id="tokugimuAddressNo" th:field="*{tokugimuAddressNo}"
 								th:errorclass="is-invalid" placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuAddressNo}">
@@ -222,7 +222,7 @@
 						<!-- 住所 -->
 						<div class="col-md-5">
 							<label for="tokugimuAddress" class="form-label fw-medium">
-								住所 </label> <input type="text" class="form-control" id="tokugimuAddress"
+								住所 </label> <input type="text" class="form-control form-control-readonly" id="tokugimuAddress"
 								th:field="*{tokugimuAddress}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuAddress}">
@@ -237,7 +237,7 @@
 						<!-- 氏名 -->
 						<div class="col-md-3">
 							<label for="name" class="form-label fw-medium"> 氏名 </label> <input
-								type="text" class="form-control" id="name" th:field="*{name}"
+								type="text" class="form-control form-control-readonly" id="name" th:field="*{name}"
 								th:errorclass="is-invalid" placeholder="自動入力されます" readonly
 								th:data-initial-value="*{name}">
 							<div class="invalid-feedback"
@@ -248,7 +248,7 @@
 						<!-- 氏名(ふりがな) -->
 						<div class="col-md-5">
 							<label for="nameKana" class="form-label fw-medium">
-								氏名(ふりがな) </label> <input type="text" class="form-control" id="nameKana"
+								氏名(ふりがな) </label> <input type="text" class="form-control form-control-readonly" id="nameKana"
 								th:field="*{nameKana}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{nameKana}">
@@ -261,7 +261,7 @@
 						<!-- 法人番号 -->
 						<div class="col-md-3">
 							<label for="corporateNumber" class="form-label fw-medium">法人番号</label>
-							<input type="text" class="form-control" id="corporateNumber"
+							<input type="text" class="form-control form-control-readonly" id="corporateNumber"
 								th:field="*{corporateNumber}" placeholder="自動入力されます" readonly
 								th:data-initial-value="*{corporateNumber}">
 						</div>
@@ -269,7 +269,7 @@
 						<!-- 電話番号 -->
 						<div class="col-md-5">
 							<label for="tokugimuPhone" class="form-label fw-medium">
-								電話番号 </label> <input type="tel" class="form-control" id="tokugimuPhone"
+								電話番号 </label> <input type="tel" class="form-control form-control-readonly" id="tokugimuPhone"
 								th:field="*{tokugimuPhone}" th:errorclass="is-invalid"
 								placeholder="自動入力されます" readonly
 								th:data-initial-value="*{tokugimuPhone}">
@@ -308,7 +308,7 @@
 								th:errorclass="is-invalid"
 								th:value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy-MM-dd') : ''}"
 								th:data-initial-value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy-MM-dd') : ''}">
-							<input th:if="${isView}" type="text" class="form-control"
+							<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 								readonly
 								th:value="*{businessStartDate != null ? #temporals.format(businessStartDate, 'yyyy/MM/dd') : ''}">
 							<div class="invalid-feedback"
@@ -322,7 +322,8 @@
 								所在地(郵便番号) </label> <input type="text" class="form-control"
 								id="facilityAddressNo" th:field="*{facilityAddressNo}"
 								th:errorclass="is-invalid" th:readonly="${isView}"
-								th:data-initial-value="*{facilityAddressNo}">
+								th:data-initial-value="*{facilityAddressNo}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 
 						</div>
 
@@ -332,7 +333,8 @@
 								所在地(住所) </label> <input type="text" class="form-control"
 								id="facilityAddress" th:field="*{facilityAddress}"
 								th:errorclass="is-invalid" th:readonly="${isView}"
-								th:data-initial-value="*{facilityAddress}">
+								th:data-initial-value="*{facilityAddress}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 
 						</div>
 
@@ -342,7 +344,8 @@
 								施設名称 <span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="facilityName"
 								th:field="*{facilityName}" th:errorclass="is-invalid"
-								th:readonly="${isView}" th:data-initial-value="*{facilityName}">
+								th:readonly="${isView}" th:data-initial-value="*{facilityName}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityName')}"
 								th:errors="*{facilityName}"></div>
@@ -355,7 +358,8 @@
 							</label> <input type="text" class="form-control" id="facilityNameKana"
 								th:field="*{facilityNameKana}" th:errorclass="is-invalid"
 								placeholder="ひらがなで入力" th:readonly="${isView}"
-								th:data-initial-value="*{facilityNameKana}">
+								th:data-initial-value="*{facilityNameKana}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('facilityNameKana')}"
 								th:errors="*{facilityNameKana}"></div>
@@ -369,7 +373,8 @@
 								電話番号 </label> <input type="tel" class="form-control" id="facilityPhone"
 								th:field="*{facilityPhone}" th:errorclass="is-invalid"
 								placeholder="例）03-1234-5678" th:readonly="${isView}"
-								th:data-initial-value="*{facilityPhone}">
+								th:data-initial-value="*{facilityPhone}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 
 						</div>
 
@@ -381,7 +386,8 @@
 								<input type="text" class="form-control" id="floorArea"
 									th:readonly="${isView}" th:field="*{floorArea}"
 									th:errorclass="is-invalid" step="0.01"
-									th:data-initial-value="*{floorArea}"> <span
+									th:data-initial-value="*{floorArea}"
+									th:classappend="${isView} ? ' form-control-readonly' : ''"> <span
 									class="input-group-text">㎡</span>
 							</div>
 
@@ -395,7 +401,8 @@
 								<input type="text" class="form-control" id="floors"
 									th:field="*{aboveGroundFloor}" th:errorclass="is-invalid"
 									placeholder="施設の地上階数を入力する" th:readonly="${isView}"
-									th:data-initial-value="*{aboveGroundFloor}"> <span
+									th:data-initial-value="*{aboveGroundFloor}"
+									th:classappend="${isView} ? ' form-control-readonly' : ''"> <span
 									class="input-group-text">階</span>
 							</div>
 
@@ -409,7 +416,8 @@
 								<input type="text" class="form-control" id="basementFloor"
 									th:field="*{basementFloor}" th:errorclass="is-invalid"
 									placeholder="施設の地下階数を入力する" th:readonly="${isView}"
-									th:data-initial-value="*{basementFloor}"> <span
+									th:data-initial-value="*{basementFloor}"
+									th:classappend="${isView} ? ' form-control-readonly' : ''"> <span
 									class="input-group-text">階</span>
 							</div>
 						</div>
@@ -424,7 +432,8 @@
 								<input type="text" class="form-control" id="roomCount"
 									th:readonly="${isView}" th:field="*{roomCount}"
 									th:errorclass="is-invalid" min="1"
-									th:data-initial-value="*{roomCount}"> <span
+									th:data-initial-value="*{roomCount}"
+									th:classappend="${isView} ? ' form-control-readonly' : ''"> <span
 									class="input-group-text">室</span>
 							</div>
 						</div>
@@ -437,7 +446,8 @@
 								<input type="text" class="form-control" id="capacity"
 									th:readonly="${isView}" th:field="*{capacity}"
 									th:errorclass="is-invalid" min="1"
-									th:data-initial-value="*{capacity}"> <span
+									th:data-initial-value="*{capacity}"
+									th:classappend="${isView} ? ' form-control-readonly' : ''"> <span
 									class="input-group-text">人</span>
 							</div>
 						</div>
@@ -470,7 +480,8 @@
 							</label> <input type="text" class="form-control" id="licenseAddressNo"
 								th:field="*{licenseAddressNo}" th:errorclass="is-invalid"
 								th:readonly="${isView}"
-								th:data-initial-value="*{licenseAddressNo}">
+								th:data-initial-value="*{licenseAddressNo}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 						</div>
 
 						<!-- 住所 -->
@@ -480,7 +491,8 @@
 							</label> <input type="text" class="form-control" id="licenseAddress"
 								th:field="*{licenseAddress}" th:errorclass="is-invalid"
 								th:readonly="${isView}"
-								th:data-initial-value="*{licenseAddress}">
+								th:data-initial-value="*{licenseAddress}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 						</div>
 
 						<div class="col-md-4"></div>
@@ -491,7 +503,8 @@
 								<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="licenseName"
 								th:field="*{licenseName}" th:errorclass="is-invalid"
-								th:readonly="${isView}" th:data-initial-value="*{licenseName}">
+								th:readonly="${isView}" th:data-initial-value="*{licenseName}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseName')}"
 								th:errors="*{licenseName}"></div>
@@ -504,7 +517,8 @@
 							</label> <input type="text" class="form-control" id="licenseNameKana"
 								th:field="*{licenseNameKana}" th:errorclass="is-invalid"
 								placeholder="ひらがなで入力" th:readonly="${isView}"
-								th:data-initial-value="*{licenseNameKana}">
+								th:data-initial-value="*{licenseNameKana}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('licenseNameKana')}"
 								th:errors="*{licenseNameKana}"></div>
@@ -518,7 +532,8 @@
 								電話番号 </label> <input type="tel" class="form-control" id="licensePhone"
 								th:field="*{licensePhone}" th:errorclass="is-invalid"
 								placeholder="例）03-1234-5678" th:readonly="${isView}"
-								th:data-initial-value="*{licensePhone}">
+								th:data-initial-value="*{licensePhone}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 						</div>
 
 						<!-- 営業種別 -->
@@ -542,7 +557,8 @@
 								許可番号<span class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="licenseNumber"
 								th:field="*{licenseNumber}" th:errorclass="is-invalid"
-								th:readonly="${isView}" th:data-initial-value="*{licenseNumber}">
+								th:readonly="${isView}" th:data-initial-value="*{licenseNumber}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 						</div>
 
 					</div>
@@ -581,7 +597,8 @@
 									</label> <input type="text" class="form-control" id="ownerAddressNo"
 										th:field="*{ownerAddressNo}" th:errorclass="is-invalid"
 										th:readonly="${isView}"
-										th:data-initial-value="*{ownerAddressNo}">
+										th:data-initial-value="*{ownerAddressNo}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''">
 								</div>
 
 								<!-- 住所 -->
@@ -590,7 +607,8 @@
 									</label> <input type="text" class="form-control" id="ownerAddress"
 										th:field="*{ownerAddress}" th:errorclass="is-invalid"
 										th:readonly="${isView}"
-										th:data-initial-value="*{ownerAddress}">
+										th:data-initial-value="*{ownerAddress}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''">
 								</div>
 
 								<div class="col-md-4"></div>
@@ -601,7 +619,8 @@
 										<span class="text-danger" th:if="!${isView}">*</span>
 									</label> <input type="text" class="form-control" id="ownerName"
 										th:field="*{ownerName}" th:errorclass="is-invalid"
-										th:readonly="${isView}" th:data-initial-value="*{ownerName}">
+										th:readonly="${isView}" th:data-initial-value="*{ownerName}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''">
 									<div class="invalid-feedback"
 										th:if="${#fields.hasErrors('ownerName')}"
 										th:errors="*{ownerName}"></div>
@@ -614,7 +633,8 @@
 									</label> <input type="text" class="form-control" id="ownerNameKana"
 										th:field="*{ownerNameKana}" th:errorclass="is-invalid"
 										placeholder="ひらがなで入力" th:readonly="${isView}"
-										th:data-initial-value="*{ownerNameKana}">
+										th:data-initial-value="*{ownerNameKana}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''">
 									<div class="invalid-feedback"
 										th:if="${#fields.hasErrors('ownerNameKana')}"
 										th:errors="*{ownerNameKana}"></div>
@@ -628,7 +648,8 @@
 										電話番号 </label> <input type="tel" class="form-control" id="ownerPhone"
 										th:field="*{ownerPhone}" th:errorclass="is-invalid"
 										placeholder="例）03-1234-5678" th:readonly="${isView}"
-										th:data-initial-value="*{ownerPhone}">
+										th:data-initial-value="*{ownerPhone}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''">
 								</div>
 
 							</div>
@@ -660,7 +681,8 @@
 								住所(郵便番号) </label> <input type="text" class="form-control"
 								id="mailAddressNo" th:field="*{mailAddressNo}"
 								th:errorclass="is-invalid" th:readonly="${isView}"
-								th:data-initial-value="*{mailAddressNo}">
+								th:data-initial-value="*{mailAddressNo}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 						</div>
 
 						<!-- 住所 -->
@@ -668,7 +690,8 @@
 							<label for="mailAddress" class="form-label fw-medium"> 住所
 							</label> <input type="text" class="form-control" id="mailAddress"
 								th:field="*{mailAddress}" th:errorclass="is-invalid"
-								th:readonly="${isView}" th:data-initial-value="*{mailAddress}">
+								th:readonly="${isView}" th:data-initial-value="*{mailAddress}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 						</div>
 
 						<div class="col-md-4"></div>
@@ -679,7 +702,8 @@
 								class="text-danger" th:if="!${isView}">*</span>
 							</label> <input type="text" class="form-control" id="mailName"
 								th:field="*{mailName}" th:errorclass="is-invalid"
-								th:readonly="${isView}" th:data-initial-value="*{mailName}">
+								th:readonly="${isView}" th:data-initial-value="*{mailName}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailName')}" th:errors="*{mailName}"></div>
 						</div>
@@ -690,7 +714,8 @@
 								氏名(ふりがな) </label> <input type="text" class="form-control"
 								id="mailNameKana" th:field="*{mailNameKana}"
 								th:errorclass="is-invalid" placeholder="ひらがなで入力"
-								th:readonly="${isView}" th:data-initial-value="*{mailNameKana}">
+								th:readonly="${isView}" th:data-initial-value="*{mailNameKana}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('mailNameKana')}"
 								th:errors="*{mailNameKana}"></div>
@@ -704,7 +729,8 @@
 							</label> <input type="tel" class="form-control" id="mailPhone"
 								th:field="*{mailPhone}" th:errorclass="is-invalid"
 								placeholder="例）03-1234-5678" th:readonly="${isView}"
-								th:data-initial-value="*{mailPhone}">
+								th:data-initial-value="*{mailPhone}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 						</div>
 					</div>
 				</div>
@@ -755,7 +781,8 @@
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoAddressNo}"
 														th:readonly="${isView}"
-														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddressNo}">
+														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddressNo}"
+														th:classappend="${isView} ? ' form-control-readonly' : ''">
 												</div>
 
 												<!-- 住所 -->
@@ -764,7 +791,8 @@
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoAddress}"
 														th:readonly="${isView}"
-														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddress}">
+														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoAddress}"
+														th:classappend="${isView} ? ' form-control-readonly' : ''">
 												</div>
 
 												<div class="col-md-4"></div>
@@ -776,7 +804,8 @@
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoName}"
 														th:readonly="${isView}"
-														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoName}">
+														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoName}"
+														th:classappend="${isView} ? ' form-control-readonly' : ''">
 												</div>
 
 												<!-- 氏名(ふりがな) -->
@@ -786,7 +815,8 @@
 														type="text" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoNameKana}"
 														placeholder="ひらがなで入力" th:readonly="${isView}"
-														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoNameKana}">
+														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoNameKana}"
+														th:classappend="${isView} ? ' form-control-readonly' : ''">
 												</div>
 
 												<div class="col-md-4"></div>
@@ -797,7 +827,8 @@
 														type="tel" class="form-control"
 														th:field="*{kyodoList[__${stat.index}__].kyodoPhone}"
 														placeholder="例）03-1234-5678" th:readonly="${isView}"
-														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoPhone}">
+														th:data-initial-value="*{kyodoList[__${stat.index}__].kyodoPhone}"
+														th:classappend="${isView} ? ' form-control-readonly' : ''">
 												</div>
 											</div>
 										</div>
@@ -841,7 +872,8 @@
 							<label for="remarks" class="form-label fw-medium">備考</label>
 							<textarea class="form-control" id="remarks" rows="3"
 								th:field="*{remarks}" placeholder="特記事項があれば入力してください"
-								th:readonly="${isView}" th:data-initial-value="*{remarks}"></textarea>
+								th:readonly="${isView}" th:data-initial-value="*{remarks}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''"></textarea>
 						</div>
 
 					</div>
@@ -904,7 +936,7 @@
 										th:disabled="*{declarationCategory == null or declarationCategory != '休止'}"
 										th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}"
 										th:data-initial-value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy-MM-dd') : ''}">
-									<input th:if="${isView}" type="text" class="form-control"
+									<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 										readonly
 										th:value="*{suspensionStartDate != null ? #temporals.format(suspensionStartDate, 'yyyy/MM/dd') : ''}">
 								</div>
@@ -917,7 +949,7 @@
 										th:disabled="*{declarationCategory == null or declarationCategory != '休止'}"
 										th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}"
 										th:data-initial-value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy-MM-dd') : ''}">
-									<input th:if="${isView}" type="text" class="form-control"
+									<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 										readonly
 										th:value="*{suspensionEndDate != null ? #temporals.format(suspensionEndDate, 'yyyy/MM/dd') : ''}">
 								</div>
@@ -944,7 +976,7 @@
 										th:disabled="*{declarationCategory == null or (declarationCategory != '再開' and declarationCategory != '廃止')}"
 										th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}"
 										th:data-initial-value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy-MM-dd') : ''}">
-									<input th:if="${isView}" type="text" class="form-control"
+									<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 										readonly
 										th:value="*{resumptionOrAbolitionDate != null ? #temporals.format(resumptionOrAbolitionDate, 'yyyy/MM/dd') : ''}">
 								</div>
@@ -957,7 +989,8 @@
 										id="suspensionOrAbolitionReason"
 										th:field="*{suspensionOrAbolitionReason}"
 										th:readonly="${isView}"
-										th:data-initial-value="*{suspensionOrAbolitionReason}"></textarea>
+										th:data-initial-value="*{suspensionOrAbolitionReason}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''"></textarea>
 								</div>
 
 							</div>

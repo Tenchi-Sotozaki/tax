@@ -64,7 +64,8 @@
 								class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="id" th:field="*{id}"
 								th:errorclass="is-invalid" th:readonly="${isEdit}"
-								th:data-initial-value="*{id}">
+								th:data-initial-value="*{id}"
+								th:classappend="${isEdit} ? ' form-control-readonly' : ''">
 
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('id')}"
 								th:errors="*{id}"></div>
@@ -80,7 +81,8 @@
 								class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="name"
 								th:field="*{name}" th:errorclass="is-invalid"
-								th:readonly="${isView}" th:data-initial-value="*{name}">
+								th:readonly="${isView}" th:data-initial-value="*{name}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
@@ -94,7 +96,8 @@
 							</label> <input type="text" class="form-control" id="nameKana"
 								th:field="*{nameKana}" th:errorclass="is-invalid"
 								placeholder="ひらがなで入力" th:readonly="${isView}"
-								th:data-initial-value="*{nameKana}">
+								th:data-initial-value="*{nameKana}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('nameKana')}" th:errors="*{nameKana}"></div>
@@ -108,7 +111,8 @@
 								class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="busho"
 								th:field="*{busho}" th:errorclass="is-invalid"
-								th:readonly="${isView}" th:data-initial-value="*{busho}">
+								th:readonly="${isView}" th:data-initial-value="*{busho}"
+								th:classappend="${isView} ? ' form-control-readonly' : ''">
 
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('busho')}" th:errors="*{busho}">

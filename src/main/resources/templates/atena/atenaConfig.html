@@ -57,7 +57,7 @@
 						<!-- 宛名番号 -->
 						<div class="col-md-4">
 							<label class="form-label fw-medium">宛名番号</label> <input
-								type="text" class="form-control" th:value="*{atenaNo}" readonly
+								type="text" class="form-control form-control-readonly" th:value="*{atenaNo}" readonly
 								placeholder="自動採番">
 						</div>
 
@@ -77,6 +77,7 @@
 							<label class="form-label fw-medium">法人番号</label> <input
 								type="text" class="form-control" th:field="*{hojinNo}"
 								th:errorclass="is-invalid" th:readonly="${mode == 'view'}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
 								placeholder="個人番号か法人番号どちらか一方を入力">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('hojinNo')}" th:errors="*{hojinNo}"></div>
@@ -90,6 +91,7 @@
 								class="text-danger" th:if="${mode != 'view'}">*</span></label> <input
 								type="text" class="form-control" th:field="*{name}"
 								th:errorclass="is-invalid" th:readonly="${mode == 'view'}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
 								placeholder="氏名または名称">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
@@ -99,35 +101,45 @@
 						<div class="col-md-8">
 							<label class="form-label fw-medium">ふりがな</label> <input
 								type="text" class="form-control" th:field="*{nameKana}"
-								th:readonly="${mode == 'view'}" placeholder="ふりがな">
+								th:readonly="${mode == 'view'}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								placeholder="ふりがな">
 						</div>
 
 						<!-- 郵便番号 -->
 						<div class="col-md-4">
 							<label class="form-label fw-medium">郵便番号</label> <input
 								type="text" class="form-control" th:field="*{yubinNo}"
-								th:readonly="${mode == 'view'}" placeholder="例：1234567（数字7桁）">
+								th:readonly="${mode == 'view'}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								placeholder="例：1234567（数字7桁）">
 						</div>
 
 						<!-- 住所 -->
 						<div class="col-md-8">
 							<label class="form-label fw-medium">住所</label> <input type="text"
 								class="form-control" th:field="*{jusho}"
-								th:readonly="${mode == 'view'}" placeholder="住所">
+								th:readonly="${mode == 'view'}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								placeholder="住所">
 						</div>
 
 						<!-- 電話番号1 -->
 						<div class="col-md-4">
 							<label class="form-label fw-medium">電話番号1</label> <input
 								type="text" class="form-control" th:field="*{tel1}"
-								th:readonly="${mode == 'view'}" placeholder="電話番号1">
+								th:readonly="${mode == 'view'}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								placeholder="電話番号1">
 						</div>
 
 						<!-- 電話番号2 -->
 						<div class="col-md-4">
 							<label class="form-label fw-medium">電話番号2</label> <input
 								type="text" class="form-control" th:field="*{tel2}"
-								th:readonly="${mode == 'view'}" placeholder="電話番号2">
+								th:readonly="${mode == 'view'}"
+								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								placeholder="電話番号2">
 						</div>
 					</div>
 				</form>

@@ -498,8 +498,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 		
         if (isChanged) {
-            input.style.border = '3px solid #ffeb3b';
+			input.classList.add('form-control-edited');
         } else {
+			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

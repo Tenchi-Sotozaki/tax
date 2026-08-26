@@ -9,7 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (initial === null) return;
         const initialStr = (initial === 'null') ? '' : String(initial).trim();
         const currentStr = String(input.value).trim();
-        input.style.border = (currentStr !== initialStr) ? '3px solid #ffeb3b' : '';
+        if (currentStr !== initialStr) {
+            input.classList.add('form-control-edited');
+        } else {
+			input.classList.remove('form-control-edited');
+            input.style.border = '';
+        }
     }
 
     document.querySelectorAll('#configForm .form-control, #configForm .form-select').forEach(function (input) {

@@ -53,7 +53,7 @@
 							<input type="number" id="tekiyoStNendo" th:field="*{tekiyoStNendo}"
 								min="2000" max="2100"
 								th:readonly="${mode == 'view' or mode == 'edit'}"
-								th:classappend="${#fields.hasErrors('tekiyoStNendo')} ? 'is-invalid' : ''"
+								th:classappend="(${#fields.hasErrors('tekiyoStNendo')} ? 'is-invalid' : '') + (${mode == 'view' or mode == 'edit'} ? ' form-control-readonly' : '')"
 								class="form-control">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoStNendo')}"
@@ -66,7 +66,7 @@
 								step="0.01" min="0" max="999.99"
 								th:readonly="${mode == 'view'}"
 								th:data-initial-value="*{kofuRitsu}"
-								th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
+								th:classappend="(${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : '') + (${mode == 'view'} ? ' form-control-readonly' : '')"
 								class="form-control">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('kofuRitsu')}"
@@ -78,7 +78,7 @@
 							<input type="number" id="sanshutsu" th:field="*{sanshutsu}"
 								min="0" th:readonly="${mode == 'view'}"
 								th:data-initial-value="*{sanshutsu}"
-								th:classappend="${#fields.hasErrors('sanshutsu')} ? 'is-invalid' : ''"
+								th:classappend="(${#fields.hasErrors('sanshutsu')} ? 'is-invalid' : '') + (${mode == 'view'} ? ' form-control-readonly' : '')"
 								class="form-control">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('sanshutsu')}"
@@ -104,7 +104,7 @@
 							<input type="number" id="saiteigaku" th:field="*{saiteigaku}"
 								step="0.01" min="0" th:readonly="${mode == 'view'}"
 								th:data-initial-value="*{saiteigaku}"
-								th:classappend="${#fields.hasErrors('saiteigaku')} ? 'is-invalid' : ''"
+								th:classappend="(${#fields.hasErrors('saiteigaku')} ? 'is-invalid' : '') + (${mode == 'view'} ? ' form-control-readonly' : '')"
 								class="form-control">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('saiteigaku')}"
