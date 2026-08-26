@@ -2,14 +2,10 @@ package jp.lg.asp.accommodation.service;
 
 import java.util.List;
 
-import jp.lg.asp.accommodation.dto.KoseiKetteiTsuchiReportsDto;
-
 /**
  * 更正・決定通知書 ReportsService インターフェース
  */
 public interface KoseiKetteiTsuchiReportsService {
-
-    KoseiKetteiTsuchiReportsDto buildDtoForDisplay(String shiteiNo);
 
     List<String> findTaishoYmList(String shiteiNo);
 

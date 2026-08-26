@@ -16,7 +16,7 @@
 					th:text="${mode == 'register' ? '納入期限登録' : (mode == 'edit' ? '納入期限編集' : '納入期限照会')}">納入期限設定</span>
 			</h5>
 			<div th:if="${mode == 'view'}" class="d-flex align-items-center gap-2">
-				<a th:href="@{/admin/nokigen/edit/{nendo}(nendo=${nokigen.nendo})}" class="btn btn-sm btn-primary text-nowrap">
+				<a th:href="@{/admin/nokigen/edit/{nendo}(nendo=${nokigen.nendo})}" class="btn btn-primary text-nowrap">
 					<i class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
@@ -97,7 +97,7 @@
 									value="monday" style="width:0.85em;height:0.85em;">
 								<label class="form-check-label small" for="shiftMonday">翌営業日にずらす</label>
 							</div>
-							<button type="button" class="btn btn-outline-primary btn-sm ms-2" th:data-url="@{/admin/nokigen/prev-data/}"
+							<button type="button" class="btn btn-outline-primary ms-2" th:data-url="@{/admin/nokigen/prev-data/}"
 								th:data-exists-url="@{/admin/nokigen/exists/}" onclick="copyPrevYear(this)">
 								<i class="bi bi-copy me-1"></i>前年度を複写する
 							</button>
@@ -245,18 +245,19 @@
 		<!-- ボタン -->
 		<div class="text-center mt-4" th:if="${mode != 'view'}">
 			<!-- 戻る -->
-			<button type="button" class="btn btn-outline-secondary btn-lg" data-bs-toggle="modal" data-bs-target="#backModal">
+			<button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#backModal"
+				th:if="${mode == 'edit'}">
 				<i class="bi bi-arrow-left me-1"></i> 戻る
 			</button>
 			<!-- 登録/更新 -->
-			<button type="submit" form="nokigenForm" class="btn btn-success btn-lg">
+			<button type="submit" form="nokigenForm" class="btn btn-success">
 				<i class="bi bi-check-circle me-1"></i> <span th:text="${mode == 'register' ? '登録する' : '更新する'}">保存</span>
 			</button>
 		</div>
 		
 		<!-- 入力内容破棄確認モーダル -->
 		<div
-			th:replace="~{layout/components :: linkConfirmModal('backModal','確認','入力内容が破棄されます。戻りますか？',@{/admin/nokigen/view/{nendo}(nendo=${mode == 'edit' ? nokigen.nendo : nendoList[0]})},'戻る')}">
+			th:replace="~{layout/components :: linkConfirmModal('backModal','確認','入力内容が破棄されます。よろしいですか？',@{/admin/nokigen/view/{nendo}(nendo=${mode == 'edit' ? nokigen.nendo : nendoList[0]})},'戻る')}">
 		</div>
 
 	</div>

@@ -22,7 +22,7 @@
 				</h5>
 
 				<div th:if="${kozaForm.viewMode}">
-					<button type="button" class="btn btn-primary btn-sm"
+					<button type="button" class="btn btn-primary"
 						onclick="editMode()">
 						<i class="bi bi-pencil"></i> 編集する
 					</button>
@@ -85,11 +85,15 @@
 
 								<label for="bankName" class="form-label"> 金融機関名 <span
 									class="text-danger">*</span>
-								</label> <input type="text" class="form-control" id="bankName"
-									th:field="*{bankName}" th:readonly="${kozaForm.viewMode}"
-									th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('bankName')} ? ' is-invalid' : '')"
-									maxlength="30"
-									required th:data-initial-value="*{bankName}">
+								</label>
+								<div class="position-relative">
+									<input type="text" class="form-control" id="bankName"
+										th:field="*{bankName}" th:readonly="${kozaForm.viewMode}"
+										maxlength="30" autocomplete="off"
+										th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('bankName')} ? ' is-invalid' : '')"
+										required th:data-initial-value="*{bankName}">
+									<ul id="bankNameSuggestions" class="list-group position-absolute w-100 shadow" style="z-index:1000;display:none;max-height:100px;overflow-y:auto;"></ul>
+								</div>
 
 								<div th:if="${#fields.hasErrors('bankName')}"
 									class="invalid-feedback">
@@ -122,11 +126,15 @@
 
 								<label for="branchName" class="form-label"> 支店名 <span
 									class="text-danger">*</span>
-								</label> <input type="text" class="form-control" id="branchName"
-									th:field="*{branchName}" th:readonly="${kozaForm.viewMode}"
-									th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('branchName')} ? ' is-invalid' : '')"
-									maxlength="30"
-									required th:data-initial-value="*{branchName}">
+								</label>
+								<div class="position-relative">
+									<input type="text" class="form-control" id="branchName"
+										th:field="*{branchName}" th:readonly="${kozaForm.viewMode}"
+										maxlength="30" autocomplete="off"
+										th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('branchName')} ? ' is-invalid' : '')"
+										required th:data-initial-value="*{branchName}">
+									<ul id="branchNameSuggestions" class="list-group position-absolute w-100 shadow" style="z-index:1000;display:none;max-height:100px;overflow-y:auto;"></ul>
+								</div>
 
 								<div th:if="${#fields.hasErrors('branchName')}"
 									class="invalid-feedback">
@@ -217,10 +225,11 @@
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary"
 						th:if="${kozaForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a href="#" class="btn btn-outline-primary"
+					</a> 
+					<a href="#" class="btn btn-outline-secondary"
 						th:unless="${kozaForm.viewMode}"
 						data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る
@@ -264,7 +273,7 @@
 			</form>
 		</div>
 
-		<div th:if="${kozaForm.createMode}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '振込先口座情報を登録しますか？', 'createForm', 'btn-success', '登録する')}"></div>
+		<div th:if="${kozaForm.createMode}" th:replace="~{layout/components :: confirmModal('registerConfirmModal', '登録確認', '振込先口座情報を登録します。よろしいですか？', 'createForm', 'btn-success', '登録する')}"></div>
 		<div th:unless="${kozaForm.viewMode}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/shoreikin/list}, '戻る')}"></div>
 
 		<!-- 特別徴収義務者指定モーダル -->
@@ -272,6 +281,10 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
+		<script th:inline="javascript">
+			const BANK_SEARCH_URL = /*[[@{/api/bank/search}]]*/ '/api/bank/search';
+			const BRANCH_SEARCH_URL = /*[[@{/api/bank/branch/search}]]*/ '/api/bank/branch/search';
+		</script>
 		<script th:src="@{/js/furikomiKoza.js}"></script>
 		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
