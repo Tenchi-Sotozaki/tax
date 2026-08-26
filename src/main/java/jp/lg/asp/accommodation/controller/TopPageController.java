@@ -114,32 +114,18 @@ public class TopPageController {
 	            && form.getPostingEndDate() != null
 	            && form.getPostingStartDate().isAfter(form.getPostingEndDate())) {
 
-	        bindingResult.reject(
+	        bindingResult.rejectValue(
+	                "postingStartDate",
 	                "date.reverse",
 	                "掲載開始日は掲載終了日以前の日付を入力してください。");
 	    }
 
 	    // バリデーションエラー
 	    if (bindingResult.hasErrors()) {
-
-	        if (bindingResult.hasFieldErrors("title")) {
-	            model.addAttribute(
-	                    "errorMessage",
-	                    "タイトルを入力してください。");
-
-	        } else if (bindingResult.hasFieldErrors("htmlContent")) {
-	            model.addAttribute(
-	                    "errorMessage",
-	                    "内容を入力してください。");
-
-	        } else {
-	            model.addAttribute(
-	                    "errorMessage",
-	                    bindingResult.getAllErrors()
-	                            .get(0)
-	                            .getDefaultMessage());
-	        }
-
+	        List<String> validationErrors = bindingResult.getAllErrors().stream()
+	                .map(e -> e.getDefaultMessage())
+	                .toList();
+	        model.addAttribute("validationErrors", validationErrors);
 	        return "top/topPageConfig";
 	    }
 
