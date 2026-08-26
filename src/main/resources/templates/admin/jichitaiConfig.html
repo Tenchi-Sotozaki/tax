@@ -152,10 +152,10 @@
 				<div class="card-body">
 					<div class="row g-3">
 						<div class="col-md-3">
-							<label for="shiteiStChar" class="form-label fw-medium">ユーザー名 <span class="text-danger">*</span></label>
-							<input type="text" id="userName" th:field="*{userName}" class="form-control"
-								th:classappend="${#fields.hasErrors('userName')} ? 'is-invalid' : ''" placeholder="例：user">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}">
+							<label for="shiteiStChar" class="form-label fw-medium">ユーザーID <span class="text-danger">*</span></label>
+							<input type="text" id="userId" th:field="*{userId}" class="form-control"
+								th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''" placeholder="例：user">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">
 							</div>
 						</div>
 					</div>

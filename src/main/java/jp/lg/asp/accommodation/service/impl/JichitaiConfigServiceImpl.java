@@ -85,6 +85,7 @@ public class JichitaiConfigServiceImpl implements JichitaiConfigService {
 	                form.setName(jichitai.getName());
 	                form.setKbnName(jichitai.getKbnName());
 	                form.setParam(jichitai.getParam());
+	                form.setUserId(jichitai.getUserName());
 
 	                form.setNendoStMonth(
 	                    jichitai.getNendoStMonth() == null
@@ -111,7 +112,7 @@ public class JichitaiConfigServiceImpl implements JichitaiConfigService {
 	            .orElseGet(Jichitai::new);
 
 	    jichitai.setJichitaiCd(configForm.getJichitaiCd());
-	    jichitai.setUserName(configForm.getUserName());
+	    jichitai.setUserName(configForm.getUserId());
 	    copyProperties(configForm, jichitai);
 
 	    jichitaiRepository.save(jichitai);
