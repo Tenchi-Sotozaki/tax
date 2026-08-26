@@ -135,7 +135,7 @@
 		</div>
 		
 		<div class="d-flex justify-content-center"
-			th:replace="~{layout/components :: linkConfirmModal('discardModal', '確認', '入力内容は破棄されます。よろしいですか？', ${mode == 'edit'} ? @{/admin/kofu-ritsu/view/{rno}(rno=${rno})} : @{/admin/kofu-ritsu/list}, '戻る')}">
+			th:replace="~{layout/components :: linkConfirmModal('discardModal', '確認', '入力内容が破棄されます。よろしいですか？', ${mode == 'edit'} ? @{/admin/kofu-ritsu/view/{rno}(rno=${rno})} : @{/admin/kofu-ritsu/list}, '戻る')}">
 		</div>
 	</div>
 
