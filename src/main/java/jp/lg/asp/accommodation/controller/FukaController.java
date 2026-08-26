@@ -263,6 +263,23 @@ public class FukaController {
 
 		accessChecker.checkWriteAccess(SCREEN_ID);
 
+		// 加算金額区分を選択した場合は、割合の入力も必須
+		if (StringUtils.hasText(form.getAdditionalCategory1())
+				&& !StringUtils.hasText(form.getAdditionalRate1())) {
+			bindingResult.rejectValue("additionalRate1", "error.additionalRate1",
+					"区分を選択した場合は、割合を入力してください");
+		}
+		if (StringUtils.hasText(form.getAdditionalCategory2())
+				&& !StringUtils.hasText(form.getAdditionalRate2())) {
+			bindingResult.rejectValue("additionalRate2", "error.additionalRate2",
+					"区分を選択した場合は、割合を入力してください");
+		}
+		if (StringUtils.hasText(form.getAdditionalCategory3())
+				&& !StringUtils.hasText(form.getAdditionalRate3())) {
+			bindingResult.rejectValue("additionalRate3", "error.additionalRate3",
+					"区分を選択した場合は、割合を入力してください");
+		}
+
 		// 1. 基本的な入力チェック（Spring Bootによる自動バリデーション）
 		if (bindingResult.hasErrors()) {
 			bindingResult.getAllErrors().forEach(error -> {
@@ -273,7 +290,9 @@ public class FukaController {
 			java.util.List<String> fieldOrder = java.util.List.of(
 					"torokuDate", "shinkokuDate",
 					"modificationCategory",
-					"additionalAmountValid1", "additionalAmountValid2", "additionalAmountValid3");
+					"additionalRate1", "additionalAmountValid1",
+					"additionalRate2", "additionalAmountValid2",
+					"additionalRate3", "additionalAmountValid3");
 			for (String field : fieldOrder) {
 				bindingResult.getAllErrors().stream()
 						.filter(e -> e instanceof org.springframework.validation.FieldError
