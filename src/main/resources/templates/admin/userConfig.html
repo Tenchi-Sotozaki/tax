@@ -17,7 +17,7 @@
 			</h5>
 
 			<a th:href="@{/admin/user-edit/{id}(id=${userForm.originalId})}"
-				class="btn btn-primary btn-sm" th:if="${isView}"> <i
+				class="btn btn-primary" th:if="${isView}"> <i
 				class="bi bi-pencil-square me-2"></i>編集する
 			</a>
 		</div>
@@ -176,17 +176,17 @@
 
 				<!-- 戻る（編集は照会画面へ、登録は一覧へ。照会画面は入力破棄の確認を出さない） -->
 				<a th:if="${isView != true}" href="#"
-					class="btn btn-outline-primary btn-lg px-4"
+					class="btn btn-outline-secondary px-4"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>戻る
 				</a>
 				<a th:if="${isView}" th:href="@{/admin/user-search}"
-					class="btn btn-outline-primary btn-lg px-4"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
+					class="btn btn-outline-secondary px-4"> <i
+					class="bi bi-arrow-left me-2"></i>戻る
 				</a>
 
 				<!-- 編集時のみ削除ボタンを表示 -->
-				<button type="button" class="btn btn-danger btn-lg px-5"
+				<button type="button" class="btn btn-danger px-5"
 					th:if="${isEdit == true and isView != true}"
 					onclick="confirmUserDelete()">
 					<i class="bi bi-trash me-2"></i>削除する
@@ -194,7 +194,7 @@
 
 				<!-- 登録する／更新する（確認モーダルを経由する） -->
 				<button type="button" id="openConfirmModalBtn"
-					class="btn btn-success btn-lg px-5" th:unless="${isView}">
+					class="btn btn-success px-5" th:unless="${isView}">
 					<i
 						th:class="${isEdit} ? 'bi bi-pencil-square me-2' : 'bi bi-save me-2'"></i>
 					<span th:text="${isEdit} ? '更新する' : '登録する'"></span>
