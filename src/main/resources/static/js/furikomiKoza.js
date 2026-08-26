@@ -124,6 +124,105 @@ function validateForm() {
 
 // フォーム送信時のバリデーション
 document.addEventListener('DOMContentLoaded', function() {
+
+    // ===== 金融機関名・支店名 あいまい検索 =====
+    const isViewMode = document.querySelector('[data-is-edit]')?.getAttribute('data-is-edit') === 'false'
+        && document.querySelector('input[name="mode"]')?.value === 'view';
+
+    if (!isViewMode) {
+        setupBankSearch();
+        setupBranchSearch();
+    }
+
+    function setupBankSearch() {
+        const input = document.getElementById('bankName');
+        const suggestions = document.getElementById('bankNameSuggestions');
+        if (!input || !suggestions) return;
+
+        let debounceTimer;
+        input.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const word = input.value.trim();
+            if (word.length < 2) { suggestions.style.display = 'none'; return; }
+            debounceTimer = setTimeout(() => fetchBankSuggestions(word, suggestions), 300);
+        });
+
+        document.addEventListener('click', e => {
+            if (!input.contains(e.target)) suggestions.style.display = 'none';
+        });
+    }
+
+    function fetchBankSuggestions(word, suggestions) {
+        fetch('/api/bank/search?word=' + encodeURIComponent(word))
+            .then(r => r.json())
+            .then(items => {
+                suggestions.innerHTML = '';
+                if (items.length === 0) { suggestions.style.display = 'none'; return; }
+                items.forEach(item => {
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'list-group-item list-group-item-action py-1 small';
+                    a.textContent = item.code + ' ' + item.name + '　' + item.kana;
+                    a.addEventListener('click', e => {
+                        e.preventDefault();
+                        document.getElementById('bankCd').value = item.code;
+                        document.getElementById('bankName').value = item.name;
+                        suggestions.style.display = 'none';
+                        // 金融機関コードが変わったので支店候補をリセット
+                        document.getElementById('branchCd').value = '';
+                        document.getElementById('branchName').value = '';
+                    });
+                    suggestions.appendChild(a);
+                });
+                suggestions.style.display = 'block';
+            })
+            .catch(() => { suggestions.style.display = 'none'; });
+    }
+
+    function setupBranchSearch() {
+        const input = document.getElementById('branchName');
+        const suggestions = document.getElementById('branchNameSuggestions');
+        if (!input || !suggestions) return;
+
+        let debounceTimer;
+        input.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const word = input.value.trim();
+            const bankCode = document.getElementById('bankCd').value.trim();
+            if (word.length < 2 || !bankCode) { suggestions.style.display = 'none'; return; }
+            debounceTimer = setTimeout(() => fetchBranchSuggestions(bankCode, word, suggestions), 300);
+        });
+
+        document.addEventListener('click', e => {
+            if (!input.contains(e.target)) suggestions.style.display = 'none';
+        });
+    }
+
+    function fetchBranchSuggestions(bankCode, word, suggestions) {
+        fetch('/api/bank/branch/search?bankCode=' + encodeURIComponent(bankCode) + '&word=' + encodeURIComponent(word))
+            .then(r => r.json())
+            .then(items => {
+                suggestions.innerHTML = '';
+                if (items.length === 0) { suggestions.style.display = 'none'; return; }
+                items.forEach(item => {
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'list-group-item list-group-item-action py-1 small';
+                    a.textContent = item.code + ' ' + item.name + '　' + item.kana;
+                    a.addEventListener('click', e => {
+                        e.preventDefault();
+                        document.getElementById('branchCd').value = item.code;
+                        document.getElementById('branchName').value = item.name;
+                        suggestions.style.display = 'none';
+                    });
+                    suggestions.appendChild(a);
+                });
+                suggestions.style.display = 'block';
+            })
+            .catch(() => { suggestions.style.display = 'none'; });
+    }
+
+    // ===== 既存処理 =====
     const form = document.querySelector('form[th\\:object]');
     if (form) {
         form.addEventListener('submit', function(event) {

@@ -87,9 +87,10 @@
 									class="text-danger">*</span>
 								</label> <input type="text" class="form-control" id="bankName"
 									th:field="*{bankName}" th:readonly="${kozaForm.viewMode}"
-									maxlength="30"
+									maxlength="30" autocomplete="off"
 									th:classappend="${#fields.hasErrors('bankName')} ? 'is-invalid' : ''"
 									required th:data-initial-value="*{bankName}">
+								<div id="bankNameSuggestions" class="list-group position-absolute z-3" style="display:none; max-height:200px; overflow-y:auto; width:100%"></div>
 
 								<div th:if="${#fields.hasErrors('bankName')}"
 									class="invalid-feedback">
@@ -124,9 +125,10 @@
 									class="text-danger">*</span>
 								</label> <input type="text" class="form-control" id="branchName"
 									th:field="*{branchName}" th:readonly="${kozaForm.viewMode}"
-									maxlength="30"
+									maxlength="30" autocomplete="off"
 									th:classappend="${#fields.hasErrors('branchName')} ? 'is-invalid' : ''"
 									required th:data-initial-value="*{branchName}">
+								<div id="branchNameSuggestions" class="list-group position-absolute z-3" style="display:none; max-height:200px; overflow-y:auto; width:100%"></div>
 
 								<div th:if="${#fields.hasErrors('branchName')}"
 									class="invalid-feedback">
