@@ -35,4 +35,7 @@ public class JichitaiConfigDto {
 
 	@NotNull(message = "宛名番号は必須です。")
 	private BigDecimal atenaStNo;
+	
+	@NotNull(message = "自治体識別名は必須です。")
+	private String param;
 }

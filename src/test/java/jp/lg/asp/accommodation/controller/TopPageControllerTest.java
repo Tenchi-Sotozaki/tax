@@ -21,236 +21,144 @@ import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TopPageConfigForm;
 import jp.lg.asp.accommodation.entity.TopPageContent;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.MarkdownService;
 import jp.lg.asp.accommodation.service.TopPageService;
 
 @ExtendWith(MockitoExtension.class)
 class TopPageControllerTest {
-	
+
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.TOP_PAGE_CONFIG;
-	
-	@Mock
-	private ScreenAccessChecker accessChecker;
 
-    @InjectMocks
-    private TopPageController controller;
+	@Mock ScreenAccessChecker accessChecker;
+	@Mock TopPageService topPageService;
+	@Mock MarkdownService markdownService;
+	@Mock JichitaiContext jichitaiContext;
+	@Mock Model model;
+	@Mock RedirectAttributes redirectAttributes;
 
-    @Mock
-    private TopPageService topPageService;
+	@InjectMocks TopPageController controller;
 
-    @Mock
-    private MarkdownService markdownService;
+	@Test
+	void index_お知らせを取得して画面に表示する() {
+		TopPageContent content = new TopPageContent();
+		content.setTitle("タイトル");
+		content.setHtmlContent("本文");
+		List<TopPageContent> sharedList = List.of(content);
 
-    @Mock
-    private Model model;
-    
-    @Mock
-    private RedirectAttributes redirectAttributes;
-    
-    @Mock
-    private JichitaiRepository jichitaiRepository;
+		when(topPageService.findShared()).thenReturn(sharedList);
+		when(markdownService.toHtml("タイトル")).thenReturn("<h1>タイトル</h1>");
+		when(markdownService.toHtml("本文")).thenReturn("<p>本文</p>");
 
-    @Mock
-    private JichitaiContext jichitaiContext;
+		String result = controller.index(model);
 
-    @Test
-    void index_お知らせを取得して画面に表示する() {
+		assertEquals("top/topPage", result);
+		assertEquals("<h1>タイトル</h1>", content.getTitleHtml());
+		assertEquals("<p>本文</p>", content.getContentHtml());
+		verify(model).addAttribute("sharedList", sharedList);
+	}
 
-        // Arrange
-        TopPageContent content = new TopPageContent();
-        content.setTitle("タイトル");
-        content.setHtmlContent("本文");
+	@Test
+	void index_お知らせが0件でも画面表示できる() {
+		List<TopPageContent> emptyList = Collections.emptyList();
+		when(topPageService.findShared()).thenReturn(emptyList);
 
-        List<TopPageContent> sharedList = List.of(content);
+		String result = controller.index(model);
 
-        when(topPageService.findShared()).thenReturn(sharedList);
-        when(markdownService.toHtml("タイトル"))
-                .thenReturn("<h1>タイトル</h1>");
-        when(markdownService.toHtml("本文"))
-                .thenReturn("<p>本文</p>");
+		assertEquals("top/topPage", result);
+		verify(model).addAttribute("sharedList", emptyList);
+		verifyNoInteractions(markdownService);
+	}
 
-        // Act
-        String result = controller.index(model);
+	@Test
+	void list_一覧を表示する() {
+		List<TopPageContent> items = List.of(new TopPageContent());
+		when(topPageService.findAll()).thenReturn(items);
 
-        // Assert
-        assertEquals("top/topPage", result);
-        assertEquals("<h1>タイトル</h1>", content.getTitleHtml());
-        assertEquals("<p>本文</p>", content.getContentHtml());
+		String result = controller.list(10, model);
 
-        verify(topPageService).findShared();
-        verify(markdownService).toHtml("タイトル");
-        verify(markdownService).toHtml("本文");
-        verify(model).addAttribute("sharedList", sharedList);
-    }
-    
-    @Test
-    void index_お知らせが0件でも画面表示できる() {
+		assertEquals("top/topPageConfigDaicho", result);
+		verify(model).addAttribute("items", items);
+		verify(model).addAttribute("pageSize", 10);
+	}
 
-	    // Arrange
-	    List<TopPageContent> emptyList = Collections.emptyList();
-	
-	    when(topPageService.findShared()).thenReturn(emptyList);
-	
-	    // Act
-	    String result = controller.index(model);
-	
-	    // Assert
-	    assertEquals("top/topPage", result);
-	
-	    verify(topPageService).findShared();
-	    verify(model).addAttribute("sharedList", emptyList);
-	
-	    // お知らせがないためMarkdown変換は呼ばれない
-	    verifyNoInteractions(markdownService);
-    }
-    
-    @Test
-    void list_一覧を表示する() {
+	@Test
+	void config_新規登録画面を表示する() {
+		TopPageConfigForm form = new TopPageConfigForm();
+		when(topPageService.loadForm()).thenReturn(form);
 
-        List<TopPageContent> items = List.of(new TopPageContent());
+		String result = controller.config(model);
 
-        when(topPageService.findAll()).thenReturn(items);
+		assertEquals("top/topPageConfig", result);
+		verify(accessChecker).checkAccess(SCREEN_ID_CONFIG);
+		verify(model).addAttribute("form", form);
+	}
 
-        String result = controller.list(10, model);
+	@Test
+	void preview_プレビューを表示する() {
+		TopPageConfigForm form = new TopPageConfigForm();
+		form.setTitle("タイトル");
+		form.setHtmlContent("本文");
+		when(markdownService.toHtml("タイトル")).thenReturn("<h1>タイトル</h1>");
+		when(markdownService.toHtml("本文")).thenReturn("<p>本文</p>");
 
-        assertEquals("top/topPageConfigDaicho", result);
+		String result = controller.preview(form, model);
 
-        verify(topPageService).findAll();
-        verify(model).addAttribute("items", items);
-        verify(model).addAttribute("pageSize", 10);
-    }
-    
-    @Test
-    void config_新規登録画面を表示する() {
+		assertEquals("top/topPageConfig", result);
+		verify(model).addAttribute("previewTitle", "<h1>タイトル</h1>");
+		verify(model).addAttribute("previewHtml", "<p>本文</p>");
+		verify(model).addAttribute("form", form);
+		verify(model).addAttribute("preview", true);
+	}
 
-        TopPageConfigForm form = new TopPageConfigForm();
+	@Test
+	void save_保存する() {
+		TopPageConfigForm form = new TopPageConfigForm();
 
-        when(topPageService.loadForm()).thenReturn(form);
+		String result = controller.save(form, model, redirectAttributes);
 
-        String result = controller.config(model);
+		assertEquals("redirect:/top/config", result);
+		verify(topPageService).save(form);
+		verify(redirectAttributes).addFlashAttribute("successMessage", "トップページコンテンツを保存しました。");
+	}
 
-        assertEquals("top/topPageConfig", result);
+	@Test
+	void save_保存失敗時は編集画面を表示する() {
+		TopPageConfigForm form = new TopPageConfigForm();
+		doThrow(new RuntimeException("DBエラー")).when(topPageService).save(form);
 
-        verify(accessChecker).checkAccess(SCREEN_ID_CONFIG);
-        verify(model).addAttribute("form", form);
-    }
-    
-    @Test
-    void preview_プレビューを表示する() {
+		String result = controller.save(form, model, redirectAttributes);
 
-        TopPageConfigForm form = new TopPageConfigForm();
-        form.setTitle("タイトル");
-        form.setHtmlContent("本文");
+		assertEquals("top/topPageConfig", result);
+		verify(model).addAttribute("form", form);
+		verify(model).addAttribute(eq("errorMessage"), eq("保存に失敗しました: DBエラー"));
+	}
 
-        when(markdownService.toHtml("タイトル"))
-                .thenReturn("<h1>タイトル</h1>");
-        when(markdownService.toHtml("本文"))
-                .thenReturn("<p>本文</p>");
+	@Test
+	void edit_編集画面を表示する() {
+		TopPageContent content = new TopPageContent();
+		content.setSeq(1);
+		content.setTitle("タイトル");
+		content.setHtmlContent("本文");
+		when(topPageService.findBySeq(1)).thenReturn(content);
 
-        String result = controller.preview(form, model);
+		String result = controller.edit(1, model);
 
-        assertEquals("top/topPageConfig", result);
+		assertEquals("top/topPageConfig", result);
+		verify(accessChecker).checkAccess(SCREEN_ID_CONFIG);
+		ArgumentCaptor<TopPageConfigForm> captor = ArgumentCaptor.forClass(TopPageConfigForm.class);
+		verify(model).addAttribute(eq("form"), captor.capture());
+		assertEquals(1, captor.getValue().getSeq());
+		assertEquals("タイトル", captor.getValue().getTitle());
+		assertEquals("本文", captor.getValue().getHtmlContent());
+	}
 
-        verify(model).addAttribute(
-                "previewTitle",
-                "<h1>タイトル</h1>");
+	@Test
+	void delete_削除する() {
+		String result = controller.delete(1, redirectAttributes);
 
-        verify(model).addAttribute(
-                "previewHtml",
-                "<p>本文</p>");
-
-        verify(model).addAttribute("form", form);
-        verify(model).addAttribute("preview", true);
-    }
-    
-    @Test
-    void save_保存する() {
-
-        TopPageConfigForm form = new TopPageConfigForm();
-
-        String result =
-                controller.save(form, model, redirectAttributes);
-
-        assertEquals("redirect:/top/config", result);
-
-        verify(topPageService).save(form);
-
-        verify(redirectAttributes)
-                .addFlashAttribute(
-                        "successMessage",
-                        "トップページコンテンツを保存しました。");
-    }
-    
-    @Test
-    void save_保存失敗時は編集画面を表示する() {
-
-        TopPageConfigForm form = new TopPageConfigForm();
-
-        doThrow(new RuntimeException("DBエラー"))
-                .when(topPageService)
-                .save(form);
-
-        String result =
-                controller.save(form, model, redirectAttributes);
-
-        assertEquals("top/topPageConfig", result);
-
-        verify(model).addAttribute("form", form);
-
-        verify(model).addAttribute(
-                eq("errorMessage"),
-                eq("保存に失敗しました: DBエラー"));
-    }
-    
-    @Test
-    void edit_編集画面を表示する() {
-
-        TopPageContent content = new TopPageContent();
-
-        content.setSeq(1);
-        content.setTitle("タイトル");
-        content.setHtmlContent("本文");
-
-        when(topPageService.findBySeq(1))
-                .thenReturn(content);
-
-        String result =
-                controller.edit(1, model);
-
-        assertEquals("top/topPageConfig", result);
-
-        verify(accessChecker).checkAccess(SCREEN_ID_CONFIG);
-
-        ArgumentCaptor<TopPageConfigForm> captor =
-                ArgumentCaptor.forClass(TopPageConfigForm.class);
-
-        verify(model).addAttribute(
-                eq("form"),
-                captor.capture());
-
-        assertEquals(1, captor.getValue().getSeq());
-        assertEquals("本文", captor.getValue().getHtmlContent());
-        assertEquals("タイトル", captor.getValue().getTitle());
-    }
-    
-    @Test
-    void delete_削除する() {
-
-        String result =
-                controller.delete(1, redirectAttributes);
-
-        assertEquals(
-                "redirect:/top/topPageConfigDaicho",
-                result);
-
-        verify(accessChecker).checkAccess(SCREEN_ID_CONFIG);
-        verify(topPageService).delete(1);
-
-        verify(redirectAttributes)
-                .addFlashAttribute(
-                        "successMessage",
-                        "削除しました。");
-    }   
-    
+		assertEquals("redirect:/top/topPageConfigDaicho", result);
+		verify(accessChecker).checkAccess(SCREEN_ID_CONFIG);
+		verify(topPageService).delete(1);
+		verify(redirectAttributes).addFlashAttribute("successMessage", "削除しました。");
+	}
 }

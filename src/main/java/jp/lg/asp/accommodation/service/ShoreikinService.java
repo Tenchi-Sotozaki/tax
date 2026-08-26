@@ -1,6 +1,6 @@
 package jp.lg.asp.accommodation.service;
 
-import org.springframework.data.domain.Page;
+import java.util.List;
 
 import jp.lg.asp.accommodation.dto.ShoreikinDto;
 
@@ -10,5 +10,5 @@ import jp.lg.asp.accommodation.dto.ShoreikinDto;
 public interface ShoreikinService {
 
 	/** 検索条件に合致する一覧を返す */
-	Page<ShoreikinDto> search(ShoreikinDto form);
+	List<ShoreikinDto> search(ShoreikinDto form);
 }

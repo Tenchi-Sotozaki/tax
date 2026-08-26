@@ -1,12 +1,15 @@
 package jp.lg.asp.accommodation.controller;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +19,7 @@ import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.EltaxRenkeiKakuninDto;
+import jp.lg.asp.accommodation.exception.EltaxRenkeiKakuninValidationException;
 import jp.lg.asp.accommodation.service.EltaxRenkeiKakuninService;
 import lombok.RequiredArgsConstructor;
 
@@ -52,10 +56,43 @@ public class EltaxRenkeiKakuninController {
 			session.setAttribute(SESSION_KEY_FILE, file.getBytes());
 			session.setAttribute(SESSION_KEY_FILE_NAME, file.getOriginalFilename());
 			model.addAttribute("kakuninDto", dto);
+			if (dto.getErrorMessage() != null) {
+				model.addAttribute("errorMessage", dto.getErrorMessage());
+			}
+			return "eltaxRenkei/eltaxRenkeiKakunin";
+		} catch (EltaxRenkeiKakuninValidationException e) {
+			try {
+				session.setAttribute(SESSION_KEY_FILE, file.getBytes());
+			} catch (Exception ignored) {
+			}
+			session.setAttribute(SESSION_KEY_FILE_NAME, file.getOriginalFilename());
+			model.addAttribute("kakuninDto", e.getDto());
+			model.addAttribute("errorMessages", e.getErrorMessages());
 			return "eltaxRenkei/eltaxRenkeiKakunin";
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 			return "redirect:/eltax-renkei";
+		}
+	}
+
+	/**
+	 * 指定番号を上書きして確認画面の情報を再構築する（Ajax）
+	 */
+	@PostMapping("/repreview")
+	public ResponseEntity<?> repreview(
+			@RequestBody Map<String, String> body,
+			HttpSession session) {
+
+		byte[] fileBytes = (byte[]) session.getAttribute(SESSION_KEY_FILE);
+		if (fileBytes == null || fileBytes.length == 0) {
+			return ResponseEntity.badRequest().body("セッションが切れました。再度ファイルを選択してください。");
+		}
+		try {
+			String shiteiNo = body.get("shiteiNo");
+			EltaxRenkeiKakuninDto dto = eltaxRenkeiKakuninService.repreview(fileBytes, shiteiNo);
+			return ResponseEntity.ok(dto);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
 		}
 	}
 
@@ -66,6 +103,7 @@ public class EltaxRenkeiKakuninController {
 	@OpeLog(screenId = SCREEN_ID, operation = "取込")
 	public String commit(
 			@RequestParam(required = false) String atenaNo,
+			@RequestParam(required = false) String shiteiNo,
 			HttpSession session,
 			RedirectAttributes redirectAttributes) {
 
@@ -79,9 +117,12 @@ public class EltaxRenkeiKakuninController {
 		try {
 			BigDecimal atenaNoDecimal = null;
 			if (atenaNo != null && !atenaNo.isBlank()) {
-				try { atenaNoDecimal = new BigDecimal(atenaNo); } catch (NumberFormatException ignored) {}
+				try {
+					atenaNoDecimal = new BigDecimal(atenaNo);
+				} catch (NumberFormatException ignored) {
+				}
 			}
-			eltaxRenkeiKakuninService.commit(fileBytes, fileName, atenaNoDecimal);
+			eltaxRenkeiKakuninService.commit(fileBytes, fileName, atenaNoDecimal, shiteiNo);
 			redirectAttributes.addFlashAttribute("successMessage", "ファイルを取り込みました。");
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

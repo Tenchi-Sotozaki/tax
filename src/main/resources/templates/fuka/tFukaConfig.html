@@ -6,7 +6,6 @@
 <head>
 <title
 	th:text="${fukaDeclarationForm.view ? '宿泊税納入情報 照会' : (fukaDeclarationForm.edit ? '宿泊税納入情報 編集' : '宿泊税納入情報 登録')}">宿泊税納入情報</title>
-<link rel="stylesheet" th:href="@{/css/fuka-config.css}">
 </head>
 
 <body>
@@ -22,7 +21,7 @@
 
 			<a th:if="${fukaDeclarationForm.view}"
 				th:href="@{/declaration/edit(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu})}"
-				class="btn btn-primary btn-sm"> <i
+				class="btn btn-primary"> <i
 				class="bi bi-pencil-square me-2"></i>編集する
 			</a>
 		</div>
@@ -33,14 +32,14 @@
 			class="d-flex align-items-center gap-2 mb-3">
 			<a
 				th:href="@{/declaration/view(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno - 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${fukaDeclarationForm.rno <= fukaDeclarationForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a> <span class="text-muted small">履歴 <span
 				th:text="${fukaDeclarationForm.rno}"></span> / <span
 				th:text="${fukaDeclarationForm.maxRno}"></span></span> <a
 				th:href="@{/declaration/view(nendo=${fukaDeclarationForm.nendo}, kibetsu=${fukaDeclarationForm.kibetsu}, rno=${fukaDeclarationForm.rno + 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${fukaDeclarationForm.rno >= fukaDeclarationForm.maxRno} ? ' disabled'">
 				次の履歴 <i class="bi bi-chevron-right"></i>
 			</a>
@@ -144,20 +143,20 @@
 						<!-- 月計表 -->
 						<div class="col-md-4 d-flex justify-content-end align-items-end">
 							<div th:if="${fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-outline-primary btn-sm"
+								<button type="button" class="btn btn-outline-primary"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
 									<i class="bi bi-eye me-1"></i>月計表を表示
 								</button>
 							</div>
 							<div th:if="${fukaDeclarationForm.edit}">
-								<button type="button" class="btn btn-outline-primary btn-sm"
+								<button type="button" class="btn btn-outline-primary"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
 									<i class="bi bi-pencil-square me-1"></i>月計表を編集
 								</button>
 							</div>
 							<div
 								th:if="${!fukaDeclarationForm.view and !fukaDeclarationForm.edit}">
-								<button type="button" class="btn btn-outline-primary btn-sm"
+								<button type="button" class="btn btn-outline-primary"
 									data-bs-toggle="modal" data-bs-target="#monthlyTallyModal">
 									<i class="bi bi-calendar3 me-1"></i>月計表を登録
 								</button>
@@ -229,9 +228,9 @@
 										<td class="text-center fw-medium bg-light"><span
 											th:text="${detail.label}">区分</span></td>
 
-										<td class="text-center fw-medium bg-light"><span
-											th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA') + ' 円'}">税率</span>
-										</td>
+											<td class="text-center fw-medium bg-light"><span
+											    th:text="${#numbers.formatInteger((detail.taxRate ?: 0) + (detail.taxKenRate ?: 0), 1, 'COMMA') + ' 円'}">税率</span>
+											</td>
 
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].hakusu}"
@@ -315,7 +314,7 @@
 							</table>
 							<div class="d-flex justify-content-end mt-2"
 								th:unless="${fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-primary btn-sm"
+								<button type="button" class="btn btn-primary"
 									id="btnEstimateBreakdownTeigaku">
 									<i class="bi bi-calculator me-1"></i>内訳試算
 								</button>
@@ -346,8 +345,8 @@
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].taxRate}" />
 										<td class="text-center fw-medium bg-light"><span
 											th:text="${detail.label}">区分</span></td>
-										<td class="text-center fw-medium bg-light"><span
-											th:text="${detail.taxRate + ' %'}">税率</span></td>
+										<td class="text-center fw-medium bg-light"><span 
+											th:text="|${detail.taxRate ?: 0}%|">税率</span></td>
 										<td><input type="text"
 											th:field="*{monthlyDetail.taxDetails[__${stat.index}__].ryokinSogaku}"
 											class="form-control form-control-sm text-end js-comma-format"
@@ -451,7 +450,7 @@
 							</table>
 							<div class="d-flex justify-content-end mt-2"
 								th:unless="${fukaDeclarationForm.view}">
-								<button type="button" class="btn btn-primary btn-sm"
+								<button type="button" class="btn btn-primary"
 									id="btnEstimateBreakdownTeiritsu">
 									<i class="bi bi-calculator me-1"></i>内訳試算
 								</button>
@@ -664,23 +663,21 @@
 			</div>
 
 			<div class="d-flex justify-content-center gap-3 mt-4 mb-5 pt-2">
+				
+				<a th:href="@{/declaration/payment-ledger}" class="btn btn-outline-secondary px-4 shadow-sm"
+					th:if="${fukaDeclarationForm.view}"> 
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<a th:href="@{/declaration/payment-ledger}" class="btn btn-outline-secondary px-4 shadow-sm"
+					th:unless="${fukaDeclarationForm.view}" data-bs-toggle="modal" data-bs-target="#backConfirmModal"> 
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
 
 				<button type="submit" class="btn btn-success px-5 shadow-sm"
 					th:unless="${fukaDeclarationForm.view}">
 					<i class="bi bi-save me-2"></i> <span
 						th:text="${fukaDeclarationForm.edit ? '更新する' : '登録する'}"></span>
 				</button>
-
-				<a th:href="@{/declaration/payment-ledger}"
-					class="btn btn-outline-primary px-4 shadow-sm"
-					th:if="${fukaDeclarationForm.view}"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a th:href="@{/declaration/payment-ledger}"
-					class="btn btn-outline-primary px-4 shadow-sm"
-					th:unless="${fukaDeclarationForm.view}"
-					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
 			</div>
 
 			<!-- 月計表モーダル -->
@@ -721,9 +718,9 @@
 									<thead class="table-light">
 										<tr>
 											<th rowspan="2" class="align-middle" style="width: 60px;">日付</th>
-
-
-											<th th:colspan="*{monthlyDetail.taxDetails.size()+1}">宿泊数</th>
+											<th th:colspan="*{monthlyDetail.taxDetails != null and monthlyDetail.taxDetails.size() != null ? monthlyDetail.taxDetails.size() + 1 : 1}">
+												宿泊数
+											</th>
 											<th rowspan="2" class="align-middle" style="width: 120px;">税額(円)</th>
 										</tr>
 										<tr>
@@ -785,17 +782,17 @@
 												readonly></td>
 										</tr>
 										<tr>
-											<td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
-											<td th:each="detail, stat : *{monthlyDetail.taxDetails}"
-												class="text-end align-middle"><span
-												th:text="${#numbers.formatInteger(detail.taxRate + detail.taxKenRate, 1, 'COMMA')}">0</span>
-												円 <input type="hidden"
-												th:id="|modal-tax-rate-${stat.index}|"
-												th:value="${detail.taxRate + detail.taxKenRate}" /></td>
-											<td class="bg-light text-center text-muted align-middle"><i
-												class="bi bi-slash-lg"></i></td>
-											<td class="bg-light text-center text-muted align-middle"><i
-												class="bi bi-slash-lg"></i></td>
+										    <td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
+										    <td th:each="detail, stat : *{monthlyDetail.taxDetails}"
+										        class="text-end align-middle">
+										        <span th:text="${#numbers.formatInteger((detail.taxRate != null ? detail.taxRate : 0) + (detail.taxKenRate != null ? detail.taxKenRate : 0), 1, 'COMMA')}">0</span>
+										        円 
+										        <input type="hidden"
+										               th:id="|modal-tax-rate-${stat.index}|"
+										               th:value="${(detail.taxRate != null ? detail.taxRate : 0) + (detail.taxKenRate != null ? detail.taxKenRate : 0)}" />
+										    </td>
+										    <td class="bg-light text-center text-muted align-middle"><i class="bi bi-slash-lg"></i></td>
+										    <td class="bg-light text-center text-muted align-middle"><i class="bi bi-slash-lg"></i></td>
 										</tr>
 										<tr>
 											<td class="text-center fw-bold bg-light text-nowrap">税額(円)</td>

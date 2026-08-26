@@ -140,12 +140,25 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
+ * 全画面共通：モーダルを閉じる前にフォーカスをモーダル外へ移動（aria-hidden警告対策）
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.modal').forEach(function (modal) {
+        modal.addEventListener('hide.bs.modal', function () {
+            if (modal.contains(document.activeElement)) {
+                document.activeElement.blur();
+            }
+        });
+    });
+});
+
+/**
  * 全画面共通：Enterキーはボタンまたはセレクトにフォーカスがある場合のみ有効
  */
 document.addEventListener('keydown', function (e) {
     if (e.key !== 'Enter') return;
     const tag = document.activeElement?.tagName?.toLowerCase();
-    if (tag === 'button' || tag === 'select') return;
+    if (tag === 'button' || tag === 'select' || tag == 'textarea') return;
     e.preventDefault();
 }, true);
 

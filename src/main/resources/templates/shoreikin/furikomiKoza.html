@@ -22,7 +22,7 @@
 				</h5>
 
 				<div th:if="${kozaForm.viewMode}">
-					<button type="button" class="btn btn-primary btn-sm"
+					<button type="button" class="btn btn-primary"
 						onclick="editMode()">
 						<i class="bi bi-pencil"></i> 編集する
 					</button>
@@ -217,10 +217,11 @@
 						</button>
 					</div>
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary"
 						th:if="${kozaForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a href="#" class="btn btn-outline-primary"
+					</a> 
+					<a href="#" class="btn btn-outline-secondary"
 						th:unless="${kozaForm.viewMode}"
 						data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る

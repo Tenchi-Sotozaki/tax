@@ -2,11 +2,11 @@ package jp.lg.asp.accommodation.service;
 
 import java.util.Map;
 
-import jp.lg.asp.accommodation.constant.ReportsConstants.reportsOutputFiled;
+import jp.lg.asp.accommodation.constant.ReportsConstants.ReportsOutputField;
 
 public interface ReportsOutputConfigService {
 
-	Map<reportsOutputFiled, String> getDefTextMap(String jichitaiCd);
+	Map<ReportsOutputField, String> getDefTextMap(String jichitaiCd);
 
 	void saveDefText(String jichitaiCd, String userId, Map<String, String> defTextMap);
 }

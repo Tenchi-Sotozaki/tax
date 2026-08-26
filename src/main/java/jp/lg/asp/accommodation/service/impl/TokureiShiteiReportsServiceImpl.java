@@ -1,10 +1,12 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
+import java.time.chrono.JapaneseChronology;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -55,10 +57,19 @@ public class TokureiShiteiReportsServiceImpl implements TokureiShiteiReportsServ
 
 	private Map<String, Object> buildParameters(TokureiShiteiDto dto) {
 		Map<String, Object> parameters = new HashMap<>();
+		
 		parameters.put("hakkoYmd", dto.getHakkoYmd() != null
-				? dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")) : "");
+		        ? DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE)
+		            .withChronology(JapaneseChronology.INSTANCE)
+		            .format(dto.getHakkoYmd()) 
+		        : "");
+		
 		parameters.put("tekiyoYmd", dto.getTekiyoYmd() != null
-				? dto.getTekiyoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")) : "");
+		        ? DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)
+		            .withChronology(JapaneseChronology.INSTANCE)
+		            .format(dto.getTekiyoYmd().atDay(1)) 
+		        : "");
+		
 		parameters.put("shonin", dto.getShonin() != null ? dto.getShonin() : "");
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
 		parameters.put("city", dto.getCity() != null ? dto.getCity() : "");
@@ -68,13 +79,16 @@ public class TokureiShiteiReportsServiceImpl implements TokureiShiteiReportsServ
 
 	private JRDataSource buildDataSource(TokureiShiteiDto dto) {
 		TokureiShiteiReportsDto reportsDto = new TokureiShiteiReportsDto();
+		reportsDto.setYubin(dto.getTokuYubin() != null ? dto.getTokuYubin() : "");
 		reportsDto.setJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setName(dto.getTokuName() != null ? dto.getTokuName() : "");
+		reportsDto.setShisetsu_yubin(dto.getShisetsuYubin() != null ? dto.getShisetsuYubin() : "");
 		reportsDto.setShisetsu_jusho(dto.getShisetsuJusho() != null ? dto.getShisetsuJusho() : "");
 		reportsDto.setShisetsu_name(dto.getShisetsuName() != null ? dto.getShisetsuName() : "");
 		reportsDto.setShitei_no(dto.getShiteiNo() != null ? dto.getShiteiNo() : "");
-		reportsDto.setBiko("");
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
+		reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
+		reportsDto.setShonin(dto.getShonin() != null ? dto.getShonin() : null);
 
 		List<TokureiShiteiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		return new JRBeanCollectionDataSource(dataSourceList, false);

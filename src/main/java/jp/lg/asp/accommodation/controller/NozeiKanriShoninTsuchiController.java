@@ -20,6 +20,7 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.entity.Nokan;
 import jp.lg.asp.accommodation.service.NokanService;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiReportsService;
 import jp.lg.asp.accommodation.service.NozeiKanriShoninTsuchiService;
@@ -62,8 +63,15 @@ public class NozeiKanriShoninTsuchiController {
 			}
 			
 			// 納税管理人情報が未登録
-			if(nokanService.findByJichitaiCdAndShiteiNo(shiteiNo).isEmpty()) {
+			Nokan nokan = nokanService.findByJichitaiCdAndShiteiNo(shiteiNo).orElse(null);
+			if (nokan == null) {
 				model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
+				return "tokugimu/tTokugimuReport";
+			}
+			
+			// 選任免除（kbn = "3"）の場合は承認(不承認)通知書を発行できない
+			if ("3".equals(nokan.getKbn())) {
+				model.addAttribute("errorMessage", "納税管理人が選任免除のため、承認(不承認)通知書は発行できません。");
 				return "tokugimu/tTokugimuReport";
 			}
 			

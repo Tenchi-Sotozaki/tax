@@ -55,7 +55,6 @@ public class KoseiKetteiTsuchiController {
 		// 指定番号を取得
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 
-		model.addAttribute("dto", reportsService.buildDtoForDisplay(shiteiNo));
 		model.addAttribute("taishoYmList",
 				!shiteiNo.isEmpty()
 						? reportsService.findTaishoYmList(shiteiNo)
