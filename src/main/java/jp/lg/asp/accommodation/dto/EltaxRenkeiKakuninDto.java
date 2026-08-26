@@ -26,6 +26,8 @@ public class EltaxRenkeiKakuninDto {
 	private String kojinNo;
 	private String hojinNo;
 
+	private String errorMessage;
+
 	private List<DiffRow> diffRows;
 
 	@Data
@@ -35,5 +37,7 @@ public class EltaxRenkeiKakuninDto {
 		private String itemName;
 		private String beforeValue;
 		private String afterValue;
+		private String dispFlg;
+		private String requiredFlg;
 	}
 }

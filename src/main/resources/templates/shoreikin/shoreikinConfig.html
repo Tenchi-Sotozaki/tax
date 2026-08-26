@@ -25,12 +25,12 @@
 				<div class="d-flex gap-2" th:if="${configForm.viewMode}">
 					<!-- 特別徴収事務交付金交付申請・決定通知ボタン -->
 					<a th:href="@{/reports/kofuKetteiTsuchiShinsei}"
-						class="btn btn-outline-primary btn-sm"> <i
+						class="btn btn-outline-primary"> <i
 						class="bi bi-pencil-square me-2"></i>特別徴収事務交付金交付申請・決定通知
 					</a>
 
 					<!-- 編集するボタン -->
-					<button type="button" class="btn btn-primary btn-sm"
+					<button type="button" class="btn btn-primary"
 						onclick="editMode()">
 						<i class="bi bi-pencil"></i> 編集する
 					</button>
@@ -198,10 +198,11 @@
 				<!-- アクションボタン -->
 				<div class="d-flex justify-content-center gap-2">
 
-					<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary"
+					<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary"
 						th:if="${configForm.viewMode}"> <i class="bi bi-arrow-left"></i>
 						戻る
-					</a> <a href="#" class="btn btn-outline-primary"
+					</a> 
+					<a href="#" class="btn btn-outline-secondary"
 						th:unless="${configForm.viewMode}" data-bs-toggle="modal"
 						data-bs-target="#backConfirmModal"> <i
 						class="bi bi-arrow-left"></i> 戻る
@@ -293,6 +294,27 @@
 				<div
 					th:replace="~{layout/components :: confirmModal('updateConfirmModal', '更新確認', '交付金情報を更新します。よろしいですか？', 'updateForm', 'btn-success', '更新する')}"></div>
 			</th:block>
+
+			<!-- ハイパーリンク付きメッセージ用モーダル -->
+			<div class="modal fade" id="customAlertModal" tabindex="-1"
+				aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header bg-dark text-white border-bottom-0">
+							<h5 class="modal-title">入力エラー</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="閉じる"></button>
+						</div>
+						<div class="modal-body" id="customAlertBody">
+							<!-- HTMLメッセージが挿入箇所 -->
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary"
+								data-bs-dismiss="modal">閉じる</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<th:block layout:fragment="scripts">
