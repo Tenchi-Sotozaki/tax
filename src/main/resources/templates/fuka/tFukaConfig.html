@@ -521,9 +521,9 @@
 											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount1}">
-										<div class="invalid-feedback"
-											th:if="${#fields.hasErrors('additionalAmount1')}"
-											th:errors="*{additionalAmount1}"></div>
+										<div class="text-danger small mt-1"
+											th:if="${fieldErrorMessages != null and fieldErrorMessages.containsKey('additionalAmount1')}"
+											th:text="${fieldErrorMessages['additionalAmount1']}"></div>
 									</div>
 								</div>
 
@@ -569,9 +569,9 @@
 											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount2}">
-										<div class="invalid-feedback"
-											th:if="${#fields.hasErrors('additionalAmount2')}"
-											th:errors="*{additionalAmount2}"></div>
+										<div class="text-danger small mt-1"
+											th:if="${fieldErrorMessages != null and fieldErrorMessages.containsKey('additionalAmount2')}"
+											th:text="${fieldErrorMessages['additionalAmount2']}"></div>
 									</div>
 								</div>
 
@@ -617,9 +617,9 @@
 											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{additionalAmount3}">
-										<div class="invalid-feedback"
-											th:if="${#fields.hasErrors('additionalAmount3')}"
-											th:errors="*{additionalAmount3}"></div>
+										<div class="text-danger small mt-1"
+											th:if="${fieldErrorMessages != null and fieldErrorMessages.containsKey('additionalAmount3')}"
+											th:text="${fieldErrorMessages['additionalAmount3']}"></div>
 									</div>
 								</div>
 
@@ -638,9 +638,9 @@
 											th:errorclass="is-invalid"
 											th:readonly="${fukaDeclarationForm.view}" placeholder="0"
 											th:data-initial-value="*{entaikin}">
-										<div class="invalid-feedback"
-											th:if="${#fields.hasErrors('entaikin')}"
-											th:errors="*{entaikin}"></div>
+										<div class="text-danger small mt-1"
+											th:if="${fieldErrorMessages != null and fieldErrorMessages.containsKey('entaikin')}"
+											th:text="${fieldErrorMessages['entaikin']}"></div>
 									</div>
 								</div>
 
@@ -701,9 +701,9 @@
 										th:errorclass="is-invalid"
 										th:data-initial-value="*{shunoKingaku}"
 										th:readonly="${fukaDeclarationForm.view}" placeholder="0">
-									<div class="invalid-feedback"
-										th:if="${#fields.hasErrors('shunoKingaku')}"
-										th:errors="*{shunoKingaku}"></div>
+									<div class="text-danger small mt-1"
+										th:if="${fieldErrorMessages != null and fieldErrorMessages.containsKey('shunoKingaku')}"
+										th:text="${fieldErrorMessages['shunoKingaku']}"></div>
 								</div>
 
 							</div>
@@ -1090,6 +1090,17 @@
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 		<script th:src="@{/js/tFukaConfig.js}"></script>
+		<!-- 入れ子フィールドのエラー欄に赤枚を付ける -->
+		<script th:if="${errorFields != null and !errorFields.isEmpty()}" th:inline="javascript">
+			(function () {
+				const errorFields = /*[[${errorFields}]]*/ [];
+				errorFields.forEach(function (field) {
+					// "monthlyDetail.taxDetails[0].hakusu" -> name="monthlyDetail.taxDetails[0].hakusu"
+					const el = document.querySelector('[name="' + field + '"]');
+					if (el) el.classList.add('is-invalid');
+				});
+			})();
+		</script>
 	</th:block>
 </body>
 

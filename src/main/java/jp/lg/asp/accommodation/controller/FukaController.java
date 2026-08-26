@@ -62,6 +62,22 @@ public class FukaController {
 	private static final String MSG_RATE_REQUIRED = "割合を入力してください";
 	private static final String MSG_AMOUNT_REQUIRED = "金額を入力してください";
 
+	/** 型変換エラー（桁数超過など）の日本語メッセージ（入力欄の下に表示） */
+	private static final Map<String, String> TYPE_MISMATCH_MESSAGES = Map.of(
+			"additionalAmount1", "13桁以内で入力してください",
+			"additionalAmount2", "13桁以内で入力してください",
+			"additionalAmount3", "13桁以内で入力してください",
+			"entaikin", "13桁以内で入力してください",
+			"shunoKingaku", "13桁以内で入力してください");
+
+	/** 型変換エラーのサマリ用メッセージ（項目名付き） */
+	private static final Map<String, String> TYPE_MISMATCH_SUMMARY_MESSAGES = Map.of(
+			"additionalAmount1", "加算金額1は13桁以内で入力してください",
+			"additionalAmount2", "加算金額2は13桁以内で入力してください",
+			"additionalAmount3", "加算金額3は13桁以内で入力してください",
+			"entaikin", "延滞金は13桁以内で入力してください",
+			"shunoKingaku", "納入金額は13桁以内で入力してください");
+
 	/**
 	 * サマリに出す必須エラーの文言。
 	 * 加算金額は3行あり、短い文言のままだと同じ文字列が並んでどの行か分からないため、
@@ -337,26 +353,50 @@ public class FukaController {
 			bindingResult.getAllErrors().forEach(error -> {
 				log.error("【バリデーションエラー】項目: {}, 内容: {}", error.getObjectName(), error.getDefaultMessage());
 			});
-			// 表示順を入力欄順に制御
+			// 表示順を入力欄順に制御（リストに載っていない項目は末尾に追加）
 			java.util.List<String> validationErrors = new java.util.ArrayList<>();
 			java.util.List<String> fieldOrder = java.util.List.of(
 					"torokuDate", "shinkokuDate",
 					"modificationCategory",
+					"monthlyDetail.taxDetails",
 					"additionalRate1", "additionalAmount1",
 					"additionalRate2", "additionalAmount2",
 					"additionalRate3", "additionalAmount3",
 					"entaikin",
 					"shunoYmd", "shunoKingaku");
+			java.util.Set<String> handled = new java.util.LinkedHashSet<>();
+			java.util.Set<String> errorFields = new java.util.LinkedHashSet<>();
 			for (String field : fieldOrder) {
 				bindingResult.getAllErrors().stream()
 						.filter(e -> e instanceof org.springframework.validation.FieldError
 								? ((org.springframework.validation.FieldError) e).getField().equals(field)
+										|| ((org.springframework.validation.FieldError) e).getField().startsWith(field + ".")
+										|| ((org.springframework.validation.FieldError) e).getField().startsWith(field + "[")
 								: e.getCode() != null && e.getCode().contains(field))
-						.map(org.springframework.context.support.DefaultMessageSourceResolvable::getDefaultMessage)
-						.map(msg -> toSummaryMessage(field, msg))
-						.forEach(validationErrors::add);
+						.forEach(e -> {
+							String f = e instanceof org.springframework.validation.FieldError fe2 ? fe2.getField() : field;
+							String msg = resolveMessage(f, e);
+							validationErrors.add(toSummaryMessage(f, msg));
+							handled.add(f);
+							if (f.startsWith("monthlyDetail.")) errorFields.add(f);
+						});
 			}
+			// fieldOrder に載っていない項目を末尾に追加
+			bindingResult.getAllErrors().stream()
+					.filter(e -> e instanceof org.springframework.validation.FieldError)
+					.map(e -> (org.springframework.validation.FieldError) e)
+					.filter(e -> !handled.contains(e.getField()))
+					.forEach(e -> {
+						validationErrors.add(resolveMessage(e.getField(), e));
+						errorFields.add(e.getField());
+					});
 			model.addAttribute("validationErrors", validationErrors);
+			model.addAttribute("errorFields", errorFields);
+			// th:errors の代わりに使うフィールド→日本語メッセージMap
+			java.util.Map<String, String> fieldErrorMessages = new java.util.LinkedHashMap<>();
+			bindingResult.getFieldErrors().forEach(fe ->
+				fieldErrorMessages.putIfAbsent(fe.getField(), resolveMessage(fe.getField(), fe)));
+			model.addAttribute("fieldErrorMessages", fieldErrorMessages);
 			return CONFIG_VIEW;
 		}
 
@@ -419,6 +459,36 @@ public class FukaController {
 	}
 
 	/**
+	 * 型変換エラーの場合は日本語メッセージに変換し、それ以外は defaultMessage をそのまま返す。
+	 * 入れ子フィールド（monthlyDetail.taxDetails[N].hakusu 等）はインデックスから区分番号を取得して日本語化する。
+	 */
+	private String resolveMessage(String field, org.springframework.context.MessageSourceResolvable error) {
+		if (error instanceof org.springframework.validation.FieldError fe) {
+			boolean isTypeMismatch = java.util.Arrays.stream(fe.getCodes() != null ? fe.getCodes() : new String[0])
+					.anyMatch(c -> c.startsWith("typeMismatch"));
+			if (isTypeMismatch) {
+				// 入れ子フィールド（monthlyDetail.taxDetails[N].hakusu 等）の日本語化
+				java.util.regex.Matcher m = java.util.regex.Pattern
+						.compile("monthlyDetail\\.taxDetails\\[(\\d+)\\]\\.(hakusu|zeigaku|ryokinSogaku|ryokin)")
+						.matcher(field);
+				if (m.matches()) {
+					int idx = Integer.parseInt(m.group(1)) + 1;
+					String label = switch (m.group(2)) {
+						case "hakusu" -> "宿泊数（区分" + idx + "）";
+						case "zeigaku" -> "宿泊税額（区分" + idx + "）";
+						case "ryokinSogaku" -> "宿泊料金総額（区分" + idx + "）";
+						case "ryokin" -> "宿泊料金（区分" + idx + "）";
+						default -> field;
+					};
+					return label + "は13桁以内で入力してください";
+				}
+				return TYPE_MISMATCH_MESSAGES.getOrDefault(field, "入力値が不正です");
+			}
+		}
+		return error.getDefaultMessage();
+	}
+
+	/**
 	 * サマリ用にメッセージを差し替える。
 	 * 入力欄の下は「割合を入力してください」のように短く出し、
 	 * サマリは3行分が並ぶのでどの行かが分かるよう項目名を付ける。
@@ -427,6 +497,9 @@ public class FukaController {
 	private String toSummaryMessage(String field, String message) {
 		if (MSG_RATE_REQUIRED.equals(message) || MSG_AMOUNT_REQUIRED.equals(message)) {
 			return SUMMARY_REQUIRED_MESSAGES.getOrDefault(field, message);
+		}
+		if (TYPE_MISMATCH_MESSAGES.containsValue(message) || TYPE_MISMATCH_SUMMARY_MESSAGES.containsKey(field)) {
+			return TYPE_MISMATCH_SUMMARY_MESSAGES.getOrDefault(field, message);
 		}
 		return message;
 	}

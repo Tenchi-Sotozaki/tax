@@ -54,7 +54,7 @@ public class FukaDeclarationForm {
 	@Pattern(regexp = "^$|^(100(\\.0{1,2})?|[0-9]{1,2}(\\.[0-9]{1,2})?)$",
 			message = "加算割合1は0〜100の半角数字（小数点以下2桁まで）で入力してください")
 	private String additionalRate1;
-	@Digits(integer = 13, fraction = 0, message = "加算金額1は13桁以内で入力してください")
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long additionalAmount1;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate1;
@@ -63,7 +63,7 @@ public class FukaDeclarationForm {
 	@Pattern(regexp = "^$|^(100(\\.0{1,2})?|[0-9]{1,2}(\\.[0-9]{1,2})?)$",
 			message = "加算割合2は0〜100の半角数字（小数点以下2桁まで）で入力してください")
 	private String additionalRate2;
-	@Digits(integer = 13, fraction = 0, message = "加算金額2は13桁以内で入力してください")
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long additionalAmount2;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate2;
@@ -72,13 +72,13 @@ public class FukaDeclarationForm {
 	@Pattern(regexp = "^$|^(100(\\.0{1,2})?|[0-9]{1,2}(\\.[0-9]{1,2})?)$",
 			message = "加算割合3は0〜100の半角数字（小数点以下2桁まで）で入力してください")
 	private String additionalRate3;
-	@Digits(integer = 13, fraction = 0, message = "加算金額3は13桁以内で入力してください")
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long additionalAmount3;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate3;
 
 	// 延滞金・納入期限（テーブル定義書2026-06-18：加算の納期限を1本化）
-	@Digits(integer = 13, fraction = 0, message = "延滞金は13桁以内で入力してください")
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long entaikin;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate nokigen;
