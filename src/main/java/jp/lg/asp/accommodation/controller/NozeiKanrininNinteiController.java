@@ -113,6 +113,11 @@ public class NozeiKanrininNinteiController {
 				return ResponseEntity.badRequest().build();
 			}
 
+			if (dto.getKoin() == null && dto.getShiteiNo() != null) {
+				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(dto.getShiteiNo());
+				if (info != null) dto.setKoin(info.getKoin());
+			}
+
 			log.debug("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 			byte[] pdfData = reportsService.generatePdf(dto);
 
@@ -139,6 +144,11 @@ public class NozeiKanrininNinteiController {
 
 			if (dto.getHakkoYmd() == null) {
 				return ResponseEntity.badRequest().build();
+			}
+
+			if (dto.getKoin() == null && dto.getShiteiNo() != null) {
+				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(dto.getShiteiNo());
+				if (info != null) dto.setKoin(info.getKoin());
 			}
 
 			byte[] pdfData = reportsService.generatePdf(dto);
@@ -169,6 +179,11 @@ public class NozeiKanrininNinteiController {
 
 			if (dto.getHakkoYmd() == null) {
 				return ResponseEntity.badRequest().build();
+			}
+
+			if (dto.getKoin() == null && dto.getShiteiNo() != null) {
+				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(dto.getShiteiNo());
+				if (info != null) dto.setKoin(info.getKoin());
 			}
 
 			byte[] pdfData = reportsService.generatePdf(dto);
