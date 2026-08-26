@@ -111,7 +111,7 @@ public class JichitaiConfigServiceImpl implements JichitaiConfigService {
 	            .orElseGet(Jichitai::new);
 
 	    jichitai.setJichitaiCd(configForm.getJichitaiCd());
-
+	    jichitai.setUserName(configForm.getUserName());
 	    copyProperties(configForm, jichitai);
 
 	    jichitaiRepository.save(jichitai);
