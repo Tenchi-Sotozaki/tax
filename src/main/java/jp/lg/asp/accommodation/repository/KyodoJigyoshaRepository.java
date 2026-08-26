@@ -21,6 +21,11 @@ public interface KyodoJigyoshaRepository extends JpaRepository<KyodoJigyosha, Ky
             @Param("shiteiNo") String shiteiNo,
             @Param("rno") BigDecimal rno);
 
+    @Query("SELECT k FROM KyodoJigyosha k WHERE k.jichitaiCd = :jichitaiCd AND k.shiteiNo = :shiteiNo ORDER BY k.rno DESC, k.idx")
+    List<KyodoJigyosha> findByJichitaiCdAndShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo);
+
     @Modifying
     @Query("DELETE FROM KyodoJigyosha k WHERE k.jichitaiCd = :jichitaiCd AND k.shiteiNo = :shiteiNo")
     void deleteByJichitaiCdAndShiteiNo(
