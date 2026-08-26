@@ -175,7 +175,22 @@ class HolidayConfigServiceImplTest {
     void save_休業日がnullでも番兵レコードを入れる() {
         service.save(form(null));
 
-        assertThat(savedEntities()).hasSize(1);
+        List<Kyugyobi> saved = savedEntities();
+        assertThat(saved).hasSize(1);
+        assertThat(saved.get(0).getKyugyobi()).isEqualTo(LocalDate.of(1, 1, 1));
+        assertThat(saved.get(0).getJichitaiCd()).isEqualTo(JICHITAI_CD);
+        assertThat(saved.get(0).getNen()).isEqualTo(NEN);
+    }
+
+    /**
+     * 日付文字列は yyyyMMdd 固定で、形式が違うと例外がそのまま外に出る。
+     * 画面から空文字や別形式が送られると 500 になるため、
+     * 本来はハンドリングが要るが、ここでは現状の挙動を固定している。
+     */
+    @Test
+    void save_日付の形式が不正なら例外がそのまま外に出る() {
+        assertThatThrownBy(() -> service.save(form(List.of("2026-01-01"))))
+                .isInstanceOf(java.time.format.DateTimeParseException.class);
     }
 
     // ===================================================================

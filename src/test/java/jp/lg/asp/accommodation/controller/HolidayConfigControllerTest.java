@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -60,8 +61,14 @@ class HolidayConfigControllerTest {
         String view = controller.index(redirectAttributes());
 
         assertThat(view).isEqualTo("redirect:/admin/holiday/view/2026");
+        verify(accessChecker).checkAccess(ScreenManagement.HOLIDAY_CONFIG);
     }
 
+    /**
+     * 期待値が本体と同じ式になっている。
+     * 厳密にやるなら本体へ Clock を注入する必要があるため、
+     * ここでは年をまたぐ瞬間だけ落ちうることを承知で現状の形にしている。
+     */
     @Test
     void index_年の一覧が空なら今年へリダイレクトする() {
         when(holidayConfigService.findNendoList()).thenReturn(List.of());
@@ -69,6 +76,7 @@ class HolidayConfigControllerTest {
         String view = controller.index(redirectAttributes());
 
         assertThat(view).isEqualTo("redirect:/admin/holiday/view/" + LocalDate.now().getYear());
+        verify(accessChecker).checkAccess(ScreenManagement.HOLIDAY_CONFIG);
     }
 
     // ===================================================================
@@ -118,11 +126,17 @@ class HolidayConfigControllerTest {
     // getInitialHolidays — 初期化ボタン（JSON）
     // ===================================================================
 
+    /**
+     * 本体の getInitialHolidays は accessChecker を呼んでいない。
+     * 他の4エンドポイントは全て権限チェックを通しているため、
+     * 実装漏れの可能性がある。ここでは現状の挙動をそのまま固定している。
+     */
     @Test
     void getInitialHolidays_サービスの戻り値をそのまま返す() {
         when(holidayConfigService.getInitialHolidays(NEN)).thenReturn(List.of("20260101", "20260102"));
 
         assertThat(controller.getInitialHolidays(NEN)).containsExactly("20260101", "20260102");
+        verifyNoInteractions(accessChecker);
     }
 
     // ===================================================================
@@ -136,8 +150,13 @@ class HolidayConfigControllerTest {
         String view = controller.save(form(NEN), new ExtendedModelMap(), redirectAttributes);
 
         assertThat(view).isEqualTo("redirect:/admin/holiday/view/" + NEN);
-        assertThat(redirectAttributes.getFlashAttributes()).containsKey("successMessage");
-        verify(holidayConfigService).save(any(HolidayConfigForm.class));
+        assertThat(redirectAttributes.getFlashAttributes().get("successMessage"))
+                .isEqualTo("休業日設定を更新しました。");
+        ArgumentCaptor<HolidayConfigForm> captor =
+                ArgumentCaptor.forClass(HolidayConfigForm.class);
+        verify(holidayConfigService).save(captor.capture());
+        assertThat(captor.getValue().getNendo()).isEqualTo(NEN);
+        verify(accessChecker).checkWriteAccess(ScreenManagement.HOLIDAY_CONFIG);
     }
 
     @Test
@@ -150,6 +169,7 @@ class HolidayConfigControllerTest {
         assertThat(model.asMap()).containsEntry("mode", "edit");
         assertThat(model.asMap().get("errorMessage").toString()).contains("年は必須です。");
         verify(holidayConfigService, never()).save(any());
+        verify(accessChecker).checkWriteAccess(ScreenManagement.HOLIDAY_CONFIG);
     }
 
     @Test
@@ -161,6 +181,7 @@ class HolidayConfigControllerTest {
         assertThat(view).isEqualTo(VIEW);
         assertThat(model.asMap().get("errorMessage").toString()).contains("年は必須です。");
         verify(holidayConfigService, never()).save(any());
+        verify(accessChecker).checkWriteAccess(ScreenManagement.HOLIDAY_CONFIG);
     }
 
     @Test
@@ -175,5 +196,6 @@ class HolidayConfigControllerTest {
         assertThat(model.asMap().get("errorMessage").toString())
                 .contains("保存に失敗しました").contains("DB接続エラー");
         assertThat(model.asMap().get("form")).isNotNull();
+        verify(accessChecker).checkWriteAccess(ScreenManagement.HOLIDAY_CONFIG);
     }
 }

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -104,6 +106,7 @@ class ReportsConfigServiceImplTest {
         verify(statement).setString(2, "RPT0000001");
         verify(statement).setString(3, "2");
         verify(statement).setString(4, "");
+        verify(statement).setInt(10, 1);
     }
 
     @Test
@@ -112,7 +115,9 @@ class ReportsConfigServiceImplTest {
 
         service.importReportFile(file, JICHITAI_CD, USER_ID);
 
-        verify(statement).setBinaryStream(eq(5), any(java.io.InputStream.class), eq((int) file.getSize()));
+        ArgumentCaptor<InputStream> captor = ArgumentCaptor.forClass(InputStream.class);
+        verify(statement).setBinaryStream(eq(5), captor.capture(), eq((int) file.getSize()));
+        assertThat(captor.getValue().readAllBytes()).isEqualTo(file.getBytes());
     }
 
     @Test
@@ -131,6 +136,16 @@ class ReportsConfigServiceImplTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("SQLエラー")
                 .hasMessageContaining("重複キー");
+    }
+
+    @Test
+    void importReportFile_接続の取得に失敗した場合もSQLエラーとして送出される() throws Exception {
+        when(dataSource.getConnection()).thenThrow(new SQLException("接続失敗"));
+
+        assertThatThrownBy(() -> service.importReportFile(jrxmlFile(), JICHITAI_CD, USER_ID))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("SQLエラー")
+                .hasMessageContaining("接続失敗");
     }
 
     @Test
