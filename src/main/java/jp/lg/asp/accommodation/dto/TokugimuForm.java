@@ -282,6 +282,38 @@ public class TokugimuForm {
 			if (eltax != null && !eltax.isEmpty() && !eltax.equals("1"))
 				errors.put("eltaxUmu", "その他の情報のELTAX有無が不正です");
 
+			// ===== 日付の前後関係チェック =====
+			LocalDate registrationDate = f.getRegistrationDate();
+			LocalDate shinseiDate = f.getShinseiDate();
+			LocalDate henkoDate = f.getHenkoDate();
+			LocalDate businessStartDate = f.getBusinessStartDate();
+			LocalDate suspensionStartDate = f.getSuspensionStartDate();
+			LocalDate suspensionEndDate = f.getSuspensionEndDate();
+			LocalDate resumptionOrAbolitionDate = f.getResumptionOrAbolitionDate();
+			String declarationCategory = f.getDeclarationCategory();
+
+			// (1) 申請年月日 <= 登録年月日
+			if (shinseiDate != null && registrationDate != null && shinseiDate.isAfter(registrationDate))
+				errors.putIfAbsent("shinseiDate", "特別徴収義務者情報の申請年月日は登録年月日以前の日付を入力してください");
+			// (2) 変更年月日 >= 登録年月日
+			if (henkoDate != null && registrationDate != null && henkoDate.isBefore(registrationDate))
+				errors.putIfAbsent("henkoDate", "特別徴収義務者情報の変更年月日は登録年月日以降の日付を入力してください");
+			// (4) 申告区分「休止」→ 休止開始年月日 必須
+			if ("休止".equals(declarationCategory) && suspensionStartDate == null)
+				errors.putIfAbsent("suspensionStartDate", "施設営業休止/再開/廃止情報の休止開始年月日は必須です");
+			// (6) 未定チェックON かつ 休止終了年月日 入力あり（(3)より先に評価）
+			if (f.isSuspensionEndDateUndecided() && suspensionEndDate != null)
+				errors.putIfAbsent("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は、未定にチェックした場合は入力できません");
+			// (3) 休止終了年月日 >= 休止開始年月日
+			if (suspensionEndDate != null && suspensionStartDate != null && suspensionEndDate.isBefore(suspensionStartDate))
+				errors.putIfAbsent("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は休止開始年月日以降の日付を入力してください");
+			// (5) 申告区分「再開」または「廃止」→ 再開または廃止年月日 必須
+			if (("再開".equals(declarationCategory) || "廃止".equals(declarationCategory)) && resumptionOrAbolitionDate == null)
+				errors.putIfAbsent("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は必須です");
+			// (7) 再開または廃止年月日 >= 営業開始(予定)日
+			if (resumptionOrAbolitionDate != null && businessStartDate != null && resumptionOrAbolitionDate.isBefore(businessStartDate))
+				errors.putIfAbsent("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は営業開始(予定)日以降の日付を入力してください");
+
 			return errors;
 		}
 
