@@ -17,32 +17,56 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AddressSearchApiController {
 
-    private final AddressSearchApiService addressSearchApiService;
-    private final JichitaiContext jichitaiContext;
+	private final AddressSearchApiService addressSearchApiService;
+	private final JichitaiContext jichitaiContext;
 
-    @GetMapping("/search")
-    public List<AddressDto> search(
-            @RequestParam(required = false) String addressNumber,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false, defaultValue = "partial") String nameMatchType,
-            @RequestParam(required = false) String address,
-            @RequestParam(required = false, defaultValue = "partial") String addressMatchType,
-            @RequestParam(required = false) String phone,
-            @RequestParam(required = false) String kojinNo,
-            @RequestParam(required = false) String hojinNo) {
-        
-        String jichitaiCd = jichitaiContext.getJichitaiCd();
+	@GetMapping("/search")
+	public List<AddressDto> search(
+			@RequestParam(required = false) String addressNumber,
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false, defaultValue = "partial") String nameMatchType,
+			@RequestParam(required = false) String address,
+			@RequestParam(required = false, defaultValue = "partial") String addressMatchType,
+			@RequestParam(required = false) String phone,
+			@RequestParam(required = false) String kojinNo,
+			@RequestParam(required = false) String hojinNo) {
 
-        return addressSearchApiService.searchAddresses(
-                jichitaiCd,
-                addressNumber,
-                name,
-                nameMatchType,
-                address,
-                addressMatchType,
-                phone,
-                kojinNo,
-                hojinNo
-        );
-    }
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+
+		return addressSearchApiService.searchAddresses(
+				jichitaiCd,
+				addressNumber,
+				name,
+				nameMatchType,
+				address,
+				addressMatchType,
+				phone,
+				kojinNo,
+				hojinNo);
+	}
+
+	@GetMapping("/search-or")
+	public List<AddressDto> searchOr(
+			@RequestParam(required = false) String addressNumber,
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false, defaultValue = "partial") String nameMatchType,
+			@RequestParam(required = false) String address,
+			@RequestParam(required = false, defaultValue = "partial") String addressMatchType,
+			@RequestParam(required = false) String phone,
+			@RequestParam(required = false) String kojinNo,
+			@RequestParam(required = false) String hojinNo) {
+
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+
+		return addressSearchApiService.searchAddressesOr(
+				jichitaiCd,
+				addressNumber,
+				name,
+				nameMatchType,
+				address,
+				addressMatchType,
+				phone,
+				kojinNo,
+				hojinNo);
+	}
 }

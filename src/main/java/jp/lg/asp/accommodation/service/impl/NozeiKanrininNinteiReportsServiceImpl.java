@@ -66,7 +66,6 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 			} else {
 				parameters.put("hakkoYmd", "");
 			}
-			
 	        parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
 	        parameters.put("city", dto.getCityName() != null ? dto.getCityName() : "");
 	        parameters.put("biko", dto.getBiko() != null ? dto.getBiko() : "");
