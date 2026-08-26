@@ -40,12 +40,12 @@ public class ShoreikinConfigDto {
 	// ========== 交付金情報エリア ==========
 
 	/** No.4 交付金年度 (t_shoreikin.nendo) */
-	@NotBlank(message = "交付金年度は必須入力です")
+	@NotBlank(message = "交付金年度は必須です")
 	@Pattern(regexp = "^[0-9]{4}$", message = "交付金年度は4桁の数字で入力してください")
 	private String nendo;
 
 	/** No.5 納入税額 (t_shoreikin.kofu_zeigaku) */
-	@NotNull(message = "納入税額は必須入力です")
+	@NotNull(message = "納入税額は必須です")
 	@Min(value = 0, message = "納入税額は0以上で入力してください")
 	@Max(value = 99999999999999L, message = "納入税額は14桁以内で入力してください")
 	private Long kofuZeigaku;
@@ -57,7 +57,7 @@ public class ShoreikinConfigDto {
 	private BigDecimal kofuRitsu;
 
 	/** No.7 交付額 (t_shoreikin.kofu_gaku) */
-	@NotNull(message = "交付額は必須入力です")
+	@NotNull(message = "交付額は必須です")
 	@Min(value = 0, message = "交付額は0以上で入力してください")
 	@Max(value = 9999999999999L, message = "交付額は13桁以内で入力してください")
 	private Long kofuGaku;
@@ -81,12 +81,12 @@ public class ShoreikinConfigDto {
 		Map<String, String> errors = new LinkedHashMap<>();
 
 		if (f.getNendo() == null || f.getNendo().isBlank())
-			errors.put("nendo", "交付金年度は必須入力です");
+			errors.put("nendo", "交付金年度は必須です");
 		else if (!f.getNendo().matches("^[0-9]{4}$"))
 			errors.put("nendo", "交付金年度は4桁の数字で入力してください");
 
 		if (f.getKofuZeigaku() == null)
-			errors.put("kofuZeigaku", "納入税額は必須入力です");
+			errors.put("kofuZeigaku", "納入税額は必須です");
 		else if (f.getKofuZeigaku() < 0)
 			errors.put("kofuZeigaku", "納入税額は0以上で入力してください");
 		else if (f.getKofuZeigaku() > 99999999999999L)
@@ -101,7 +101,7 @@ public class ShoreikinConfigDto {
 			errors.put("kofuRitsu", "交付率は整数部5桁、小数部2桁以内で入力してください");
 
 		if (f.getKofuGaku() == null)
-			errors.put("kofuGaku", "交付額は必須入力です");
+			errors.put("kofuGaku", "交付額は必須です");
 		else if (f.getKofuGaku() < 0)
 			errors.put("kofuGaku", "交付額は0以上で入力してください");
 		else if (f.getKofuGaku() > 9999999999999L)
