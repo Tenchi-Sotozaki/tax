@@ -245,7 +245,7 @@
 		
 		<!-- 入力内容破棄確認モーダル -->
 		<div
-			th:replace="~{layout/components :: linkConfirmModal('backModal','確認','入力内容が破棄されます。戻りますか？',@{/admin/nokigen/view/{nendo}(nendo=${mode == 'edit' ? nokigen.nendo : nendoList[0]})},'戻る')}">
+			th:replace="~{layout/components :: linkConfirmModal('backModal','確認','入力内容が破棄されます。よろしいですか？',@{/admin/nokigen/view/{nendo}(nendo=${mode == 'edit' ? nokigen.nendo : nendoList[0]})},'戻る')}">
 		</div>
 
 	</div>
