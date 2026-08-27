@@ -105,7 +105,7 @@
 							</label> <input th:if="!${isView}" type="date" class="form-control"
 								id="torokuYmd" th:field="*{torokuYmd}"
 								th:errorclass="is-invalid" th:data-initial-value="*{torokuYmd}">
-							<input th:if="${isView}" type="text" class="form-control"
+							<input th:if="${isView}" type="text" class="form-control form-control-readonly"
 								id="torokuYmdView" readonly th:value="*{torokuYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('torokuYmd')}"
@@ -121,7 +121,7 @@
 								id="shinkokuYmd" th:field="*{shinkokuYmd}"
 								th:errorclass="is-invalid"
 								th:data-initial-value="*{shinkokuYmd}"> <input
-								th:if="${isView}" type="text" class="form-control"
+								th:if="${isView}" type="text" class="form-control form-control-readonly"
 								id="shinkokuYmdView" readonly th:value="*{shinkokuYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('shinkokuYmd')}"
@@ -131,7 +131,7 @@
 						<!-- 合算指定番号（編集・照会のみ） -->
 						<div th:if="${isEdit or isView}" class="col-md-3">
 							<label class="form-label fw-medium">合算指定番号</label> <input
-								type="text" class="form-control bg-light"
+								type="text" class="form-control form-control-readonly"
 								th:value="*{gassanShiteiNo}" readonly
 								th:data-initial-value="*{gassanShiteiNo}">
 						</div>
@@ -148,7 +148,7 @@
 								id="tekiyoStYmd" th:field="*{tekiyoStYmd}"
 								th:errorclass="is-invalid"
 								th:data-initial-value="*{tekiyoStYmd}"> <input
-								th:if="${isView}" type="text" class="form-control"
+								th:if="${isView}" type="text" class="form-control form-control-readonly"
 								id="tekiyoStYmdView" readonly th:value="*{tekiyoStYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoStYmd')}"
@@ -163,7 +163,7 @@
 								id="tekiyoEdYmd" th:field="*{tekiyoEdYmd}"
 								th:errorclass="is-invalid"
 								th:data-initial-value="*{tekiyoEdYmd}"> <input
-								th:if="${isView}" type="text" class="form-control"
+								th:if="${isView}" type="text" class="form-control form-control-readonly"
 								id="tekiyoEdYmdView" readonly th:value="*{tekiyoEdYmd}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoEdYmd')}"

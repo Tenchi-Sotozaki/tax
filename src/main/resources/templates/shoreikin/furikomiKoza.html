@@ -68,8 +68,8 @@
 									class="text-danger">*</span>
 								</label> <input type="text" class="form-control" id="bankCd"
 									th:field="*{bankCd}" th:readonly="${kozaForm.viewMode}"
+									th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('bankCd')} ? ' is-invalid' : '')"
 									maxlength="4"
-									th:classappend="${#fields.hasErrors('bankCd')} ? 'is-invalid' : ''"
 									pattern="[0-9]{4}" title="4桁の数字で入力してください" required
 									th:data-initial-value="*{bankCd}">
 
@@ -90,7 +90,7 @@
 									<input type="text" class="form-control" id="bankName"
 										th:field="*{bankName}" th:readonly="${kozaForm.viewMode}"
 										maxlength="30" autocomplete="off"
-										th:classappend="${#fields.hasErrors('bankName')} ? 'is-invalid' : ''"
+										th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('bankName')} ? ' is-invalid' : '')"
 										required th:data-initial-value="*{bankName}">
 									<ul id="bankNameSuggestions" class="list-group position-absolute w-100 shadow" style="z-index:1000;display:none;max-height:100px;overflow-y:auto;"></ul>
 								</div>
@@ -109,8 +109,8 @@
 									class="text-danger">*</span>
 								</label> <input type="text" class="form-control" id="branchCd"
 									th:field="*{branchCd}" th:readonly="${kozaForm.viewMode}"
+									th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('branchCd')} ? ' is-invalid' : '')"
 									maxlength="3"
-									th:classappend="${#fields.hasErrors('branchCd')} ? 'is-invalid' : ''"
 									pattern="[0-9]{3}" title="3桁の数字で入力してください" required
 									th:data-initial-value="*{branchCd}">
 
@@ -131,7 +131,7 @@
 									<input type="text" class="form-control" id="branchName"
 										th:field="*{branchName}" th:readonly="${kozaForm.viewMode}"
 										maxlength="30" autocomplete="off"
-										th:classappend="${#fields.hasErrors('branchName')} ? 'is-invalid' : ''"
+										th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('branchName')} ? ' is-invalid' : '')"
 										required th:data-initial-value="*{branchName}">
 									<ul id="branchNameSuggestions" class="list-group position-absolute w-100 shadow" style="z-index:1000;display:none;max-height:100px;overflow-y:auto;"></ul>
 								</div>
@@ -174,8 +174,8 @@
 									class="text-danger">*</span>
 								</label> <input type="text" class="form-control" id="kozaNo"
 									th:field="*{kozaNo}" th:readonly="${kozaForm.viewMode}"
+									th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('kozaNo')} ? ' is-invalid' : '')"
 									maxlength="7"
-									th:classappend="${#fields.hasErrors('kozaNo')} ? 'is-invalid' : ''"
 									pattern="[0-9]{7}" title="7桁の数字で入力してください" required
 									th:data-initial-value="*{kozaNo}">
 
@@ -192,8 +192,8 @@
 									class="text-danger">*</span>
 								</label> <input type="text" class="form-control" id="meigi"
 									th:field="*{meigi}" th:readonly="${kozaForm.viewMode}"
+									th:classappend="(${kozaForm.viewMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('meigi')} ? ' is-invalid' : '')"
 									maxlength="30"
-									th:classappend="${#fields.hasErrors('meigi')} ? 'is-invalid' : ''"
 									required th:data-initial-value="*{meigi}">
 
 								<div th:if="${#fields.hasErrors('meigi')}"
