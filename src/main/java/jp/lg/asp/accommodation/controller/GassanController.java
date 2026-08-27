@@ -196,7 +196,15 @@ public class GassanController {
 					form.getTekiyoStYmd() != null && form.getTekiyoStYmd().isAfter(java.time.LocalDate.now()));
 			model.addAttribute("editable",
 					form.getTekiyoEdYmd() == null || form.getTekiyoEdYmd().isAfter(java.time.LocalDate.now()));
-			model.addAttribute("errorMessage", e.getMessage());
+			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
+				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else if (e.getMessage() != null && e.getMessage().contains("適用終了年月")) {
+				bindingResult.rejectValue("tekiyoEdYmd", "error.tekiyoEdYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else {
+				model.addAttribute("errorMessage", e.getMessage());
+			}
 			return FORM_VIEW;
 		}
 	}
@@ -242,6 +250,9 @@ public class GassanController {
 			model.addAttribute("isView", false);
 			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
 				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else if (e.getMessage() != null && e.getMessage().contains("適用終了年月")) {
+				bindingResult.rejectValue("tekiyoEdYmd", "error.tekiyoEdYmd", e.getMessage());
 				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
 			} else {
 				model.addAttribute("errorMessage", e.getMessage());

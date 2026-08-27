@@ -197,6 +197,12 @@ public class GassanServiceImpl implements GassanService {
                 throw new RuntimeException("代表施設を選択してください。");
             }
 
+            // 適用開始・終了年月の逆転チェック
+            if (form.getTekiyoStYmd() != null && form.getTekiyoEdYmd() != null
+                    && !form.getTekiyoEdYmd().isAfter(form.getTekiyoStYmd())) {
+                throw new RuntimeException("適用終了年月は適用開始年月より後の年月を入力してください。");
+            }
+
             if (gassanShiteiNo != null) {
                 // ③再登録：セッションに合算指定番号あり
                 reRegister(jichitaiCd, gassanShiteiNo, daihyoShiteiNo, form);
@@ -285,6 +291,14 @@ public class GassanServiceImpl implements GassanService {
                 gassan.setTekiyoStYmd(form.getTekiyoStYmd());
             }
             gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
+
+            // 適用開始・終了年月の逆転チェック
+            LocalDate stYmd = gassan.getTekiyoStYmd();
+            LocalDate edYmd = gassan.getTekiyoEdYmd();
+            if (stYmd != null && edYmd != null && !edYmd.isAfter(stYmd)) {
+                throw new RuntimeException("適用終了年月は適用開始年月より後の年月を入力してください。");
+            }
+
             gassan.setShinkokuYmd(form.getShinkokuYmd());
             gassan.setTorokuYmd(form.getTorokuYmd());
             gassanRepository.save(gassan);

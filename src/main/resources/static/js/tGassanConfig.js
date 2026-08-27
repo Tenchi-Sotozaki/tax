@@ -38,6 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // チェックされた行をハイライト
     setupFacilityEventListeners();
 
+    // Flatpickr初期化（yyyy/MM形式、月選択）
+    ['tekiyoStYmd', 'tekiyoEdYmd'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.type === 'text') flatpickr(el, {
+            locale: 'ja',
+            plugins: [new monthSelectPlugin({ shorthand: false, dateFormat: 'Y/m', altFormat: 'Y/m' })],
+        });
+    });
     // 確認モーダルを開く前にチェック済み施設が2件以上あるか検証（登録時のみ）
     document.getElementById('openConfirmModalBtn')?.addEventListener('click', () => {
         const container = document.querySelector('[data-is-edit]');
@@ -57,15 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // フォーム送信前に type=month の値を yyyy-MM-dd 形式に変換
     document.getElementById('gassanForm')?.addEventListener('formdata', (e) => {
         const stYmd = document.getElementById('tekiyoStYmd');
-        if (stYmd && stYmd.type === 'month' && stYmd.value) {
-            e.formData.set('tekiyoStYmd', stYmd.value + '-01');
+        if (stYmd && stYmd.value) {
+            const [year, month] = stYmd.value.split('/');
+            if (year && month) e.formData.set('tekiyoStYmd', `${year}-${month.padStart(2, '0')}-01`);
         }
 
         const edYmd = document.getElementById('tekiyoEdYmd');
-        if (edYmd && edYmd.type === 'month' && edYmd.value) {
-            const [year, month] = edYmd.value.split('-').map(Number);
-            const lastDay = new Date(year, month, 0).getDate();
-            e.formData.set('tekiyoEdYmd', `${year}-${String(month).padStart(2, '0')}-${lastDay}`);
+        if (edYmd && edYmd.value) {
+            const [year, month] = edYmd.value.split('/').map(Number);
+            if (year && month) {
+                const lastDay = new Date(year, month, 0).getDate();
+                e.formData.set('tekiyoEdYmd', `${year}-${String(month).padStart(2, '0')}-${lastDay}`);
+            }
         }
     });
 
