@@ -295,7 +295,7 @@
 		<!-- 確認モーダル -->
 		<div th:if="!${isView}"
 			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', 
-			${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'gassanForm', 
+			${isEdit} ? '合算申請を更新します。よろしいですか？' : '合算申請を登録します。よろしいですか？', 'gassanForm', 
 			'btn-success', ${isEdit} ? '更新する' : '登録する')}">
 		</div>
 
@@ -308,7 +308,7 @@
 		<!-- 削除確認モーダル -->
 		<div th:if="!${isView} && ${isEdit}"
 			th:replace="~{layout/components :: confirmModal('deleteModal', '削除確認', 
-			'このデータを削除します。よろしいですか？', 'deleteForm', 
+			'合算申請を削除します。よろしいですか？', 'deleteForm', 
 			'btn-danger', '削除する')}">
 		</div>
 
