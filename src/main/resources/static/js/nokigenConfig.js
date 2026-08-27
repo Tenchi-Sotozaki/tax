@@ -243,9 +243,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const isChanged = (currentStr !== initialStr);
         if (isChanged) {
-			input.classList.add('form-control-edited');
+            input.style.border = '3px solid #ffeb3b';
         } else {
-			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

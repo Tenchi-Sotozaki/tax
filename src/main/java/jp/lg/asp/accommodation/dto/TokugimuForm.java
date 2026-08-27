@@ -5,6 +5,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,8 +16,6 @@ import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.Payload;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import org.springframework.util.StringUtils;
@@ -34,101 +33,79 @@ public class TokugimuForm {
 	private LocalDate registrationDate;
 	private LocalDate shinseiDate;
 	private LocalDate henkoDate;
+	@Size(max = 10)
 	private String tokugimuAddressNo;
 	private String tokugimuAddress;
 	private String name;
+	@Size(max = 200)
 	private String nameKana;
 	private String personalNumber;
 	private String corporateNumber;
 	private String tokugimuPhone;
 
 	// ===== 宿泊施設情報 =====
-	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
+	@Size(max = 10)
 	private String facilityAddressNo;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String facilityAddress;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String facilityName;
-	@Size(max = 200, message = "200文字以内で入力してください")
-	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "施設名称(ふりがな)はひらがなまたはカタカナで入力してください")
+	@Size(max = 200)
 	private String facilityNameKana;
-	@Size(max = 20, message = "20文字以内で入力してください")
-	@Pattern(regexp = "^[0-9-]*$", message = "半角数字とハイフンで入力してください")
+	@Size(max = 20)
 	private String facilityPhone;
-	/** 半角数字とピリオドのみ。yuka_menseki numeric(9,2) に合わせて整数部7桁・小数部2桁まで */
-	@Pattern(regexp = "^[0-9]{0,7}(\\.[0-9]{1,2})?$",
-			message = "半角数字とピリオドで、整数部7桁、小数部2桁以内で入力してください")
-	private String floorArea;
-	/** 半角数字のみ。chijo_kai numeric(3) に合わせて3桁まで */
-	@Pattern(regexp = "^[0-9]{0,3}$", message = "半角数字3桁以内で入力してください")
+	private BigDecimal floorArea;
 	private String aboveGroundFloor;
-	/** 半角数字のみ。chika_kai numeric(2) に合わせて2桁まで */
-	@Pattern(regexp = "^[0-9]{0,2}$", message = "半角数字2桁以内で入力してください")
 	private String basementFloor;
-	/** 半角数字のみ。kyakushitsu_su numeric(5) に合わせて5桁まで */
-	@Pattern(regexp = "^[0-9]{0,5}$", message = "半角数字5桁以内で入力してください")
-	private String roomCount;
-	/** 半角数字のみ。shuyo_su numeric(7) に合わせて7桁まで */
-	@Pattern(regexp = "^[0-9]{0,7}$", message = "半角数字7桁以内で入力してください")
-	private String capacity;
+	private Integer roomCount;
+	private Integer capacity;
 	private LocalDate businessStartDate;
 
 	// ===== 営業許可等情報 =====
-	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
+	@Size(max = 10)
 	private String licenseAddressNo;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String licenseAddress;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String licenseName;
-	@Size(max = 200, message = "200文字以内で入力してください")
-	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "氏名(ふりがな)はひらがなまたはカタカナで入力してください")
+	@Size(max = 200)
 	private String licenseNameKana;
-	@Size(max = 20, message = "20文字以内で入力してください")
-	@Pattern(regexp = "^[0-9-]*$", message = "半角数字とハイフンで入力してください")
+	@Size(max = 20)
 	private String licensePhone;
 	private String businessType;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String licenseNumber;
 
 	// ===== 施設所有者情報 =====
-	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
+	@Size(max = 10)
 	private String ownerAddressNo;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String ownerAddress;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String ownerName;
-	@Size(max = 200, message = "200文字以内で入力してください")
-	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "氏名(ふりがな)はひらがなまたはカタカナで入力してください")
+	@Size(max = 200)
 	private String ownerNameKana;
-	@Size(max = 20, message = "20文字以内で入力してください")
-	@Pattern(regexp = "^[0-9-]*$", message = "半角数字とハイフンで入力してください")
+	@Size(max = 20)
 	private String ownerPhone;
 
 	// ===== 書類送付先情報 =====
-	@Size(max = 10, message = "10文字以内で入力してください")
-	@Pattern(regexp = "^$|^[0-9]{3}-?[0-9]{4}$", message = "半角数字7桁で入力してください（ハイフン可）")
+	@Size(max = 10)
 	private String mailAddressNo;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String mailAddress;
-	@Size(max = 200, message = "200文字以内で入力してください")
+	@Size(max = 200)
 	private String mailName;
-	@Size(max = 200, message = "200文字以内で入力してください")
-	@Pattern(regexp = "^[\\u3041-\\u3096\\u309D\\u309E\\u30A1-\\u30F6\\u30FD\\u30FEー\u3000 ]*$", message = "氏名(ふりがな)はひらがなまたはカタカナで入力してください")
+	@Size(max = 200)
 	private String mailNameKana;
-	@Size(max = 20, message = "20文字以内で入力してください")
-	@Pattern(regexp = "^[0-9-]*$", message = "半角数字とハイフンで入力してください")
+	@Size(max = 20)
 	private String mailPhone;
 
 	// ===== 共同事業者情報 =====
-	@Valid
+	private boolean kyodoFlg;
 	private List<KyodoJigyoshaDto> kyodoList = new ArrayList<>();
 
 	// ===== その他の情報 =====
 	private String eltaxUmu;
-	@Size(max = 400, message = "400文字以内で入力してください")
 	private String remarks;
 
 	// ===== 施設営業休止/再開/廃止情報 =====
@@ -138,39 +115,12 @@ public class TokugimuForm {
 	private LocalDate suspensionEndDate;
 	private boolean suspensionEndDateUndecided;
 	private LocalDate resumptionOrAbolitionDate;
-	@Size(max = 400, message = "400文字以内で入力してください")
 	private String suspensionOrAbolitionReason;
 
 	private String shiteiNo;
 	private Integer rno;
 	private Integer maxRno;
 	private Integer minRno;
-
-	/**
-	 * エラーサマリの表示順。tTokugimuConfig.html の項目順に並べる。
-	 * 画面に項目を追加したときは、ここにも追加すること。
-	 */
-	private static final List<String> FIELD_ORDER = List.of(
-			"atenaNo", "registrationDate", "henkoDate", "shinseiDate", "tokugimuAddressNo",
-			"tokugimuAddress", "name", "nameKana", "personalNumber",
-			"corporateNumber", "tokugimuPhone", "businessStartDate", "facilityAddressNo",
-			"facilityAddress", "facilityName", "facilityNameKana", "facilityPhone",
-			"floorArea", "aboveGroundFloor", "basementFloor", "roomCount",
-			"capacity", "licenseAddressNo", "licenseAddress", "licenseName",
-			"licenseNameKana", "licensePhone", "businessType", "licenseNumber",
-			"ownerAddressNo", "ownerAddress", "ownerName", "ownerNameKana",
-			"ownerPhone", "mailAddressNo", "mailAddress", "mailName",
-			"mailNameKana", "mailPhone", "kyodoName", "kyodoNameKana",
-			"eltaxUmu", "remarks", "declarationCategory", "suspensionStartDate",
-			"suspensionEndDate", "resumptionOrAbolitionDate", "suspensionOrAbolitionReason");
-
-	/** FIELD_ORDER 上の位置を返す。未登録の項目は末尾に回す */
-	public static int fieldOrder(String field) {
-		// kyodoList[0].kyodoName のような添字付きの項目は、末尾の項目名で引く
-		int dot = field.lastIndexOf('.');
-		int index = FIELD_ORDER.indexOf(dot < 0 ? field : field.substring(dot + 1));
-		return index < 0 ? FIELD_ORDER.size() : index;
-	}
 
 	public String getTokugimuYubinNo() {
 		return mailAddressNo != null && !mailAddressNo.isBlank() ? mailAddressNo : tokugimuAddressNo;
@@ -199,23 +149,17 @@ public class TokugimuForm {
 			Map<String, String> errors = new LinkedHashMap<>();
 
 			if (f.getRegistrationDate() == null)
-				errors.put("registrationDate", "特別徴収義務者情報の登録年月日は必須です");
-			if (f.getShinseiDate() == null)
-				errors.put("shinseiDate", "特別徴収義務者情報の申請年月日は必須です");
-			if (f.getAtenaNo() == null) {
-				errors.put("atenaNo", "宛名が選択されていません");
-			} else {
-				if (!StringUtils.hasText(f.getTokugimuAddressNo()))
-					errors.put("tokugimuAddressNo", "特別徴収義務者情報の郵便番号は必須です");
-				if (!StringUtils.hasText(f.getTokugimuAddress()))
-					errors.put("tokugimuAddress", "特別徴収義務者情報の住所は必須です");
-				if (!StringUtils.hasText(f.getName()))
-					errors.put("name", "特別徴収義務者情報の氏名または名称は必須です");
-				if (!StringUtils.hasText(f.getNameKana()))
-					errors.put("nameKana", "特別徴収義務者情報の氏名(ふりがな)は必須です");
-				if (!StringUtils.hasText(f.getTokugimuPhone()))
-					errors.put("tokugimuPhone", "特別徴収義務者情報の電話番号は必須です");
-			}
+				errors.put("registrationDate", "特別徴収義務者情報の登録日は必須です");
+			if (!StringUtils.hasText(f.getTokugimuAddressNo()))
+				errors.put("tokugimuAddressNo", "特別徴収義務者情報の郵便番号は必須です");
+			if (!StringUtils.hasText(f.getTokugimuAddress()))
+				errors.put("tokugimuAddress", "特別徴収義務者情報の住所は必須です");
+			if (!StringUtils.hasText(f.getName()))
+				errors.put("name", "特別徴収義務者情報の氏名または名称は必須です");
+			if (!StringUtils.hasText(f.getNameKana()))
+				errors.put("nameKana", "特別徴収義務者情報の氏名(ふりがな)は必須です");
+			if (!StringUtils.hasText(f.getTokugimuPhone()))
+				errors.put("tokugimuPhone", "特別徴収義務者情報の電話番号は必須です");
 			if (!StringUtils.hasText(f.getFacilityName()))
 				errors.put("facilityName", "宿泊施設情報の施設名称は必須です");
 			if (!StringUtils.hasText(f.getFacilityNameKana()))
@@ -232,8 +176,6 @@ public class TokugimuForm {
 				errors.put("licenseNameKana", "営業許可等情報の氏名(ふりがな)は必須です");
 			if (!StringUtils.hasText(f.getBusinessType()))
 				errors.put("businessType", "営業許可等情報の営業種別は必須です");
-			else if (!List.of("1", "2", "3", "4").contains(f.getBusinessType()))
-				errors.put("businessType", "営業許可等情報の営業種別が不正です");
 			if (!StringUtils.hasText(f.getLicenseNumber()))
 				errors.put("licenseNumber", "営業許可等情報の許可番号は必須です");
 			boolean ownerAnyInput = StringUtils.hasText(f.getOwnerName()) || StringUtils.hasText(f.getOwnerNameKana())
@@ -247,72 +189,14 @@ public class TokugimuForm {
 			}
 			if (!StringUtils.hasText(f.getMailName()))
 				errors.put("mailName", "書類送付先情報の氏名は必須です");
-			// 1行でも入力があれば、その行の氏名・氏名(ふりがな)を必須とする。
-			// 完全に空の行は入力なしとみなして無視する（施設所有者情報と同じ扱い）。
-			// エラーのキーは画面の th:field と揃えるため添字付きにする。
-			List<KyodoJigyoshaDto> kyodoList = f.getKyodoList();
-			if (kyodoList != null) {
-				for (int i = 0; i < kyodoList.size(); i++) {
-					KyodoJigyoshaDto k = kyodoList.get(i);
-					if (!hasAnyInput(k))
-						continue;
-					if (!StringUtils.hasText(k.getKyodoName()))
-						errors.put("kyodoList[" + i + "].kyodoName", "共同事業者情報の氏名は必須です");
-					if (!StringUtils.hasText(k.getKyodoNameKana()))
-						errors.put("kyodoList[" + i + "].kyodoNameKana", "共同事業者情報の氏名(ふりがな)は必須です");
-				}
+			if (f.isKyodoFlg()) {
+				if (f.getKyodoList().stream().anyMatch(k -> !StringUtils.hasText(k.getKyodoName())))
+					errors.put("kyodoName", "共同事業者情報の氏名は必須です");
+				if (f.getKyodoList().stream().anyMatch(k -> !StringUtils.hasText(k.getKyodoNameKana())))
+					errors.put("kyodoNameKana", "共同事業者情報の氏名(ふりがな)は必須です");
 			}
 
-			if (f.getDeclarationCategory() != null
-					&& !List.of("休止", "再開", "廃止").contains(f.getDeclarationCategory()))
-				errors.put("declarationCategory", "施設営業休止/再開/廃止情報の申告区分が不正です");
-
-			String eltax = f.getEltaxUmu();
-			if (eltax != null && !eltax.isEmpty() && !eltax.equals("1"))
-				errors.put("eltaxUmu", "その他の情報のELTAX有無が不正です");
-
-			// ===== 日付の前後関係チェック =====
-			LocalDate registrationDate = f.getRegistrationDate();
-			LocalDate shinseiDate = f.getShinseiDate();
-			LocalDate henkoDate = f.getHenkoDate();
-			LocalDate businessStartDate = f.getBusinessStartDate();
-			LocalDate suspensionStartDate = f.getSuspensionStartDate();
-			LocalDate suspensionEndDate = f.getSuspensionEndDate();
-			LocalDate resumptionOrAbolitionDate = f.getResumptionOrAbolitionDate();
-			String declarationCategory = f.getDeclarationCategory();
-
-			// (1) 申請年月日 <= 登録年月日
-			if (shinseiDate != null && registrationDate != null && shinseiDate.isAfter(registrationDate))
-				errors.putIfAbsent("shinseiDate", "特別徴収義務者情報の申請年月日は登録年月日以前の日付を入力してください");
-			// (2) 変更年月日 >= 登録年月日
-			if (henkoDate != null && registrationDate != null && henkoDate.isBefore(registrationDate))
-				errors.putIfAbsent("henkoDate", "特別徴収義務者情報の変更年月日は登録年月日以降の日付を入力してください");
-			// (4) 申告区分「休止」→ 休止開始年月日 必須
-			if ("休止".equals(declarationCategory) && suspensionStartDate == null)
-				errors.putIfAbsent("suspensionStartDate", "施設営業休止/再開/廃止情報の休止開始年月日は必須です");
-			// (6) 未定チェックON かつ 休止終了年月日 入力あり（(3)より先に評価）
-			if (f.isSuspensionEndDateUndecided() && suspensionEndDate != null)
-				errors.putIfAbsent("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は、未定にチェックした場合は入力できません");
-			// (3) 休止終了年月日 >= 休止開始年月日
-			if (suspensionEndDate != null && suspensionStartDate != null && suspensionEndDate.isBefore(suspensionStartDate))
-				errors.putIfAbsent("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は休止開始年月日以降の日付を入力してください");
-			// (5) 申告区分「再開」または「廃止」→ 再開または廃止年月日 必須
-			if (("再開".equals(declarationCategory) || "廃止".equals(declarationCategory)) && resumptionOrAbolitionDate == null)
-				errors.putIfAbsent("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は必須です");
-			// (7) 再開または廃止年月日 >= 営業開始(予定)日
-			if (resumptionOrAbolitionDate != null && businessStartDate != null && resumptionOrAbolitionDate.isBefore(businessStartDate))
-				errors.putIfAbsent("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は営業開始(予定)日以降の日付を入力してください");
-
 			return errors;
-		}
-
-		/** 共同事業者の1行に何か入力されているか */
-		private static boolean hasAnyInput(KyodoJigyoshaDto k) {
-			return StringUtils.hasText(k.getKyodoName())
-					|| StringUtils.hasText(k.getKyodoNameKana())
-					|| StringUtils.hasText(k.getKyodoAddressNo())
-					|| StringUtils.hasText(k.getKyodoAddress())
-					|| StringUtils.hasText(k.getKyodoPhone());
 		}
 
 		@Override

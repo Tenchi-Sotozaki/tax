@@ -2,47 +2,6 @@
  * 振込先口座照会／登録／編集画面用JavaScript
  */
 
-// ========== あいまい検索 ==========
-
-function setupFuzzySearch(inputId, suggestionsId, getApiUrl, onSelect) {
-    const input = document.getElementById(inputId);
-    const list = document.getElementById(suggestionsId);
-    if (!input || !list) return;
-
-    let timer;
-
-    input.addEventListener('input', function () {
-        clearTimeout(timer);
-        const q = this.value.trim();
-        if (q.length === 0) { list.style.display = 'none'; return; }
-        timer = setTimeout(() => {
-            const url = typeof getApiUrl === 'function' ? getApiUrl(q) : getApiUrl + encodeURIComponent(q);
-            fetch(url)
-                .then(r => r.json())
-                .then(data => {
-                    list.innerHTML = '';
-                    if (data.length === 0) { list.style.display = 'none'; return; }
-                    data.forEach(item => {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item list-group-item-action py-1';
-                        li.style.cursor = 'pointer';
-                        li.textContent = item.bank_name || item.branch_name;
-                        li.addEventListener('mousedown', function (e) {
-                            e.preventDefault();
-                            onSelect(item);
-                            list.style.display = 'none';
-                        });
-                        list.appendChild(li);
-                    });
-                    list.style.display = 'block';
-                })
-                .catch(() => { list.style.display = 'none'; });
-        }, 200);
-    });
-
-    input.addEventListener('blur', () => { setTimeout(() => { list.style.display = 'none'; }, 150); });
-}
-
 function editMode() {
     // 編集モードに切り替え
     document.getElementById('editForm').submit();
@@ -178,34 +137,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 編集・登録モードのみあいまい検索を有効化（readonlyでなければ入力可能モード）
-    const bankNameInput = document.getElementById('bankName');
-    const isEditable = bankNameInput && !bankNameInput.readOnly;
-
-    if (isEditable) {
-        // 金融機関名あいまい検索
-        setupFuzzySearch('bankName', 'bankNameSuggestions', BANK_SEARCH_URL + '?q=', function(item) {
-            document.getElementById('bankName').value = item.bank_name;
-            document.getElementById('bankCd').value = item.bank_code;
-            // 金融機関が変わったら支店候補をリセット
-            document.getElementById('branchName').value = '';
-            document.getElementById('branchCd').value = '';
-        });
-
-        // 支店名あいまい検索（金融機関コードで絞り込み）
-        setupFuzzySearch('branchName', 'branchNameSuggestions', function(q) {
-            const bankCode = document.getElementById('bankCd').value.trim();
-            let url = BRANCH_SEARCH_URL + '?q=' + encodeURIComponent(q);
-            if (bankCode) url += '&bankCode=' + encodeURIComponent(bankCode);
-            return url;
-        }, function(item) {
-            document.getElementById('branchName').value = item.branch_name;
-            document.getElementById('branchCd').value = item.branch_code;
-        });
-    }
-
+    // 編集モードでなければ処理を行わない
     const contentContainer = document.querySelector('[data-is-edit]');
     const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
+
     if (!isEdit) return;
 
     // 編集変更チェック
@@ -225,9 +160,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 変更があれば黄色い枠を付与
         if (isChanged) {
-			input.classList.add('form-control-edited');
+            input.style.border = '3px solid #ffeb3b';
         } else {
-			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

@@ -20,7 +20,7 @@
 			</h5>
 			<a
 				th:href="@{/tekiyo-nozei-shuki/edit/{id}(id=${tekiyoNozeiShukiForm.shiteiNo})}"
-				class="btn btn-primary" th:if="${isView ?: false}"> <i
+				class="btn btn-primary btn-sm" th:if="${isView ?: false}"> <i
 				class="bi bi-pencil-square me-2"></i>編集する
 			</a>
 		</div>
@@ -68,7 +68,7 @@
 							</label> <input th:if="${!(isView ?: false)}" type="month"
 								class="form-control" th:field="*{tekiyoStMonth}"
 								th:data-initial-value="*{tekiyoStMonth}"> <input
-								th:if="${isView ?: false}" type="text" class="form-control form-control-readonly"
+								th:if="${isView ?: false}" type="text" class="form-control"
 								readonly th:value="${tekiyoNozeiShukiForm.tekiyoStMonth != null ? tekiyoNozeiShukiForm.tekiyoStMonth.substring(0,4) + '年' + tekiyoNozeiShukiForm.tekiyoStMonth.substring(5) + '月' : ''}">
 						</div>
 
@@ -77,7 +77,7 @@
 								th:if="${!(isView ?: false)}" type="month" class="form-control"
 								th:field="*{tekiyoEdMonth}" th:data-initial-value="*{tekiyoEdMonth}">
 							<input th:if="${isView ?: false}" type="text"
-								class="form-control form-control-readonly" readonly th:value="${tekiyoNozeiShukiForm.tekiyoEdMonth != null ? tekiyoNozeiShukiForm.tekiyoEdMonth.substring(0,4) + '年' + tekiyoNozeiShukiForm.tekiyoEdMonth.substring(5) + '月' : ''}">
+								class="form-control" readonly th:value="${tekiyoNozeiShukiForm.tekiyoEdMonth != null ? tekiyoNozeiShukiForm.tekiyoEdMonth.substring(0,4) + '年' + tekiyoNozeiShukiForm.tekiyoEdMonth.substring(5) + '月' : ''}">
 						</div>
 
 						<div class="col-md-4">
@@ -127,26 +127,26 @@
 			</div>
 
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				<!-- 一覧に戻るボタン（照会時のみ表示） -->
-				<a th:href="@{/tokugimu/list}" class="btn btn-outline-secondary btn-lg px-4" th:if="${isView ?: false}">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
-				
-				<!-- 照会に戻るボタン（編集・登録時） -->
-				<a href="#" class="btn btn-outline-secondary btn-lg px-4" th:unless="${isView ?: false}" data-bs-toggle="modal"
-					data-bs-target="#backConfirmModal">
-					<i class="bi bi-arrow-left me-2"></i>照会に戻る
-				</a>
-				
-				<!-- 登録/更新ボタン修正 -->
-				<button type="submit" class="btn btn-success px-5" th:if="${!(isView ?: false)}">
-					<i class="bi bi-save me-2"></i> <span th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
+				<button type="submit" class="btn btn-success btn-lg px-5"
+					th:if="${!(isView ?: false)}">
+					<i class="bi bi-save me-2"></i> <span
+						th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
 				</button>
-				
-				<!-- 削除ボタン（編集時のみ表示） -->
-				<a href="#" class="btn btn-danger btn-lg px-4" th:if="${(isEdit ?: false) and !(isView ?: false)}"
-					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
-					<i class="bi bi-trash me-2"></i>削除する
+
+				<a href="#"
+					class="btn btn-danger btn-lg px-4"
+					th:if="${(isEdit ?: false) and !(isView ?: false)}"
+					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"> <i
+					class="bi bi-trash me-2"></i>
+				</a> <a th:href="@{/tokugimu/list}"削除してもよろしいですか？')"> <i
+					class="bi bi-trash me-2"></i>削除する
+				</a> <a th:href="@{/tokugimu/list}"
+					class="btn btn-outline-primary btn-lg px-4"
+					th:if="${isView ?: false}"> <i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a> <a href="#" class="btn btn-outline-primary btn-lg px-4"
+					th:unless="${isView ?: false}"
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
+					class="bi bi-arrow-left me-2"></i>照会に戻る
 				</a>
 			</div>
 		</form>

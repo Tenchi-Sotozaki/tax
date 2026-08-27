@@ -136,7 +136,7 @@
 			<header
 				class="bg-white shadow-sm d-flex align-items-center justify-content-between px-4 flex-shrink-0"
 				style="height: 56px;">
-				<button class="btn btn-outline-secondary d-md-none"
+				<button class="btn btn-sm btn-outline-secondary d-md-none"
 					id="sidebarToggle">
 					<i class="bi bi-list"></i>
 				</button>
@@ -150,7 +150,7 @@
 						<!-- CSRFトークン（CSRF保護が有効な場合のみ） -->
 						<input type="hidden" th:if="${_csrf}"
 							th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-						<button type="submit" class="btn btn-outline-secondary">
+						<button type="submit" class="btn btn-outline-secondary btn-sm">
 							<i class="bi bi-box-arrow-right me-1"></i>ログアウト
 						</button>
 					</form>

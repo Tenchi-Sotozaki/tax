@@ -38,17 +38,17 @@
 									<!-- 承認・不承認 -->
 									<div class="col-md-1">
 										<label class="form-label">区分</label>
-										<input th:if="*{kbn} == 1" type="text" class="form-control form-control-readonly" value="承認" readonly>
-										<input th:if="*{kbn} == 2" type="text" class="form-control form-control-readonly" value="不承認" readonly>
+										<input th:if="*{kbn} == 1" type="text" class="form-control" value="承認" readonly>
+										<input th:if="*{kbn} == 2" type="text" class="form-control" value="不承認" readonly>
 									</div>
 									
 									<div class="col-md-5">
-										<label class="form-label">納税管理人名</label> <input type="text" class="form-control form-control-readonly"
+										<label class="form-label">納税管理人名</label> <input type="text" class="form-control"
 											th:field="*{nozeiKanriName}" readonly>
 									</div>
 									<div class="col-md-6">
 										<label class="form-label">納税管理人住所</label> <input type="text"
-											class="form-control form-control-readonly" th:field="*{nozeiKanriJusho}" readonly>
+											class="form-control" th:field="*{nozeiKanriJusho}" readonly>
 									</div>
 								</div>
 							</div>
@@ -64,8 +64,7 @@
 									<div class="col-md-6">
 										<label for="hakkoYmd" class="form-label">発行年月日 <span
 												class="text-danger">*</span></label> <input type="date"
-											class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}">
-										<div class="invalid-feedback" id="hakkoYmdError"></div>
+											class="form-control" id="hakkoYmd" th:field="*{hakkoYmd}" required>
 									</div>
 								</div>
 							</div>
@@ -85,18 +84,16 @@
 
 						<!-- アクションボタン -->
 						<div class="d-flex justify-content-center gap-2">
-							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
-								<i class="bi bi-arrow-left me-1"></i> 戻る
-							</a>
-							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/nozeiKanrininShoninTsuchi/preview}"
-								formtarget="_blank">
-								<i class="bi bi-eye me-1"></i> プレビュー
-							</button>
-							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/nozeiKanrininShoninTsuchi/pdf}">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/nozeiKanrininShoninTsuchi/pdf}">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
 							</button>
-							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/nozeiKanrininShoninTsuchi/print}"
-								formtarget="_blank">
+							<button type="submit" class="btn btn-outline-primary"
+								th:formaction="@{/reports/nozeiKanrininShoninTsuchi/preview}" formtarget="_blank">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/nozeiKanrininShoninTsuchi/print}" formtarget="_blank">
 								<i class="bi bi-printer me-1"></i> 印刷
 							</button>
 						</div>
@@ -104,14 +101,11 @@
 				</div>
 			</div>
 		</div>
-		<!-- 特別徴収義務者指定モーダル -->
-		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/nozeiKanrininShoninTsuchi.js}"></script>
 		<script th:src="@{/js/reportForm.js}"></script>
-		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
 </body>
 

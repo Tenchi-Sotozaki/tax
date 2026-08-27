@@ -146,10 +146,10 @@
 							<input type="hidden" name="searched" value="true">
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
 								<a th:href="@{/atena/list}"
-									class="btn btn-outline-secondary"> <i
+									class="btn btn-outline-secondary btn-sm"> <i
 									class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 								</a>
-								<button type="submit" class="btn btn-primary px-4">
+								<button type="submit" class="btn btn-primary btn-sm px-4">
 									<i class="bi bi-search me-1"></i>検索する
 								</button>
 							</div>
@@ -217,7 +217,7 @@
 								</td>
 								<td><a th:if="${item.manual}"
 									th:href="@{/atena/view/{atenaNo}(atenaNo=${item.atena.atenaNo})}"
-									class="btn btn-outline-primary">照会</a></td>
+									class="btn btn-outline-primary btn-sm">照会</a></td>
 							</tr>
 						</tbody>
 					</table>

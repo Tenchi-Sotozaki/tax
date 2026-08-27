@@ -59,7 +59,7 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 	@Transactional(readOnly = true)
 	public NozeiShuki findBySeq(BigDecimal seq) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		NozeiShukiId id = new NozeiShukiId(jichitaiCd);
+		NozeiShukiId id = new NozeiShukiId(jichitaiCd, seq);
 		return nozeiShukiRepository.findById(id).orElse(null);
 	}
 
@@ -97,7 +97,7 @@ public class NozeiShukiServiceImpl implements NozeiShukiService {
 	@Transactional
 	public void delete(BigDecimal seq) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		NozeiShukiId id = new NozeiShukiId(jichitaiCd);
+		NozeiShukiId id = new NozeiShukiId(jichitaiCd, seq);
 		NozeiShuki nozeiShuki = nozeiShukiRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("削除対象のデータが見つかりません"));
 

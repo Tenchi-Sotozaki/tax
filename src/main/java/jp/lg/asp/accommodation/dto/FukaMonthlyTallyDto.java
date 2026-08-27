@@ -3,9 +3,6 @@ package jp.lg.asp.accommodation.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Digits;
-
 import lombok.Data;
 
 /**
@@ -15,7 +12,6 @@ import lombok.Data;
 public class FukaMonthlyTallyDto {
 
 	// 1日〜31日分の日別データリスト
-	@Valid
 	private List<DailyItem> dailyItems = new ArrayList<>();
 
 	/**
@@ -24,14 +20,11 @@ public class FukaMonthlyTallyDto {
 	@Data
 	public static class DailyItem {
 		private Integer day; // 日付 (1〜31)
-		private List<@Digits(integer = 8, fraction = 0, message = "8桁以内で入力してください") Integer> hakusu = new ArrayList<>();
-		private List<@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください") Long> ryokin = new ArrayList<>();
-		private List<@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください") Long> sogaku = new ArrayList<>();
-		@Digits(integer = 8, fraction = 0, message = "8桁以内で入力してください")
+		private List<Integer> hakusu = new ArrayList<>();
+		private List<Long> ryokin = new ArrayList<>();
+		private List<Long> sogaku = new ArrayList<>();
 		private Integer menjoHakusu;
-		@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 		private Long menjoRyokin;
-		@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 		private Long zeigaku;
 	}
 

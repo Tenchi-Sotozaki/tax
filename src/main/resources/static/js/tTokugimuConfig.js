@@ -8,30 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSmoothScroll();
     initKyodoSection();
     initBusinessStatusSection();
-    openAccordionsWithContent();
 });
-
-// -----------------------------------------------------------------------
-// 中身のあるアコーディオンを開いた状態にする
-// ・登録済みのデータがある場合  … たたまれていると気づけないため
-// ・エラーがある場合            … 項目直下のメッセージが見えないため
-// 新規登録で何も入っていないときは、たたんだままにする
-// -----------------------------------------------------------------------
-function openAccordionsWithContent() {
-    document.querySelectorAll('.accordion-collapse').forEach(el => {
-        const hasError = el.querySelector('.is-invalid') !== null;
-        const hasValue = Array.from(el.querySelectorAll('input, textarea, select')).some(hasInputValue);
-        if (!hasError && !hasValue) return;
-        bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
-    });
-}
-
-/** 入力欄に値が入っているか。ボタン類と hidden は対象外 */
-function hasInputValue(el) {
-    if (el.type === 'checkbox' || el.type === 'radio') return el.checked;
-    if (el.type === 'hidden' || el.type === 'button' || el.type === 'submit') return false;
-    return (el.value ?? '').trim() !== '';
-}
 
 // -----------------------------------------------------------------------
 // イベントバインド
@@ -242,6 +219,18 @@ function initCopyCheckboxes() {
         });
     }
 
+    // 共同事業者情報の表示切替
+    const kyodoCheck = document.getElementById('kyodoCheck');
+    if (kyodoCheck) {
+        kyodoCheck.addEventListener('change', () => {
+            const kyodoBody = document.getElementById('kyodoBody');
+            kyodoBody.style.display = kyodoCheck.checked ? '' : 'none';
+            if (!kyodoCheck.checked) {
+                kyodoBody.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
+            }
+        });
+    }
+
     // 営業状況情報の表示切替
     const businessStatusCheck = document.getElementById('businessStatusCheck');
     if (businessStatusCheck) {
@@ -397,9 +386,10 @@ function renumberKyodoRows() {
 // 共同事業者セクション初期化（編集・照会時にデータがあれば表示）
 // -----------------------------------------------------------------------
 function initKyodoSection() {
-    // 照会画面では行を追加しない。
-    // 追加ボタンは登録・編集時にしか描画されないため、その有無で判定する
-    if (!document.getElementById('kyodoAddBtn')) return;
+    const kyodoCheck = document.getElementById('kyodoCheck');
+    if (kyodoCheck && kyodoCheck.checked) {
+        document.getElementById('kyodoBody').style.display = '';
+    }
     // 保存済みデータがない場合は初期行を追加
     const rows = document.getElementById('kyodoRows');
     if (rows && rows.querySelectorAll('.kyodo-row').length === 0) {
@@ -508,9 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 		
         if (isChanged) {
-			input.classList.add('form-control-edited');
+            input.style.border = '3px solid #ffeb3b';
         } else {
-			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

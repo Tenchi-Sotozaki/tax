@@ -1,5 +1,7 @@
 package jp.lg.asp.accommodation.dto;
 
+import java.sql.Date;
+
 import lombok.Data;
 
 /**
@@ -18,9 +20,7 @@ public class GassanNonyuTsuchiReportsDto {
 	private String gassan_shitei_no;
 
 	/** 適用開始年月日 */
-	private String tekiyo_st_ymd;
-	
-	private String tekiyoYmString;
+	private Date tekiyo_st_ymd;
 	
 	/** 公印 */
 	private byte[] koin;

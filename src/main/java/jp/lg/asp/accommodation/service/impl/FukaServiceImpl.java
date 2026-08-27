@@ -30,6 +30,7 @@ import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
+import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -250,12 +251,12 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, LocalDate targetDate) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		boolean inPeriod = tekiyoList.stream()
-				.anyMatch(t -> (t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
-						&& (t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd())));
-		if (!inPeriod) return 3;
-		return jichitaiRepository.findById(jichitaiCd)
-				.map(j -> j.getNozeiShuki() != null ? Integer.parseInt(j.getNozeiShuki().trim()) : 3)
+		return tekiyoList.stream()
+				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
+				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
+				.findFirst()
+				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd, t.getSeq())))
+				.map(n -> n.getShuki().intValue())
 				.orElse(3);
 	}
 
@@ -661,8 +662,8 @@ public class FukaServiceImpl implements FukaService {
 			saveChoshuGenboDataWithRno(form, parentFuka, jichitaiCd, targetRno);
 		}
 
-		// 納入情報の保存（納入年月日と、0より大きい納入金額の両方に入力がある場合のみ登録処理を行う）
-		if (form.getShunoYmd() != null && form.getShunoKingaku() != null && form.getShunoKingaku() > 0) {
+		// 納入情報の保存（納入年月日・納入金額の両方に入力がある場合のみ登録処理を行う）
+		if (form.getShunoYmd() != null && form.getShunoKingaku() != null) {
 			Integer shunoRno = shunoRirekiRepository.findMaxRno(jichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
 					.map(r -> r + 1).orElse(1);
 			ShunoRireki shuno = new ShunoRireki();
@@ -761,18 +762,16 @@ public class FukaServiceImpl implements FukaService {
 				uchi.setRyokinSogaku(getLongValue(detail.getRyokinSogaku()));
 			} else {
 				// 定額制: 都道府県税額、市区町村税額を算出
-			    long hakusu = getLongValue(detail.getHakusu());
-			    BigDecimal taxKenRate = detail.getTaxKenRate();
-			    long kenRateLong = (taxKenRate != null) ? taxKenRate.longValue() : 0L;
-			    long kenZeigaku = kenRateLong * hakusu;
-			    long zeigaku = (detail.getZeigaku() != null) ? detail.getZeigaku() : 0L;
-			    long cityZeigaku = zeigaku - kenZeigaku >= 0L ? zeigaku - kenZeigaku : 0L; // 差引き
-			    kenZeigaku = zeigaku - cityZeigaku;
-			    uchi.setZeigaku(zeigaku);
-			    uchi.setKenZeigaku(kenZeigaku);
-			    uchi.setCityZeigaku(cityZeigaku);
-			    uchi.setRyokin(null);
-			    uchi.setRyokinSogaku(null);
+				long hakusu = getLongValue(detail.getHakusu());
+				long kenZeigaku = detail.getTaxKenRate().longValue() * hakusu;
+				long zeigaku = (detail.getZeigaku() != null) ? detail.getZeigaku() : 0L;
+				long cityZeigaku = zeigaku - kenZeigaku >= 0L ? zeigaku - kenZeigaku : 0L; // 差引き
+				kenZeigaku = zeigaku - cityZeigaku;
+				uchi.setZeigaku(zeigaku);
+				uchi.setKenZeigaku(kenZeigaku);
+				uchi.setCityZeigaku(cityZeigaku);
+				uchi.setRyokin(null);
+				uchi.setRyokinSogaku(null);
 			}
 			uchi.setHakusu(getLongValue(detail.getHakusu()));
 			uchi.setZeiRitsu(detail.getTaxRate());
@@ -1233,21 +1232,19 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	public long calculateTax(String fukaKbn, long baseValue, BigDecimal cityRate, BigDecimal kenRate) {
 
-	    // null を防ぐための安全な BigDecimal 変数を用意する
-	    BigDecimal city = (cityRate != null) ? cityRate : BigDecimal.ZERO;
-	    BigDecimal ken = (kenRate != null) ? kenRate : BigDecimal.ZERO;
+		BigDecimal city = (cityRate != null) ? cityRate : BigDecimal.ZERO;
 
-	    if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
-	        // 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
-	        return BigDecimal.valueOf(baseValue)
-	                .multiply(city)
-	                .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.DOWN)
-	                .longValue();
-	    } else {
-	        // 定額制：宿泊数 × 税率
-	        long rate = city.longValue() + ken.longValue();
-	        return baseValue * rate;
-	    }
+		if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
+			// 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
+			return BigDecimal.valueOf(baseValue)
+					.multiply(city)
+					.divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.DOWN)
+					.longValue();
+		} else {
+			// 定額制：宿泊数 × 税率
+			long rate = cityRate.longValue() + kenRate.longValue();
+			return baseValue * rate;
+		}
 	}
 	
 	@Override

@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -113,8 +115,9 @@ class TopPageControllerTest {
 	@Test
 	void save_保存する() {
 		TopPageConfigForm form = new TopPageConfigForm();
+		BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
 
-		String result = controller.save(form, model, redirectAttributes);
+		String result = controller.save(form, bindingResult, model, redirectAttributes);
 
 		assertEquals("redirect:/top/config", result);
 		verify(topPageService).save(form);
@@ -125,11 +128,11 @@ class TopPageControllerTest {
 	void save_保存失敗時は編集画面を表示する() {
 		TopPageConfigForm form = new TopPageConfigForm();
 		doThrow(new RuntimeException("DBエラー")).when(topPageService).save(form);
+		BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
 
-		String result = controller.save(form, model, redirectAttributes);
+		String result = controller.save(form, bindingResult, model, redirectAttributes);
 
 		assertEquals("top/topPageConfig", result);
-		verify(model).addAttribute("form", form);
 		verify(model).addAttribute(eq("errorMessage"), eq("保存に失敗しました: DBエラー"));
 	}
 

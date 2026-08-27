@@ -27,7 +27,7 @@ public class KofuRitsuConfigDto {
 	private BigDecimal saiteigaku;
 
 	@NotNull(message = "適用開始年度は必須です")
-	private String tekiyoStNendo;
+	private Integer tekiyoStNendo;
 
 	public static Map<String, String> validate(KofuRitsuConfigDto f) {
 		Map<String, String> errors = new LinkedHashMap<>();

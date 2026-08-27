@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -23,6 +22,7 @@ import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
+import jp.lg.asp.accommodation.service.ReportsCommonService;
 import jp.lg.asp.accommodation.service.impl.NozeiKanrininNinteiServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,8 +46,7 @@ class NozeiKanrininNinteiServiceImplTest {
     @Test
     void getNinteiInfo_success() {
         Jichitai jichitai = new Jichitai();
-        jichitai.setName("占冠");
-        jichitai.setKbnName("村");
+        jichitai.setName("占冠村");
         when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai));
 
         Tokugimu tokugimu = new Tokugimu();
@@ -64,16 +63,13 @@ class NozeiKanrininNinteiServiceImplTest {
         atena.setJusho("北海道占冠村");
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE)).thenReturn(Optional.of(atena));
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
-        when(reportsCommonService.getReportsDefText(any())).thenReturn("");
 
         NozeiKanrininNinteiDto result = service.getNinteiInfo(SHITEI_NO);
 
         assertThat(result.getShiteiNo()).isEqualTo(SHITEI_NO);
         assertThat(result.getCityName()).isEqualTo("占冠村");
         assertThat(result.getTokuName()).isEqualTo("テスト事業者");
-        assertThat(result.getTokuYubin()).isEqualTo("〒060-0001");
         assertThat(result.getShisetsuName()).isEqualTo("テスト施設");
-        assertThat(result.getShisetsuYubin()).isEqualTo("〒060-0001");
     }
 
     @Test
@@ -81,7 +77,6 @@ class NozeiKanrininNinteiServiceImplTest {
         when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
-        when(reportsCommonService.getReportsDefText(any())).thenReturn("");
 
         assertThatThrownBy(() -> service.getNinteiInfo(SHITEI_NO))
                 .isInstanceOf(RuntimeException.class)
@@ -91,8 +86,7 @@ class NozeiKanrininNinteiServiceImplTest {
     @Test
     void getNinteiInfo_atenaNotFound_throwsException() {
         Jichitai jichitai = new Jichitai();
-        jichitai.setName("占冠");
-        jichitai.setKbnName("村");
+        jichitai.setName("占冠村");
         when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai));
 
         Tokugimu tokugimu = new Tokugimu();
@@ -100,7 +94,6 @@ class NozeiKanrininNinteiServiceImplTest {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of(tokugimu));
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE)).thenReturn(Optional.empty());
         when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
-        when(reportsCommonService.getReportsDefText(any())).thenReturn("");
 
         assertThatThrownBy(() -> service.getNinteiInfo(SHITEI_NO))
                 .isInstanceOf(RuntimeException.class)

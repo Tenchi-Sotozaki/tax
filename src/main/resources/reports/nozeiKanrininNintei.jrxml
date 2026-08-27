@@ -16,92 +16,65 @@
 	<parameter name="city" class="java.lang.String"/>
 	<parameter name="biko" class="java.lang.String"/>
 	<parameter name="nintei" class="java.lang.String"/>
-
+	<query language="SQL"><![CDATA[SELECT atn.jusho,
+	atn.name,
+	tkg.shisetsu_jusho,
+	tkg.shisetsu_name
+FROM t_tokugimu tkg
+	left outer join m_atena atn ON 
+	 tkg.jichitai_cd = atn.jichitai_cd]]></query>
 	<field name="jusho" class="java.lang.String">
+		<description><![CDATA[住所]]></description>
 		<property name="com.jaspersoft.studio.field.name" value="jusho"/>
 		<property name="com.jaspersoft.studio.field.label" value="jusho"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="m_atena"/>
 	</field>
 	<field name="name" class="java.lang.String">
+		<description><![CDATA[名称]]></description>
 		<property name="com.jaspersoft.studio.field.name" value="name"/>
 		<property name="com.jaspersoft.studio.field.label" value="name"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="m_atena"/>
 	</field>
-	<field name="shisetsuJusho" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="shisetsuJusho"/>
-		<property name="com.jaspersoft.studio.field.label" value="shisetsuJusho"/>
+	<field name="shisetsu_jusho" class="java.lang.String">
+		<description><![CDATA[施設所在地]]></description>
+		<property name="com.jaspersoft.studio.field.name" value="shisetsu_jusho"/>
+		<property name="com.jaspersoft.studio.field.label" value="shisetsu_jusho"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="t_tokugimu"/>
 	</field>
-	<field name="shisetsuName" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="shisetsuName"/>
-		<property name="com.jaspersoft.studio.field.label" value="shisetsuName"/>
+	<field name="shisetsu_name" class="java.lang.String">
+		<description><![CDATA[施設名称]]></description>
+		<property name="com.jaspersoft.studio.field.name" value="shisetsu_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="shisetsu_name"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="t_tokugimu"/>
 	</field>
 	<field name="koin" class="java.lang.Object"/>
-	<field name="yubin" class="java.lang.String"/>
-	<field name="shisetsuYubin" class="java.lang.String"/>
 	<detail>
 		<band height="715" splitType="Stretch">
-			<element kind="textField" uuid="d5da7094-1c5b-4b82-b81b-431134420576" x="330" y="100" width="150" height="30" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
+			<element kind="textField" uuid="d5da7094-1c5b-4b82-b81b-431134420576" x="446" y="100" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$P{hakkoYmd}]]></expression>
 			</element>
-			<element kind="staticText" uuid="0ae2b475-d014-401b-82ca-82a0cf5e8f0a" x="45" y="121" width="110" height="30" fontName="IPAex明朝" fontSize="12.0">
-				<text><![CDATA[（特別徴収義務者）]]></text>
+			<element kind="staticText" uuid="0ae2b475-d014-401b-82ca-82a0cf5e8f0a" x="2" y="121" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
+				<text><![CDATA[特別徴収義務者]]></text>
 			</element>
-			<element kind="staticText" uuid="8bf225c9-4895-488b-9e43-412a60ff0191" x="45" y="151" width="110" height="30" fontName="IPAex明朝" fontSize="12.0">
+			<element kind="staticText" uuid="8bf225c9-4895-488b-9e43-412a60ff0191" x="0" y="151" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<text><![CDATA[住所（所在地）]]></text>
 			</element>
-			<element kind="staticText" uuid="ca313d47-08ee-4335-b01e-537d4fb3f567" x="45" y="181" width="110" height="30" fontName="IPAex明朝" fontSize="12.0">
+			<element kind="staticText" uuid="ca313d47-08ee-4335-b01e-537d4fb3f567" x="0" y="181" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<text><![CDATA[氏名（名称）]]></text>
 			</element>
-			<element kind="textField" uuid="b5a479e8-b855-47bd-a417-ac734870d11e" x="165" y="150" width="315" height="15" fontName="IPAex明朝" fontSize="12.0">
-				<expression><![CDATA[$F{yubin}]]></expression>
-			</element>
-			<element kind="textField" uuid="b5a479e8-b855-47bd-a417-ac734870d11f" x="165" y="165" width="315" height="15" fontName="IPAex明朝" fontSize="12.0">
+			<element kind="textField" uuid="b5a479e8-b855-47bd-a417-ac734870d11e" x="120" y="150" width="200" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$F{jusho}]]></expression>
 			</element>
-			<element kind="textField" uuid="2003f29c-cba4-47e5-9fb9-c9b022e7f8df" x="165" y="181" width="315" height="30" fontName="IPAex明朝" fontSize="14.0">
+			<element kind="textField" uuid="2003f29c-cba4-47e5-9fb9-c9b022e7f8df" x="120" y="180" width="200" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$F{name}]]></expression>
 			</element>
-			<!-- タイトル1行横並び: 宿泊税納税管理人選任免除 | 認定(縦)/不認定(縦) | 通知書 -->
-			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda5a" x="70" y="10" width="200" height="60" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
-				<text><![CDATA[宿泊税納税管理人選任免除]]></text>
+			<element kind="textField" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda6b" x="20" y="20" width="500" height="50" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center">
+				<expression><![CDATA["宿泊税納税管理人選定免除" + $P{nintei} + "通知書"]]></expression>
 			</element>
-			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda6b" x="260" y="15" width="80" height="25" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
-				<text><![CDATA[認定]]></text>
+			<element kind="textField" uuid="12e8a4b9-46d1-4b20-80ac-310be7b75ec8" x="45" y="260" width="435" height="50" fontName="IPAex明朝" fontSize="12.0">
+				<expression><![CDATA[$P{city} + "宿泊税施行規則" + $P{jorei} + "の規定により、申請ありました納税管理人の選任免除について、次の通り" + $P{nintei} + "することを決定しましたので通知します。"]]></expression>
 			</element>
-			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda6c" x="260" y="40" width="80" height="25" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
-				<text><![CDATA[不認定]]></text>
-			</element>
-			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c401" mode="Transparent" x="260" y="15" width="80" height="25">
-				<printWhenExpression><![CDATA[$P{nintei}.equals("認定")]]></printWhenExpression>
-				<pen lineWidth="1.5"/>
-			</element>
-			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c402" mode="Transparent" x="260" y="40" width="80" height="25">
-				<printWhenExpression><![CDATA[$P{nintei}.equals("不認定")]]></printWhenExpression>
-				<pen lineWidth="1.5"/>
-			</element>
-			<element kind="staticText" uuid="44420cca-bbeb-4bc1-b977-11a33c5dda7b" x="285" y="10" width="165" height="60" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Center" vTextAlign="Middle">
-				<text><![CDATA[通知書]]></text>
-			</element>
-			<element kind="textField" uuid="12e8a4b9-46d1-4b20-80ac-310be7b75ec8" x="45" y="260" width="435" height="20" fontName="IPAex明朝" fontSize="12.0">
-				<expression><![CDATA["　" + $P{city} + "宿泊税条例施行規則" + $P{jorei} + "の規定により、"]]></expression>
-			</element>
-			<element kind="staticText" uuid="12e8a4b9-46d1-4b20-80ac-310be7b75eca" x="45" y="280" width="435" height="20" fontName="IPAex明朝" fontSize="12.0">
-				<text><![CDATA[申請ありました納税管理人の選任免除について、次のとおり]]></text>
-			</element>
-			<element kind="staticText" uuid="12e8a4b9-46d1-4b20-80ac-310be7b75ec9" x="45" y="300" width="435" height="20" fontName="IPAex明朝" fontSize="12.0">
-				<text><![CDATA[（認定・不認定）することを決定しましたので通知します。]]></text>
-			</element>
-			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c403" mode="Transparent" x="50" y="298" width="34" height="16">
-				<printWhenExpression><![CDATA[$P{nintei}.equals("認定")]]></printWhenExpression>
-				<pen lineWidth="1.5"/>
-			</element>
-			<element kind="ellipse" uuid="a1b2c3d4-e5f6-4a7b-8c9d-e0f1a2b3c404" mode="Transparent" x="87" y="298" width="48" height="16">
-				<printWhenExpression><![CDATA[$P{nintei}.equals("不認定")]]></printWhenExpression>
-				<pen lineWidth="1.5"/>
-			</element>
-			<element kind="staticText" uuid="b2a7637f-f110-4bff-bb62-4821df8903bf" x="141" y="350" width="109" height="80" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="b2a7637f-f110-4bff-bb62-4821df8903bf" x="141" y="350" width="109" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[所在地]]></text>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -110,7 +83,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="36e95b60-15c2-4c61-867b-63ff38f2e8c8" x="141" y="430" width="109" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="36e95b60-15c2-4c61-867b-63ff38f2e8c8" x="141" y="410" width="109" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[名称]]></text>
 				<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
 				<box>
@@ -120,7 +93,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="cbb4ca9c-c922-4f21-a603-80ac504b18f7" x="141" y="490" width="109" height="80" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="cbb4ca9c-c922-4f21-a603-80ac504b18f7" x="141" y="470" width="109" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<paragraph lineSpacing="Single"/>
 				<text><![CDATA[住所
 (所在地)]]></text>
@@ -132,56 +105,39 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="12b06915-de53-4126-933c-b08245936076" x="250" y="350" width="230" height="30" fontName="IPAex明朝" fontSize="11.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA[$F{shisetsuYubin}]]></expression>
+			<element kind="textField" uuid="12b06915-de53-4126-933c-b08245936076" x="250" y="350" width="230" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{shisetsu_jusho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				<box leftPadding="5">
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-			</element>
-			<element kind="textField" uuid="12b06915-de53-4126-933c-b08245936077" x="250" y="380" width="230" height="50" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA[$F{shisetsuJusho}]]></expression>
-				<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				<box leftPadding="5">
-					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-			</element>
-			<element kind="textField" uuid="c0c558ac-227d-4604-9126-da304835732b" x="250" y="430" width="230" height="60" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA[$F{shisetsuName}]]></expression>
-				<property name="com.jaspersoft.studio.unit.x" value="px"/>
-				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				<box leftPadding="5">
+				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="7487ca62-251f-4a75-9da8-464f4aec1bb3" x="250" y="490" width="230" height="30" fontName="IPAex明朝" fontSize="11.0" hTextAlign="Left" vTextAlign="Middle">
-				<expression><![CDATA[$F{yubin}]]></expression>
+			<element kind="textField" uuid="c0c558ac-227d-4604-9126-da304835732b" x="250" y="410" width="230" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+				<expression><![CDATA[$F{shisetsu_name}]]></expression>
+				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				<box leftPadding="5">
+				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="7487ca62-251f-4a75-9da8-464f4aec1bb4" x="250" y="520" width="230" height="50" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+			<element kind="textField" uuid="7487ca62-251f-4a75-9da8-464f4aec1bb3" x="250" y="470" width="230" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{jusho}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				<box leftPadding="5">
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="1f6c9ddc-0fc4-427f-b040-8d2df8687318" x="141" y="570" width="109" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="1f6c9ddc-0fc4-427f-b040-8d2df8687318" x="141" y="530" width="109" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[氏名
 (名称)]]></text>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -193,7 +149,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="81cb1b71-e912-43bb-aa02-a5cf6ba53282" x="45" y="630" width="205" height="85" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="81cb1b71-e912-43bb-aa02-a5cf6ba53282" x="45" y="590" width="205" height="125" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[不認定の場合の理由]]></text>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -204,32 +160,32 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="5aa72391-0594-40ca-adfa-d0f825182225" x="250" y="570" width="230" height="60" fontName="IPAex明朝" fontSize="14.0" hTextAlign="Left" vTextAlign="Middle">
+			<element kind="textField" uuid="5aa72391-0594-40ca-adfa-d0f825182225" x="250" y="530" width="230" height="60" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$F{name}]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				<box leftPadding="5">
+				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="0ebb2515-7f1e-44a3-99af-bc55e71b6e5e" x="250" y="630" width="230" height="85" fontName="IPAex明朝" hTextAlign="Left" vTextAlign="Top">
+			<element kind="textField" uuid="0ebb2515-7f1e-44a3-99af-bc55e71b6e5e" x="250" y="590" width="230" height="125" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<expression><![CDATA[$P{biko}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				<box leftPadding="5" topPadding="5">
+				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="textField" uuid="03be05e0-09eb-470c-868c-1a73d8e1b57f" x="280" y="210" width="150" height="30" fontName="IPAex明朝" fontSize="12.0" hTextAlign="Right">
+			<element kind="textField" uuid="03be05e0-09eb-470c-868c-1a73d8e1b57f" x="280" y="210" width="100" height="30" fontName="IPAex明朝" fontSize="12.0">
 				<expression><![CDATA[$P{city} + "長"]]></expression>
 			</element>
-			<element kind="staticText" uuid="1edc8c33-f912-4d44-a327-14453cf26b0d" x="45" y="490" width="96" height="140" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="1edc8c33-f912-4d44-a327-14453cf26b0d" x="45" y="470" width="96" height="120" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[特別徴収義務者]]></text>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -238,7 +194,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="staticText" uuid="523cff17-c463-4898-8646-5e136dea0fee" x="45" y="350" width="96" height="140" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
+			<element kind="staticText" uuid="523cff17-c463-4898-8646-5e136dea0fee" x="45" y="350" width="96" height="120" fontName="IPAex明朝" hTextAlign="Center" vTextAlign="Middle">
 				<text><![CDATA[宿泊施設]]></text>
 				<box>
 					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -247,7 +203,7 @@
 					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
 				</box>
 			</element>
-			<element kind="image" uuid="6276b85c-f50c-4ac4-84d1-c68c80e64c73" x="430" y="190" width="50" height="50" onErrorType="Blank">
+			<element kind="image" uuid="6276b85c-f50c-4ac4-84d1-c68c80e64c73" x="400" y="190" width="50" height="50" onErrorType="Blank">
 				<expression><![CDATA[$F{koin}]]></expression>
 			</element>
 		</band>

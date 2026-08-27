@@ -27,6 +27,9 @@ public class OpeLogViewDto {
 	/** 操作日時 TO */
 	private String opeDtTo;
 
+	/** 任意項目／パラメータ（部分一致） */
+	private String param;
+
 	// ===== 一覧表示用 =====
 
 	/** 管理番号 */
@@ -34,6 +37,15 @@ public class OpeLogViewDto {
 
 	/** 画面名 */
 	private String screenName;
+
+	/** メソッド */
+	private String method;
+
+	/** PATH */
+	private String path;
+
+	/** ステータス */
+	private String status;
 
 	/** 操作日時 */
 	private LocalDateTime opeDt;

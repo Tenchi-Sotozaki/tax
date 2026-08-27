@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,10 +22,13 @@ import jp.lg.asp.accommodation.dto.MenuDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Menu;
+import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.exception.AccessDeniedException;
-import jp.lg.asp.accommodation.service.GlobalModelService;
-import jp.lg.asp.accommodation.service.JichitaiConfigService;
-import jp.lg.asp.accommodation.service.MenuService;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.repository.MenuRepository;
+import jp.lg.asp.accommodation.repository.RoleRepository;
+import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +38,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class GlobalModelAdvice {
 
-	private final GlobalModelService globalModelService;
-	private final JichitaiConfigService jichitaiConfigService;
-	private final MenuService menuService;
+	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
+	private final MenuRepository menuRepository;
+	private final JichitaiRepository jichitaiRepository;
+
 	private final JichitaiContext jichitaiContext;
 
 	private static final String OPERATOR_JICHITAI_CD = "99999";
@@ -72,29 +78,56 @@ public class GlobalModelAdvice {
 		return SessionHelper.getShiteiGassan(request);
 	}
 
+	/**
+	 * ログインユーザーがアクセス可能な screen_id のセットをモデルに追加する。
+	 * サイドバーの表示制御に使用する。
+	 * DBにユーザーが存在しない場合（モックユーザー等）は全画面を許可する。
+	 */
 	@ModelAttribute("accessibleScreens")
 	public Set<String> accessibleScreens() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+		try {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+				return Collections.emptySet();
+			}
+
+			UserId pk = new UserId();
+			pk.setJichitaiCd(jichitaiCd);
+			pk.setId(auth.getName());
+
+			User user = userRepository.findById(pk).orElse(null);
+
+			// DBにユーザーが存在しない場合（モックユーザー）は全画面許可
+			if (user == null || user.getRoleId() == null) {
+				return Set.of("*");
+			}
+
+			return roleRepository.findByIdWithDetails(jichitaiCd, user.getRoleId().longValue())
+					.map(role -> role.getRoleDetails() == null ? Collections.<String> emptySet()
+							: role.getRoleDetails().stream()
+									.filter(rd -> rd.getPermission() != null && rd.getPermission().compareTo("1") >= 0)
+									.map(rd -> rd.getScreenId().strip())
+									.collect(Collectors.toSet()))
+					.orElse(Collections.emptySet());
+		} catch (Exception e) {
+			log.error("accessibleScreens取得エラー: {}", e.getMessage());
 			return Collections.emptySet();
 		}
-		return globalModelService.getAccessibleScreens(jichitaiCd, auth.getName());
 	}
 
 	@ModelAttribute("sideMenuTree")
 	public List<MenuDto> sideMenuTree() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-
 		try {
 			boolean isOperator = OPERATOR_JICHITAI_CD.equals(jichitaiCd);
-			boolean isMonthly = jichitaiConfigService.findById(jichitaiCd)
+			boolean isMonthly = jichitaiRepository.findById(jichitaiCd)
 					.map(Jichitai::getNozeiShuki)
 					.map("1"::equals)
 					.orElse(false);
 			// 運用者は全画面許可として扱う
 			Set<String> screens = isOperator ? Set.of("*") : accessibleScreens();
-			List<Menu> menus = menuService.findAllOrderByDspOdr();
+			List<Menu> menus = menuRepository.findAllOrderByDspOdr();
 			Map<String, MenuDto> map = new LinkedHashMap<>();
 			for (Menu m : menus) {
 				if (!isDspKbnVisible(m.getDspKbn(), isOperator, isMonthly)) continue;

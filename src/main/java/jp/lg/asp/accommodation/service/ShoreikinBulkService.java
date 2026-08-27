@@ -1,8 +1,5 @@
 package jp.lg.asp.accommodation.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
 
 /**
@@ -16,9 +13,4 @@ public interface ShoreikinBulkService {
 	 * @return 処理結果を含むDTO
 	 */
 	ShoreikinBulkDto executeBulkSanshutsu(ShoreikinBulkDto dto);
-
-	/**
-	 * 交付率取得
-	 */
-	List<BigDecimal> findKofuRitsuList(String jichitaiCd, int year);
 }

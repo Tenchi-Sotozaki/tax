@@ -8,6 +8,8 @@ import java.util.Set;
 
 import jakarta.servlet.http.HttpSession;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,9 +34,12 @@ import jp.lg.asp.accommodation.dto.AtenaDaichoItem;
 import jp.lg.asp.accommodation.dto.AtenaImportPreviewDto;
 import jp.lg.asp.accommodation.dto.AtenaSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.AtenaConfigService;
 import jp.lg.asp.accommodation.service.AtenaImportService;
-import jp.lg.asp.accommodation.service.AtenaService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,13 +49,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/atena")
 public class AtenaController {
 
-	/*private final AtenaRepository atenaRepository;
-	private final JichitaiRepository jichitaiRepository;*/
-	
+	private final AtenaRepository atenaRepository;
 	private final AtenaImportService atenaImportService;
 	private final AtenaConfigService atenaConfigService;
-	private final AtenaService atenaService;
+	private final JichitaiRepository jichitaiRepository;
 	private final ScreenAccessChecker accessChecker;
+	private final HashUtil hashUtil;
 
 	private final JichitaiContext jichitaiContext;
 
@@ -68,9 +72,21 @@ public class AtenaController {
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_DAICHO);
-		
-		List<AtenaDaichoItem> items = atenaService.searchDaicho(jichitaiCd, searchForm, searched);
-		
+		BigDecimal atenaStNo = jichitaiRepository.findById(jichitaiCd)
+				.map(Jichitai::getAtenaStNo).orElse(null);
+		List<AtenaDaichoItem> items = searched
+				? atenaRepository.search(
+						jichitaiCd,
+						toLikePattern(searchForm.getAtenaNo(), "exact"),
+						toLikePattern(searchForm.getName(), searchForm.getNameMatchType()),
+						toLikePattern(searchForm.getNameKana(), searchForm.getNameKanaMatchType()),
+						toLikePattern(searchForm.getYubinNo(), "exact"),
+						toLikePattern(searchForm.getJusho(), searchForm.getJushoMatchType()),
+						toLikePattern(searchForm.getTel(), "exact"),
+						toLikePattern(hashIfPresent(searchForm.getKojinNo()), "exact"),
+						toLikePattern(searchForm.getHojinNo(), "exact"))
+						.stream().map(a -> new AtenaDaichoItem(a, atenaStNo)).toList()
+				: List.of();
 		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
 		model.addAttribute("isSearched", searched);
@@ -164,13 +180,7 @@ public class AtenaController {
 	public ResponseEntity<?> importDetail(@PathVariable BigDecimal seq) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		accessChecker.checkAccess(ATENA_INSERT);
-		var result = atenaImportService.findDetail(jichitaiCd, seq).stream()
-				.map(d -> Map.of(
-						"atenaNo", d.getAtenaNo().toPlainString(),
-						"name", d.getName(),
-						"kbn", d.getKbn()))
-				.toList();
-		return ResponseEntity.ok(result);
+		return ResponseEntity.ok(atenaImportService.findDetail(jichitaiCd, seq));
 	}
 
 	private ResponseEntity<Map<String, String>> badRequest(String message) {
@@ -327,5 +337,19 @@ public class AtenaController {
 
 	private String emptyToNull(String s) {
 		return (s == null || s.isBlank()) ? null : s;
+	}
+
+	private String hashIfPresent(String s) {
+		return (s == null || s.isBlank()) ? null : hashUtil.sha256(s);
+	}
+
+	private String toLikePattern(String value, String matchType) {
+		if (value == null || value.isBlank())
+			return "%";
+		return switch (matchType) {
+		case "prefix" -> value + "%";
+		case "exact" -> value;
+		default -> "%" + value + "%"; // partial
+		};
 	}
 }

@@ -3,8 +3,6 @@ package jp.lg.asp.accommodation.controller;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,9 +36,6 @@ public class ShoreikinConfigController {
 
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN_CONFIG;
 	private static final String CONFIG_VIEW = "shoreikin/shoreikinConfig";
-	/** 更新失敗時に画面へ出す文言。事由によらず共通にする */
-	private static final String UPDATE_ERROR_MESSAGE
-			= "交付金情報の更新に失敗しました。時間をおいて再度お試しください。";
 
 	@GetMapping("/config")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
@@ -73,7 +68,7 @@ public class ShoreikinConfigController {
 	@PostMapping("/config/switch-mode")
 	@OpeLog(screenId = SCREEN_ID, operation = "モード切替")
 	public String switchMode(@RequestParam("mode") String mode, 
-	                         @ModelAttribute("configForm") ShoreikinConfigDto configForm, 
+	                         @ModelAttribute ShoreikinConfigDto configForm, 
 	                         Model model) {
 	    accessChecker.checkWriteAccess(SCREEN_ID);
 
@@ -88,22 +83,16 @@ public class ShoreikinConfigController {
 
 	@PostMapping("/config/calculate")
 	@OpeLog(screenId = SCREEN_ID, operation = "算出")
-	public String calculate(@ModelAttribute("configForm") ShoreikinConfigDto configForm, Model model) {
+	public String calculate(@ModelAttribute ShoreikinConfigDto configForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
 		try {
 			ShoreikinConfigDto result = shoreikinConfigService.calculateShoreikin(configForm);
 			model.addAttribute("configForm", result);
-		} catch (IllegalStateException e) {
-			log.warn("交付金情報算出エラー: {}", e.getMessage());
-			configForm.setKofuRitsu(null);
-			model.addAttribute("configForm", configForm);
 		} catch (Exception e) {
-			// 想定外の事由。原因はログに残し、画面には内部情報を出さない
 			log.error("交付金情報算出エラー", e);
 			model.addAttribute("configForm", configForm);
-			model.addAttribute("errorMessage",
-					"交付金情報の算出に失敗しました。時間をおいて再度お試しください。");
+			model.addAttribute("errorMessage", "交付金情報算出に失敗しました: " + e.getMessage());
 		}
 
 		return CONFIG_VIEW;
@@ -111,7 +100,7 @@ public class ShoreikinConfigController {
 
 	@PostMapping("/config/create")
 	@OpeLog(screenId = SCREEN_ID, operation = "新規登録")
-	public String create(@Valid @ModelAttribute("configForm") ShoreikinConfigDto configForm,
+	public String create(@Valid @ModelAttribute ShoreikinConfigDto configForm,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
@@ -120,23 +109,15 @@ public class ShoreikinConfigController {
 		if (bindingResult.hasErrors()) {
 			configForm.setMode("create");
 			model.addAttribute("configForm", configForm);
-			model.addAttribute("validationErrors", ShoreikinConfigDto.validate(configForm).values());
 			return CONFIG_VIEW;
 		}
 
 		try {
 			shoreikinConfigService.createShoreikin(configForm);
 			redirectAttributes.addFlashAttribute("successMessage", "交付金情報を登録しました。");
-		} catch (DataIntegrityViolationException e) {
-			// 主キー（自治体・指定番号・年度）の重複。SQLの文面は利用者に出さない
-			log.warn("交付金情報の登録が重複: shiteiNo={}, nendo={}",
-					configForm.getShiteiNo(), configForm.getNendo(), e);
-			redirectAttributes.addFlashAttribute("errorMessage",
-					"この年度の交付金情報は既に登録されています。一覧から対象を選び直してください。");
 		} catch (Exception e) {
 			log.error("交付金登録エラー", e);
-			redirectAttributes.addFlashAttribute("errorMessage",
-					"交付金情報の登録に失敗しました。時間をおいて再度お試しください。");
+			redirectAttributes.addFlashAttribute("errorMessage", "交付金情報登録に失敗しました: " + e.getMessage());
 		}
 
 		return "redirect:/shoreikin/list";
@@ -144,7 +125,7 @@ public class ShoreikinConfigController {
 
 	@PostMapping("/config/update")
 	@OpeLog(screenId = SCREEN_ID, operation = "更新")
-	public String update(@Valid @ModelAttribute("configForm") ShoreikinConfigDto configForm,
+	public String update(@Valid @ModelAttribute ShoreikinConfigDto configForm,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
@@ -153,23 +134,15 @@ public class ShoreikinConfigController {
 		if (bindingResult.hasErrors()) {
 			configForm.setMode("edit");
 			model.addAttribute("configForm", configForm);
-			model.addAttribute("validationErrors", ShoreikinConfigDto.validate(configForm).values());
 			return CONFIG_VIEW;
 		}
 
 		try {
 			shoreikinConfigService.updateShoreikin(configForm);
 			redirectAttributes.addFlashAttribute("successMessage", "交付金情報を更新しました。");
-		} catch (OptimisticLockingFailureException e) {
-			// 表示中に他の利用者が更新した（version 不一致）。業務上ありうるので warn に留め、
-			// 原因は判明しているためスタックトレースは出さない。画面の文言は共通
-			log.warn("交付金情報の更新が競合: shiteiNo={}, nendo={}, cause={}",
-					configForm.getShiteiNo(), configForm.getNendo(), e.getMessage());
-			redirectAttributes.addFlashAttribute("errorMessage", UPDATE_ERROR_MESSAGE);
 		} catch (Exception e) {
-			log.error("交付金更新エラー: shiteiNo={}, nendo={}",
-					configForm.getShiteiNo(), configForm.getNendo(), e);
-			redirectAttributes.addFlashAttribute("errorMessage", UPDATE_ERROR_MESSAGE);
+			log.error("交付金更新エラー", e);
+			redirectAttributes.addFlashAttribute("errorMessage", "交付金情報更新に失敗しました: " + e.getMessage());
 		}
 
 		return "redirect:/shoreikin/list";

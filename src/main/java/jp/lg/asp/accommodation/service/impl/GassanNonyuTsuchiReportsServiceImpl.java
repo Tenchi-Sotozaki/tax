@@ -1,12 +1,11 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
-import java.time.chrono.JapaneseChronology;
+import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -56,15 +55,8 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 
 	private Map<String, Object> buildParameters(GassanNonyuTsuchiDto dto) {
 		Map<String, Object> parameters = new HashMap<>();
-		
-		if (dto.getHakkoYmd() != null) {
-		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE)
-		            .withChronology(JapaneseChronology.INSTANCE);
-		    parameters.put("hakkoYmd", dto.getHakkoYmd().format(formatter));
-		} else {
-		    parameters.put("hakkoYmd", "");
-		}
-		
+		parameters.put("hakkoYmd", dto.getHakkoYmd() != null
+				? dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日")) : "");
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
 		parameters.put("city", dto.getCity() != null ? dto.getCity() : "");
 		parameters.put("biko", dto.getBiko() != null ? dto.getBiko() : "");
@@ -77,19 +69,9 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 		reportsDto.setJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
 		reportsDto.setName(dto.getTokuName() != null ? dto.getTokuName() : "");
 		reportsDto.setGassan_shitei_no(dto.getGassanShiteiNo() != null ? dto.getGassanShiteiNo() : "");
+		reportsDto.setTekiyo_st_ymd(dto.getTekiyoStYmd() != null
+				? Date.valueOf(dto.getTekiyoStYmd()) : null);
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
-		
-		if (dto.getTekiyoStYmd() != null) {
-		    // 和暦のフォーマッタを作成
-		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)
-		            .withChronology(JapaneseChronology.INSTANCE);
-		            
-		    // 和暦の文字列に変換
-		    String warekiYm = dto.getTekiyoStYmd().format(formatter);
-		    reportsDto.setTekiyo_st_ymd(warekiYm);
-		} else {
-		    reportsDto.setTekiyo_st_ymd("");
-		}
 
 		List<GassanNonyuTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
 		return new JRBeanCollectionDataSource(dataSourceList, false);

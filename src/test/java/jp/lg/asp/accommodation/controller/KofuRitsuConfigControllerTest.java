@@ -94,7 +94,7 @@ class KofuRitsuConfigControllerTest {
         entity.setSanshutsu(1);
         entity.setKbn("1");
         entity.setSaiteigaku(BigDecimal.ZERO);
-        entity.setTekiyoStNendo("2024");
+        entity.setTekiyoStNendo(2024);
         when(kofuRitsuConfigService.findByRno(rno)).thenReturn(entity);
         Model model = new ExtendedModelMap();
 

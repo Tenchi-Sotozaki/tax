@@ -62,6 +62,16 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public boolean isGassanTarget(String shiteiNo) {
+		if (shiteiNo == null || shiteiNo.isBlank()) {
+			return false;
+		}
+		return gassanUchiRepository.existsByJichitaiCdAndShiteiNo(
+				jichitaiContext.getJichitaiCd(), shiteiNo);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<TokugimuListItem> searchAll(TokugimuSearchForm form) {
 		// page/pageSizeを無視して全件取得するためformを複製
 		TokugimuSearchForm all = new TokugimuSearchForm();
@@ -503,11 +513,11 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setFacilityName(t.getShisetsuName());
 		form.setFacilityNameKana(t.getShisetsuNameKana());
 		form.setFacilityPhone(t.getShisetsuTel());
-		form.setFloorArea(t.getYukaMenseki() != null ? t.getYukaMenseki().toPlainString() : null);
+		form.setFloorArea(t.getYukaMenseki());
 		form.setAboveGroundFloor(t.getChijoKai() != null ? t.getChijoKai().toPlainString() : null);
 		form.setBasementFloor(t.getChikaKai() != null ? t.getChikaKai().toPlainString() : null);
-		form.setRoomCount(t.getKyakushitsuSu() != null ? t.getKyakushitsuSu().toPlainString() : null);
-		form.setCapacity(t.getShuyoSu() != null ? t.getShuyoSu().toPlainString() : null);
+		form.setRoomCount(t.getKyakushitsuSu() != null ? t.getKyakushitsuSu().intValue() : null);
+		form.setCapacity(t.getShuyoSu() != null ? t.getShuyoSu().intValue() : null);
 		form.setBusinessStartDate(t.getEigyoStYmd());
 
 		// 営業許可・送付先・その他
@@ -537,9 +547,10 @@ public class TokugimuServiceImpl implements TokugimuService {
 				});
 
 		// 共同事業者情報
-		List<KyodoJigyosha> kyodoList = kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNoAndRno(jichitaiCd,
-				t.getShiteiNo(), t.getRno());
+		List<KyodoJigyosha> kyodoList = kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo(jichitaiCd,
+				t.getShiteiNo());
 		if (!kyodoList.isEmpty()) {
+			form.setKyodoFlg(true);
 			form.setKyodoList(kyodoList.stream().map(k -> {
 				KyodoJigyoshaDto dto = new KyodoJigyoshaDto();
 				dto.setKyodoName(k.getKyodoJigyoshaName());
@@ -567,11 +578,15 @@ public class TokugimuServiceImpl implements TokugimuService {
 		t.setShisetsuName(form.getFacilityName());
 		t.setShisetsuNameKana(form.getFacilityNameKana());
 		t.setShisetsuTel(form.getFacilityPhone());
-		t.setYukaMenseki(toDecimal(form.getFloorArea()));
-		t.setChijoKai(toDecimal(form.getAboveGroundFloor()));
-		t.setChikaKai(toDecimal(form.getBasementFloor()));
-		t.setKyakushitsuSu(toDecimal(form.getRoomCount()));
-		t.setShuyoSu(toDecimal(form.getCapacity()));
+		t.setYukaMenseki(form.getFloorArea());
+		t.setChijoKai(form.getAboveGroundFloor() != null && !form.getAboveGroundFloor().isBlank()
+				? new BigDecimal(form.getAboveGroundFloor())
+				: null);
+		t.setChikaKai(form.getBasementFloor() != null && !form.getBasementFloor().isBlank()
+				? new BigDecimal(form.getBasementFloor())
+				: null);
+		t.setKyakushitsuSu(form.getRoomCount() != null ? BigDecimal.valueOf(form.getRoomCount()) : null);
+		t.setShuyoSu(form.getCapacity() != null ? BigDecimal.valueOf(form.getCapacity()) : null);
 		t.setEigyoStYmd(form.getBusinessStartDate());
 		t.setKyokaYubinNo(form.getLicenseAddressNo());
 		t.setKyokaJusho(form.getLicenseAddress());
@@ -602,7 +617,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	private void saveKyodoJigyosha(String shiteiNo, BigDecimal rno, TokugimuForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		if (form.getKyodoList() == null)
+		if (!form.isKyodoFlg() || form.getKyodoList() == null)
 			return;
 		for (int i = 0; i < form.getKyodoList().size(); i++) {
 			KyodoJigyoshaDto dto = form.getKyodoList().get(i);
@@ -652,13 +667,5 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.stream().findFirst()
 				.map(Tokugimu::getShiteiNo)
 				.orElseThrow(() -> new RuntimeException("指定番号が見つかりません: " + id));
-	}
-
-	/**
-	 * 画面から受け取った数値項目を BigDecimal に変換する。
-	 * 未入力は null。書式は Form 側の @Pattern で担保しているため、ここでは検査しない。
-	 */
-	private BigDecimal toDecimal(String value) {
-		return value != null && !value.isBlank() ? new BigDecimal(value) : null;
 	}
 }

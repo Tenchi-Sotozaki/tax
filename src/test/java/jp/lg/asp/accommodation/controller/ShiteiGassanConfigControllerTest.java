@@ -3,6 +3,8 @@ package jp.lg.asp.accommodation.controller;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,13 +22,13 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.ShiteiGassanConfigDto;
 import jp.lg.asp.accommodation.entity.Jichitai;
-import jp.lg.asp.accommodation.service.ShiteiGassanConfigService;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ShiteiGassanConfigControllerTest {
 
-    @Mock ShiteiGassanConfigService shiteiGassanConfigService;
+    @Mock JichitaiRepository jichitaiRepository;
     @Mock ScreenAccessChecker accessChecker;
     @Mock JichitaiContext jichitaiContext;
 
@@ -40,7 +42,7 @@ class ShiteiGassanConfigControllerTest {
     @Test
     void register_未登録は登録画面を返す() {
         Jichitai jichitai = new Jichitai();
-        when(shiteiGassanConfigService.findById("011002")).thenReturn(jichitai);
+        when(jichitaiRepository.findById("011002")).thenReturn(Optional.of(jichitai));
         Model model = new ExtendedModelMap();
 
         String view = controller.register(model, new RedirectAttributesModelMap());
@@ -53,7 +55,7 @@ class ShiteiGassanConfigControllerTest {
     void register_登録済みは照会へリダイレクト() {
         Jichitai jichitai = new Jichitai();
         jichitai.setShiteiStChar("000");
-        when(shiteiGassanConfigService.findById("011002")).thenReturn(jichitai);
+        when(jichitaiRepository.findById("011002")).thenReturn(Optional.of(jichitai));
 
         String view = controller.register(new ExtendedModelMap(), new RedirectAttributesModelMap());
 
@@ -65,7 +67,7 @@ class ShiteiGassanConfigControllerTest {
         Jichitai jichitai = new Jichitai();
         jichitai.setShiteiStChar("000");
         jichitai.setGassanStChar("900");
-        when(shiteiGassanConfigService.findById("011002")).thenReturn(jichitai);
+        when(jichitaiRepository.findById("011002")).thenReturn(Optional.of(jichitai));
         Model model = new ExtendedModelMap();
 
         String view = controller.view(model, new RedirectAttributesModelMap());
@@ -81,11 +83,11 @@ class ShiteiGassanConfigControllerTest {
         dto.setGassanStChar("900");
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(dto, "configDto");
         Jichitai jichitai = new Jichitai();
-        when(shiteiGassanConfigService.findById("011002")).thenReturn(jichitai);
+        when(jichitaiRepository.findById("011002")).thenReturn(Optional.of(jichitai));
 
         String view = controller.save(dto, bindingResult, new ExtendedModelMap(), new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/shitei-gassan/view");
-        verify(shiteiGassanConfigService).save("011002", dto);
+        verify(jichitaiRepository).save(jichitai);
     }
 }

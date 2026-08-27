@@ -44,10 +44,6 @@ public class Nokan {
     @Column(name = "name")
     private String name;
 
-    /** 最新フラグ */
-    @Column(name = "new_flg")
-    private String newFlg;
-
     /** 削除フラグ */
     @Column(name = "del_flg")
     private String delFlg;

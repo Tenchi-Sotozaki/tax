@@ -1,9 +1,11 @@
 package jp.lg.asp.accommodation.controller;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
@@ -21,6 +24,7 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Nokigen;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.NokigenService;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +32,7 @@ import jp.lg.asp.accommodation.service.NokigenService;
 class NokigenControllerTest {
 
     @Mock NokigenService nokigenService;
+    @Mock JichitaiRepository jichitaiRepository;
     @Mock ScreenAccessChecker accessChecker;
     @Mock JichitaiContext jichitaiContext;
 
@@ -38,7 +43,7 @@ class NokigenControllerTest {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
         Jichitai jichitai = new Jichitai();
         jichitai.setNendoStMonth("4");
-        when(nokigenService.findJichitai("011002")).thenReturn(jichitai);
+        when(jichitaiRepository.findById("011002")).thenReturn(Optional.of(jichitai));
     }
 
     @Test
@@ -63,7 +68,6 @@ class NokigenControllerTest {
 
     @Test
     void register_登録画面を返す() {
-        when(nokigenService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         String view = controller.register(model);
@@ -99,7 +103,6 @@ class NokigenControllerTest {
         Nokigen nokigen = new Nokigen();
         nokigen.setNendo("2024");
         when(nokigenService.existsByNendo("2024")).thenReturn(false);
-        when(nokigenService.findAll()).thenReturn(List.of(nokigen));
         Model model = new ExtendedModelMap();
 
         String view = controller.save(nokigen, "register", model, new RedirectAttributesModelMap());
@@ -112,7 +115,6 @@ class NokigenControllerTest {
     void save_年度空はバリデーションエラー() {
         Nokigen nokigen = new Nokigen();
         nokigen.setNendo("");
-        when(nokigenService.findAll()).thenReturn(List.of());
         Model model = new ExtendedModelMap();
 
         String view = controller.save(nokigen, "register", model, new RedirectAttributesModelMap());

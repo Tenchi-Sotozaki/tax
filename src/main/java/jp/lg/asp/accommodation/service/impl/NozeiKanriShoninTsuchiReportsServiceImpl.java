@@ -1,12 +1,10 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.io.InputStream;
-import java.time.chrono.JapaneseChronology;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -83,14 +81,10 @@ public class NozeiKanriShoninTsuchiReportsServiceImpl implements NozeiKanriShoni
 		
 		// 発行日
 		if (dto.getHakkoYmd() != null) {
-		    // 和暦用のフォーマッタを作成
-		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE)
-		            .withChronology(JapaneseChronology.INSTANCE);
-		    
-		    String strDate = dto.getHakkoYmd().format(formatter);
-		    reportsDto.setHakkoYmd(strDate);
+			String strDate = dto.getHakkoYmd().format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
+			reportsDto.setHakkoYmd(strDate);
 		} else {
-		    reportsDto.setHakkoYmd("");
+			reportsDto.setHakkoYmd("");
 		}
 		
 		List<NozeiKanriShoninTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);

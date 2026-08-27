@@ -67,7 +67,7 @@ public class TokureiShiteiReportsServiceImpl implements TokureiShiteiReportsServ
 		parameters.put("tekiyoYmd", dto.getTekiyoYmd() != null
 		        ? DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)
 		            .withChronology(JapaneseChronology.INSTANCE)
-		            .format(dto.getTekiyoYmd().atDay(1)) 
+		            .format(dto.getTekiyoYmd()) 
 		        : "");
 		
 		parameters.put("shonin", dto.getShonin() != null ? dto.getShonin() : "");

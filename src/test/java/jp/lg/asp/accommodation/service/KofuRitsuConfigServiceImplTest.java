@@ -66,7 +66,7 @@ class KofuRitsuConfigServiceImplTest {
 
         KofuRitsuConfigDto dto = new KofuRitsuConfigDto();
         dto.setKofuRitsu(BigDecimal.valueOf(10));
-        dto.setTekiyoStNendo("2024");
+        dto.setTekiyoStNendo(2024);
 
         service.register(dto);
 

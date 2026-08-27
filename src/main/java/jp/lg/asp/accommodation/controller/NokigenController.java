@@ -17,8 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
-import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Nokigen;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.NokigenService;
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,9 @@ import lombok.RequiredArgsConstructor;
 public class NokigenController {
 
 	private final NokigenService nokigenService;
+	private final JichitaiRepository jichitaiRepository;
 	private final ScreenAccessChecker accessChecker;
+
 	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.NOKIGEN;
@@ -36,19 +38,19 @@ public class NokigenController {
 
 	private void addKiMonthLabels(Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		Jichitai jichitai = nokigenService.findJichitai(jichitaiCd);
-		if (jichitai == null) return;
-		if (jichitai.getNendoStMonth() == null || jichitai.getNendoStMonth().trim().isEmpty()) {
-			model.addAttribute("warnMessage", "年度開始月が未設定です。");
-			return;
-		}
-		int st = Integer.parseInt(jichitai.getNendoStMonth().trim());
-		java.util.List<String> labels = new java.util.ArrayList<>();
-		for (int i = 0; i < 12; i++) {
-			int month = (st + i - 1) % 12 + 1;
-			labels.add(month + "月");
-		}
-		model.addAttribute("kiMonthLabels", labels);
+		jichitaiRepository.findById(jichitaiCd).ifPresent(j -> {
+			if (j.getNendoStMonth() == null || j.getNendoStMonth().trim().isEmpty()) {
+				model.addAttribute("warnMessage", "年度開始月が未設定です。");
+				return;
+			}
+			int st = Integer.parseInt(j.getNendoStMonth().trim());
+			java.util.List<String> labels = new java.util.ArrayList<>();
+			for (int i = 0; i < 12; i++) {
+				int month = (st + i - 1) % 12 + 1;
+				labels.add(month + "月");
+			}
+			model.addAttribute("kiMonthLabels", labels);
+		});
 	}
 
 	@GetMapping("/list")
@@ -76,9 +78,9 @@ public class NokigenController {
 	@GetMapping("/view/{nendo}")
 	public String view(@PathVariable String nendo, Model model, RedirectAttributes redirectAttributes) {
 		accessChecker.checkAccess(SCREEN_ID);
-
+		
 		model.addAttribute("nendoList", nokigenService.findAll().stream().map(Nokigen::getNendo).toList());
-
+		
 		Nokigen nokigen = nokigenService.findByNendo(nendo);
 		if (nokigen == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "指定されたデータが見つかりません。");
@@ -106,27 +108,30 @@ public class NokigenController {
 		return "admin/nokigenConfig";
 	}
 
+	/** 指定年度が登録済みかチェック */
 	@GetMapping("/exists/{nendo}")
 	@ResponseBody
 	public ResponseEntity<Map<String, Boolean>> exists(@PathVariable String nendo) {
 		return ResponseEntity.ok(Map.of("exists", nokigenService.existsByNendo(nendo)));
 	}
 
+	/** 前年度データをJSONで返す（画面への複写用） */
 	@GetMapping("/prev-data/{nendo}")
 	@ResponseBody
 	public ResponseEntity<Map<String, String>> prevData(
 			@PathVariable String nendo,
 			@RequestParam(defaultValue = "none") String shiftMode) {
-
+		
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
 		int prevNendo = Integer.parseInt(nendo) - 1;
 		Nokigen prev = nokigenService.findByNendo(String.valueOf(prevNendo));
 		if (prev == null) {
 			return ResponseEntity.notFound().build();
 		}
-
+		
+		// サービス層で休業日（土日・m_kyugyobi）とシフトモードを考慮したマップを生成する
 		Map<String, String> result = nokigenService.getPrevDataWithShift(prev, nendo, shiftMode);
-
+		
 		return ResponseEntity.ok(result);
 	}
 
@@ -136,6 +141,7 @@ public class NokigenController {
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
+		// nendoListを取得する
 		List<String> nendoList = nokigenService.findAll().stream().map(Nokigen::getNendo).toList();
 
 		if (nokigen.getNendo() == null || nokigen.getNendo().isBlank()) {
@@ -170,6 +176,7 @@ public class NokigenController {
 		return "redirect:/admin/nokigen/view/" + nokigen.getNendo();
 	}
 
+	/** yyyyMMdd → yyyy-MM-dd に変換してHTML date inputに対応 */
 	private void toHtmlDate(Nokigen n) {
 		n.setNokigen1st(toHtml(n.getNokigen1st()));
 		n.setNokigen2nd(toHtml(n.getNokigen2nd()));

@@ -67,9 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let initialStr = (initialValue === null || initialValue === 'null') ? '' : String(initialValue).trim();
         let currentStr = String(input.value).trim();
         if (currentStr !== initialStr) {
-			input.classList.add('form-control-edited');
+            input.style.border = '3px solid #ffeb3b';
         } else {
-			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

@@ -18,7 +18,7 @@
 					th:text="${mode == 'register' ? '指定番号・合算指定番号設定登録' : (mode == 'edit' ? '指定番号・合算指定番号設定編集' : '指定番号・合算指定番号設定照会')}">指定番号・合算指定番号設定</span>
 			</h5>
 			<div th:if="${mode == 'view'}">
-				<a th:href="@{/admin/shitei-gassan/edit}" class="btn btn-primary"> <i
+				<a th:href="@{/admin/shitei-gassan/edit}" class="btn btn-sm btn-primary"> <i
 						class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
@@ -62,8 +62,7 @@
 
 							<input type="text" class="form-control" th:field="*{shiteiStChar}" id="shiteiStChar"
 								maxlength="3" placeholder="例：001" th:readonly="${mode == 'view'}"
-								th:data-initial-value="*{shiteiStChar}"
-								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''">
+								th:data-initial-value="*{shiteiStChar}">
 
 							<div th:if="${#fields.hasErrors('shiteiStChar')}" class="text-danger small mt-1">
 								<span th:errors="*{shiteiStChar}"></span>
@@ -80,8 +79,7 @@
 
 							<input type="text" class="form-control" th:field="*{gassanStChar}" id="gassanStChar"
 								maxlength="3" placeholder="例：001" th:readonly="${mode == 'view'}"
-								th:data-initial-value="*{gassanStChar}"
-								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''">
+								th:data-initial-value="*{gassanStChar}">
 
 							<div th:if="${#fields.hasErrors('gassanStChar')}" class="text-danger small mt-1">
 								<span th:errors="*{gassanStChar}"></span>
@@ -91,9 +89,9 @@
 
 					<div class="d-flex justify-content-end gap-2" th:if="!${mode == 'view'}">
 						<div th:if="${mode == 'edit'}">
-							<a href="#" class="btn btn-outline-secondary"
+							<a href="#" class="btn btn-outline-primary"
 								data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
-									class="bi bi-arrow-left me-1"></i>戻る
+									class="bi bi-arrow-left me-1"></i>照会に戻る
 							</a>
 						</div>
 						<button type="submit" class="btn btn-success">
@@ -107,7 +105,7 @@
 
 	</div>
 
-	<div th:if="${mode == 'edit'}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/shitei-gassan/view}, '戻る')}"></div>
+	<div th:if="${mode == 'edit'}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/shitei-gassan/view}, '照会に戻る')}"></div>
 
 	<!-- JavaScriptファイル読み込み -->
 	<th:block layout:fragment="scripts">

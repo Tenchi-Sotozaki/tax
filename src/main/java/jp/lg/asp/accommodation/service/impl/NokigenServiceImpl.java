@@ -13,12 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
-import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Kyugyobi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.repository.HolidayRepository;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.service.NokigenService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +27,6 @@ public class NokigenServiceImpl implements NokigenService {
 
     private final NokigenRepository nokigenRepository;
     private final HolidayRepository holidayRepository;
-    private final JichitaiRepository jichitaiRepository;
     private final JichitaiContext jichitaiContext;
 
     @Override
@@ -72,12 +69,6 @@ public class NokigenServiceImpl implements NokigenService {
         nokigen.setNokigen11th(toDbDate(nokigen.getNokigen11th()));
         nokigen.setNokigen12th(toDbDate(nokigen.getNokigen12th()));
         return nokigenRepository.save(nokigen);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Jichitai findJichitai(String jichitaiCd) {
-        return jichitaiRepository.findById(jichitaiCd).orElse(null);
     }
 
     /** yyyy-MM-dd → yyyyMMdd 変換。null/空の場合は空文字を返す */

@@ -10,7 +10,5 @@ public interface EltaxRenkeiKakuninService {
 
 	EltaxRenkeiKakuninDto preview(MultipartFile file);
 
-	EltaxRenkeiKakuninDto repreview(byte[] fileBytes, String overrideShiteiNo);
-
-	void commit(byte[] fileBytes, String fileName, BigDecimal atenaNoFromSession, String shiteiNo);
+	void commit(byte[] fileBytes, String fileName, BigDecimal atenaNoFromSession);
 }

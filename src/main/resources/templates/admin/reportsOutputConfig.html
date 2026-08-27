@@ -5,20 +5,17 @@
 
 <head>
 <title>帳票出力項目編集・照会</title>
-
-<!-- 外部CSSのインポート -->
-<link rel="stylesheet" th:href="@{/css/reportsOutputConfig.css}">
 </head>
 
 <body>
-	<div layout:fragment="content" class="container-fluid p-4" th:attr="data-is-edit=${mode == 'edit'}">
+	<div layout:fragment="content" class="container-fluid p-4">
 
 		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
 				<i class="bi bi-file-earmark-text me-2 text-primary"></i>帳票出力項目<span th:text="${mode == 'edit' ? '編集' : '照会'}">照会</span>
 			</h5>
 			<div th:if="${mode == 'view'}">
-				<a th:href="@{/admin/reports-output-config/edit}" class="btn btn-primary">
+				<a th:href="@{/admin/reports-output-config/edit}" class="btn btn-sm btn-primary">
 					<i class="bi bi-pencil-square me-1"></i>編集する
 				</a>
 			</div>
@@ -33,7 +30,7 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<form th:if="${mode == 'edit'}" th:action="@{/admin/reports-output-config/save}" method="post" id="reports-output">
+		<form th:if="${mode == 'edit'}" th:action="@{/admin/reports-output-config/save}" method="post">
 			<div class="card shadow-sm">
 				<div class="table-responsive">
 					<table class="table table-bordered table-hover mb-0">
@@ -48,12 +45,9 @@
 								<td class="align-middle fw-semibold" th:text="${entry.key.name}"></td>
 								<td>
 									<input th:if="${entry.key.inputType == 1}" type="text" class="form-control"
-										th:name="${entry.key.id}" th:value="${entry.value}"
-										th:attr="data-initial-value=${entry.value}">
-										
+										th:name="${entry.key.id}" th:value="${entry.value}">
 									<textarea th:if="${entry.key.inputType == 2}" class="form-control" rows="4"
-										th:name="${entry.key.id}" th:text="${entry.value}"
-										th:attr="data-initial-value=${entry.value}"></textarea>
+										th:name="${entry.key.id}" th:text="${entry.value}"></textarea>
 								</td>
 							</tr>
 						</tbody>
@@ -61,10 +55,7 @@
 				</div>
 			</div>
 			<div class="text-center mt-4">
-				<a th:if="${mode == 'edit'}" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#discardModal">
-					<i class="bi bi-arrow-left me-1"></i>戻る
-				</a>
-				<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#registCheckModal">
+				<button type="submit" class="btn btn-success btn-lg">
 					<i class="bi bi-check-circle me-1"></i>登録する
 				</button>
 			</div>
@@ -88,18 +79,7 @@
 				</table>
 			</div>
 		</div>
-		
-		<!-- 内容破棄確認モーダル -->
-		<div class="d-flex justify-content-center"
-			th:replace="~{layout/components :: linkConfirmModal('discardModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/reports-output-config/view}, '戻る')}">
-		</div>
-		
-		<!-- 登録確認モーダル -->
-		<div th:replace="~{layout/components :: confirmModal('registCheckModal','登録確認','登録します。よろしいですか？','reports-output','btn-primary','登録する')}"></div>
+
 	</div>
-	
-	<th:block layout:fragment="scripts">
-		<script th:src="@{/js/reportsOutputConfig.js}"></script>
-	</th:block>
 </body>
 </html>

@@ -8,10 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TopPageConfigForm;
-import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.entity.TopPageContentId;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TopPageContentRepository;
 import jp.lg.asp.accommodation.service.TopPageService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,6 @@ public class TopPageServiceImpl implements TopPageService {
 	private static final String KBN_CUSTOM = "1";
 
 	private final TopPageContentRepository repository;
-	private final JichitaiRepository jichitaiRepository;
 	private final JichitaiContext jichitaiContext;
 
 	@Override
@@ -92,11 +89,6 @@ public class TopPageServiceImpl implements TopPageService {
 				new IllegalArgumentException("データが存在しません。"));
 	}
 	
-	@Override
-	public Jichitai findJichitai(String jichitaiCd) {
-		return jichitaiRepository.findById(jichitaiCd).orElse(null);
-	}
-
 	@Override
 	@Transactional
 

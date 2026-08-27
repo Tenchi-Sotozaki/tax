@@ -1,5 +1,4 @@
 package jp.lg.asp.accommodation.controller;
-
 import jp.lg.asp.accommodation.config.JichitaiContext;
 
 import java.io.PrintWriter;
@@ -23,6 +22,7 @@ import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
+import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.service.ShoreikinBulkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +35,12 @@ public class ShoreikinBulkController {
 
 	private final ShoreikinBulkService shoreikinBulkService;
 	private final ScreenAccessChecker accessChecker;
-	private final JichitaiContext jichitaiContext;
+	private final KofuRitsuRepository kofuRitsuRepository;
 
 	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN_BULK;
 	private static final String BULK_VIEW = "shoreikin/shoreikinBulk";
+
+	private final JichitaiContext jichitaiContext;
 
 	@GetMapping("/bulk")
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
@@ -49,7 +51,7 @@ public class ShoreikinBulkController {
 		ShoreikinBulkDto dto = new ShoreikinBulkDto();
 		dto.setNendo(nendo);
 
-		List<BigDecimal> kofuRitsuList = shoreikinBulkService.findKofuRitsuList(jichitaiCd, LocalDate.now().getYear());
+		List<BigDecimal> kofuRitsuList = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, LocalDate.now().getYear());
 		if (kofuRitsuList.isEmpty()) {
 			model.addAttribute("errorMessage", "交付率のシステム設定値が登録されていません。システム設定から交付率を設定してください。");
 		} else {

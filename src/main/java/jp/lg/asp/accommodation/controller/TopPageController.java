@@ -2,8 +2,11 @@ package jp.lg.asp.accommodation.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,17 +81,51 @@ public class TopPageController {
 
 	@PostMapping("/config/save")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "保存")
-	public String save(@ModelAttribute("form") TopPageConfigForm form, Model model, RedirectAttributes redirectAttributes) {
-		try {
-			topPageService.save(form);
-			redirectAttributes.addFlashAttribute("successMessage", "トップページコンテンツを保存しました。");
-		} catch (Exception e) {
-			log.error("トップページ保存エラー", e);
-			model.addAttribute("form", form);
-			model.addAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
-			return "top/topPageConfig";
-		}
-		return "redirect:/top/config";
+	public String save(
+	        @Valid @ModelAttribute("form") TopPageConfigForm form,
+	        BindingResult bindingResult,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
+
+	    // 掲載開始日・終了日の整合性チェック
+	    if (form.getPostingStartDate() != null
+	            && form.getPostingEndDate() != null
+	            && form.getPostingStartDate().isAfter(form.getPostingEndDate())) {
+
+	        bindingResult.rejectValue(
+	                "postingStartDate",
+	                "date.reverse",
+	                "掲載開始日は掲載終了日以前の日付を入力してください。");
+	    }
+
+	    // バリデーションエラー
+	    if (bindingResult.hasErrors()) {
+	        List<String> validationErrors = bindingResult.getAllErrors().stream()
+	                .map(e -> e.getDefaultMessage())
+	                .toList();
+	        model.addAttribute("validationErrors", validationErrors);
+	        return "top/topPageConfig";
+	    }
+
+	    try {
+	        topPageService.save(form);
+
+	        redirectAttributes.addFlashAttribute(
+	                "successMessage",
+	                "トップページコンテンツを保存しました。");
+
+	    } catch (Exception e) {
+
+	        log.error("トップページ保存エラー", e);
+
+	        model.addAttribute(
+	                "errorMessage",
+	                "保存に失敗しました: " + e.getMessage());
+
+	        return "top/topPageConfig";
+	    }
+
+	    return "redirect:/top/config";
 	}
 
 	@GetMapping("/config/{seq}")

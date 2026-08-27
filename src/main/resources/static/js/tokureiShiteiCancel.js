@@ -6,37 +6,43 @@
  * フォームバリデーション
  */
 function validateForm() {
-    const hakkoYmd = document.getElementById('hakkoYmd');
-    const tekiyoYmd = document.getElementById('tekiyoYmd');
-    const riyu = document.getElementById('riyu');
-    let hasError = false;
 
-    [hakkoYmd, tekiyoYmd, riyu].forEach(el => {
-        el.classList.remove('is-invalid');
-        document.getElementById(el.id + 'Error').textContent = '';
-    });
+	window.ReportError.hide();
+	clearInvalid();
 
-    if (!hakkoYmd.value) {
-        hakkoYmd.classList.add('is-invalid');
-        document.getElementById('hakkoYmdError').textContent = '発行年月日を入力してください。';
-        hasError = true;
-    }
-    if (!tekiyoYmd.value) {
-        tekiyoYmd.classList.add('is-invalid');
-        document.getElementById('tekiyoYmdError').textContent = '適用年月を入力してください。';
-        hasError = true;
-    }
-    if (!riyu.value.trim()) {
-        riyu.classList.add('is-invalid');
-        document.getElementById('riyuError').textContent = '取消理由を入力してください。';
-        hasError = true;
-    }
+    const hakkoYmd = document.getElementById('hakkoYmd').value;
+    const tekiyoYmd = document.getElementById('tekiyoYmd').value;
+    const riyu = document.getElementById('riyu').value;
 
-    if (hasError) {
-        [hakkoYmd, tekiyoYmd, riyu].find(el => el.classList.contains('is-invalid')).focus();
+    if (!hakkoYmd) {
+        setInvalid('hakkoYmd');
+        window.ReportError.show('発行年月日を入力してください。');
         return false;
     }
+
+    if (!tekiyoYmd) {
+        setInvalid('tekiyoYmd');
+        window.ReportError.show('適用年月を入力してください。');
+        return false;
+    }
+
+    if (!riyu.trim()) {
+        setInvalid('riyu');
+        window.ReportError.show('取消理由を入力してください。');
+        return false;
+    }
+
     return true;
+}
+
+function setInvalid(id) {
+    const el = document.getElementById(id);
+    el.classList.add('is-invalid');
+    el.addEventListener('input', () => el.classList.remove('is-invalid'), { once: true });
+}
+
+function clearInvalid() {
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
 }
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -25,7 +25,7 @@
 
 		<div class="card shadow-sm mb-3">
 			<div class="card-body py-2 px-3">
-				<a th:href="@{/admin/kofu-ritsu}" class="btn btn-success">
+				<a th:href="@{/admin/kofu-ritsu}" class="btn btn-success btn-sm">
 					<i class="bi bi-plus-lg me-1"></i>新規登録
 				</a>
 			</div>
@@ -52,7 +52,7 @@
 							<td th:text="${item.saiteigaku}"></td>
 							<td th:text="${item.tekiyoStNendo}"></td>
 							<td class="text-center">
-								<a class="btn btn-outline-primary" th:href="@{/admin/kofu-ritsu/view/{rno}(rno=${item.rno})}">
+								<a class="btn btn-outline-primary btn-sm" th:href="@{/admin/kofu-ritsu/view/{rno}(rno=${item.rno})}">
 									<i class="bi bi-eye me-1"></i>照会
 								</a>
 							</td>

@@ -22,6 +22,7 @@ public class NozeiShuki extends BaseEntity {
 	@Column(name = "jichitai_cd", length = 5)
 	private String jichitaiCd;
 
+	@Id
 	@Column(name = "seq", precision = 3)
 	private BigDecimal seq;
 

@@ -7,34 +7,44 @@
 // 印刷
 // フォームバリデーション
 function validateForm() {
-    const fields = [
-        { id: 'hakkoYmd',       msg: '発行年月日を入力してください。' },
-        { id: 'juriYmd',        msg: '申請受理年月日を入力してください。' },
-        { id: 'shinseiYm',      msg: '対象年月を入力してください。' },
-        { id: 'zeigaku',        msg: '申請した税額を入力してください。' },
-        { id: 'kanpuMenjoGaku', msg: '還付又は納入義務の免除を決定した額を入力してください。' }
+    const requiredFields = [
+        'hakkoYmd',
+        'juriYmd', 
+        'shinseiYm',
+        'zeigaku',
+        'kanpuMenjoGaku'
     ];
-    let hasError = false;
-    let firstError = null;
-
-    fields.forEach(({ id, msg }) => {
-        const el = document.getElementById(id);
-        const errEl = document.getElementById(id + 'Error');
-        el.classList.remove('is-invalid');
-        errEl.textContent = '';
-        if (!el.value.toString().trim()) {
-            el.classList.add('is-invalid');
-            errEl.textContent = msg;
-            if (!firstError) firstError = el;
-            hasError = true;
+    
+    let isValid = true;
+    const errorMessages = [];
+    
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field.value.trim()) {
+            isValid = false;
+            field.classList.add('is-invalid');
+            
+            const label = document.querySelector(`label[for="${fieldId}"]`);
+            if (label) {
+                errorMessages.push(`${label.textContent.replace(' *', '')}は必須です。`);
+            }
+        } else {
+            field.classList.remove('is-invalid');
         }
     });
-
-    if (hasError) {
-        firstError.focus();
-        return false;
+    
+    // 申請の年月フォーマットチェック
+    const shinseiYm = document.getElementById('shinseiYm');
+    if (shinseiYm.value.trim()) {
+        // type="month"の場合のフォーマットチェックはブラウザが自動的に行う
+        // YYYY-MM形式で入力されるので、特別なチェックは不要
     }
-    return true;
+    
+    if (!isValid) {
+        alert('入力エラー:\n' + errorMessages.join('\n'));
+    }
+    
+    return isValid;
 }
 
 // DOM読み込み完了後の初期化

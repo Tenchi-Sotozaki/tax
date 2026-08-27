@@ -27,11 +27,12 @@
 					<!-- 帳票発行エラー表示エリア -->
 					<div th:replace="~{layout/components :: reportErrorAlert}"></div>
 
-					<form id="koseiKetteiForm" method="post" th:object="${dto}" onsubmit="return validateForm()">
+					<form id="koseiKetteiForm" method="post">
 
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 						<input type="hidden" name="shiteiNo" th:value="${selectedShiteiGassan?.shiteiNo}" />
-					
+						<input type="hidden" name="koin" th:value="${dto.koin}">
+
 						<!-- 特別徴収義務者情報エリア -->
 						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
 
@@ -46,7 +47,7 @@
 									<div class="col-md-3">
 										<label for="henkoKbn" class="form-label fw-bold">発行区分 <span
 											class="text-danger">*</span></label>
-										<select id="henkoKbn" name="henkoKbn" class="form-select">
+										<select id="henkoKbn" name="henkoKbn" class="form-select" required>
 											<option value="2">更正</option>
 											<option value="3">決定</option>
 										</select>
@@ -62,14 +63,13 @@
 									<div class="col-md-3">
 										<label class="form-label fw-bold"> 対象月1 <span
 											class="text-danger">*</span>
-										</label> <select id="b1Ym" name="b1Ym" class="form-select">
+										</label> <select id="b1Ym" name="b1Ym" class="form-select" required>
 
 											<option value="">--- 選択してください ---</option>
 											<option th:each="ym : ${taishoYmList}" th:value="${ym}"
 												th:text="${#strings.substring(ym,0,4) + '年' + #strings.substring(ym,4,6) + '月'}">
 											</option>
 										</select>
-										<div class="invalid-feedback" id="b1YmError"></div>
 									</div>
 
 									<!-- 対象月２（任意)チェックで有効化！-->
@@ -107,19 +107,21 @@
 
 						<!-- アクションボタン -->
 						<div class="d-flex justify-content-center gap-2">
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/koseiKetteiTsuchi/pdf}">
+								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
+							</button>
+							<button type="submit" class="btn btn-outline-primary"
+								th:formaction="@{/reports/koseiKetteiTsuchi/preview}" formtarget="_blank">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
+							<button type="submit" class="btn btn-primary"
+								th:formaction="@{/reports/koseiKetteiTsuchi/print}" formtarget="_blank">
+								<i class="bi bi-printer me-1"></i> 印刷
+							</button>
 							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
 								<i class="bi bi-arrow-left me-1"></i> 戻る
 							</a>
-							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/koseiKetteiTsuchi/preview}"
-								formtarget="_blank">
-								<i class="bi bi-eye me-1"></i> プレビュー
-							</button>
-							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/koseiKetteiTsuchi/pdf}">
-								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
-							</button>
-							<button type="submit" class="btn btn-primary" th:formaction="@{/reports/koseiKetteiTsuchi/print}" formtarget="_blank">
-								<i class="bi bi-printer me-1"></i> 印刷
-							</button>
 						</div>
 					</form>
 				</div>

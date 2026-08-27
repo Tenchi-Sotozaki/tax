@@ -30,9 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 変更があれば黄色い枠を付与
         if (isChanged) {
-			input.classList.add('form-control-edited');
+            input.style.border = '3px solid #ffeb3b';
         } else {
-			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

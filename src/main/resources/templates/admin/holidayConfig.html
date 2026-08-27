@@ -26,7 +26,7 @@
 					</select>
 					<div th:if="${mode == 'view'}">
 						<a th:href="@{/admin/holiday/edit/{nen}(nen=${form.nendo})}"
-							class="btn btn-primary text-nowrap"> <i
+							class="btn btn-sm btn-primary text-nowrap"> <i
 							class="bi bi-pencil-square me-1"></i>編集する
 						</a>
 					</div>
@@ -52,12 +52,12 @@
 						<i class="bi bi-calendar-month me-2"></i>カレンダー
 					</h5>
 					<div class="d-flex align-items-center gap-2">
-						<button type="button" class="btn btn-outline-secondary"
+						<button type="button" class="btn btn-sm btn-outline-secondary"
 							id="prevQuarter">
 							<i class="bi bi-chevron-left"></i> 前へ
 						</button>
 						<span class="fw-medium" id="calendarTitle"></span>
-						<button type="button" class="btn btn-outline-secondary"
+						<button type="button" class="btn btn-sm btn-outline-secondary"
 							id="nextQuarter">
 							次へ <i class="bi bi-chevron-right"></i>
 						</button>
@@ -80,7 +80,7 @@
 					<h5 class="mb-0">
 						<i class="bi bi-list-check me-2"></i>休業日一覧（土・日を除く）
 					</h5>
-					<button type="button" class="btn btn-outline-danger" id="clearAllBtn"
+					<button type="button" class="btn btn-sm btn-outline-danger" id="clearAllBtn"
 						th:if="${mode == 'edit'}">
 						<i class="bi bi-x-circle me-1"></i>選択全解除
 					</button>
@@ -106,21 +106,21 @@
 
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				
-				<button type="button" class="btn btn-outline-secondary px-4" th:if="${mode == 'edit'}" data-bs-toggle="modal"
-					data-bs-target="#backConfirmModal">
-					<i class="bi bi-arrow-left me-2"></i>戻る
-				</button>
 
-				<button type="button" class="btn btn-outline-secondary px-4"
+				<button type="button" class="btn btn-outline-secondary btn-lg px-4"
 					id="initBtn" th:if="${mode == 'edit'}"
 					data-bs-toggle="modal" data-bs-target="#initConfirmModal">
 					<i class="bi bi-arrow-counterclockwise me-2"></i>初期化
 				</button>
 
 				<button type="submit" form="holidayForm"
-					class="btn btn-success px-5" th:if="${mode == 'edit'}">
+					class="btn btn-success btn-lg px-5" th:if="${mode == 'edit'}">
 					<i class="bi bi-check-circle me-2"></i>更新
+				</button>
+				<button type="button" class="btn btn-outline-secondary btn-lg px-4"
+					th:if="${mode == 'edit'}"
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal">
+					<i class="bi bi-arrow-left me-2"></i>戻る
 				</button>
 
 			</div>
