@@ -5,6 +5,9 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,9 +24,9 @@ import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
+import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
-import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.KyodoJigyoshaRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
@@ -71,6 +74,27 @@ class TokugimuServiceImplTest {
         return a;
     }
 
+    /**
+     * テスト用のSHA-256ハッシュ化ヘルパー
+     */
+    private String sha256Hex(String value) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedhash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Test
     void search_emptyForm_returnsAllItems() {
         TokugimuSearchForm form = new TokugimuSearchForm();
@@ -97,6 +121,48 @@ class TokugimuServiceImplTest {
         var result = service.search(form);
 
         assertThat(result.isEmpty()).isTrue();
+    }
+
+    @Test
+    void search_withKojinNo_hashesAndCallsRepository() {
+        TokugimuSearchForm form = new TokugimuSearchForm();
+        form.setPage(0);
+        form.setPageSize(10);
+        String rawKojinNo = "test_kojin_no_12345";
+        form.setKojinNo(rawKojinNo);
+
+        String expectedHashedKojinNo = sha256Hex(rawKojinNo);
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+
+        when(tokugimuRepository.findBySearchConditions(
+                eq(JICHITAI_CD),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                eq("999"),
+                eq(expectedHashedKojinNo), // ハッシュ化された個人番号が渡されること
+                isNull()
+        )).thenReturn(List.of(t));
+
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
+
+        var result = service.search(form);
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(tokugimuRepository).findBySearchConditions(
+                eq(JICHITAI_CD),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                eq("999"),
+                eq(expectedHashedKojinNo),
+                isNull()
+        );
     }
 
     @Test
