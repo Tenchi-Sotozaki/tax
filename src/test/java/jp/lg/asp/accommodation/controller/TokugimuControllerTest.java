@@ -83,7 +83,7 @@ class TokugimuControllerTest {
         bindingResult.rejectValue("name", "NotBlank", "必須です");
         Model model = new ExtendedModelMap();
 
-        String view = controller.register(form, bindingResult, model, new RedirectAttributesModelMap());
+        String view = controller.register(form, bindingResult, new MockHttpSession(), model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
     }
@@ -92,11 +92,12 @@ class TokugimuControllerTest {
     void register_正常登録() {
         TokugimuForm form = new TokugimuForm();
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
+        when(tokugimuService.register(form)).thenReturn("00100001");
         Model model = new ExtendedModelMap();
 
-        String view = controller.register(form, bindingResult, model, new RedirectAttributesModelMap());
+        String view = controller.register(form, bindingResult, new MockHttpSession(), model, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("redirect:/tokugimu/list");
+        assertThat(view).isEqualTo("redirect:/tokugimu/view");
         verify(tokugimuService).register(form);
     }
 
