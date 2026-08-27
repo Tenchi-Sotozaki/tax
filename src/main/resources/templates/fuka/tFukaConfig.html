@@ -78,11 +78,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 
-			<!-- 半角数字以外が入力されたときにJSが表示する -->
-			<div id="numericInputAlert" class="alert alert-danger d-none"
-				role="alert">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i>半角数字で入力してください。
-			</div>
+
 
 
 			<input type="hidden" th:field="*{declarationId}" /> <input
@@ -752,12 +748,6 @@
 						</div>
 						<div class="modal-body"
 							style="max-height: 65vh; overflow-y: auto; padding-bottom: 0;">
-							<!-- 半角数字以外が入力されたときにJSが表示する -->
-							<div id="numericInputAlertTally"
-								class="alert alert-danger d-none" role="alert">
-								<i class="bi bi-exclamation-triangle-fill me-2"></i>半角数字で入力してください。
-							</div>
-
 							<!-- 「入力内容を決定」を押したときの桁数エラーをJSが表示する -->
 							<div id="tallyDigitAlert" class="alert alert-danger d-none"
 								role="alert">
@@ -1106,6 +1096,8 @@
 				</div>
 			</div>
 		</div>
+		<!-- 半角数字エラーモーダル -->
+		<div th:replace="~{layout/components :: errorModal('hankakuErrorModal', '入力エラー', '半角数字で入力してください。')}"></div>
 		<!-- 戻る確認モーダル -->
 		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容を破棄します。よろしいですか？', @{/declaration/payment-ledger}, '戻る')}"></div>
 		<!-- 特別徴収義務者指定モーダル -->

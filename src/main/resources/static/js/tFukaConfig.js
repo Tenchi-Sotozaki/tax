@@ -523,19 +523,9 @@ const setInputError = (input, marker, hasError) => {
         || input.classList.contains('js-digit-error'));
 };
 
-// 半角数字以外が入力されたことを画面上部で知らせる。
-// 月計表はモーダルで開くため、画面上部のアラートは隠れてしまう。モーダル内には別のアラートを置く。
-const numericAlertScope = (input) => input.closest('#monthlyTallyModal');
-
-const numericAlertOf = (input) => document.getElementById(
-    numericAlertScope(input) ? 'numericInputAlertTally' : 'numericInputAlert');
-
-// スコープ内に対象の欄が残っていなければアラートを閉じる
-const refreshNumericAlert = (input) => {
-    const alertEl = numericAlertOf(input);
-    if (!alertEl) return;
-    const scope = numericAlertScope(input) || document;
-    alertEl.classList.toggle('d-none', !scope.querySelector('.js-hankaku-error'));
+const showHankakuErrorModal = () => {
+    const el = document.getElementById('hankakuErrorModal');
+    if (el) bootstrap.Modal.getOrCreateInstance(el).show();
 };
 
 document.querySelectorAll('.js-comma-format').forEach(input => {
@@ -553,15 +543,13 @@ document.querySelectorAll('.js-comma-format').forEach(input => {
     // 入力時の数値チェック
     input.addEventListener('input', (e) => {
         if (!validateNumericInput(e.target.value)) {
-            // 全角数字・記号などが入った場合。取り除いたうえで、入力欄を赤くしてアラートを出す
+            // 全角数字・記号などが入った場合。取り除いたうえでモーダルを出す
             e.target.value = e.target.value.replace(/[^0-9,]/g, '');
-            setInputError(e.target, 'js-hankaku-error', true);
-            const alertEl = numericAlertOf(e.target);
-            if (alertEl) alertEl.classList.remove('d-none');
+            setInputError(e.target, 'js-hankaku-error', false);
+            showHankakuErrorModal();
             return;
         }
         setInputError(e.target, 'js-hankaku-error', false);
-        refreshNumericAlert(e.target);
     });
 
     // フォーカスが当たったらカンマを消す（数値だけにして入力しやすくする）
