@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -84,10 +85,10 @@ public class TokugimuServiceImpl implements TokugimuService {
 	@Transactional(readOnly = true)
 	public Page<TokugimuListItem> search(TokugimuSearchForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		
+
 		// 指定した件数ごとにページを切り替える
 		PageRequest pageable = PageRequest.of(form.getPage(), form.getPageSize());
-		
+
 		// 初期遷移時（検索条件がすべて空）は全件取得
 		List<Tokugimu> tokugimuList;
 		if (isEmptySearchForm(form)) {
@@ -262,11 +263,12 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	private String toLikePattern(String value, String matchType) {
-		if (value == null || value.isBlank()) return null;
+		if (value == null || value.isBlank())
+			return null;
 		return switch (matchType) {
-			case "prefix" -> value + "%";
-			case "exact"  -> value;
-			default       -> "%" + value + "%"; // partial
+		case "prefix" -> value + "%";
+		case "exact" -> value;
+		default -> "%" + value + "%"; // partial
 		};
 	}
 
@@ -346,7 +348,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	public TokugimuForm getTokugimuByShiteiNoAndRno(String shiteiNo, int rno) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		Tokugimu t = tokugimuRepository.findByJichitaiCdAndShiteiNoAndRno(
-					jichitaiCd, shiteiNo, BigDecimal.valueOf(rno))
+				jichitaiCd, shiteiNo, BigDecimal.valueOf(rno))
 				.orElseThrow(() -> new RuntimeException("宿泊施設が見つかりません: " + shiteiNo + "/rno=" + rno));
 
 		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, t.getAtenaNo())
@@ -378,7 +380,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	@Transactional
-	public void register(TokugimuForm form) {
+	public String register(TokugimuForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		LocalDateTime now = LocalDateTime.now();
 		String systemUser = getCurrentUser();
@@ -559,7 +561,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		form.setSuspensionOrAbolitionReason(t.getKyuhaishiRiyu());
 		form.setBusinessStatusFlg(
 				t.getKyushiStYmd() != null || t.getKyushiEdYmd() != null
-				|| t.getEigyoEdYmd() != null || t.getKyuhaishiRiyu() != null);
+						|| t.getEigyoEdYmd() != null || t.getKyuhaishiRiyu() != null);
 	}
 
 	private void applyFormToTokugimu(Tokugimu t, TokugimuForm form) {
