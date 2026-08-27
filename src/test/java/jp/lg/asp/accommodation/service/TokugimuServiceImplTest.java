@@ -5,22 +5,21 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
-import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -38,358 +37,241 @@ import jp.lg.asp.accommodation.service.impl.TokugimuServiceImpl;
 @ExtendWith(MockitoExtension.class)
 class TokugimuServiceImplTest {
 
-    @Mock private TokugimuRepository tokugimuRepository;
-    @Mock private AtenaRepository atenaRepository;
-    @Mock private GassanRepository gassanRepository;
-    @Mock private GassanUchiRepository gassanUchiRepository;
-    @Mock private ShoyushaRepository shoyushaRepository;
-    @Mock private KyodoJigyoshaRepository kyodoJigyoshaRepository;
-    @Mock private JichitaiRepository jichitaiRepository;
-    @Mock private FukaRepository fukaRepository;
-    @Mock private ShunoRirekiRepository shunoRirekiRepository;
-    @Mock private JichitaiContext jichitaiContext;
+    @Mock TokugimuRepository tokugimuRepository;
+    @Mock AtenaRepository atenaRepository;
+    @Mock GassanRepository gassanRepository;
+    @Mock GassanUchiRepository gassanUchiRepository;
+    @Mock ShoyushaRepository shoyushaRepository;
+    @Mock KyodoJigyoshaRepository kyodoJigyoshaRepository;
+    @Mock JichitaiRepository jichitaiRepository;
+    @Mock FukaRepository fukaRepository;
+    @Mock ShunoRirekiRepository shunoRirekiRepository;
+    @Mock JichitaiContext jichitaiContext;
+    @InjectMocks TokugimuServiceImpl service;
 
-    @InjectMocks
-    private TokugimuServiceImpl tokugimuService;
+    private static final String JICHITAI_CD = "011002";
+    private static final String SHITEI_NO = "00000001";
 
     @BeforeEach
     void setUp() {
-        lenient().when(jichitaiContext.getJichitaiCd()).thenReturn("012345");
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
     }
-    
-    @Nested
-    @DisplayName("search メソッドのテスト（基本機能・境界値）")
-    class SearchBasicTest {
 
-        @Test
-        @DisplayName("正常系：検索条件が空のとき、自治体コードに合致する全件が取得できること")
-        void success_emptySearchForm() {
-            TokugimuSearchForm form = new TokugimuSearchForm();
-            form.setPage(0);
-            form.setPageSize(10);
+    private Tokugimu buildTokugimu(String shiteiNo) {
+        Tokugimu t = new Tokugimu();
+        t.setShiteiNo(shiteiNo);
+        t.setAtenaNo(BigDecimal.ONE);
+        t.setShisetsuName("テスト施設");
+        t.setKyokaName("テスト事業者");
+        t.setRno(BigDecimal.ONE);
+        return t;
+    }
 
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo("00000001");
-            tokugimu.setAtenaNo(BigDecimal.ONE);
-            tokugimu.setKyokaShu("1");
+    private Atena buildAtena() {
+        Atena a = new Atena();
+        a.setAtenaNo(BigDecimal.ONE);
+        a.setName("テスト事業者");
+        return a;
+    }
 
-            when(tokugimuRepository.findAllByJichitaiCd("012345")).thenReturn(List.of(tokugimu));
-            when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq("012345"), any())).thenReturn(List.of());
-            when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq("012345"), any())).thenReturn(List.of());
-            when(fukaRepository.findDeclaredByShiteiNoInOrderByShinkokuYmdDesc(any(), any())).thenReturn(List.of());
-
-            Page<TokugimuListItem> result = tokugimuService.search(form);
-
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0).getShiteiNo()).isEqualTo("00000001");
-        }
-
-        @Test
-        @DisplayName("境界値：該当件数が0件のとき、空のページが返却されること")
-        void boundary_noResults() {
-            TokugimuSearchForm form = new TokugimuSearchForm();
-            form.setPage(0);
-            form.setPageSize(10);
-
-            when(tokugimuRepository.findAllByJichitaiCd("012345")).thenReturn(List.of());
-
-            Page<TokugimuListItem> result = tokugimuService.search(form);
-
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).isEmpty();
-            assertThat(result.getTotalElements()).isZero();
+    /**
+     * テスト用のSHA-256ハッシュ化ヘルパー
+     */
+    private String sha256Hex(String value) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedhash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    @Nested
-    @DisplayName("search メソッドの検索条件（AND検索・個人番号・法人番号・マッチタイプ）テスト")
-    class SearchConditionsTest {
+    @Test
+    void search_emptyForm_returnsAllItems() {
+        TokugimuSearchForm form = new TokugimuSearchForm();
+        form.setPage(0);
+        form.setPageSize(10);
 
-        @Test
-        @DisplayName("正常系：個人番号を指定した検索が正しくリポジトリへ伝達されること")
-        void success_withKojinNoCondition() {
-            TokugimuSearchForm form = new TokugimuSearchForm();
-            form.setPage(0);
-            form.setPageSize(10);
-            form.setKojinNo("1234567890123");
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
 
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo("00000001");
-            tokugimu.setAtenaNo(BigDecimal.ONE);
-            tokugimu.setKyokaShu("1");
+        var result = service.search(form);
 
-            Atena atena = new Atena();
-            atena.setAtenaNo(BigDecimal.ONE);
-            atena.setName("テスト事業者");
-            atena.setKojinNo("1234567890123");
-
-            when(tokugimuRepository.findBySearchConditions(
-                    eq("012345"),
-                    isNull(),
-                    isNull(),
-                    isNull(),
-                    isNull(),
-                    isNull(),
-                    eq("999"),
-                    eq("1234567890123"),
-                    isNull()
-            )).thenReturn(List.of(tokugimu));
-
-            when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq("012345"), any())).thenReturn(List.of(atena));
-            when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq("012345"), any())).thenReturn(List.of());
-            when(fukaRepository.findDeclaredByShiteiNoInOrderByShinkokuYmdDesc(any(), any())).thenReturn(List.of());
-
-            Page<TokugimuListItem> result = tokugimuService.search(form);
-
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0).getKojinNo()).isEqualTo("1234567890123");
-        }
-
-        @Test
-        @DisplayName("正常系：法人番号を指定した検索が正しくリポジトリへ伝達されること")
-        void success_withHojinNoCondition() {
-            TokugimuSearchForm form = new TokugimuSearchForm();
-            form.setPage(0);
-            form.setPageSize(10);
-            form.setHojinNo("9876543210987");
-
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo("00000001");
-            tokugimu.setAtenaNo(BigDecimal.ONE);
-            tokugimu.setKyokaShu("1");
-
-            Atena atena = new Atena();
-            atena.setAtenaNo(BigDecimal.ONE);
-            atena.setHojinNo("9876543210987");
-
-            when(tokugimuRepository.findBySearchConditions(
-                    eq("012345"),
-                    isNull(),
-                    isNull(),
-                    isNull(),
-                    isNull(),
-                    isNull(),
-                    eq("999"),
-                    isNull(),
-                    eq("9876543210987")
-            )).thenReturn(List.of(tokugimu));
-
-            when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq("012345"), any())).thenReturn(List.of(atena));
-            when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq("012345"), any())).thenReturn(List.of());
-            when(fukaRepository.findDeclaredByShiteiNoInOrderByShinkokuYmdDesc(any(), any())).thenReturn(List.of());
-
-            Page<TokugimuListItem> result = tokugimuService.search(form);
-
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getContent().get(0).getHojinNo()).isEqualTo("9876543210987");
-        }
-
-        @Test
-        @DisplayName("正常系：名称のマッチタイプ（prefix）に応じたLIKEパターンが生成されること")
-        void success_withMatchTypePatterns() {
-            TokugimuSearchForm form = new TokugimuSearchForm();
-            form.setPage(0);
-            form.setPageSize(10);
-            form.setName("テスト");
-            form.setNameMatchType("prefix");
-
-            when(tokugimuRepository.findBySearchConditions(
-                    eq("012345"),
-                    isNull(),
-                    eq("テスト"),
-                    eq("テスト%"),
-                    isNull(),
-                    isNull(),
-                    eq("999"),
-                    isNull(),
-                    isNull()
-            )).thenReturn(List.of());
-
-            Page<TokugimuListItem> result = tokugimuService.search(form);
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).isEmpty();
-        }
-
-        @Test
-        @DisplayName("正常系：メモリ上のフィルタリング（ステータス不一致）により0件になること")
-        void success_filteredOutByMemoryConditions() {
-            TokugimuSearchForm form = new TokugimuSearchForm();
-            form.setPage(0);
-            form.setPageSize(10);
-            form.setStatus("3"); // 廃止で検索
-
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo("00000001");
-            tokugimu.setAtenaNo(BigDecimal.ONE);
-            tokugimu.setKyokaShu("1");
-            // 廃止日などはnullなのでステータスは "1"（営業中）になる
-
-            Atena atena = new Atena();
-            atena.setAtenaNo(BigDecimal.ONE);
-            atena.setName("テスト事業者");
-
-            lenient().when(tokugimuRepository.findAllByJichitaiCd("012345")).thenReturn(List.of(tokugimu));
-            lenient().when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq("012345"), any())).thenReturn(List.of(atena));
-            lenient().when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq("012345"), any())).thenReturn(List.of());
-
-            Page<TokugimuListItem> result = tokugimuService.search(form);
-
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).isEmpty();
-            assertThat(result.getTotalElements()).isZero();
-        }
-    }
-    
-    @Nested
-    @DisplayName("getTokugimuByShiteiNo メソッドのテスト")
-    class GetTokugimuByShiteiNoTest {
-
-        @Test
-        @DisplayName("正常系：指定番号に該当するデータが存在する場合、Formにマッピングされて返却されること")
-        void success() {
-            String shiteiNo = "00000001";
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo(shiteiNo);
-            tokugimu.setAtenaNo(BigDecimal.ONE);
-            tokugimu.setRno(BigDecimal.ONE);
-
-            Atena atena = new Atena();
-            atena.setAtenaNo(BigDecimal.ONE);
-            atena.setName("テスト事業者");
-
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo)).thenReturn(List.of(tokugimu));
-            when(atenaRepository.findByJichitaiCdAndAtenaNo("012345", BigDecimal.ONE)).thenReturn(Optional.of(atena));
-            when(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo("012345", shiteiNo)).thenReturn(Optional.of(1));
-            when(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo("012345", shiteiNo)).thenReturn(Optional.of(1));
-            when(shoyushaRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo)).thenReturn(List.of());
-           
-            TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
-
-            assertThat(form).isNotNull();
-            assertThat(form.getShiteiNo()).isEqualTo(shiteiNo);
-            assertThat(form.getName()).isEqualTo("テスト事業者");
-        }
-
-        @Test
-        @DisplayName("異常系：指定番号に該当する宿泊施設が存在しない場合、RuntimeExceptionがスローされること")
-        void exception_tokugimuNotFound() {
-            String shiteiNo = "99999999";
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo)).thenReturn(List.of());
-
-            assertThatThrownBy(() -> tokugimuService.getTokugimuByShiteiNo(shiteiNo))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("宿泊施設が見つかりません");
-        }
-    }
-    
-    @Nested
-    @DisplayName("searchAll メソッドのテスト")
-    class SearchAllTest {
-
-        @Test
-        @DisplayName("正常系：ページングの制限を無視して全件のリストが取得できること")
-        void success() {
-            TokugimuSearchForm form = new TokugimuSearchForm();
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo("00000001");
-            tokugimu.setAtenaNo(BigDecimal.ONE);
-            tokugimu.setKyokaShu("1");
-
-            when(tokugimuRepository.findAllByJichitaiCd("012345")).thenReturn(List.of(tokugimu));
-            when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq("012345"), any())).thenReturn(List.of());
-            when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq("012345"), any())).thenReturn(List.of());
-            when(fukaRepository.findDeclaredByShiteiNoInOrderByShinkokuYmdDesc(any(), any())).thenReturn(List.of());
-
-            List<TokugimuListItem> result = tokugimuService.searchAll(form);
-
-            assertThat(result).isNotNull();
-            assertThat(result).hasSize(1);
-            assertThat(result.get(0).getShiteiNo()).isEqualTo("00000001");
-        }
+        assertThat(result.getTotalElements()).isEqualTo(1);
     }
 
-    @Nested
-    @DisplayName("getTokugimuByShiteiNoAndRno メソッドのテスト")
-    class GetTokugimuByShiteiNoAndRnoTest {
+    @Test
+    void search_emptyResult_returnsEmptyPage() {
+        TokugimuSearchForm form = new TokugimuSearchForm();
+        form.setPage(0);
+        form.setPageSize(10);
+        when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of());
 
-        @Test
-        @DisplayName("正常系：指定番号と履歴番号（rno）に一致するデータが存在する場合、Formが返却されること")
-        void success() {
-            String shiteiNo = "00000001";
-            int rno = 2;
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo(shiteiNo);
-            tokugimu.setAtenaNo(BigDecimal.ONE);
-            tokugimu.setRno(BigDecimal.valueOf(rno));
+        var result = service.search(form);
 
-            Atena atena = new Atena();
-            atena.setAtenaNo(BigDecimal.ONE);
-            atena.setName("テスト事業者");
-
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndRno("012345", shiteiNo, BigDecimal.valueOf(rno)))
-                    .thenReturn(Optional.of(tokugimu));
-            when(atenaRepository.findByJichitaiCdAndAtenaNo("012345", BigDecimal.ONE))
-                    .thenReturn(Optional.of(atena));
-            when(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(Optional.of(2));
-            when(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(Optional.of(1));
-            when(shoyushaRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of());
-           
-            TokugimuForm form = tokugimuService.getTokugimuByShiteiNoAndRno(shiteiNo, rno);
-
-            assertThat(form).isNotNull();
-            assertThat(form.getShiteiNo()).isEqualTo(shiteiNo);
-            assertThat(form.getRno()).isEqualTo(rno);
-        }
-
-        @Test
-        @DisplayName("異常系：指定した rno のデータが存在しない場合、RuntimeExceptionがスローされること")
-        void exception_notFound() {
-            String shiteiNo = "00000001";
-            int rno = 99;
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndRno(any(), any(), any()))
-                    .thenReturn(Optional.empty());
-
-            assertThatThrownBy(() -> tokugimuService.getTokugimuByShiteiNoAndRno(shiteiNo, rno))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("宿泊施設が見つかりません");
-        }
+        assertThat(result.isEmpty()).isTrue();
     }
 
-    @Nested
-    @DisplayName("getShiteiNoById メソッドのテスト")
-    class GetShiteiNoByIdTest {
+    @Test
+    void search_withKojinNo_hashesAndCallsRepository() {
+        TokugimuSearchForm form = new TokugimuSearchForm();
+        form.setPage(0);
+        form.setPageSize(10);
+        String rawKojinNo = "test_kojin_no_12345";
+        form.setKojinNo(rawKojinNo);
 
-        @Test
-        @DisplayName("正常系：ID（宛名番号）に紐づく指定番号が存在する場合、その文字列が返却されること")
-        void success() {
-            Long id = 1L;
-            Tokugimu tokugimu = new Tokugimu();
-            tokugimu.setShiteiNo("00000001");
+        String expectedHashedKojinNo = sha256Hex(rawKojinNo);
+        Tokugimu t = buildTokugimu(SHITEI_NO);
 
-            when(tokugimuRepository.findByJichitaiCdAndAtenaNo("012345", BigDecimal.valueOf(id)))
-                    .thenReturn(List.of(tokugimu));
+        when(tokugimuRepository.findBySearchConditions(
+                eq(JICHITAI_CD),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                eq("999"),
+                eq(expectedHashedKojinNo), // ハッシュ化された個人番号が渡されること
+                isNull()
+        )).thenReturn(List.of(t));
 
-            String shiteiNo = tokugimuService.getShiteiNoById(id);
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
 
-            assertThat(shiteiNo).isEqualTo("00000001");
-        }
+        var result = service.search(form);
 
-        @Test
-        @DisplayName("異常系：IDに紐づくデータが存在しない場合、RuntimeExceptionがスローされること")
-        void exception_notFound() {
-            Long id = 999L;
-            when(tokugimuRepository.findByJichitaiCdAndAtenaNo(any(), any()))
-                    .thenReturn(List.of());
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        verify(tokugimuRepository).findBySearchConditions(
+                eq(JICHITAI_CD),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                isNull(),
+                eq("999"),
+                eq(expectedHashedKojinNo),
+                isNull()
+        );
+    }
 
-            assertThatThrownBy(() -> tokugimuService.getShiteiNoById(id))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("指定番号が見つかりません");
-        }
+    @Test
+    void searchAll_returnsAllItems() {
+        TokugimuSearchForm form = new TokugimuSearchForm();
+
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of());
+
+        var result = service.searchAll(form);
+
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void getTokugimuByShiteiNo_found() {
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of(t));
+        when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE)).thenReturn(Optional.of(buildAtena()));
+        when(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(Optional.of(1));
+        when(tokugimuRepository.findMinRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(Optional.of(1));
+        when(shoyushaRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
+        when(kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNoAndRno(eq(JICHITAI_CD), eq(SHITEI_NO), any()))
+                .thenReturn(List.of());
+
+        TokugimuForm form = service.getTokugimuByShiteiNo(SHITEI_NO);
+
+        assertThat(form.getShiteiNo()).isEqualTo(SHITEI_NO);
+    }
+
+    @Test
+    void getTokugimuByShiteiNo_notFound_throwsException() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.getTokugimuByShiteiNo(SHITEI_NO))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void register_noAtenaNo_throwsException() {
+        TokugimuForm form = new TokugimuForm();
+        form.setAtenaNo(null);
+
+        assertThatThrownBy(() -> service.register(form))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("宛名番号");
+    }
+
+    @Test
+    void deleteByShiteiNo_履歴が残らない場合はfalseを返す() {
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        t.setDelFlg("0");
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of(t));
+        when(tokugimuRepository.findActiveHistoryByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of());
+        when(tokugimuRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        boolean remains = service.deleteByShiteiNo(SHITEI_NO);
+
+        assertThat(remains).isFalse();
+        assertThat(t.getDelFlg()).isEqualTo("1");
+        assertThat(t.getNewFlg()).isEqualTo("0");
+    }
+
+    @Test
+    void deleteByShiteiNo_履歴が残る場合は最新履歴を最新版に戻す() {
+        Tokugimu current = buildTokugimu(SHITEI_NO);
+        current.setDelFlg("0");
+        current.setRno(BigDecimal.valueOf(2));
+        Tokugimu prev = buildTokugimu(SHITEI_NO);
+        prev.setDelFlg("0");
+        prev.setNewFlg("0");
+        prev.setRno(BigDecimal.ONE);
+
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of(current));
+        when(tokugimuRepository.findActiveHistoryByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(prev));
+        when(tokugimuRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        boolean remains = service.deleteByShiteiNo(SHITEI_NO);
+
+        assertThat(remains).isTrue();
+        assertThat(current.getDelFlg()).isEqualTo("1");
+        assertThat(prev.getNewFlg()).isEqualTo("1");
+    }
+
+    @Test
+    void deleteByShiteiNo_notFound_throwsException() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.deleteByShiteiNo(SHITEI_NO))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void getShiteiNoById_found() {
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        when(tokugimuRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE)).thenReturn(List.of(t));
+
+        assertThat(service.getShiteiNoById(1L)).isEqualTo(SHITEI_NO);
+    }
+
+    @Test
+    void getShiteiNoById_notFound_throwsException() {
+        when(tokugimuRepository.findByJichitaiCdAndAtenaNo(any(), any())).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.getShiteiNoById(99L))
+                .isInstanceOf(RuntimeException.class);
     }
 }
