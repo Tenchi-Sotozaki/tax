@@ -126,7 +126,7 @@
 			</div>
 		</form>
 
-		<div th:replace="~{layout/components :: confirmModal('saveConfirmModal', ${form.seq != null} ? '更新確認' : '登録確認', ${form.seq != null} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'configForm', 'btn-success', ${form.seq != null} ? '更新する' : '登録する')}"></div>
+		<div th:replace="~{layout/components :: confirmModal('saveConfirmModal', ${form.seq != null} ? '更新確認' : '登録確認', ${form.seq != null} ? 'トップページコンテンツを更新します。よろしいですか？' : 'トップページコンテンツを登録します。よろしいですか？', 'configForm', 'btn-success', ${form.seq != null} ? '更新する' : '登録する')}"></div>
 
 		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/top/topPageConfigDaicho}, '一覧に戻る')}"></div>
 	</div>
