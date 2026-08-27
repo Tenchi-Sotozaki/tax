@@ -129,7 +129,7 @@ class FurikomiKozaControllerTest {
         String view = controller.create(form, bindingResult, model, redirectAttributes);
 
         assertThat(view).isEqualTo("redirect:/shoreikin/list");
-        assertThat(redirectAttributes.getFlashAttributes()).containsEntry("successMessage", "振込先口座情報を登録しました。");
+        assertThat(redirectAttributes.getFlashAttributes().get("successMessage")).isEqualTo("振込先口座情報を登録しました。");
         verify(furikomiKozaService).createFurikomiKoza(form);
     }
 
@@ -189,7 +189,7 @@ class FurikomiKozaControllerTest {
         String view = controller.update(form, bindingResult, model, redirectAttributes);
 
         assertThat(view).isEqualTo("redirect:/shoreikin/list");
-        assertThat(redirectAttributes.getFlashAttributes()).containsEntry("successMessage", "振込先口座情報を更新しました。");
+        assertThat(redirectAttributes.getFlashAttributes().get("successMessage")).isEqualTo("振込先口座情報を更新しました。");
         verify(furikomiKozaService).updateFurikomiKoza(form);
     }
 
