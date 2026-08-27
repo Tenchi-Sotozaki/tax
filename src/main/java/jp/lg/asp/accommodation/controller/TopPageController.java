@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.annotation.OpeLog;
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TopPageConfigForm;
 import jp.lg.asp.accommodation.entity.TopPageContent;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.MarkdownService;
 import jp.lg.asp.accommodation.service.TopPageService;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 public class TopPageController {
 
 	private final TopPageService topPageService;
-	private final JichitaiRepository jichitaiRepository;
+	private final MarkdownService markdownService;
 	private final ScreenAccessChecker accessChecker;
-	private final JichitaiContext jichitaiContext;
 
 	private static final String SCREEN_ID = ScreenManagement.TOP_PAGE;
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.TOP_PAGE_CONFIG;
@@ -84,8 +81,6 @@ public class TopPageController {
 		return "top/topPageConfig";
 	}
 
-	private final MarkdownService markdownService;
-	
 	@PostMapping("/config/preview")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "プレビュー")
 	public String preview(@ModelAttribute("form") TopPageConfigForm form, Model model) {
