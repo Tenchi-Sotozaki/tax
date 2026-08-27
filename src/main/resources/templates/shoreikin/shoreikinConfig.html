@@ -76,8 +76,8 @@
 								</label> <input type="text" class="form-control" id="nendo"
 									th:field="*{nendo}"
 									th:readonly="${configForm.viewMode or configForm.editMode}"
+									th:classappend="(${configForm.viewMode or configForm.editMode} ? ' form-control-readonly' : '') + (${#fields.hasErrors('nendo')} ? ' is-invalid' : '')"
 									maxlength="4"
-									th:classappend="${#fields.hasErrors('nendo')} ? 'is-invalid' : ''"
 									pattern="[0-9]{4}" title="4桁の数字で入力してください" required
 									th:data-initial-value="*{nendo}">
 
@@ -100,7 +100,7 @@
 									<input type="number" class="form-control text-end"
 										id="kofuZeigaku" th:field="*{kofuZeigaku}"
 										th:readonly="${configForm.viewMode}"
-										th:classappend="${#fields.hasErrors('kofuZeigaku')} ? 'is-invalid' : ''"
+										th:classappend="(${#fields.hasErrors('kofuZeigaku')} ? ' is-invalid' : '') + (${configForm.viewMode} ? ' form-control-readonly' : '')"
 										step="1" min="0" max="99999999999999" required
 										th:data-initial-value="*{kofuZeigaku}"> <span
 										class="input-group-text">円</span>
@@ -122,7 +122,7 @@
 
 								<div class="input-group">
 
-									<input type="number" class="form-control text-end"
+									<input type="number" class="form-control text-end form-control-readonly"
 										id="kofuRitsu" th:field="*{kofuRitsu}" readonly
 										th:classappend="${#fields.hasErrors('kofuRitsu')} ? 'is-invalid' : ''"
 										step="0.01" min="0" max="99999.99" required
@@ -150,7 +150,7 @@
 									<input type="number" class="form-control text-end"
 										id="kofuGaku" th:field="*{kofuGaku}"
 										th:readonly="${configForm.viewMode}"
-										th:classappend="${#fields.hasErrors('kofuGaku')} ? 'is-invalid' : ''"
+										th:classappend="(${#fields.hasErrors('kofuGaku')} ? ' is-invalid' : '') + (${configForm.viewMode} ? ' form-control-readonly' : '')"
 										step="1" min="0" max="9999999999999" required
 										th:data-initial-value="*{kofuGaku}"> <span
 										class="input-group-text">円</span>
@@ -173,6 +173,7 @@
 									type="date" class="form-control" id="kofuYmd"
 									th:value="${configForm.kofuYmd != null ? #temporals.format(configForm.kofuYmd, 'yyyy-MM-dd') : ''}"
 									name="kofuYmd" th:readonly="${configForm.viewMode}"
+									th:classappend="${configForm.viewMode} ? ' form-control-readonly' : ''"
 									th:data-initial-value="*{kofuYmd}">
 							</div>
 

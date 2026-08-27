@@ -182,6 +182,30 @@
     background-color: var(--acomo-navy) !important;
 }
 
+/* フォーム(編集不可) */
+.form-control-readonly {
+	background-color: #f2f2f2;
+	caret-color: transparent;
+	cursor: default;
+}
+
+.form-control.form-control-readonly:focus {
+	background-color: #f2f2f2;
+	border-color: var(--acomo-border);
+	box-shadow: none;
+	outline: none;
+}
+
+.form-control-edited {
+    border: 3px solid #ffeb3b;
+    background-color: #fdf6d9;
+}
+
+.form-control.form-control-edited:focus {
+    border-color: #ffeb3b;
+    background-color: #fdf6d9;
+}
+
 /* ==========================================
    テーブル
 ========================================== */
