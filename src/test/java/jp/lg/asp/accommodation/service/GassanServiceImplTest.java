@@ -89,10 +89,16 @@ class GassanServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
                 .thenReturn(Optional.of(new Atena()));
-        when(gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+        when(gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
                 .thenReturn(BigDecimal.ONE);
         when(gassanRepository.findMinRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
                 .thenReturn(BigDecimal.ONE);
+        when(gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNoAndRnoLe(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(BigDecimal.ONE);
+        when(gassanRepository.findPrevRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(BigDecimal.ZERO);
+        when(gassanRepository.findNextRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(BigDecimal.ZERO);
 
         GassanForm form = service.getByGassanShiteiNo(GASSAN_SHITEI_NO);
 
