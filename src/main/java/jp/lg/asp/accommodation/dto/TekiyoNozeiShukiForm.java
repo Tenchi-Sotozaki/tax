@@ -5,18 +5,17 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class TokureiTekiyoForm {
+public class TekiyoNozeiShukiForm {
 
     private String shiteiNo;
     private String obligorName;
     private String facilityName;
+    private boolean edit;
 
-    // 登録/編集対象レコードのrno（編集時にセット）
     private Integer rno;
-
 
     private String tekiyoStMonth;
     private String tekiyoEdMonth;
 
-    private List<TokureiTekiyoHistoryDto> histories;
+    private List<TekiyoNozeiShukiHistoryDto> histories;
 }

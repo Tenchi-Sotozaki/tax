@@ -12,7 +12,7 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.NozeiShukiDto;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiHistoryDto;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -56,11 +56,11 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
                     form.setFacilityName(t.getShisetsuName());
                 });
 
-        List<TekiyoNozeiShuki> allRecords = tekiyoNozeiShukiRepository
+        List<TokureiTekiyo> allRecords = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 
         if (!allRecords.isEmpty()) {
-            TekiyoNozeiShuki latest = allRecords.get(0);
+            TokureiTekiyo latest = allRecords.get(0);
             form.setEdit(true);
             form.setRno(latest.getRno());
             if (latest.getTekiyoStYmd() != null) {
@@ -107,7 +107,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         Integer maxRno = tekiyoNozeiShukiRepository.findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
         Integer newRno = maxRno + 1;
 
-        TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
+        TokureiTekiyo entity = new TokureiTekiyo();
         entity.setJichitaiCd(jichitaiCd);
         entity.setShiteiNo(shiteiNo);
         entity.setRno(newRno);
@@ -122,10 +122,10 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
     private void checkAndResolveOverlap(String shiteiNo, LocalDate newStYmd, LocalDate newEdYmd) {
         String jichitaiCd = jichitaiContext.getJichitaiCd();
 
-        List<TekiyoNozeiShuki> existingRecords = tekiyoNozeiShukiRepository
+        List<TokureiTekiyo> existingRecords = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 
-        for (TekiyoNozeiShuki existing : existingRecords) {
+        for (TokureiTekiyo existing : existingRecords) {
             LocalDate exStYmd = existing.getTekiyoStYmd();
             LocalDate exEdYmd = existing.getTekiyoEdYmd();
 
@@ -150,7 +150,7 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
     @Transactional
     public void delete(String shiteiNo) {
         String jichitaiCd = jichitaiContext.getJichitaiCd();
-        TekiyoNozeiShuki latest = tekiyoNozeiShukiRepository
+        TokureiTekiyo latest = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
                 .stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("削除対象のレコードが見つかりません。"));
