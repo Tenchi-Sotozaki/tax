@@ -35,7 +35,7 @@
 			<div class="card-body">
 				<form id="atenaForm"
 					th:action="@{${mode == 'register' ? '/atena/register' : '/atena/edit'}}"
-					method="post" th:object="${form}">
+					method="post" th:object="${form}" th:data-mode="${mode}">
 
 					<div
 						th:if="${validationErrors != null and !validationErrors.isEmpty()}"
@@ -78,6 +78,7 @@
 								type="text" class="form-control" th:field="*{hojinNo}"
 								th:errorclass="is-invalid" th:readonly="${mode == 'view'}"
 								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								th:data-initial-value="*{hojinNo}"
 								placeholder="個人番号か法人番号どちらか一方を入力">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('hojinNo')}" th:errors="*{hojinNo}"></div>
@@ -92,6 +93,7 @@
 								type="text" class="form-control" th:field="*{name}"
 								th:errorclass="is-invalid" th:readonly="${mode == 'view'}"
 								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								th:data-initial-value="*{name}"
 								placeholder="氏名または名称">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
@@ -103,6 +105,7 @@
 								type="text" class="form-control" th:field="*{nameKana}"
 								th:readonly="${mode == 'view'}"
 								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								th:data-initial-value="*{nameKana}"
 								placeholder="ふりがな">
 						</div>
 
@@ -112,6 +115,7 @@
 								type="text" class="form-control" th:field="*{yubinNo}"
 								th:readonly="${mode == 'view'}"
 								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								th:data-initial-value="*{yubinNo}"
 								placeholder="例：1234567（数字7桁）">
 						</div>
 
@@ -121,6 +125,7 @@
 								class="form-control" th:field="*{jusho}"
 								th:readonly="${mode == 'view'}"
 								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								th:data-initial-value="*{jusho}"
 								placeholder="住所">
 						</div>
 
@@ -130,6 +135,7 @@
 								type="text" class="form-control" th:field="*{tel1}"
 								th:readonly="${mode == 'view'}"
 								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								th:data-initial-value="*{tel1}"
 								placeholder="電話番号1">
 						</div>
 
@@ -139,6 +145,7 @@
 								type="text" class="form-control" th:field="*{tel2}"
 								th:readonly="${mode == 'view'}"
 								th:classappend="${mode == 'view'} ? ' form-control-readonly' : ''"
+								th:data-initial-value="*{tel2}"
 								placeholder="電話番号2">
 						</div>
 					</div>
@@ -175,5 +182,8 @@
 		<div th:if="${mode == 'edit'}"
 			th:replace="~{layout/components :: confirmModal('editConfirmModal', '更新確認', '更新します。よろしいですか？', 'atenaForm', 'btn-primary', '更新する')}"></div>
 	</div>
+<th:block layout:fragment="scripts">
+	<script th:src="@{/js/atenaConfig.js}"></script>
+</th:block>
 </body>
 </html>
