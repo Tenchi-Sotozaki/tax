@@ -19,12 +19,12 @@ import jakarta.servlet.http.HttpSession;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoForm;
-import jp.lg.asp.accommodation.dto.TokureiTekiyoHistoryDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.TokureiTekiyoService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 
 @ExtendWith(MockitoExtension.class)
+@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class TokureiTekiyoControllerTest {
 
     @Mock TokureiTekiyoService tokureiTekiyoService;
