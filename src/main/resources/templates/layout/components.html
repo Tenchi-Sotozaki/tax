@@ -204,6 +204,45 @@
 	</div>
 
 	<!--
+  エラー通知モーダル フラグメント
+  引数:
+    modalId - モーダルのHTML id属性値
+    title   - モーダルのタイトル
+    message - モーダルの本文メッセージ
+
+  使用例:
+    <div th:replace="~{layout/components :: errorModal('hankakuErrorModal','入力エラー','半角数字で入力してください')}"></div>
+-->
+	<div
+		th:fragment="errorModal(modalId, title, message)"
+		class="modal fade" th:id="${modalId}" tabindex="-1"
+		data-bs-backdrop="static" data-bs-keyboard="false"
+		th:aria-labelledby="${modalId + 'Label'}" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content shadow">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title" th:id="${modalId + 'Label'}">
+						<i class="bi bi-exclamation-triangle me-2"></i>
+						<span th:text="${title}">エラー</span>
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="閉じる"></button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-0" th:text="${message}">エラーが発生しました。</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>閉じる
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!--
   特別徴収義務者情報表示 フラグメント（セッションから取得）
   引数:
     showButton - 特別徴収義務者指定ボタンを表示するか（照会時: true, 編集時: false）
