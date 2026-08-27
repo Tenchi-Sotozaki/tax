@@ -409,6 +409,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		saveKyodoJigyosha(shiteiNo, BigDecimal.ONE, form);
 
 		log.debug("特別徴収義務者登録完了: shiteiNo={}", shiteiNo);
+		return shiteiNo;
 	}
 
 	/**
