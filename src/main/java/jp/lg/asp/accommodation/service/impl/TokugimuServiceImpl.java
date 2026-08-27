@@ -130,7 +130,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.stream().collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
 
 		// 指定番号 -> 合算指定番号。合算対象かどうかの判定にも利用する
-		Map<String, String> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos)
+		Map<String, String> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos, null)
 				.stream().collect(Collectors.toMap(GassanUchi::getShiteiNo,
 						GassanUchi::getGassanShiteiNo, (a, b) -> a));
 
@@ -410,7 +410,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	@Transactional
-	public void register(TokugimuForm form) {
+	public String register(TokugimuForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		LocalDateTime now = LocalDateTime.now();
 		String systemUser = getCurrentUser();
@@ -441,6 +441,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		saveKyodoJigyosha(shiteiNo, BigDecimal.ONE, form);
 
 		log.debug("特別徴収義務者登録完了: shiteiNo={}", shiteiNo);
+		return shiteiNo;
 	}
 
 	/**

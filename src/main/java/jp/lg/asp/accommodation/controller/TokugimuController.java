@@ -124,6 +124,7 @@ public class TokugimuController {
 	public String register(
 			@Validated @ModelAttribute("TokugimuForm") TokugimuForm form,
 			BindingResult bindingResult,
+			HttpSession session,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 		accessChecker.checkWriteAccess(TOKUGIMU_CONFIG);
@@ -133,8 +134,9 @@ public class TokugimuController {
 			model.addAttribute("validationErrors", buildValidationMessages(bindingResult));
 			return FORM_VIEW;
 		}
+		String shiteiNo;
 		try {
-			tokugimuService.register(form);
+			shiteiNo = tokugimuService.register(form);
 		} catch (Exception e) {
 			log.error("登録処理エラー", e);
 			model.addAttribute("isEdit", false);
@@ -142,8 +144,11 @@ public class TokugimuController {
 			model.addAttribute("errorMessage", e.getMessage());
 			return FORM_VIEW;
 		}
+		SessionHelper.saveShiteiGassan(session, new ShiteiGassanSearchDto(
+				form.getAtenaNo() != null ? String.valueOf(form.getAtenaNo()) : null,
+				shiteiNo, null, form.getLicenseName(), form.getFacilityName()));
 		redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。");
-		return "redirect:/tokugimu/list";
+		return "redirect:/tokugimu/view";
 	}
 
 	// ========== 照会 ==========
@@ -217,7 +222,7 @@ public class TokugimuController {
 			return FORM_VIEW;
 		}
 		redirectAttributes.addFlashAttribute("successMessage", "更新が完了しました。");
-		return "redirect:/tokugimu/list";
+		return "redirect:/tokugimu/view";
 	}
 
 	// ========== 帳票出力 ==========
