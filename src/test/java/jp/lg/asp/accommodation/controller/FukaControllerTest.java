@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -195,5 +196,47 @@ class FukaControllerTest {
 
         assertThat(view).isEqualTo("redirect:/declaration/payment-ledger");
         verify(fukaService).saveDeclaration(form);
+    }
+
+    @Test
+    void save_課税対象外宿泊数の桁数エラーはサマリに項目名が付く() {
+        FukaDeclarationForm form = new FukaDeclarationForm();
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
+        bindingResult.rejectValue("monthlyDetail.exemptStayCount", "Digits", "9桁以内で入力してください");
+        Model model = new ExtendedModelMap();
+
+        String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("fuka/tFukaConfig");
+        assertThat(validationErrors(model))
+                .containsExactly("課税対象外宿泊数は9桁以内で入力してください");
+        assertThat(fieldErrorMessages(model))
+                .containsEntry("monthlyDetail.exemptStayCount", "9桁以内で入力してください");
+    }
+
+    @Test
+    void save_宿泊数合計の桁数エラーはサマリに項目名が付く() {
+        FukaDeclarationForm form = new FukaDeclarationForm();
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
+        bindingResult.rejectValue("monthlyDetail.totalStayCount", "Digits", "9桁以内で入力してください");
+        Model model = new ExtendedModelMap();
+
+        String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("fuka/tFukaConfig");
+        assertThat(validationErrors(model))
+                .containsExactly("宿泊数合計は9桁以内で入力してください");
+        assertThat(fieldErrorMessages(model))
+                .containsEntry("monthlyDetail.totalStayCount", "9桁以内で入力してください");
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> validationErrors(Model model) {
+        return (List<String>) model.asMap().get("validationErrors");
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, String> fieldErrorMessages(Model model) {
+        return (Map<String, String>) model.asMap().get("fieldErrorMessages");
     }
 }

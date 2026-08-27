@@ -68,7 +68,9 @@ public class FukaController {
 			"additionalAmount2", "13桁以内で入力してください",
 			"additionalAmount3", "13桁以内で入力してください",
 			"entaikin", "13桁以内で入力してください",
-			"shunoKingaku", "13桁以内で入力してください");
+			"shunoKingaku", "13桁以内で入力してください",
+			"monthlyDetail.exemptStayCount", "9桁以内で入力してください",
+			"monthlyDetail.totalStayCount", "9桁以内で入力してください");
 
 	/** 型変換エラーのサマリ用メッセージ（項目名付き） */
 	private static final Map<String, String> TYPE_MISMATCH_SUMMARY_MESSAGES = Map.of(
@@ -76,7 +78,9 @@ public class FukaController {
 			"additionalAmount2", "加算金額2は13桁以内で入力してください",
 			"additionalAmount3", "加算金額3は13桁以内で入力してください",
 			"entaikin", "延滞金は13桁以内で入力してください",
-			"shunoKingaku", "納入金額は13桁以内で入力してください");
+			"shunoKingaku", "納入金額は13桁以内で入力してください",
+			"monthlyDetail.exemptStayCount", "課税対象外宿泊数は9桁以内で入力してください",
+			"monthlyDetail.totalStayCount", "宿泊数合計は9桁以内で入力してください");
 
 	/**
 	 * サマリに出す必須エラーの文言。
@@ -359,6 +363,8 @@ public class FukaController {
 					"torokuDate", "shinkokuDate",
 					"modificationCategory",
 					"monthlyDetail.taxDetails",
+					"monthlyDetail.exemptStayCount",
+					"monthlyDetail.totalStayCount",
 					"additionalRate1", "additionalAmount1",
 					"additionalRate2", "additionalAmount2",
 					"additionalRate3", "additionalAmount3",
