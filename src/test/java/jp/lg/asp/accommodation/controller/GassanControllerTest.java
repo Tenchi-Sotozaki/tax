@@ -329,7 +329,7 @@ class GassanControllerTest {
     void register_異常系_サービス例外() {
         GassanForm form = new GassanForm();
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "GassanForm");
-        doThrow(new RuntimeException("DB Error")).when(gassanService).register(any(), any());
+        when(gassanService.register(any(), any())).thenThrow(new RuntimeException("DB Error"));
         Model model = new ExtendedModelMap();
 
         String view = controller.register(form, bindingResult, model, new RedirectAttributesModelMap(), new MockHttpSession());

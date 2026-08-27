@@ -159,7 +159,7 @@ class GassanServiceImplTest {
         Gassan prev = buildGassan(BigDecimal.ONE, LocalDate.now().minusMonths(1));
         when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
                 .thenReturn(List.of(prev));
-        when(gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+        when(gassanRepository.findMaxRnoIncludingDeletedByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
                 .thenReturn(BigDecimal.ONE);
 
         String result = service.register(form, GASSAN_SHITEI_NO);
