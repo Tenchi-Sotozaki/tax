@@ -7,15 +7,15 @@ import jp.lg.asp.accommodation.dto.TokureiTekiyoHistoryDto;
 
 public interface TokureiTekiyoService {
 
-    List<TokureiTekiyoHistoryDto> getHistories(String shiteiNo);
+    List<TokureiTekiyoHistoryDto> getHistories();
 
-    TokureiTekiyoForm getForView(String shiteiNo, Integer rno);
+    TokureiTekiyoForm getForView(Integer rno);
 
-    TokureiTekiyoForm getForRegister(String shiteiNo);
+    TokureiTekiyoForm getForRegister();
 
-    void save(String shiteiNo, TokureiTekiyoForm form);
+    void save(TokureiTekiyoForm form);
 
-    void update(String shiteiNo, Integer rno, TokureiTekiyoForm form);
+    void update(Integer rno, TokureiTekiyoForm form);
 
-    void delete(String shiteiNo, Integer rno);
+    void delete(Integer rno);
 }

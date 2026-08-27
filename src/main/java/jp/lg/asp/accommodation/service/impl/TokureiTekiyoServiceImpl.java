@@ -8,6 +8,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.servlet.http.HttpSession;
+
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoForm;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoHistoryDto;
@@ -15,6 +17,7 @@ import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokureiTekiyoService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +29,7 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
     private final TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
     private final TokugimuRepository tokugimuRepository;
     private final JichitaiContext jichitaiContext;
+    private final HttpSession session;
 
     private static final String FLG_ON = "1";
     private static final String FLG_OFF = "0";
@@ -34,7 +38,8 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TokureiTekiyoHistoryDto> getHistories(String shiteiNo) {
+    public List<TokureiTekiyoHistoryDto> getHistories() {
+        String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         return tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
@@ -48,7 +53,8 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
 
     @Override
     @Transactional(readOnly = true)
-    public TokureiTekiyoForm getForView(String shiteiNo, Integer rno) {
+    public TokureiTekiyoForm getForView(Integer rno) {
+        String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         TekiyoNozeiShuki record = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
@@ -70,14 +76,16 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
 
     @Override
     @Transactional(readOnly = true)
-    public TokureiTekiyoForm getForRegister(String shiteiNo) {
+    public TokureiTekiyoForm getForRegister() {
+        String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         return buildBaseForm(shiteiNo, jichitaiCd);
     }
 
     @Override
     @Transactional
-    public void save(String shiteiNo, TokureiTekiyoForm form) {
+    public void save(TokureiTekiyoForm form) {
+        String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         LocalDate stYmd = toFirstDay(form.getTekiyoStMonth());
         LocalDate edYmd = toLastDay(form.getTekiyoEdMonth());
@@ -86,7 +94,7 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
         checkOverlap(jichitaiCd, shiteiNo, stYmd, edYmd, null);
 
         int nextRno = tekiyoNozeiShukiRepository
-                .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).size() + 1;
+                .findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo) + 1;
 
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setJichitaiCd(jichitaiCd);
@@ -101,7 +109,8 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
 
     @Override
     @Transactional
-    public void update(String shiteiNo, Integer rno, TokureiTekiyoForm form) {
+    public void update(Integer rno, TokureiTekiyoForm form) {
+        String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         LocalDate stYmd = toFirstDay(form.getTekiyoStMonth());
         LocalDate edYmd = toLastDay(form.getTekiyoEdMonth());
@@ -124,7 +133,8 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
 
     @Override
     @Transactional
-    public void delete(String shiteiNo, Integer rno) {
+    public void delete(Integer rno) {
+        String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
         TekiyoNozeiShuki entity = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
@@ -139,6 +149,14 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
     }
 
     // ========== private ==========
+
+    private String resolveShiteiNo() {
+        String shiteiNo = SessionHelper.getShiteiNo(session);
+        if (shiteiNo == null) {
+            throw new IllegalStateException("指定番号がセッションに存在しません。");
+        }
+        return shiteiNo;
+    }
 
     private TokureiTekiyoForm buildBaseForm(String shiteiNo, String jichitaiCd) {
         TokureiTekiyoForm form = new TokureiTekiyoForm();

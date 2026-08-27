@@ -16,4 +16,9 @@ public interface TekiyoNozeiShukiRepository extends JpaRepository<TekiyoNozeiShu
     List<TekiyoNozeiShuki> findActiveByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
+
+    @Query("SELECT COALESCE(MAX(t.rno), 0) FROM TekiyoNozeiShuki t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo")
+    int findMaxRnoByJichitaiCdAndShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo);
 }

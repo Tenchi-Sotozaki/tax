@@ -14,13 +14,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import jakarta.servlet.http.HttpSession;
+
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoForm;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoHistoryDto;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TokureiTekiyoServiceImpl;
+import jp.lg.asp.accommodation.util.SessionHelper;
 
 @ExtendWith(MockitoExtension.class)
 @org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
@@ -29,6 +33,7 @@ class TokureiTekiyoServiceImplTest {
     @Mock TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
     @Mock TokugimuRepository tokugimuRepository;
     @Mock JichitaiContext jichitaiContext;
+    @Mock HttpSession session;
     @InjectMocks TokureiTekiyoServiceImpl service;
 
     private static final String JICHITAI_CD = "011002";
@@ -37,6 +42,9 @@ class TokureiTekiyoServiceImplTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+        dto.setShiteiNo(SHITEI_NO);
+        when(session.getAttribute(SessionHelper.SHITEI_GASSAN_KEY)).thenReturn(dto);
     }
 
     // ========== getHistories ==========
@@ -46,7 +54,7 @@ class TokureiTekiyoServiceImplTest {
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
-        List<TokureiTekiyoHistoryDto> result = service.getHistories(SHITEI_NO);
+        List<TokureiTekiyoHistoryDto> result = service.getHistories();
 
         assertThat(result).isEmpty();
     }
@@ -60,7 +68,7 @@ class TokureiTekiyoServiceImplTest {
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(t));
 
-        List<TokureiTekiyoHistoryDto> result = service.getHistories(SHITEI_NO);
+        List<TokureiTekiyoHistoryDto> result = service.getHistories();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getIdx()).isEqualTo(1);
@@ -78,7 +86,7 @@ class TokureiTekiyoServiceImplTest {
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(t));
 
-        TokureiTekiyoForm form = service.getForView(SHITEI_NO, 1);
+        TokureiTekiyoForm form = service.getForView(1);
 
         assertThat(form.getShiteiNo()).isEqualTo(SHITEI_NO);
         assertThat(form.getRno()).isEqualTo(1);
@@ -91,7 +99,7 @@ class TokureiTekiyoServiceImplTest {
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
-        assertThatThrownBy(() -> service.getForView(SHITEI_NO, 99))
+        assertThatThrownBy(() -> service.getForView(99))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -102,7 +110,7 @@ class TokureiTekiyoServiceImplTest {
         TokureiTekiyoForm form = new TokureiTekiyoForm();
         form.setTekiyoStMonth(null);
 
-        assertThatThrownBy(() -> service.save(SHITEI_NO, form))
+        assertThatThrownBy(() -> service.save(form))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("適用開始年月は必須");
     }
@@ -113,7 +121,7 @@ class TokureiTekiyoServiceImplTest {
         form.setTekiyoStMonth("2024-06");
         form.setTekiyoEdMonth("2024-03");
 
-        assertThatThrownBy(() -> service.save(SHITEI_NO, form))
+        assertThatThrownBy(() -> service.save(form))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("適用開始年月");
     }
@@ -131,7 +139,7 @@ class TokureiTekiyoServiceImplTest {
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(existing));
 
-        assertThatThrownBy(() -> service.save(SHITEI_NO, form))
+        assertThatThrownBy(() -> service.save(form))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("重複");
     }
@@ -145,7 +153,7 @@ class TokureiTekiyoServiceImplTest {
                 .thenReturn(List.of());
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        service.save(SHITEI_NO, form);
+        service.save(form);
 
         verify(tekiyoNozeiShukiRepository).save(any());
     }
@@ -166,7 +174,7 @@ class TokureiTekiyoServiceImplTest {
                 .thenReturn(List.of(entity));
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        service.update(SHITEI_NO, 1, form);
+        service.update(1, form);
 
         verify(tekiyoNozeiShukiRepository).save(entity);
     }
@@ -182,7 +190,7 @@ class TokureiTekiyoServiceImplTest {
                 .thenReturn(List.of(entity));
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        service.delete(SHITEI_NO, 1);
+        service.delete(1);
 
         assertThat(entity.getDelFlg()).isEqualTo("1");
     }
@@ -192,7 +200,18 @@ class TokureiTekiyoServiceImplTest {
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
-        assertThatThrownBy(() -> service.delete(SHITEI_NO, 99))
+        assertThatThrownBy(() -> service.delete(99))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    // ========== resolveShiteiNo ==========
+
+    @Test
+    void getHistories_セッションなし_例外をスロー() {
+        when(session.getAttribute(SessionHelper.SHITEI_GASSAN_KEY)).thenReturn(null);
+
+        assertThatThrownBy(() -> service.getHistories())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("セッション");
     }
 }
