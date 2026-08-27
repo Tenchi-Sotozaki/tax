@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShoreikinConfigDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Fuka;
+import jp.lg.asp.accommodation.entity.KofuRitsu;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.ShoreikinId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -156,13 +158,18 @@ class ShoreikinConfigServiceImplTest {
         assertThat(result).isEqualTo(8000L);
     }
 
-    @Test
-    void calculateShoreikin_calculatesKofuGaku() {
-        ShoreikinConfigDto dto = new ShoreikinConfigDto();
-        dto.setShiteiNo(SHITEI_NO);
-        dto.setNendo(NENDO);
-        dto.setKofuRitsu(BigDecimal.valueOf(10));
+    /** 交付率設定のダミー。端数処理を挟まないよう算出単位1・切り捨て・最低額0にする */
+    private KofuRitsu kofuRitsu(String ritsu) {
+        KofuRitsu k = new KofuRitsu();
+        k.setKofuRitsu(new BigDecimal(ritsu));
+        k.setSanshutsu(1);
+        k.setKbn("1");
+        k.setSaiteigaku(BigDecimal.ZERO);
+        return k;
+    }
 
+    /** 1期・税額10000円・納付済みの賦課をモックに仕込む */
+    private void arrangeNofuzumiFuka() {
         Fuka f = new Fuka();
         f.setKibetsu(1);
         f.setRno(1);
@@ -170,15 +177,57 @@ class ShoreikinConfigServiceImplTest {
         f.setShinkokuYmd(java.time.LocalDate.of(2024, 1, 1));
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoAndDelFlgAndNewFlg(any(), any(), any(), any(), any()))
                 .thenReturn(List.of(f));
-        // 納付済み
         when(shunoRirekiRepository.sumNonyugakuByShiteiNoIn(eq(JICHITAI_CD), anyList()))
                 .thenReturn(List.<Object[]>of(new Object[]{SHITEI_NO, NENDO, 1, 10000L}));
-        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
-                .thenReturn(List.of());
+    }
 
-        ShoreikinConfigDto result = service.calculateShoreikin(dto);
+    private ShoreikinConfigDto configDto(String kofuRitsuOnScreen) {
+        ShoreikinConfigDto dto = new ShoreikinConfigDto();
+        dto.setShiteiNo(SHITEI_NO);
+        dto.setNendo(NENDO);
+        if (kofuRitsuOnScreen != null) {
+            dto.setKofuRitsu(new BigDecimal(kofuRitsuOnScreen));
+        }
+        return dto;
+    }
+
+    @Test
+    void calculateShoreikin_calculatesKofuGaku() {
+        arrangeNofuzumiFuka();
+        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
+                .thenReturn(List.of(kofuRitsu("10")));
+
+        ShoreikinConfigDto result = service.calculateShoreikin(configDto("10"));
 
         assertThat(result.getKofuZeigaku()).isEqualTo(10000L);
         assertThat(result.getKofuGaku()).isEqualTo(1000L); // 10000 * 10 / 100
+    }
+
+    /**
+     * 交付率は画面で入力せず交付率設定から取得するため、
+     * 画面から送られてきた値ではなく必ずマスタの値で計算する。
+     */
+    @Test
+    void calculateShoreikin_交付率は画面の値ではなくマスタの値で上書きされる() {
+        arrangeNofuzumiFuka();
+        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
+                .thenReturn(List.of(kofuRitsu("10")));
+
+        // 画面からは 99 が送られてきたことにする
+        ShoreikinConfigDto result = service.calculateShoreikin(configDto("99"));
+
+        assertThat(result.getKofuRitsu()).isEqualByComparingTo("10");
+        assertThat(result.getKofuGaku()).isEqualTo(1000L); // 99 ではなく 10 で計算される
+    }
+
+    /** 交付率設定が無ければ算出できないため、エラーにする */
+    @Test
+    void calculateShoreikin_交付率が取得できない場合は例外になる() {
+        when(kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(eq(JICHITAI_CD), any(Integer.class)))
+                .thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.calculateShoreikin(configDto("10")))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("交付率が設定されていません");
     }
 }

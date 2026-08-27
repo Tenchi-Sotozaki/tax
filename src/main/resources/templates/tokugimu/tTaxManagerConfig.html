@@ -22,7 +22,7 @@
 			</h5>
 
 			<a th:href="@{/tax-manager/edit}"
-				class="btn btn-primary btn-sm" th:if="${isView ?: false}"> <i
+				class="btn btn-primary" th:if="${isView ?: false}"> <i
 				class="bi bi-pencil-square me-2"></i>変更する
 			</a>
 		</div>
@@ -33,14 +33,14 @@
 			class="d-flex align-items-center gap-2 mb-3">
 			<a
 				th:href="@{/tax-manager/view(rno=${taxManagerForm.rno - 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${taxManagerForm.rno <= taxManagerForm.minRno} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a> <span class="text-muted small">履歴 <span
 				th:text="${taxManagerForm.rno}"></span> / <span
 				th:text="${taxManagerForm.maxRno}"></span></span> <a
 				th:href="@{/tax-manager/view(rno=${taxManagerForm.rno + 1})}"
-				class="btn btn-outline-secondary btn-sm"
+				class="btn btn-outline-secondary"
 				th:classappend="${taxManagerForm.rno >= taxManagerForm.maxRno} ? ' disabled'">
 			次の履歴 <i class="bi bi-chevron-right"></i>
 			</a>
@@ -109,8 +109,8 @@
 								登録年月日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
 								th:field="*{registrationDate}" th:readonly="${isView ?: false}"
-								th:data-initial-value="*{registrationDate}"
-								th:classappend="${#fields.hasErrors('registrationDate')} ? 'is-invalid'">
+								th:classappend="(${isView ?: false} ? ' form-control-readonly' : '') + (${#fields.hasErrors('registrationDate')} ? ' is-invalid' : '')"
+								th:data-initial-value="*{registrationDate}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('registrationDate')}"
 								th:errors="*{registrationDate}"></div>
@@ -121,8 +121,8 @@
 								申告年月日 <span class="text-danger">*</span>
 							</label> <input type="date" class="form-control"
 								th:field="*{declarationDate}" th:readonly="${isView ?: false}"
-								th:data-initial-value="*{declarationDate}"
-								th:classappend="${#fields.hasErrors('declarationDate')} ? 'is-invalid'">
+								th:classappend="(${isView ?: false} ? ' form-control-readonly' : '') + (${#fields.hasErrors('declarationDate')} ? ' is-invalid' : '')"
+								th:data-initial-value="*{declarationDate}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('declarationDate')}"
 								th:errors="*{declarationDate}"></div>
@@ -131,13 +131,13 @@
 						<!-- 照会画面での表示 -->
 						<div class="col-md-2" th:if="${isView ?: false}">
 							<label class="form-label fw-medium">登録年月日</label> <input
-								type="text" class="form-control" readonly
+								type="text" class="form-control form-control-readonly" readonly
 								th:value="*{registrationDate}">
 						</div>
 
 						<div class="col-md-2" th:if="${isView ?: false}">
 							<label class="form-label fw-medium">申告年月日</label> <input
-								type="text" class="form-control" readonly
+								type="text" class="form-control form-control-readonly" readonly
 								th:value="*{declarationDate}">
 						</div>
 						
@@ -165,7 +165,7 @@
 
 						<div class="col-md-2">
 							<label class="form-label fw-medium">住所(郵便番号)</label> <input
-								type="text" class="form-control" id="managerYubinNo"
+								type="text" class="form-control form-control-readonly" id="managerYubinNo"
 								th:field="*{managerYubinNo}" readonly
 								th:data-initial-value="*{managerYubinNo}"
 								th:classappend="${#fields.hasErrors('managerYubinNo')} ? 'is-invalid'"
@@ -177,7 +177,7 @@
 
 						<div class="col-md-6">
 							<label class="form-label fw-medium">住所（所在地）</label> <input
-								type="text" class="form-control" id="managerAddress"
+								type="text" class="form-control form-control-readonly" id="managerAddress"
 								th:field="*{managerAddress}" readonly
 								th:classappend="${#fields.hasErrors('managerAddress')} ? 'is-invalid'"
 								th:data-initial-value="*{managerAddress}"
@@ -191,7 +191,7 @@
 
 						<div class="col-md-4">
 							<label class="form-label fw-medium">氏名</label> <input type="text"
-								class="form-control" id="managerName" th:field="*{managerName}"
+								class="form-control form-control-readonly" id="managerName" th:field="*{managerName}"
 								readonly th:data-initial-value="*{managerName}"
 								th:classappend="${#fields.hasErrors('managerName')} ? 'is-invalid'"
 								placeholder="宛名検索モーダルから自動入力">
@@ -202,7 +202,7 @@
 
 						<div class="col-md-4">
 							<label class="form-label fw-medium">ふりがな</label> <input
-								type="text" class="form-control" id="managerNameKana"
+								type="text" class="form-control form-control-readonly" id="managerNameKana"
 								th:field="*{managerNameKana}" readonly
 								th:data-initial-value="*{managerNameKana}"
 								th:classappend="${#fields.hasErrors('managerNameKana')} ? 'is-invalid'"
@@ -214,7 +214,7 @@
 
 						<div class="col-md-4">
 							<label class="form-label fw-medium">電話番号</label> <input
-								type="tel" class="form-control" id="managerPhone"
+								type="tel" class="form-control form-control-readonly" id="managerPhone"
 								th:field="*{managerPhone}" readonly
 								th:data-initial-value="*{managerPhone}"
 								th:classappend="${#fields.hasErrors('managerPhone')} ? 'is-invalid'"
@@ -231,6 +231,7 @@
 							</label>
 							<textarea class="form-control" id="reason" rows="3"
 								th:field="*{reason}" th:readonly="${isView ?: false}"
+								th:classappend="${isView ?: false} ? ' form-control-readonly' : ''"
 								th:data-initial-value="*{reason}"></textarea>
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('reason')}"
@@ -243,20 +244,20 @@
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
 
 				<a href="#"
-					class="btn btn-outline-primary btn-lg px-4"
+					class="btn btn-outline-secondary px-4"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
 					data-bs-toggle="modal" data-bs-target="#backConfirmModal"> <i
 					class="bi bi-arrow-left me-2"></i>戻る
 				</a>
 
 				<!-- 編集時のみ削除ボタンを表示 -->
-				<button type="button" class="btn btn-danger btn-lg px-5"
+				<button type="button" class="btn btn-danger px-5"
 					th:if="${(isEdit ?: false) and !(isView ?: false)}"
 					data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
 					<i class="bi bi-trash me-2"></i>削除する
 				</button>
 
-				<button type="submit" class="btn btn-success btn-lg px-5"
+				<button type="submit" class="btn btn-success px-5"
 					th:if="${!(isView ?: false)}">
 					<i class="bi bi-save me-2"></i> <span
 						th:text="${(isEdit ?: false) ? '更新する' : '登録する'}"></span>
