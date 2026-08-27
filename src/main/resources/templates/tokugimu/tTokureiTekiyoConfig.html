@@ -16,7 +16,7 @@
 				<span th:text="${isView} ? '特例適用照会' : (${isEdit} ? '特例適用編集' : '特例適用登録')"></span>
 			</h5>
 			<a th:if="${isView}"
-				th:href="@{/tekiyo-nozei-shuki/edit/{rno}(rno=${tokureiTekiyoForm.rno})}"
+				th:href="@{/tokurei-tekiyo/edit/{rno}(rno=${tokureiTekiyoForm.rno})}"
 				class="btn btn-primary">
 				<i class="bi bi-pencil-square me-2"></i>編集する
 			</a>
@@ -34,7 +34,7 @@
 		</div>
 
 		<form th:if="${!isView}"
-			th:action="${isEdit} ? @{/tekiyo-nozei-shuki/edit/{rno}(rno=${tokureiTekiyoForm.rno})} : @{/tekiyo-nozei-shuki/register}"
+			th:action="${isEdit} ? @{/tokurei-tekiyo/edit/{rno}(rno=${tokureiTekiyoForm.rno})} : @{/tokurei-tekiyo/register}"
 			th:object="${tokureiTekiyoForm}" method="post" id="mainForm">
 
 			<input type="hidden" th:field="*{rno}" />
@@ -101,7 +101,7 @@
 		</div>
 
 		<div th:if="${isView}" class="d-flex justify-content-center gap-3 py-4">
-			<a th:href="@{/tekiyo-nozei-shuki/list}"
+			<a th:href="@{/tokurei-tekiyo/list}"
 				class="btn btn-outline-secondary btn-lg px-4">
 				<i class="bi bi-arrow-left me-2"></i>一覧に戻る
 			</a>
@@ -149,7 +149,7 @@
 					</div>
 					<div class="modal-footer justify-content-center">
 						<a class="btn btn-danger"
-							th:href="@{/tekiyo-nozei-shuki/delete/{rno}(rno=${tokureiTekiyoForm.rno})}">
+							th:href="@{/tokurei-tekiyo/delete/{rno}(rno=${tokureiTekiyoForm.rno})}">
 							<i class="bi bi-check-lg me-1"></i>はい
 						</a>
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -175,7 +175,7 @@
 					</div>
 					<div class="modal-footer justify-content-center">
 						<a class="btn btn-primary"
-							th:href="@{/tekiyo-nozei-shuki/list}">
+							th:href="@{/tokurei-tekiyo/list}">
 							<i class="bi bi-check-lg me-1"></i>はい
 						</a>
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">

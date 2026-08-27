@@ -13,10 +13,10 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "t_nozei_shuki")
-@IdClass(TekiyoNozeiShukiId.class)
+@IdClass(TokureiTekiyoId.class)
 @Getter
 @Setter
-public class TekiyoNozeiShuki extends BaseEntity {
+public class TokureiTekiyo extends BaseEntity {
 
 	@Id
 	@Column(name = "jichitai_cd", length = 5, nullable = false)

@@ -28,7 +28,7 @@
 		</div>
 
 		<div th:if="${showShiteiGassanModal != true}" class="d-flex justify-content-end mb-3 mt-3">
-			<a th:href="@{/tekiyo-nozei-shuki/register}" class="btn btn-primary">
+			<a th:href="@{/tokurei-tekiyo/register}" class="btn btn-primary">
 				<i class="bi bi-plus-circle me-1"></i>新規登録
 			</a>
 		</div>
@@ -48,7 +48,7 @@
 							<td class="text-center" th:text="${h.tekiyoStMonth}"></td>
 							<td class="text-center" th:text="${h.tekiyoEdMonth}"></td>
 							<td class="text-center">
-								<a th:href="@{/tekiyo-nozei-shuki/view/{rno}(rno=${h.idx})}"
+								<a th:href="@{/tokurei-tekiyo/view/{rno}(rno=${h.idx})}"
 									class="btn btn-sm btn-outline-primary">照会</a>
 							</td>
 						</tr>

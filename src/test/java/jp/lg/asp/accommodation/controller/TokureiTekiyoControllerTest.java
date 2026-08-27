@@ -46,7 +46,7 @@ class TokureiTekiyoControllerTest {
     void listFromMenu_セッションあり_リダイレクト() {
         String view = controller.listFromMenu(session, new ExtendedModelMap());
 
-        assertThat(view).isEqualTo("redirect:/tekiyo-nozei-shuki/list");
+        assertThat(view).isEqualTo("redirect:/tokurei-tekiyo/list");
     }
 
     @Test
@@ -115,7 +115,7 @@ class TokureiTekiyoControllerTest {
 
         String view = controller.register(form, model, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("redirect:/tekiyo-nozei-shuki/list");
+        assertThat(view).isEqualTo("redirect:/tokurei-tekiyo/list");
         verify(tokureiTekiyoService).save(form);
     }
 
@@ -151,7 +151,7 @@ class TokureiTekiyoControllerTest {
 
         String view = controller.edit(1, form, model, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("redirect:/tekiyo-nozei-shuki/list");
+        assertThat(view).isEqualTo("redirect:/tokurei-tekiyo/list");
         verify(tokureiTekiyoService).update(1, form);
     }
 
@@ -159,7 +159,7 @@ class TokureiTekiyoControllerTest {
     void delete_削除後リダイレクト() {
         String view = controller.delete(1, new RedirectAttributesModelMap());
 
-        assertThat(view).isEqualTo("redirect:/tekiyo-nozei-shuki/list");
+        assertThat(view).isEqualTo("redirect:/tokurei-tekiyo/list");
         verify(tokureiTekiyoService).delete(1);
     }
 }

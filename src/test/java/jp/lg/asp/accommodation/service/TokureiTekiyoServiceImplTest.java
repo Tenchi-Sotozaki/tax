@@ -20,8 +20,8 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoForm;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoHistoryDto;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
-import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
+import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TokureiTekiyoServiceImpl;
 import jp.lg.asp.accommodation.util.SessionHelper;
@@ -30,7 +30,7 @@ import jp.lg.asp.accommodation.util.SessionHelper;
 @org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class TokureiTekiyoServiceImplTest {
 
-    @Mock TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
+    @Mock TokureiTekiyoRepository tekiyoNozeiShukiRepository;
     @Mock TokugimuRepository tokugimuRepository;
     @Mock JichitaiContext jichitaiContext;
     @Mock HttpSession session;
@@ -61,7 +61,7 @@ class TokureiTekiyoServiceImplTest {
 
     @Test
     void getHistories_レコードあり_DTOリストを返す() {
-        TekiyoNozeiShuki t = new TekiyoNozeiShuki();
+        TokureiTekiyo t = new TokureiTekiyo();
         t.setRno(1);
         t.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
         t.setTekiyoEdYmd(LocalDate.of(2024, 9, 30));
@@ -79,7 +79,7 @@ class TokureiTekiyoServiceImplTest {
 
     @Test
     void getForView_存在するrno_フォームを返す() {
-        TekiyoNozeiShuki t = new TekiyoNozeiShuki();
+        TokureiTekiyo t = new TokureiTekiyo();
         t.setRno(1);
         t.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
@@ -132,7 +132,7 @@ class TokureiTekiyoServiceImplTest {
         form.setTekiyoStMonth("2024-04");
         form.setTekiyoEdMonth("2024-09");
 
-        TekiyoNozeiShuki existing = new TekiyoNozeiShuki();
+        TokureiTekiyo existing = new TokureiTekiyo();
         existing.setRno(1);
         existing.setTekiyoStYmd(LocalDate.of(2024, 1, 1));
         existing.setTekiyoEdYmd(LocalDate.of(2024, 6, 30));
@@ -165,7 +165,7 @@ class TokureiTekiyoServiceImplTest {
         TokureiTekiyoForm form = new TokureiTekiyoForm();
         form.setTekiyoStMonth("2024-10");
 
-        TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
+        TokureiTekiyo entity = new TokureiTekiyo();
         entity.setRno(1);
         entity.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
         entity.setTekiyoEdYmd(LocalDate.of(2024, 9, 30));
@@ -183,7 +183,7 @@ class TokureiTekiyoServiceImplTest {
 
     @Test
     void delete_正常_delFlgを1に設定() {
-        TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
+        TokureiTekiyo entity = new TokureiTekiyo();
         entity.setRno(1);
         entity.setDelFlg("0");
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))

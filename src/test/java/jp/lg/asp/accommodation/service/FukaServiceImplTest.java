@@ -25,7 +25,7 @@ import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
-import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
+import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
@@ -49,7 +49,7 @@ class FukaServiceImplTest {
     @Mock NokigenRepository nokigenRepository;
     @Mock JichitaiRepository jichitaiRepository;
     @Mock ShunoRirekiRepository shunoRirekiRepository;
-    @Mock TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
+    @Mock TokureiTekiyoRepository tekiyoNozeiShukiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks FukaServiceImpl service;
 

@@ -13,8 +13,8 @@ import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoForm;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoHistoryDto;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
-import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
+import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokureiTekiyoService;
 import jp.lg.asp.accommodation.util.SessionHelper;
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
 
-    private final TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
+    private final TokureiTekiyoRepository tekiyoNozeiShukiRepository;
     private final TokugimuRepository tokugimuRepository;
     private final JichitaiContext jichitaiContext;
     private final HttpSession session;
@@ -56,7 +56,7 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
     public TokureiTekiyoForm getForView(Integer rno) {
         String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
-        TekiyoNozeiShuki record = tekiyoNozeiShukiRepository
+        TokureiTekiyo record = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
                 .stream()
                 .filter(t -> t.getRno().equals(rno))
@@ -96,7 +96,7 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
         int nextRno = tekiyoNozeiShukiRepository
                 .findMaxRnoByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo) + 1;
 
-        TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
+        TokureiTekiyo entity = new TokureiTekiyo();
         entity.setJichitaiCd(jichitaiCd);
         entity.setShiteiNo(shiteiNo);
         entity.setRno(nextRno);
@@ -118,7 +118,7 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
         validate(stYmd, edYmd);
         checkOverlap(jichitaiCd, shiteiNo, stYmd, edYmd, rno);
 
-        TekiyoNozeiShuki entity = tekiyoNozeiShukiRepository
+        TokureiTekiyo entity = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
                 .stream()
                 .filter(t -> t.getRno().equals(rno))
@@ -136,7 +136,7 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
     public void delete(Integer rno) {
         String shiteiNo = resolveShiteiNo();
         String jichitaiCd = jichitaiContext.getJichitaiCd();
-        TekiyoNozeiShuki entity = tekiyoNozeiShukiRepository
+        TokureiTekiyo entity = tekiyoNozeiShukiRepository
                 .findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
                 .stream()
                 .filter(t -> t.getRno().equals(rno))

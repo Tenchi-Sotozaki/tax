@@ -23,13 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/tekiyo-nozei-shuki")
+@RequestMapping("/tokurei-tekiyo")
 public class TokureiTekiyoController {
 
 	private final TokureiTekiyoService tokureiTekiyoService;
 	private final ScreenAccessChecker accessChecker;
 
-	private static final String SCREEN_ID = ScreenManagement.TEKIYO_NOZEI_SHUKI_CONFIG;
+	private static final String SCREEN_ID = ScreenManagement.TOKUREI_TEKIYO;
 	private static final String LIST_VIEW = "tokugimu/tTokureiTekiyoList";
 	private static final String FORM_VIEW = "tokugimu/tTokureiTekiyoConfig";
 
@@ -45,7 +45,7 @@ public class TokureiTekiyoController {
 			model.addAttribute("histories", java.util.List.of());
 			return LIST_VIEW;
 		}
-		return "redirect:/tekiyo-nozei-shuki/list";
+		return "redirect:/tokurei-tekiyo/list";
 	}
 
 	@GetMapping("/list")
@@ -95,7 +95,7 @@ public class TokureiTekiyoController {
 		try {
 			tokureiTekiyoService.save(form);
 			redirectAttributes.addFlashAttribute("successMessage", "特例適用を登録しました。");
-			return "redirect:/tekiyo-nozei-shuki/list";
+			return "redirect:/tokurei-tekiyo/list";
 		} catch (Exception e) {
 			log.error("特例適用登録エラー: {}", e.getMessage());
 			model.addAttribute("errorMessage", e.getMessage());
@@ -126,7 +126,7 @@ public class TokureiTekiyoController {
 		try {
 			tokureiTekiyoService.update(rno, form);
 			redirectAttributes.addFlashAttribute("successMessage", "特例適用を更新しました。");
-			return "redirect:/tekiyo-nozei-shuki/list";
+			return "redirect:/tokurei-tekiyo/list";
 		} catch (Exception e) {
 			log.error("特例適用更新エラー: {}", e.getMessage());
 			model.addAttribute("errorMessage", e.getMessage());
@@ -149,6 +149,6 @@ public class TokureiTekiyoController {
 			log.error("特例適用削除エラー: {}", e.getMessage());
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
-		return "redirect:/tekiyo-nozei-shuki/list";
+		return "redirect:/tokurei-tekiyo/list";
 	}
 }
