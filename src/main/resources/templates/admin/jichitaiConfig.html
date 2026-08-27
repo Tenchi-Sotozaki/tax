@@ -33,7 +33,7 @@
 		</div>
 
 		<form th:action="@{/admin/jichitai-config/save}" method="post" th:object="${configForm}" novalidate>
-
+			
 			<!-- 自治体情報エリア -->
 			<div class="card shadow-sm mb-4">
 				<div class="card-header">
@@ -61,7 +61,15 @@
 								th:classappend="${#fields.hasErrors('kbnName')} ? 'is-invalid' : ''"
 								maxlength="10">
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('kbnName')}" th:errors="*{kbnName}"></div>
-						</div>
+						</div>						
+						<div class="col-md-3">
+						    <label for="param" class="form-label fw-medium">自治体識別名<span class="text-danger">*</span></label>
+						    <input type="text" id="param" th:field="*{param}" class="form-control" 
+								th:classappend="${#fields.hasErrors('param')} ? 'is-invalid' : ''" 
+								maxlength="10">
+						    <div class="invalid-feedback" th:if="${#fields.hasErrors('param')}" th:errors="*{param}">
+						    </div>
+						</div>						
 					</div>
 				</div>
 			</div>
@@ -75,13 +83,18 @@
 					<div class="row g-3">
 						<div class="col-md-3">
 							<label for="nendoStMonth" class="form-label fw-medium">年度開始月 <span class="text-danger">*</span></label>
-							<select id="nendoStMonth" th:field="*{nendoStMonth}" class="form-select"
-								th:classappend="${#fields.hasErrors('nendoStMonth')} ? 'is-invalid' : ''">
-								<option value="">選択してください</option>
-								<option th:each="m : ${#numbers.sequence(1, 12)}"
-									th:value="${#strings.toString(m)}"
-									th:text="${m + '月'}">
-								</option>
+							<select id="nendoStMonth"
+							        th:field="*{nendoStMonth}"
+							        class="form-select">
+
+							    <option value="">選択してください</option>
+
+							    <option th:each="m : ${#numbers.sequence(1,12)}"
+							            th:value="${m}"
+							            th:text="${m + '月'}"
+							            th:selected="${nendoStMonth == #strings.toString(m)}">
+							    </option>
+
 							</select>
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('nendoStMonth')}" th:errors="*{nendoStMonth}"></div>
 						</div>
@@ -126,6 +139,24 @@
 								th:classappend="${#fields.hasErrors('atenaStNo')} ? 'is-invalid' : ''"
 								placeholder="例：1">
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('atenaStNo')}" th:errors="*{atenaStNo}"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- ユーザー情報エリア -->
+			<div class="card shadow-sm mb-4">
+				<div class="card-header">
+					<h6 class="mb-0"><i class="bi bi-hash me-2"></i>ユーザー情報</h6>
+				</div>
+				<div class="card-body">
+					<div class="row g-3">
+						<div class="col-md-3">
+							<label for="shiteiStChar" class="form-label fw-medium">ユーザーID <span class="text-danger">*</span></label>
+							<input type="text" id="userId" th:field="*{userId}" class="form-control"
+								th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''" placeholder="例：user">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">
+							</div>
 						</div>
 					</div>
 				</div>
