@@ -102,6 +102,48 @@ class TokugimuControllerTest {
             verify(model).addAttribute("searchForm", searchForm);
             verify(model).addAttribute("isSearched", false);
         }
+        
+        @Test
+        @DisplayName("正常系：個人番号を含む検索フォームが渡されたとき、そのままサービス層の searchAll へ伝達されること")
+        void success_withKojinNoSearch() {
+            TokugimuSearchForm searchForm = new TokugimuSearchForm();
+            searchForm.setKojinNo("search_target_kojin_no"); // ダミーの検索値
+            boolean searched = true;
+
+            TokugimuListItem item = new TokugimuListItem();
+            item.setShiteiNo("00000001");
+
+            when(tokugimuService.searchAll(eq(searchForm))).thenReturn(List.of(item));
+
+            String viewName = tokugimuController.list(searchForm, searched, model);
+
+            assertThat(viewName).isEqualTo("tokugimu/tTokugimuDaicho");
+            verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_DAICHO);
+            // 検索フォーム（個人番号等）が正しくサービスへ渡されていることを検証
+            verify(tokugimuService).searchAll(searchForm);
+            assertThat(searchForm.getKojinNo()).isEqualTo("search_target_kojin_no");
+            
+            verify(model).addAttribute("items", List.of(item));
+            verify(model).addAttribute("searchForm", searchForm);
+            verify(model).addAttribute("isSearched", true);
+        }
+
+        @Test
+        @DisplayName("正常系：各種検索条件（指定番号・法人番号等）を含む検索フォームが正しくサービス層へ伝達されること")
+        void success_withVariousSearchConditions() {
+            TokugimuSearchForm searchForm = new TokugimuSearchForm();
+            searchForm.setShiteiNo("00000001");
+            searchForm.setHojinNo("search_target_hojin_no");
+            boolean searched = true;
+
+            when(tokugimuService.searchAll(eq(searchForm))).thenReturn(List.of());
+
+            String viewName = tokugimuController.list(searchForm, searched, model);
+
+            assertThat(viewName).isEqualTo("tokugimu/tTokugimuDaicho");
+            verify(tokugimuService).searchAll(searchForm);
+            verify(model).addAttribute("isSearched", true);
+        }
     }
 
     @Nested
