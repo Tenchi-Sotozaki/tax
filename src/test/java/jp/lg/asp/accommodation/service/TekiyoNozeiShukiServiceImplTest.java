@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
 import jp.lg.asp.accommodation.entity.NozeiShuki;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -84,7 +84,7 @@ class TekiyoNozeiShukiServiceImplTest {
         form.setTekiyoStMonth("2024-04");
         form.setTekiyoEdMonth("2024-09");
 
-        TekiyoNozeiShuki existing = new TekiyoNozeiShuki();
+        TokureiTekiyo existing = new TokureiTekiyo();
         existing.setTekiyoStYmd(LocalDate.of(2024, 1, 1));
         existing.setTekiyoEdYmd(LocalDate.of(2024, 6, 30));
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
@@ -113,7 +113,7 @@ class TekiyoNozeiShukiServiceImplTest {
 
     @Test
     void delete_setsDelFlg1() {
-        TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
+        TokureiTekiyo entity = new TokureiTekiyo();
         entity.setDelFlg("0");
         entity.setRno(1);
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
