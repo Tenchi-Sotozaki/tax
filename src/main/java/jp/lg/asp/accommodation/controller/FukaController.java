@@ -31,6 +31,7 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
 import jp.lg.asp.accommodation.dto.FukaMonthlyDeclarationDto;
+import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.FukaService;
 import jp.lg.asp.accommodation.service.FukaValidatorService;
@@ -382,7 +383,7 @@ public class FukaController {
 						.forEach(e -> {
 							String f = e instanceof org.springframework.validation.FieldError fe2 ? fe2.getField() : field;
 							String msg = resolveMessage(f, e);
-							validationErrors.add(toSummaryMessage(f, msg));
+							validationErrors.add(toSummaryMessage(form, f, msg));
 							handled.add(f);
 							if (f.startsWith("monthlyDetail.")) errorFields.add(f);
 						});
@@ -464,30 +465,22 @@ public class FukaController {
 		}
 	}
 
+	/** 税区分ごとの入力欄（monthlyDetail.taxDetails[N].xxx）を判定する */
+	private static final java.util.regex.Pattern TAX_DETAIL_FIELD = java.util.regex.Pattern
+			.compile("monthlyDetail\\.taxDetails\\[(\\d+)\\]\\.(hakusu|zeigaku|ryokinSogaku|ryokin)");
+
 	/**
 	 * 型変換エラーの場合は日本語メッセージに変換し、それ以外は defaultMessage をそのまま返す。
-	 * 入れ子フィールド（monthlyDetail.taxDetails[N].hakusu 等）はインデックスから区分番号を取得して日本語化する。
+	 * 入力欄の下に出すため、項目名は付けずに短い文言にする。
 	 */
 	private String resolveMessage(String field, org.springframework.context.MessageSourceResolvable error) {
 		if (error instanceof org.springframework.validation.FieldError fe) {
 			boolean isTypeMismatch = java.util.Arrays.stream(fe.getCodes() != null ? fe.getCodes() : new String[0])
 					.anyMatch(c -> c.startsWith("typeMismatch"));
 			if (isTypeMismatch) {
-				// 入れ子フィールド（monthlyDetail.taxDetails[N].hakusu 等）の日本語化
-				java.util.regex.Matcher m = java.util.regex.Pattern
-						.compile("monthlyDetail\\.taxDetails\\[(\\d+)\\]\\.(hakusu|zeigaku|ryokinSogaku|ryokin)")
-						.matcher(field);
+				java.util.regex.Matcher m = TAX_DETAIL_FIELD.matcher(field);
 				if (m.matches()) {
-					int idx = Integer.parseInt(m.group(1)) + 1;
-					String label = switch (m.group(2)) {
-						case "hakusu" -> "宿泊数（区分" + idx + "）";
-						case "zeigaku" -> "宿泊税額（区分" + idx + "）";
-						case "ryokinSogaku" -> "宿泊料金総額（区分" + idx + "）";
-						case "ryokin" -> "宿泊料金（区分" + idx + "）";
-						default -> field;
-					};
-					int maxDigits = "hakusu".equals(m.group(2)) ? 8 : 13;
-					return label + "は" + maxDigits + "桁以内で入力してください";
+					return ("hakusu".equals(m.group(2)) ? 8 : 13) + "桁以内で入力してください";
 				}
 				return TYPE_MISMATCH_MESSAGES.getOrDefault(field, "入力値が不正です");
 			}
@@ -498,16 +491,53 @@ public class FukaController {
 	/**
 	 * サマリ用にメッセージを差し替える。
 	 * 入力欄の下は「割合を入力してください」のように短く出し、
-	 * サマリは3行分が並ぶのでどの行かが分かるよう項目名を付ける。
-	 * 差し替えるのは必須エラーだけで、形式エラー（@Pattern）はそのまま通す。
+	 * サマリは複数行が並ぶのでどの行かが分かるよう項目名を付ける。
 	 */
-	private String toSummaryMessage(String field, String message) {
+	private String toSummaryMessage(FukaDeclarationForm form, String field, String message) {
 		if (MSG_RATE_REQUIRED.equals(message) || MSG_AMOUNT_REQUIRED.equals(message)) {
 			return SUMMARY_REQUIRED_MESSAGES.getOrDefault(field, message);
+		}
+		String itemLabel = taxDetailItemLabel(form, field);
+		if (itemLabel != null) {
+			return itemLabel + "は" + message;
 		}
 		if (TYPE_MISMATCH_MESSAGES.containsValue(message) || TYPE_MISMATCH_SUMMARY_MESSAGES.containsKey(field)) {
 			return TYPE_MISMATCH_SUMMARY_MESSAGES.getOrDefault(field, message);
 		}
 		return message;
+	}
+
+	/**
+	 * 税区分ごとの入力欄なら「宿泊数（0円以上の区分）」のようなサマリ用の項目名を返す。
+	 * 対象外のフィールドなら null を返す。
+	 */
+	private String taxDetailItemLabel(FukaDeclarationForm form, String field) {
+		java.util.regex.Matcher m = TAX_DETAIL_FIELD.matcher(field);
+		if (!m.matches()) {
+			return null;
+		}
+		String kbnName = taxDetailKbnName(form, Integer.parseInt(m.group(1)));
+		return switch (m.group(2)) {
+			case "hakusu" -> "宿泊数（" + kbnName + "）";
+			case "zeigaku" -> "宿泊税額（" + kbnName + "）";
+			case "ryokinSogaku" -> "宿泊料金総額（" + kbnName + "）";
+			case "ryokin" -> "宿泊料金（" + kbnName + "）";
+			default -> null;
+		};
+	}
+
+	/**
+	 * 税率マスタの区分名（定額制は「0円以上」、定率制は区分名）を返す。
+	 * hidden で送られてくるが、取得できなければ通番で代替する。
+	 */
+	private String taxDetailKbnName(FukaDeclarationForm form, int index) {
+		if (form != null && form.getMonthlyDetail() != null) {
+			List<FukaTaxDetailDto> details = form.getMonthlyDetail().getTaxDetails();
+			if (details != null && index < details.size()
+					&& StringUtils.hasText(details.get(index).getLabel())) {
+				return details.get(index).getLabel() + "の区分";
+			}
+		}
+		return "区分" + (index + 1);
 	}
 }
