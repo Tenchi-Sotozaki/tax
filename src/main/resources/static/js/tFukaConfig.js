@@ -249,10 +249,85 @@ document.addEventListener('DOMContentLoaded', function() {
             firstInput?.focus();
         });
 
+        // ===== 月計表の桁数チェック =====
+        // 保存時のサーバ側チェックと同じ桁数を見る。ここで弾けば、モーダルを閉じて保存してから
+        // やり直す流れにならずに済む
+        const TALLY_MAX_DIGITS = {
+            hakusu: 8, menjoHakusu: 8,
+            sogaku: 13, ryokin: 13, menjoRyokin: 13, zeigaku: 13
+        };
+
+        const TALLY_ITEM_NAMES = {
+            hakusu: '宿泊数',
+            menjoHakusu: '課税対象外の宿泊数',
+            sogaku: '宿泊料金総額',
+            ryokin: '宿泊料金',
+            menjoRyokin: '課税対象外の宿泊料金',
+            zeigaku: '税額'
+        };
+
+        // 区分名は monthlyDetail.taxDetails[N].label に hidden で入っている
+        const tallyKbnName = (index) => {
+            const el = document.getElementsByName(
+                'monthlyDetail.taxDetails[' + index + '].label')[0];
+            return el && el.value ? el.value + 'の区分' : '区分' + (Number(index) + 1);
+        };
+
+        // 桁数を超えている欄を赤くして、メッセージの配列を返す
+        const collectTallyDigitErrors = () => {
+            const messages = [];
+            monthlyTallyModal.querySelectorAll('input[name^="monthlyTally.dailyItems"]')
+                .forEach(input => {
+                    const m = input.name.match(
+                        /^monthlyTally\.dailyItems\[(\d+)\]\.([A-Za-z]+)(?:\[(\d+)\])?$/);
+                    if (!m) return;
+                    const maxDigits = TALLY_MAX_DIGITS[m[2]];
+                    if (!maxDigits) return;
+
+                    // カンマなどを除いた桁数で判定する。先頭の0は桁数に数えない
+                    const digits = input.value.replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '').length;
+                    if (digits <= maxDigits) {
+                        setInputError(input, 'js-digit-error', false);
+                        return;
+                    }
+                    setInputError(input, 'js-digit-error', true);
+                    const kbn = m[3] !== undefined ? '（' + tallyKbnName(m[3]) + '）' : '';
+                    messages.push('月計表 ' + (Number(m[1]) + 1) + '日 '
+                        + TALLY_ITEM_NAMES[m[2]] + kbn + 'は' + maxDigits + '桁以内で入力してください');
+                });
+            return messages;
+        };
+
+        const showTallyDigitErrors = (messages) => {
+            const alertEl = document.getElementById('tallyDigitAlert');
+            const listEl = document.getElementById('tallyDigitAlertList');
+            if (!alertEl || !listEl) return;
+
+            listEl.innerHTML = '';
+            messages.forEach(message => {
+                const li = document.createElement('li');
+                li.className = 'small';
+                li.textContent = message;
+                listEl.appendChild(li);
+            });
+            alertEl.classList.toggle('d-none', messages.length === 0);
+
+            // アラートはモーダルの先頭にあるので、見えるところまで戻す
+            if (messages.length > 0) {
+                const body = monthlyTallyModal.querySelector('.modal-body');
+                if (body) body.scrollTop = 0;
+            }
+        };
+
         // 「入力内容を決定」を押した時点で入力内容を確定させてから閉じる
         // 確定後は「変更なし」となるため、閉じる際に確認ダイアログは出ない
         // 閉じる順序を明確にするため data-bs-dismiss は使わずJSから閉じる
         document.getElementById('btnApplyTally')?.addEventListener('click', function() {
+            const digitErrors = collectTallyDigitErrors();
+            showTallyDigitErrors(digitErrors);
+            // 桁数エラーがある間はモーダルを閉じない
+            if (digitErrors.length > 0) return;
+
             openedSnapshot = takeSnapshot();
             bootstrap.Modal.getOrCreateInstance(monthlyTallyModal).hide();
         });
@@ -439,6 +514,30 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// 入力欄の赤枠は「半角数字エラー」と「桁数エラー」の2種類が付きうる。
+// どちらか一方が解消しただけで赤枠が消えないよう、種類ごとのマーカーで管理する
+const setInputError = (input, marker, hasError) => {
+    input.classList.toggle(marker, hasError);
+    input.classList.toggle('is-invalid',
+        input.classList.contains('js-hankaku-error')
+        || input.classList.contains('js-digit-error'));
+};
+
+// 半角数字以外が入力されたことを画面上部で知らせる。
+// 月計表はモーダルで開くため、画面上部のアラートは隠れてしまう。モーダル内には別のアラートを置く。
+const numericAlertScope = (input) => input.closest('#monthlyTallyModal');
+
+const numericAlertOf = (input) => document.getElementById(
+    numericAlertScope(input) ? 'numericInputAlertTally' : 'numericInputAlert');
+
+// スコープ内に対象の欄が残っていなければアラートを閉じる
+const refreshNumericAlert = (input) => {
+    const alertEl = numericAlertOf(input);
+    if (!alertEl) return;
+    const scope = numericAlertScope(input) || document;
+    alertEl.classList.toggle('d-none', !scope.querySelector('.js-hankaku-error'));
+};
+
 document.querySelectorAll('.js-comma-format').forEach(input => {
     // ページ読み込み時に初期値があればカンマ変換
     if (input.value) {
@@ -454,9 +553,15 @@ document.querySelectorAll('.js-comma-format').forEach(input => {
     // 入力時の数値チェック
     input.addEventListener('input', (e) => {
         if (!validateNumericInput(e.target.value)) {
-            // 数値とカンマ以外の文字を削除
+            // 全角数字・記号などが入った場合。取り除いたうえで、入力欄を赤くしてアラートを出す
             e.target.value = e.target.value.replace(/[^0-9,]/g, '');
+            setInputError(e.target, 'js-hankaku-error', true);
+            const alertEl = numericAlertOf(e.target);
+            if (alertEl) alertEl.classList.remove('d-none');
+            return;
         }
+        setInputError(e.target, 'js-hankaku-error', false);
+        refreshNumericAlert(e.target);
     });
 
     // フォーカスが当たったらカンマを消す（数値だけにして入力しやすくする）

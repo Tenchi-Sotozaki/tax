@@ -84,6 +84,7 @@ public class FukaDeclarationForm {
 	private LocalDate nokigen;
 
 	// 徴収原簿
+	@Valid
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
 
 	// ========== 納入情報エリア ==========

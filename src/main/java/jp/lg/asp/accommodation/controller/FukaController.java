@@ -74,14 +74,20 @@ public class FukaController {
 			"monthlyDetail.totalStayCount", "9桁以内で入力してください");
 
 	/** 型変換エラーのサマリ用メッセージ（項目名付き） */
-	private static final Map<String, String> TYPE_MISMATCH_SUMMARY_MESSAGES = Map.of(
-			"additionalAmount1", "加算金額1は13桁以内で入力してください",
-			"additionalAmount2", "加算金額2は13桁以内で入力してください",
-			"additionalAmount3", "加算金額3は13桁以内で入力してください",
-			"entaikin", "延滞金は13桁以内で入力してください",
-			"shunoKingaku", "納入金額は13桁以内で入力してください",
-			"monthlyDetail.exemptStayCount", "課税対象外宿泊数は9桁以内で入力してください",
-			"monthlyDetail.totalStayCount", "宿泊数合計は9桁以内で入力してください");
+	private static final Map<String, String> TYPE_MISMATCH_SUMMARY_MESSAGES = Map.ofEntries(
+			Map.entry("additionalAmount1", "加算金額1は13桁以内で入力してください"),
+			Map.entry("additionalAmount2", "加算金額2は13桁以内で入力してください"),
+			Map.entry("additionalAmount3", "加算金額3は13桁以内で入力してください"),
+			Map.entry("entaikin", "延滞金は13桁以内で入力してください"),
+			Map.entry("shunoKingaku", "納入金額は13桁以内で入力してください"),
+			Map.entry("monthlyDetail.exemptStayCount", "課税対象外宿泊数は13桁以内で入力してください"),
+			Map.entry("monthlyDetail.totalStayCount", "宿泊数合計は13桁以内で入力してください"),
+			Map.entry("monthlyDetail.totalPaymentAmount", "宿泊税額合計は13桁以内で入力してください"),
+			Map.entry("monthlyDetail.totalSogaku", "宿泊料金総額合計は13桁以内で入力してください"),
+			Map.entry("monthlyDetail.kazeiRyokin", "宿泊料金合計は13桁以内で入力してください"),
+			Map.entry("monthlyDetail.totalCityZeigaku", "市区町村税額合計は13桁以内で入力してください"),
+			Map.entry("monthlyDetail.totalKenZeigaku", "都道府県税額合計は13桁以内で入力してください")
+	);
 
 	/**
 	 * サマリに出す必須エラーの文言。
@@ -366,6 +372,7 @@ public class FukaController {
 					"monthlyDetail.taxDetails",
 					"monthlyDetail.exemptStayCount",
 					"monthlyDetail.totalStayCount",
+					"monthlyTally",
 					"additionalRate1", "additionalAmount1",
 					"additionalRate2", "additionalAmount2",
 					"additionalRate3", "additionalAmount3",
@@ -386,6 +393,7 @@ public class FukaController {
 							validationErrors.add(toSummaryMessage(form, f, msg));
 							handled.add(f);
 							if (f.startsWith("monthlyDetail.")) errorFields.add(f);
+							if (f.startsWith("monthlyTally.")) errorFields.add(f);
 						});
 			}
 			// fieldOrder に載っていない項目を末尾に追加
@@ -394,9 +402,15 @@ public class FukaController {
 					.map(e -> (org.springframework.validation.FieldError) e)
 					.filter(e -> !handled.contains(e.getField()))
 					.forEach(e -> {
-						validationErrors.add(resolveMessage(e.getField(), e));
+						String msg = resolveMessage(e.getField(), e);
+						validationErrors.add(toSummaryMessage(form, e.getField(), msg));
 						errorFields.add(e.getField());
 					});
+			// 月計表エラーをモーダル内表示用に別出し
+			java.util.List<String> tallyErrors = validationErrors.stream()
+					.filter(msg -> msg.startsWith("月計表 "))
+					.toList();
+			model.addAttribute("tallyErrors", tallyErrors);
 			model.addAttribute("validationErrors", validationErrors);
 			model.addAttribute("errorFields", errorFields);
 			// th:errors の代わりに使うフィールド→日本語メッセージMap
@@ -469,6 +483,10 @@ public class FukaController {
 	private static final java.util.regex.Pattern TAX_DETAIL_FIELD = java.util.regex.Pattern
 			.compile("monthlyDetail\\.taxDetails\\[(\\d+)\\]\\.(hakusu|zeigaku|ryokinSogaku|ryokin)");
 
+	/** 月計表の入力欄（monthlyTally.dailyItems[日].項目 / 項目[区分]）を判定する */
+	private static final java.util.regex.Pattern TALLY_FIELD = java.util.regex.Pattern
+			.compile("monthlyTally\\.dailyItems\\[(\\d+)\\]\\.([A-Za-z]+)(?:\\[(\\d+)\\])?");
+
 	/**
 	 * 型変換エラーの場合は日本語メッセージに変換し、それ以外は defaultMessage をそのまま返す。
 	 * 入力欄の下に出すため、項目名は付けずに短い文言にする。
@@ -481,6 +499,10 @@ public class FukaController {
 				java.util.regex.Matcher m = TAX_DETAIL_FIELD.matcher(field);
 				if (m.matches()) {
 					return ("hakusu".equals(m.group(2)) ? 8 : 13) + "桁以内で入力してください";
+				}
+				java.util.regex.Matcher t = TALLY_FIELD.matcher(field);
+				if (t.matches()) {
+					return (isTallyHakusu(t.group(2)) ? 8 : 13) + "桁以内で入力してください";
 				}
 				return TYPE_MISMATCH_MESSAGES.getOrDefault(field, "入力値が不正です");
 			}
@@ -500,6 +522,10 @@ public class FukaController {
 		String itemLabel = taxDetailItemLabel(form, field);
 		if (itemLabel != null) {
 			return itemLabel + "は" + message;
+		}
+		String tallyLabel = tallyItemLabel(form, field);
+		if (tallyLabel != null) {
+			return tallyLabel + "は" + message;
 		}
 		if (TYPE_MISMATCH_MESSAGES.containsValue(message) || TYPE_MISMATCH_SUMMARY_MESSAGES.containsKey(field)) {
 			return TYPE_MISMATCH_SUMMARY_MESSAGES.getOrDefault(field, message);
@@ -524,6 +550,38 @@ public class FukaController {
 			case "ryokin" -> "宿泊料金（" + kbnName + "）";
 			default -> null;
 		};
+	}
+
+	/**
+	 * 月計表の入力欄なら「月計表 6日 宿泊数（0円以上の区分）」のようなサマリ用の項目名を返す。
+	 * 対象外のフィールドなら null を返す。
+	 */
+	private String tallyItemLabel(FukaDeclarationForm form, String field) {
+		java.util.regex.Matcher m = TALLY_FIELD.matcher(field);
+		if (!m.matches()) {
+			return null;
+		}
+		String kbn = m.group(3) != null
+				? "（" + taxDetailKbnName(form, Integer.parseInt(m.group(3))) + "）"
+				: "";
+		String item = switch (m.group(2)) {
+			case "hakusu" -> "宿泊数" + kbn;
+			case "ryokin" -> "宿泊料金" + kbn;
+			case "sogaku" -> "宿泊料金総額" + kbn;
+			case "menjoHakusu" -> "課税対象外の宿泊数";
+			case "menjoRyokin" -> "課税対象外の宿泊料金";
+			case "zeigaku" -> "税額";
+			default -> null;
+		};
+		if (item == null) {
+			return null;
+		}
+		return "月計表 " + (Integer.parseInt(m.group(1)) + 1) + "日 " + item;
+	}
+
+	/** 月計表の項目が宿泊数系（8桁）かどうか */
+	private boolean isTallyHakusu(String property) {
+		return "hakusu".equals(property) || "menjoHakusu".equals(property);
 	}
 
 	/**
