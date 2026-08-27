@@ -30,7 +30,6 @@ import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
-import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -44,7 +43,6 @@ import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
-import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -72,7 +70,7 @@ public class FukaServiceImpl implements FukaService {
 	private final ChoshuGenboRepository choshuGenboRepository;
 	private final ChoshuGenboUchiRepository choshuGenboUchiRepository;
 	private final AtenaRepository atenaRepository;
-	private final NozeiShukiRepository nozeiShukiRepository;
+	private final TekiyoNozeiShukiRepository nozeiShukiRepository;
 	private final NokigenRepository nokigenRepository;
 	private final JichitaiRepository jichitaiRepository;
 	private final ShunoRirekiRepository shunoRirekiRepository;
@@ -250,14 +248,18 @@ public class FukaServiceImpl implements FukaService {
 	 * 対象日に適用される納税周期を判定する
 	 */
 	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, LocalDate targetDate) {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return tekiyoList.stream()
-				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
-				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
-				.findFirst()
-				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd)))
-				.map(n -> n.getShuki().intValue())
-				.orElse(3);
+
+	    String jichitaiCd = jichitaiContext.getJichitaiCd();
+
+	    return tekiyoList.stream()
+	            .filter(t -> t.getTekiyoStYmd() == null
+	                    || !targetDate.isBefore(t.getTekiyoStYmd()))
+	            .filter(t -> t.getTekiyoEdYmd() == null
+	                    || !targetDate.isAfter(t.getTekiyoEdYmd()))
+	            .findFirst()
+	            .flatMap(t -> jichitaiRepository.findById(jichitaiCd))
+	            .map(j -> Integer.parseInt(j.getNozeiShuki()))
+	            .orElse(3);
 	}
 
 	/**

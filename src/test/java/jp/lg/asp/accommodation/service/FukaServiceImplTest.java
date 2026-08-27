@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,6 @@ import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
-import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -45,7 +43,7 @@ class FukaServiceImplTest {
     @Mock ChoshuGenboRepository choshuGenboRepository;
     @Mock ChoshuGenboUchiRepository choshuGenboUchiRepository;
     @Mock AtenaRepository atenaRepository;
-    @Mock NozeiShukiRepository nozeiShukiRepository;
+    @Mock TekiyoNozeiShukiRepository nozeiShukiRepository;
     @Mock NokigenRepository nokigenRepository;
     @Mock JichitaiRepository jichitaiRepository;
     @Mock ShunoRirekiRepository shunoRirekiRepository;
