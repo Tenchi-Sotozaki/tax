@@ -102,15 +102,20 @@ class TekiyoNozeiShukiServiceImplTest {
 
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
+        when(tekiyoNozeiShukiRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(0);
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         service.save(SHITEI_NO, form);
+
+        verify(tekiyoNozeiShukiRepository).save(argThat(e -> e.getRno() == 1));
     }
 
     @Test
     void delete_setsDelFlg1() {
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setDelFlg("0");
+        entity.setRno(1);
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(entity));
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
