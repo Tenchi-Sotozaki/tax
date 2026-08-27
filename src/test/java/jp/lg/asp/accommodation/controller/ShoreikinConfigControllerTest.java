@@ -5,6 +5,9 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -129,6 +132,42 @@ class ShoreikinConfigControllerTest {
         // 交付率はクリアしない（誘導モーダルの対象ではない）
         assertThat(form.getKofuRitsu()).isEqualByComparingTo("10.00");
         assertThat(model.asMap()).containsKey("errorMessage");
+    }
+
+    @Test
+    void create_主キー重複はSQLの文面を出さず利用者向けメッセージにする() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setShiteiNo("00100007");
+        form.setNendo("2026");
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
+        doThrow(new DataIntegrityViolationException("t_shoreikin_pkey"))
+                .when(shoreikinConfigService).createShoreikin(form);
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String view = controller.create(form, bindingResult, new ExtendedModelMap(), redirectAttributes);
+
+        assertThat(view).isEqualTo("redirect:/shoreikin/list");
+        String message = (String) redirectAttributes.getFlashAttributes().get("errorMessage");
+        assertThat(message).isEqualTo("この年度の交付金情報は既に登録されています。一覧から対象を選び直してください。");
+        // 内部情報が画面に漏れないこと
+        assertThat(message).doesNotContain("insert into", "t_shoreikin_pkey", "Exception");
+    }
+
+    @Test
+    void update_更新に失敗したらSQLの文面を出さず利用者向けメッセージにする() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setShiteiNo("00100007");
+        form.setNendo("2026");
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
+        doThrow(new OptimisticLockingFailureException("version"))
+                .when(shoreikinConfigService).updateShoreikin(form);
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String view = controller.update(form, bindingResult, new ExtendedModelMap(), redirectAttributes);
+
+        assertThat(view).isEqualTo("redirect:/shoreikin/list");
+        assertThat((String) redirectAttributes.getFlashAttributes().get("errorMessage"))
+                .isEqualTo("交付金情報の更新に失敗しました。時間をおいて再度お試しください。");
     }
 
     @Test

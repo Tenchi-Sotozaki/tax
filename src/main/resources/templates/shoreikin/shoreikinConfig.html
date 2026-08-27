@@ -280,7 +280,7 @@
 			<!-- 交付率未設定の誘導モーダル。表示要否はサーバ側で判定する -->
 			<th:block th:if="${configForm.editable and configForm.kofuRitsu == null}">
 				<div
-					th:replace="~{layout/components :: linkConfirmModal('kofuRitsuGuideModal', '確認', '交付率が設定されていません。交付率設定画面で登録してください。', @{/admin/kofu-ritsu/list}, '交付率設定へ')}"></div>
+					th:replace="~{layout/components :: linkErrorModal('kofuRitsuGuideModal', '交付率未設定', '交付率が設定されていません。交付率設定画面で登録してください。', @{/admin/kofu-ritsu/list}, '交付率設定へ')}"></div>
 			</th:block>
 
 			<!-- 登録確認モーダル -->
@@ -294,27 +294,6 @@
 				<div
 					th:replace="~{layout/components :: confirmModal('updateConfirmModal', '更新確認', '交付金情報を更新します。よろしいですか？', 'updateForm', 'btn-success', '更新する')}"></div>
 			</th:block>
-
-			<!-- ハイパーリンク付きメッセージ用モーダル -->
-			<div class="modal fade" id="customAlertModal" tabindex="-1"
-				aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header bg-dark text-white border-bottom-0">
-							<h5 class="modal-title">入力エラー</h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal"
-								aria-label="閉じる"></button>
-						</div>
-						<div class="modal-body" id="customAlertBody">
-							<!-- HTMLメッセージが挿入箇所 -->
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary"
-								data-bs-dismiss="modal">閉じる</button>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 
 		<th:block layout:fragment="scripts">
