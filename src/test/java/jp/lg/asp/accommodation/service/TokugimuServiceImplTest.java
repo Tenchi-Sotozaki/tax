@@ -23,6 +23,7 @@ import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
+import jp.lg.asp.accommodation.entity.GassanUchi;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
@@ -93,6 +94,98 @@ class TokugimuServiceImplTest {
             form.setPageSize(10);
 
             when(tokugimuRepository.findAllByJichitaiCd("012345")).thenReturn(List.of());
+
+            Page<TokugimuListItem> result = tokugimuService.search(form);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).isEmpty();
+            assertThat(result.getTotalElements()).isZero();
+        }
+    }
+    
+    @Nested
+    @DisplayName("search メソッドの検索条件（AND検索）テスト")
+    class SearchConditionsTest {
+
+        @Test
+        @DisplayName("正常系：指定番号や事業者名、許可種別などの検索条件を指定してAND検索ができること")
+        void success_withSearchConditions() {
+            TokugimuSearchForm form = new TokugimuSearchForm();
+            form.setPage(0);
+            form.setPageSize(10);
+            form.setShiteiNo("00000001");
+            form.setName("テスト事業者");
+            form.setNameMatchType("partial");
+            form.setKyokaShu("1"); // ホテル
+            form.setStatus("1");   // 営業中
+            form.setGasanTaisho("2"); // 対象
+
+            Tokugimu tokugimu = new Tokugimu();
+            tokugimu.setShiteiNo("00000001");
+            tokugimu.setAtenaNo(BigDecimal.ONE);
+            tokugimu.setKyokaShu("1");
+            // 廃止日・休止日がnullなら determineStatus は "1"（営業中）になる
+
+            Atena atena = new Atena();
+            atena.setAtenaNo(BigDecimal.ONE);
+            atena.setName("テスト事業者");
+
+            // findBySearchConditions のモック設定
+            when(tokugimuRepository.findBySearchConditions(
+                    eq("012345"),
+                    eq("00000001"),
+                    eq("テスト事業者"),
+                    eq("%テスト事業者%"),
+                    isNull(),
+                    isNull(),
+                    eq("1"),
+                    isNull(),
+                    isNull()
+            )).thenReturn(List.of(tokugimu));
+
+            when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq("012345"), any()))
+                    .thenReturn(List.of(atena));
+            
+            // 合算対象（isGasanTarget = true になるように設定）
+            GassanUchi gassanUchi = new GassanUchi();
+            gassanUchi.setShiteiNo("00000001");
+            gassanUchi.setGassanShiteiNo("90000001");
+            when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq("012345"), any()))
+                    .thenReturn(List.of(gassanUchi));
+
+            when(fukaRepository.findDeclaredByShiteiNoInOrderByShinkokuYmdDesc(any(), any()))
+                    .thenReturn(List.of());
+
+            Page<TokugimuListItem> result = tokugimuService.search(form);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getContent().get(0).getShiteiNo()).isEqualTo("00000001");
+            assertThat(result.getContent().get(0).getName()).isEqualTo("テスト事業者");
+            assertThat(result.getContent().get(0).getStatus()).isEqualTo("1");
+        }
+
+        @Test
+        @DisplayName("正常系：メモリ上のフィルタリング（ステータス・合算対象）に一致せず0件になること")
+        void success_filteredOutByMemoryConditions() {
+            TokugimuSearchForm form = new TokugimuSearchForm();
+            form.setPage(0);
+            form.setPageSize(10);
+            form.setStatus("3"); // 廃止で検索したいが、実データは営業中（status="1"）
+
+            Tokugimu tokugimu = new Tokugimu();
+            tokugimu.setShiteiNo("00000001");
+            tokugimu.setAtenaNo(BigDecimal.ONE);
+            tokugimu.setKyokaShu("1");
+
+            Atena atena = new Atena();
+            atena.setAtenaNo(BigDecimal.ONE);
+            atena.setName("テスト事業者");
+
+            // リポジトリ層ではヒットするが、サービスクラス内のステータス判定で弾かれるケース
+            lenient().when(tokugimuRepository.findAllByJichitaiCd("012345")).thenReturn(List.of(tokugimu));
+            lenient().when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq("012345"), any())).thenReturn(List.of(atena));
+            lenient().when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq("012345"), any())).thenReturn(List.of());
 
             Page<TokugimuListItem> result = tokugimuService.search(form);
 
