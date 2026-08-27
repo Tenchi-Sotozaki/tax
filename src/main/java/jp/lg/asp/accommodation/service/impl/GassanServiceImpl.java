@@ -92,10 +92,13 @@ public class GassanServiceImpl implements GassanService {
         form.setShiteiNoList(checkedShiteiNos);
         form.setDaihyoShiteiNo(daihyoShiteiNo);
         form.setRno(gassan.getRno());
-        BigDecimal maxRno = gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        BigDecimal maxRno = gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
         BigDecimal minRno = gassanRepository.findMinRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
         form.setMaxRno(maxRno);
         form.setMinRno(minRno);
+        form.setPrevRno(gassanRepository.findPrevRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo, gassan.getRno()));
+        form.setNextRno(gassanRepository.findNextRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo, gassan.getRno()));
+        form.setCurrentNo(gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNoAndRnoLe(jichitaiCd, gassanShiteiNo, gassan.getRno()));
         return form;
     }
 
@@ -138,10 +141,13 @@ public class GassanServiceImpl implements GassanService {
         form.setShiteiNoList(checkedShiteiNos);
         form.setDaihyoShiteiNo(daihyoShiteiNo);
         form.setRno(gassan.getRno());
-        BigDecimal maxRno = gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
+        BigDecimal maxRno = gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
         BigDecimal minRno = gassanRepository.findMinRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo);
         form.setMaxRno(maxRno);
         form.setMinRno(minRno);
+        form.setPrevRno(gassanRepository.findPrevRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo, gassan.getRno()));
+        form.setNextRno(gassanRepository.findNextRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo, gassan.getRno()));
+        form.setCurrentNo(gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNoAndRnoLe(jichitaiCd, gassanShiteiNo, gassan.getRno()));
         return form;
     }
 

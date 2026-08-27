@@ -49,6 +49,9 @@ public class GassanForm {
     private BigDecimal rno;
     private BigDecimal maxRno;
     private BigDecimal minRno;
+    private BigDecimal prevRno;
+    private BigDecimal nextRno;
+    private BigDecimal currentNo;
 
     public static Map<String, String> validate(GassanForm f) {
         Map<String, String> errors = new LinkedHashMap<>();

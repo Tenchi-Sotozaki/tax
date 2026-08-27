@@ -138,6 +138,17 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
             @Param("jichitaiCd") String jichitaiCd,
             @Param("gassanShiteiNo") String gassanShiteiNo);
 
+    @Query("SELECT COUNT(g) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.delFlg = '0'")
+    BigDecimal countValidRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Query("SELECT COUNT(g) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.rno <= :rno AND g.delFlg = '0'")
+    BigDecimal countValidRnoByJichitaiCdAndGassanShiteiNoAndRnoLe(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
     @Query("SELECT COALESCE(MAX(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo")
     BigDecimal findMaxRnoIncludingDeletedByJichitaiCdAndGassanShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
@@ -147,4 +158,16 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
     BigDecimal findMinRnoByJichitaiCdAndGassanShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Query("SELECT COALESCE(MAX(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.rno < :rno AND g.delFlg = '0'")
+    BigDecimal findPrevRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
+    @Query("SELECT COALESCE(MIN(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.rno > :rno AND g.delFlg = '0'")
+    BigDecimal findNextRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
 }

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
@@ -46,16 +46,16 @@
 			th:if="${isView and GassanForm.maxRno != null and GassanForm.maxRno > 1}"
 			class="d-flex align-items-center gap-2 mb-3">
 			<a
-				th:href="@{/gassan/view-form(rno=${GassanForm.rno - 1})}"
+				th:href="@{/gassan/view-form(rno=${GassanForm.prevRno})}"
 				class="btn btn-outline-secondary"
-				th:classappend="${GassanForm.rno <= GassanForm.minRno} ? ' disabled'">
+				th:classappend="${GassanForm.prevRno == null or GassanForm.prevRno == 0} ? ' disabled'">
 				<i class="bi bi-chevron-left"></i> 前の履歴
 			</a> <span class="text-muted small">履歴 <span
-				th:text="${GassanForm.rno}"></span> / <span
+				th:text="${GassanForm.currentNo}"></span> / <span
 				th:text="${GassanForm.maxRno}"></span></span> <a
-				th:href="@{/gassan/view-form(rno=${GassanForm.rno + 1})}"
+				th:href="@{/gassan/view-form(rno=${GassanForm.nextRno})}"
 				class="btn btn-outline-secondary"
-				th:classappend="${GassanForm.rno >= GassanForm.maxRno} ? ' disabled'">
+				th:classappend="${GassanForm.nextRno == null or GassanForm.nextRno == 0} ? ' disabled'">
 				次の履歴 <i class="bi bi-chevron-right"></i>
 			</a>
 		</div>
