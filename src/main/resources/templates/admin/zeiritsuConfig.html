@@ -104,7 +104,7 @@
 										th:unless="${isView or (isEdit and !isHeaderEditable)}">*</span>
 									</label> <input type="month" id="tekiyoStYm" name="tekiyoStYmDisplay"
 										class="form-control"
-										th:classappend="${#fields.hasErrors('tekiyoStYm')} ? 'is-invalid'"
+										th:classappend="(${#fields.hasErrors('tekiyoEdYm')} ? 'is-invalid' : '') + (${isView or (isEdit and !isHeaderEditable)} ? ' form-control-readonly' : '')"
 										th:readonly="${isView or (isEdit and !isHeaderEditable)}"
 										th:data-initial-value="*{tekiyoStYm}"> <input
 										type="hidden" th:field="*{tekiyoStYm}" id="tekiyoStYmHidden">
@@ -119,7 +119,7 @@
 										<small class="text-muted">(省略可)</small>
 									</label> <input type="month" id="tekiyoEdYm" name="tekiyoEdYmDisplay"
 										class="form-control"
-										th:classappend="${#fields.hasErrors('tekiyoEdYm')} ? 'is-invalid'"
+										th:classappend="(${#fields.hasErrors('tekiyoEdYm')} ? 'is-invalid' : '') + (${isView} ? ' form-control-readonly' : '')"
 										th:readonly="${isView}" th:data-initial-value="*{tekiyoEdYm}">
 									<input type="hidden" th:field="*{tekiyoEdYm}"
 										id="tekiyoEdYmHidden">
@@ -190,7 +190,8 @@
 									<td><input type="text" class="form-control"
 										th:field="*{details[0].zeiValue}"
 										th:readonly="${isView or !isDetailEditable}"
-										th:data-initial-value="*{details[0].zeiValue}">
+										th:data-initial-value="*{details[0].zeiValue}"
+										th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''">
 
 										<div class="text-danger small"
 											th:if="${#fields.hasErrors('details[0].zeiValue')}"
@@ -201,7 +202,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[0].ryokinSt}" placeholder="以上"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[0].ryokinSt}"> <span
+													th:data-initial-value="*{details[0].ryokinSt}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円以上</span>
 											</div>
 
@@ -209,7 +211,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[0].ryokinEd}" placeholder="未満"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[0].ryokinEd}"> <span
+													th:data-initial-value="*{details[0].ryokinEd}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円未満</span>
 											</div>
 
@@ -222,7 +225,8 @@
 												th:field="*{details[0].kbnName}" placeholder="区分名"
 												th:readonly="${isView or !isDetailEditable}"
 												th:data-initial-value="*{details[0].kbnName}"
-												data-ignore-width="true">
+												data-ignore-width="true"
+												th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''">
 										</div>
 									</td>
 								</tr>
@@ -233,7 +237,8 @@
 									<td><input type="text" class="form-control"
 										th:field="*{details[1].zeiValue}"
 										th:readonly="${isView or !isDetailEditable}"
-										th:data-initial-value="*{details[1].zeiValue}"></td>
+										th:data-initial-value="*{details[1].zeiValue}"
+										th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"></td>
 
 									<td class="condition-cell">
 										<div class="teigaku-condition">
@@ -241,7 +246,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[1].ryokinSt}" placeholder="以上"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[1].ryokinSt}"> <span
+													th:data-initial-value="*{details[1].ryokinSt}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円以上</span>
 											</div>
 
@@ -249,7 +255,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[1].ryokinEd}" placeholder="未満"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[1].ryokinEd}"> <span
+													th:data-initial-value="*{details[1].ryokinEd}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円未満</span>
 											</div>
 
@@ -263,7 +270,8 @@
 												th:field="*{details[1].kbnName}" placeholder="区分名"
 												th:readonly="${isView or !isDetailEditable}"
 												th:data-initial-value="*{details[1].kbnName}"
-												data-ignore-width="true">
+												data-ignore-width="true"
+												th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''">
 										</div>
 									</td>
 								</tr>
@@ -274,7 +282,8 @@
 									<td><input type="text" class="form-control"
 										th:field="*{details[2].zeiValue}"
 										th:readonly="${isView or !isDetailEditable}"
-										th:data-initial-value="*{details[2].zeiValue}"></td>
+										th:data-initial-value="*{details[2].zeiValue}"
+										th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"></td>
 
 									<td class="condition-cell">
 										<div class="teigaku-condition">
@@ -282,7 +291,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[2].ryokinSt}" placeholder="以上"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[2].ryokinSt}"> <span
+													th:data-initial-value="*{details[2].ryokinSt}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円以上</span>
 											</div>
 
@@ -290,7 +300,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[2].ryokinEd}" placeholder="未満"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[2].ryokinEd}"> <span
+													th:data-initial-value="*{details[2].ryokinEd}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円未満</span>
 											</div>
 
@@ -304,7 +315,8 @@
 												th:field="*{details[2].kbnName}" placeholder="区分名"
 												th:readonly="${isView or !isDetailEditable}"
 												th:data-initial-value="*{details[2].kbnName}"
-												data-ignore-width="true">
+												data-ignore-width="true"
+												th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''">
 										</div>
 									</td>
 								</tr>
@@ -314,7 +326,8 @@
 
 									<td><input type="text" class="form-control"
 										th:field="*{details[3].zeiValue}" th:readonly="${isView}"
-										th:data-initial-value="*{details[3].zeiValue}"></td>
+										th:data-initial-value="*{details[3].zeiValue}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''"></td>
 
 									<td class="condition-cell">
 										<div class="teigaku-condition">
@@ -322,7 +335,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[3].ryokinSt}" placeholder="以上"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[3].ryokinSt}"> <span
+													th:data-initial-value="*{details[3].ryokinSt}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円以上</span>
 											</div>
 
@@ -330,7 +344,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[3].ryokinEd}" placeholder="未満"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[3].ryokinEd}"> <span
+													th:data-initial-value="*{details[3].ryokinEd}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円未満</span>
 											</div>
 
@@ -344,7 +359,8 @@
 												th:field="*{details[3].kbnName}" placeholder="区分名"
 												th:readonly="${isView or !isDetailEditable}"
 												th:data-initial-value="*{details[3].kbnName}"
-												data-ignore-width="true">
+												data-ignore-width="true"
+												th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''">
 										</div>
 									</td>
 								</tr>
@@ -354,7 +370,8 @@
 
 									<td><input type="text" class="form-control"
 										th:field="*{details[4].zeiValue}" th:readonly="${isView}"
-										th:data-initial-value="*{details[4].zeiValue}"></td>
+										th:data-initial-value="*{details[4].zeiValue}"
+										th:classappend="${isView} ? ' form-control-readonly' : ''"></td>
 
 									<td class="condition-cell">
 										<div class="teigaku-condition">
@@ -362,7 +379,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[4].ryokinSt}" placeholder="以上"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[4].ryokinSt}"> <span
+													th:data-initial-value="*{details[4].ryokinSt}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円以上</span>
 											</div>
 
@@ -370,7 +388,8 @@
 												<input type="text" class="form-control"
 													th:field="*{details[4].ryokinEd}" placeholder="未満"
 													th:readonly="${isView or !isDetailEditable}"
-													th:data-initial-value="*{details[4].ryokinEd}"> <span
+													th:data-initial-value="*{details[4].ryokinEd}"
+													th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''"> <span
 													class="input-group-text">円未満</span>
 											</div>
 
@@ -384,7 +403,8 @@
 												th:field="*{details[4].kbnName}" placeholder="区分名"
 												th:readonly="${isView or !isDetailEditable}"
 												th:data-initial-value="*{details[4].kbnName}"
-												data-ignore-width="true">
+												data-ignore-width="true"
+												th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''">
 										</div>
 									</td>
 								</tr>
