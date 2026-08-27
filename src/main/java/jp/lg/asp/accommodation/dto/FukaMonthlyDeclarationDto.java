@@ -25,7 +25,7 @@ public class FukaMonthlyDeclarationDto {
 	private Long exemptRyokin;
 
 	// 免除宿泊数
-	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
+	@Digits(integer = 9, fraction = 0, message = "9桁以内で入力してください")
 	private Long exemptStayCount;
 
 	// 宿泊料金総額合計
@@ -33,7 +33,7 @@ public class FukaMonthlyDeclarationDto {
 	private Long totalSogaku;
 
 	// 宿泊数合計
-	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
+	@Digits(integer = 9, fraction = 0, message = "9桁以内で入力してください")
 	private Long totalStayCount;
 
 	// 宿泊料金合計

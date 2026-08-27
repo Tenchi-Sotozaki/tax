@@ -480,7 +480,8 @@ public class FukaController {
 						case "ryokin" -> "宿泊料金（区分" + idx + "）";
 						default -> field;
 					};
-					return label + "は13桁以内で入力してください";
+					int maxDigits = "hakusu".equals(m.group(2)) ? 8 : 13;
+					return label + "は" + maxDigits + "桁以内で入力してください";
 				}
 				return TYPE_MISMATCH_MESSAGES.getOrDefault(field, "入力値が不正です");
 			}
