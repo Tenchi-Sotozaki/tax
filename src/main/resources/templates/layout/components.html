@@ -39,10 +39,6 @@
 					<p class="mb-0" th:text="${message}">よろしいですか？</p>
 				</div>
 				<div class="modal-footer justify-content-center">
-					<button type="button" class="btn btn-outline-secondary"
-						data-bs-dismiss="modal">
-						<i class="bi bi-x-lg me-1"></i>キャンセル
-					</button>
 					<button type="button" class="btn" th:classappend="${btnClass}"
 						th:data-form-id="${formId}"
 						onclick="
@@ -55,8 +51,11 @@
 							}
 						">
 						<i
-							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>
-						<span th:text="${btnLabel}">実行</span>
+							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>はい
+					</button>
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>いいえ
 					</button>
 				</div>
 			</div>
@@ -95,14 +94,13 @@
 					<p class="mb-0" th:text="${message}">よろしいですか？</p>
 				</div>
 				<div class="modal-footer justify-content-center">
+					<a class="btn btn-primary" th:href="${href}">
+						<i class="bi bi-check-lg me-1"></i>はい
+					</a>
 					<button type="button" class="btn btn-outline-secondary"
 						data-bs-dismiss="modal">
-						<i class="bi bi-x-lg me-1"></i>キャンセル
+						<i class="bi bi-x-lg me-1"></i>いいえ
 					</button>
-					<a class="btn btn-primary" th:href="${href}">
-						<i class="bi bi-check-lg me-1"></i>
-						<span th:text="${btnLabel}">実行</span>
-					</a>
 				</div>
 			</div>
 		</div>

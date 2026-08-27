@@ -208,13 +208,13 @@
 			<form id="deleteForm" th:action="@{/admin/user-delete/{id}(id=${userForm.originalId})}" method="post"
 				style="display:none;"></form>
 			<div
-				th:replace="~{layout/components :: confirmModal('deleteModal','削除確認','このユーザーを削除します。よろしいですか？','deleteForm','btn-danger','削除する')}">
+				th:replace="~{layout/components :: confirmModal('deleteModal','削除確認','ユーザーを削除します。よろしいですか？','deleteForm','btn-danger','削除する')}">
 			</div>
 		</th:block>
 
 		<!-- 確認モーダル（登録と更新） -->
 		<div th:if="${isView != true}"
-			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'userConfigForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}">
+			th:replace="~{layout/components :: confirmModal('registerModal', ${isEdit} ? '更新確認' : '登録確認', ${isEdit} ? 'ユーザーを更新します。よろしいですか？' : 'ユーザーを登録します。よろしいですか？', 'userConfigForm', ${isEdit} ? 'btn-success' : 'btn-primary', ${isEdit} ? '更新' : '登録')}">
 		</div>
 
 		<div th:if="${isView != true}" th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', ${isEdit == true} ? @{/admin/user-view/{id}(id=${userForm.originalId})} : @{/admin/user-search}, '戻る')}"></div>

@@ -1,14 +1,21 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.AbstractMap;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
@@ -34,6 +41,25 @@ public class TokugimuController {
 	private final TokugimuService tokugimuService;
 	private final NozeiShukiService nozeiShukiService;
 	private final ScreenAccessChecker accessChecker;
+
+	/**
+	 * 型変換に失敗した項目の表示メッセージ。
+	 * 画面の入力欄はいずれもテキストのため、数値項目で起こりうる。
+	 */
+	private static final Map<String, String> TYPE_MISMATCH_MESSAGES = Map.ofEntries(
+			new AbstractMap.SimpleEntry<>("floorArea", "宿泊施設情報の延床面積は半角数字とピリオドで入力してください"),
+			new AbstractMap.SimpleEntry<>("roomCount", "宿泊施設情報の客室数は半角数字で入力してください"),
+			new AbstractMap.SimpleEntry<>("capacity", "宿泊施設情報の収容人数は半角数字で入力してください"),
+			new AbstractMap.SimpleEntry<>("registrationDate", "特別徴収義務者情報の登録年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("shinseiDate", "特別徴収義務者情報の申請年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("henkoDate", "特別徴収義務者情報の変更年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("businessStartDate", "宿泊施設情報の営業開始(予定)日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("suspensionStartDate", "施設営業休止/再開/廃止情報の休止開始年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は正しい日付を入力してください")
+	);
+
+	private static final String TYPE_MISMATCH_DEFAULT_MESSAGE = "入力形式が正しくない項目があります";
 
 	private static final String TOKUGIMU_DAICHO = ScreenManagement.TOKUGIMU_DAICHO;
 	private static final String TOKUGIMU_CONFIG = ScreenManagement.TOKUGIMU_CONFIG;
@@ -104,7 +130,7 @@ public class TokugimuController {
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", false);
-			model.addAttribute("validationErrors", TokugimuForm.TokugimuValidator.validate(form).values());
+			model.addAttribute("validationErrors", buildValidationMessages(bindingResult));
 			return FORM_VIEW;
 		}
 		try {
@@ -181,7 +207,7 @@ public class TokugimuController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("editId", id);
-			model.addAttribute("validationErrors", TokugimuForm.TokugimuValidator.validate(form).values());
+			model.addAttribute("validationErrors", buildValidationMessages(bindingResult));
 			return FORM_VIEW;
 		}
 		try {
@@ -272,5 +298,22 @@ public class TokugimuController {
 						null,
 						form.getName(),
 						form.getFacilityName()));
+	}
+
+	/**
+	 * 画面上部のサマリに出すメッセージを組み立てる。
+	 *
+	 * 必須チェックと桁数・形式チェックは、各アノテーションに指定した日本語メッセージを
+	 * そのまま使う。型変換の失敗だけは英語の既定メッセージになるため、日本語へ差し替える。
+	 */
+	private List<String> buildValidationMessages(BindingResult bindingResult) {
+		return bindingResult.getFieldErrors().stream()
+				.sorted(Comparator.comparingInt((FieldError e) -> TokugimuForm.fieldOrder(e.getField())))
+				.map(e -> e.isBindingFailure()
+						? TYPE_MISMATCH_MESSAGES.getOrDefault(e.getField(), TYPE_MISMATCH_DEFAULT_MESSAGE)
+						: e.getDefaultMessage())
+				.filter(StringUtils::hasText)
+				.distinct()
+				.toList();
 	}
 }

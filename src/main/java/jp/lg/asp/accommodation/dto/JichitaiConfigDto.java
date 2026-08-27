@@ -38,4 +38,7 @@ public class JichitaiConfigDto {
 	
 	@NotNull(message = "自治体識別名は必須です。")
 	private String param;
+	
+	@NotBlank(message = "ユーザーIDは必須です。")
+	private String userId;
 }
