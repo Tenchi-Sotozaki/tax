@@ -30,7 +30,6 @@ import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
-import jp.lg.asp.accommodation.entity.NozeiShukiId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
 import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -251,12 +250,12 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	private int resolveShuki(List<TokureiTekiyo> tekiyoList, LocalDate targetDate) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return tekiyoList.stream()
-				.filter(t -> t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
-				.filter(t -> t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd()))
-				.findFirst()
-				.flatMap(t -> nozeiShukiRepository.findById(new NozeiShukiId(jichitaiCd)))
-				.map(n -> n.getShuki().intValue())
+		boolean inPeriod = tekiyoList.stream()
+				.anyMatch(t -> (t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))
+						&& (t.getTekiyoEdYmd() == null || !targetDate.isAfter(t.getTekiyoEdYmd())));
+		if (!inPeriod) return 3;
+		return jichitaiRepository.findById(jichitaiCd)
+				.map(j -> j.getNozeiShuki() != null ? Integer.parseInt(j.getNozeiShuki().trim()) : 3)
 				.orElse(3);
 	}
 
@@ -662,8 +661,8 @@ public class FukaServiceImpl implements FukaService {
 			saveChoshuGenboDataWithRno(form, parentFuka, jichitaiCd, targetRno);
 		}
 
-		// 納入情報の保存（納入年月日・納入金額の両方に入力がある場合のみ登録処理を行う）
-		if (form.getShunoYmd() != null && form.getShunoKingaku() != null) {
+		// 納入情報の保存（納入年月日と、0より大きい納入金額の両方に入力がある場合のみ登録処理を行う）
+		if (form.getShunoYmd() != null && form.getShunoKingaku() != null && form.getShunoKingaku() > 0) {
 			Integer shunoRno = shunoRirekiRepository.findMaxRno(jichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
 					.map(r -> r + 1).orElse(1);
 			ShunoRireki shuno = new ShunoRireki();

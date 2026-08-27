@@ -12,8 +12,8 @@ import jp.lg.asp.accommodation.entity.TokureiTekiyoId;
 
 @Repository
 public interface TokureiTekiyoRepository extends JpaRepository<TokureiTekiyo, TokureiTekiyoId> {
-    @Query("SELECT t FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0' ORDER BY t.tekiyoStYmd ASC")
-    List<TokureiTekiyo> findActiveByJichitaiCdAndShiteiNo(
+    @Query("SELECT t FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0' ORDER BY t.rno DESC")
+    List<TokureiTekiyo> findLatestByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
 
@@ -21,4 +21,15 @@ public interface TokureiTekiyoRepository extends JpaRepository<TokureiTekiyo, To
     int findMaxRnoByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
+
+    @Query("SELECT t FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0' ORDER BY t.tekiyoStYmd ASC")
+    List<TokureiTekiyo> findActiveByJichitaiCdAndShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo);
+
+    @Query("SELECT t FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.rno < :rno AND t.delFlg = '0' ORDER BY t.rno DESC")
+    List<TokureiTekiyo> findPreviousRecords(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("shiteiNo") String shiteiNo,
+            @Param("rno") Integer rno);
 }

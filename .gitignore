@@ -3,6 +3,9 @@
 .metadata/
 Servers/
 RemoteSystemsTempFiles/
+docs/テストデータ/
+docs/migration/
+src/main/resources/db/
 src/main/resources/templates/tokugimu/tTaxManagerConfig_BACKUP_1947.html
 src/main/resources/templates/tokugimu/tTaxManagerConfig_BASE_1947.html
 src/main/resources/templates/tokugimu/tTaxManagerConfig_LOCAL_1947.html

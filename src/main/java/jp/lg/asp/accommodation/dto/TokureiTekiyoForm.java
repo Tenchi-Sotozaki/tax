@@ -14,6 +14,8 @@ public class TokureiTekiyoForm {
     // 登録/編集対象レコードのrno（編集時にセット）
     private Integer rno;
 
+    private Integer rno;
+
     private String tekiyoStMonth;
     private String tekiyoEdMonth;
 
