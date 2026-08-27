@@ -240,7 +240,12 @@ public class GassanController {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
-			model.addAttribute("errorMessage", e.getMessage());
+			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
+				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else {
+				model.addAttribute("errorMessage", e.getMessage());
+			}
 			return FORM_VIEW;
 		}
 	}
