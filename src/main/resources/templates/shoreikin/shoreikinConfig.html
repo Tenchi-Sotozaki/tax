@@ -282,7 +282,7 @@
 			<!-- 交付率未設定の誘導モーダル。表示要否はサーバ側で判定する -->
 			<th:block th:if="${configForm.editable and configForm.kofuRitsu == null}">
 				<div
-					th:replace="~{layout/components :: linkErrorModal('kofuRitsuGuideModal', '交付率未設定', '交付率が設定されていません。交付率設定画面で登録してください。', @{/admin/kofu-ritsu/list}, '交付率設定へ')}"></div>
+					th:replace="~{layout/components :: linkConfirmModal('kofuRitsuGuideModal', '交付率未設定', '交付率が設定されていません。設定画面へ遷移します。よろしいですか？', @{/admin/kofu-ritsu/list}, '交付率設定へ')}"></div>
 			</th:block>
 
 			<!-- 登録確認モーダル -->
