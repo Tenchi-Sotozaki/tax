@@ -104,6 +104,8 @@ public class TekiyoNozeiShukiServiceImpl implements TekiyoNozeiShukiService {
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setJichitaiCd(jichitaiCd);
         entity.setShiteiNo(shiteiNo);
+        entity.setRno(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .stream().mapToInt(TekiyoNozeiShuki::getRno).max().orElse(0) + 1);
         entity.setTekiyoStYmd(stYmd);
         entity.setTekiyoEdYmd(edYmd);
         entity.setDelFlg(FLG_OFF);

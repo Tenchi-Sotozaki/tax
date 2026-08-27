@@ -1181,10 +1181,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 
 	private long getKenZeigaku(Long shukuhakuRyokin, String taishoYm) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		Optional<ZeiritsuTeigaku> teigakuOp = zeiritsuTeigakuRepository
+		return zeiritsuTeigakuRepository
 				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm,
-						shukuhakuRyokin);
-		return teigakuOp.map(ZeiritsuTeigaku::getZeigaku).orElse(0L);
+						shukuhakuRyokin)
+				.stream().findFirst()
+				.map(ZeiritsuTeigaku::getZeigaku).orElse(0L);
 	}
 
 	private String toNendo(String taishoYm) {

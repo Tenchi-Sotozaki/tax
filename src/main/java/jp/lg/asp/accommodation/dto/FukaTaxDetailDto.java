@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.dto;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.constraints.Digits;
+
 import lombok.Data;
 
 @Data
@@ -12,6 +14,7 @@ public class FukaTaxDetailDto {
 	private BigDecimal taxKenRate;
 
 	private Long ryokinSogaku;
+	@Digits(integer = 8, fraction = 0, message = "8桁以内で入力してください")
 	private Long hakusu;
 	private Long ryokin;
 	private Long zeigaku;

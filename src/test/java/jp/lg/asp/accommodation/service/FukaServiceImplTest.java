@@ -93,8 +93,9 @@ class FukaServiceImplTest {
 
     @Test
     void isAlreadyRegistered_existingData_returnsTrue() {
-        // 202403 → nendo=2024, kibetsu=1 (3月-2=1)
-        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 1))
+        // nendoStMonth=4(デフォルト) の場合: 202403 → nendo=2023, kibetsu=12
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(java.util.Optional.empty());
+        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2023", 12))
                 .thenReturn(List.of(new Fuka()));
 
         assertThat(service.isAlreadyRegistered(SHITEI_NO, "202403")).isTrue();
@@ -102,8 +103,9 @@ class FukaServiceImplTest {
 
     @Test
     void isAlreadyRegistered_noData_returnsFalse() {
-        // 202404 → nendo=2024, kibetsu=2 (4月-2=2)
-        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 2))
+        // nendoStMonth=4(デフォルト) の場合: 202404 → nendo=2024, kibetsu=1
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(java.util.Optional.empty());
+        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 1))
                 .thenReturn(List.of());
 
         assertThat(service.isAlreadyRegistered(SHITEI_NO, "202404")).isFalse();
