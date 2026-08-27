@@ -2,8 +2,11 @@ package jp.lg.asp.accommodation.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,28 +37,40 @@ public class TopPageController {
 
 	private static final String SCREEN_ID = ScreenManagement.TOP_PAGE;
 	private static final String SCREEN_ID_CONFIG = ScreenManagement.TOP_PAGE_CONFIG;
+	private static final String LIST_VIEW = "top/topPageConfigDaicho";
 
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(Model model) {
-		List<TopPageContent> sharedList = topPageService.findShared();
-		sharedList.forEach(content -> {
-			content.setTitleHtml(markdownService.toHtml(content.getTitle()));
-			content.setContentHtml(markdownService.toHtml(content.getHtmlContent()));
-		});
-		model.addAttribute("sharedList", sharedList);
-		return "top/topPage";
-	}
 
+	    List<TopPageContent> sharedList = topPageService.findShared();
+
+	    sharedList.forEach(content -> {
+	    	content.setTitleHtml(markdownService.toHtml(content.getTitle()));
+	    	content.setContentHtml(markdownService.toHtml(content.getHtmlContent()));
+	    });
+
+	    model.addAttribute("sharedList", sharedList);
+
+	    return "top/topPage";
+	}
+	
+	/**
+	* 一覧表示
+	*/
 	@GetMapping("/topPageConfigDaicho")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "一覧表示")
 	public String list(
 	        @RequestParam(defaultValue = "10") int pageSize,
 	        Model model) {
-		List<TopPageContent> items = topPageService.findAll();
-		model.addAttribute("items", items);
-		model.addAttribute("pageSize", pageSize);
-		return "top/topPageConfigDaicho";
+
+	    List<TopPageContent> items =
+	            topPageService.findAll();
+
+	    model.addAttribute("items", items);
+	    model.addAttribute("pageSize", pageSize);
+
+	    return "top/topPageConfigDaicho";
 	}
 
 	@GetMapping("/config")
@@ -69,53 +84,105 @@ public class TopPageController {
 	@PostMapping("/config/preview")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "プレビュー")
 	public String preview(@ModelAttribute("form") TopPageConfigForm form, Model model) {
-		model.addAttribute("previewTitle", markdownService.toHtml(form.getTitle()));
-		model.addAttribute("previewHtml", markdownService.toHtml(form.getHtmlContent()));
-		model.addAttribute("form", form);
+		String previewTitle = markdownService.toHtml(form.getTitle());
+		String previewHtml = markdownService.toHtml(form.getHtmlContent());
+	
+		model.addAttribute("previewTitle", previewTitle);	
+		model.addAttribute("previewHtml", previewHtml);	
+		
+		model.addAttribute("form", form);	
 		model.addAttribute("preview", true);
 		return "top/topPageConfig";
 	}
+	
 
 	@PostMapping("/config/save")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "保存")
-	public String save(@ModelAttribute("form") TopPageConfigForm form, Model model, RedirectAttributes redirectAttributes) {
+	public String save(
+	        @Valid @ModelAttribute("form") TopPageConfigForm form,
+	        BindingResult bindingResult,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
+
+	    // 掲載開始日・終了日の整合性チェック
+	    if (form.getPostingStartDate() != null
+	            && form.getPostingEndDate() != null
+	            && form.getPostingStartDate().isAfter(form.getPostingEndDate())) {
+
+	        bindingResult.rejectValue(
+	                "postingStartDate",
+	                "date.reverse",
+	                "掲載開始日は掲載終了日以前の日付を入力してください。");
+	    }
+
+	    // バリデーションエラー
+	    if (bindingResult.hasErrors()) {
+	        List<String> validationErrors = bindingResult.getAllErrors().stream()
+	                .map(e -> e.getDefaultMessage())
+	                .toList();
+	        model.addAttribute("validationErrors", validationErrors);
+	        return "top/topPageConfig";
+	    }
+
 		try {
 			topPageService.save(form);
-			redirectAttributes.addFlashAttribute("successMessage", "トップページコンテンツを保存しました。");
+
+	        redirectAttributes.addFlashAttribute(
+	                "successMessage",
+	                "トップページコンテンツを保存しました。");
+
 		} catch (Exception e) {
+
 			log.error("トップページ保存エラー", e);
-			model.addAttribute("form", form);
-			model.addAttribute("errorMessage", "保存に失敗しました: " + e.getMessage());
+
+	        model.addAttribute(
+	                "errorMessage",
+	                "保存に失敗しました: " + e.getMessage());
+
 			return "top/topPageConfig";
 		}
+
 		return "redirect:/top/config";
 	}
-
+	
 	@GetMapping("/config/{seq}")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String edit(
 	        @PathVariable Integer seq,
 	        Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
-		TopPageContent content = topPageService.findBySeq(seq);
-		TopPageConfigForm form = new TopPageConfigForm();
-		form.setSeq(content.getSeq());
-		form.setTitle(content.getTitle());
-		form.setHtmlContent(content.getHtmlContent());
-		form.setPostingStartDate(content.getPostingStartDate());
-		form.setPostingEndDate(content.getPostingEndDate());
-		model.addAttribute("form", form);
-		return "top/topPageConfig";
-	}
 
+	    accessChecker.checkAccess(SCREEN_ID_CONFIG);
+
+	    TopPageContent content =
+	            topPageService.findBySeq(seq);
+
+	    TopPageConfigForm form = new TopPageConfigForm();
+
+	    form.setSeq(content.getSeq());
+	    form.setTitle(content.getTitle());
+	    form.setHtmlContent(content.getHtmlContent());
+	    form.setPostingStartDate(content.getPostingStartDate());
+	    form.setPostingEndDate(content.getPostingEndDate());
+
+	    model.addAttribute("form", form);
+
+	    return "top/topPageConfig";
+	}
+	
 	@PostMapping("/config/delete/{seq}")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "削除")
 	public String delete(
 	        @PathVariable Integer seq,
 	        RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
-		topPageService.delete(seq);
-		redirectAttributes.addFlashAttribute("successMessage", "削除しました。");
-		return "redirect:/top/topPageConfigDaicho";
+
+	    accessChecker.checkAccess(SCREEN_ID_CONFIG);
+
+	    topPageService.delete(seq);
+
+	    redirectAttributes.addFlashAttribute(
+	            "successMessage",
+	            "削除しました。");
+
+	    return "redirect:/top/topPageConfigDaicho";
 	}
 }

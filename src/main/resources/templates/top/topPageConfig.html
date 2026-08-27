@@ -15,6 +15,13 @@
 			</h5>
 		</div>
 		
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+			<ul class="mb-0 mt-1">
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+			</ul>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -34,43 +41,49 @@
 					<h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>HTML入力エリア</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
-					<input class="form-control font-monospace" id="htmlContent" th:field="*{title}"
-						rows="15" placeholder="タイトルを入力してください"></input>
+					<label for="title" class="form-label fw-medium">
+					    タイトル<span class="text-danger">*</span>
+					</label>
+					<input class="form-control font-monospace" id="title" th:field="*{title}"
+						th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+						placeholder="タイトルを入力してください">
+					<div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
 				</div>				
 				<div class="card-body bg-light-subtle">
+					<label for="htmlContent" class="form-label fw-medium">
+					    内容 <span class="text-danger">*</span>
+					</label>
 					<textarea class="form-control font-monospace" id="htmlContent" th:field="*{htmlContent}"
+						th:classappend="${#fields.hasErrors('htmlContent')} ? 'is-invalid' : ''"
 						rows="15" placeholder="本文を入力してください"></textarea>
+					<div class="invalid-feedback" th:if="${#fields.hasErrors('htmlContent')}" th:errors="*{htmlContent}"></div>
 				</div>
 				<div class="row">
-				    <!-- 登録日 -->
+				    <!-- 掲載開始日 -->
 				    <div class="col-md-6">
 				        <div class="card-body bg-light-subtle">
-				            <label for="registrationDate1" class="form-label fw-medium">
-				                掲載開始日 <!--<span class="badge bg-danger text-white ms-1">必須</span>-->
+				            <label for="postingStartDate" class="form-label fw-medium">
+				                掲載開始日
 				            </label>
 							<input type="date"
+							       id="postingStartDate"
 							       class="form-control"
-							       th:field="*{PostingStartDate}"
-							       required>
-				            <div id="registrationDateError1" class="text-danger small mt-1 d-none">
-				                ※掲載開始日を入力してください
-				            </div>
+							       th:classappend="${#fields.hasErrors('postingStartDate')} ? 'is-invalid' : ''"
+							       th:field="*{postingStartDate}">
+						<div class="invalid-feedback" th:if="${#fields.hasErrors('postingStartDate')}" th:errors="*{postingStartDate}"></div>
 				        </div>
 				    </div>
 
-				    <!-- 終了日 -->
+				    <!-- 掲載終了日 -->
 				    <div class="col-md-6">
 				        <div class="card-body bg-light-subtle">
-				            <label for="registrationDate2" class="form-label fw-medium">
-				                掲載終了日 <!--<span class="badge bg-danger text-white ms-1">必須</span>-->
+				            <label for="postingEndDate" class="form-label fw-medium">
+				                掲載終了日
 				            </label>
 							<input type="date"
+							       id="postingEndDate"
 							       class="form-control"
-							       th:field="*{PostingEndDate}"
-							       required>
-				            <div id="registrationDateError2" class="text-danger small mt-1 d-none">
-				                ※掲載終了日を入力してください
-				            </div>
+							       th:field="*{postingEndDate}">
 				        </div>
 				    </div>
 				</div>
@@ -88,26 +101,34 @@
 
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				
-				<a th:href="@{/top/topPageConfigDaicho}" class="btn btn-outline-secondary px-4">
-					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a>
 
 				<button type="submit" form="configForm"
 					formaction="/accommodation-tax/top/config/preview"
-					class="btn btn-outline-primary px-4">
+					class="btn btn-outline-primary btn-lg px-4">
 					<i class="bi bi-eye me-2"></i>プレビュー
 				</button>
 
-				<button type="submit" form="configForm"
-					formaction="/accommodation-tax/top/config/save"
-					class="btn btn-success px-5">
+				<button type="button"
+					data-bs-toggle="modal"
+					data-bs-target="#saveConfirmModal"
+					class="btn btn-success btn-lg px-5">
 					<i class="bi bi-check-circle me-2"></i>
-					<span th:text="${form.htmlContent != null and !#strings.isEmpty(form.htmlContent)} ? '更新' : '登録'">保存</span>
+					<span th:text="${form.seq != null} ? '更新' : '登録'">保存</span>
 				</button>
+
+				<a href="#"
+					data-bs-toggle="modal"
+					data-bs-target="#backConfirmModal"
+					class="btn btn-outline-secondary btn-lg px-4">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
 
 			</div>
 		</form>
+
+		<div th:replace="~{layout/components :: confirmModal('saveConfirmModal', ${form.seq != null} ? '更新確認' : '登録確認', ${form.seq != null} ? 'この内容で更新します。よろしいですか？' : 'この内容で登録します。よろしいですか？', 'configForm', 'btn-success', ${form.seq != null} ? '更新する' : '登録する')}"></div>
+
+		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/top/topPageConfigDaicho}, '一覧に戻る')}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
