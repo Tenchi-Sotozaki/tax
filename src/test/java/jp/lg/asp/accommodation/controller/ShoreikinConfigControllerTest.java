@@ -3,6 +3,8 @@ package jp.lg.asp.accommodation.controller;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -92,6 +94,41 @@ class ShoreikinConfigControllerTest {
         String view = controller.calculate(form, model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+    }
+
+    @Test
+    void calculate_交付率が取得できない場合は交付率をクリアする() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setMode("edit");
+        form.setKofuRitsu(new BigDecimal("10.00"));
+        when(shoreikinConfigService.calculateShoreikin(form))
+                .thenThrow(new IllegalStateException("交付率が設定されていません。交付率設定画面で登録してください。"));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.calculate(form, model);
+
+        assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+        // 交付率が null であることが、テンプレートが誘導モーダルを描画する条件
+        assertThat(form.getKofuRitsu()).isNull();
+        assertThat(model.asMap()).containsEntry("configForm", form);
+        // 文言はモーダル側に持たせているため、上部の alert は出さない
+        assertThat(model.asMap()).doesNotContainKey("errorMessage");
+    }
+
+    @Test
+    void calculate_想定外の例外は従来どおり画面上部にエラーを出す() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setKofuRitsu(new BigDecimal("10.00"));
+        when(shoreikinConfigService.calculateShoreikin(form))
+                .thenThrow(new RuntimeException("DB接続エラー"));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.calculate(form, model);
+
+        assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+        // 交付率はクリアしない（誘導モーダルの対象ではない）
+        assertThat(form.getKofuRitsu()).isEqualByComparingTo("10.00");
+        assertThat(model.asMap()).containsKey("errorMessage");
     }
 
     @Test

@@ -180,7 +180,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				jichitaiCd, nendoInt);
 		// 交付率が取得できない場合は算出できないためエラーとする
 		if (kofuRitsuList.isEmpty()) {
-			throw new IllegalStateException("交付率が設定されていません。交付率設定画面で登録してください");
+			throw new IllegalStateException("交付率が設定されていません。交付率設定画面で登録してください。");
 		}
 		KofuRitsu kofuRitsuEntity = kofuRitsuList.get(0);
 
