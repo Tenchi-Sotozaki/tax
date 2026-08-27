@@ -191,11 +191,13 @@
 											<span th:if="${item.kofuYmd == null}" class="text-muted">-</span>
 										</td>
 										<td class="text-center">
+											<!-- 交付金レコードが無い行は kofuNendo が null になるため、
+											     検索条件の交付金年度を照会画面へ渡す -->
 											<button type="button" class="btn btn-outline-primary py-0 me-1 btn-kofu"
 											    th:data-shitei-no="${item.listShiteiNo}" 
 											    th:data-shisetsu-name="${item.listShisetsuName}"
 											    th:data-shimei="${item.shimei}"
-											    th:data-nendo="${item.kofuNendo}">
+											    th:data-nendo="${item.kofuNendo != null ? item.kofuNendo : searchForm.nendo}">
 											    <i class="bi bi-eye me-1"></i>照会
 											</button>
 											<button type="button" class="btn btn-outline-secondary py-0 btn-koza"
