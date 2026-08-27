@@ -62,6 +62,13 @@
 
 
 
+		<!-- JSエラーメッセージ -->
+		<div id="jsErrorMessage" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i>
+			<span id="jsErrorMessageText"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
 		<!-- エラーメッセージ -->
 		<div th:if="${errorMessage}"
 			class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -355,26 +362,9 @@
 				name="gassanShiteiNo" th:value="${GassanForm.gassanShiteiNo}" />
 		</form>
 
-		<!-- すでに登録されている場合の確認用モーダル -->
-		<div class="modal fade" id="alreadyRegisteredModal" tabindex="-1"
-			aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">確認</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"
-							aria-label="閉じる"></button>
-					</div>
-					<div class="modal-body">この宛名はすでに合算申請に登録されています。照会画面に遷移しますか？</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary"
-							data-bs-dismiss="modal" id="alreadyRegisteredNoBtn">いいえ</button>
-						<button type="button" class="btn btn-primary"
-							id="alreadyRegisteredYesBtn">はい</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<!-- 照会画面遷移確認モーダル -->
+		<div
+			th:replace="~{layout/components :: linkConfirmModal('alreadyRegisteredModal', '確認', 'この宛名はすでに登録されています。照会画面に遷移しますか？', '#', 'はい')}"></div>
 
 	</div>
 

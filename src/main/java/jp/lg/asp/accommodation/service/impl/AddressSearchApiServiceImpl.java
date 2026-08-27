@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,13 +53,17 @@ public class AddressSearchApiServiceImpl implements AddressSearchApiService {
 
 					// 宛名がすでに合算申請に登録されているかチェック（論理削除済みを除く全履歴対象）
 					List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, a.getAtenaNo());
-					// 有効（適用中または未来終了）の合算を優先、なければ過去履歴の最新を取得
-					Optional<Gassan> activeGassan = gassanList.stream()
-							.filter(g -> g.getTekiyoEdYmd() == null || !g.getTekiyoEdYmd().isBefore(LocalDate.now()))
+					// 照会画面へ遷移：tekiyoEdYmdが未設定（終了日なし）の有効履歴がある場合
+					Optional<Gassan> viewOnlyGassan = gassanList.stream()
+							.filter(g -> g.getTekiyoEdYmd() == null)
 							.findFirst();
-					Optional<Gassan> targetGassan = activeGassan.isPresent() ? activeGassan
-							: gassanList.stream().findFirst();
+					// 再登録対象：tekiyoEdYmdが設定されている最新履歴
+					Optional<Gassan> reRegisterGassan = gassanList.stream()
+							.filter(g -> g.getTekiyoEdYmd() != null)
+							.findFirst();
+					Optional<Gassan> targetGassan = viewOnlyGassan.isPresent() ? viewOnlyGassan : reRegisterGassan;
 					boolean alreadyRegistered = targetGassan.isPresent();
+					boolean viewOnly = viewOnlyGassan.isPresent();
 					String gassanShiteiNo = null;
 					String tekiyoEdYmd = null;
 					if (alreadyRegistered) {
@@ -79,6 +82,7 @@ public class AddressSearchApiServiceImpl implements AddressSearchApiService {
 							.kojinNo(a.getKojinNo())
 							.hojinNo(a.getHojinNo())
 							.alreadyRegistered(alreadyRegistered)
+							.viewOnly(viewOnly)
 							.gassanShiteiNo(gassanShiteiNo)
 							.tekiyoEdYmd(tekiyoEdYmd)
 							.build();

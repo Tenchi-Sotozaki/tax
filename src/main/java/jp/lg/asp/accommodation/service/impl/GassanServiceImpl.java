@@ -226,11 +226,11 @@ public class GassanServiceImpl implements GassanService {
                 .orElseThrow(() -> new RuntimeException("前履歴が見つかりません: " + gassanShiteiNo));
 
         if (prev.getTekiyoEdYmd() != null && form.getTekiyoStYmd() != null
-                && form.getTekiyoStYmd().isBefore(prev.getTekiyoEdYmd())) {
-            throw new RuntimeException("適用開始年月は前履歴の適用終了年月（" + prev.getTekiyoEdYmd() + "）以降で入力してください。");
+                && !form.getTekiyoStYmd().isAfter(prev.getTekiyoEdYmd())) {
+            throw new RuntimeException("適用開始年月は前履歴の適用終了年月（" + prev.getTekiyoEdYmd() + "）より後の日付を入力してください。");
         }
 
-        BigDecimal nextRno = gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo).add(BigDecimal.ONE);
+        BigDecimal nextRno = gassanRepository.findMaxRnoIncludingDeletedByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo).add(BigDecimal.ONE);
         // 前履歴の newFlg をクリア
         gassanRepository.clearNewFlgByRno(jichitaiCd, gassanShiteiNo, prev.getRno());
 
@@ -281,7 +281,9 @@ public class GassanServiceImpl implements GassanService {
             }
 
             // 施設は編集不可—現在の内訳をそのまま維持
-            gassan.setTekiyoStYmd(form.getTekiyoStYmd());
+            if (form.getTekiyoStYmd() != null) {
+                gassan.setTekiyoStYmd(form.getTekiyoStYmd());
+            }
             gassan.setTekiyoEdYmd(form.getTekiyoEdYmd());
             gassan.setShinkokuYmd(form.getShinkokuYmd());
             gassan.setTorokuYmd(form.getTorokuYmd());

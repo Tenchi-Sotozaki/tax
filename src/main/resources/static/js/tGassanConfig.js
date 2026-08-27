@@ -45,10 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isEdit) {
             const checked = document.querySelectorAll('.facility-check:checked');
             if (checked.length < 2) {
-                alert('合算対象施設を2件以上選択してください。');
+                showJsError('合算対象施設を2件以上選択してください。');
                 return;
             }
         }
+        hideJsError();
         const modal = document.getElementById('registerModal');
         if (modal) new bootstrap.Modal(modal).show();
     });
@@ -158,13 +159,12 @@ function renderAddressResults(data) {
 async function selectAddress(d) {
     const searchModalEl = document.getElementById('addressSearchModal');
     const searchModal = bootstrap.Modal.getInstance(searchModalEl) || new bootstrap.Modal(searchModalEl);
+    // 宛名が選択されたので登録ボタンを再活性化
+    document.getElementById('openConfirmModalBtn')?.removeAttribute('disabled');
 
     if (d.alreadyRegistered) {
-        const edYmd = d.tekiyoEdYmd ? new Date(d.tekiyoEdYmd) : null;
-        const isExpired = edYmd && edYmd < new Date();
-
-        if (isExpired) {
-            // 適用終了年月が過ぎている→セッションに合算指定番号を保存して再登録画面へ遷移
+        if (!d.viewOnly) {
+            // tekiyoEdYmdが設定されている→再登録画面へ
             searchModal.hide();
             fetch('/accommodation-tax/gassan/select', {
                 method: 'POST',
@@ -186,42 +186,36 @@ async function selectAddress(d) {
             return;
         }
 
-        // 適用終了年月が未来または未設定→照会確認モーダル
+        // tekiyoEdYmdが未設定（終了日なし）→照会確認モーダル
         searchModal.hide();
         searchModalEl.addEventListener('hidden.bs.modal', function handler() {
             searchModalEl.removeEventListener('hidden.bs.modal', handler);
 
             const confirmModalEl = document.getElementById('alreadyRegisteredModal');
-            const confirmModal = new bootstrap.Modal(confirmModalEl);
-            confirmModal.show();
-
-            const yesBtn = document.getElementById('alreadyRegisteredYesBtn');
-            const newYesBtn = yesBtn.cloneNode(true);
-            yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
-            newYesBtn.addEventListener('click', () => {
-                // セッションに合算指定番号を保存してから照会画面へ
-                fetch('/accommodation-tax/gassan/select', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        [document.querySelector('meta[name="_csrf_header"]')?.content]: document.querySelector('meta[name="_csrf"]')?.content
-                    },
-                    body: new URLSearchParams({ gassanShiteiNo: d.gassanShiteiNo })
-                }).then(() => {
-                    window.location.href = '/accommodation-tax/gassan/view-form';
-                });
-            });
-
-            const noBtn = document.getElementById('alreadyRegisteredNoBtn');
-            const newNoBtn = noBtn.cloneNode(true);
-            noBtn.parentNode.replaceChild(newNoBtn, noBtn);
-            newNoBtn.addEventListener('click', () => {
-                confirmModal.hide();
-                resetAtenaSelection();
-                confirmModalEl.addEventListener('hidden.bs.modal', function searchModalHandler() {
-                    confirmModalEl.removeEventListener('hidden.bs.modal', searchModalHandler);
-                    new bootstrap.Modal(document.getElementById('addressSearchModal')).show();
+            // linkConfirmModalの「はい」ボタン（aタグ）のhrefにセッション保存後のURLを設定
+            fetch('/accommodation-tax/gassan/select', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    [document.querySelector('meta[name="_csrf_header"]')?.content]: document.querySelector('meta[name="_csrf"]')?.content
+                },
+                body: new URLSearchParams({ gassanShiteiNo: d.gassanShiteiNo })
+            }).then(() => {
+                const yesBtn = confirmModalEl.querySelector('.btn-primary');
+                if (yesBtn) yesBtn.href = '/accommodation-tax/gassan/view-form';
+                let navigated = false;
+                if (yesBtn) yesBtn.addEventListener('click', () => { navigated = true; }, { once: true });
+                const confirmModal = new bootstrap.Modal(confirmModalEl);
+                confirmModalEl.addEventListener('hidden.bs.modal', function handler() {
+                    confirmModalEl.removeEventListener('hidden.bs.modal', handler);
+                    if (!navigated) {
+                        // いいえで戻る場合は登録ボタンを無効化してから宛名検索モーダルを再表示
+                        const confirmBtn = document.getElementById('openConfirmModalBtn');
+                        if (confirmBtn) confirmBtn.setAttribute('disabled', 'disabled');
+                        new bootstrap.Modal(searchModalEl).show();
+                    }
                 }, { once: true });
+                confirmModal.show();
             });
         }, { once: true });
 
@@ -362,4 +356,17 @@ function updateDeleteButtonState() {
         deleteBtn.removeAttribute('disabled');
         deleteBtn.classList.remove('disabled');
     }
+}
+
+function showJsError(message) {
+    const area = document.getElementById('jsErrorMessage');
+    const text = document.getElementById('jsErrorMessageText');
+    if (!area || !text) return;
+    text.textContent = message;
+    area.classList.remove('d-none');
+    area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hideJsError() {
+    document.getElementById('jsErrorMessage')?.classList.add('d-none');
 }
