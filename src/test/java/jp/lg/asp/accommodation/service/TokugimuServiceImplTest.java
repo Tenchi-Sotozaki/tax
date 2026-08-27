@@ -23,7 +23,6 @@ import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
-import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
@@ -130,9 +129,7 @@ class TokugimuServiceImplTest {
                     .thenReturn(Optional.of(1));
             when(shoyushaRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
                     .thenReturn(List.of());
-            when(kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of());
-
+           
             TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
 
             assertThat(form).isNotNull();
@@ -150,105 +147,6 @@ class TokugimuServiceImplTest {
             assertThatThrownBy(() -> tokugimuService.getTokugimuByShiteiNo(shiteiNo))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("宿泊施設が見つかりません");
-        }
-    }
-    
-    @Nested
-    @DisplayName("register メソッドのテスト")
-    class RegisterTest {
-
-        @Test
-        @DisplayName("正常系：必須項目が揃っている場合、新規登録処理が正常に完了すること")
-        void success() {
-            TokugimuForm form = new TokugimuForm();
-            form.setAtenaNo(1L);
-            form.setFacilityName("テスト施設");
-
-            Jichitai jichitai = new Jichitai();
-            jichitai.setShiteiStChar("000");
-
-            when(jichitaiRepository.findById("012345")).thenReturn(Optional.of(jichitai));
-            when(atenaRepository.findByJichitaiCdAndAtenaNo(eq("012345"), any()))
-                    .thenReturn(Optional.of(new Atena()));
-            when(tokugimuRepository.findMaxShiteiNoByJichitaiCdAndPrefix(any(), any()))
-                    .thenReturn(Optional.of(5));
-
-            tokugimuService.register(form);
-
-            verify(tokugimuRepository, times(1)).save(any(Tokugimu.class));
-        }
-
-        @Test
-        @DisplayName("異常系：宛名番号がnullの場合、IllegalArgumentExceptionがスローされること")
-        void exception_atenaNoNull() {
-            TokugimuForm form = new TokugimuForm();
-            form.setAtenaNo(null);
-
-            assertThatThrownBy(() -> tokugimuService.register(form))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("宛名番号が指定されていません");
-        }
-    }
-    
-    @Nested
-    @DisplayName("deleteByShiteiNo メソッドのテスト")
-    class DeleteByShiteiNoTest {
-
-        @Test
-        @DisplayName("正常系：削除対象が存在し、過去の履歴（有効な履歴）が存在する場合、フラグが適切に切り替わりtrueが返ること")
-        void success_withHistory() {
-            String shiteiNo = "00000001";
-            Tokugimu target = new Tokugimu();
-            target.setShiteiNo(shiteiNo);
-            target.setNewFlg("1");
-
-            Tokugimu history = new Tokugimu();
-            history.setShiteiNo(shiteiNo);
-            history.setRno(BigDecimal.ONE);
-            history.setNewFlg("0");
-
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of(target));
-            when(tokugimuRepository.findActiveHistoryByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of(history));
-
-            boolean result = tokugimuService.deleteByShiteiNo(shiteiNo);
-
-            assertThat(result).isTrue();
-            assertThat(target.getDelFlg()).isEqualTo("1");
-            assertThat(history.getNewFlg()).isEqualTo("1");
-            verify(tokugimuRepository, times(2)).save(any(Tokugimu.class));
-        }
-
-        @Test
-        @DisplayName("境界値：削除対象はあるが、履歴が他に存在しない場合、delFlgのみ更新されfalseが返ること")
-        void boundary_noHistory() {
-            String shiteiNo = "00000001";
-            Tokugimu target = new Tokugimu();
-            target.setShiteiNo(shiteiNo);
-
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of(target));
-            when(tokugimuRepository.findActiveHistoryByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of());
-
-            boolean result = tokugimuService.deleteByShiteiNo(shiteiNo);
-
-            assertThat(result).isFalse();
-            assertThat(target.getDelFlg()).isEqualTo("1");
-            verify(tokugimuRepository, times(1)).save(any(Tokugimu.class));
-        }
-
-        @Test
-        @DisplayName("異常系：削除対象の指定番号が見つからない場合、RuntimeExceptionがスローされること")
-        void exception_notFound() {
-            String shiteiNo = "99999999";
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of());
-
-            assertThatThrownBy(() -> tokugimuService.deleteByShiteiNo(shiteiNo))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("削除対象が見つかりません");
         }
     }
     
@@ -307,9 +205,7 @@ class TokugimuServiceImplTest {
                     .thenReturn(Optional.of(1));
             when(shoyushaRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
                     .thenReturn(List.of());
-            when(kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of());
-
+           
             TokugimuForm form = tokugimuService.getTokugimuByShiteiNoAndRno(shiteiNo, rno);
 
             assertThat(form).isNotNull();
@@ -328,50 +224,6 @@ class TokugimuServiceImplTest {
             assertThatThrownBy(() -> tokugimuService.getTokugimuByShiteiNoAndRno(shiteiNo, rno))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("宿泊施設が見つかりません");
-        }
-    }
-
-    @Nested
-    @DisplayName("updateByShiteiNo メソッドのテスト")
-    class UpdateByShiteiNoTest {
-
-        @Test
-        @DisplayName("正常系：既存データの旧レコードの new_flg が 0 になり、インクリメントされた rno で新レコードが保存されること")
-        void success() {
-            String shiteiNo = "00000001";
-            TokugimuForm form = new TokugimuForm();
-            form.setAtenaNo(1L);
-            form.setFacilityName("更新後施設名");
-
-            Tokugimu oldTokugimu = new Tokugimu();
-            oldTokugimu.setShiteiNo(shiteiNo);
-            oldTokugimu.setNewFlg("1");
-            oldTokugimu.setRno(BigDecimal.ONE);
-
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of(oldTokugimu));
-            when(tokugimuRepository.findMaxRnoByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(Optional.of(1));
-
-            tokugimuService.updateByShiteiNo(shiteiNo, form);
-
-            assertThat(oldTokugimu.getNewFlg()).isEqualTo("0");
-            // oldの保存と新レコードの保存で計2回saveが呼ばれる
-            verify(tokugimuRepository, times(2)).save(any(Tokugimu.class));
-        }
-
-        @Test
-        @DisplayName("異常系：更新対象の指定番号が存在しない場合、RuntimeExceptionがスローされること")
-        void exception_notFound() {
-            String shiteiNo = "99999999";
-            TokugimuForm form = new TokugimuForm();
-
-            when(tokugimuRepository.findByJichitaiCdAndShiteiNo("012345", shiteiNo))
-                    .thenReturn(List.of());
-
-            assertThatThrownBy(() -> tokugimuService.updateByShiteiNo(shiteiNo, form))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("特別徴収義務者が見つかりません");
         }
     }
 

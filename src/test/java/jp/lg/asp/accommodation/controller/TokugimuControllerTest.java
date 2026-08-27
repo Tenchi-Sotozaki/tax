@@ -6,21 +6,24 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpSession;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
+import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
@@ -29,337 +32,134 @@ import jp.lg.asp.accommodation.util.SessionHelper;
 @ExtendWith(MockitoExtension.class)
 class TokugimuControllerTest {
 
-    @Mock TokugimuService tokugimuService;
-    @Mock NozeiShukiService nozeiShukiService;
-    @Mock ScreenAccessChecker accessChecker;
+    @Mock
+    private TokugimuService tokugimuService;
 
-    @InjectMocks TokugimuController controller;
+    @Mock
+    private NozeiShukiService nozeiShukiService;
 
-    private MockHttpSession sessionWith(String shiteiNo) {
-        MockHttpSession session = new MockHttpSession();
-        ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
-        dto.setShiteiNo(shiteiNo);
-        SessionHelper.saveShiteiGassan(session, dto);
-        return session;
-    }
-    
-    //===========================================
-  	// list
-  	//===========================================
+    @Mock
+    private ScreenAccessChecker accessChecker;
 
-    @Test
-    void list_検索済みの場合は一覧を表示する() {
-        when(tokugimuService.searchAll(any())).thenReturn(List.of());
-        Model model = new ExtendedModelMap();
+    @Mock
+    private HttpSession session;
 
-        String view = controller.list(new TokugimuSearchForm(), true, model);
+    @Mock
+    private Model model;
 
-        assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
-        assertThat(model.asMap()).containsKey("items");
-        assertThat(model.asMap()).containsEntry("isSearched", true);
+    @InjectMocks
+    private TokugimuController tokugimuController;
+
+    private MockedStatic<SessionHelper> sessionHelperMock;
+
+    @BeforeEach
+    void setUp() {
+        sessionHelperMock = mockStatic(SessionHelper.class);
     }
 
-    @Test
-    void list_初期表示では検索を実行しない() {
-        Model model = new ExtendedModelMap();
-
-        String view = controller.list(new TokugimuSearchForm(), false, model);
-
-        assertThat(view).isEqualTo("tokugimu/tTokugimuDaicho");
-        assertThat(model.asMap()).containsEntry("isSearched", false);
-        verify(tokugimuService, never()).searchAll(any());
-    }
-    
-    //===========================================
-  	// showRegistrationForm
-  	//===========================================
-
-    @Test
-    void showRegistrationForm_登録画面を返す() {
-        Model model = new ExtendedModelMap();
-
-        String view = controller.showRegistrationForm(model);
-
-        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-        assertThat(model.asMap()).containsEntry("isEdit", false);
+    @AfterEach
+    void tearDown() {
+        sessionHelperMock.close();
     }
 
-    //===========================================
-  	// delete
-  	//===========================================
+    @Nested
+    @DisplayName("list メソッドのテスト")
+    class ListTest {
 
-    @Test
-    void delete_全履歴が削除された場合は一覧に戻りセッションを解除する() {
-        MockHttpSession session = sessionWith("00100001");
-        Model model = new ExtendedModelMap();
-        when(tokugimuService.deleteByShiteiNo("00100001")).thenReturn(false);
+        @Test
+        @DisplayName("正常系：検索フラグが true のとき、検索サービスが呼び出され、取得された一覧がモデルに設定されて一覧画面が返却されること")
+        void success_searchedTrue() {
+            TokugimuSearchForm searchForm = new TokugimuSearchForm();
+            boolean searched = true;
 
-        String view = controller.delete(session, model, new RedirectAttributesModelMap());
+            TokugimuListItem item = new TokugimuListItem();
+            item.setShiteiNo("00000001");
 
-        assertThat(view).isEqualTo("redirect:/tokugimu/list");
-        assertThat(SessionHelper.getShiteiGassan(session)).isNull();
+            when(tokugimuService.searchAll(searchForm)).thenReturn(List.of(item));
+
+            String viewName = tokugimuController.list(searchForm, searched, model);
+
+            assertThat(viewName).isEqualTo("tokugimu/tTokugimuDaicho");
+            verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_DAICHO);
+            verify(tokugimuService).searchAll(searchForm);
+            verify(model).addAttribute("items", List.of(item));
+            verify(model).addAttribute("searchForm", searchForm);
+            verify(model).addAttribute("isSearched", true);
+        }
+
+        @Test
+        @DisplayName("境界値：初期表示時は検索結果一覧を表示しないため、検索が行われず空のリストがモデルに設定されて一覧画面が返却されること")
+        void boundary_searchedFalse() {
+            TokugimuSearchForm searchForm = new TokugimuSearchForm();
+            boolean searched = false;
+
+            String viewName = tokugimuController.list(searchForm, searched, model);
+
+            assertThat(viewName).isEqualTo("tokugimu/tTokugimuDaicho");
+            verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_DAICHO);
+            verify(tokugimuService, never()).searchAll(any());
+            verify(model).addAttribute("items", List.of());
+            verify(model).addAttribute("searchForm", searchForm);
+            verify(model).addAttribute("isSearched", false);
+        }
     }
 
-    @Test
-    void delete_履歴が残る場合は照会画面に戻りセッションを維持する() {
-        MockHttpSession session = sessionWith("00100001");
-        Model model = new ExtendedModelMap();
-        when(tokugimuService.deleteByShiteiNo("00100001")).thenReturn(true);
+    @Nested
+    @DisplayName("showView メソッドのテスト")
+    class ShowViewTest {
 
-        String view = controller.delete(session, model, new RedirectAttributesModelMap());
+        @Test
+        @DisplayName("正常系：セッションに指定番号が存在し、rno が指定されている場合に、履歴番号を指定してデータが取得・モデルに設定されること")
+        void success_withRno() {
+            Integer rno = 2;
+            String shiteiNo = "00000001";
+            TokugimuForm form = new TokugimuForm();
+            form.setShiteiNo(shiteiNo);
+            form.setName("テスト事業者");
+            form.setFacilityName("テスト施設");
+            form.setAtenaNo(1L);
 
-        assertThat(view).isEqualTo("redirect:/tokugimu/view");
-        assertThat(SessionHelper.getShiteiGassan(session)).isNotNull();
+            sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(shiteiNo);
+            sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
+
+            when(tokugimuService.getTokugimuByShiteiNoAndRno(shiteiNo, rno)).thenReturn(form);
+
+            String viewName = tokugimuController.showView(session, rno, model);
+
+            assertThat(viewName).isEqualTo("tokugimu/tTokugimuConfig");
+            verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_CONFIG);
+            verify(tokugimuService).getTokugimuByShiteiNoAndRno(shiteiNo, rno);
+            verify(model).addAttribute(eq("TokugimuForm"), eq(form));
+            verify(model).addAttribute("isView", true);
+            verify(model).addAttribute("isEdit", false);
+            verify(model).addAttribute("editId", shiteiNo);
+        }
+
+        @Test
+        @DisplayName("正常系：セッションに指定番号が存在し、rno が未指定の場合に、最新データが取得・モデルに設定されること")
+        void success_withoutRno() {
+            Integer rno = null;
+            String shiteiNo = "00000001";
+            TokugimuForm form = new TokugimuForm();
+            form.setShiteiNo(shiteiNo);
+            form.setName("テスト事業者");
+            form.setFacilityName("テスト施設");
+            form.setAtenaNo(1L);
+
+            sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(shiteiNo);
+            sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
+
+            when(tokugimuService.getTokugimuByShiteiNo(shiteiNo)).thenReturn(form);
+
+            String viewName = tokugimuController.showView(session, rno, model);
+
+            assertThat(viewName).isEqualTo("tokugimu/tTokugimuConfig");
+            verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_CONFIG);
+            verify(tokugimuService).getTokugimuByShiteiNo(shiteiNo);
+            verify(model).addAttribute(eq("TokugimuForm"), eq(form));
+            verify(model).addAttribute("isView", true);
+            verify(model).addAttribute("isEdit", false);
+            verify(model).addAttribute("editId", shiteiNo);
+        }
     }
-
-    @Test
-    void delete_セッション未設定は削除せずモーダル表示() {
-        MockHttpSession session = new MockHttpSession();
-        Model model = new ExtendedModelMap();
-
-        String view = controller.delete(session, model, new RedirectAttributesModelMap());
-
-        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
-        verify(tokugimuService, never()).deleteByShiteiNo(any());
-    }
-    
-	//===========================================
-	// showView
-	//===========================================
-    
-	@Test
-	void showView_履歴番号指定ありで照会画面を返す() {
-
-		MockHttpSession session = sessionWith("00100001");
-		TokugimuForm form = new TokugimuForm();
-		when(tokugimuService.getTokugimuByShiteiNoAndRno("00100001", 2)).thenReturn(form);
-		Model model = new ExtendedModelMap();
-
-		String view = controller.showView(session, 2, model);
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-		assertThat(model.asMap()).containsEntry("isView", true);
-		verify(tokugimuService, never()).getTokugimuByShiteiNo(any());
-	}
-	
-	@Test
-    void showView_照会画面を返す() {
-        MockHttpSession session = sessionWith("00100001");
-        TokugimuForm form = new TokugimuForm();
-        when(tokugimuService.getTokugimuByShiteiNo("00100001")).thenReturn(form);
-        Model model = new ExtendedModelMap();
-
-        String view = controller.showView(session, null, model);
-
-        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-        assertThat(model.asMap()).containsEntry("isView", true);
-        // 帳票発行画面が参照するセッションに、表示中の特別徴収義務者が格納されること
-        assertThat(SessionHelper.getShiteiGassan(session)).isNotNull();
-    }
-
-    @Test
-    void showView_セッション未設定は照会画面でモーダル表示() {
-        MockHttpSession session = new MockHttpSession();
-        Model model = new ExtendedModelMap();
-
-        String view = controller.showView(session, null, model);
-
-        // モーダルは一覧ではなく遷移先の画面で開く
-        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
-    }
-	
-	//===========================================
-	// register
-	//===========================================
-
-	@Test
-	void register_サービス例外発生時にエラーハンドリングして登録画面に戻る() {
-		TokugimuForm form = new TokugimuForm();
-		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
-		Model model = new ExtendedModelMap();
-
-		// サービス層で例外が発生するケース
-		doThrow(new RuntimeException("DB登録エラー")).when(tokugimuService).register(any());
-
-		String view = controller.register(form, bindingResult, model, new RedirectAttributesModelMap());
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-		assertThat(model.asMap()).containsEntry("errorMessage", "DB登録エラー");
-	}
-	
-	@Test
-    void register_バリデーションエラー() {
-        TokugimuForm form = new TokugimuForm();
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
-        bindingResult.rejectValue("name", "NotBlank", "必須です");
-        Model model = new ExtendedModelMap();
-
-        String view = controller.register(form, bindingResult, model, new RedirectAttributesModelMap());
-
-        assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-    }
-
-    @Test
-    void register_正常登録() {
-        TokugimuForm form = new TokugimuForm();
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
-        Model model = new ExtendedModelMap();
-
-        String view = controller.register(form, bindingResult, model, new RedirectAttributesModelMap());
-
-        assertThat(view).isEqualTo("redirect:/tokugimu/list");
-        verify(tokugimuService).register(form);
-    }
-
-	//===========================================
-	// showEditForm
-	//===========================================
-
-	@Test
-	void showEditForm_セッションありの場合は編集画面を返す() {
-		MockHttpSession session = sessionWith("00100001");
-		TokugimuForm form = new TokugimuForm();
-		when(tokugimuService.getTokugimuByShiteiNo("00100001")).thenReturn(form);
-		Model model = new ExtendedModelMap();
-
-		String view = controller.showEditForm(session, model);
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-		assertThat(model.asMap()).containsEntry("isEdit", true);
-		verify(tokugimuService).getTokugimuByShiteiNo("00100001");
-	}
-
-	@Test
-	void showEditForm_セッション未設定の場合は編集画面でモーダル表示() {
-		MockHttpSession session = new MockHttpSession();
-		Model model = new ExtendedModelMap();
-
-		String view = controller.showEditForm(session, model);
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-		assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
-		verify(tokugimuService, never()).getTokugimuByShiteiNo(any());
-	}
-
-	//===========================================
-	// update
-	//===========================================
-
-	@Test
-	void update_バリデーションエラーありの場合は編集画面に戻る() {
-		MockHttpSession session = sessionWith("00100001");
-		TokugimuForm form = new TokugimuForm();
-		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
-		bindingResult.rejectValue("name", "NotBlank", "必須です");
-		Model model = new ExtendedModelMap();
-
-		String view = controller.update(session, form, bindingResult, model, new RedirectAttributesModelMap());
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-		verify(tokugimuService, never()).updateByShiteiNo(any(), any());
-	}
-
-	@Test
-	void update_正常に更新された場合は一覧または詳細へリダイレクト() {
-		MockHttpSession session = sessionWith("00100001");
-		TokugimuForm form = new TokugimuForm();
-		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
-		Model model = new ExtendedModelMap();
-
-		String view = controller.update(session, form, bindingResult, model, new RedirectAttributesModelMap());
-
-		assertThat(view).startsWith("redirect:");
-		verify(tokugimuService).updateByShiteiNo(eq("00100001"), eq(form));
-	}
-	
-	@Test
-	void update_サービス例外発生時にエラーハンドリングして編集画面に戻る() {
-		MockHttpSession session = sessionWith("00100001");
-		TokugimuForm form = new TokugimuForm();
-		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
-		Model model = new ExtendedModelMap();
-
-		// 更新処理で例外が発生するケース
-		doThrow(new RuntimeException("DB更新エラー")).when(tokugimuService).updateByShiteiNo(eq("00100001"), any());
-
-		String view = controller.update(session, form, bindingResult, model, new RedirectAttributesModelMap());
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-	}
-
-	@Test
-	void update_セッション未設定の場合は更新せずモーダル表示() {
-		MockHttpSession session = new MockHttpSession();
-		TokugimuForm form = new TokugimuForm();
-		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "TokugimuForm");
-		Model model = new ExtendedModelMap();
-
-		String view = controller.update(session, form, bindingResult, model, new RedirectAttributesModelMap());
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuConfig");
-		assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
-		verify(tokugimuService, never()).updateByShiteiNo(any(), any());
-	}
-
-	//===========================================
-	// showReport
-	//===========================================
-
-	@Test
-	void showReport_セッションありの場合は帳票発行画面を返す() {
-		MockHttpSession session = sessionWith("00100001");
-		Model model = new ExtendedModelMap();
-
-		String view = controller.showReport(session, model);
-
-		assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
-		assertThat(model.asMap()).doesNotContainKey("showShiteiGassanModal");
-	}
-	
-	@Test
-    void showReport_セッション未設定は帳票発行画面でモーダル表示() {
-        MockHttpSession session = new MockHttpSession();
-        Model model = new ExtendedModelMap();
-
-        String view = controller.showReport(session, model);
-
-        assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
-        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
-    }
-
-	//===========================================
-	// showGassanReport
-	//===========================================
-
-	@Test
-	void showGassanReport_合算指定番号が存在する場合は合算納入通知書の画面へリダイレクトする() {
-	    MockHttpSession session = new MockHttpSession();
-	    ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
-	    dto.setGassanShiteiNo("00100001"); // 合算指定番号を設定
-	    SessionHelper.saveShiteiGassan(session, dto);
-	    Model model = new ExtendedModelMap();
-	    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
-
-	    String view = controller.showGassanReport(session, model, redirectAttributes);
-
-	    assertThat(view).isEqualTo("redirect:/reports/gassanNonyuTsuchi");
-	}
-
-	@Test
-	void showGassanReport_合算指定番号が存在しない場合はエラーメッセージを設定して一覧へリダイレクトする() {
-	    MockHttpSession session = new MockHttpSession();
-	    // DTOがnull、または gassanShiteiNo が空の状態
-	    ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
-	    dto.setGassanShiteiNo(""); 
-	    SessionHelper.saveShiteiGassan(session, dto);
-	    Model model = new ExtendedModelMap();
-	    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
-
-	    String view = controller.showGassanReport(session, model, redirectAttributes);
-
-	    assertThat(view).isEqualTo("redirect:/tokugimu/report");
-	    assertThat(redirectAttributes.getFlashAttributes()).containsKey("errorMessage");
-	}
 }
