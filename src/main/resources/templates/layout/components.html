@@ -108,56 +108,6 @@
 
 
 	<!--
-  リンク付きエラーモーダル フラグメント
-
-  linkConfirmModal と引数は同じだが、確認ではなくエラーの見た目にする。
-  エラーを伝えたうえで、原因を解消できる画面へ誘導する用途で使う。
-
-  パラメータ:
-    modalId  - モーダルのHTML id属性値
-    title    - モーダルのタイトル
-    message  - モーダルの本文メッセージ
-    href     - 遷移先URL
-    btnLabel - 遷移ボタンのラベル
-
-  使用例:
-    <div th:replace="~{layout/components :: linkErrorModal('kofuRitsuGuideModal','交付率未設定','交付率が設定されていません。交付率設定画面で登録してください。',@{/admin/kofu-ritsu/list},'交付率設定へ')}"></div>
--->
-	<div
-		th:fragment="linkErrorModal(modalId, title, message, href, btnLabel)"
-		class="modal fade" th:id="${modalId}" tabindex="-1"
-		data-bs-backdrop="static" data-bs-keyboard="false"
-		th:aria-labelledby="${modalId + 'Label'}" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content shadow">
-				<div class="modal-header bg-primary text-white">
-					<h5 class="modal-title" th:id="${modalId + 'Label'}">
-						<i class="bi bi-exclamation-triangle-fill me-2"></i>
-						<span th:text="${title}">エラー</span>
-					</h5>
-					<button type="button" class="btn-close btn-close-white"
-						data-bs-dismiss="modal" aria-label="閉じる"></button>
-				</div>
-				<div class="modal-body">
-					<p class="mb-0" th:text="${message}"></p>
-				</div>
-				<div class="modal-footer justify-content-center">
-					<button type="button" class="btn btn-outline-secondary"
-						data-bs-dismiss="modal">
-						<i class="bi bi-x-lg me-1"></i>閉じる
-					</button>
-					<!-- 遷移自体は破壊的な操作ではないため btn-primary のままにする -->
-					<a class="btn btn-primary" th:href="${href}">
-						<i class="bi bi-gear me-1"></i>
-						<span th:text="${btnLabel}">設定へ</span>
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
-
-
-	<!--
   宛名検索モーダル フラグメント
   使用例:
     <div th:replace="~{layout/components :: addressSearchModal}"></div>
