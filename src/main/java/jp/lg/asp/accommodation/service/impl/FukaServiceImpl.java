@@ -31,7 +31,7 @@ import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
@@ -45,7 +45,7 @@ import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
-import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
+import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
@@ -75,7 +75,7 @@ public class FukaServiceImpl implements FukaService {
 	private final NokigenRepository nokigenRepository;
 	private final JichitaiRepository jichitaiRepository;
 	private final ShunoRirekiRepository shunoRirekiRepository;
-	private final TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
+	private final TokureiTekiyoRepository tekiyoNozeiShukiRepository;
 
 	// 定数定義（マジックナンバーの排除）
 	private static final String STATUS_ALL = "999";
@@ -103,7 +103,7 @@ public class FukaServiceImpl implements FukaService {
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
 		Map<Integer, Fuka> fukaMap = createFukaMap(fukaList);
 
-		List<TekiyoNozeiShuki> tekiyoList = tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		List<TokureiTekiyo> tekiyoList = tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
 		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
 				.orElse(3);
@@ -127,7 +127,7 @@ public class FukaServiceImpl implements FukaService {
 	 * 期別ごとの台帳明細行リストを作成する。
 	 */
 	private List<FukaDaichoListItem> createDaichoItems(String nendo, Map<Integer, Fuka> fukaMap, String filterStatus,
-			List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
+			List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
 		List<FukaDaichoListItem> items = new ArrayList<>();
 		for (int i = 1; i <= MAX_KIBETSU; i++) {
 			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, shiteiNo);
@@ -148,7 +148,7 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 単一の台帳明細行を組み立てる。
 	 */
-	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap, List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
+	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap, List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
 		FukaDaichoListItem item = new FukaDaichoListItem();
 		item.setNendo(nendo);
 		item.setKibetsu(kibetsu);
@@ -248,7 +248,7 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 対象日に適用される納税周期を判定する
 	 */
-	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, LocalDate targetDate) {
+	private int resolveShuki(List<TokureiTekiyo> tekiyoList, LocalDate targetDate) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		boolean inPeriod = tekiyoList.stream()
 				.anyMatch(t -> (t.getTekiyoStYmd() == null || !targetDate.isBefore(t.getTekiyoStYmd()))

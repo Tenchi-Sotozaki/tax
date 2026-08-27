@@ -11,18 +11,18 @@ import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.entity.TokureiTekiyoId;
 
 @Repository
-public interface TekiyoNozeiShukiRepository extends JpaRepository<TokureiTekiyo, TokureiTekiyoId> {
+public interface TokureiTekiyoRepository extends JpaRepository<TokureiTekiyo, TokureiTekiyoId> {
     @Query("SELECT t FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0' ORDER BY t.rno DESC")
     List<TokureiTekiyo> findLatestByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
 
     @Query("SELECT COALESCE(MAX(t.rno), 0) FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo")
-    Integer findMaxRnoByJichitaiCdAndShiteiNo(
+    int findMaxRnoByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
 
-    @Query("SELECT t FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0'")
+    @Query("SELECT t FROM TokureiTekiyo t WHERE t.jichitaiCd = :jichitaiCd AND t.shiteiNo = :shiteiNo AND t.delFlg = '0' ORDER BY t.tekiyoStYmd ASC")
     List<TokureiTekiyo> findActiveByJichitaiCdAndShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("shiteiNo") String shiteiNo);
