@@ -194,8 +194,8 @@ public class GassanController {
 			model.addAttribute("editId", gassanShiteiNo);
 			model.addAttribute("tekiyoStYmdEditable",
 					form.getTekiyoStYmd() != null && form.getTekiyoStYmd().isAfter(java.time.LocalDate.now()));
-			model.addAttribute("editable",
-					form.getTekiyoEdYmd() == null || form.getTekiyoEdYmd().isAfter(java.time.LocalDate.now()));
+			// エラー時は editable を DB の値ではなくフォーム送信値で判定しない（常に編集可能にする）
+			model.addAttribute("editable", true);
 			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
 				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
 				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
@@ -229,10 +229,12 @@ public class GassanController {
 			HttpSession session) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
+		boolean isReRegister = SessionHelper.getGassanShiteiNo(session) != null;
 		if (bindingResult.hasErrors()) {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
+			model.addAttribute("isReRegister", isReRegister);
 			model.addAttribute("validationErrors", GassanForm.validate(form).values());
 			return FORM_VIEW;
 		}
@@ -248,6 +250,7 @@ public class GassanController {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
+			model.addAttribute("isReRegister", isReRegister);
 			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
 				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
 				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
@@ -22,7 +22,7 @@
 				<h5 class="mb-0 fw-bold text-dark">
 					<i class="bi bi-file-earmark-text me-2 text-primary"></i> <span
 						id="pageTitleSpan"
-						th:text="${isView} ? '合算申請 照会' : (${isEdit} ? '合算申請 編集' : '合算申請 新規登録')"></span>
+						th:text="${isView} ? '合算申請 照会' : (${isEdit} ? '合算申請 編集' : (${isReRegister} ? '合算申請 再登録' : '合算申請 新規登録'))"></span>
 				</h5>
 				<th:block th:if="${isView}">
 					<a th:href="@{/gassan/edit}" class="btn btn-primary ms-auto"
@@ -35,7 +35,7 @@
 		</div>
 		<!-- 2段目：合算情報表示（登録以外、または再登録時） -->
 		<div id="sessionInfoArea"
-			th:classappend="${isEdit} or ${isView} ? '' : 'd-none'">
+			th:classappend="${isEdit} or ${isView} or ${isReRegister} ? '' : 'd-none'">
 			<div
 				th:replace="~{layout/components :: selectedTokugimuInfo(${isView})}"></div>
 		</div>
@@ -120,7 +120,7 @@
 							<input th:if="${isView} or !${editable ?: true}" type="text"
 								class="form-control form-control-readonly" id="torokuYmdView"
 								readonly
-								th:value="*{torokuYmd != null ? #temporals.format(torokuYmd, 'yyyy/MM/dd') : ''}">
+								th:value="*{torokuYmd != null ? #temporals.format(torokuYmd, 'yyyy年MM月dd日') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('torokuYmd')}"
 								th:errors="*{torokuYmd}"></div>
@@ -139,7 +139,7 @@
 								th:if="${isView} or !${editable ?: true}" type="text"
 								class="form-control form-control-readonly" id="shinkokuYmdView"
 								readonly
-								th:value="*{shinkokuYmd != null ? #temporals.format(shinkokuYmd, 'yyyy/MM/dd') : ''}">
+								th:value="*{shinkokuYmd != null ? #temporals.format(shinkokuYmd, 'yyyy年MM月dd日') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('shinkokuYmd')}"
 								th:errors="*{shinkokuYmd}"></div>
@@ -156,30 +156,29 @@
 								class="text-danger" th:if="!${isView} and ${editable ?: true}">*</span>
 							</label>
 							<!-- 登録時：入力可 -->
-							<input th:if="!${isView} and !${isEdit}" type="text"
+							<input th:if="!${isView} and !${isEdit}" type="month"
 								class="form-control" id="tekiyoStYmd" name="tekiyoStYmd"
-								placeholder="yyyy/MM"
-								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy/MM') : ''}"
+								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy-MM') : ''}"
 								th:errorclass="is-invalid"
-								th:data-initial-value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy/MM') : ''}">
+								th:data-initial-value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy-MM') : ''}">
 							<!-- 編集時：editable かつ未来日のみ入力可 -->
 							<input
 								th:if="${isEdit} and ${editable ?: true} and ${tekiyoStYmdEditable}"
-								type="text" class="form-control" id="tekiyoStYmd"
-								name="tekiyoStYmd" placeholder="yyyy/MM"
-								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy/MM') : ''}"
+								type="month" class="form-control" id="tekiyoStYmd"
+								name="tekiyoStYmd"
+								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy-MM') : ''}"
 								th:errorclass="is-invalid"
-								th:data-initial-value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy/MM') : ''}">
+								th:data-initial-value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy-MM') : ''}">
 							<!-- 編集時：過去日 or 編集不可は読み取り専用 -->
 							<input
 								th:if="${isEdit} and (!${editable ?: true} or !${tekiyoStYmdEditable})"
 								type="text" class="form-control form-control-readonly" readonly
-								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy/MM') : ''}">
+								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy年MM月') : ''}">
 							<!-- 照会時 -->
 							<input th:if="${isView}" type="text"
 								class="form-control form-control-readonly" id="tekiyoStYmdView"
 								readonly
-								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy/MM') : ''}">
+								th:value="*{tekiyoStYmd != null ? #temporals.format(tekiyoStYmd, 'yyyy年MM月') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoStYmd')}"
 								th:errors="*{tekiyoStYmd}"></div>
@@ -190,16 +189,15 @@
 							<label
 								th:for="!${isView} and ${editable ?: true} ? 'tekiyoEdYmd' : 'tekiyoEdYmdView'"
 								class="form-label fw-medium"> 適用終了年月 </label> <input
-								th:if="!${isView} and ${editable ?: true}" type="text"
+								th:if="!${isView} and ${editable ?: true}" type="month"
 								class="form-control" id="tekiyoEdYmd" name="tekiyoEdYmd"
-								placeholder="yyyy/MM"
-								th:value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy/MM') : ''}"
+								th:value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy-MM') : ''}"
 								th:errorclass="is-invalid"
-								th:data-initial-value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy/MM') : ''}">
+								th:data-initial-value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy-MM') : ''}">
 							<input th:if="${isView} or !${editable ?: true}" type="text"
 								class="form-control form-control-readonly" id="tekiyoEdYmdView"
 								readonly
-								th:value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy/MM') : ''}">
+								th:value="*{tekiyoEdYmd != null ? #temporals.format(tekiyoEdYmd, 'yyyy年MM月') : ''}">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoEdYmd')}"
 								th:errors="*{tekiyoEdYmd}"></div>
@@ -371,11 +369,7 @@
 	</div>
 
 	<th:block layout:fragment="scripts">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
-		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-		<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
-		<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
 		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 		<script th:src="@{/js/tGassanConfig.js}"></script>
 	</th:block>

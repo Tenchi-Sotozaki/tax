@@ -38,41 +38,38 @@ document.addEventListener('DOMContentLoaded', () => {
     // チェックされた行をハイライト
     setupFacilityEventListeners();
 
-    // Flatpickr初期化（yyyy/MM形式、月選択）
-    ['tekiyoStYmd', 'tekiyoEdYmd'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && el.type === 'text') flatpickr(el, {
-            locale: 'ja',
-            plugins: [new monthSelectPlugin({ shorthand: false, dateFormat: 'Y/m', altFormat: 'Y/m' })],
-        });
-    });
-    // 確認モーダルを開く前にチェック済み施設が2件以上あるか検証（登録時のみ）
+    // 確認モーダルを開く
     document.getElementById('openConfirmModalBtn')?.addEventListener('click', () => {
-        const container = document.querySelector('[data-is-edit]');
-        const isEdit = container ? container.getAttribute('data-is-edit') === 'true' : false;
-        if (!isEdit) {
-            const checked = document.querySelectorAll('.facility-check:checked');
-            if (checked.length < 2) {
-                showJsError('合算対象施設を2件以上選択してください。');
-                return;
-            }
-        }
         hideJsError();
         const modal = document.getElementById('registerModal');
         if (modal) new bootstrap.Modal(modal).show();
     });
 
-    // フォーム送信前に type=month の値を yyyy-MM-dd 形式に変換
+    // 登録フォーム送信時に施設件数を検証（登録時のみ）
+    document.getElementById('gassanForm')?.addEventListener('submit', (e) => {
+        const container = document.querySelector('[data-is-edit]');
+        const isEdit = container ? container.getAttribute('data-is-edit') === 'true' : false;
+        if (!isEdit) {
+            const checked = document.querySelectorAll('.facility-check:checked');
+            if (checked.length < 2) {
+                e.preventDefault();
+                bootstrap.Modal.getInstance(document.getElementById('registerModal'))?.hide();
+                showJsError('合算対象施設を2件以上選択してください。');
+            }
+        }
+    });
+
+    // フォーム送信前に値を変換
     document.getElementById('gassanForm')?.addEventListener('formdata', (e) => {
+        // type=month: yyyy-MM -> yyyy-MM-dd / 末日
         const stYmd = document.getElementById('tekiyoStYmd');
         if (stYmd && stYmd.value) {
-            const [year, month] = stYmd.value.split('/');
-            if (year && month) e.formData.set('tekiyoStYmd', `${year}-${month.padStart(2, '0')}-01`);
+            e.formData.set('tekiyoStYmd', `${stYmd.value}-01`);
         }
 
         const edYmd = document.getElementById('tekiyoEdYmd');
         if (edYmd && edYmd.value) {
-            const [year, month] = edYmd.value.split('/').map(Number);
+            const [year, month] = edYmd.value.split('-').map(Number);
             if (year && month) {
                 const lastDay = new Date(year, month, 0).getDate();
                 e.formData.set('tekiyoEdYmd', `${year}-${String(month).padStart(2, '0')}-${lastDay}`);
