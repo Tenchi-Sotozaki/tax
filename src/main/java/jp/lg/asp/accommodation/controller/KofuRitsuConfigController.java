@@ -52,7 +52,7 @@ public class KofuRitsuConfigController {
 			return "admin/kofuRitsuConfig";
 		}
 		if (kofuRitsuConfigService.existsByTekiyoStNendo(configForm.getTekiyoStNendo())) {
-			model.addAttribute("errorMessage", "登録済みの適用開始年度です。");
+			model.addAttribute("tekiyoStNendoError", "登録済みの適用開始年度です。");
 			model.addAttribute("mode", "register");
 			return "admin/kofuRitsuConfig";
 		}

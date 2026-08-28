@@ -106,7 +106,7 @@ class KofuRitsuConfigControllerTest {
         String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("admin/kofuRitsuConfig");
-        assertThat(model.asMap().get("errorMessage").toString()).contains("登録済みの適用開始年度");
+        assertThat(model.asMap().get("tekiyoStNendoError").toString()).contains("登録済みの適用開始年度");
         assertThat(model.asMap().get("mode")).isEqualTo("register");
         verify(kofuRitsuConfigService, never()).register(any());
         verify(accessChecker).checkWriteAccess(anyString());
