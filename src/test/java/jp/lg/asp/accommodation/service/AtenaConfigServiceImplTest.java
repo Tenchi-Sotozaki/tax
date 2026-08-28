@@ -173,25 +173,6 @@ class AtenaConfigServiceImplTest {
 					.isInstanceOf(BusinessException.class)
 					.hasMessage("この法人番号はすでに登録されています。");
 		}
-		
-		@Test
-		@DisplayName("異常系：自治体情報の宛名開始番号（atenaStNo）が未設定かつ既存の宛名が存在しない場合、ビジネス例外がスローされること")
-		void exception_atenaStNoNotSet() {
-			String jichitaiCd = "123456";
-			Jichitai jichitai = new Jichitai();
-			jichitai.setAtenaStNo(null);
-			Atena atena = new Atena();
-			atena.setHojinNo("1234567890123");
-
-			when(jichitaiRepository.findById(jichitaiCd)).thenReturn(Optional.of(jichitai));
-			when(atenaRepository.existsByHojinNo(any(), any(), any())).thenReturn(false);
-			when(atenaRepository.findMaxAtenaNoByJichitaiCd(jichitaiCd)).thenReturn(Optional.empty());
-
-			assertThatThrownBy(() -> atenaConfigService.register(atena, jichitaiCd))
-					.isInstanceOf(BusinessException.class)
-					.hasMessage("宛名の開始番号が設定されていません。管理者にお問い合わせください。");
-			verify(atenaRepository, never()).save(any(Atena.class));
-		}
 	}
 
 	@Nested

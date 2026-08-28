@@ -15,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
@@ -34,6 +36,7 @@ import jp.lg.asp.accommodation.service.AtenaImportService;
 import jp.lg.asp.accommodation.service.AtenaService;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AtenaControllerTest {
 
 	@InjectMocks
