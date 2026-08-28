@@ -1,0 +1,20 @@
+﻿,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,作成者,亀井,
+帳票項目一覧表,,帳票物理名,kofukinShinsei,作成日,2026/6/11,
+,,帳票論理名,宿泊税特別徴収事務交付金交付申請書,更新日,,
+,,,,,,
+No.,項目名,フィールド名,DBテーブル,DBカラム,型,備考
+1,発行様式,hakkoYoshiki,m_reports_def,def_data,String,
+2,市区町村名,cityName,m_jichitai,name,String,
+3,条令,jorei,m_reports_def,def_data,String,
+4,施設住所,shisetsuJusho,t_tokugimu,"shisets_yubin_no
+shisetsu_jusho",String,郵便番号と住所を連結して設定
+5,施設名称,shisetsuName,t_tokugimu ,shisetsu_name,String,
+6,指定番号,shiteiNo,t_tokugimu,shitei_no,String,
+7,申告納入金額,nonyugaku,t_shoreikin,kofu_zeigaku,String,
+8,交付申請額,kofugaku,t_shoreikin,kofu_gaku,String,
+9,交付条件文,kofuJoken,m_reports_def,def_data,String,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,

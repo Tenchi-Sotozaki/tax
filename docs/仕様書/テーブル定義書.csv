@@ -1,0 +1,22 @@
+﻿論理名,,物理名,,,作成者,,作成日
+納入期限マスタ,,m_nokigen,,,亀井,,2026/7/2
+no,論理名,物理名,型,精度,pk,not null,備考
+1,自治体コード,jichitai_cd,char,5,〇,〇,
+2,対象年度,nendo,char,4,○,〇,
+3,1期納期,nokigen_1st,char,8,,〇,
+4,2期納期,nokigen_2nd,char,8,,〇,
+5,3期納期,nokigen_3rd,char,8,,〇,
+6,4期納期,nokigen_4th,char,8,,〇,
+7,5期納期,nokigen_5th,char,8,,〇,
+8,6期納期,nokigen_6th,char,8,,〇,
+9,7期納期,nokigen_7th,char,8,,〇,
+10,8期納期,nokigen_8th,char,8,,〇,
+11,9期納期,nokigen_9th,char,8,,〇,
+12,10期納期,nokigen_10th,char,8,,〇,
+13,11期納期,nokigen_11th,char,8,,〇,
+14,12期納期,nokigen_12th,char,8,,〇,
+15,作成日時,add_dt,timestamp,,,〇,
+16,作成者,add_user,varchar,20,,〇,
+17,更新日時,upd_dt,timestamp,,,〇,
+18,更新者,upd_user,varchar,20,,〇,
+19,バージョン,version,integer,,,〇,
