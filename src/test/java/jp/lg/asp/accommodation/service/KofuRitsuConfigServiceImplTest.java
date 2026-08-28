@@ -87,4 +87,18 @@ class KofuRitsuConfigServiceImplTest {
 
         verify(kofuRitsuRepository, times(1)).save(any());
     }
+
+    @Test
+    void existsByTekiyoStNendo_存在する場合_trueを返す() {
+        when(kofuRitsuRepository.countByJichitaiCdAndTekiyoStNendo(JICHITAI_CD, 2024)).thenReturn(1L);
+
+        assertThat(service.existsByTekiyoStNendo(2024)).isTrue();
+    }
+
+    @Test
+    void existsByTekiyoStNendo_存在しない場合_falseを返す() {
+        when(kofuRitsuRepository.countByJichitaiCdAndTekiyoStNendo(JICHITAI_CD, 2024)).thenReturn(0L);
+
+        assertThat(service.existsByTekiyoStNendo(2024)).isFalse();
+    }
 }

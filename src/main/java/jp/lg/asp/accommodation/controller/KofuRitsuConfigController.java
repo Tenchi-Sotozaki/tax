@@ -44,6 +44,11 @@ public class KofuRitsuConfigController {
 			model.addAttribute("mode", "register");
 			return "admin/kofuRitsuConfig";
 		}
+		if (kofuRitsuConfigService.existsByTekiyoStNendo(configForm.getTekiyoStNendo())) {
+			model.addAttribute("errorMessage", "登録済みの適用開始年度です。編集画面から修正してください。");
+			model.addAttribute("mode", "register");
+			return "admin/kofuRitsuConfig";
+		}
 		try {
 			kofuRitsuConfigService.register(configForm);
 			redirectAttributes.addFlashAttribute("successMessage", "交付率を登録しました。");

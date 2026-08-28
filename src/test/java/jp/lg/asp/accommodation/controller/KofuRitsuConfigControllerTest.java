@@ -54,13 +54,31 @@ class KofuRitsuConfigControllerTest {
     @Test
     void save_正常登録() {
         KofuRitsuConfigDto form = new KofuRitsuConfigDto();
+        form.setTekiyoStNendo(2024);
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
         Model model = new ExtendedModelMap();
+        when(kofuRitsuConfigService.existsByTekiyoStNendo(2024)).thenReturn(false);
 
         String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/kofu-ritsu/list");
         verify(kofuRitsuConfigService).register(form);
+    }
+
+    @Test
+    void save_同一年度重複_登録画面に戻りエラーメッセージが設定される() {
+        KofuRitsuConfigDto form = new KofuRitsuConfigDto();
+        form.setTekiyoStNendo(2024);
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
+        Model model = new ExtendedModelMap();
+        when(kofuRitsuConfigService.existsByTekiyoStNendo(2024)).thenReturn(true);
+
+        String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("admin/kofuRitsuConfig");
+        assertThat(model.asMap().get("errorMessage").toString()).contains("登録済みの適用開始年度");
+        assertThat(model.asMap().get("mode")).isEqualTo("register");
+        verify(kofuRitsuConfigService, never()).register(any());
     }
 
     @Test

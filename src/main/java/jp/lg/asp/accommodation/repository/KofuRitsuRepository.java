@@ -37,4 +37,7 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 		       "AND CAST(k.tekiyo_st_nendo AS INTEGER) <= :nendo " +
 		       "ORDER BY k.rno DESC", nativeQuery = true)
 	List<KofuRitsu> findKofuRitsuEntityByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
+
+	@Query("SELECT COUNT(k) FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd AND k.tekiyoStNendo = :nendo")
+	long countByJichitaiCdAndTekiyoStNendo(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
 }
