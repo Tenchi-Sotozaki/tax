@@ -216,6 +216,7 @@ class TokugimuControllerTest {
             String viewName = tokugimuController.register(form, bindingResult, session, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("tokugimu/tTokugimuConfig");
+            verify(accessChecker).checkWriteAccess(ScreenManagement.TOKUGIMU_CONFIG);
             verify(model).addAttribute("isEdit", false);
             verify(model).addAttribute("errorMessage", "登録失敗");
         }
@@ -334,6 +335,7 @@ class TokugimuControllerTest {
             String viewName = tokugimuController.update(session, form, bindingResult, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("redirect:/tokugimu/list");
+            verify(accessChecker).checkWriteAccess(ScreenManagement.TOKUGIMU_CONFIG);
             verify(tokugimuService).updateByShiteiNo(shiteiNo, form);
             verify(redirectAttributes).addFlashAttribute("successMessage", "更新が完了しました。");
         }
@@ -351,6 +353,7 @@ class TokugimuControllerTest {
             String viewName = tokugimuController.update(session, form, bindingResult, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("tokugimu/tTokugimuConfig");
+            verify(accessChecker).checkWriteAccess(ScreenManagement.TOKUGIMU_CONFIG);
             verify(model).addAttribute("isEdit", true);
             verify(model).addAttribute("editId", shiteiNo);
             verify(tokugimuService, never()).updateByShiteiNo(any(), any());
