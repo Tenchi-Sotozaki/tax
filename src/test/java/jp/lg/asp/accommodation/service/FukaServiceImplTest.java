@@ -92,12 +92,12 @@ class FukaServiceImplTest {
 
     @Test
     void isAlreadyRegistered_existingData_returnsTrue() {
-        // nendoStMonth=4(デフォルト) の場合: 202403 → nendo=2023, kibetsu=12
+        // nendoStMonth=3(デフォルト) の場合: 202402 → nendo=2023, kibetsu=12
         when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(java.util.Optional.empty());
         when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2023", 12))
                 .thenReturn(List.of(new Fuka()));
 
-        assertThat(service.isAlreadyRegistered(SHITEI_NO, "202403")).isTrue();
+        assertThat(service.isAlreadyRegistered(SHITEI_NO, "202402")).isTrue();
     }
 
     @Test
