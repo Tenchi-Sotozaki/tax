@@ -1,13 +1,11 @@
 package jp.lg.asp.accommodation.controller;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-<<<<<<< HEAD
-=======
 import java.util.List;
->>>>>>> master
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,29 +15,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-<<<<<<< HEAD
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-=======
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.ConcurrentModel;
->>>>>>> master
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-<<<<<<< HEAD
-import jp.lg.asp.accommodation.dto.AtenaConfigForm;
-import jp.lg.asp.accommodation.entity.Atena;
-import jp.lg.asp.accommodation.exception.BusinessException;
-=======
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.AtenaConfigForm;
 import jp.lg.asp.accommodation.dto.AtenaDaichoItem;
 import jp.lg.asp.accommodation.dto.AtenaSearchForm;
 import jp.lg.asp.accommodation.entity.Atena;
->>>>>>> master
+import jp.lg.asp.accommodation.exception.BusinessException;
 import jp.lg.asp.accommodation.service.AtenaConfigService;
 import jp.lg.asp.accommodation.service.AtenaImportService;
 import jp.lg.asp.accommodation.service.AtenaService;
@@ -47,7 +36,6 @@ import jp.lg.asp.accommodation.service.AtenaService;
 @ExtendWith(MockitoExtension.class)
 class AtenaControllerTest {
 
-<<<<<<< HEAD
 	@InjectMocks
 	private AtenaController atenaController;
 
@@ -263,31 +251,6 @@ class AtenaControllerTest {
 			verify(model).addAttribute(eq("form"), any(AtenaConfigForm.class));
 		}
 	}
-=======
-    @Mock
-    private AtenaImportService atenaImportService;
-
-    @Mock
-    private AtenaConfigService atenaConfigService;
-
-    @Mock
-    private AtenaService atenaService;
-
-    @Mock
-    private ScreenAccessChecker accessChecker;
-
-    @Mock
-    private JichitaiContext jichitaiContext;
-
-    @InjectMocks
-    private AtenaController atenaController;
-
-    private static final String JICHITAI_CD = "123456";
-
-    @BeforeEach
-    void setUp() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-    }
 
     @Nested
     @DisplayName("list メソッドのテスト")
@@ -345,5 +308,4 @@ class AtenaControllerTest {
                     .isInstanceOf(AccessDeniedException.class);
         }
     }
->>>>>>> master
 }

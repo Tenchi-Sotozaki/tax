@@ -1,10 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
-<<<<<<< HEAD
 import static org.mockito.ArgumentMatchers.*;
-=======
->>>>>>> master
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -19,12 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import jp.lg.asp.accommodation.entity.Atena;
-<<<<<<< HEAD
 import jp.lg.asp.accommodation.entity.AtenaId;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.exception.BusinessException;
-=======
->>>>>>> master
 import jp.lg.asp.accommodation.exception.ResourceNotFoundException;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -34,7 +28,6 @@ import jp.lg.asp.accommodation.util.HashUtil;
 @ExtendWith(MockitoExtension.class)
 class AtenaConfigServiceImplTest {
 
-<<<<<<< HEAD
 	@InjectMocks
 	private AtenaConfigServiceImpl atenaConfigService;
 
@@ -46,6 +39,8 @@ class AtenaConfigServiceImplTest {
 
 	@Mock
 	private HashUtil hashUtil;
+	
+    private static final String JICHITAI_CD = "123456";
 
 	@Nested
 	@DisplayName("register メソッドのテスト")
@@ -285,20 +280,6 @@ class AtenaConfigServiceImplTest {
 					.hasMessage("この個人番号はすでに登録されています。");
 		}
 	}
-=======
-    @Mock
-    private AtenaRepository atenaRepository;
-
-    @Mock
-    private JichitaiRepository jichitaiRepository;
-
-    @Mock
-    private HashUtil hashUtil;
-
-    @InjectMocks
-    private AtenaConfigServiceImpl atenaConfigService;
-
-    private static final String JICHITAI_CD = "123456";
 
     @Nested
     @DisplayName("findByAtenaNo メソッドのテスト")
@@ -335,5 +316,4 @@ class AtenaConfigServiceImplTest {
                     .hasMessage("宛名が見つかりません。");
         }
     }
->>>>>>> master
 }
