@@ -244,10 +244,12 @@
 
 	<!--
   特別徴収義務者情報表示 フラグメント（セッションから取得）
+  引数:
+    showButton - 特別徴収義務者指定ボタンを表示するか（照会時: true, 編集時: false）
   使用例:
-    <div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+    <div th:replace="~{layout/components :: selectedTokugimuInfo(${isView})}"></div>
 -->
-	<div th:fragment="selectedTokugimuInfo"
+	<div th:fragment="selectedTokugimuInfo(showButton)"
 		class="mt-2 mb-2 ps-3 d-flex align-items-center">
 		<span class="fw-semibold flex-shrink-0">指定番号：</span>
 		<span class="tokugimu-info-value me-4"
@@ -267,7 +269,7 @@
 			data-bs-toggle="tooltip" data-bs-placement="bottom"
 			th:attr="title=${selectedShiteiGassan?.shisetsuName}"
 			th:text="${selectedShiteiGassan?.shisetsuName}"></span>
-		<button type="button" class="btn btn-outline-primary flex-shrink-0"
+		<button th:if="${showButton}" type="button" class="btn btn-outline-primary flex-shrink-0"
 			data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal">
 			<i class="bi bi-search me-1"></i>特別徴収義務者指定
 		</button>

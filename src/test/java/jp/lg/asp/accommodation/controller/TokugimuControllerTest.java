@@ -239,6 +239,7 @@ class TokugimuControllerTest {
 
             sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(shiteiNo);
             sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
+            sessionHelperMock.when(() -> SessionHelper.saveShiteiGassan(eq(session), any())).thenAnswer(inv -> null);
 
             when(tokugimuService.getTokugimuByShiteiNoAndRno(shiteiNo, rno)).thenReturn(form);
 
@@ -266,6 +267,7 @@ class TokugimuControllerTest {
 
             sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(shiteiNo);
             sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
+            sessionHelperMock.when(() -> SessionHelper.saveShiteiGassan(eq(session), any())).thenAnswer(inv -> null);
 
             when(tokugimuService.getTokugimuByShiteiNo(shiteiNo)).thenReturn(form);
 

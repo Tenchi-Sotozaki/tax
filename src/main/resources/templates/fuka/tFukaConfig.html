@@ -46,7 +46,7 @@
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
-		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+		<div th:replace="~{layout/components :: selectedTokugimuInfo(${isView})}"></div>
 
 		<!-- 成功・エラーメッセージ -->
 		<div th:if="${successMessage}"

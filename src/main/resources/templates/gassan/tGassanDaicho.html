@@ -139,7 +139,13 @@
 									<td th:text="${item.shiteiNo}"></td>
 									<td th:text="${item.name}"></td>
 									<td>
-										<a th:href="@{/gassan/view-form/{id}(id=${item.gassanShiteiNo})}">詳細</a>
+										<form th:action="@{/gassan/select}" method="post" style="display:inline;">
+											<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+											<input type="hidden" name="gassanShiteiNo" th:value="${item.gassanShiteiNo}">
+											<input type="hidden" name="name" th:value="${item.name}">
+											<input type="hidden" name="shisetsuName" th:value="${item.daihyoShisetsuName}">
+											<button type="submit" class="btn btn-link p-0">詳細</button>
+										</form>
 									</td>
 								</tr>
 								<tr th:if="${items.totalElements == 0}">

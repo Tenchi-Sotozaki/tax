@@ -103,12 +103,19 @@ class TokugimuServiceImplTest {
     @DisplayName("search メソッドのテスト")
     class SearchTest {
 
+<<<<<<< HEAD
         @Test
         @DisplayName("正常系：空のフォームの場合、すべてのアイテムが返ること")
         void search_emptyForm_returnsAllItems() {
             TokugimuSearchForm form = new TokugimuSearchForm();
             form.setPage(0);
             form.setPageSize(10);
+=======
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any(), any())).thenReturn(List.of());
+>>>>>>> master
 
             Tokugimu t = buildTokugimu(SHITEI_NO);
             when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
@@ -240,8 +247,13 @@ class TokugimuServiceImplTest {
 
             TokugimuForm form = service.getTokugimuByShiteiNo(SHITEI_NO);
 
+<<<<<<< HEAD
             assertThat(form.getShiteiNo()).isEqualTo(SHITEI_NO);
         }
+=======
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any(), any())).thenReturn(List.of());
+>>>>>>> master
 
         @Test
         @DisplayName("異常系：指定番号に該当するデータが存在しない場合、例外がスローされること")
@@ -268,6 +280,7 @@ class TokugimuServiceImplTest {
     @DisplayName("getTokugimuByShiteiNoAndRno メソッドのテスト")
     class GetTokugimuByShiteiNoAndRnoTest {
 
+<<<<<<< HEAD
         @Test
         @DisplayName("正常系：指定番号とrnoに該当するデータが存在する場合、フォームが返ること")
         void success() {
@@ -280,6 +293,12 @@ class TokugimuServiceImplTest {
             when(shoyushaRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
             when(kyodoJigyoshaRepository.findByJichitaiCdAndShiteiNoAndRno(eq(JICHITAI_CD), eq(SHITEI_NO), any()))
                     .thenReturn(List.of());
+=======
+        Tokugimu t = buildTokugimu(SHITEI_NO);
+        when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(t));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any())).thenReturn(List.of(buildAtena()));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any(), any())).thenReturn(List.of());
+>>>>>>> master
 
             TokugimuForm form = service.getTokugimuByShiteiNoAndRno(SHITEI_NO, 1);
 

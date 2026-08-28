@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -50,22 +51,41 @@ public class AddressSearchApiServiceImpl implements AddressSearchApiService {
 				StringUtils.hasText(hojinNo) ? hojinNo : "%").stream().map(a -> {
 					String atenaNoStr = a.getAtenaNo().toPlainString();
 
-					// 宛名がすでに合算申請に登録されているかチェック
+					// 宛名がすでに合算申請に登録されているかチェック（論理削除済みを除く全履歴対象）
 					List<Gassan> gassanList = gassanRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, a.getAtenaNo());
-					boolean alreadyRegistered = !gassanList.isEmpty();
-					String gassanShiteiNo = alreadyRegistered ? gassanList.get(0).getGassanShiteiNo() : null;
+					// 照会画面へ遷移：tekiyoEdYmdが未設定（終了日なし）の有効履歴がある場合
+					Optional<Gassan> viewOnlyGassan = gassanList.stream()
+							.filter(g -> g.getTekiyoEdYmd() == null)
+							.findFirst();
+					// 再登録対象：tekiyoEdYmdが設定されている最新履歴
+					Optional<Gassan> reRegisterGassan = gassanList.stream()
+							.filter(g -> g.getTekiyoEdYmd() != null)
+							.findFirst();
+					Optional<Gassan> targetGassan = viewOnlyGassan.isPresent() ? viewOnlyGassan : reRegisterGassan;
+					boolean alreadyRegistered = targetGassan.isPresent();
+					boolean viewOnly = viewOnlyGassan.isPresent();
+					String gassanShiteiNo = null;
+					String tekiyoEdYmd = null;
+					if (alreadyRegistered) {
+						Gassan g = targetGassan.get();
+						gassanShiteiNo = g.getGassanShiteiNo();
+						tekiyoEdYmd = g.getTekiyoEdYmd() != null ? g.getTekiyoEdYmd().toString() : null;
+					}
 
-					return new AddressDto(
-							atenaNoStr,
-							a.getName(),
-							a.getNameKana(),
-							a.getYubinNo(),
-							a.getJusho(),
-							a.getTel1(),
-							a.getKojinNo(),
-							a.getHojinNo(),
-							alreadyRegistered,
-							gassanShiteiNo);
+					return AddressDto.builder()
+							.addressNumber(atenaNoStr)
+							.name(a.getName())
+							.nameKana(a.getNameKana())
+							.yubinNo(a.getYubinNo())
+							.address(a.getJusho())
+							.phone(a.getTel1())
+							.kojinNo(a.getKojinNo())
+							.hojinNo(a.getHojinNo())
+							.alreadyRegistered(alreadyRegistered)
+							.viewOnly(viewOnly)
+							.gassanShiteiNo(gassanShiteiNo)
+							.tekiyoEdYmd(tekiyoEdYmd)
+							.build();
 				}).toList();
 	}
 
@@ -96,17 +116,16 @@ public class AddressSearchApiServiceImpl implements AddressSearchApiService {
 				StringUtils.hasText(hojinNo) ? hojinNo : "").stream().map(a -> {
 					String atenaNoStr = a.getAtenaNo().toPlainString();
 
-					return new AddressDto(
-							atenaNoStr,
-							a.getName(),
-							a.getNameKana(),
-							a.getYubinNo(),
-							a.getJusho(),
-							a.getTel1(),
-							a.getKojinNo(),
-							a.getHojinNo(),
-							false,
-							"");
+					return AddressDto.builder()
+							.addressNumber(atenaNoStr)
+							.name(a.getName())
+							.nameKana(a.getNameKana())
+							.yubinNo(a.getYubinNo())
+							.address(a.getJusho())
+							.phone(a.getTel1())
+							.kojinNo(a.getKojinNo())
+							.hojinNo(a.getHojinNo())
+							.build();
 				}).toList();
 	}
 
