@@ -14,7 +14,14 @@
 				<i class="bi bi-pencil-square me-2 text-primary"></i>トップページ編集
 			</h5>
 		</div>
-
+		
+		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+			<ul class="mb-0 mt-1">
+				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+			</ul>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
 			<span th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -25,49 +32,8 @@
 		</div>
 
 		<form id="configForm" th:action="@{/top/config/save}" th:object="${form}" method="post">
-
-			<div class="card shadow-sm mb-4">
-				<div class="card-header py-3">
-					<h5 class="mb-0"><i class="bi bi-sliders me-2"></i>編集対象</h5>
-				</div>
-				<div class="card-body bg-light-subtle">
-					<div class="row g-3 align-items-end">
-
-						<!-- 情報選択 -->
-						<div class="col-md-4">
-							<label class="form-label fw-medium">情報選択</label>
-							<div class="d-flex gap-4 pt-1">
-								<div class="form-check">
-									<input class="form-check-input" type="radio" id="kbnShared"
-										th:field="*{kbn}" value="0"
-										onchange="onKbnChange(this)">
-									<label class="form-check-label" for="kbnShared">共有エリア</label>
-								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" id="kbnCustom"
-										th:field="*{kbn}" value="1"
-										onchange="onKbnChange(this)">
-									<label class="form-check-label" for="kbnCustom">カスタマイズエリア</label>
-								</div>
-							</div>
-						</div>
-
-						<!-- 自治体選択（カスタマイズ時のみ有効） -->
-						<div class="col-md-4">
-							<label for="jichitaiCd" class="form-label fw-medium">自治体選択</label>
-							<select class="form-select" id="jichitaiCd" th:field="*{jichitaiCd}"
-								th:disabled="${form.kbn == '0'}">
-								<option value="">選択してください</option>
-								<option th:each="j : ${jichitaiList}"
-									th:value="${j.jichitaiCd}"
-									th:text="${j.jichitaiCd + ' ' + j.name}">
-								</option>
-							</select>
-						</div>
-
-					</div>
-				</div>
-			</div>
+			
+			<input type="hidden" th:field="*{seq}">
 
 			<!-- HTML入力エリア -->
 			<div class="card shadow-sm mb-4">
@@ -75,8 +41,51 @@
 					<h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>HTML入力エリア</h5>
 				</div>
 				<div class="card-body bg-light-subtle">
+					<label for="title" class="form-label fw-medium">
+					    タイトル<span class="text-danger">*</span>
+					</label>
+					<input class="form-control font-monospace" id="title" th:field="*{title}"
+						th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+						placeholder="タイトルを入力してください">
+					<div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+				</div>				
+				<div class="card-body bg-light-subtle">
+					<label for="htmlContent" class="form-label fw-medium">
+					    内容 <span class="text-danger">*</span>
+					</label>
 					<textarea class="form-control font-monospace" id="htmlContent" th:field="*{htmlContent}"
-						rows="15" placeholder="HTMLを入力してください"></textarea>
+						th:classappend="${#fields.hasErrors('htmlContent')} ? 'is-invalid' : ''"
+						rows="15" placeholder="本文を入力してください"></textarea>
+					<div class="invalid-feedback" th:if="${#fields.hasErrors('htmlContent')}" th:errors="*{htmlContent}"></div>
+				</div>
+				<div class="row">
+				    <!-- 掲載開始日 -->
+				    <div class="col-md-6">
+				        <div class="card-body bg-light-subtle">
+				            <label for="postingStartDate" class="form-label fw-medium">
+				                掲載開始日
+				            </label>
+							<input type="date"
+							       id="postingStartDate"
+							       class="form-control"
+							       th:classappend="${#fields.hasErrors('postingStartDate')} ? 'is-invalid' : ''"
+							       th:field="*{postingStartDate}">
+						<div class="invalid-feedback" th:if="${#fields.hasErrors('postingStartDate')}" th:errors="*{postingStartDate}"></div>
+				        </div>
+				    </div>
+
+				    <!-- 掲載終了日 -->
+				    <div class="col-md-6">
+				        <div class="card-body bg-light-subtle">
+				            <label for="postingEndDate" class="form-label fw-medium">
+				                掲載終了日
+				            </label>
+							<input type="date"
+							       id="postingEndDate"
+							       class="form-control"
+							       th:field="*{postingEndDate}">
+				        </div>
+				    </div>
 				</div>
 			</div>
 
@@ -85,7 +94,9 @@
 				<div class="card-header py-3">
 					<h5 class="mb-0"><i class="bi bi-eye me-2"></i>プレビュー</h5>
 				</div>
-				<div class="card-body" th:utext="${form.htmlContent}"></div>
+				
+				<div th:utext="${previewTitle}"></div>
+				<div th:utext="${previewHtml}"></div>
 			</div>
 
 			<!-- アクションボタン -->
@@ -97,21 +108,27 @@
 					<i class="bi bi-eye me-2"></i>プレビュー
 				</button>
 
-				<button type="submit" form="configForm"
-					formaction="/accommodation-tax/top/config/save"
+				<button type="button"
+					data-bs-toggle="modal"
+					data-bs-target="#saveConfirmModal"
 					class="btn btn-success btn-lg px-5">
 					<i class="bi bi-check-circle me-2"></i>
-					<span th:text="${form.htmlContent != null and !#strings.isEmpty(form.htmlContent)} ? '更新' : '登録'">保存</span>
+					<span th:text="${form.seq != null} ? '更新' : '登録'">保存</span>
 				</button>
 
-				<a th:href="@{/top}" class="btn btn-outline-secondary btn-lg px-4">
+				<a href="#"
+					data-bs-toggle="modal"
+					data-bs-target="#backConfirmModal"
+					class="btn btn-outline-secondary btn-lg px-4">
 					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
 				</a>
 
 			</div>
-
 		</form>
 
+		<div th:replace="~{layout/components :: confirmModal('saveConfirmModal', ${form.seq != null} ? '更新確認' : '登録確認', ${form.seq != null} ? 'トップページコンテンツを更新します。よろしいですか？' : 'トップページコンテンツを登録します。よろしいですか？', 'configForm', 'btn-success', ${form.seq != null} ? '更新する' : '登録する')}"></div>
+
+		<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/top/topPageConfigDaicho}, '一覧に戻る')}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">

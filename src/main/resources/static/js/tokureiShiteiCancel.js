@@ -6,32 +6,36 @@
  * フォームバリデーション
  */
 function validateForm() {
-	
-	// エラーメッセージをクリア
-	window.ReportError.hide();
-	
-    const hakkoYmd = document.getElementById('hakkoYmd').value;
-    const tekiyoYmd = document.getElementById('tekiyoYmd').value;
-    const riyu = document.getElementById('riyu').value;
+    const hakkoYmd = document.getElementById('hakkoYmd');
+    const tekiyoYmd = document.getElementById('tekiyoYmd');
+    const riyu = document.getElementById('riyu');
+    let hasError = false;
 
-    if (!hakkoYmd) {
-        window.ReportError.show('発行年月日を入力してください。');
-        document.getElementById('hakkoYmd').focus();
-        return false;
+    [hakkoYmd, tekiyoYmd, riyu].forEach(el => {
+        el.classList.remove('is-invalid');
+        document.getElementById(el.id + 'Error').textContent = '';
+    });
+
+    if (!hakkoYmd.value) {
+        hakkoYmd.classList.add('is-invalid');
+        document.getElementById('hakkoYmdError').textContent = '発行年月日を入力してください。';
+        hasError = true;
+    }
+    if (!tekiyoYmd.value) {
+        tekiyoYmd.classList.add('is-invalid');
+        document.getElementById('tekiyoYmdError').textContent = '適用年月を入力してください。';
+        hasError = true;
+    }
+    if (!riyu.value.trim()) {
+        riyu.classList.add('is-invalid');
+        document.getElementById('riyuError').textContent = '取消理由を入力してください。';
+        hasError = true;
     }
 
-    if (!tekiyoYmd) {
-        window.ReportError.show('適用年月を入力してください。');
-        document.getElementById('tekiyoYmd').focus();
+    if (hasError) {
+        [hakkoYmd, tekiyoYmd, riyu].find(el => el.classList.contains('is-invalid')).focus();
         return false;
     }
-
-    if (!riyu.trim()) {
-        window.ReportError.show('取消理由を入力してください。');
-        document.getElementById('riyu').focus();
-        return false;
-    }
-
     return true;
 }
 

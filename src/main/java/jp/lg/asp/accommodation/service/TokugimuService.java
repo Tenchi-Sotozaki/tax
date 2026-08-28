@@ -11,8 +11,11 @@ import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
  */
 public interface TokugimuService {
 
-	// 検索条件に合致する一覧を返す
+	// 検索条件に合致する一覧を返す（サーバーサイドページング）
 	Page<TokugimuListItem> search(TokugimuSearchForm form);
+
+	// 検索条件に合致する全件を返す（クライアントサイドページング用）
+	java.util.List<TokugimuListItem> searchAll(TokugimuSearchForm form);
 
 	// 指定番号で1件取得してフォームに変換する
 	TokugimuForm getTokugimuByShiteiNo(String shiteiNo);
@@ -38,13 +41,4 @@ public interface TokugimuService {
 
 	// IDから指定番号を取得する
 	String getShiteiNoById(Long id);
-
-	/**
-	 * 指定番号が合算対象かどうかを判定する。
-	 * 判定基準は特別徴収義務者管理台帳の「合算対象」と同じ。
-	 *
-	 * @param shiteiNo 指定番号
-	 * @return 合算対象の場合 true
-	 */
-	boolean isGassanTarget(String shiteiNo);
 }

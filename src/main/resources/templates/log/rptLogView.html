@@ -4,6 +4,7 @@
 
 <head>
 	<title>帳票ログ照会</title>
+	<link rel="stylesheet" th:href="@{/css/tokugimu-daicho.css}">
 </head>
 
 <body>
@@ -20,13 +21,13 @@
 		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
 			<div class="accordion-item border">
 				<h2 class="accordion-header">
-					<button class="accordion-button py-2 fw-semibold" type="button" data-bs-toggle="collapse"
+					<button class="accordion-button py-2 fw-semibold" th:classappend="${searched == true} ? 'collapsed' : ''" type="button" data-bs-toggle="collapse"
 						data-bs-target="#searchPanel">
 						<i class="bi bi-funnel me-2"></i>検索条件
 					</button>
 				</h2>
 			</div>
-			<div id="searchPanel" class="accordion-collapse collapse show">
+			<div id="searchPanel" class="accordion-collapse collapse" th:classappend="${searched != true} ? 'show' : ''">
 				<div class="accordion-body pt-3 pb-2 px-3">
 					<form th:action="@{/log/rpt-log/search}" th:object="${form}" method="post" id="searchForm">
 						<input type="hidden" th:if="${_csrf}" th:name="${_csrf.parameterName}"
@@ -88,10 +89,10 @@
 						</div>
 
 						<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-							<button type="button" class="btn btn-outline-secondary btn-sm" id="resetBtn">
+							<button type="button" class="btn btn-outline-secondary" id="resetBtn">
 								<i class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 							</button>
-							<button type="submit" class="btn btn-primary btn-sm px-4">
+							<button type="submit" class="btn btn-primary px-4">
 								<i class="bi bi-search me-1"></i>検索する
 							</button>
 						</div>
@@ -100,27 +101,30 @@
 			</div>
 		</div>
 
+		<th:block th:if="${searched}">
+
 		<!-- ======== 件数・ページネーション ======== -->
 		<div class="d-flex justify-content-between align-items-center mb-2">
 			<span class="text-muted small">検索結果：<span id="totalCount" th:text="${items.size()}">0</span> 件</span>
 			<nav>
-				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+				<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".log-row"></ul>
 			</nav>
 			<div class="d-flex align-items-center gap-2">
 				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
 				<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
-					<option value="5">5件</option>
 					<option value="10" selected>10件</option>
-					<option value="20">20件</option>
+					<option value="50">50件</option>
+					<option value="100">100件</option>
 				</select>
 			</div>
 		</div>
 
 		<!-- ======== 一覧テーブル ======== -->
 		<div class="card shadow-sm mb-2">
-			<div class="table-responsive" style="max-height: 45vh; overflow-y: auto;">
-				<table class="table table-striped table-hover table-bordered align-middle mb-0">
-					<thead class="table-primary" style="position: sticky; top: 0; z-index: 1;">
+			<div class="card-body p-0">
+			<div class="table-scroll" style="max-height: 70vh;">
+				<table class="table table-bordered table-hover table-sm align-middle mb-0 sticky-table">
+					<thead class="table-primary">
 						<tr>
 							<th style="width: 80px;">No.</th>
 							<th style="width: 200px;">帳票名</th>
@@ -145,8 +149,10 @@
 					</tbody>
 				</table>
 			</div>
+			</div>
 		</div>
 
+		</th:block>
 
 	</div>
 

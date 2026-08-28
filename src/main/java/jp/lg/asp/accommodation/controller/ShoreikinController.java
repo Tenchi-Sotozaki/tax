@@ -50,20 +50,9 @@ public class ShoreikinController {
 	@OpeLog(screenId = SCREEN_ID, operation = "検索")
 	public String search(@ModelAttribute ShoreikinDto searchForm, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		searchForm.setPage(0);
 		model.addAttribute("items", shoreikinService.search(searchForm));
 		model.addAttribute("searchForm", searchForm);
 		return LIST_VIEW;
-	}
-
-	@PostMapping("/bulkCalculate")
-	@OpeLog(screenId = SCREEN_ID, operation = "一括算出")
-	public String bulkCalculate(@ModelAttribute ShoreikinDto searchForm,
-			RedirectAttributes redirectAttributes) {
-		accessChecker.checkAccess(SCREEN_ID);
-		// 一括算出画面に遷移
-		redirectAttributes.addAttribute("nendo", searchForm.getNendo());
-		return "redirect:/shoreikin/bulk";
 	}
 
 	@PostMapping("/viewKofu")

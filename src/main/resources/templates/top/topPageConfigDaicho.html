@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}"
+      lang="ja">
+
+<head>
+    <title>トップページコンテンツ管理</title>
+</head>
+
+<body>
+
+<div layout:fragment="content" class="container-fluid p-4">
+
+    <!-- タイトル -->
+    <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+
+        <h5 class="mb-0 fw-bold text-dark">
+            <i class="bi bi-house me-2 text-primary"></i>
+            トップページコンテンツ管理
+        </h5>
+
+        <span class="text-muted small">
+            登録件数：
+            <span th:text="${#lists.size(items)}">0</span>
+            件
+        </span>
+    </div>
+
+    <!-- 成功メッセージ -->
+    <div th:if="${successMessage}"
+         class="alert alert-success alert-dismissible fade show"
+         role="alert">
+
+        <i class="bi bi-check-circle-fill me-2"></i>
+
+        <span th:text="${successMessage}"></span>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- エラーメッセージ -->
+    <div th:if="${errorMessage}"
+         class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+        <span th:text="${errorMessage}"></span>
+
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"></button>
+    </div>
+
+	<div class="d-flex justify-content-between align-items-center mb-2">
+
+	    <!-- 新規登録 -->
+	    <div>
+	        <a th:href="@{/top/config}"
+	           class="btn btn-success">
+	            <i class="bi bi-plus-circle"></i>
+	            新規登録
+	        </a>
+	    </div>
+
+	    <!-- ページネーション -->
+	    <nav>
+	        <ul id="pagination"
+	            class="pagination pagination-sm mb-0">
+	        </ul>
+	    </nav>
+
+	    <!-- 表示件数 -->
+		<div class="d-flex align-items-center gap-2 text-nowrap">	
+	        <label class="mb-0">表示件数</label>
+	        <select id="pageSizeSelect"
+	                class="form-select form-select-sm">
+	            <option value="10">10件</option>
+	            <option value="50">50件</option>
+	            <option value="100">100件</option>
+	        </select>
+	    </div>
+
+	</div>
+
+    <!-- 一覧 -->
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead class="table-primary text-center">
+
+                    <tr>
+                        <th style="width:80px;">番号</th>
+                        <th>タイトル</th>
+                        <th style="width:140px;">掲載開始日</th>
+                        <th style="width:140px;">掲載終了日</th>
+                        <th style="width:150px;">操作</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:if="${#lists.isEmpty(items)}">
+
+                        <td colspan="5"
+                            class="text-center text-muted py-4">
+
+                            登録されているデータはありません
+
+                        </td>
+
+                    </tr>
+
+                    <tr th:each="item : ${items}">
+
+                        <td class="text-center"
+                            th:text="${item.seq}">
+                        </td>
+
+                        <td th:text="${item.title}">
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${item.postingStartDate}">
+                        </td>
+
+                        <td class="text-center"
+                            th:text="${item.postingEndDate}">
+                        </td>
+
+                        <td class="text-center">
+
+                            <a th:href="@{/top/config/{seq}(seq=${item.seq})}"
+                               class="btn btn-primary">
+
+                                <i class="bi bi-pencil-square me-1"></i>
+                                編集
+
+                            </a>
+
+                            <form th:action="@{/top/config/delete/{seq}(seq=${item.seq})}"
+                                  method="post"
+                                  style="display:inline-block"
+                                  onsubmit="return confirm('削除しますか？');">
+
+                                <button type="submit"
+                                        class="btn btn-danger">
+
+                                    <i class="bi bi-trash me-1"></i>
+                                    削除
+
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block layout:fragment="scripts">
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			const rows = Array.from(document.querySelectorAll('tbody tr')).filter(tr => tr.querySelector('td'));
+			const pageSizeSelect = document.getElementById('pageSizeSelect');
+			const pager = new Pagination(rows, pageSizeSelect, document.getElementById('pagination'));
+			if (rows.length > 0) {
+				pager.render(1);
+				pageSizeSelect?.addEventListener('change', () => pager.render(1));
+			}
+		});
+	</script>
+</th:block>
+
+</body>
+</html>

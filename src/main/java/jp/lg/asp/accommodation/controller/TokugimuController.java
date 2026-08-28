@@ -1,16 +1,21 @@
 package jp.lg.asp.accommodation.controller;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.AbstractMap;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
@@ -20,7 +25,6 @@ import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
-import jp.lg.asp.accommodation.dto.TokugimuListItem;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
 import jp.lg.asp.accommodation.service.TokugimuService;
@@ -38,6 +42,25 @@ public class TokugimuController {
 	private final NozeiShukiService nozeiShukiService;
 	private final ScreenAccessChecker accessChecker;
 
+	/**
+	 * 型変換に失敗した項目の表示メッセージ。
+	 * 画面の入力欄はいずれもテキストのため、数値項目で起こりうる。
+	 */
+	private static final Map<String, String> TYPE_MISMATCH_MESSAGES = Map.ofEntries(
+			new AbstractMap.SimpleEntry<>("floorArea", "宿泊施設情報の延床面積は半角数字とピリオドで入力してください"),
+			new AbstractMap.SimpleEntry<>("roomCount", "宿泊施設情報の客室数は半角数字で入力してください"),
+			new AbstractMap.SimpleEntry<>("capacity", "宿泊施設情報の収容人数は半角数字で入力してください"),
+			new AbstractMap.SimpleEntry<>("registrationDate", "特別徴収義務者情報の登録年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("shinseiDate", "特別徴収義務者情報の申請年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("henkoDate", "特別徴収義務者情報の変更年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("businessStartDate", "宿泊施設情報の営業開始(予定)日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("suspensionStartDate", "施設営業休止/再開/廃止情報の休止開始年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は正しい日付を入力してください"),
+			new AbstractMap.SimpleEntry<>("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は正しい日付を入力してください")
+	);
+
+	private static final String TYPE_MISMATCH_DEFAULT_MESSAGE = "入力形式が正しくない項目があります";
+
 	private static final String TOKUGIMU_DAICHO = ScreenManagement.TOKUGIMU_DAICHO;
 	private static final String TOKUGIMU_CONFIG = ScreenManagement.TOKUGIMU_CONFIG;
 	private static final String LIST_VIEW = "tokugimu/tTokugimuDaicho";
@@ -49,20 +72,16 @@ public class TokugimuController {
 	@GetMapping("/list")
 	@OpeLog(screenId = TOKUGIMU_DAICHO, operation = "一覧表示")
 	public String list(@ModelAttribute TokugimuSearchForm searchForm,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int pageSize,
 			@RequestParam(defaultValue = "false") boolean searched,
 			Model model) {
 		accessChecker.checkAccess(TOKUGIMU_DAICHO);
-		searchForm.setPage(page);
-		searchForm.setPageSize(pageSize);
 
 		// 初期表示時は検索結果一覧を表示しない
-		Page<TokugimuListItem> pageResult = searched
-				? tokugimuService.search(searchForm)
-				: Page.empty(PageRequest.of(page, pageSize));
+		java.util.List<jp.lg.asp.accommodation.dto.TokugimuListItem> items = searched
+				? tokugimuService.searchAll(searchForm)
+				: java.util.List.of();
 
-		model.addAttribute("items", pageResult);
+		model.addAttribute("items", items);
 		model.addAttribute("searchForm", searchForm);
 		model.addAttribute("isSearched", searched);
 		return LIST_VIEW;
@@ -111,7 +130,7 @@ public class TokugimuController {
 
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", false);
-			model.addAttribute("validationErrors", TokugimuForm.TokugimuValidator.validate(form).values());
+			model.addAttribute("validationErrors", buildValidationMessages(bindingResult));
 			return FORM_VIEW;
 		}
 		try {
@@ -188,7 +207,7 @@ public class TokugimuController {
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("editId", id);
-			model.addAttribute("validationErrors", TokugimuForm.TokugimuValidator.validate(form).values());
+			model.addAttribute("validationErrors", buildValidationMessages(bindingResult));
 			return FORM_VIEW;
 		}
 		try {
@@ -207,33 +226,6 @@ public class TokugimuController {
 	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "帳票出力")
 	public String showReport(HttpSession session, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		return buildReportView(session, model);
-	}
-
-	/**
-	 * 合算申告納入承認通知書へ遷移する。
-	 * 選択中の指定番号が合算対象でない場合は遷移せず、
-	 * 帳票発行画面にエラーメッセージを表示する。
-	 */
-	@GetMapping("/report/gassan")
-	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
-	public String showGassanReport(HttpSession session, Model model) {
-		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
-		String id = getShiteiNoFromSession(session);
-		if (id != null && tokugimuService.isGassanTarget(id)) {
-			return "redirect:/reports/gassanNonyuTsuchi";
-		}
-		if (id != null) {
-			model.addAttribute("errorMessage", "合算対象外の特別徴収義務者です。");
-		}
-		return buildReportView(session, model);
-	}
-
-	/**
-	 * 帳票発行画面を表示する。
-	 * 指定番号が未選択の場合は指定番号選択モーダルを開いた状態で表示する。
-	 */
-	private String buildReportView(HttpSession session, Model model) {
 		String id = getShiteiNoFromSession(session);
 		if (id == null) {
 			return showSelectModalOnReport(model);
@@ -244,6 +236,19 @@ public class TokugimuController {
 		model.addAttribute("tokugimuName", form.getName());
 		model.addAttribute("shisetsuName", form.getFacilityName());
 		return REPORT_VIEW;
+	}
+
+	@GetMapping("/report/gassan")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "合算申告納入承認通知書")
+	public String showGassanReport(HttpSession session,
+			Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
+			return "redirect:/tokugimu/report";
+		}
+		return "redirect:/reports/gassanNonyuTsuchi";
 	}
 
 	// ========== 削除 ==========
@@ -293,5 +298,22 @@ public class TokugimuController {
 						null,
 						form.getName(),
 						form.getFacilityName()));
+	}
+
+	/**
+	 * 画面上部のサマリに出すメッセージを組み立てる。
+	 *
+	 * 必須チェックと桁数・形式チェックは、各アノテーションに指定した日本語メッセージを
+	 * そのまま使う。型変換の失敗だけは英語の既定メッセージになるため、日本語へ差し替える。
+	 */
+	private List<String> buildValidationMessages(BindingResult bindingResult) {
+		return bindingResult.getFieldErrors().stream()
+				.sorted(Comparator.comparingInt((FieldError e) -> TokugimuForm.fieldOrder(e.getField())))
+				.map(e -> e.isBindingFailure()
+						? TYPE_MISMATCH_MESSAGES.getOrDefault(e.getField(), TYPE_MISMATCH_DEFAULT_MESSAGE)
+						: e.getDefaultMessage())
+				.filter(StringUtils::hasText)
+				.distinct()
+				.toList();
 	}
 }

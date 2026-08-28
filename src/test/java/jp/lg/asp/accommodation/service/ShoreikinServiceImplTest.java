@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.ShoreikinDto;
 import jp.lg.asp.accommodation.entity.Atena;
@@ -75,8 +73,6 @@ class ShoreikinServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
 
         Shoreikin shoreikin = new Shoreikin();
         shoreikin.setShiteiNo(SHITEI_NO);
@@ -86,24 +82,26 @@ class ShoreikinServiceImplTest {
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
                 .thenReturn(List.of(shoreikin));
 
-        Page<ShoreikinDto> result = service.search(form);
+        List<ShoreikinDto> result = service.search(form);
 
-        assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getShimei()).isEqualTo("テスト太郎");
-        assertThat(result.getContent().get(0).getKofuGaku()).isEqualTo(100000L);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getShimei()).isEqualTo("テスト太郎");
+        assertThat(result.get(0).getKofuGaku()).isEqualTo(100000L);
+        assertThat(result.get(0).getKofuYmd()).isEqualTo(LocalDate.of(2024, 6, 1));
+        assertThat(result.get(0).getListShisetsuName()).isEqualTo("テスト施設");
     }
 
     @Test
-    void search_特別徴収義務者なしは空ページ() {
+    void search_特別徴収義務者なしは空リスト() {
         ShoreikinDto form = new ShoreikinDto();
         form.setNendo(NENDO);
 
         when(tokugimuRepository.findBySearchConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of());
 
-        Page<ShoreikinDto> result = service.search(form);
+        List<ShoreikinDto> result = service.search(form);
 
-        assertThat(result.getTotalElements()).isEqualTo(0);
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -116,15 +114,55 @@ class ShoreikinServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
                 .thenReturn(List.of()); // 奨励金なし
 
-        Page<ShoreikinDto> result = service.search(form);
+        List<ShoreikinDto> result = service.search(form);
 
-        assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getKofuGaku()).isNull();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getKofuGaku()).isNull();
+    }
+
+    @Test
+    void search_奨励金あり_算出有フィルタ() {
+        ShoreikinDto form = new ShoreikinDto();
+        form.setNendo(NENDO);
+        form.setKofuSanshutsuUmu("1"); // 算出有のみ
+
+        when(tokugimuRepository.findBySearchConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
+                .thenReturn(List.of(buildAtena()));
+
+        Shoreikin shoreikin = new Shoreikin();
+        shoreikin.setShiteiNo(SHITEI_NO);
+        shoreikin.setNendo(NENDO);
+        shoreikin.setKofuGaku(50000L);
+        when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
+                .thenReturn(List.of(shoreikin));
+
+        List<ShoreikinDto> result = service.search(form);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getKofuGaku()).isEqualTo(50000L);
+    }
+
+    @Test
+    void search_奨励金なし_算出有フィルタは除外() {
+        ShoreikinDto form = new ShoreikinDto();
+        form.setNendo(NENDO);
+        form.setKofuSanshutsuUmu("1"); // 算出有のみ
+
+        when(tokugimuRepository.findBySearchConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
+                .thenReturn(List.of(buildAtena()));
+        when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
+                .thenReturn(List.of()); // 奨励金なし
+
+        List<ShoreikinDto> result = service.search(form);
+
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -143,22 +181,57 @@ class ShoreikinServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), any()))
                 .thenReturn(List.of());
 
-        Page<ShoreikinDto> result = service.search(form);
+        List<ShoreikinDto> result = service.search(form);
 
-        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result).hasSize(1);
     }
 
     @Test
-    void search_ページング() {
+    void search_指定番号9始まりは合算検索() {
         ShoreikinDto form = new ShoreikinDto();
         form.setNendo(NENDO);
-        form.setPage(0);
-        form.setPageSize(2);
+        form.setShiteiNo("90000001");
+
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(eq(JICHITAI_CD), eq("90000001")))
+                .thenReturn(List.of(new Gassan()));
+        GassanUchi gassanUchi = new GassanUchi();
+        gassanUchi.setShiteiNo(SHITEI_NO);
+        when(gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(eq(JICHITAI_CD), eq("90000001")))
+                .thenReturn(List.of(gassanUchi));
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(eq(JICHITAI_CD), eq(SHITEI_NO)))
+                .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
+        when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
+                .thenReturn(List.of(buildAtena()));
+        when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), any()))
+                .thenReturn(List.of());
+
+        List<ShoreikinDto> result = service.search(form);
+
+        assertThat(result).hasSize(1);
+        verify(tokugimuRepository, never()).findBySearchConditions(any(), any(), any(), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void search_合算指定番号が存在しない場合は空リスト() {
+        ShoreikinDto form = new ShoreikinDto();
+        form.setNendo(NENDO);
+        form.setGassanShiteiNo("90000099");
+
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(eq(JICHITAI_CD), eq("90000099")))
+                .thenReturn(List.of());
+
+        List<ShoreikinDto> result = service.search(form);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void search_全件返却() {
+        ShoreikinDto form = new ShoreikinDto();
+        form.setNendo(NENDO);
 
         List<Tokugimu> tokugimuList = List.of(
                 buildTokugimu("00100001"),
@@ -168,14 +241,11 @@ class ShoreikinServiceImplTest {
                 .thenReturn(tokugimuList);
         when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
                 .thenReturn(List.of(buildAtena()));
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(eq(JICHITAI_CD), any()))
-                .thenReturn(List.of());
         when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
                 .thenReturn(List.of());
 
-        Page<ShoreikinDto> result = service.search(form);
+        List<ShoreikinDto> result = service.search(form);
 
-        assertThat(result.getTotalElements()).isEqualTo(3);
-        assertThat(result.getContent()).hasSize(2);
+        assertThat(result).hasSize(3);
     }
 }

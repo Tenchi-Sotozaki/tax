@@ -215,45 +215,43 @@ function printReport() {
  * フォームバリデーション
  */
 function validateForm() {
-	
-	// 処理開始時に古いエラーをクリアする
-	hideErrorMessage();
-	
-    const shiteiNo = document.querySelector('input[name="shiteiNo"]').value;
 
+    const nendoInput = document.getElementById('nendoInput');
+    const hakkoYmdInput = document.getElementById('hakkoYmdInput');
+    let hasError = false;
+
+    [nendoInput, hakkoYmdInput].forEach(el => {
+        el.classList.remove('is-invalid');
+        document.getElementById(el.id + 'Error').textContent = '';
+    });
+
+    const shiteiNo = document.querySelector('input[name="shiteiNo"]').value;
     if (!shiteiNo) {
         showErrorMessage('指定番号が取得できません。');
         return false;
     }
-	
-    // 年度（YYYY形式）のバリデーション
-    const nendoInput = document.getElementById('nendoInput');
-    const nendoValue = nendoInput ? nendoInput.value.trim() : '';
 
+    const nendoValue = nendoInput.value.trim();
     if (!nendoValue) {
-        showErrorMessage('年度を入力してください。');
-        nendoInput.focus();
-        return false;
+        nendoInput.classList.add('is-invalid');
+        document.getElementById('nendoInputError').textContent = '年度を入力してください。';
+        hasError = true;
+    } else if (!/^\d{4}$/.test(nendoValue)) {
+        nendoInput.classList.add('is-invalid');
+        document.getElementById('nendoInputError').textContent = '年度は4桁の半角数字（例: 2026）で入力してください。';
+        hasError = true;
     }
 
-    // 4桁の半角数字であるかチェックする正規表現
-    const nendoRegex = /^\d{4}$/;
-    if (!nendoRegex.test(nendoValue)) {
-        showErrorMessage('年度は4桁の半角数字（例: 2026）で入力してください。');
-        nendoInput.focus();
-        return false;
-    }
-	
-    // 発行年月日入力チェック
-    const hakkoYmdInput = document.getElementById('hakkoYmdInput');
-    const hakkoYmdValue = hakkoYmdInput ? hakkoYmdInput.value.trim() : '';
-
-    if (!hakkoYmdValue) {
-        showErrorMessage('発行年月日を入力してください。');
-        hakkoYmdInput.focus();
-        return false;
+    if (!hakkoYmdInput.value.trim()) {
+        hakkoYmdInput.classList.add('is-invalid');
+        document.getElementById('hakkoYmdInputError').textContent = '発行年月日を入力してください。';
+        hasError = true;
     }
 
+    if (hasError) {
+        (nendoInput.classList.contains('is-invalid') ? nendoInput : hakkoYmdInput).focus();
+        return false;
+    }
     return true;
 }
 
@@ -282,26 +280,19 @@ function updateDisplayDate() {
  * 画面上部にエラーメッセージを表示する
  */
 function showErrorMessage(message) {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = message;
-        errorAlert.style.display = 'block';
-        errorAlert.classList.add('show');
+    // 画面上部のalert-danger領域に表示する（reportForm.jsで定義）
+    if (window.ReportError) {
+        window.ReportError.show(message);
+        return;
     }
+    alert(message);
 }
 
 /**
  * 画面上部のエラーメッセージを非表示にする
  */
 function hideErrorMessage() {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessageText = document.getElementById('errorMessageText');
-    
-    if (errorAlert && errorMessageText) {
-        errorMessageText.textContent = '';
-        errorAlert.style.display = 'none';
-        errorAlert.classList.remove('show');
+    if (window.ReportError) {
+        window.ReportError.hide();
     }
 }

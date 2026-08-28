@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -26,13 +25,9 @@ public class TekiyoNozeiShuki extends BaseEntity {
 	@Id
 	@Column(name = "shitei_no", length = 8, nullable = false)
 	private String shiteiNo;
-
 	@Id
-	@Column(name = "idx", nullable = false)
-	private Integer idx;
-
-	@Column(name = "seq", precision = 3, nullable = false)
-	private BigDecimal seq;
+	@Column(name = "rno", nullable = false)
+	private Integer rno;
 
 	@Column(name = "tekiyo_st_ymd")
 	private LocalDate tekiyoStYmd;

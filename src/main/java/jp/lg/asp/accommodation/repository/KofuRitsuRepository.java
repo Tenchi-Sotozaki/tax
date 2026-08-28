@@ -24,17 +24,15 @@ public interface KofuRitsuRepository extends JpaRepository<KofuRitsu, KofuRitsuI
 	@Query("SELECT COALESCE(MAX(k.rno), 0) + 1 FROM KofuRitsu k WHERE k.jichitaiCd = :jichitaiCd")
 	BigDecimal findNextRno(@Param("jichitaiCd") String jichitaiCd);
 
-	@Query("SELECT k.kofuRitsu FROM KofuRitsu k " +
-		       "WHERE k.jichitaiCd = :jichitaiCd " +
-		       "AND k.newFlg = '1' " +
-		       "AND k.tekiyoStNendo <= :nendo " +
-		       "ORDER BY k.rno DESC")
+	@Query(value = "SELECT k.kofu_ritsu FROM m_kofu_ritsu k " +
+		       "WHERE k.jichitai_cd = :jichitaiCd " +
+		       "AND CAST(TRIM(k.tekiyo_st_nendo) AS INTEGER) <= :nendo " +
+		       "ORDER BY CAST(TRIM(k.tekiyo_st_nendo) AS INTEGER) DESC, k.rno DESC", nativeQuery = true)
 	List<BigDecimal> findKofuRitsuByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
 
-	@Query("SELECT k FROM KofuRitsu k " +
-		       "WHERE k.jichitaiCd = :jichitaiCd " +
-		       "AND k.newFlg = '1' " +
-		       "AND k.tekiyoStNendo <= :nendo " +
-		       "ORDER BY k.rno DESC")
+	@Query(value = "SELECT * FROM m_kofu_ritsu k " +
+		       "WHERE k.jichitai_cd = :jichitaiCd " +
+		       "AND CAST(TRIM(k.tekiyo_st_nendo) AS INTEGER) <= :nendo " +
+		       "ORDER BY CAST(TRIM(k.tekiyo_st_nendo) AS INTEGER) DESC, k.rno DESC", nativeQuery = true)
 	List<KofuRitsu> findKofuRitsuEntityByJichitaiCd(@Param("jichitaiCd") String jichitaiCd, @Param("nendo") Integer nendo);
 }

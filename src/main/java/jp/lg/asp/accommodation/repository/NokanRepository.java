@@ -14,9 +14,15 @@ import jp.lg.asp.accommodation.entity.NokanId;
 @Repository
 public interface NokanRepository extends JpaRepository<Nokan, NokanId> {
 
+	/**
+	 * 最新の納税管理人情報を取得する。
+	 * t_nokan は rno を持つ履歴テーブルのため、new_flg で最新の1件に絞る。
+	 * 絞らないと履歴が2件以上あるときに複数行が返り、Optional で受け取れない。
+	 */
 	@Query("""
 			SELECT n FROM Nokan n
-			WHERE n.jichitaiCd = :jichitaiCd AND n.shiteiNo = :shiteiNo AND n.delFlg = '0'
+			WHERE n.jichitaiCd = :jichitaiCd AND n.shiteiNo = :shiteiNo
+			  AND n.newFlg = '1' AND n.delFlg = '0'
 			""")
 	Optional<Nokan> findByJichitaiCdAndShiteiNo(
 			@Param("jichitaiCd") String jichitaiCd,

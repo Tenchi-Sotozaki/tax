@@ -8,7 +8,30 @@ document.addEventListener('DOMContentLoaded', () => {
     initSmoothScroll();
     initKyodoSection();
     initBusinessStatusSection();
+    openAccordionsWithContent();
 });
+
+// -----------------------------------------------------------------------
+// 中身のあるアコーディオンを開いた状態にする
+// ・登録済みのデータがある場合  … たたまれていると気づけないため
+// ・エラーがある場合            … 項目直下のメッセージが見えないため
+// 新規登録で何も入っていないときは、たたんだままにする
+// -----------------------------------------------------------------------
+function openAccordionsWithContent() {
+    document.querySelectorAll('.accordion-collapse').forEach(el => {
+        const hasError = el.querySelector('.is-invalid') !== null;
+        const hasValue = Array.from(el.querySelectorAll('input, textarea, select')).some(hasInputValue);
+        if (!hasError && !hasValue) return;
+        bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+    });
+}
+
+/** 入力欄に値が入っているか。ボタン類と hidden は対象外 */
+function hasInputValue(el) {
+    if (el.type === 'checkbox' || el.type === 'radio') return el.checked;
+    if (el.type === 'hidden' || el.type === 'button' || el.type === 'submit') return false;
+    return (el.value ?? '').trim() !== '';
+}
 
 // -----------------------------------------------------------------------
 // イベントバインド
@@ -150,8 +173,6 @@ function onDeclarationTypeChange(e) {
     const undecided = document.getElementById('suspensionEndDateUndecided');
     const resumeClose = document.getElementById('resumptionOrAbolitionDate');
     const reason = document.getElementById('suspensionOrAbolitionReason');
-    const today = new Date().toLocaleDateString('sv-SE');
-
     // 全て非活性にしてクリア
     [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
         if (el) { el.disabled = true; el.value = ''; }
@@ -162,15 +183,12 @@ function onDeclarationTypeChange(e) {
         [suspendStart, suspendEnd, undecided, reason].forEach(el => {
             if (el) el.disabled = false;
         });
-        if (suspendStart && !suspendStart.value) suspendStart.value = today;
-        if (suspendEnd && !suspendEnd.value) suspendEnd.value = today;
     } else if (value === '再開') {
-        if (resumeClose) { resumeClose.disabled = false; if (!resumeClose.value) resumeClose.value = today; }
+        if (resumeClose) resumeClose.disabled = false;
     } else if (value === '廃止') {
         [resumeClose, reason].forEach(el => {
             if (el) el.disabled = false;
         });
-        if (resumeClose && !resumeClose.value) resumeClose.value = today;
     }
 }
 
@@ -221,18 +239,6 @@ function initCopyCheckboxes() {
     if (copyToMail) {
         copyToMail.addEventListener('change', () => {
             copyTokugimuInfoToMail(copyToMail.checked);
-        });
-    }
-
-    // 共同事業者情報の表示切替
-    const kyodoCheck = document.getElementById('kyodoCheck');
-    if (kyodoCheck) {
-        kyodoCheck.addEventListener('change', () => {
-            const kyodoBody = document.getElementById('kyodoBody');
-            kyodoBody.style.display = kyodoCheck.checked ? '' : 'none';
-            if (!kyodoCheck.checked) {
-                kyodoBody.querySelectorAll('input, textarea, select').forEach(el => el.value = '');
-            }
         });
     }
 
@@ -391,10 +397,9 @@ function renumberKyodoRows() {
 // 共同事業者セクション初期化（編集・照会時にデータがあれば表示）
 // -----------------------------------------------------------------------
 function initKyodoSection() {
-    const kyodoCheck = document.getElementById('kyodoCheck');
-    if (kyodoCheck && kyodoCheck.checked) {
-        document.getElementById('kyodoBody').style.display = '';
-    }
+    // 照会画面では行を追加しない。
+    // 追加ボタンは登録・編集時にしか描画されないため、その有無で判定する
+    if (!document.getElementById('kyodoAddBtn')) return;
     // 保存済みデータがない場合は初期行を追加
     const rows = document.getElementById('kyodoRows');
     if (rows && rows.querySelectorAll('.kyodo-row').length === 0) {
@@ -422,11 +427,11 @@ function applyDeclarationState() {
     const resumeClose = document.getElementById('resumptionOrAbolitionDate');
     const reason = document.getElementById('suspensionOrAbolitionReason');
 
-    // ラジオ未選択時は全て非活性
+    // ラジオ未選択時は全て非活性かつ値をクリア
     [suspendStart, suspendEnd, resumeClose, reason].forEach(el => {
-        if (el) el.disabled = true;
+        if (el) { el.disabled = true; el.value = ''; }
     });
-    if (undecided) undecided.disabled = true;
+    if (undecided) { undecided.disabled = true; undecided.checked = false; }
 
     if (!checked) return;
     const value = checked.value;
@@ -477,7 +482,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isEdit) return;
 
     // 対象となる入力要素を取得
-    const inputs = document.querySelectorAll('.form-control, .form-select, .form-check-input');
+    const inputs = document.querySelectorAll(
+        '.form-control:not(#addressSearchModal .form-control), ' +
+        '.form-select:not(#addressSearchModal .form-select), ' +
+        '.form-check-input:not(#addressSearchModal .form-check-input)'
+    );
 
     /**
      * 値が変わったかどうかを判定し、枠線を黄色にする
@@ -499,8 +508,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 		
         if (isChanged) {
-            input.style.border = '3px solid #ffeb3b';
+			input.classList.add('form-control-edited');
         } else {
+			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

@@ -1,10 +1,18 @@
 package jp.lg.asp.accommodation.service.impl;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.chrono.JapaneseChronology;
+import java.time.chrono.JapaneseDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,12 +20,14 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
 import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.dto.NonyushoReportsDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.ReportsDef;
+import jp.lg.asp.accommodation.entity.ReportsDefId;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
@@ -167,10 +177,10 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 			}
 
 			// m_reports_defテーブルからデータ取得
-			response.setKozaNo(getReportsDefData("口座番号"));
-			response.setNonyuBasho(getReportsDefData("納入場所"));
-			response.setShiteiKinyuName(getReportsDefData("指定金融機関名"));
-			response.setTorimatome(getReportsDefData("取りまとめ店"));
+			response.setKozaNo(getReportsDefText(ReportsConstants.NONYUSHO_KOZA_NO));
+			response.setNonyuBasho(getReportsDefText(ReportsConstants.NONYUSHO_KOZA));
+			response.setShiteiKinyuName(getReportsDefText(ReportsConstants.NONYUSHO_SHITEI_KINYU_NAME));
+			response.setTorimatome(getReportsDefText(ReportsConstants.NONYUSHO_TORIMATOME));
 
 			log.debug("納入書動的データ取得完了: shiteiNo={}, nendo={}", shiteiNo, nendo);
 			return response;
@@ -192,21 +202,25 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	}
 
 	/**
-	 * m_reports_defテーブルから指定したテキストのdef_dataを取得
+	 * m_reports_defテーブルから定義IDに対応するdef_textを取得
 	 */
-	private String getReportsDefData(String defText) {
+	private String getReportsDefText(String defId) {
 		String jichitaiCode = jichitaiContext.getJichitaiCd();
 		try {
-			Optional<ReportsDef> reportsDefOpt = reportsDefRepository.findByJichitaiCdAndDefText(jichitaiCode, defText);
+			ReportsDefId id = new ReportsDefId();
+			id.setJichitaiCd(jichitaiCode);
+			id.setId(defId);
+
+			Optional<ReportsDef> reportsDefOpt = reportsDefRepository.findById(id);
 			if (reportsDefOpt.isPresent()) {
-				byte[] defData = reportsDefOpt.get().getDefData();
-				return defData != null ? new String(defData, "UTF-8") : "";
+				String defText = reportsDefOpt.get().getDefText();
+				return defText != null ? defText : "";
 			} else {
-				log.error("該当するm_reports_defレコードが見つかりません: defText={}", defText);
+				log.error("該当するm_reports_defレコードが見つかりません: defId={}", defId);
 				return "";
 			}
 		} catch (Exception e) {
-			log.error("m_reports_defデータ取得エラー: defText={}", defText, e);
+			log.error("m_reports_defデータ取得エラー: defId={}", defId, e);
 			return "";
 		}
 	}
@@ -237,48 +251,80 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		reportsDto.setJichitaiCd(jichitaiCd);
 		reportsDto.setKozaNo(dto.getKozaNo() != null ? dto.getKozaNo() : "");
 		reportsDto.setKozaName(dto.getKozaName() != null ? dto.getKozaName() : "");
-		reportsDto.setNendo(nendo != null ? nendo : "");
 		reportsDto.setShiteiNo(shiteiNo != null ? shiteiNo : "");
-		reportsDto.setZeigaku(dto.getZeigaku() != null ? dto.getZeigaku() : "0");
-		reportsDto.setEntai(dto.getEntai() != null ? dto.getEntai() : "0");
-		reportsDto.setKasan(dto.getKasan() != null ? dto.getKasan() : "0");
-		reportsDto.setGokei(dto.getGokei() != null ? dto.getGokei() : "0");
-
-		// 住所に郵便番号を連結
-		String tokuJusho = dto.getTokuJusho() != null ? dto.getTokuJusho().trim() : "";
-		String tokuYubinNo = dto.getTokuYubinNo() != null ? dto.getTokuYubinNo().trim() : "";
-
-		log.debug("郵便番号連結前: 郵便番号=[{}], 住所=[{}]", tokuYubinNo, tokuJusho);
-
-		// 郵便番号がある場合は住所の先頭に付加
-		if (!tokuYubinNo.isEmpty()) {
-			// 郵便番号のフォーマットを確認し、必要に応じてハイフンを追加
-			if (tokuYubinNo.matches("\\d{7}")) {
-				tokuYubinNo = tokuYubinNo.substring(0, 3) + "-" + tokuYubinNo.substring(3);
-			}
-			// 郵便番号を先頭に追加（住所が空でも郵便番号は表示）
-			tokuJusho = "〒" + tokuYubinNo + (tokuJusho.isEmpty() ? "" : " " + tokuJusho);
-			log.debug("郵便番号連結後: [{}]", tokuJusho);
-		} else {
-			log.debug("郵便番号が空のため連結処理をスキップしました");
-		}
-		reportsDto.setTokuJusho(tokuJusho);
-
+		reportsDto.setZeigaku(formatToCommaString(dto.getZeigaku()));
+		reportsDto.setEntai(formatToCommaString(dto.getEntai()));
+		reportsDto.setKasan(formatToCommaString(dto.getKasan()));
+		reportsDto.setGokei(formatToCommaString(dto.getGokei()));
+		reportsDto.setTokuYubin(dto.getTokuYubinNo() != null ? "〒" + dto.getTokuYubinNo().trim() : "");
+		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho().trim() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
 		reportsDto.setNonyuBasho(dto.getNonyuBasho() != null ? dto.getNonyuBasho() : "");
 		reportsDto.setShiteiKinyuName(dto.getShiteiKinyuName() != null ? dto.getShiteiKinyuName() : "");
 		reportsDto.setTorimatome(dto.getTorimatome() != null ? dto.getTorimatome() : "");
+		
+		// 年度（和暦）を設定
+		String nendoStr = "";
+		if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
+			try {
+				// yyyy の文字列を int に変換
+				int year = Integer.parseInt(nendo);
+
+				// 和暦の年を取得する
+				LocalDate localDate = LocalDate.of(year, 1, 1);
+				JapaneseDate japaneseDate = JapaneseDate.from(localDate);
+
+				// 和暦用のフォーマッタを作成
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年", Locale.JAPANESE);
+				String warekiYear = japaneseDate.format(formatter);
+
+				nendoStr = warekiYear;
+
+			} catch (NumberFormatException | java.time.format.DateTimeParseException e) {
+				nendoStr = dto.getNendo();
+			}
+		}
+
+		reportsDto.setNendo(nendoStr);
 
 		// 申告年月
 		if (dto.getShinkokuYmd() != null) {
-			reportsDto.setShinkokuYm(dto.getShinkokuYmd());
+			try {
+				// 文字列を YearMonth に変換
+				YearMonth yearMonth = YearMonth.parse(dto.getShinkokuYmd(), DateTimeFormatter.ofPattern("yyyyMM"));
+
+		        // 和暦の年月フォーマッタを作成
+		        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)
+		                .withChronology(JapaneseChronology.INSTANCE);
+
+		        // 和暦に変換
+		        String strDate = yearMonth.atDay(1).format(formatter);
+		        
+		        reportsDto.setShinkokuYm(strDate);
+		    } catch (DateTimeParseException e) {
+		        reportsDto.setShinkokuYm("");
+		    }
 		} else {
 			reportsDto.setShinkokuYm("");
 		}
 
 		// 納期限
 		if (dto.getNokigen() != null) {
-			reportsDto.setNokigen(dto.getNokigen());
+			try {
+		        // 文字列を LocalDate に変換
+		        LocalDate localDate = LocalDate.parse(dto.getNokigen(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+		        // 和暦に変換
+		        JapaneseDate japaneseDate = JapaneseDate.from(localDate);
+
+		        // 和暦用のフォーマッタで文字列化
+		        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE);
+		        String strDate = japaneseDate.format(formatter);
+		        
+		        reportsDto.setNokigen(strDate);
+		    } catch (DateTimeParseException e) {
+		        reportsDto.setNokigen("");
+		    }
 		} else {
 			reportsDto.setNokigen("");
 		}
@@ -310,5 +356,18 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 		
 		// データが存在するかどうかを返す
 		return fukaList.isEmpty();
+	}
+	
+	private String formatToCommaString(Object value) {
+	    if (value == null) {
+	        return "0";
+	    }
+	    try {
+	        BigDecimal val = new BigDecimal(value.toString());
+	        DecimalFormat formatter = new DecimalFormat("#,##0");
+	        return formatter.format(val);
+	    } catch (NumberFormatException e) {
+	        return value.toString();
+	    }
 	}
 }

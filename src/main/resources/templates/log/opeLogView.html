@@ -72,20 +72,13 @@
 									th:field="*{opeDtTo}">
 							</div>
 
-							<!-- 任意項目 -->
-							<div class="col">
-								<label class="form-label form-label-sm fw-medium mb-1">任意項目</label>
-								<input type="text" class="form-control form-control-sm" th:field="*{param}"
-									placeholder="PATH、パラメータ部分一致">
-							</div>
-
 						</div>
 
 						<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-							<button type="button" class="btn btn-outline-secondary btn-sm" id="resetBtn">
+							<button type="button" class="btn btn-outline-secondary" id="resetBtn">
 								<i class="bi bi-arrow-counterclockwise me-1"></i>リセット
 							</button>
-							<button type="submit" class="btn btn-primary btn-sm px-4">
+							<button type="submit" class="btn btn-primary px-4">
 								<i class="bi bi-search me-1"></i>検索する
 							</button>
 						</div>
@@ -99,7 +92,7 @@
 			<span class="text-muted small">検索結果：<span id="totalCount" th:text="${items.size()}">0</span> 件</span>
 			<!-- ======== ページネーション ======== -->
 			<nav class="position-absolute start-50 translate-middle-x">
-				<ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+				<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".log-row"></ul>
 			</nav>
 			<!-- ======== 表示件数 ======== -->
 			<div class="d-flex align-items-center gap-2">
@@ -121,12 +114,8 @@
 							<th style="width: 80px;">No.</th>
 							<th style="width: 200px;">画面名</th>
 							<th style="width: 200px;">操作</th>
-							<th style="width: 80px;">メソッド</th>
-							<th style="width: 80px;">ステータス</th>
-							<th style="width: 200px;">PATH</th>
 							<th style="width: 120px;">操作者</th>
 							<th style="width: 170px;">操作日時</th>
-							<th>パラメータ</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -137,14 +126,8 @@
 							<td th:text="${stat.count}"></td>
 							<td th:text="${item.screenName}"></td>
 							<td th:text="${item.sousa}"></td>
-							<td th:text="${item.method}"></td>
-							<td th:text="${item.status}"></td>
-							<td th:text="${item.path}"></td>
 							<td th:text="${item.opeUser}"></td>
 							<td th:text="${#temporals.format(item.opeDt, 'yyyy/MM/dd HH:mm:ss')}"></td>
-							<td>
-								<pre class="mb-0 small param-cell" th:text="${item.param}"></pre>
-							</td>
 						</tr>
 					</tbody>
 				</table>

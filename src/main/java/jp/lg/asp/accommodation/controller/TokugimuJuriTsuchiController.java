@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,12 +13,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuJuriTsuchiDto;
 import jp.lg.asp.accommodation.service.TokugimuJuriTsuchiReportsService;
 import jp.lg.asp.accommodation.service.TokugimuJuriTsuchiService;
@@ -46,16 +48,21 @@ public class TokugimuJuriTsuchiController {
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		TokugimuJuriTsuchiDto dto = new TokugimuJuriTsuchiDto();
+		
+		// 指定番号が存在しない場合
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			// 画面を戻して検索モーダルを表示
+			model.addAttribute("showShiteiGassanModal", true);
+			return "tokugimu/tTokugimuReport";
+		}
 
 		// 指定番号はセッションから取得
 		String shiteiNo = SessionHelper.getShiteiNo(session);
-		if (shiteiNo == null) shiteiNo = "";
 
-		if (!shiteiNo.isEmpty()) {
-			TokugimuJuriTsuchiDto tokugimuInfo = tokugimuJuriTsuchiService.getTokugimuInfo(shiteiNo);
-			if (tokugimuInfo != null) {
-				dto = tokugimuInfo;
-			}
+		TokugimuJuriTsuchiDto tokugimuInfo = tokugimuJuriTsuchiService.getTokugimuInfo(shiteiNo);
+		if (tokugimuInfo != null) {
+			dto = tokugimuInfo;
 		}
 
 		// 発行日のデフォルト値を今日に設定

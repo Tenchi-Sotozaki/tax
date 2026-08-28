@@ -44,7 +44,19 @@ public class Nokan {
     @Column(name = "name")
     private String name;
 
+    /** 最新フラグ */
+    @Column(name = "new_flg")
+    private String newFlg;
+
     /** 削除フラグ */
     @Column(name = "del_flg")
     private String delFlg;
+    
+    /** 区分 */
+    @Column(name = "kbn")
+    private String kbn;
+    
+    /** 理由 */
+    @Column(name="riyu")
+    private String riyu;
 }
