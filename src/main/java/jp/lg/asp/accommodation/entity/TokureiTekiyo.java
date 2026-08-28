@@ -1,6 +1,5 @@
 package jp.lg.asp.accommodation.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import jakarta.persistence.Column;
@@ -14,10 +13,10 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "t_nozei_shuki")
-@IdClass(TekiyoNozeiShukiId.class)
+@IdClass(TokureiTekiyoId.class)
 @Getter
 @Setter
-public class TekiyoNozeiShuki extends BaseEntity {
+public class TokureiTekiyo extends BaseEntity {
 
 	@Id
 	@Column(name = "jichitai_cd", length = 5, nullable = false)
@@ -28,11 +27,8 @@ public class TekiyoNozeiShuki extends BaseEntity {
 	private String shiteiNo;
 
 	@Id
-	@Column(name = "idx", nullable = false)
-	private Integer idx;
-
-	@Column(name = "seq", precision = 3, nullable = false)
-	private BigDecimal seq;
+	@Column(name = "rno", nullable = false)
+	private Integer rno;
 
 	@Column(name = "tekiyo_st_ymd")
 	private LocalDate tekiyoStYmd;

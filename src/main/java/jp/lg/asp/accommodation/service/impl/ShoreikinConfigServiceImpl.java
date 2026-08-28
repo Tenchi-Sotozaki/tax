@@ -19,8 +19,10 @@ import jp.lg.asp.accommodation.entity.KofuRitsu;
 import jp.lg.asp.accommodation.entity.Shoreikin;
 import jp.lg.asp.accommodation.entity.ShoreikinId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
@@ -44,6 +46,7 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	private final FukaRepository fukaRepository;
 	private final KofuRitsuRepository kofuRitsuRepository;
 	private final ShunoRirekiRepository shunoRirekiRepository;
+	private final JichitaiRepository jichitaiRepository;
 
 	private final JichitaiContext jichitaiContext;
 
@@ -91,23 +94,18 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				dto.setExists(false);
 				dto.setMode("create");
 
-				LocalDate today = LocalDate.now();
-				dto.setNendo(String.valueOf(today.getYear()));
-
-				// 交付率を取得して設定 ( 処理日を指定 )
-				List<BigDecimal> ritsuList1 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today.getYear());
+				// 交付率を取得して設定 ( 画面の交付金年度を指定 )
+				Integer nendoInt = Integer.parseInt(nendo);
+				List<BigDecimal> ritsuList1 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, nendoInt);
 				dto.setKofuRitsu(ritsuList1.isEmpty() ? null : ritsuList1.get(0));
 			}
 		} else {
-			// 新規登録モード
+			// 新規登録モード（nendo未指定 → 年度開始月から今年度を算出）
 			dto.setExists(false);
 			dto.setMode("create");
-
-			LocalDate today = LocalDate.now();
-			dto.setNendo(String.valueOf(today.getYear()));
-
-			// 交付率を取得して設定 ( 処理日を指定 )
-			List<BigDecimal> ritsuList2 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, today.getYear());
+			int currentNendo = resolveCurrentNendo(jichitaiCd);
+			dto.setNendo(String.valueOf(currentNendo));
+			List<BigDecimal> ritsuList2 = kofuRitsuRepository.findKofuRitsuByJichitaiCd(jichitaiCd, currentNendo);
 			dto.setKofuRitsu(ritsuList2.isEmpty() ? null : ritsuList2.get(0));
 		}
 
@@ -176,21 +174,25 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 	public ShoreikinConfigDto calculateShoreikin(ShoreikinConfigDto dto) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
-		// 交付率設定を取得
+		// 交付率設定を取得（画面の交付金年度を指定）
+		Integer nendoInt = Integer.parseInt(dto.getNendo());
 		List<KofuRitsu> kofuRitsuList = kofuRitsuRepository.findKofuRitsuEntityByJichitaiCd(
-				jichitaiCd, LocalDate.now().getYear());
-		KofuRitsu kofuRitsuEntity = kofuRitsuList.isEmpty() ? null : kofuRitsuList.get(0);
-
-		if (dto.getKofuRitsu() == null) {
-			dto.setKofuRitsu(kofuRitsuEntity != null ? kofuRitsuEntity.getKofuRitsu() : null);
+				jichitaiCd, nendoInt);
+		// 交付率が取得できない場合は算出できないためエラーとする
+		if (kofuRitsuList.isEmpty()) {
+			throw new IllegalStateException("交付率が設定されていません。交付率設定画面で登録してください。");
 		}
+		KofuRitsu kofuRitsuEntity = kofuRitsuList.get(0);
+
+		// 交付率は画面で入力せず交付率設定から取得するため、常にマスタの値で上書きする
+		dto.setKofuRitsu(kofuRitsuEntity.getKofuRitsu());
 
 		// 納入税額を算出
 		Long kofuZeigaku = calculateKofuZeigaku(dto.getShiteiNo(), dto.getNendo());
 		dto.setKofuZeigaku(kofuZeigaku);
 
-		// 交付額を算出
-		if (kofuZeigaku != null && dto.getKofuRitsu() != null) {
+		// 交付額を算出（交付率は上で必ず設定されている）
+		if (kofuZeigaku != null) {
 			dto.setKofuGaku(calculateKofuGaku(kofuZeigaku, dto.getKofuRitsu(), kofuRitsuEntity));
 		}
 
@@ -224,6 +226,18 @@ public class ShoreikinConfigServiceImpl implements ShoreikinConfigService {
 				})
 				.map(Fuka::getTotalZeigaku)
 				.reduce(0L, Long::sum);
+	}
+
+	/**
+	 * 年度開始月をもとに現在の年度を算出する
+	 */
+	private int resolveCurrentNendo(String jichitaiCd) {
+		LocalDate today = LocalDate.now();
+		int stMonth = jichitaiRepository.findById(jichitaiCd)
+				.map(Jichitai::getNendoStMonth)
+				.map(Integer::parseInt)
+				.orElse(4);
+		return today.getMonthValue() >= stMonth ? today.getYear() : today.getYear() - 1;
 	}
 
 	/**

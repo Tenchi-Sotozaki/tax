@@ -47,6 +47,9 @@ public class NonyushoReportsDto {
     /** 納期限 */
     private String nokigen;
     
+    /** 特別徴収義務者郵便番号 */
+    private String tokuYubin;
+    
     /** 特別徴収義務者住所(所在地) */
     private String tokuJusho;
     

@@ -143,6 +143,24 @@
 					</div>
 				</div>
 			</div>
+			
+			<!-- ユーザー情報エリア -->
+			<div class="card shadow-sm mb-4">
+				<div class="card-header">
+					<h6 class="mb-0"><i class="bi bi-hash me-2"></i>ユーザー情報</h6>
+				</div>
+				<div class="card-body">
+					<div class="row g-3">
+						<div class="col-md-3">
+							<label for="shiteiStChar" class="form-label fw-medium">ユーザーID <span class="text-danger">*</span></label>
+							<input type="text" id="userId" th:field="*{userId}" class="form-control"
+								th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''" placeholder="例：user">
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
 			<!-- ボタンエリア -->
 			<div class="d-flex justify-content-center">

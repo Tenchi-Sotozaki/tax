@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -17,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
 import jp.lg.asp.accommodation.entity.NozeiShuki;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
@@ -54,7 +55,7 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void getByShiteiNo_noHistory_returnsEmptyForm() {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
         TekiyoNozeiShukiForm form = service.getByShiteiNo(SHITEI_NO);
@@ -66,7 +67,6 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_startAfterEnd_throwsException() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setSeq(BigDecimal.ONE);
         form.setTekiyoStMonth("2024-06");
         form.setTekiyoEdMonth("2024-03");
 
@@ -81,11 +81,10 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_overlappingPeriod_throwsException() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setSeq(BigDecimal.ONE);
         form.setTekiyoStMonth("2024-04");
         form.setTekiyoEdMonth("2024-09");
 
-        TekiyoNozeiShuki existing = new TekiyoNozeiShuki();
+        TokureiTekiyo existing = new TokureiTekiyo();
         existing.setTekiyoStYmd(LocalDate.of(2024, 1, 1));
         existing.setTekiyoEdYmd(LocalDate.of(2024, 6, 30));
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
@@ -99,26 +98,25 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_validPeriod_savesEntity() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setSeq(BigDecimal.ONE);
         form.setTekiyoStMonth("2024-10");
 
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
-        when(tekiyoNozeiShukiRepository.findMaxIdxByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(0);
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         service.save(SHITEI_NO, form);
 
-        verify(tekiyoNozeiShukiRepository).save(argThat(e -> e.getIdx() == 1));
+        verify(tekiyoNozeiShukiRepository).save(argThat(e -> e.getRno() == 1));
     }
 
     @Test
     void delete_setsDelFlg1() {
-        TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
+        TokureiTekiyo entity = new TokureiTekiyo();
         entity.setDelFlg("0");
-        entity.setIdx(1);
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        entity.setRno(1);
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(entity));
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -129,7 +127,7 @@ class TekiyoNozeiShukiServiceImplTest {
 
     @Test
     void delete_notFound_throwsException() {
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
         assertThatThrownBy(() -> service.delete(SHITEI_NO))

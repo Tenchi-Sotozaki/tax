@@ -20,5 +20,7 @@ public class AddressDto {
     private String hojinNo;
     
     private boolean alreadyRegistered;
+    private boolean viewOnly;
     private String gassanShiteiNo;
+    private String tekiyoEdYmd;
 }

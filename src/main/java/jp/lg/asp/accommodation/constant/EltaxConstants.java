@@ -49,4 +49,14 @@ public final class EltaxConstants {
 	public static final String SHINSEI_KBN_HENPU = "8";
 	public static final String SHINSEI_KBN_SONOTA = "9";
 
+	public static final Map<String, String> SHINSEI_KBN_NAME_MAP = Map.of(
+			SHINSEI_KBN_SHINKI, "1:新規",
+			SHINSEI_KBN_HENKO, "2:変更",
+			SHINSEI_KBN_KYUSHI, "3:休止",
+			SHINSEI_KBN_SAIKAI, "4:再開",
+			SHINSEI_KBN_HAISHI, "5:廃止",
+			SHINSEI_KBN_FUNSHITSU, "6:紛失",
+			SHINSEI_KBN_SAIKOFU, "7:再交付",
+			SHINSEI_KBN_HENPU, "8:頒布",
+			SHINSEI_KBN_SONOTA, "9:その他");
 }

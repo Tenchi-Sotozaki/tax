@@ -41,11 +41,13 @@
 									<div class="col-md-1">
 										<label class="form-label">年度</label> <span class="text-danger">*</span>
 										<input type="text" class="form-control" th:field="*{nendo}" id="nendoInput" placeholder="年度を入力">
+										<div class="invalid-feedback" id="nendoInputError"></div>
 									</div>
 
 									<div class="col-md-2">
 										<label class="form-label">発行年月日</label> <span class="text-danger">*</span>
 										<input type="date" class="form-control" th:field="*{hakkoYmd}" id="hakkoYmdInput" onchange="updateDisplayDate()">
+										<div class="invalid-feedback" id="hakkoYmdInputError"></div>
 									</div>
 								</div>
 
@@ -79,11 +81,11 @@
 							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
 								<i class="bi bi-arrow-left me-1"></i> 戻る
 							</a>
+							<button type="button" class="btn btn-primary" onclick="preview()">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
 							<button type="button" class="btn btn-primary" onclick="generatePdf()">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
-							</button>
-							<button type="button" class="btn btn-outline-primary" onclick="preview()">
-								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
 							<button type="button" class="btn btn-primary" onclick="printReport()">
 								<i class="bi bi-printer me-1"></i> 印刷

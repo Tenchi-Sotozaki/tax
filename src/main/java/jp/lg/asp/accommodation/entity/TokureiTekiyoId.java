@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TekiyoNozeiShukiId implements Serializable {
+public class TokureiTekiyoId implements Serializable {
 	private String jichitaiCd;
 	private String shiteiNo;
-	private Integer idx;
+	private Integer rno;
 }
