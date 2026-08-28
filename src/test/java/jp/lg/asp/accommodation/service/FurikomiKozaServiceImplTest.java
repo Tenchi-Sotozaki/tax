@@ -338,9 +338,9 @@ class FurikomiKozaServiceImplTest {
                 .hasMessageContaining("他のユーザー");
     }
 
-    // No.16 異常系: dto.version=nullの場合、NullPointerExceptionが投げられる
+    // No.16 異常系: dto.version=nullの場合、RuntimeExceptionが投げられる
     @Test
-    void updateFurikomiKoza_dtoVersionがnullの場合_NullPointerExceptionをスロー() {
+    void updateFurikomiKoza_dtoVersionがnullの場合_RuntimeExceptionをスロー() {
         FurikomiKoza existing = new FurikomiKoza();
         existing.setVersion(1);
         when(furikomiKozaRepository.findById(any())).thenReturn(Optional.of(existing));
@@ -350,6 +350,7 @@ class FurikomiKozaServiceImplTest {
         dto.setVersion(null);
 
         assertThatThrownBy(() -> service.updateFurikomiKoza(dto))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("他のユーザー");
     }
 }
