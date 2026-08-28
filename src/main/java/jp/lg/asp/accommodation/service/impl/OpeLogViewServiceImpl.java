@@ -57,7 +57,6 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Screen> findAllScreens() {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return screenRepository.findAllByOrderByScreenIdAsc();
 	}
 
