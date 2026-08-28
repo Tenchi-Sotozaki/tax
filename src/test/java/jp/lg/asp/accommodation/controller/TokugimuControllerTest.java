@@ -181,7 +181,7 @@ class TokugimuControllerTest {
             TokugimuForm form = new TokugimuForm();
             when(bindingResult.hasErrors()).thenReturn(false);
 
-            String viewName = tokugimuController.register(form, bindingResult, model, redirectAttributes);
+            String viewName = tokugimuController.register(form, bindingResult, session, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("redirect:/tokugimu/list");
             verify(accessChecker).checkWriteAccess(ScreenManagement.TOKUGIMU_CONFIG);
@@ -196,7 +196,7 @@ class TokugimuControllerTest {
             when(bindingResult.hasErrors()).thenReturn(true);
             when(bindingResult.getFieldErrors()).thenReturn(List.of());
 
-            String viewName = tokugimuController.register(form, bindingResult, model, redirectAttributes);
+            String viewName = tokugimuController.register(form, bindingResult, session, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("tokugimu/tTokugimuConfig");
             verify(accessChecker).checkWriteAccess(ScreenManagement.TOKUGIMU_CONFIG);
@@ -213,7 +213,7 @@ class TokugimuControllerTest {
             doThrow(new RuntimeException("登録失敗")).when(tokugimuService).register(form);
             when(nozeiShukiService.findAll()).thenReturn(List.of());
 
-            String viewName = tokugimuController.register(form, bindingResult, model, redirectAttributes);
+            String viewName = tokugimuController.register(form, bindingResult, session, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("tokugimu/tTokugimuConfig");
             verify(model).addAttribute("isEdit", false);
