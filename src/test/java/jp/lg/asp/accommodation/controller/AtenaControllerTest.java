@@ -299,16 +299,16 @@ class AtenaControllerTest {
         }
 
         @Test
-        @DisplayName("異常系：画面アクセス権限がない場合に例外がスローされること")
-        void list_accessDenied_throwsException() {
-            AtenaSearchForm searchForm = new AtenaSearchForm();
-            Model model = new ConcurrentModel();
+		@DisplayName("異常系：画面アクセス権限がない場合に例外がスローされること")
+		void list_accessDenied_throwsException() {
+			AtenaSearchForm searchForm = new AtenaSearchForm();
+			Model model = new ConcurrentModel();
 
-            org.mockito.Mockito.doThrow(new AccessDeniedException("Access Denied"))
-                    .when(accessChecker).checkAccess(ScreenManagement.ATENA_DAICHO);
+			doThrow(new AccessDeniedException("Access Denied"))
+					.when(accessChecker).checkAccess(ScreenManagement.ATENA_DAICHO);
 
-            assertThatThrownBy(() -> atenaController.list(searchForm, false, model))
-                    .isInstanceOf(AccessDeniedException.class);
-        }
+			assertThatThrownBy(() -> atenaController.list(searchForm, false, model))
+					.isInstanceOf(AccessDeniedException.class);
+		}
     }
 }

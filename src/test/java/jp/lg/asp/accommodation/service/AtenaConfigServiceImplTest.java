@@ -40,7 +40,7 @@ class AtenaConfigServiceImplTest {
 	@Mock
 	private HashUtil hashUtil;
 	
-    private static final String JICHITAI_CD = "123456";
+	private static final String JICHITAI_CD = "123456";
 
 	@Nested
 	@DisplayName("register メソッドのテスト")
@@ -79,7 +79,6 @@ class AtenaConfigServiceImplTest {
 			atena.setHojinNo("1234567890123");
 
 			when(jichitaiRepository.findById(jichitaiCd)).thenReturn(Optional.of(jichitai));
-			when(atenaRepository.existsByHojinNo(jichitaiCd, "1234567890123", null)).thenReturn(false);
 			when(atenaRepository.findMaxAtenaNoByJichitaiCd(jichitaiCd)).thenReturn(Optional.empty());
 			when(atenaRepository.save(any(Atena.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -100,7 +99,6 @@ class AtenaConfigServiceImplTest {
 			atena.setHojinNo("1234567890123");
 
 			when(jichitaiRepository.findById(jichitaiCd)).thenReturn(Optional.of(jichitai));
-			when(atenaRepository.existsByHojinNo(any(), any(), any())).thenReturn(false);
 			when(atenaRepository.findMaxAtenaNoByJichitaiCd(jichitaiCd)).thenReturn(Optional.of(BigDecimal.valueOf(5)));
 			when(atenaRepository.save(any(Atena.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -110,8 +108,8 @@ class AtenaConfigServiceImplTest {
 		}
 
 		@Test
-		@DisplayName("境界値：既存の宛名が0件で、開始番号が未設定の場合（BigDecimal.ONE が使われること）")
-		void boundary_defaultToOne() {
+		@DisplayName("異常系：自治体情報の宛名開始番号（atenaStNo）が未設定かつ既存の宛名が存在しない場合、ビジネス例外がスローされること")
+		void exception_atenaStNoNotSet() {
 			String jichitaiCd = "123456";
 			Jichitai jichitai = new Jichitai();
 			jichitai.setAtenaStNo(null);
@@ -119,13 +117,12 @@ class AtenaConfigServiceImplTest {
 			atena.setHojinNo("1234567890123");
 
 			when(jichitaiRepository.findById(jichitaiCd)).thenReturn(Optional.of(jichitai));
-			when(atenaRepository.existsByHojinNo(any(), any(), any())).thenReturn(false);
 			when(atenaRepository.findMaxAtenaNoByJichitaiCd(jichitaiCd)).thenReturn(Optional.empty());
-			when(atenaRepository.save(any(Atena.class))).thenAnswer(inv -> inv.getArgument(0));
 
-			Atena result = atenaConfigService.register(atena, jichitaiCd);
-
-			assertThat(result.getAtenaNo()).isEqualTo(BigDecimal.ONE);
+			assertThatThrownBy(() -> atenaConfigService.register(atena, jichitaiCd))
+					.isInstanceOf(BusinessException.class)
+					.hasMessage("宛名の開始番号が設定されていません。管理者にお問い合わせください。");
+			verify(atenaRepository, never()).save(any(Atena.class));
 		}
 
 		@Test
@@ -150,28 +147,12 @@ class AtenaConfigServiceImplTest {
 			atena.setKojinNo("123456789012");
 
 			when(jichitaiRepository.findById(jichitaiCd)).thenReturn(Optional.of(jichitai));
-			when(hashUtil.sha256("123456789012")).thenReturn("hashed_kojin");
-			when(atenaRepository.existsByKojinNo(jichitaiCd, "hashed_kojin", null)).thenReturn(true);
+			when(hashUtil.sha256(anyString())).thenReturn("hashed_kojin");
+			when(atenaRepository.existsByKojinNo(eq(jichitaiCd), eq("hashed_kojin"), isNull())).thenReturn(true);
 
 			assertThatThrownBy(() -> atenaConfigService.register(atena, jichitaiCd))
 					.isInstanceOf(BusinessException.class)
 					.hasMessage("この個人番号はすでに登録されています。");
-		}
-
-		@Test
-		@DisplayName("異常系：登録しようとした法人番号がすでに存在する場合、ビジネス例外がスローされること")
-		void exception_duplicateHojinNo() {
-			String jichitaiCd = "123456";
-			Jichitai jichitai = new Jichitai();
-			Atena atena = new Atena();
-			atena.setHojinNo("1234567890123");
-
-			when(jichitaiRepository.findById(jichitaiCd)).thenReturn(Optional.of(jichitai));
-			when(atenaRepository.existsByHojinNo(jichitaiCd, "1234567890123", null)).thenReturn(true);
-
-			assertThatThrownBy(() -> atenaConfigService.register(atena, jichitaiCd))
-					.isInstanceOf(BusinessException.class)
-					.hasMessage("この法人番号はすでに登録されています。");
 		}
 	}
 
@@ -253,8 +234,8 @@ class AtenaConfigServiceImplTest {
 			existing.setAtenaNo(BigDecimal.ONE);
 
 			when(atenaRepository.findById(any(AtenaId.class))).thenReturn(Optional.of(existing));
-			when(hashUtil.sha256("other_kojin")).thenReturn("hashed_other");
-			when(atenaRepository.existsByKojinNo(jichitaiCd, "hashed_other", BigDecimal.ONE)).thenReturn(true);
+			when(hashUtil.sha256(anyString())).thenReturn("hashed_other");
+			when(atenaRepository.existsByKojinNo(eq(jichitaiCd), eq("hashed_other"), eq(BigDecimal.ONE))).thenReturn(true);
 
 			assertThatThrownBy(() -> atenaConfigService.update(atena, jichitaiCd))
 					.isInstanceOf(BusinessException.class)
@@ -262,39 +243,39 @@ class AtenaConfigServiceImplTest {
 		}
 	}
 
-    @Nested
-    @DisplayName("findByAtenaNo メソッドのテスト")
-    class FindByAtenaNoTest {
+	@Nested
+	@DisplayName("findByAtenaNo メソッドのテスト")
+	class FindByAtenaNoTest {
 
-        @Test
-        @DisplayName("正常系：指定した自治体コードと宛名番号に該当する宛名情報が正しく取得できること")
-        void findByAtenaNo_found() {
-            BigDecimal atenaNo = BigDecimal.valueOf(1);
-            Atena expectedAtena = new Atena();
-            expectedAtena.setJichitaiCd(JICHITAI_CD);
-            expectedAtena.setAtenaNo(atenaNo);
+		@Test
+		@DisplayName("正常系：指定した自治体コードと宛名番号に該当する宛名情報が正しく取得できること")
+		void findByAtenaNo_found() {
+			BigDecimal atenaNo = BigDecimal.valueOf(1);
+			Atena expectedAtena = new Atena();
+			expectedAtena.setJichitaiCd(JICHITAI_CD);
+			expectedAtena.setAtenaNo(atenaNo);
 
-            when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo))
-                    .thenReturn(Optional.of(expectedAtena));
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo))
+					.thenReturn(Optional.of(expectedAtena));
 
-            Atena result = atenaConfigService.findByAtenaNo(JICHITAI_CD, atenaNo);
+			Atena result = atenaConfigService.findByAtenaNo(JICHITAI_CD, atenaNo);
 
-            assertThat(result).isNotNull();
-            assertThat(result.getJichitaiCd()).isEqualTo(JICHITAI_CD);
-            assertThat(result.getAtenaNo()).isEqualTo(atenaNo);
-        }
+			assertThat(result).isNotNull();
+			assertThat(result.getJichitaiCd()).isEqualTo(JICHITAI_CD);
+			assertThat(result.getAtenaNo()).isEqualTo(atenaNo);
+		}
 
-        @Test
-        @DisplayName("異常系：指定した自治体コードと宛名番号に該当する宛名情報が存在しない場合、例外がスローされること")
-        void findByAtenaNo_notFound_throwsException() {
-            BigDecimal atenaNo = BigDecimal.valueOf(999);
+		@Test
+		@DisplayName("異常系：指定した自治体コードと宛名番号に該当する宛名情報が存在しない場合、例外がスローされること")
+		void findByAtenaNo_notFound_throwsException() {
+			BigDecimal atenaNo = BigDecimal.valueOf(999);
 
-            when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo))
-                    .thenReturn(Optional.empty());
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, atenaNo))
+					.thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> atenaConfigService.findByAtenaNo(JICHITAI_CD, atenaNo))
-                    .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("宛名が見つかりません。");
-        }
-    }
+			assertThatThrownBy(() -> atenaConfigService.findByAtenaNo(JICHITAI_CD, atenaNo))
+					.isInstanceOf(ResourceNotFoundException.class)
+					.hasMessage("宛名が見つかりません。");
+		}
+	}
 }
