@@ -5,7 +5,6 @@ Servers/
 RemoteSystemsTempFiles/
 docs/テストデータ/
 docs/migration/
-docs/仕様書/
 src/main/resources/db/
 src/main/resources/templates/tokugimu/tTaxManagerConfig_BACKUP_1947.html
 src/main/resources/templates/tokugimu/tTaxManagerConfig_BASE_1947.html

@@ -1,0 +1,18 @@
+﻿,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,,作成者,亀井
+画面項目一覧表,,画面物理名,jichitaiConfig,,作成日,2026/7/23
+,,画面論理名,自治体情報設定,,更新日,
+,,,,,,
+No.,DBテーブル名,カラム名,画面項目名,更新条件,備考,
+1,m_jichitai,jichitai_cd,自治体コード,ー,必須,
+2,m_jichitai,name,自治体名称,ー,必須,
+3,m_jichitai,kbn_name,自治体種別名,ー,必須,
+4,m_jichitai,nendo_st_month,年度開始月,ー,必須,
+5,m_jichitai,nozei_shuki,デフォルト納税周期,ー,必須,
+6,m_jichitai,shitei_st_char,指定番号,ー,必須,
+7,m_jichitai,gassan_st_char,合算指定番号,ー,必須,
+8,m_jichitai,atena_st_no,宛名番号,ー,必須,
+9,m_jichitai,add_dt,ー,BaseEntity.javaで自動更新,,
+10,m_jichitai,add_user,ー,BaseEntity.javaで自動更新,,
+11,m_jichitai,upd_dt,ー,BaseEntity.javaで自動更新,,
+12,m_jichitai,upd_user,ー,BaseEntity.javaで自動更新,,
+13,m_jichitai,version,ー,BaseEntity.javaで自動更新,,
