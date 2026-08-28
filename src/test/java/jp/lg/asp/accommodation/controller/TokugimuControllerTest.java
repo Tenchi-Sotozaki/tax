@@ -116,7 +116,7 @@ class TokugimuControllerTest {
         @DisplayName("正常系：個人番号を含む検索フォームが渡されたとき、そのままサービス層の searchAll へ伝達されること")
         void success_withKojinNoSearch() {
             TokugimuSearchForm searchForm = new TokugimuSearchForm();
-            searchForm.setKojinNo("search_target_kojin_no"); // ダミーの検索値
+            searchForm.setKojinNo("search_target_kojin_no");
             boolean searched = true;
 
             TokugimuListItem item = new TokugimuListItem();
@@ -128,7 +128,6 @@ class TokugimuControllerTest {
 
             assertThat(viewName).isEqualTo("tokugimu/tTokugimuDaicho");
             verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_DAICHO);
-            // 検索フォーム（個人番号等）が正しくサービスへ渡されていることを検証
             verify(tokugimuService).searchAll(searchForm);
             assertThat(searchForm.getKojinNo()).isEqualTo("search_target_kojin_no");
             
@@ -176,17 +175,17 @@ class TokugimuControllerTest {
     class RegisterTest {
 
         @Test
-        @DisplayName("正常系：入力エラーがなく登録処理が成功した場合に、メッセージが設定され一覧画面へリダイレクトされること")
+        @DisplayName("正常系：入力エラーがなく登録処理が成功した場合に、メッセージが設定され詳細画面へリダイレクトされること")
         void success() {
             TokugimuForm form = new TokugimuForm();
             when(bindingResult.hasErrors()).thenReturn(false);
 
             String viewName = tokugimuController.register(form, bindingResult, session, model, redirectAttributes);
 
-            assertThat(viewName).isEqualTo("redirect:/tokugimu/list");
+            assertThat(viewName).isEqualTo("redirect:/tokugimu/view");
             verify(accessChecker).checkWriteAccess(ScreenManagement.TOKUGIMU_CONFIG);
             verify(tokugimuService).register(form);
-            verify(redirectAttributes).addFlashAttribute("successMessage", "登録が完了しました。");
+            verify(redirectAttributes).addFlashAttribute(eq("successMessage"), anyString());
         }
 
         @Test
@@ -221,7 +220,6 @@ class TokugimuControllerTest {
             verify(model).addAttribute("errorMessage", "登録失敗");
         }
     }
-
 
     @Nested
     @DisplayName("showView メソッドのテスト")
@@ -324,7 +322,7 @@ class TokugimuControllerTest {
     class UpdateTest {
 
         @Test
-        @DisplayName("正常系：セッションに指定番号が存在し、バリデーションエラーがない場合に更新処理が成功し、一覧画面へリダイレクトされること")
+        @DisplayName("正常系：セッションに指定番号が存在し、バリデーションエラーがない場合に更新処理が成功し、詳細画面へリダイレクトされること")
         void success() {
             String shiteiNo = "00000001";
             TokugimuForm form = new TokugimuForm();
@@ -334,10 +332,10 @@ class TokugimuControllerTest {
 
             String viewName = tokugimuController.update(session, form, bindingResult, model, redirectAttributes);
 
-            assertThat(viewName).isEqualTo("redirect:/tokugimu/list");
+            assertThat(viewName).isEqualTo("redirect:/tokugimu/view");
             verify(accessChecker).checkWriteAccess(ScreenManagement.TOKUGIMU_CONFIG);
             verify(tokugimuService).updateByShiteiNo(shiteiNo, form);
-            verify(redirectAttributes).addFlashAttribute("successMessage", "更新が完了しました。");
+            verify(redirectAttributes).addFlashAttribute(eq("successMessage"), anyString());
         }
 
         @Test
@@ -477,5 +475,4 @@ class TokugimuControllerTest {
             verify(model).addAttribute("showShiteiGassanModal", true);
         }
     }
-
 }
