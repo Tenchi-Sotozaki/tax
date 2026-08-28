@@ -31,8 +31,8 @@ import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
-import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
+import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
@@ -317,7 +317,7 @@ public class FukaServiceImpl implements FukaService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
-				.orElse(4);
+				.orElse(3);
 		FukaDeclarationForm form = new FukaDeclarationForm();
 		form.setShiteiNo(shiteiNo);
 		form.setTorokuDate(LocalDate.now());
@@ -507,7 +507,7 @@ public class FukaServiceImpl implements FukaService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
-				.orElse(4);
+				.orElse(3);
 		String taishoYm = createTaishoYmString(nendo, kibetsu, nendoStMonth);
 		FukaDeclarationForm form = getDeclarationFormForRegister(shiteiNo, taishoYm);
 
@@ -586,7 +586,7 @@ public class FukaServiceImpl implements FukaService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		int nendoStMonth2 = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
-				.orElse(4);
+				.orElse(3);
 		String taishoYm = createTaishoYmString(nendo, kibetsu, nendoStMonth2);
 		FukaDeclarationForm form = getDeclarationFormForRegister(shiteiNo, taishoYm);
 
@@ -799,7 +799,7 @@ public class FukaServiceImpl implements FukaService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
-				.orElse(4);
+				.orElse(3);
 		String nendo = calculateNendo(taishoYm, nendoStMonth);
 		Integer kibetsu = calculateKibetsu(taishoYm, nendoStMonth);
 		return isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu);
@@ -820,7 +820,7 @@ public class FukaServiceImpl implements FukaService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
-				.orElse(4);
+				.orElse(3);
 		FukaMonthlyDeclarationDto dto = form.getMonthlyDetail();
 		String taishoYm = dto.getPaymentYearMonth().replace("年", "").replace("月", "");
 		Fuka parentFuka = new Fuka();
@@ -1271,7 +1271,7 @@ public class FukaServiceImpl implements FukaService {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
-				.orElse(4);
+				.orElse(3);
 	}
 
 	@Override
