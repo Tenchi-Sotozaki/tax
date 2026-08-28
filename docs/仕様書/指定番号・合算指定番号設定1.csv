@@ -1,8 +1,0 @@
-﻿,,プロジェクト名,宿泊税 LGWAN-ASPシステム開発,,作成者,亀井
-画面項目一覧表,,画面物理名,shiteiGassanConfig,,作成日,2026/7/3
-,,画面論理名,指定番号・合算指定番号設定・照会,,更新日,
-,,,,,,
-No.,DBテーブル名,カラム名,画面項目名,更新条件,備考,
-1,m_jichitai,shitei_st_char,指定番号,ー,,
-2,m_jichitai,gassan_st_char,合算指定番号,ー,,
-3,m_jichitai,version,ー,ー,BaseEntity.javaで自動更新,

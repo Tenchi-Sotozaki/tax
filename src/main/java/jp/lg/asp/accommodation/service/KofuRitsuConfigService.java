@@ -18,5 +18,5 @@ public interface KofuRitsuConfigService {
 
 	void update(BigDecimal rno, KofuRitsuConfigDto dto);
 
-	boolean existsByTekiyoStNendo(Integer nendo);
+	boolean existsByTekiyoStNendo(String nendo);
 }

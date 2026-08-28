@@ -54,10 +54,10 @@ class KofuRitsuConfigControllerTest {
     @Test
     void save_正常登録() {
         KofuRitsuConfigDto form = new KofuRitsuConfigDto();
-        form.setTekiyoStNendo(2024);
+        form.setTekiyoStNendo("2024");
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
         Model model = new ExtendedModelMap();
-        when(kofuRitsuConfigService.existsByTekiyoStNendo(2024)).thenReturn(false);
+        when(kofuRitsuConfigService.existsByTekiyoStNendo("2024")).thenReturn(false);
 
         String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
 
@@ -68,10 +68,10 @@ class KofuRitsuConfigControllerTest {
     @Test
     void save_同一年度重複_登録画面に戻りエラーメッセージが設定される() {
         KofuRitsuConfigDto form = new KofuRitsuConfigDto();
-        form.setTekiyoStNendo(2024);
+        form.setTekiyoStNendo("2024");
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
         Model model = new ExtendedModelMap();
-        when(kofuRitsuConfigService.existsByTekiyoStNendo(2024)).thenReturn(true);
+        when(kofuRitsuConfigService.existsByTekiyoStNendo("2024")).thenReturn(true);
 
         String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
 
