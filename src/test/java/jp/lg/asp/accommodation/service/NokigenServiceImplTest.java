@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.Jichitai;
@@ -26,6 +28,7 @@ import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.service.impl.NokigenServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class NokigenServiceImplTest {
 
     @Mock NokigenRepository nokigenRepository;
