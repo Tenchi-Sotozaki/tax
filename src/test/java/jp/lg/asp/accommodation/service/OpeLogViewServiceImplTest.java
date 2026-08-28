@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,11 +34,6 @@ class OpeLogViewServiceImplTest {
 
 	private static final String JICHITAI_CD = "011002";
 
-	@BeforeEach
-	void setUp() {
-		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-	}
-
 	@Test
 	void search_mapsLogToDto() {
 		OperationLog log = new OperationLog();
@@ -52,6 +46,7 @@ class OpeLogViewServiceImplTest {
 		screen.setScreenId("SCR001");
 		screen.setScreenName("特別徴収義務者管理");
 
+		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 		when(operationLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any()))
 				.thenReturn(List.of(log));
 		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen));
@@ -70,6 +65,7 @@ class OpeLogViewServiceImplTest {
 		OperationLog log = new OperationLog();
 		log.setScreenId("UNKNOWN");
 
+		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 		when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
 				.thenReturn(List.of(log));
 		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
@@ -81,6 +77,7 @@ class OpeLogViewServiceImplTest {
 
 	@Test
 	void search_emptyLogs_returnsEmptyList() {
+		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 		when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
 				.thenReturn(List.of());
 		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
