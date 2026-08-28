@@ -35,10 +35,28 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
-			<span th:text="${errorMessage}"></span>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		<div th:if="${errorMessage}" id="errorMessageModal" class="modal fade" tabindex="-1"
+			data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content shadow">
+					<div class="modal-header bg-danger text-white">
+						<h5 class="modal-title">
+							<i class="bi bi-exclamation-triangle me-2"></i>エラー
+						</h5>
+						<button type="button" class="btn-close btn-close-white"
+							data-bs-dismiss="modal" aria-label="閉じる"></button>
+					</div>
+					<div class="modal-body">
+						<p class="mb-0" th:text="${errorMessage}"></p>
+					</div>
+					<div class="modal-footer justify-content-center">
+						<button type="button" class="btn btn-outline-secondary"
+							data-bs-dismiss="modal">
+							<i class="bi bi-x-lg me-1"></i>閉じる
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div class="card shadow-sm mb-4">
@@ -136,6 +154,11 @@
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/kofuRitsuConfig.js}"></script>
+		<script th:if="${errorMessage}">
+			document.addEventListener('DOMContentLoaded', function () {
+				new bootstrap.Modal(document.getElementById('errorMessageModal')).show();
+			});
+		</script>
 	</th:block>
 </body>
 
