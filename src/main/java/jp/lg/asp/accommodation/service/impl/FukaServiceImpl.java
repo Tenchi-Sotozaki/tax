@@ -31,8 +31,8 @@ import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
@@ -74,7 +74,6 @@ public class FukaServiceImpl implements FukaService {
 	private final NokigenRepository nokigenRepository;
 	private final JichitaiRepository jichitaiRepository;
 	private final ShunoRirekiRepository shunoRirekiRepository;
-	private final TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
 
 	// 定数定義（マジックナンバーの排除）
 	private static final String STATUS_ALL = "999";
@@ -102,10 +101,14 @@ public class FukaServiceImpl implements FukaService {
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
 		Map<String, Fuka> fukaMap = createFukaMap(fukaList);
 
-		List<TekiyoNozeiShuki> tekiyoList = tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
-		var jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
-		int nendoStMonth = jichitai != null ? Integer.parseInt(jichitai.getNendoStMonth().trim()) : 3;
-		int defaultShuki = jichitai != null ? Integer.parseInt(jichitai.getNozeiShuki().trim()) : 1;
+		List<TekiyoNozeiShuki> tekiyoList = nozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
+				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
+				.orElse(3);
+		int defaultShuki = jichitaiRepository.findById(jichitaiCd)
+				.map(j -> j.getNozeiShuki() != null ? Integer.parseInt(j.getNozeiShuki().trim()) : 1)
+				.orElse(1);
+
 		Nokigen nokigen = nokigenRepository.findById(new NokigenId(jichitaiCd, nendo)).orElse(null);
 		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), tekiyoList, nokigen, nendoStMonth, defaultShuki, shiteiNo));
 		return form;
@@ -127,6 +130,7 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	private List<FukaDaichoListItem> createDaichoItems(String nendo, Map<String, Fuka> fukaMap, String filterStatus,
 			List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, int defaultShuki, String shiteiNo) {
+
 		List<FukaDaichoListItem> items = new ArrayList<>();
 		for (int i = 1; i <= MAX_KIBETSU; i++) {
 			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, defaultShuki, shiteiNo);
@@ -145,6 +149,7 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 単一の台帳明細行を組み立てる。
 	 */
+
 	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<String, Fuka> fukaMap, List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, int defaultShuki, String shiteiNo) {
 		FukaDaichoListItem item = new FukaDaichoListItem();
 		item.setNendo(nendo);
@@ -247,16 +252,12 @@ public class FukaServiceImpl implements FukaService {
 	 * nozei_shuki=1（月次）かつ t_nozei_shuki に有効期間内レコードがある場合は 3（四半期）を返す。
 	 */
 	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, int defaultShuki) {
-	    if (defaultShuki == 1 && !tekiyoList.isEmpty()) {
-	        LocalDate today = LocalDate.now();
-	        boolean hasActive = tekiyoList.stream()
-	                .anyMatch(t -> (t.getTekiyoStYmd() == null || !today.isBefore(t.getTekiyoStYmd()))
-	                        && (t.getTekiyoEdYmd() == null || !today.isAfter(t.getTekiyoEdYmd())));
-	        if (hasActive) {
-	            return 3;
-	        }
-	    }
-	    return defaultShuki;
+		if (defaultShuki != 1 || tekiyoList.isEmpty()) return defaultShuki;
+		LocalDate today = LocalDate.now();
+		boolean hasActive = tekiyoList.stream()
+				.anyMatch(t -> (t.getTekiyoStYmd() == null || !today.isBefore(t.getTekiyoStYmd()))
+						&& (t.getTekiyoEdYmd() == null || !today.isAfter(t.getTekiyoEdYmd())));
+		return hasActive ? 3 : defaultShuki;
 	}
 
 	/**
@@ -670,8 +671,8 @@ public class FukaServiceImpl implements FukaService {
 			saveChoshuGenboDataWithRno(form, parentFuka, jichitaiCd, targetRno);
 		}
 
-		// 納入情報の保存（納入年月日・納入金額の両方に入力がある場合のみ登録処理を行う）
-		if (form.getShunoYmd() != null && form.getShunoKingaku() != null) {
+		// 納入情報の保存（納入年月日と、0より大きい納入金額の両方に入力がある場合のみ登録処理を行う）
+		if (form.getShunoYmd() != null && form.getShunoKingaku() != null && form.getShunoKingaku() > 0) {
 			Integer shunoRno = shunoRirekiRepository.findMaxRno(jichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
 					.map(r -> r + 1).orElse(1);
 			ShunoRireki shuno = new ShunoRireki();

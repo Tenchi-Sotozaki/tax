@@ -47,7 +47,6 @@ class FukaServiceImplTest {
     @Mock NokigenRepository nokigenRepository;
     @Mock JichitaiRepository jichitaiRepository;
     @Mock ShunoRirekiRepository shunoRirekiRepository;
-    @Mock TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks FukaServiceImpl service;
 
