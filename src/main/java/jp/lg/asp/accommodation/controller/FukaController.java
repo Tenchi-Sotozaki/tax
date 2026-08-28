@@ -127,7 +127,8 @@ public class FukaController {
 		
 		// 今年度と前年度を計算
 	    LocalDate now = LocalDate.now();
-	    int thisNendo = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
+	    int nendoStMonth = fukaService.getNendoStMonth();
+	    int thisNendo = now.getMonthValue() >= nendoStMonth ? now.getYear() : now.getYear() - 1;
 	    int prevNendo = thisNendo - 1;
 
 	    // パラメータ指定がない場合のデフォルト年度設定
