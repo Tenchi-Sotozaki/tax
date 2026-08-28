@@ -27,7 +27,7 @@ import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.service.AdminUserService;
 
 @ExtendWith(MockitoExtension.class)
-class AdminUserControllerTest {
+class AdminUserSearchControllerTest {
 
     @Mock AdminUserService adminUserService;
     @Mock ScreenAccessChecker accessChecker;

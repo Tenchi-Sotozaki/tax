@@ -34,7 +34,7 @@ import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.impl.AdminUserServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class AdminUserServiceImplTest {
+class AdminUserSearchServiceImplTest {
 
     @Mock UserRepository userRepository;
     @Mock RoleRepository roleRepository;
