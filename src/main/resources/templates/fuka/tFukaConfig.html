@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
@@ -46,7 +46,7 @@
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
-		<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+		<div th:replace="~{layout/components :: selectedTokugimuInfo(false)}"></div>
 
 		<!-- 成功・エラーメッセージ -->
 		<div th:if="${successMessage}"

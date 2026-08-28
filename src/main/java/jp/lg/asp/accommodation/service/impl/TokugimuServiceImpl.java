@@ -1,5 +1,9 @@
 package jp.lg.asp.accommodation.service.impl;
+
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.KyodoJigyoshaDto;
@@ -88,6 +93,12 @@ public class TokugimuServiceImpl implements TokugimuService {
 		// 指定した件数ごとにページを切り替える
 		PageRequest pageable = PageRequest.of(form.getPage(), form.getPageSize());
 		
+		// 個人番号が入力されている場合、ハッシュ化して検索条件に用いる
+		String searchKojinNo = null;
+		if (StringUtils.hasText(form.getKojinNo())) {
+			searchKojinNo = hashKojinNo(form.getKojinNo());
+		}
+
 		// 初期遷移時（検索条件がすべて空）は全件取得
 		List<Tokugimu> tokugimuList;
 		if (isEmptySearchForm(form)) {
@@ -104,7 +115,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 					form.getShisetsuName(),
 					toLikePattern(form.getShisetsuName(), form.getShisetsuNameMatchType()),
 					form.getKyokaShu(),
-					form.getKojinNo(),
+					searchKojinNo, // ← ハッシュ化された個人番号を渡す
 					form.getHojinNo());
 		}
 
@@ -119,7 +130,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 				.stream().collect(Collectors.toMap(Atena::getAtenaNo, a -> a));
 
 		// 指定番号 -> 合算指定番号。合算対象かどうかの判定にも利用する
-		Map<String, String> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos)
+		Map<String, String> gassanMap = gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(jichitaiCd, shiteiNos, null)
 				.stream().collect(Collectors.toMap(GassanUchi::getShiteiNo,
 						GassanUchi::getGassanShiteiNo, (a, b) -> a));
 
@@ -168,6 +179,27 @@ public class TokugimuServiceImpl implements TokugimuService {
 		applyLastDeclarationInfo(jichitaiCd, pageContent);
 
 		return new PageImpl<>(pageContent, pageable, allItems.size());
+	}
+
+	/**
+	 * 個人番号のハッシュ化処理（SHA-256）
+	 */
+	private String hashKojinNo(String kojinNo) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] encodedhash = digest.digest(kojinNo.getBytes(StandardCharsets.UTF_8));
+			StringBuilder hexString = new StringBuilder();
+			for (byte b : encodedhash) {
+				String hex = Integer.toHexString(0xff & b);
+				if (hex.length() == 1) {
+					hexString.append('0');
+				}
+				hexString.append(hex);
+			}
+			return hexString.toString();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("個人番号のハッシュ化に失敗しました", e);
+		}
 	}
 
 	/**
@@ -378,7 +410,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 
 	@Override
 	@Transactional
-	public void register(TokugimuForm form) {
+	public String register(TokugimuForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		LocalDateTime now = LocalDateTime.now();
 		String systemUser = getCurrentUser();
@@ -409,6 +441,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		saveKyodoJigyosha(shiteiNo, BigDecimal.ONE, form);
 
 		log.debug("特別徴収義務者登録完了: shiteiNo={}", shiteiNo);
+		return shiteiNo;
 	}
 
 	/**
