@@ -54,7 +54,7 @@ class OpeLogViewServiceImplTest {
 
 		when(operationLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any()))
 				.thenReturn(List.of(log));
-		when(screenRepository.findByJichitaiCdOrderByScreenId(JICHITAI_CD)).thenReturn(List.of(screen));
+		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen));
 
 		OpeLogViewDto form = new OpeLogViewDto();
 		List<OpeLogViewDto> result = service.search(form);
@@ -72,7 +72,7 @@ class OpeLogViewServiceImplTest {
 
 		when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
 				.thenReturn(List.of(log));
-		when(screenRepository.findByJichitaiCdOrderByScreenId(JICHITAI_CD)).thenReturn(List.of());
+		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
 
 		List<OpeLogViewDto> result = service.search(new OpeLogViewDto());
 
@@ -83,7 +83,7 @@ class OpeLogViewServiceImplTest {
 	void search_emptyLogs_returnsEmptyList() {
 		when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
 				.thenReturn(List.of());
-		when(screenRepository.findByJichitaiCdOrderByScreenId(JICHITAI_CD)).thenReturn(List.of());
+		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
 
 		assertThat(service.search(new OpeLogViewDto())).isEmpty();
 	}
@@ -91,7 +91,7 @@ class OpeLogViewServiceImplTest {
 	@Test
 	void findAllScreens_delegatesToRepository() {
 		Screen screen = new Screen();
-		when(screenRepository.findByJichitaiCdOrderByScreenId(JICHITAI_CD)).thenReturn(List.of(screen));
+		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen));
 
 		assertThat(service.findAllScreens()).hasSize(1);
 	}

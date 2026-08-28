@@ -38,7 +38,7 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 				form.getOpeDtTo());
 
 		// screen_id → screen_name マッピング用
-		List<Screen> screens = screenRepository.findByJichitaiCdOrderByScreenId(jichitaiCd);
+		List<Screen> screens = screenRepository.findAllByOrderByScreenIdAsc();
 
 		List<OpeLogViewDto> results = new ArrayList<>();
 		for (OperationLog log : logList) {
@@ -58,7 +58,7 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 	@Transactional(readOnly = true)
 	public List<Screen> findAllScreens() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return screenRepository.findByJichitaiCdOrderByScreenId(jichitaiCd);
+		return screenRepository.findAllByOrderByScreenIdAsc();
 	}
 
 	private String resolveScreenName(List<Screen> screens, String screenId) {
