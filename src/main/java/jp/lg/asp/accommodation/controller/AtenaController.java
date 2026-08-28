@@ -190,9 +190,13 @@ public class AtenaController {
 	@OpeLog(screenId = ATENA_CONFIG, operation = "登録")
 	public String register(@ModelAttribute("form") AtenaConfigForm form,
 			org.springframework.validation.BindingResult bindingResult,
-			Model model,
-			org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		
+		if (form.getAtenaNo() == null) {
+			bindingResult.rejectValue("atenaNo", "", "宛名の開始番号が設定されていません。管理者にお問い合わせください。");
+		}
+
 		//accessChecker.checkWriteAccess(ATENA_CONFIG);
 		if (isBlank(form.getKojinNo()) && isBlank(form.getHojinNo())) {
 			bindingResult.rejectValue("kojinNo", "", "個人番号または法人番号のいずれかを入力してください。");
@@ -224,8 +228,10 @@ public class AtenaController {
 			model.addAttribute("mode", "register");
 			return "atena/atenaConfig";
 		}
-		redirectAttributes.addFlashAttribute("successMessage", "宛名を登録しました。");
-		return "redirect:/atena/list";
+		model.addAttribute("successMessage", "宛名を登録しました。");
+		model.addAttribute("form", toForm(atena));
+		model.addAttribute("mode", "view");
+		return "atena/atenaConfig";
 	}
 
 	@GetMapping("/view/{atenaNo}")

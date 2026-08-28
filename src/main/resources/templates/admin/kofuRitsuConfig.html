@@ -35,9 +35,9 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
-			<span th:text="${errorMessage}"></span>
+		<div th:if="${tekiyoStNendoError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i>
+			<span th:text="${tekiyoStNendoError}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
@@ -53,11 +53,14 @@
 							<input type="number" id="tekiyoStNendo" th:field="*{tekiyoStNendo}"
 								min="2000" max="2100"
 								th:readonly="${mode == 'view' or mode == 'edit'}"
-								th:classappend="(${#fields.hasErrors('tekiyoStNendo')} ? 'is-invalid' : '') + (${mode == 'view' or mode == 'edit'} ? ' form-control-readonly' : '')"
+								th:classappend="((${#fields.hasErrors('tekiyoStNendo')} or ${tekiyoStNendoError != null}) ? 'is-invalid' : '') + (${mode == 'view' or mode == 'edit'} ? ' form-control-readonly' : '')"
 								class="form-control">
 							<div class="invalid-feedback"
 								th:if="${#fields.hasErrors('tekiyoStNendo')}"
 								th:errors="*{tekiyoStNendo}"></div>
+							<div class="invalid-feedback"
+								th:if="${tekiyoStNendoError != null}"
+								th:text="${tekiyoStNendoError}"></div>
 						</div>
 						<div class="col-md-4">
 							<label for="kofuRitsu" class="form-label">交付率（%） <span

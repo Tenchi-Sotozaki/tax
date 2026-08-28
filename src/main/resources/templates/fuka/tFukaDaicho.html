@@ -26,7 +26,8 @@
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
-		<div th:replace="~{layout/components :: selectedTokugimuInfo(false)}"></div>
+		<div th:replace="~{layout/components :: selectedTokugimuInfo(true)}"></div>
+		<div th:if="${showShiteiGassanModal}" data-show-shitei-modal="true" style="display:none"></div>
 
 		<!-- 成功・エラーメッセージ -->
 		<div th:if="${successMessage}"

@@ -7,11 +7,13 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "t_choshu_genbo")
-@IdClass(ChoshuGenboId.class) // 💡 複合主キーを指定
+@IdClass(ChoshuGenboId.class)
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class ChoshuGenbo extends BaseEntity {
 	@Id
 	@Column(name = "jichitai_cd")
