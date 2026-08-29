@@ -60,6 +60,11 @@ public class TokugimuJuriTsuchiController {
 		// 指定番号はセッションから取得
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 
+		// 合算指定番号が保存されている場合はエラーを表示
+		if (selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
+			model.addAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。受理通知書は合算申告対象外の特別徴収義務者を指定してください。");
+		}
+
 		TokugimuJuriTsuchiDto tokugimuInfo = tokugimuJuriTsuchiService.getTokugimuInfo(shiteiNo);
 		if (tokugimuInfo != null) {
 			dto = tokugimuInfo;
