@@ -22,7 +22,7 @@ public interface ZeiritsuService {
 
     void save(String jichitaiCd, ZeiritsuForm form);
 
-    void update(String jichitaiCd, BigDecimal seq, ZeiritsuForm form, boolean detailEditable);
+    void update(String jichitaiCd, BigDecimal seq, ZeiritsuForm form, boolean detailEditable, boolean edYmOnly);
 
     void delete(String jichitaiCd, BigDecimal seq);
 
