@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
@@ -46,7 +46,27 @@
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
-		<div th:replace="~{layout/components :: selectedTokugimuInfo(${isView})}"></div>
+		<div class="mt-2 mb-2 ps-3 d-flex align-items-center">
+			<span class="fw-semibold flex-shrink-0">指定番号：</span>
+			<span class="tokugimu-info-value me-4"
+				style="display:inline-block; width:5em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+				data-bs-toggle="tooltip" data-bs-placement="bottom"
+				th:with="displayNo=${fukaDeclarationForm.gassanTarget ? selectedShiteiGassan?.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}"
+				th:attr="title=${displayNo}"
+				th:text="${displayNo}"></span>
+			<span class="fw-semibold flex-shrink-0">氏名：</span>
+			<span class="tokugimu-info-value me-4"
+				style="display:inline-block; width:12em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+				data-bs-toggle="tooltip" data-bs-placement="bottom"
+				th:attr="title=${selectedShiteiGassan?.name}"
+				th:text="${selectedShiteiGassan?.name}"></span>
+			<span class="fw-semibold flex-shrink-0">施設名称：</span>
+			<span class="tokugimu-info-value me-2"
+				style="display:inline-block; width:20em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+				data-bs-toggle="tooltip" data-bs-placement="bottom"
+				th:attr="title=${selectedShiteiGassan?.shisetsuName}"
+				th:text="${selectedShiteiGassan?.shisetsuName}"></span>
+		</div>
 
 		<!-- 成功・エラーメッセージ -->
 		<div th:if="${successMessage}"
@@ -836,15 +856,15 @@
 												type="text"
 												class="form-control form-control-sm text-end js-comma-format"
 												th:id="|modal-total-count-${stat.index}|" value="0"
-												data-initial-value="0" readonly class="form-control-readonly"></td>
+												data-initial-value="0" readonly></td>
 											<td><input type="text"
 												class="form-control form-control-sm text-end js-comma-format"
 												id="modal-total-exempt" value="0" data-initial-value="0"
-												readonly class="form-control-readonly"></td>
+												readonly></td>
 											<td><input type="text"
 												class="form-control form-control-sm text-end js-comma-format"
 												id="modal-total-zeigaku" value="0" data-initial-value="0"
-												readonly class="form-control-readonly"></td>
+												readonly></td>
 										</tr>
 										<tr>
 										    <td class="text-center fw-bold bg-light text-nowrap">税率(円)</td>
@@ -865,7 +885,7 @@
 												type="text"
 												class="form-control form-control-sm text-end js-comma-format"
 												th:id="|modal-tax-amount-${stat.index}|" value="0"
-												data-initial-value="0" readonly class="form-control-readonly"></td>
+												data-initial-value="0" readonly></td>
 											<td class="bg-light text-center text-muted align-middle"><i
 												class="bi bi-slash-lg"></i></td>
 											<td class="bg-light text-center text-muted align-middle"><i
@@ -977,30 +997,30 @@
 												<td><input type="text"
 													class="form-control form-control-sm text-end js-comma-format"
 													th:id="|modal-teiritsu-total-kazei-sogaku-${stat.index}|"
-													value="0" data-initial-value="0" readonly class="form-control-readonly"></td>
+													value="0" data-initial-value="0" readonly></td>
 												<td><input type="text"
 													class="form-control form-control-sm text-end js-comma-format"
 													th:id="|modal-teiritsu-total-kazei-hakusu-${stat.index}|"
-													value="0" data-initial-value="0" readonly class="form-control-readonly"></td>
+													value="0" data-initial-value="0" readonly></td>
 												<td><input type="text"
 													class="form-control form-control-sm text-end js-comma-format"
 													th:id="|modal-teiritsu-total-kazei-ryokin-${stat.index}|"
-													value="0" data-initial-value="0" readonly class="form-control-readonly"></td>
+													value="0" data-initial-value="0" readonly></td>
 											</th:block>
 											<td><input type="text"
 												class="form-control form-control-sm text-end js-comma-format"
 												id="modal-teiritsu-total-menjo-hakusu" value="0"
-												data-initial-value="0" readonly class="form-control-readonly">
+												data-initial-value="0" readonly>
 											</td>
 											<td><input type="text"
 												class="form-control form-control-sm text-end js-comma-format"
 												id="modal-teiritsu-total-menjo-ryokin" value="0"
-												data-initial-value="0" readonly class="form-control-readonly">
+												data-initial-value="0" readonly>
 											</td>
 											<td><input type="text"
 												class="form-control form-control-sm text-end js-comma-format"
 												id="modal-teiritsu-total-zeigaku" value="0"
-												data-initial-value="0" readonly class="form-control-readonly">
+												data-initial-value="0" readonly>
 											</td>
 										</tr>
 										<tr>
@@ -1034,7 +1054,7 @@
 												<td><input type="text"
 													class="form-control form-control-sm text-end fw-bold text-danger js-comma-format"
 													th:id="|modal-teiritsu-total-tax-${stat.index}|" value="0"
-													data-initial-value="0" readonly class="form-control-readonly"></td>
+													data-initial-value="0" readonly></td>
 											</th:block>
 											<td class="bg-light text-center text-muted align-middle"><i
 												class="bi bi-slash-lg"></i></td>

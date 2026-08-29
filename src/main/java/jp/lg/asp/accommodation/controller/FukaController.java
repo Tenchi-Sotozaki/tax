@@ -119,12 +119,13 @@ public class FukaController {
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		if (selected == null
+				|| (!StringUtils.hasText(selected.getShiteiNo()) && !StringUtils.hasText(selected.getGassanShiteiNo()))) {
 			model.addAttribute("showShiteiGassanModal", true);
 			return DAICHO_VIEW;
 		}
 		String shiteiNo = selected.getShiteiNo();
-		
+
 		// 今年度と前年度を計算
 	    LocalDate now = LocalDate.now();
 	    int thisNendo = now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1;
@@ -189,11 +190,26 @@ public class FukaController {
 			Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		if (selected == null
+				|| (!StringUtils.hasText(selected.getShiteiNo()) && !StringUtils.hasText(selected.getGassanShiteiNo()))) {
 			model.addAttribute("showShiteiGassanModal", true);
 			return DAICHO_VIEW;
 		}
-		String shiteiNo = selected.getShiteiNo();
+
+		// 合算指定番号がセッションにない場合、指定番号が合算対象月かチェック
+		if (!StringUtils.hasText(selected.getGassanShiteiNo()) && StringUtils.hasText(month) && month.length() == 6) {
+			int y = Integer.parseInt(month.substring(0, 4));
+			int m = Integer.parseInt(month.substring(4, 6));
+			if (fukaService.isShiteiNoGassanTargetMonth(selected.getShiteiNo(), LocalDate.of(y, m, 1))) {
+				redirectAttributes.addFlashAttribute("errorMessage",
+						m + "月は合算対象月です。合算指定番号を選択し直してください。");
+				return "redirect:/declaration/payment-ledger";
+			}
+		}
+
+		// 合算対象月かどうかを判定し、合算の場合は合算指定番号側の shiteiNo で処理する
+		boolean gassanTarget = isGassanTarget(selected, month);
+		String shiteiNo = resolveShiteiNo(selected, month);
 
 		// 二重申告を防止するためのアクセスガード
 		if (StringUtils.hasText(month)) {
@@ -205,6 +221,7 @@ public class FukaController {
 
 		try {
 			FukaDeclarationForm form = fukaService.getDeclarationFormForRegister(shiteiNo, month);
+			form.setGassanTarget(gassanTarget);
 			model.addAttribute("fukaDeclarationForm", form);
 		} catch (Exception e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -232,11 +249,27 @@ public class FukaController {
 			Model model) {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		if (selected == null
+				|| (!StringUtils.hasText(selected.getShiteiNo()) && !StringUtils.hasText(selected.getGassanShiteiNo()))) {
 			model.addAttribute("showShiteiGassanModal", true);
 			return DAICHO_VIEW;
 		}
-		String shiteiNo = selected.getShiteiNo();
+
+		// 合算指定番号がセッションにない場合、指定番号が合算対象月かチェック
+		String taishoYm = toTaishoYm(nendo, kibetsu);
+		if (!StringUtils.hasText(selected.getGassanShiteiNo())) {
+			LocalDate taishoDate = LocalDate.of(Integer.parseInt(taishoYm.substring(0, 4)),
+					Integer.parseInt(taishoYm.substring(4, 6)), 1);
+			if (fukaService.isShiteiNoGassanTargetMonth(selected.getShiteiNo(), taishoDate)) {
+				redirectAttributes.addFlashAttribute("errorMessage",
+						taishoDate.getMonthValue() + "月は合算対象月です。合算指定番号を選択し直してください。");
+				return "redirect:/declaration/payment-ledger";
+			}
+		}
+
+		// 合算対象月かどうかを判定し、合算の場合は合算指定番号側の shiteiNo で処理する
+		boolean gassanTarget = isGassanTarget(selected, taishoYm);
+		String shiteiNo = resolveShiteiNo(selected, taishoYm);
 
 		// 未申告データに対する編集アクセス制限
 		if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
@@ -245,6 +278,7 @@ public class FukaController {
 		}
 
 		FukaDeclarationForm form = fukaService.getDeclarationFormForEdit(shiteiNo, nendo, kibetsu);
+		form.setGassanTarget(gassanTarget);
 		form.setView(false);
 		form.setEdit(true);
 		model.addAttribute("fukaDeclarationForm", form);
@@ -271,11 +305,27 @@ public class FukaController {
 			Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		if (selected == null
+				|| (!StringUtils.hasText(selected.getShiteiNo()) && !StringUtils.hasText(selected.getGassanShiteiNo()))) {
 			model.addAttribute("showShiteiGassanModal", true);
 			return DAICHO_VIEW;
 		}
-		String shiteiNo = selected.getShiteiNo();
+
+		// 合算指定番号がセッションにない場合、指定番号が合算対象月かチェック
+		String taishoYm = toTaishoYm(nendo, kibetsu);
+		if (!StringUtils.hasText(selected.getGassanShiteiNo())) {
+			LocalDate taishoDate = LocalDate.of(Integer.parseInt(taishoYm.substring(0, 4)),
+					Integer.parseInt(taishoYm.substring(4, 6)), 1);
+			if (fukaService.isShiteiNoGassanTargetMonth(selected.getShiteiNo(), taishoDate)) {
+				redirectAttributes.addFlashAttribute("errorMessage",
+						taishoDate.getMonthValue() + "月は合算対象月です。合算指定番号を選択し直してください。");
+				return "redirect:/declaration/payment-ledger";
+			}
+		}
+
+		// 合算対象月かどうかを判定し、合算の場合は合算指定番号側の shiteiNo で処理する
+		boolean gassanTarget = isGassanTarget(selected, taishoYm);
+		String shiteiNo = resolveShiteiNo(selected, taishoYm);
 
 		if (!fukaService.isAlreadyRegisteredByKibetsu(shiteiNo, nendo, kibetsu)) {
 			redirectAttributes.addFlashAttribute("errorMessage", "未申告のデータです。「新規登録」ボタンから登録してください。");
@@ -285,6 +335,7 @@ public class FukaController {
 		FukaDeclarationForm form = (rno != null)
 				? fukaService.getDeclarationFormForViewByRno(shiteiNo, nendo, kibetsu, rno)
 				: fukaService.getDeclarationFormForView(shiteiNo, nendo, kibetsu);
+		form.setGassanTarget(gassanTarget);
 		form.setView(true);
 		form.setEdit(false);
 		model.addAttribute("fukaDeclarationForm", form);
@@ -577,6 +628,41 @@ public class FukaController {
 			return null;
 		}
 		return "月計表 " + (Integer.parseInt(m.group(1)) + 1) + "日 " + item;
+	}
+
+	/** 対象年月が合算対象月かどうかを返す */
+	private boolean isGassanTarget(ShiteiGassanSearchDto selected, String taishoYm) {
+		String gassanShiteiNo = selected.getGassanShiteiNo();
+		if (StringUtils.hasText(gassanShiteiNo) && StringUtils.hasText(taishoYm) && taishoYm.length() == 6) {
+			int year = Integer.parseInt(taishoYm.substring(0, 4));
+			int month = Integer.parseInt(taishoYm.substring(4, 6));
+			return fukaService.isGassanTargetMonth(gassanShiteiNo, LocalDate.of(year, month, 1));
+		}
+		return false;
+	}
+
+	/**
+	 * そうでない場合は selected の shiteiNo をそのまま返す。
+	 * month が null/空の場合も selected.shiteiNo を返す。
+	 */
+	private String resolveShiteiNo(ShiteiGassanSearchDto selected, String taishoYm) {
+		String gassanShiteiNo = selected.getGassanShiteiNo();
+		if (StringUtils.hasText(gassanShiteiNo) && StringUtils.hasText(taishoYm) && taishoYm.length() == 6) {
+			int year = Integer.parseInt(taishoYm.substring(0, 4));
+			int month = Integer.parseInt(taishoYm.substring(4, 6));
+			LocalDate taishoDate = LocalDate.of(year, month, 1);
+			if (fukaService.isGassanTargetMonth(gassanShiteiNo, taishoDate)) {
+				return selected.getShiteiNo();
+			}
+		}
+		return selected.getShiteiNo();
+	}
+
+	/** 年度・期別から対象年月文字列（yyyyMM）を生成する */
+	private String toTaishoYm(String nendo, int kibetsu) {
+		int year = (kibetsu + 2) > 12 ? Integer.parseInt(nendo) + 1 : Integer.parseInt(nendo);
+		int month = (kibetsu + 2) > 12 ? (kibetsu + 2) - 12 : (kibetsu + 2);
+		return year + String.format("%02d", month);
 	}
 
 	/** 月計表の項目が宿泊数系（8桁）かどうか */

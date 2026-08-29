@@ -45,6 +45,7 @@ import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
+import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
@@ -76,6 +77,7 @@ public class FukaServiceImpl implements FukaService {
 	private final JichitaiRepository jichitaiRepository;
 	private final ShunoRirekiRepository shunoRirekiRepository;
 	private final TokureiTekiyoRepository tekiyoNozeiShukiRepository;
+	private final GassanRepository gassanRepository;
 
 	// 定数定義（マジックナンバーの排除）
 	private static final String STATUS_ALL = "999";
@@ -108,7 +110,12 @@ public class FukaServiceImpl implements FukaService {
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
 				.orElse(3);
 		Nokigen nokigen = nokigenRepository.findById(new NokigenId(jichitaiCd, nendo)).orElse(null);
-		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), tekiyoList, nokigen, nendoStMonth, shiteiNo));
+
+		// 合算指定番号に紐づく合算適用期間リストを取得（なければ空リスト）
+		List<jp.lg.asp.accommodation.entity.Gassan> gassanList =
+				gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+
+		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), tekiyoList, nokigen, nendoStMonth, shiteiNo, gassanList));
 		return form;
 	}
 
@@ -127,10 +134,11 @@ public class FukaServiceImpl implements FukaService {
 	 * 期別ごとの台帳明細行リストを作成する。
 	 */
 	private List<FukaDaichoListItem> createDaichoItems(String nendo, Map<Integer, Fuka> fukaMap, String filterStatus,
-			List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
+			List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo,
+			List<jp.lg.asp.accommodation.entity.Gassan> gassanList) {
 		List<FukaDaichoListItem> items = new ArrayList<>();
 		for (int i = 1; i <= MAX_KIBETSU; i++) {
-			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, shiteiNo);
+			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, shiteiNo, gassanList);
 
 			if (STATUS_ZUMI.equals(filterStatus) && !item.isShinkokuZumi()) {
 				continue;
@@ -138,8 +146,8 @@ public class FukaServiceImpl implements FukaService {
 			if (STATUS_MI.equals(filterStatus) && item.isShinkokuZumi()) {
 				continue;
 			}
-			item.setNendo(nendo); // 年度をセット
-			item.setKibetsu(i); // 期別（月）をセット
+			item.setNendo(nendo);
+			item.setKibetsu(i);
 			items.add(item);
 		}
 		return items;
@@ -148,7 +156,9 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 単一の台帳明細行を組み立てる。
 	 */
-	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap, List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo) {
+	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<Integer, Fuka> fukaMap,
+			List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, String shiteiNo,
+			List<jp.lg.asp.accommodation.entity.Gassan> gassanList) {
 		FukaDaichoListItem item = new FukaDaichoListItem();
 		item.setNendo(nendo);
 		item.setKibetsu(kibetsu);
@@ -164,6 +174,12 @@ public class FukaServiceImpl implements FukaService {
 		item.setDisplayNengetsu(createTaishoYmLabel(nendo, kibetsu));
 		item.setDisplayKigen(createNonyuKigenString(nendo, kibetsu, shuki, nokigen, nendoStMonth));
 		item.setTargetYearMonth(taishoYm);
+
+		// 合算適用期間の判定：対象月がいずれかの合算レコードの適用期間内であれば合算対象
+		boolean gassanTarget = gassanList != null && gassanList.stream().anyMatch(g ->
+				(g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+				&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+		item.setGassanTarget(gassanTarget);
 
 		if (fukaMap.containsKey(kibetsu)) {
 			Fuka dbData = fukaMap.get(kibetsu);
@@ -1250,6 +1266,26 @@ public class FukaServiceImpl implements FukaService {
 	    }
 	}
 	
+	@Override
+	public boolean isGassanTargetMonth(String gassanShiteiNo, LocalDate taishoDate) {
+		if (gassanShiteiNo == null || taishoDate == null) return false;
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo).stream()
+				.anyMatch(g ->
+						(g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+	}
+
+	@Override
+	public boolean isShiteiNoGassanTargetMonth(String shiteiNo, LocalDate taishoDate) {
+		if (shiteiNo == null || taishoDate == null) return false;
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
+				.anyMatch(g ->
+						(g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+	}
+
 	@Override
 	public List<Integer> getExistingNendoList(String shiteiNo) {
 		// 既存メソッドで対象事業者の全データを取得

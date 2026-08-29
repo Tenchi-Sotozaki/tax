@@ -34,7 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (container && container.dataset.showShiteiModal === 'true') {
         const modal = document.getElementById('shiteiGassanSearchModal');
         if (modal) {
-            new bootstrap.Modal(modal).show();
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+            modal.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            }, { once: true });
         }
     }
 });
@@ -99,13 +105,6 @@ function renderShiteiGassanResults(data) {
 }
 
 async function selectShiteiGassan(d) {
-    // 合算指定番号がある場合はエラー（合算申告登録画面の場合）
-    const container = document.querySelector('[data-show-shitei-modal]');
-    if (container && d.gassanShiteiNo) {
-        alert('合算申告登録済みの特別徴収義務者です。\n特別徴収義務者を再度指定してください。');
-        return;
-    }
-
     // セッションに保存
     try {
         await SessionManager.save(SG_SELECT_API, d);

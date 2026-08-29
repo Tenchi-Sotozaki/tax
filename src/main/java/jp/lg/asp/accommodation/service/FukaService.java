@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
@@ -61,6 +62,22 @@ public interface FukaService {
 	 * 指定された指定番号に該当するデータが存在する年度の一覧を取得する。
 	 */
 	List<Integer> getExistingNendoList(String shiteiNo);
+
+	/**
+	 * 対象年月が合算納入対象月か判定する。
+	 * @param gassanShiteiNo 合算指定番号
+	 * @param taishoDate 対象年月の1日
+	 * @return 合算納入対象月の場合true
+	 */
+	boolean isGassanTargetMonth(String gassanShiteiNo, LocalDate taishoDate);
+
+	/**
+	 * 指定番号が合算申告の構成員として合算対象月かを判定する。
+	 * @param shiteiNo 指定番号
+	 * @param taishoDate 対象年月の1日
+	 * @return 合算対象月の場合true
+	 */
+	boolean isShiteiNoGassanTargetMonth(String shiteiNo, LocalDate taishoDate);
 
 	/**
 	 * 保存前に、入力中の内容から市区町村税額・都道府県税額の内訳を試算する（内訳試算ボタン用）。

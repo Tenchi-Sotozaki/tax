@@ -21,4 +21,5 @@ public class FukaDaichoListItem {
 	private Integer kibetsu; // 期別
 	private String targetYearMonth; // 登録画面等への遷移パラメータ用
 	private LocalDate shinkokuYmd; // 申告日（判定用）
+	private boolean gassanTarget; // 合算納入対象月フラグ
 }
