@@ -1287,6 +1287,30 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	@Override
+	public String resolveGassanTekiyoPeriod(String shiteiNo, LocalDate taishoDate) {
+		if (shiteiNo == null || taishoDate == null) return null;
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
+				.filter(g ->
+						(g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())))
+				.findFirst()
+				.map(g -> {
+					String st = g.getTekiyoStYmd() != null
+							? g.getTekiyoStYmd().getYear() + "年" + g.getTekiyoStYmd().getMonthValue() + "月"
+							: "";
+					String ed = g.getTekiyoEdYmd() != null
+							? g.getTekiyoEdYmd().getYear() + "年" + g.getTekiyoEdYmd().getMonthValue() + "月"
+							: "";
+					if (st.isEmpty() && ed.isEmpty()) return null;
+					if (st.isEmpty()) return ed + "まで";
+					if (ed.isEmpty()) return st + "以降";
+					return st + "～" + ed;
+				})
+				.orElse(null);
+	}
+
+	@Override
 	public List<Integer> getExistingNendoList(String shiteiNo) {
 		// 既存メソッドで対象事業者の全データを取得
 	    List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNo(jichitaiContext.getJichitaiCd(), shiteiNo);

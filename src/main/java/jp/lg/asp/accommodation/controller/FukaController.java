@@ -200,9 +200,11 @@ public class FukaController {
 		if (!StringUtils.hasText(selected.getGassanShiteiNo()) && StringUtils.hasText(month) && month.length() == 6) {
 			int y = Integer.parseInt(month.substring(0, 4));
 			int m = Integer.parseInt(month.substring(4, 6));
-			if (fukaService.isShiteiNoGassanTargetMonth(selected.getShiteiNo(), LocalDate.of(y, m, 1))) {
+			LocalDate taishoDate = LocalDate.of(y, m, 1);
+			String period = fukaService.resolveGassanTekiyoPeriod(selected.getShiteiNo(), taishoDate);
+			if (period != null) {
 				redirectAttributes.addFlashAttribute("errorMessage",
-						m + "月は合算対象月です。合算指定番号を選択し直してください。");
+						period + "は合算対象月です。合算指定番号を選択し直してください。");
 				return "redirect:/declaration/payment-ledger";
 			}
 		}
@@ -260,9 +262,10 @@ public class FukaController {
 		if (!StringUtils.hasText(selected.getGassanShiteiNo())) {
 			LocalDate taishoDate = LocalDate.of(Integer.parseInt(taishoYm.substring(0, 4)),
 					Integer.parseInt(taishoYm.substring(4, 6)), 1);
-			if (fukaService.isShiteiNoGassanTargetMonth(selected.getShiteiNo(), taishoDate)) {
+			String period = fukaService.resolveGassanTekiyoPeriod(selected.getShiteiNo(), taishoDate);
+			if (period != null) {
 				redirectAttributes.addFlashAttribute("errorMessage",
-						taishoDate.getMonthValue() + "月は合算対象月です。合算指定番号を選択し直してください。");
+						period + "は合算対象月です。合算指定番号を選択し直してください。");
 				return "redirect:/declaration/payment-ledger";
 			}
 		}

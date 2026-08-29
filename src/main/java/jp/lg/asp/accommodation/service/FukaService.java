@@ -80,6 +80,15 @@ public interface FukaService {
 	boolean isShiteiNoGassanTargetMonth(String shiteiNo, LocalDate taishoDate);
 
 	/**
+	 * 指定番号が合算対象月の場合、該当する合算レコードの適用期間文字列を返す。
+	 * 対象外の場合は null を返す。
+	 * @param shiteiNo 指定番号
+	 * @param taishoDate 対象年月の1日
+	 * @return 「○年○月～○年○月」形式の文字列、対象外の場合null
+	 */
+	String resolveGassanTekiyoPeriod(String shiteiNo, LocalDate taishoDate);
+
+	/**
 	 * 保存前に、入力中の内容から市区町村税額・都道府県税額の内訳を試算する（内訳試算ボタン用）。
 	 * 定額制・定率制のどちらにも対応する。
 	 * @param fukaKbn 賦課区分コード（"1"=定額, "2"=定率）
