@@ -15,6 +15,7 @@ public class FukaDaichoListItem {
 	private boolean shinkokuZumi; // 申告済・未の判定フラグ
 	private String nonyuStatus; // 納入状況 ("paid", "partial", "unpaid")
 	private String displayKigen; // 申告・納入期限
+	private boolean nonyuKigenInRange; // 納入期限内フラグ（本日 <= 納入期限）
 
 	// 内部処理・遷移用
 	private String nendo; // 年度
