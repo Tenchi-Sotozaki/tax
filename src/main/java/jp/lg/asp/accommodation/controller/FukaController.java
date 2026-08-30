@@ -691,9 +691,11 @@ public class FukaController {
 
 	/** 年度・期別から対象年月文字列（yyyyMM）を生成する */
 	private String toTaishoYm(String nendo, int kibetsu) {
-		int year = (kibetsu + 2) > 12 ? Integer.parseInt(nendo) + 1 : Integer.parseInt(nendo);
-		int month = (kibetsu + 2) > 12 ? (kibetsu + 2) - 12 : (kibetsu + 2);
-		return year + String.format("%02d", month);
+		int nendoStMonth = fukaService.getNendoStMonth();
+		int offset = kibetsu - 1;
+		int totalMonth = (nendoStMonth - 1 + offset) % 12 + 1;
+		int year = Integer.parseInt(nendo) + (nendoStMonth - 1 + offset) / 12;
+		return year + String.format("%02d", totalMonth);
 	}
 
 	/** 月計表の項目が宿泊数系（8桁）かどうか */
