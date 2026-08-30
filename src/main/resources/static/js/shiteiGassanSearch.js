@@ -105,9 +105,14 @@ function renderShiteiGassanResults(data) {
 }
 
 async function selectShiteiGassan(d) {
+    // 合算指定番号がある場合は shiteiNo を保存しない
+    const payload = d.gassanShiteiNo
+        ? { gassanShiteiNo: d.gassanShiteiNo, name: d.name, shisetsuName: d.shisetsuName }
+        : d;
+
     // セッションに保存
     try {
-        await SessionManager.save(SG_SELECT_API, d);
+        await SessionManager.save(SG_SELECT_API, payload);
     } catch (err) {
         console.error('セッション保存エラー:', err);
     }
