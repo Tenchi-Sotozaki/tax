@@ -89,6 +89,11 @@ public interface FukaService {
 	String resolveGassanTekiyoPeriod(String shiteiNo, LocalDate taishoDate);
 
 	/**
+	 * ログイン中の自治体の年度開始月を取得する。
+	 */
+	int getNendoStMonth();
+
+	/**
 	 * 保存前に、入力中の内容から市区町村税額・都道府県税額の内訳を試算する（内訳試算ボタン用）。
 	 * 定額制・定率制のどちらにも対応する。
 	 * @param fukaKbn 賦課区分コード（"1"=定額, "2"=定率）
