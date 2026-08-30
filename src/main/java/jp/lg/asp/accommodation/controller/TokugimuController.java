@@ -232,14 +232,18 @@ public class TokugimuController {
 	public String showReport(HttpSession session, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		String id = getShiteiNoFromSession(session);
-		if (id == null) {
+		String gassanId = SessionHelper.getGassanShiteiNo(session);
+		if (id == null && gassanId == null) {
 			return showSelectModalOnReport(model);
 		}
-		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
-		storeSelectedShiteiGassan(session, id, form);
-		model.addAttribute("shiteiNo", id);
-		model.addAttribute("tokugimuName", form.getName());
-		model.addAttribute("shisetsuName", form.getFacilityName());
+		if (id != null) {
+			TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
+			storeSelectedShiteiGassan(session, id, form);
+			model.addAttribute("shiteiNo", id);
+		} else {
+			// 合算指定番号のみ選択されている場合
+			model.addAttribute("shiteiNo", gassanId);
+		}
 		return REPORT_VIEW;
 	}
 
