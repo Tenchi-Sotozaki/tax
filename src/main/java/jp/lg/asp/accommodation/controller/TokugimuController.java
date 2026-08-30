@@ -256,6 +256,30 @@ public class TokugimuController {
 		return "redirect:/reports/gassanNonyuTsuchi";
 	}
 
+	@GetMapping("/report/tokugimuShiteiTsuchi")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "特別徴収義務者指定通知書")
+	public String showTokugimuShiteiTsuchiReport(HttpSession session, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected != null && selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。指定通知書は合算申告対象外の特別徴収義務者を指定してください。");
+			return "redirect:/tokugimu/report";
+		}
+		return "redirect:/reports/tokugimuShiteiTsuchi";
+	}
+
+	@GetMapping("/report/tokugimuJuriTsuchi")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "特別徴収義務者申請受理通知書")
+	public String showTokugimuJuriTsuchiReport(HttpSession session, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected != null && selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。受理通知書は合算申告対象外の特別徴収義務者を指定してください。");
+			return "redirect:/tokugimu/report";
+		}
+		return "redirect:/reports/tokugimuJuriTsuchi";
+	}
+
 	// ========== 削除 ==========
 
 	/**

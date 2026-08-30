@@ -110,11 +110,13 @@ public class GassanController {
 	@PostMapping("/select")
 	public String select(
 			@RequestParam String gassanShiteiNo,
+			@RequestParam(required = false) String shiteiNo,
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false) String shisetsuName,
 			HttpSession session) {
 		ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
 		dto.setGassanShiteiNo(gassanShiteiNo);
+		dto.setShiteiNo(shiteiNo);
 		dto.setName(name);
 		dto.setShisetsuName(shisetsuName);
 		SessionHelper.saveShiteiGassan(session, dto);

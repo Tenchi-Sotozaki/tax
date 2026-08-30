@@ -50,19 +50,21 @@ public class GassanNonyuTsuchiController {
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 		GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
 
-		if (shiteiNo == null || shiteiNo.isEmpty()) {
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
 			model.addAttribute("showShiteiGassanModal", true);
-			model.addAttribute("dto", dto);
-			return "reports/gassanNonyuTsuchi";
+			model.addAttribute("errorMessage", "特別徴収義務者を指定してください。");
+			return "tokugimu/tTokugimuReport";
 		}
 
-		GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(shiteiNo);
-		if (info != null) {
-			dto = info;
-		}
-
-		if (dto.getHakkoYmd() == null) {
-			dto.setHakkoYmd(LocalDate.now());
+		if (selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
+			GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(shiteiNo);
+			if (info != null) {
+				dto = info;
+			}
+			if (dto.getHakkoYmd() == null) {
+				dto.setHakkoYmd(LocalDate.now());
+			}
 		}
 
 		model.addAttribute("dto", dto);

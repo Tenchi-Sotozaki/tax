@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{layout/layout}" lang="ja">
@@ -46,7 +46,28 @@
 		</div>
 
 		<!-- 特別徴収義務者情報 -->
-		<div th:replace="~{layout/components :: selectedTokugimuInfo(false)}"></div>
+
+		<div class="mt-2 mb-2 ps-3 d-flex align-items-center">
+			<span class="fw-semibold flex-shrink-0">指定番号：</span>
+			<span class="tokugimu-info-value me-4"
+				style="display:inline-block; width:5em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+				data-bs-toggle="tooltip" data-bs-placement="bottom"
+				th:with="displayNo=${fukaDeclarationForm.gassanTarget ? selectedShiteiGassan?.gassanShiteiNo : selectedShiteiGassan?.shiteiNo}"
+				th:attr="title=${displayNo}"
+				th:text="${displayNo}"></span>
+			<span class="fw-semibold flex-shrink-0">氏名：</span>
+			<span class="tokugimu-info-value me-4"
+				style="display:inline-block; width:12em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+				data-bs-toggle="tooltip" data-bs-placement="bottom"
+				th:attr="title=${selectedShiteiGassan?.name}"
+				th:text="${selectedShiteiGassan?.name}"></span>
+			<span class="fw-semibold flex-shrink-0">施設名称：</span>
+			<span class="tokugimu-info-value me-2"
+				style="display:inline-block; width:20em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle;"
+				data-bs-toggle="tooltip" data-bs-placement="bottom"
+				th:attr="title=${selectedShiteiGassan?.shisetsuName}"
+				th:text="${selectedShiteiGassan?.shisetsuName}"></span>
+		</div>
 
 		<!-- 成功・エラーメッセージ -->
 		<div th:if="${successMessage}"

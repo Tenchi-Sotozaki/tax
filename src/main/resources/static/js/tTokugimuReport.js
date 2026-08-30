@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    go('btnReportTokugimuShiteiTsuchi',         '/accommodation-tax/reports/tokugimuShiteiTsuchi');
-    go('btnReportTokugimuJuriTsuchi',           '/accommodation-tax/reports/tokugimuJuriTsuchi');
+    go('btnReportTokugimuShiteiTsuchi',         '/accommodation-tax/tokugimu/report/tokugimuShiteiTsuchi');
+    go('btnReportTokugimuJuriTsuchi',           '/accommodation-tax/tokugimu/report/tokugimuJuriTsuchi');
     go('btnReportNozeiKanrinin',                '/accommodation-tax/reports/nozeiKanrininShoninTsuchi');
     go('btnReportNozeiMenjo',                   '/accommodation-tax/reports/nozeiKanrininNintei');
     go('btnReportTokureiShitei',                '/accommodation-tax/reports/tokureiShitei');

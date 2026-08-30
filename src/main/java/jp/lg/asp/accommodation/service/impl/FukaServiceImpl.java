@@ -1,4 +1,5 @@
 package jp.lg.asp.accommodation.service.impl;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ import jp.lg.asp.accommodation.entity.FukaUchi;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.ShunoRireki;
-import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
 import jp.lg.asp.accommodation.entity.Tokugimu;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeigaku;
 import jp.lg.asp.accommodation.entity.ZeiritsuTeiritsu;
@@ -41,11 +42,12 @@ import jp.lg.asp.accommodation.repository.ChoshuGenboRepository;
 import jp.lg.asp.accommodation.repository.ChoshuGenboUchiRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
+import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
-import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
+import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
@@ -70,10 +72,11 @@ public class FukaServiceImpl implements FukaService {
 	private final ChoshuGenboRepository choshuGenboRepository;
 	private final ChoshuGenboUchiRepository choshuGenboUchiRepository;
 	private final AtenaRepository atenaRepository;
-	private final TekiyoNozeiShukiRepository nozeiShukiRepository;
 	private final NokigenRepository nokigenRepository;
 	private final JichitaiRepository jichitaiRepository;
 	private final ShunoRirekiRepository shunoRirekiRepository;
+	private final TokureiTekiyoRepository tekiyoNozeiShukiRepository;
+	private final GassanRepository gassanRepository;
 
 	// 定数定義（マジックナンバーの排除）
 	private static final String STATUS_ALL = "999";
@@ -101,7 +104,8 @@ public class FukaServiceImpl implements FukaService {
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
 		Map<String, Fuka> fukaMap = createFukaMap(fukaList);
 
-		List<TekiyoNozeiShuki> tekiyoList = nozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		List<TokureiTekiyo> tekiyoList = tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd,
+				shiteiNo);
 		int nendoStMonth = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
 				.orElse(3);
@@ -110,7 +114,12 @@ public class FukaServiceImpl implements FukaService {
 				.orElse(1);
 
 		Nokigen nokigen = nokigenRepository.findById(new NokigenId(jichitaiCd, nendo)).orElse(null);
-		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), tekiyoList, nokigen, nendoStMonth, defaultShuki, shiteiNo));
+		// 合算指定番号に紐づく合算適用期間リストを取得（なければ空リスト）
+		List<jp.lg.asp.accommodation.entity.Gassan> gassanList = gassanRepository
+				.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+
+		form.setItems(createDaichoItems(nendo, fukaMap, form.getStatus(), tekiyoList, nokigen, nendoStMonth, defaultShuki, shiteiNo,
+				gassanList));
 		return form;
 	}
 
@@ -129,11 +138,12 @@ public class FukaServiceImpl implements FukaService {
 	 * 期別ごとの台帳明細行リストを作成する。
 	 */
 	private List<FukaDaichoListItem> createDaichoItems(String nendo, Map<String, Fuka> fukaMap, String filterStatus,
-			List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, int defaultShuki, String shiteiNo) {
-
+			List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, int defaultShuki, String shiteiNo,
+			List<jp.lg.asp.accommodation.entity.Gassan> gassanList) {
 		List<FukaDaichoListItem> items = new ArrayList<>();
 		for (int i = 1; i <= MAX_KIBETSU; i++) {
-			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, defaultShuki, shiteiNo);
+			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, defaultShuki, shiteiNo,
+					gassanList);
 
 			if (STATUS_ZUMI.equals(filterStatus) && !item.isShinkokuZumi()) {
 				continue;
@@ -141,6 +151,8 @@ public class FukaServiceImpl implements FukaService {
 			if (STATUS_MI.equals(filterStatus) && item.isShinkokuZumi()) {
 				continue;
 			}
+			item.setNendo(nendo);
+			item.setKibetsu(i);
 			items.add(item);
 		}
 		return items;
@@ -149,20 +161,30 @@ public class FukaServiceImpl implements FukaService {
 	/**
 	 * 単一の台帳明細行を組み立てる。
 	 */
-
-	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<String, Fuka> fukaMap, List<TekiyoNozeiShuki> tekiyoList, Nokigen nokigen, int nendoStMonth, int defaultShuki, String shiteiNo) {
+	private FukaDaichoListItem buildDaichoItem(String nendo, int kibetsu, Map<String, Fuka> fukaMap,
+			List<TokureiTekiyo> tekiyoList, Nokigen nokigen, int nendoStMonth, int defaultShuki, String shiteiNo,
+			List<jp.lg.asp.accommodation.entity.Gassan> gassanList) {
 		FukaDaichoListItem item = new FukaDaichoListItem();
 		item.setNendo(nendo);
 		item.setKibetsu(kibetsu);
 
 		// 対象年月の1日を算出し、適用納税周期を判定
 		String taishoYm = createTaishoYmString(nendo, kibetsu, nendoStMonth);
+		int taishoYear = Integer.parseInt(taishoYm.substring(0, 4));
+		int taishoMonth = Integer.parseInt(taishoYm.substring(4, 6));
+		LocalDate taishoDate = LocalDate.of(taishoYear, taishoMonth, 1);
 
-		int shuki = resolveShuki(tekiyoList, defaultShuki);
+		int shuki = resolveShuki(tekiyoList, taishoDate, defaultShuki);
 
 		item.setDisplayNengetsu(createTaishoYmLabel(nendo, kibetsu, nendoStMonth));
 		item.setDisplayKigen(createNonyuKigenString(nokigen, kibetsu, shuki));
 		item.setTargetYearMonth(taishoYm);
+
+		// 合算適用期間の判定：対象月がいずれかの合算レコードの適用期間内であれば合算対象
+		boolean gassanTarget = gassanList != null && gassanList.stream()
+				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+		item.setGassanTarget(gassanTarget);
 
 		if (fukaMap.containsKey(taishoYm)) {
 			Fuka dbData = fukaMap.get(taishoYm);
@@ -176,7 +198,8 @@ public class FukaServiceImpl implements FukaService {
 			item.setShinkokuZumi(true);
 			long totalZeigaku = dbData.getTotalZeigaku() != null ? dbData.getTotalZeigaku() : 0L;
 			String jichitaiCd = jichitaiContext.getJichitaiCd();
-			long totalNonyu = shunoRirekiRepository.sumNonyugaku(jichitaiCd, shiteiNo, dbData.getNendo(), dbData.getKibetsu());
+			long totalNonyu = shunoRirekiRepository.sumNonyugaku(jichitaiCd, shiteiNo, dbData.getNendo(),
+					dbData.getKibetsu());
 			long remaining = totalZeigaku - totalNonyu;
 			if (remaining <= 0) {
 				item.setNonyuStatus("paid");
@@ -223,7 +246,6 @@ public class FukaServiceImpl implements FukaService {
 		return year + String.format("%02d", totalMonth);
 	}
 
-
 	/** 
 	 * 年度、期別、納税周期、納期限マスタから納入期限を作成
 	 * 申告期限の翌月のm_nokigenの納期限を表示する
@@ -251,8 +273,9 @@ public class FukaServiceImpl implements FukaService {
 	 * 対象日に適用される納税周期を判定する。
 	 * nozei_shuki=1（月次）かつ t_nozei_shuki に有効期間内レコードがある場合は 3（四半期）を返す。
 	 */
-	private int resolveShuki(List<TekiyoNozeiShuki> tekiyoList, int defaultShuki) {
-		if (defaultShuki != 1 || tekiyoList.isEmpty()) return defaultShuki;
+	private int resolveShuki(List<TokureiTekiyo> tekiyoList, LocalDate taishoDate, int defaultShuki) {
+		if (defaultShuki != 1 || tekiyoList.isEmpty())
+			return defaultShuki;
 		LocalDate today = LocalDate.now();
 		boolean hasActive = tekiyoList.stream()
 				.anyMatch(t -> (t.getTekiyoStYmd() == null || !today.isBefore(t.getTekiyoStYmd()))
@@ -265,19 +288,19 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	private String getNokigenByOrdinal(Nokigen nokigen, int ordinal) {
 		return switch (ordinal) {
-			case 1 -> nokigen.getNokigen1st();
-			case 2 -> nokigen.getNokigen2nd();
-			case 3 -> nokigen.getNokigen3rd();
-			case 4 -> nokigen.getNokigen4th();
-			case 5 -> nokigen.getNokigen5th();
-			case 6 -> nokigen.getNokigen6th();
-			case 7 -> nokigen.getNokigen7th();
-			case 8 -> nokigen.getNokigen8th();
-			case 9 -> nokigen.getNokigen9th();
-			case 10 -> nokigen.getNokigen10th();
-			case 11 -> nokigen.getNokigen11th();
-			case 12 -> nokigen.getNokigen12th();
-			default -> null;
+		case 1 -> nokigen.getNokigen1st();
+		case 2 -> nokigen.getNokigen2nd();
+		case 3 -> nokigen.getNokigen3rd();
+		case 4 -> nokigen.getNokigen4th();
+		case 5 -> nokigen.getNokigen5th();
+		case 6 -> nokigen.getNokigen6th();
+		case 7 -> nokigen.getNokigen7th();
+		case 8 -> nokigen.getNokigen8th();
+		case 9 -> nokigen.getNokigen9th();
+		case 10 -> nokigen.getNokigen10th();
+		case 11 -> nokigen.getNokigen11th();
+		case 12 -> nokigen.getNokigen12th();
+		default -> null;
 		};
 	}
 
@@ -449,7 +472,8 @@ public class FukaServiceImpl implements FukaService {
 				detail.setZeiritsuSeq(rate.getTeigakuSeq());
 				detail.setTaxRate(rate.getZeigaku() != null ? BigDecimal.valueOf(rate.getZeigaku()) : BigDecimal.ZERO);
 				detail.setTaxKenRate(
-						kenRate != null && kenRate.getZeigaku() != null ? BigDecimal.valueOf(kenRate.getZeigaku()) : BigDecimal.ZERO);
+						kenRate != null && kenRate.getZeigaku() != null ? BigDecimal.valueOf(kenRate.getZeigaku())
+								: BigDecimal.ZERO);
 				detail.setLabel(rate.getRyokinSt() + "円以上");
 				detail.setHakusu(null);
 				detail.setZeigaku(null);
@@ -582,7 +606,8 @@ public class FukaServiceImpl implements FukaService {
 	 * rno指定で照会用の表示データを取得する。
 	 */
 	@Transactional(readOnly = true)
-	public FukaDeclarationForm getDeclarationFormForViewByRno(String shiteiNo, String nendo, Integer kibetsu, Integer rno) {
+	public FukaDeclarationForm getDeclarationFormForViewByRno(String shiteiNo, String nendo, Integer kibetsu,
+			Integer rno) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		int nendoStMonth2 = jichitaiRepository.findById(jichitaiCd)
 				.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
@@ -601,14 +626,17 @@ public class FukaServiceImpl implements FukaService {
 					form.setModificationCategory(entity.getHenkoKbn());
 					form.setModificationReason(entity.getHenkoRiyu());
 					form.setAdditionalCategory1(entity.getKasanKbn1());
-					if (entity.getKasanRitsu1() != null) form.setAdditionalRate1(entity.getKasanRitsu1().toString());
+					if (entity.getKasanRitsu1() != null)
+						form.setAdditionalRate1(entity.getKasanRitsu1().toString());
 					form.setAdditionalAmount1(entity.getKasanGaku1());
 					form.setAdditionalDueDate1(entity.getNokigen());
 					form.setAdditionalCategory2(entity.getKasanKbn2());
-					if (entity.getKasanRitsu2() != null) form.setAdditionalRate2(entity.getKasanRitsu2().toString());
+					if (entity.getKasanRitsu2() != null)
+						form.setAdditionalRate2(entity.getKasanRitsu2().toString());
 					form.setAdditionalAmount2(entity.getKasanGaku2());
 					form.setAdditionalCategory3(entity.getKasanKbn3());
-					if (entity.getKasanRitsu3() != null) form.setAdditionalRate3(entity.getKasanRitsu3().toString());
+					if (entity.getKasanRitsu3() != null)
+						form.setAdditionalRate3(entity.getKasanRitsu3().toString());
 					form.setAdditionalAmount3(entity.getKasanGaku3());
 					form.setEntaikin(entity.getEntaikin());
 					form.setNokigen(entity.getNokigen());
@@ -673,7 +701,8 @@ public class FukaServiceImpl implements FukaService {
 
 		// 納入情報の保存（納入年月日と、0より大きい納入金額の両方に入力がある場合のみ登録処理を行う）
 		if (form.getShunoYmd() != null && form.getShunoKingaku() != null && form.getShunoKingaku() > 0) {
-			Integer shunoRno = shunoRirekiRepository.findMaxRno(jichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
+			Integer shunoRno = shunoRirekiRepository
+					.findMaxRno(jichitaiCd, form.getShiteiNo(), form.getNendo(), form.getKibetsu())
 					.map(r -> r + 1).orElse(1);
 			ShunoRireki shuno = new ShunoRireki();
 			shuno.setJichitaiCd(jichitaiCd);
@@ -771,18 +800,18 @@ public class FukaServiceImpl implements FukaService {
 				uchi.setRyokinSogaku(getLongValue(detail.getRyokinSogaku()));
 			} else {
 				// 定額制: 都道府県税額、市区町村税額を算出
-			    long hakusu = getLongValue(detail.getHakusu());
-			    BigDecimal taxKenRate = detail.getTaxKenRate();
-			    long kenRateLong = (taxKenRate != null) ? taxKenRate.longValue() : 0L;
-			    long kenZeigaku = kenRateLong * hakusu;
-			    long zeigaku = (detail.getZeigaku() != null) ? detail.getZeigaku() : 0L;
-			    long cityZeigaku = zeigaku - kenZeigaku >= 0L ? zeigaku - kenZeigaku : 0L; // 差引き
-			    kenZeigaku = zeigaku - cityZeigaku;
-			    uchi.setZeigaku(zeigaku);
-			    uchi.setKenZeigaku(kenZeigaku);
-			    uchi.setCityZeigaku(cityZeigaku);
-			    uchi.setRyokin(null);
-			    uchi.setRyokinSogaku(null);
+				long hakusu = getLongValue(detail.getHakusu());
+				BigDecimal taxKenRate = detail.getTaxKenRate();
+				long kenRateLong = (taxKenRate != null) ? taxKenRate.longValue() : 0L;
+				long kenZeigaku = kenRateLong * hakusu;
+				long zeigaku = (detail.getZeigaku() != null) ? detail.getZeigaku() : 0L;
+				long cityZeigaku = zeigaku - kenZeigaku >= 0L ? zeigaku - kenZeigaku : 0L; // 差引き
+				kenZeigaku = zeigaku - cityZeigaku;
+				uchi.setZeigaku(zeigaku);
+				uchi.setKenZeigaku(kenZeigaku);
+				uchi.setCityZeigaku(cityZeigaku);
+				uchi.setRyokin(null);
+				uchi.setRyokinSogaku(null);
 			}
 			uchi.setHakusu(getLongValue(detail.getHakusu()));
 			uchi.setZeiRitsu(detail.getTaxRate());
@@ -928,7 +957,8 @@ public class FukaServiceImpl implements FukaService {
 	private long getKenZeigaku(Long shukuhakuRyokin, String taishoYm) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		return zeiritsuTeigakuRepository
-				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm, shukuhakuRyokin)
+				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm,
+						shukuhakuRyokin)
 				.stream().findFirst()
 				.map(ZeiritsuTeigaku::getZeigaku).orElse(0L);
 	}
@@ -1057,15 +1087,16 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	private Long getSogakuValue(ChoshuGenboUchi uchi, int index) {
-	    if (uchi == null) return 0L;
-	    
-	    try {
-	        String methodName = "getSogaku" + index;
-	        Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
-	        return (val != null) ? (Long) val : 0L;
-	    } catch (ReflectiveOperationException e) {
-	        return 0L;
-	    }
+		if (uchi == null)
+			return 0L;
+
+		try {
+			String methodName = "getSogaku" + index;
+			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
+			return (val != null) ? (Long) val : 0L;
+		} catch (ReflectiveOperationException e) {
+			return 0L;
+		}
 	}
 
 	private void setHakusuByIndex(ChoshuGenboUchi uchi, int index, int value) {
@@ -1078,8 +1109,9 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	private Integer getHakusuValue(ChoshuGenboUchi uchi, int index) {
-		if (uchi == null) return 0;
-		
+		if (uchi == null)
+			return 0;
+
 		try {
 			String methodName = "getHakusu" + index;
 			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
@@ -1100,19 +1132,20 @@ public class FukaServiceImpl implements FukaService {
 	}
 
 	private Long getRyokinValue(ChoshuGenboUchi uchi, int index) {
-		if (uchi == null) return 0L;
-	    
-	    try {
-	        String methodName = "getRyokin" + index;
-	        Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
-	        return (val != null) ? (Long) val : 0L;
-	    } catch (ReflectiveOperationException e) {
-	        return 0L;
-	    }
+		if (uchi == null)
+			return 0L;
+
+		try {
+			String methodName = "getRyokin" + index;
+			Object val = uchi.getClass().getMethod(methodName).invoke(uchi);
+			return (val != null) ? (Long) val : 0L;
+		} catch (ReflectiveOperationException e) {
+			return 0L;
+		}
 	}
 
 	private long getLongValue(Long value) {
-	    return value == null ? 0L : value;
+		return value == null ? 0L : value;
 	}
 
 	/**
@@ -1132,7 +1165,7 @@ public class FukaServiceImpl implements FukaService {
 		}
 
 		List<DailyItem> dailyItems = form.getMonthlyTally().getDailyItems();
-		
+
 		Long maxIdxObj = choshuGenboUchiRepository.getMaxUchiIdx(jichitaiCd);
 		long currentMaxIdx = (maxIdxObj != null) ? maxIdxObj : 0L;
 
@@ -1249,23 +1282,70 @@ public class FukaServiceImpl implements FukaService {
 	 */
 	public long calculateTax(String fukaKbn, long baseValue, BigDecimal cityRate, BigDecimal kenRate) {
 
-	    // null を防ぐための安全な BigDecimal 変数を用意する
-	    BigDecimal city = (cityRate != null) ? cityRate : BigDecimal.ZERO;
-	    BigDecimal ken = (kenRate != null) ? kenRate : BigDecimal.ZERO;
+		// null を防ぐための安全な BigDecimal 変数を用意する
+		BigDecimal city = (cityRate != null) ? cityRate : BigDecimal.ZERO;
+		BigDecimal ken = (kenRate != null) ? kenRate : BigDecimal.ZERO;
 
-	    if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
-	        // 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
-	        return BigDecimal.valueOf(baseValue)
-	                .multiply(city)
-	                .divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.DOWN)
-	                .longValue();
-	    } else {
-	        // 定額制：宿泊数 × 税率
-	        long rate = city.longValue() + ken.longValue();
-	        return baseValue * rate;
-	    }
+		if (FukaConstants.TEIRITSU.getValue().equals(fukaKbn)) {
+			// 定率制：宿泊料金 × 税率(%) / 100（端数切り捨て）
+			return BigDecimal.valueOf(baseValue)
+					.multiply(city)
+					.divide(BigDecimal.valueOf(100), 0, java.math.RoundingMode.DOWN)
+					.longValue();
+		} else {
+			// 定額制：宿泊数 × 税率
+			long rate = city.longValue() + ken.longValue();
+			return baseValue * rate;
+		}
 	}
-	
+
+	@Override
+	public boolean isGassanTargetMonth(String gassanShiteiNo, LocalDate taishoDate) {
+		if (gassanShiteiNo == null || taishoDate == null)
+			return false;
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo).stream()
+				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+	}
+
+	@Override
+	public boolean isShiteiNoGassanTargetMonth(String shiteiNo, LocalDate taishoDate) {
+		if (shiteiNo == null || taishoDate == null)
+			return false;
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
+				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+	}
+
+	@Override
+	public String resolveGassanTekiyoPeriod(String shiteiNo, LocalDate taishoDate) {
+		if (shiteiNo == null || taishoDate == null)
+			return null;
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
+				.filter(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
+						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())))
+				.findFirst()
+				.map(g -> {
+					String st = g.getTekiyoStYmd() != null
+							? g.getTekiyoStYmd().getYear() + "年" + g.getTekiyoStYmd().getMonthValue() + "月"
+							: "";
+					String ed = g.getTekiyoEdYmd() != null
+							? g.getTekiyoEdYmd().getYear() + "年" + g.getTekiyoEdYmd().getMonthValue() + "月"
+							: "";
+					if (st.isEmpty() && ed.isEmpty())
+						return null;
+					if (st.isEmpty())
+						return ed + "まで";
+					if (ed.isEmpty())
+						return st + "以降";
+					return st + "～" + ed;
+				})
+				.orElse(null);
+	}
+
 	@Override
 	public int getNendoStMonth() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
@@ -1277,20 +1357,20 @@ public class FukaServiceImpl implements FukaService {
 	@Override
 	public List<Integer> getExistingNendoList(String shiteiNo) {
 		// 既存メソッドで対象事業者の全データを取得
-	    List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNo(jichitaiContext.getJichitaiCd(), shiteiNo);
+		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNo(jichitaiContext.getJichitaiCd(), shiteiNo);
 
-	    if (fukaList == null || fukaList.isEmpty()) {
-	        return List.of();
-	    }
+		if (fukaList == null || fukaList.isEmpty()) {
+			return List.of();
+		}
 
-	    // 年度を取り出してInteger型のリストにする
-	    return fukaList.stream()
-	            .filter(f -> "1".equals(f.getNewFlg()) && "0".equals(f.getDelFlg())) // 有効データのみ
-	            .map(Fuka::getNendo)
-	            .filter(Objects::nonNull)
-	            .map(Integer::parseInt)
-	            .distinct()
-	            .sorted()
-	            .toList();
+		// 年度を取り出してInteger型のリストにする
+		return fukaList.stream()
+				.filter(f -> "1".equals(f.getNewFlg()) && "0".equals(f.getDelFlg())) // 有効データのみ
+				.map(Fuka::getNendo)
+				.filter(Objects::nonNull)
+				.map(Integer::parseInt)
+				.distinct()
+				.sorted()
+				.toList();
 	}
 }

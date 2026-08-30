@@ -161,10 +161,18 @@ public class ZeiritsuServiceImpl implements ZeiritsuService {
 
     @Override
     @Transactional
-    public void update(String jichitaiCd, BigDecimal seq, ZeiritsuForm form, boolean detailEditable) {
+    public void update(String jichitaiCd, BigDecimal seq, ZeiritsuForm form, boolean detailEditable, boolean edYmOnly) {
         Zeiritsu entity = findOrThrow(jichitaiCd, seq);
-        boolean latest = isLatestRecord(jichitaiCd, entity);
 
+        if (edYmOnly) {
+            String tekiyoEdYm = form.getTekiyoEdYm();
+            entity.setTekiyoEdYm(tekiyoEdYm != null && !tekiyoEdYm.isBlank() ? tekiyoEdYm.replace("-", "") : null);
+            zeiritsuRepository.save(entity);
+            log.debug("税率管理マスタ(適用終了年月のみ)を更新しました。jichitaiCd: {}, seq: {}", jichitaiCd, seq);
+            return;
+        }
+
+        boolean latest = isLatestRecord(jichitaiCd, entity);
         String tekiyoStYm = form.getTekiyoStYm().replace("-", "");
 
         if (latest) {

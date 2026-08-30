@@ -30,7 +30,7 @@
 						<input type="hidden" id="tokuJusho" name="tokuJusho" th:value="${tokuJusho}" />
 						
 						<!-- 特別徴収義務者情報 -->
-						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+						<div th:replace="~{layout/components :: selectedTokugimuInfo(true)}"></div>
 						
 						<!-- 内容エリア -->
 						<div class="card mb-4">

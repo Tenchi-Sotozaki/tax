@@ -142,6 +142,7 @@
 										<form th:action="@{/gassan/select}" method="post" style="display:inline;">
 											<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 											<input type="hidden" name="gassanShiteiNo" th:value="${item.gassanShiteiNo}">
+											<input type="hidden" name="shiteiNo" th:value="${item.shiteiNo}">
 											<input type="hidden" name="name" th:value="${item.name}">
 											<input type="hidden" name="shisetsuName" th:value="${item.daihyoShisetsuName}">
 											<button type="submit" class="btn btn-link p-0">詳細</button>
