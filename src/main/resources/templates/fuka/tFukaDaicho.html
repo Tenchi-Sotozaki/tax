@@ -143,9 +143,8 @@
 							</thead>
 							<tbody>
 								<tr th:each="item : ${fukaDaichoForm.items}"
-									th:classappend="${item.nonyuStatus != 'partial'} ? 'table-danger' : 
-										(${item.shinkokuZumi} ? '' : 
-										(${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')} ? 'table-secondary' : 'table-danger'))">
+									th:classappend="${item.shinkokuZumi and item.nonyuStatus == 'paid'} ? '' : 
+										(${item.nonyuKigenInRange} ? 'table-secondary' : 'table-danger')">
 									<td class="text-center fw-bold" th:text="${item.displayNengetsu}">-</td>
 									<td class="text-end px-4"><span th:if="${item.totalZeigaku != null}"
 											th:text="${#numbers.formatInteger(item.totalZeigaku, 1, 'COMMA') + ' 円'}">-</span>
@@ -165,19 +164,23 @@
 									<td class="text-center">
 										<span th:if="${item.shinkokuZumi}">〇</span>
 										<span th:unless="${item.shinkokuZumi}">
-											<span th:if="${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">ー</span>
-											<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">△</span>
+											<span th:if="${item.nonyuKigenInRange}">－</span>
+											<span th:unless="${item.nonyuKigenInRange}">△</span>
 										</span>
 									</td>
 
 									<!-- 納入状況 -->
 									<td class="text-center">
-										<span th:if="${item.displayKigen < #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">
+										<span th:if="${item.nonyuKigenInRange}">
 											<span th:if="${item.nonyuStatus == 'paid'}">〇</span>
 											<span th:if="${item.nonyuStatus == 'partial'}">△</span>
-											<span th:if="${item.nonyuStatus == 'unpaid'}">ー</span>
+											<span th:if="${item.nonyuStatus == 'unpaid'}">－</span>
 										</span>
-										<span th:if="${item.displayKigen >= #temporals.format(#temporals.createToday(), 'yyyy/MM/dd')}">▲</span>
+										<span th:unless="${item.nonyuKigenInRange}">
+											<span th:if="${item.nonyuStatus == 'paid'}">〇</span>
+											<span th:if="${item.nonyuStatus == 'partial'}">△</span>
+											<span th:if="${item.nonyuStatus == 'unpaid'}">▲</span>
+										</span>
 									</td>
 
 									<!-- 新規or照会 -->

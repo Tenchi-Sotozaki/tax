@@ -178,6 +178,7 @@ public class FukaServiceImpl implements FukaService {
 
 		item.setDisplayNengetsu(createTaishoYmLabel(nendo, kibetsu, nendoStMonth));
 		item.setDisplayKigen(createNonyuKigenString(nokigen, kibetsu, shuki));
+		item.setNonyuKigenInRange(isNonyuKigenInRange(nokigen, kibetsu, shuki));
 		item.setTargetYearMonth(taishoYm);
 
 		// 合算適用期間の判定：対象月がいずれかの合算レコードの適用期間内であれば合算対象
@@ -244,6 +245,27 @@ public class FukaServiceImpl implements FukaService {
 		int totalMonth = (nendoStMonth - 1 + offset) % 12 + 1;
 		int year = Integer.parseInt(nendo) + (nendoStMonth - 1 + offset) / 12;
 		return year + String.format("%02d", totalMonth);
+	}
+
+	/** 
+	 * 納入期限が本日以降（期限内）かどうかを判定する
+	 */
+	private boolean isNonyuKigenInRange(Nokigen nokigen, int kibetsu, int shuki) {
+		if (nokigen == null || shuki <= 0) {
+			return false;
+		}
+		int ordinal = ((kibetsu - 1) / shuki + 1) * shuki;
+		if (ordinal > MAX_KIBETSU) {
+			ordinal = MAX_KIBETSU;
+		}
+		String nokigenValue = getNokigenByOrdinal(nokigen, ordinal);
+		if (nokigenValue != null && nokigenValue.trim().length() == 8) {
+			int y = Integer.parseInt(nokigenValue.trim().substring(0, 4));
+			int m = Integer.parseInt(nokigenValue.trim().substring(4, 6));
+			int d = Integer.parseInt(nokigenValue.trim().substring(6, 8));
+			return !LocalDate.now().isAfter(LocalDate.of(y, m, d));
+		}
+		return false;
 	}
 
 	/** 
