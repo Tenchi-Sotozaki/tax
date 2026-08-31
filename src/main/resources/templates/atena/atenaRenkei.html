@@ -21,12 +21,6 @@
 				th:text="${successMessage}"></span>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
-		<div th:if="${errorMessage}"
-			class="alert alert-danger alert-dismissible fade show" role="alert">
-			<i class="bi bi-exclamation-triangle-fill me-2"></i><span
-				th:text="${errorMessage}"></span>
-			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-		</div>
 
 		<!-- 画面内メッセージ（取込処理の結果を表示する） -->
 		<div id="importAlert" class="alert alert-dismissible fade show d-none"
@@ -36,7 +30,7 @@
 		</div>
 
 		<!-- ファイル選択エリア -->
-		<div class="card mb-4 shadow-sm">
+		<div id="importCard" class="card mb-4 shadow-sm">
 			<div class="card-header bg-primary text-white py-3">
 				<h5 class="mb-0">
 					<i class="bi bi-file-earmark-arrow-up me-2"></i>ファイル選択
@@ -46,10 +40,9 @@
 				<form id="importForm" enctype="multipart/form-data">
 					<div class="row g-3 align-items-end">
 						<div class="col-md-6">
-							<label for="file" class="form-label fw-medium"> CSVファイル <span
-								class="text-danger">*</span>
-							</label> <input type="file" class="form-control" id="file" name="file"
-								accept=".csv" required>
+							<label for="file" class="form-label fw-medium"> CSVファイル <span class="text-danger">*</span>
+							</label>
+							<input type="file" class="form-control" id="file" name="file" accept=".csv" required>
 						</div>
 						<div class="col-md-2">
 							<button type="submit" id="btnAnalyze" class="btn btn-primary w-100">
@@ -58,6 +51,9 @@
 						</div>
 					</div>
 				</form>
+				
+				<!-- エラーメッセージ -->
+				<div id="fileErrorText" class="text-danger small mt-1 d-none"></div>
 			</div>
 		</div>
 
