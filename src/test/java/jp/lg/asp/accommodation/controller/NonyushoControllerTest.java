@@ -224,20 +224,22 @@ class NonyushoControllerTest {
                 .isEqualTo("賦課情報が見つかりません。");
     }
 
-    // No.11 異常系: サービスがExceptionをスローした場合、HTTP 500を返す
+    // No.11 異常系: サービスがRuntimeExceptionをスローした場合（PDF生成内部エラー）、HTTP 400を返す
     @Test
-    void generatePdf_Exceptionをスロー_HTTP500を返す() throws Exception {
+    void generatePdf_PDF生成内部エラー_HTTP400を返す() throws Exception {
         NonyushoDto dto = new NonyushoDto();
         dto.setShiteiNo(SHITEI_NO);
         when(nonyushoReportsService.dataCheck(dto)).thenReturn(false);
         when(nonyushoReportsService.generateNonyushoPdf(dto))
-                .thenThrow(new Exception("予期せぬエラー"));
+                .thenThrow(new RuntimeException("PDF生成に失敗しました: 予期せぬエラー"));
 
         Object result = controller.generatePdf(dto);
 
         assertThat(result).isInstanceOf(ResponseEntity.class);
         ResponseEntity<?> response = (ResponseEntity<?>) result;
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(new String((byte[]) response.getBody(), StandardCharsets.UTF_8))
+                .isEqualTo("PDF生成に失敗しました: 予期せぬエラー");
     }
 
     // ===== previewPdf =====
@@ -294,20 +296,22 @@ class NonyushoControllerTest {
                 .isEqualTo("賦課情報が見つかりません。");
     }
 
-    // No.15 異常系: サービスがExceptionをスローした場合、HTTP 500を返す
+    // No.15 異常系: サービスがRuntimeExceptionをスローした場合（PDF生成内部エラー）、HTTP 400を返す
     @Test
-    void previewPdf_Exceptionをスロー_HTTP500を返す() throws Exception {
+    void previewPdf_PDF生成内部エラー_HTTP400を返す() throws Exception {
         NonyushoDto dto = new NonyushoDto();
         dto.setShiteiNo(SHITEI_NO);
         when(nonyushoReportsService.dataCheck(dto)).thenReturn(false);
         when(nonyushoReportsService.generateNonyushoPdf(dto))
-                .thenThrow(new Exception("予期せぬエラー"));
+                .thenThrow(new RuntimeException("PDF生成に失敗しました: 予期せぬエラー"));
 
         Object result = controller.previewPdf(dto);
 
         assertThat(result).isInstanceOf(ResponseEntity.class);
         ResponseEntity<?> response = (ResponseEntity<?>) result;
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(new String((byte[]) response.getBody(), StandardCharsets.UTF_8))
+                .isEqualTo("PDF生成に失敗しました: 予期せぬエラー");
     }
 
     // ===== printPDF =====
@@ -363,19 +367,21 @@ class NonyushoControllerTest {
                 .isEqualTo("賦課情報が見つかりません。");
     }
 
-    // No.19 異常系: サービスがExceptionをスローした場合、HTTP 500を返す
+    // No.19 異常系: サービスがRuntimeExceptionをスローした場合（PDF生成内部エラー）、HTTP 400を返す
     @Test
-    void printPDF_Exceptionをスロー_HTTP500を返す() throws Exception {
+    void printPDF_PDF生成内部エラー_HTTP400を返す() throws Exception {
         NonyushoDto dto = new NonyushoDto();
         dto.setShiteiNo(SHITEI_NO);
         when(nonyushoReportsService.dataCheck(dto)).thenReturn(false);
         when(nonyushoReportsService.generateNonyushoPdf(dto))
-                .thenThrow(new Exception("予期せぬエラー"));
+                .thenThrow(new RuntimeException("PDF生成に失敗しました: 予期せぬエラー"));
 
         Object result = controller.printPDF(dto);
 
         assertThat(result).isInstanceOf(ResponseEntity.class);
         ResponseEntity<?> response = (ResponseEntity<?>) result;
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(new String((byte[]) response.getBody(), StandardCharsets.UTF_8))
+                .isEqualTo("PDF生成に失敗しました: 予期せぬエラー");
     }
 }
