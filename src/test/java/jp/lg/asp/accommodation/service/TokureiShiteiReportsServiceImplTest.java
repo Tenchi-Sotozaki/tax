@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 
 import java.time.LocalDate;
 
@@ -9,10 +11,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import jp.lg.asp.accommodation.dto.TokureiShiteiDto;
 import jp.lg.asp.accommodation.service.impl.TokureiShiteiReportsServiceImpl;
+import net.sf.jasperreports.engine.JasperExportManager;
 
 /**
  * 納入申告書の提出期限等の特例適用者指定通知帳票 単体テスト（サービス）
@@ -149,30 +153,14 @@ class TokureiShiteiReportsServiceImplTest {
     @Test
     @DisplayName("#30 generateTsuchiPdf 異常系 JasperReports処理中に例外が発生した場合")
     void generateTsuchiPdf_JasperReports処理中に例外が発生した場合はRuntimeExceptionがスローされる() {
-        // jrxml が存在しないパスを参照させるため、テンプレートパスを壊した
-        // サブクラスで JRXML_PATH を差し替える手段がないため、
-        // 実装の catch ブロックが RuntimeException をラップして再スローすることを
-        // 存在しない jrxml を参照させることで間接的に検証する。
-        // ※ JRXML_PATH は private static final のため直接差し替え不可。
-        //   ClassPathResource が存在しないリソースを参照すると IOException が発生し、
-        //   catch ブロックで RuntimeException にラップされることを確認する。
-        TokureiShiteiReportsServiceImpl brokenService = new TokureiShiteiReportsServiceImpl() {
-            @Override
-            public byte[] generateTsuchiPdf(TokureiShiteiDto dto) {
-                try {
-                    // 存在しないリソースを参照して強制的に例外を発生させる
-                    new org.springframework.core.io.ClassPathResource("reports/nonexistent.jrxml")
-                            .getInputStream();
-                    return new byte[0];
-                } catch (Exception e) {
-                    throw new RuntimeException("PDF生成に失敗しました: " + e.getMessage(), e);
-                }
-            }
-        };
-
         TokureiShiteiDto dto = baseDto();
 
-        assertThatThrownBy(() -> brokenService.generateTsuchiPdf(dto))
-                .isInstanceOf(RuntimeException.class);
+        try (MockedStatic<JasperExportManager> mocked = mockStatic(JasperExportManager.class)) {
+            mocked.when(() -> JasperExportManager.exportReportToPdf(any()))
+                    .thenThrow(new RuntimeException("JasperReports error"));
+
+            assertThatThrownBy(() -> service.generateTsuchiPdf(dto))
+                    .isInstanceOf(RuntimeException.class);
+        }
     }
 }
