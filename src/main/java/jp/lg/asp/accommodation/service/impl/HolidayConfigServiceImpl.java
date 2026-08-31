@@ -72,11 +72,12 @@ public class HolidayConfigServiceImpl implements HolidayConfigService {
 	@Transactional(readOnly = true)
 	public List<String> findNendoList() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		List<String> list = holidayRepository.findDistinctNenByJichitaiCd(jichitaiCd);
-		if (list.isEmpty()) {
-			list = holidayRepository.findDistinctNenByJichitaiCd(SENTINEL_CD);
-		}
-		return list;
+		List<String> jichitaiList = holidayRepository.findDistinctNenByJichitaiCd(jichitaiCd);
+		List<String> sentinelList = holidayRepository.findDistinctNenByJichitaiCd(SENTINEL_CD);
+		return java.util.stream.Stream.concat(jichitaiList.stream(), sentinelList.stream())
+				.distinct()
+				.sorted()
+				.toList();
 	}
 
 	@Override
