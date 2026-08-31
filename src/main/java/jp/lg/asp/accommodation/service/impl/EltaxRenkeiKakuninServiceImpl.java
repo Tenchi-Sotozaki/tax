@@ -684,6 +684,9 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		int kyodoJigyoshaYubinNoIdx = findIndexByName(yoshikiMap, "共同事業者情報【郵便番号");
 		int kyodoJigyoshaJushoIdx = findIndexByName(yoshikiMap, "共同事業者情報【住所又は所在地");
 		int kyodoJigyoshaTelIdx = findIndexByName(yoshikiMap, "共同事業者情報【電話番号");
+		int tokugimuNameIdx = findIndexByName(yoshikiMap, "特別徴収義務者【氏名又は名称】");
+		int tokugimuJushoIdx = findIndexByName(yoshikiMap, "特別徴収義務者【住所又は所在地】");
+		int tokugimuYubinIdx = findIndexByName(yoshikiMap, "特別徴収義務者【郵便番号】");
 
 		String shinseikubun = getDataValue(dataRow, shinseikubunIdx);
 		String teishutsuYmd = getDataValue(dataRow, teishutsuYmdIdx);
@@ -787,16 +790,20 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 		String kyokaShu = convertKyokaShu(getDataValue(dataRow, kyokaShuIdx));
 
 		String kyokaName = getDataValue(dataRow, kyokaNameIdx).isEmpty()
-				? !isNew && !prev.getKyokaName().isEmpty() ? prev.getKyokaName() : ""
+				? !isNew && !prev.getKyokaName().isEmpty() ? prev.getKyokaName()
+						: getDataValue(dataRow, tokugimuNameIdx)
 				: getDataValue(dataRow, kyokaNameIdx);
 		String kyokaYubinNo = getDataValue(dataRow, kyokaYubinNoIdx).isEmpty()
-				? !isNew && !prev.getKyokaYubinNo().isEmpty() ? prev.getKyokaYubinNo() : ""
+				? !isNew && !prev.getKyokaYubinNo().isEmpty() ? prev.getKyokaYubinNo()
+						: getDataValue(dataRow, tokugimuYubinIdx)
 				: getDataValue(dataRow, kyokaYubinNoIdx);
 		String kyokaJusho = getDataValue(dataRow, kyokaJushoIdx).isEmpty()
-				? !isNew && !prev.getKyokaJusho().isEmpty() ? prev.getKyokaJusho() : ""
+				? !isNew && !prev.getKyokaJusho().isEmpty() ? prev.getKyokaJusho()
+						: getDataValue(dataRow, tokugimuJushoIdx)
 				: getDataValue(dataRow, kyokaJushoIdx);
 		String soufusakiName = getDataValue(dataRow, soufusakiNameIdx).isEmpty()
-				? !isNew && !prev.getSoufusakiName().isEmpty() ? prev.getSoufusakiName() : ""
+				? !isNew && !prev.getSoufusakiName().isEmpty() ? prev.getSoufusakiName()
+						: getDataValue(dataRow, tokugimuNameIdx)
 				: getDataValue(dataRow, soufusakiNameIdx);
 
 		Tokugimu entity = new Tokugimu();
