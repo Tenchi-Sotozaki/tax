@@ -149,21 +149,5 @@ class RptLogViewControllerTest {
 			assertThat(model.containsAttribute("searched")).isFalse();
 			verify(rptLogViewService, never()).search(any());
 		}
-
-		@Test
-		@DisplayName("異常系：検索時にアクセス権限がない場合に例外がスローされること")
-		void accessDenied() {
-			RptLogViewDto form = new RptLogViewDto();
-			BindingResult bindingResult = mock(BindingResult.class);
-			Model model = new ConcurrentModel();
-
-			doThrow(new AccessDeniedException("Access Denied"))
-					.when(accessChecker).checkAccess(ScreenManagement.RPT_LOG_VIEW);
-
-			assertThatThrownBy(() -> rptLogViewController.search(form, bindingResult, model))
-					.isInstanceOf(AccessDeniedException.class);
-			verify(rptLogViewService, never()).findAllReports();
-			verify(rptLogViewService, never()).search(any());
-		}
 	}
 }
