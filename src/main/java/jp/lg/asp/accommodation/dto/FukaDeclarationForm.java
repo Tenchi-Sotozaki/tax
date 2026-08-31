@@ -20,6 +20,7 @@ public class FukaDeclarationForm {
 	// ========== 制御用フィールド ==========
 	private boolean edit;
 	private boolean view;
+	private boolean gassanTarget;
 	private Long declarationId;
 	private String shiteiNo;
 	private String nendo;

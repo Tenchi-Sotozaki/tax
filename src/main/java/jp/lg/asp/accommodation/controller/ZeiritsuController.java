@@ -72,6 +72,8 @@ public class ZeiritsuController {
 		model.addAttribute("seq", seq);
 		model.addAttribute("isDetailEditable", false);
 		model.addAttribute("isHeaderEditable", false);
+		model.addAttribute("isEdYmOnlyEditable", false);
+		model.addAttribute("autoUpdateTarget", null);
 		addConstants(model);
 		return FORM_VIEW;
 	}
@@ -88,8 +90,11 @@ public class ZeiritsuController {
 		model.addAttribute("seq", seq);
 		model.addAttribute("isLatest", zeiritsuService.isLatestRecord(jichitaiCd, z));
 		boolean futureStart = zeiritsuService.isFutureStartYm(z.getTekiyoStYm());
+		boolean edYmOnly = !futureStart;
 		model.addAttribute("isDetailEditable", futureStart);
 		model.addAttribute("isHeaderEditable", futureStart);
+		model.addAttribute("isEdYmOnlyEditable", edYmOnly);
+		model.addAttribute("autoUpdateTarget", null);
 		addConstants(model);
 		return FORM_VIEW;
 	}
@@ -109,6 +114,34 @@ public class ZeiritsuController {
 		boolean latest = zeiritsuService.isLatestRecord(jichitaiCd, entity);
 		boolean detailEditable = zeiritsuService.isFutureStartYm(entity.getTekiyoStYm());
 		boolean headerEditable = detailEditable;
+		boolean edYmOnly = !detailEditable;
+
+		if (edYmOnly) {
+			// 適用期間内：適用終了年月のみ更新・バリデーション
+			validateEdYmOverlap(entity, form, bindingResult, jichitaiCd, seqDec);
+			List<String> edYmErrors = bindingResult.getFieldErrors("tekiyoEdYm").stream()
+					.map(org.springframework.validation.FieldError::getDefaultMessage).toList();
+			if (!edYmErrors.isEmpty()) {
+				ZeiritsuForm cleanForm = zeiritsuService.toForm(entity, jichitaiCd);
+				cleanForm.setTekiyoEdYm(form.getTekiyoEdYm());
+				model.addAttribute("zeiritsuForm", cleanForm);
+				model.addAttribute("isView", false);
+				model.addAttribute("isEdit", true);
+				model.addAttribute("seq", seq);
+				model.addAttribute("isLatest", latest);
+				model.addAttribute("isDetailEditable", false);
+				model.addAttribute("isHeaderEditable", false);
+				model.addAttribute("isEdYmOnlyEditable", true);
+				model.addAttribute("autoUpdateTarget", null);
+				model.addAttribute("validationErrors", edYmErrors);
+				model.addAttribute("tekiyoEdYmErrors", edYmErrors);
+				addConstants(model);
+				return FORM_VIEW;
+			}
+			zeiritsuService.update(jichitaiCd, seqDec, form, false, true);
+			redirectAttributes.addFlashAttribute("successMessage", "税率管理マスタを更新しました。");
+			return "redirect:/admin/zeiritsu/view/" + seq;
+		}
 
 		if (!headerEditable) {
 			form.setFukaKbn(entity.getFukaKbn());
@@ -129,12 +162,14 @@ public class ZeiritsuController {
 			model.addAttribute("isLatest", latest);
 			model.addAttribute("isDetailEditable", detailEditable);
 			model.addAttribute("isHeaderEditable", headerEditable);
+			model.addAttribute("isEdYmOnlyEditable", edYmOnly);
+			model.addAttribute("autoUpdateTarget", null);
 			addConstants(model);
 			model.addAttribute("validationErrors", ZeiritsuForm.validate(form).values());
 			return FORM_VIEW;
 		}
 
-		zeiritsuService.update(jichitaiCd, seqDec, form, detailEditable);
+		zeiritsuService.update(jichitaiCd, seqDec, form, detailEditable, false);
 		redirectAttributes.addFlashAttribute("successMessage", "税率管理マスタを更新しました。");
 		return "redirect:/admin/zeiritsu/view/" + seq;
 	}
@@ -158,6 +193,7 @@ public class ZeiritsuController {
 		model.addAttribute("isEdit", false);
 		model.addAttribute("isDetailEditable", true);
 		model.addAttribute("isHeaderEditable", true);
+		model.addAttribute("isEdYmOnlyEditable", false);
 		addConstants(model);
 		return FORM_VIEW;
 	}
@@ -184,6 +220,7 @@ public class ZeiritsuController {
 					model.addAttribute("isEdit", false);
 					model.addAttribute("isDetailEditable", true);
 					model.addAttribute("isHeaderEditable", true);
+					model.addAttribute("isEdYmOnlyEditable", false);
 					model.addAttribute("autoUpdateTarget", autoUpdateTarget);
 					model.addAttribute("autoUpdateNewEdYm",
 							zeiritsuService.formatYm(zeiritsuService.getPreviousMonth(form.getTekiyoStYm().replace("-", ""))));
@@ -203,6 +240,7 @@ public class ZeiritsuController {
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isDetailEditable", true);
 			model.addAttribute("isHeaderEditable", true);
+			model.addAttribute("isEdYmOnlyEditable", false);
 			model.addAttribute("autoUpdateTarget", null);
 			addConstants(model);
 			model.addAttribute("validationErrors", ZeiritsuForm.validate(form).values());
@@ -255,6 +293,25 @@ public class ZeiritsuController {
 		}
 		if (isTeigaku) {
 			validateTeigakuRangeOverlap(form, bindingResult);
+		}
+	}
+
+	private void validateEdYmOverlap(Zeiritsu entity, ZeiritsuForm form, BindingResult bindingResult,
+			String jichitaiCd, BigDecimal excludeSeq) {
+		String tekiyoEdYm = form.getTekiyoEdYm();
+		if (tekiyoEdYm == null || tekiyoEdYm.isBlank()) return;
+		String edYm = tekiyoEdYm.replace("-", "");
+		String taishoKbn = entity.getTaishoKbn();
+		boolean overlap = zeiritsuService.findActiveByJichitaiCd(jichitaiCd).stream()
+				.filter(z -> z.getTaishoKbn().equals(taishoKbn))
+				.filter(z -> !"1".equals(z.getDelFlg()))
+				.filter(z -> !z.getSeq().equals(excludeSeq))
+				.anyMatch(z -> edYm.compareTo(z.getTekiyoStYm()) >= 0
+						&& (z.getTekiyoEdYm() == null || z.getTekiyoEdYm().isBlank()
+								|| edYm.compareTo(z.getTekiyoEdYm()) <= 0));
+		if (overlap) {
+			bindingResult.rejectValue("tekiyoEdYm", "PeriodOverlap",
+					"適用終了年月が別レコードの適用期間と重複しています。");
 		}
 	}
 

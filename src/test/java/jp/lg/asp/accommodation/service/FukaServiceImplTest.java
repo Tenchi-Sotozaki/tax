@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +22,8 @@ import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
-import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
-import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
+import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
@@ -45,11 +43,10 @@ class FukaServiceImplTest {
     @Mock ChoshuGenboRepository choshuGenboRepository;
     @Mock ChoshuGenboUchiRepository choshuGenboUchiRepository;
     @Mock AtenaRepository atenaRepository;
-    @Mock NozeiShukiRepository nozeiShukiRepository;
+    @Mock TekiyoNozeiShukiRepository nozeiShukiRepository;
     @Mock NokigenRepository nokigenRepository;
     @Mock JichitaiRepository jichitaiRepository;
     @Mock ShunoRirekiRepository shunoRirekiRepository;
-    @Mock TokureiTekiyoRepository tekiyoNozeiShukiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks FukaServiceImpl service;
 
@@ -95,17 +92,19 @@ class FukaServiceImplTest {
 
     @Test
     void isAlreadyRegistered_existingData_returnsTrue() {
-        // 202403 → nendo=2024, kibetsu=1 (3月-2=1)
-        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 1))
+        // nendoStMonth=3(デフォルト) の場合: 202402 → nendo=2023, kibetsu=12
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(java.util.Optional.empty());
+        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2023", 12))
                 .thenReturn(List.of(new Fuka()));
 
-        assertThat(service.isAlreadyRegistered(SHITEI_NO, "202403")).isTrue();
+        assertThat(service.isAlreadyRegistered(SHITEI_NO, "202402")).isTrue();
     }
 
     @Test
     void isAlreadyRegistered_noData_returnsFalse() {
-        // 202404 → nendo=2024, kibetsu=2 (4月-2=2)
-        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 2))
+        // nendoStMonth=4(デフォルト) の場合: 202404 → nendo=2024, kibetsu=1
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(java.util.Optional.empty());
+        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 1))
                 .thenReturn(List.of());
 
         assertThat(service.isAlreadyRegistered(SHITEI_NO, "202404")).isFalse();

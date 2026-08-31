@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // 区分が都道府県の場合、賦課方式を定額のみに制限
     function updateFukaKbnByTaisho() {
         if (isView) return;
+        const isEdit = document.getElementById('zeiritsuConfigRoot').dataset.isEdit === 'true';
+        const isHeaderEditable = document.getElementById('fukaTeigaku') && !document.getElementById('fukaTeigaku').disabled;
+        if (isEdit && !isHeaderEditable) return;
         const taishoChecked = document.querySelector('input[name="taishoKbn"]:checked');
         const fukaTeiritsu = document.getElementById('fukaTeiritsu');
         const fukaTeigaku = document.getElementById('fukaTeigaku');
