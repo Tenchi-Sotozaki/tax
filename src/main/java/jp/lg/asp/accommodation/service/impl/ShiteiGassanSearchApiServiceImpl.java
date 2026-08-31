@@ -18,6 +18,7 @@ import jp.lg.asp.accommodation.repository.GassanRepository;
 import jp.lg.asp.accommodation.repository.GassanUchiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.ShiteiGassanSearchApiService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,6 +29,7 @@ public class ShiteiGassanSearchApiServiceImpl implements ShiteiGassanSearchApiSe
     private final GassanUchiRepository gassanUchiRepository;
     private final GassanRepository gassanRepository;
     private final AtenaRepository atenaRepository;
+    private final HashUtil hashUtil;
 
     @Override
     @Transactional(readOnly = true)
@@ -97,7 +99,7 @@ public class ShiteiGassanSearchApiServiceImpl implements ShiteiGassanSearchApiSe
     @Override
     @Transactional(readOnly = true)
     public List<ShiteiGassanSearchDto> searchByKojinNo(String jichitaiCd, String kojinNo) {
-        List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", "%", "%", "%", "%", "%", kojinNo, "%");
+        List<Atena> atenaList = atenaRepository.search(jichitaiCd, "%", "%", "%", "%", "%", "%", hashUtil.sha256(kojinNo), "%");
         return searchTokugimuByAtenaList(jichitaiCd, atenaList);
     }
 

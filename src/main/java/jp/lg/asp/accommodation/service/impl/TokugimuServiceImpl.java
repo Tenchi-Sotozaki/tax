@@ -1,9 +1,6 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +37,7 @@ import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokugimuService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,6 +57,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 	private final ShunoRirekiRepository shunoRirekiRepository;
 
 	private final JichitaiContext jichitaiContext;
+	private final HashUtil hashUtil;
 
 	private String getCurrentUser() {
 		var auth = SecurityContextHolder.getContext().getAuthentication();
@@ -96,7 +95,7 @@ public class TokugimuServiceImpl implements TokugimuService {
 		// 個人番号が入力されている場合、ハッシュ化して検索条件に用いる
 		String searchKojinNo = null;
 		if (StringUtils.hasText(form.getKojinNo())) {
-			searchKojinNo = hashKojinNo(form.getKojinNo());
+			searchKojinNo = hashUtil.sha256(form.getKojinNo());
 		}
 
 		// 初期遷移時（検索条件がすべて空）は全件取得
@@ -179,27 +178,6 @@ public class TokugimuServiceImpl implements TokugimuService {
 		applyLastDeclarationInfo(jichitaiCd, pageContent);
 
 		return new PageImpl<>(pageContent, pageable, allItems.size());
-	}
-
-	/**
-	 * 個人番号のハッシュ化処理（SHA-256）
-	 */
-	private String hashKojinNo(String kojinNo) {
-		try {
-			MessageDigest digest = MessageDigest.getInstance("SHA-256");
-			byte[] encodedhash = digest.digest(kojinNo.getBytes(StandardCharsets.UTF_8));
-			StringBuilder hexString = new StringBuilder();
-			for (byte b : encodedhash) {
-				String hex = Integer.toHexString(0xff & b);
-				if (hex.length() == 1) {
-					hexString.append('0');
-				}
-				hexString.append(hex);
-			}
-			return hexString.toString();
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("個人番号のハッシュ化に失敗しました", e);
-		}
 	}
 
 	/**
