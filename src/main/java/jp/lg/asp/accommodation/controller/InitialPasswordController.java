@@ -14,8 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.User;
-import jp.lg.asp.accommodation.entity.UserId;
-import jp.lg.asp.accommodation.repository.UserRepository;
+import jp.lg.asp.accommodation.service.InitialPasswordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,13 +24,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class InitialPasswordController {
 
-    private final UserRepository userRepository;
+    private final InitialPasswordService initialPasswordService;
     private final PasswordEncoder passwordEncoder;
     private final JichitaiContext jichitaiContext;
 
     private static final String FORM_VIEW = "auth/initialPassword";
 
-    /** デフォルトユーザーのID（AdminUserControllerの権限変更不可判定でも使用） */
     public static final String ADMIN_ID = "admin_user";
 
     @GetMapping
@@ -61,12 +59,7 @@ public class InitialPasswordController {
         }
 
         String jichitaiCd = jichitaiContext.getJichitaiCd();
-
-        UserId pk = new UserId();
-        pk.setJichitaiCd(jichitaiCd);
-        pk.setId(authentication.getName());
-        User user = userRepository.findById(pk)
-                .orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+        User user = initialPasswordService.findUser(jichitaiCd, authentication.getName());
 
         if (!"1".equals(user.getInitialPasswordFlg())) {
             model.addAttribute("error", "パスワードは設定済みです。");
@@ -78,9 +71,7 @@ public class InitialPasswordController {
             return FORM_VIEW;
         }
 
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setInitialPasswordFlg("0");
-        userRepository.save(user);
+        initialPasswordService.changeInitialPassword(user, newPassword);
 
         log.info("初回パスワード変更が完了しました: userId={}, jichitaiCd={}", ADMIN_ID, jichitaiCd);
 

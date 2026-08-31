@@ -56,7 +56,7 @@ class RoleServiceImplTest {
     @Test
     void findAllScreens_delegatesToRepository() {
         Screen screen = new Screen();
-        when(screenRepository.findByJichitaiCdOrderByScreenId(JICHITAI_CD)).thenReturn(List.of(screen));
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen));
 
         assertThat(service.findAllScreens()).hasSize(1);
     }

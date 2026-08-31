@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.dto.FukaDeclarationForm;
+import jp.lg.asp.accommodation.dto.FukaTaxDetailDto;
 import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.service.FukaService;
@@ -130,6 +132,8 @@ class FukaControllerTest {
     @Test
     void showEdit_未申告はリダイレクト() {
         MockHttpSession session = sessionWith("00100001");
+        when(fukaService.getNendoStMonth()).thenReturn(4);
+        when(fukaService.resolveGassanTekiyoPeriod(eq("00100001"), any())).thenReturn(null);
         when(fukaService.isAlreadyRegisteredByKibetsu("00100001", "2024", 1)).thenReturn(false);
 
         String view = controller.showEdit("2024", 1, session,
@@ -141,6 +145,8 @@ class FukaControllerTest {
     @Test
     void showEdit_申告済みは編集画面を返す() {
         MockHttpSession session = sessionWith("00100001");
+        when(fukaService.getNendoStMonth()).thenReturn(4);
+        when(fukaService.resolveGassanTekiyoPeriod(eq("00100001"), any())).thenReturn(null);
         when(fukaService.isAlreadyRegisteredByKibetsu("00100001", "2024", 1)).thenReturn(true);
         FukaDeclarationForm form = new FukaDeclarationForm();
         when(fukaService.getDeclarationFormForEdit("00100001", "2024", 1)).thenReturn(form);
@@ -195,5 +201,84 @@ class FukaControllerTest {
 
         assertThat(view).isEqualTo("redirect:/declaration/payment-ledger");
         verify(fukaService).saveDeclaration(form);
+    }
+
+    @Test
+    void save_課税対象外宿泊数の桁数エラーはサマリに項目名が付く() {
+        FukaDeclarationForm form = new FukaDeclarationForm();
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
+        bindingResult.rejectValue("monthlyDetail.exemptStayCount", "Digits", "9桁以内で入力してください");
+        Model model = new ExtendedModelMap();
+
+        String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("fuka/tFukaConfig");
+        assertThat(validationErrors(model))
+                .containsExactly("課税対象外宿泊数は9桁以内で入力してください");
+        assertThat(fieldErrorMessages(model))
+                .containsEntry("monthlyDetail.exemptStayCount", "9桁以内で入力してください");
+    }
+
+    @Test
+    void save_宿泊数合計の桁数エラーはサマリに項目名が付く() {
+        FukaDeclarationForm form = new FukaDeclarationForm();
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
+        bindingResult.rejectValue("monthlyDetail.totalStayCount", "Digits", "9桁以内で入力してください");
+        Model model = new ExtendedModelMap();
+
+        String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("fuka/tFukaConfig");
+        assertThat(validationErrors(model))
+                .containsExactly("宿泊数合計は9桁以内で入力してください");
+        assertThat(fieldErrorMessages(model))
+                .containsEntry("monthlyDetail.totalStayCount", "9桁以内で入力してください");
+    }
+
+    @Test
+    void save_区分ごとの宿泊数の桁数エラーはサマリに区分名が付く() {
+        FukaDeclarationForm form = formWithTaxDetailLabel("0円以上");
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
+        bindingResult.rejectValue("monthlyDetail.taxDetails[0].hakusu", "Digits", "8桁以内で入力してください");
+        Model model = new ExtendedModelMap();
+
+        String view = controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(view).isEqualTo("fuka/tFukaConfig");
+        assertThat(validationErrors(model))
+                .containsExactly("宿泊数（0円以上の区分）は8桁以内で入力してください");
+        assertThat(fieldErrorMessages(model))
+                .containsEntry("monthlyDetail.taxDetails[0].hakusu", "8桁以内で入力してください");
+    }
+
+    @Test
+    void save_区分名が取得できない場合は通番で代替する() {
+        FukaDeclarationForm form = formWithTaxDetailLabel(null);
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
+        bindingResult.rejectValue("monthlyDetail.taxDetails[0].hakusu", "Digits", "8桁以内で入力してください");
+        Model model = new ExtendedModelMap();
+
+        controller.save(form, bindingResult, model, new RedirectAttributesModelMap());
+
+        assertThat(validationErrors(model))
+                .containsExactly("宿泊数（区分1）は8桁以内で入力してください");
+    }
+
+    private FukaDeclarationForm formWithTaxDetailLabel(String label) {
+        FukaDeclarationForm form = new FukaDeclarationForm();
+        FukaTaxDetailDto detail = new FukaTaxDetailDto();
+        detail.setLabel(label);
+        form.getMonthlyDetail().getTaxDetails().add(detail);
+        return form;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> validationErrors(Model model) {
+        return (List<String>) model.asMap().get("validationErrors");
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, String> fieldErrorMessages(Model model) {
+        return (Map<String, String>) model.asMap().get("fieldErrorMessages");
     }
 }

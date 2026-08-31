@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.KofuRitsuConfigDto;
 import jp.lg.asp.accommodation.entity.KofuRitsu;
 import jp.lg.asp.accommodation.service.KofuRitsuConfigService;
@@ -27,9 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 public class KofuRitsuConfigController {
 
 	private final KofuRitsuConfigService kofuRitsuConfigService;
+	private final ScreenAccessChecker accessChecker;
+
+	private static final String SCREEN_ID = ScreenManagement.KOFU_RITSU_CONFIG;
 
 	@GetMapping
 	public String register(Model model) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		model.addAttribute("configForm", new KofuRitsuConfigDto());
 		model.addAttribute("mode", "register");
 		return "admin/kofuRitsuConfig";
@@ -39,8 +45,14 @@ public class KofuRitsuConfigController {
 	public String save(@Valid @ModelAttribute("configForm") KofuRitsuConfigDto configForm,
 			BindingResult bindingResult, Model model,
 			RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("validationErrors", KofuRitsuConfigDto.validate(configForm).values());
+			model.addAttribute("mode", "register");
+			return "admin/kofuRitsuConfig";
+		}
+		if (kofuRitsuConfigService.existsByTekiyoStNendo(configForm.getTekiyoStNendo())) {
+			model.addAttribute("tekiyoStNendoError", "登録済みの適用開始年度です。");
 			model.addAttribute("mode", "register");
 			return "admin/kofuRitsuConfig";
 		}
@@ -56,6 +68,7 @@ public class KofuRitsuConfigController {
 
 	@GetMapping("/list")
 	public String list(Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
 		try {
 			model.addAttribute("historyList", kofuRitsuConfigService.findAll());
 		} catch (Exception e) {
@@ -68,6 +81,7 @@ public class KofuRitsuConfigController {
 
 	@GetMapping("/view/{rno}")
 	public String viewForm(@PathVariable BigDecimal rno, Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(SCREEN_ID);
 		try {
 			KofuRitsu entity = kofuRitsuConfigService.findByRno(rno);
 			KofuRitsuConfigDto form = toDto(entity);
@@ -84,6 +98,7 @@ public class KofuRitsuConfigController {
 
 	@GetMapping("/edit/{rno}")
 	public String editForm(@PathVariable BigDecimal rno, Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		try {
 			KofuRitsu entity = kofuRitsuConfigService.findByRno(rno);
 			KofuRitsuConfigDto form = toDto(entity);
@@ -103,6 +118,7 @@ public class KofuRitsuConfigController {
 			@Valid @ModelAttribute("configForm") KofuRitsuConfigDto configForm,
 			BindingResult bindingResult, Model model,
 			RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("validationErrors", KofuRitsuConfigDto.validate(configForm).values());
 			model.addAttribute("rno", rno);

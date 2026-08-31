@@ -116,10 +116,10 @@
 
 								</div>
 								<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-									<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary btn-sm"> <i
+									<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary"> <i
 											class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 									</a>
-									<button type="submit" class="btn btn-primary btn-sm px-4">
+									<button type="submit" class="btn btn-primary px-4">
 										<i class="bi bi-search me-1"></i>検索する
 									</button>
 									<input type="hidden" name="searched" value="true">
@@ -191,14 +191,16 @@
 											<span th:if="${item.kofuYmd == null}" class="text-muted">-</span>
 										</td>
 										<td class="text-center">
-											<button type="button" class="btn btn-outline-primary btn-sm py-0 me-1 btn-kofu"
+											<!-- 交付金レコードが無い行は kofuNendo が null になるため、
+											     検索条件の交付金年度を照会画面へ渡す -->
+											<button type="button" class="btn btn-outline-primary py-0 me-1 btn-kofu"
 											    th:data-shitei-no="${item.listShiteiNo}" 
 											    th:data-shisetsu-name="${item.listShisetsuName}"
 											    th:data-shimei="${item.shimei}"
-											    th:data-nendo="${item.kofuNendo}">
+											    th:data-nendo="${item.kofuNendo != null ? item.kofuNendo : searchForm.nendo}">
 											    <i class="bi bi-eye me-1"></i>照会
 											</button>
-											<button type="button" class="btn btn-outline-secondary btn-sm py-0 btn-koza"
+											<button type="button" class="btn btn-outline-secondary py-0 btn-koza"
 											    th:data-shitei-no="${item.listShiteiNo}"
 											    th:data-shisetsu-name="${item.listShisetsuName}"
 											    th:data-shimei="${item.shimei}">
