@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
@@ -57,39 +58,38 @@ class ShoreikinBulkControllerTest {
 	class BulkTest {
 
 		@Test
-		@DisplayName("正常系：交付率が取得できる場合、DTOに設定されて初期表示画面が返却されること")
-		void bulk_success_returnsView() {
-			String nendo = "2026";
-			BigDecimal kofuRitsu = BigDecimal.valueOf(50.0);
+        @DisplayName("正常系：初期表示時、年度未指定でデータが取得できる場合にフォームと交付率が設定されること")
+        void bulk_success() {
+            Model model = new ConcurrentModel();
+            when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+            when(shoreikinBulkService.findKofuRitsuList(eq(JICHITAI_CD), anyInt()))
+                    .thenReturn(List.of(BigDecimal.valueOf(0.5)));
 
-			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-			doNothing().when(accessChecker).checkAccess(SCREEN_ID);
-			when(shoreikinBulkService.findKofuRitsuList(eq(JICHITAI_CD), anyInt()))
-					.thenReturn(List.of(kofuRitsu));
+            String viewName = controller.bulk(null, model);
 
-			String viewName = controller.bulk(nendo, model);
+            assertThat(viewName).isEqualTo(BULK_VIEW);
+            assertThat(model.containsAttribute("bulkForm")).isTrue();
+            ShoreikinBulkDto form = (ShoreikinBulkDto) model.getAttribute("bulkForm");
+            assertThat(form.getKofuRitsu()).isEqualByComparingTo(BigDecimal.valueOf(0.5));
+            assertThat(model.containsAttribute("errorMessage")).isFalse();
+            verify(accessChecker, times(1)).checkAccess(any());
+        }
 
-			assertThat(viewName).isEqualTo(BULK_VIEW);
-			verify(model, times(1)).addAttribute(eq("bulkForm"), any(ShoreikinBulkDto.class));
-			verify(model, never()).addAttribute(eq("errorMessage"), any());
-		}
+        @Test
+        @DisplayName("異常系：交付率が未登録の場合、エラーメッセージがモデルに追加されること")
+        void bulk_noKofuRitsu_setsErrorMessage() {
+            Model model = new ConcurrentModel();
+            when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+            when(shoreikinBulkService.findKofuRitsuList(eq(JICHITAI_CD), anyInt()))
+                    .thenReturn(Collections.emptyList());
 
-		@Test
-		@DisplayName("異常系：交付率が未登録の場合、エラーメッセージがモデルに追加されて初期表示画面が返却されること")
-		void bulk_noKofuRitsu_setsErrorMessage() {
-			String nendo = "2026";
+            String viewName = controller.bulk(null, model);
 
-			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-			doNothing().when(accessChecker).checkAccess(SCREEN_ID);
-			when(shoreikinBulkService.findKofuRitsuList(eq(JICHITAI_CD), anyInt()))
-					.thenReturn(Collections.emptyList());
-
-			String viewName = controller.bulk(nendo, model);
-
-			assertThat(viewName).isEqualTo(BULK_VIEW);
-			verify(model, times(1)).addAttribute(eq("errorMessage"), eq("交付率のシステム設定値が登録されていません。システム設定から交付率を設定してください。"));
-			verify(model, times(1)).addAttribute(eq("bulkForm"), any(ShoreikinBulkDto.class));
-		}
+            assertThat(viewName).isEqualTo(BULK_VIEW);
+            assertThat(model.getAttribute("errorMessage"))
+                    .isEqualTo("交付率のシステム設定値が登録されていません。システム設定から交付率を設定してください。");
+            assertThat(model.containsAttribute("bulkForm")).isTrue();
+        }
 	}
 
 	@Nested
