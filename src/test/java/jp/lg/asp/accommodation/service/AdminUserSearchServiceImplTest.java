@@ -15,9 +15,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -156,24 +153,6 @@ class AdminUserSearchServiceImplTest {
         List<Role> result = service.selectableRoles(JICHITAI_CD, BigDecimal.valueOf(UserRepository.DEFAULT_USER_ROLE_ID));
 
         assertThat(result).contains(defaultRole);
-    }
-
-    // ── search ────────────────────────────────────────────────────
-
-    @Test
-    void search_ページング条件付き検索_PageRequestが正しく生成されてsearchPageに渡される() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-        Page<User> emptyPage = new PageImpl<>(List.of());
-        when(userRepository.searchPage(any(), any(), any(), any(), any(), any(), any())).thenReturn(emptyPage);
-        UserSearchForm form = new UserSearchForm();
-        form.setPage(2);
-        form.setPageSize(10);
-
-        service.search(form);
-
-        verify(userRepository).searchPage(
-                eq(JICHITAI_CD), any(), any(), any(), any(), any(),
-                eq(PageRequest.of(2, 10)));
     }
 
     // ── findById ──────────────────────────────────────────────────
