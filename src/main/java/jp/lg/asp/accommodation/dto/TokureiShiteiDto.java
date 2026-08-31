@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.dto;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -20,8 +21,8 @@ public class TokureiShiteiDto {
 	private LocalDate hakkoYmd;
 
 	/** 適用年月日 */
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private LocalDate tekiyoYmd;
+	@DateTimeFormat(pattern = "yyyy-MM")
+	private YearMonth tekiyoYmd;
 
 	/** 承認 */
 	private String shonin;
@@ -31,7 +32,7 @@ public class TokureiShiteiDto {
 
 	/** 特別徴収義務者名 */
 	private String tokuName;
-	
+
 	/** 特別徴収義務者郵便番号 */
 	private String tokuYubin;
 
@@ -40,7 +41,7 @@ public class TokureiShiteiDto {
 
 	/** 施設名称 */
 	private String shisetsuName;
-	
+
 	/** 施設郵便番号 */
 	private String shisetsuYubin;
 
@@ -52,10 +53,10 @@ public class TokureiShiteiDto {
 
 	/** 条例 */
 	private String jorei;
-	
+
 	/** 備考 */
 	private String biko;
-	
+
 	/** 公印 */
 	private byte[] koin;
 }
