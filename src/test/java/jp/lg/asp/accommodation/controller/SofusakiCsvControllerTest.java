@@ -36,9 +36,7 @@ import jp.lg.asp.accommodation.service.SofusakiCsvService;
  * 送付先情報CSV出力 単体テスト（コントローラ）
  *
  * <p>チェックリスト「送付先情報CSV出力_単体テストチェックリスト.xlsx」の #1〜#5 に1対1で対応する。
- * チェックリストはあるべき仕様で書かれているため、現行実装では落ちるケースがある
- * （#2・#3。チェックリスト側に「実装側の修正が必要」と注記あり）。
- * テストが通るように期待値を実装へ寄せないこと。</p>
+ * チェックリストはあるべき仕様で書かれている。テストが通るように期待値を実装へ寄せないこと。</p>
  */
 @ExtendWith(MockitoExtension.class)
 class SofusakiCsvControllerTest {
@@ -82,45 +80,32 @@ class SofusakiCsvControllerTest {
 
     // ------------------------------------------------------------------
     // #2・#3 download 未選択
-    //   ※現行実装は全件出力となるため、実装側の修正が必要。
-    //     エラーの返し方（例外／画面メッセージ／ステータス）は未確定のため、
-    //     ここでは「2xxのCSVを返さないこと」で判定している。
-    //     返し方が決まったら、その形に合わせて書き直すこと。
     // ------------------------------------------------------------------
 
     @Test
     @DisplayName("#2 download 異常系 selectedIndexesがnullの場合：エラーとなる（未選択でのダウンロードは不可）")
-    void download_selectedIndexesがnullはエラー() {
+    void download_selectedIndexesがnullはエラー() throws IOException {
         assertUnselectedIsError(null);
     }
 
     @Test
     @DisplayName("#3 download 異常系 selectedIndexesが空の場合：エラーとなる（未選択でのダウンロードは不可）")
-    void download_selectedIndexesが空はエラー() {
+    void download_selectedIndexesが空はエラー() throws IOException {
         assertUnselectedIsError(List.of());
     }
 
     /**
      * 未選択でのダウンロードがエラーとなり、一覧取得・CSV生成が行われないことを検証する。
-     * エラーの返し方（例外／画面メッセージ／ステータス）が未確定のため、
-     * ここでは「例外がスローされる」または「2xx以外を返す」のいずれかで判定している。
-     * 返し方が決まったら、その形に合わせて書き直すこと。
+     * ACCOMMODATION_TAX-539 で「400 + メッセージ本文」を返す形に確定した。
      */
-    private void assertUnselectedIsError(List<Integer> selectedIndexes) {
-        ResponseEntity<byte[]> response = null;
-        Throwable thrown = null;
-        try {
-            response = controller.download(selectedIndexes);
-        } catch (Throwable t) {
-            thrown = t;
-        }
+    private void assertUnselectedIsError(List<Integer> selectedIndexes) throws IOException {
+        ResponseEntity<byte[]> response = controller.download(selectedIndexes);
 
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(new String(response.getBody(), StandardCharsets.UTF_8))
+                .isEqualTo("出力対象が選択されていません。");
         verify(sofusakiCsvService, never()).findAll();
         verify(sofusakiCsvService, never()).toCsvString(anyList());
-
-        assertThat(thrown != null || !response.getStatusCode().is2xxSuccessful())
-                .as("未選択でのダウンロードはエラーとなること")
-                .isTrue();
     }
 
     // ------------------------------------------------------------------
