@@ -42,12 +42,7 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
         // 自治体情報をDBから取得
         Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
         String cityName = jichitai != null ? jichitai.getName() : "";
-        // 条項を含む条例文は自治体ごとに異なるため設定値を優先し、
-        // 未設定の場合のみ従来どおり自治体名からの組み立てにフォールバックする
         String jorei = reportsCommonService.getReportsDefText(ReportsConstants.NOZEI_KANRININ_SHONIN_JOREI);
-        if (jorei == null || jorei.isEmpty()) {
-            jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
-        }
 
         NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
         dto.setShiteiNo(shiteiNo);
@@ -88,16 +83,5 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
         return dto;
     }
 
-    /**
-     * 郵便番号と住所を連結してフォーマット
-     */
-    private String buildAddress(String yubinNo, String jusho) {
-        if (yubinNo != null && !yubinNo.isEmpty() && jusho != null && !jusho.isEmpty()) {
-            return "〒" + yubinNo + " " + jusho;
-        } else if (jusho != null && !jusho.isEmpty()) {
-            return jusho;
-        } else {
-            return "";
-        }
-    }
+
 }

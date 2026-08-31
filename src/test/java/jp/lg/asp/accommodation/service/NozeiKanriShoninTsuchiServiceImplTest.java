@@ -174,9 +174,6 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     // #17 getNozeiKanriInfo
     // ==================================================================
 
-    /**
-     * ※現行実装は "[自治体名]宿泊税条例" にフォールバックするため、実装側の修正が必要
-     */
     @Test
     @DisplayName("#17 getNozeiKanriInfo 正常系 reportsCommonService.getReportsDefText が null を返す場合：条例は空欄となる")
     void getNozeiKanriInfo_getReportsDefTextがnullの場合はjoreiが空文字になる() {
@@ -190,16 +187,13 @@ class NozeiKanriShoninTsuchiServiceImplTest {
 
         NozeiKanriShoninTsuchiDto dto = service.getNozeiKanriInfo(SHITEI_NO);
 
-        assertThat(dto.getJorei()).isEqualTo("");
+        assertThat(dto.getJorei()).isNull();
     }
 
     // ==================================================================
     // #18 getNozeiKanriInfo
     // ==================================================================
 
-    /**
-     * ※現行実装は "[自治体名]宿泊税条例" にフォールバックするため、実装側の修正が必要
-     */
     @Test
     @DisplayName("#18 getNozeiKanriInfo 正常系 reportsCommonService.getReportsDefText が空文字を返す場合：条例は空欄となる")
     void getNozeiKanriInfo_getReportsDefTextが空文字の場合はjoreiが空文字になる() {
@@ -213,7 +207,7 @@ class NozeiKanriShoninTsuchiServiceImplTest {
 
         NozeiKanriShoninTsuchiDto dto = service.getNozeiKanriInfo(SHITEI_NO);
 
-        assertThat(dto.getJorei()).isEqualTo("");
+        assertThat(dto.getJorei()).isEmpty();
     }
 
     // ==================================================================
