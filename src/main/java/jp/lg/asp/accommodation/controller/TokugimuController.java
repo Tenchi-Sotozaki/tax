@@ -232,14 +232,18 @@ public class TokugimuController {
 	public String showReport(HttpSession session, Model model) {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		String id = getShiteiNoFromSession(session);
-		if (id == null) {
+		String gassanId = SessionHelper.getGassanShiteiNo(session);
+		if (id == null && gassanId == null) {
 			return showSelectModalOnReport(model);
 		}
-		TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
-		storeSelectedShiteiGassan(session, id, form);
-		model.addAttribute("shiteiNo", id);
-		model.addAttribute("tokugimuName", form.getName());
-		model.addAttribute("shisetsuName", form.getFacilityName());
+		if (id != null) {
+			TokugimuForm form = tokugimuService.getTokugimuByShiteiNo(id);
+			storeSelectedShiteiGassan(session, id, form);
+			model.addAttribute("shiteiNo", id);
+		} else {
+			// 合算指定番号のみ選択されている場合
+			model.addAttribute("shiteiNo", gassanId);
+		}
 		return REPORT_VIEW;
 	}
 
@@ -254,6 +258,30 @@ public class TokugimuController {
 			return "redirect:/tokugimu/report";
 		}
 		return "redirect:/reports/gassanNonyuTsuchi";
+	}
+
+	@GetMapping("/report/tokugimuShiteiTsuchi")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "特別徴収義務者指定通知書")
+	public String showTokugimuShiteiTsuchiReport(HttpSession session, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected != null && selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。指定通知書は合算申告対象外の特別徴収義務者を指定してください。");
+			return "redirect:/tokugimu/report";
+		}
+		return "redirect:/reports/tokugimuShiteiTsuchi";
+	}
+
+	@GetMapping("/report/tokugimuJuriTsuchi")
+	@OpeLog(screenId = TOKUGIMU_CONFIG, operation = "特別徴収義務者申請受理通知書")
+	public String showTokugimuJuriTsuchiReport(HttpSession session, RedirectAttributes redirectAttributes) {
+		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		if (selected != null && selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。受理通知書は合算申告対象外の特別徴収義務者を指定してください。");
+			return "redirect:/tokugimu/report";
+		}
+		return "redirect:/reports/tokugimuJuriTsuchi";
 	}
 
 	// ========== 削除 ==========

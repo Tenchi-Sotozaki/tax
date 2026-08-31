@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -1181,10 +1180,11 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 
 	private long getKenZeigaku(Long shukuhakuRyokin, String taishoYm) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		Optional<ZeiritsuTeigaku> teigakuOp = zeiritsuTeigakuRepository
+		return zeiritsuTeigakuRepository
 				.findActiveByTaishoKbnAndTekiyoYmAndRyokin(jichitaiCd, ZeiritsuConstants.KEN.getValue(), taishoYm,
-						shukuhakuRyokin);
-		return teigakuOp.map(ZeiritsuTeigaku::getZeigaku).orElse(0L);
+						shukuhakuRyokin)
+				.stream().findFirst()
+				.map(ZeiritsuTeigaku::getZeigaku).orElse(0L);
 	}
 
 	private String toNendo(String taishoYm) {
@@ -1279,21 +1279,6 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 	private String convertKyokaShu(String raw) {
 		return switch (raw) {
 		case "1" -> "1"; // 旅館・ホテル営業 → ホテル
-		case "2" -> "3"; // 簡易宿所営業 → 簡易宿所
-		case "3", "4" -> "4"; // 下宿営業・その他 → 民泊
-		default -> raw;
-		};
-	}
-
-	/**
-	 * 申請区分変換：eLTAX値 → 区分名称
-	 * 
-	 * @param raw eLTAX値
-	 * @return 区分名称 
-	 */
-	private String convertShinseiKbn(String raw) {
-		return switch (raw) {
-		case "1" -> "1";
 		case "2" -> "3"; // 簡易宿所営業 → 簡易宿所
 		case "3", "4" -> "4"; // 下宿営業・その他 → 民泊
 		default -> raw;

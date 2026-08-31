@@ -58,6 +58,13 @@ public class KofuRitsuConfigServiceImpl implements KofuRitsuConfigService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public boolean existsByTekiyoStNendo(String nendo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		return kofuRitsuRepository.countByJichitaiCdAndTekiyoStNendo(jichitaiCd, nendo) > 0;
+	}
+
+	@Override
 	@Transactional
 	public void register(KofuRitsuConfigDto dto) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();

@@ -45,6 +45,7 @@ class GassanControllerTest {
         MockHttpSession session = new MockHttpSession();
         ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
         dto.setGassanShiteiNo(gassanShiteiNo);
+        dto.setShiteiNo("S001");
         SessionHelper.saveShiteiGassan(session, dto);
         return session;
     }
@@ -146,10 +147,11 @@ class GassanControllerTest {
     void select_セッションに保存してリダイレクト() {
         MockHttpSession session = new MockHttpSession();
 
-        String view = controller.select("G001", "山田太郎", "ホテルABC", session);
+        String view = controller.select("G001", "S001", "山田太郎", "ホテルABC", session);
 
         assertThat(view).isEqualTo("redirect:/gassan/view-form");
         assertThat(SessionHelper.getGassanShiteiNo(session)).isEqualTo("G001");
+        assertThat(SessionHelper.getShiteiGassan(session).getShiteiNo()).isEqualTo("S001");
         assertThat(SessionHelper.getShiteiGassan(session).getName()).isEqualTo("山田太郎");
         assertThat(SessionHelper.getShiteiGassan(session).getShisetsuName()).isEqualTo("ホテルABC");
     }

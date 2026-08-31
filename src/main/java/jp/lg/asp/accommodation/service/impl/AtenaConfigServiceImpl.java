@@ -30,34 +30,40 @@ public class AtenaConfigServiceImpl implements AtenaConfigService {
                 .orElseThrow(() -> new ResourceNotFoundException("宛名が見つかりません。"));
     }
 
-    @Override
-    @Transactional
     public Atena register(Atena atena, String jichitaiCd) {
+        // 自治体存在チェック
         Jichitai jichitai = jichitaiRepository.findById(jichitaiCd)
                 .orElseThrow(() -> new ResourceNotFoundException("自治体情報が見つかりません。"));
 
-        if (atena.getKojinNo() != null && !atena.getKojinNo().isBlank()) {
-            String hashed = hashUtil.sha256(atena.getKojinNo());
-            if (atenaRepository.existsByKojinNo(jichitaiCd, hashed, null)) {
+        // 個人番号の重複チェック & ハッシュ化
+        if (atena.getKojinNo() != null && !atena.getKojinNo().isEmpty()) {
+            String hashedKojinNo = hashUtil.sha256(atena.getKojinNo());
+            if (atenaRepository.existsByKojinNo(jichitaiCd, hashedKojinNo, null)) {
                 throw new BusinessException("DUPLICATE_KOJIN_NO", "この個人番号はすでに登録されています。");
             }
-            atena.setKojinNo(hashed);
+            atena.setKojinNo(hashedKojinNo);
             atena.setKbn("1");
-        } else {
-            if (atena.getHojinNo() != null && !atena.getHojinNo().isBlank()
-                    && atenaRepository.existsByHojinNo(jichitaiCd, atena.getHojinNo(), null)) {
+        } 
+        // 法人の重複チェックを追加
+        else if (atena.getHojinNo() != null && !atena.getHojinNo().isEmpty()) {
+            if (atenaRepository.existsByHojinNo(jichitaiCd, atena.getHojinNo(), null)) {
                 throw new BusinessException("DUPLICATE_HOJIN_NO", "この法人番号はすでに登録されています。");
             }
             atena.setKbn("2");
         }
 
-        BigDecimal maxNo = atenaRepository.findMaxAtenaNoByJichitaiCd(jichitaiCd).orElse(null);
-        BigDecimal nextNo = maxNo != null
-                ? maxNo.add(BigDecimal.ONE)
-                : (jichitai.getAtenaStNo() != null ? jichitai.getAtenaStNo() : BigDecimal.ONE);
+        // 採番処理などの後続ロジック...
+        BigDecimal atenaNo = atenaRepository.findMaxAtenaNoByJichitaiCd(jichitaiCd)
+                .map(max -> max.add(BigDecimal.ONE))
+                .orElseGet(() -> {
+                    if (jichitai.getAtenaStNo() == null) {
+                        throw new BusinessException("DUPLICATE_ATENAST_NO", "宛名の開始番号が設定されていません。管理者にお問い合わせください。");
+                    }
+                    return jichitai.getAtenaStNo();
+                });
 
         atena.setJichitaiCd(jichitaiCd);
-        atena.setAtenaNo(nextNo);
+        atena.setAtenaNo(atenaNo);
 
         return atenaRepository.save(atena);
     }
@@ -72,16 +78,21 @@ public class AtenaConfigServiceImpl implements AtenaConfigService {
                 .orElseThrow(() -> new ResourceNotFoundException("宛名が見つかりません。"));
 
         atena.setJichitaiCd(jichitaiCd);
-        if (atena.getKojinNo() != null && !atena.getKojinNo().isBlank()) {
-            String hashed = hashUtil.sha256(atena.getKojinNo());
+
+        String kojinNo = atena.getKojinNo();
+        boolean hasKojinNo = (kojinNo != null) && (!kojinNo.isBlank());
+
+        if (hasKojinNo) {
+            String hashed = hashUtil.sha256(kojinNo);
             if (atenaRepository.existsByKojinNo(jichitaiCd, hashed, atena.getAtenaNo())) {
                 throw new BusinessException("DUPLICATE_KOJIN_NO", "この個人番号はすでに登録されています。");
             }
             atena.setKojinNo(hashed);
             atena.setKbn("1");
         } else {
-            if (atena.getHojinNo() != null && !atena.getHojinNo().isBlank()
-                    && atenaRepository.existsByHojinNo(jichitaiCd, atena.getHojinNo(), atena.getAtenaNo())) {
+            String hojinNo = atena.getHojinNo();
+            boolean hasHojinNo = (hojinNo != null) && (!hojinNo.isBlank());
+            if (hasHojinNo && atenaRepository.existsByKojinNo(jichitaiCd, hojinNo, atena.getAtenaNo())) {
                 throw new BusinessException("DUPLICATE_HOJIN_NO", "この法人番号はすでに登録されています。");
             }
             atena.setKojinNo(existing.getKojinNo());

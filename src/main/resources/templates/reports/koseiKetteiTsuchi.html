@@ -33,7 +33,7 @@
 						<input type="hidden" name="shiteiNo" th:value="${selectedShiteiGassan?.shiteiNo}" />
 					
 						<!-- 特別徴収義務者情報エリア -->
-						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+						<div th:replace="~{layout/components :: selectedTokugimuInfo(true)}"></div>
 
 						<!-- 内容エリア -->
 						<div class="card mb-4">
