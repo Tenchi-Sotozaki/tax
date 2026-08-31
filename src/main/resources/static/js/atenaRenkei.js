@@ -40,6 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
             showDetail(this.dataset.seq, this.dataset.fileName);
         });
     });
+	
+    const fileInput = document.getElementById('file');
+    if (fileInput) {
+        fileInput.addEventListener('change', clearFileError);
+    }
 });
 
 /**
@@ -85,11 +90,12 @@ function clearAlert() {
  */
 async function analyze() {
     // 前回のエラーメッセージが残らないようにする
+    clearFileError();
     clearAlert();
 
     const fileInput = document.getElementById('file');
     if (!fileInput || !fileInput.files.length) {
-        showAlert('danger', 'ファイルを選択してください。');
+        showFileError('ファイルを選択してください。');
         return;
     }
 
@@ -108,7 +114,7 @@ async function analyze() {
 
         const body = await res.json();
         if (!res.ok) {
-            showAlert('danger', body.message || '取込内容の確認に失敗しました。');
+            showFileError(body.message || '取込内容の確認に失敗しました。');
             return;
         }
 
@@ -122,7 +128,7 @@ async function analyze() {
         renderSabunModal(body);
     } catch (err) {
         console.error(err);
-        showAlert('danger', '取込内容の確認に失敗しました。');
+        showFileError('取込内容の確認に失敗しました。');
     } finally {
         btn.disabled = false;
     }
@@ -358,5 +364,33 @@ function kbnLabel(kbn) {
         case '2': return '取込';
         case '3': return 'スキップ';
         default: return '';
+    }
+}
+
+/**
+ * ファイル選択エリアのエラー表示を制御する
+ */
+function showFileError(message) {
+    const fileInput = document.getElementById('file');
+    const errorText = document.getElementById('fileErrorText');
+
+    if (fileInput) fileInput.classList.add('is-invalid');
+    if (errorText) {
+        errorText.textContent = message;
+        errorText.classList.remove('d-none');
+    }
+}
+
+/**
+ * ファイル選択エリアのエラー表示をクリアする
+ */
+function clearFileError() {
+    const fileInput = document.getElementById('file');
+    const errorText = document.getElementById('fileErrorText');
+
+    if (fileInput) fileInput.classList.remove('is-invalid');
+    if (errorText) {
+        errorText.textContent = '';
+        errorText.classList.add('d-none');
     }
 }
