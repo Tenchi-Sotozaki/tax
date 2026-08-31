@@ -132,6 +132,8 @@ class FukaControllerTest {
     @Test
     void showEdit_未申告はリダイレクト() {
         MockHttpSession session = sessionWith("00100001");
+        when(fukaService.getNendoStMonth()).thenReturn(4);
+        when(fukaService.resolveGassanTekiyoPeriod(eq("00100001"), any())).thenReturn(null);
         when(fukaService.isAlreadyRegisteredByKibetsu("00100001", "2024", 1)).thenReturn(false);
 
         String view = controller.showEdit("2024", 1, session,
@@ -143,6 +145,8 @@ class FukaControllerTest {
     @Test
     void showEdit_申告済みは編集画面を返す() {
         MockHttpSession session = sessionWith("00100001");
+        when(fukaService.getNendoStMonth()).thenReturn(4);
+        when(fukaService.resolveGassanTekiyoPeriod(eq("00100001"), any())).thenReturn(null);
         when(fukaService.isAlreadyRegisteredByKibetsu("00100001", "2024", 1)).thenReturn(true);
         FukaDeclarationForm form = new FukaDeclarationForm();
         when(fukaService.getDeclarationFormForEdit("00100001", "2024", 1)).thenReturn(form);

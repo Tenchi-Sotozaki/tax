@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.EltaxRenkeiDto;
@@ -48,7 +50,7 @@ class EltaxRenkeiServiceImplTest {
 
     @Test
     void findAll_returnsMappedDtos() {
-        when(eltaxRenkeiRepository.findByJichitaiCd(JICHITAI_CD))
+        when(eltaxRenkeiRepository.findByJichitaiCd(JICHITAI_CD, PageRequest.of(0, 1000)))
                 .thenReturn(List.of(buildEntity(BigDecimal.ONE)));
 
         List<EltaxRenkeiDto> result = service.findAll();
@@ -60,7 +62,7 @@ class EltaxRenkeiServiceImplTest {
 
     @Test
     void findAll_empty_returnsEmptyList() {
-        when(eltaxRenkeiRepository.findByJichitaiCd(JICHITAI_CD)).thenReturn(List.of());
+        when(eltaxRenkeiRepository.findByJichitaiCd(JICHITAI_CD, PageRequest.of(0, 1000))).thenReturn(List.of());
 
         assertThat(service.findAll()).isEmpty();
     }

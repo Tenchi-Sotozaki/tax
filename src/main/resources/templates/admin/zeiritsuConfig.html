@@ -90,7 +90,7 @@
 								</div>
 							</div>
 							<div class="text-danger small mt-1"
-								th:if="${#fields.hasErrors('taishoKbn')}"
+								th:if="${!isEdYmOnlyEditable and #fields.hasErrors('taishoKbn')}"
 								th:errors="*{taishoKbn}"></div>
 						</div>
 
@@ -117,7 +117,7 @@
 								</div>
 							</div>
 							<div class="text-danger small mt-1"
-								th:if="${#fields.hasErrors('fukaKbn')}" th:errors="*{fukaKbn}"></div>
+								th:if="${!isEdYmOnlyEditable and #fields.hasErrors('fukaKbn')}" th:errors="*{fukaKbn}"></div>
 						</div>
 
 						<!-- 適用開始年月・適用終了年月 -->
@@ -129,12 +129,12 @@
 										th:unless="${isView or (isEdit and !isHeaderEditable)}">*</span>
 									</label> <input type="month" id="tekiyoStYm" name="tekiyoStYmDisplay"
 										class="form-control"
-										th:classappend="(${#fields.hasErrors('tekiyoEdYm')} ? 'is-invalid' : '') + (${isView or (isEdit and !isHeaderEditable)} ? ' form-control-readonly' : '')"
+										th:classappend="(${!isEdYmOnlyEditable and #fields.hasErrors('tekiyoStYm')} ? 'is-invalid' : '') + (${isView or (isEdit and !isHeaderEditable)} ? ' form-control-readonly' : '')"
 										th:readonly="${isView or (isEdit and !isHeaderEditable)}"
 										th:data-initial-value="*{tekiyoStYm}"> <input
 										type="hidden" th:field="*{tekiyoStYm}" id="tekiyoStYmHidden">
 									<div class="invalid-feedback"
-										th:if="${#fields.hasErrors('tekiyoStYm')}">
+										th:if="${!isEdYmOnlyEditable and #fields.hasErrors('tekiyoStYm')}">
 										<div th:each="error : ${#fields.errors('tekiyoStYm')}"
 											th:text="${error}"></div>
 									</div>
@@ -144,14 +144,18 @@
 										<small class="text-muted">(省略可)</small>
 									</label> <input type="month" id="tekiyoEdYm" name="tekiyoEdYmDisplay"
 										class="form-control"
-										th:classappend="(${#fields.hasErrors('tekiyoEdYm')} ? 'is-invalid' : '') + (${isView} ? ' form-control-readonly' : '')"
-										th:readonly="${isView}" th:data-initial-value="*{tekiyoEdYm}">
+										th:classappend="(${(isEdYmOnlyEditable and tekiyoEdYmErrors != null and !tekiyoEdYmErrors.isEmpty()) or (!isEdYmOnlyEditable and #fields.hasErrors('tekiyoEdYm'))} ? 'is-invalid' : '') + (${isView or (isEdit and !isEdYmOnlyEditable and !isHeaderEditable)} ? ' form-control-readonly' : '')"
+										th:readonly="${isView or (isEdit and !isEdYmOnlyEditable and !isHeaderEditable)}" th:data-initial-value="*{tekiyoEdYm}">
 									<input type="hidden" th:field="*{tekiyoEdYm}"
 										id="tekiyoEdYmHidden">
 									<div class="invalid-feedback"
-										th:if="${#fields.hasErrors('tekiyoEdYm')}">
+										th:if="${!isEdYmOnlyEditable and #fields.hasErrors('tekiyoEdYm')}">
 										<div th:each="error : ${#fields.errors('tekiyoEdYm')}"
 											th:text="${error}"></div>
+									</div>
+									<div class="invalid-feedback"
+										th:if="${isEdYmOnlyEditable and tekiyoEdYmErrors != null}">
+										<div th:each="error : ${tekiyoEdYmErrors}" th:text="${error}"></div>
 									</div>
 								</div>
 							</div>
@@ -192,7 +196,7 @@
 										th:classappend="${isView or !isDetailEditable} ? ' form-control-readonly' : ''">
 
 										<div class="text-danger small"
-											th:if="${#fields.hasErrors('details[0].zeiValue')}"
+											th:if="${!isEdYmOnlyEditable and #fields.hasErrors('details[0].zeiValue')}"
 											th:errors="*{details[0].zeiValue}"></div></td>
 									<td class="condition-cell">
 										<div class="teigaku-condition">
@@ -215,7 +219,7 @@
 											</div>
 
 											<div class="text-danger small"
-												th:if="${#fields.hasErrors('details[0].ryokinSt')}"
+												th:if="${!isEdYmOnlyEditable and #fields.hasErrors('details[0].ryokinSt')}"
 												th:errors="*{details[0].ryokinSt}"></div>
 										</div>
 										<div class="teiritsu-condition" style="display: none;">
@@ -259,7 +263,7 @@
 											</div>
 
 											<div class="text-danger small"
-												th:if="${#fields.hasErrors('details[1].ryokinSt')}"
+												th:if="${!isEdYmOnlyEditable and #fields.hasErrors('details[1].ryokinSt')}"
 												th:errors="*{details[1].ryokinSt}"></div>
 										</div>
 
@@ -304,7 +308,7 @@
 											</div>
 
 											<div class="text-danger small"
-												th:if="${#fields.hasErrors('details[2].ryokinSt')}"
+												th:if="${!isEdYmOnlyEditable and #fields.hasErrors('details[2].ryokinSt')}"
 												th:errors="*{details[2].ryokinSt}"></div>
 										</div>
 
@@ -348,7 +352,7 @@
 											</div>
 
 											<div class="text-danger small"
-												th:if="${#fields.hasErrors('details[3].ryokinSt')}"
+												th:if="${!isEdYmOnlyEditable and #fields.hasErrors('details[3].ryokinSt')}"
 												th:errors="*{details[3].ryokinSt}"></div>
 										</div>
 
@@ -392,7 +396,7 @@
 											</div>
 
 											<div class="text-danger small"
-												th:if="${#fields.hasErrors('details[4].ryokinSt')}"
+												th:if="${!isEdYmOnlyEditable and #fields.hasErrors('details[4].ryokinSt')}"
 												th:errors="*{details[4].ryokinSt}"></div>
 										</div>
 
@@ -419,10 +423,10 @@
 				<a th:if="${isView}" th:href="@{/admin/zeiritsu/list}"
 					class="btn btn-outline-secondary px-4"> <i
 					class="bi bi-arrow-left me-2"></i>一覧に戻る
-				</a> <a th:if="${isEdit}" th:href="#"
+				</a> <a th:if="${isEdit}" href="#"
 					class="btn btn-outline-secondary px-4" data-bs-toggle="modal"
-					data-bs-target="#backConfirmModal"> <i
-					class="bi bi-arrow-left me-2"></i>一覧に戻る
+					data-bs-target="#editBackConfirmModal"> <i
+					class="bi bi-arrow-left me-2"></i>戻る
 				</a> <a th:unless="${isView or isEdit}" href="#" data-bs-toggle="modal"
 					data-bs-target="#backConfirmModal"
 					class="btn btn-outline-secondary px-4"> <i
@@ -447,9 +451,13 @@
 			</div>
 		</form>
 
-		<!-- 戻る確認モーダル -->
+		<!-- 戻る確認モーダル(登録) -->
 		<div
 			th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/zeiritsu/list}, '戻る')}"></div>
+
+		<!-- 戻る確認モーダル(編集) -->
+		<div th:if="${isEdit}"
+			th:replace="~{layout/components :: linkConfirmModal('editBackConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/zeiritsu/view/{seq}(seq=${seq})}, '戻る')}"></div>
 
 		<!-- 削除フォーム（隠し） -->
 		<form th:if="${isEdit}" id="deleteZeiritsuForm"
