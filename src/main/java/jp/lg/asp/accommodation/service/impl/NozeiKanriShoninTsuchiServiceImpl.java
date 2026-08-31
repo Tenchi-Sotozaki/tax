@@ -7,6 +7,7 @@ import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanriShoninTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.Nokan;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
@@ -60,28 +61,34 @@ public class NozeiKanriShoninTsuchiServiceImpl implements NozeiKanriShoninTsuchi
                 .orElseThrow(() -> new RuntimeException("宛名情報が見つかりません: " + tokugimu.getAtenaNo()));
 
         // 特別徴収義務者郵便番号・住所・名前を設定
-        dto.setTokuYubin("〒"+atena.getYubinNo());
+        dto.setTokuYubin(formatYubin(atena.getYubinNo()));
         dto.setTokuJusho(atena.getJusho());
         dto.setTokuName(atena.getName());
 
         // 施設郵便番号・住所・名前を設定
-        dto.setShisetsuYubin("〒"+tokugimu.getShisetsuYubinNo());
+        dto.setShisetsuYubin(formatYubin(tokugimu.getShisetsuYubinNo()));
         dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
         dto.setShisetsuName(tokugimu.getShisetsuName());
 
         // 納税管理人情報を取得
-		nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-				.ifPresent(nokan -> {
-					dto.setNozeiKanriYubin("〒"+nokan.getYubinNo());
-					dto.setNozeiKanriJusho(nokan.getJusho());
-					dto.setNozeiKanriName(nokan.getName());
-					dto.setKbn(nokan.getKbn());
-					dto.setRiyu(nokan.getRiyu());
-				});
+        // 納税管理人が未登録では通知書を作成できないため、読み飛ばさず例外とする
+        Nokan nokan = nokanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
+                .orElseThrow(() -> new RuntimeException("納税管理人が見つかりません: " + shiteiNo));
+
+        dto.setNozeiKanriYubin(formatYubin(nokan.getYubinNo()));
+        dto.setNozeiKanriJusho(nokan.getJusho());
+        dto.setNozeiKanriName(nokan.getName());
+        dto.setKbn(nokan.getKbn());
+        dto.setRiyu(nokan.getRiyu());
 
         log.debug("納税管理人承認通知書情報取得完了: {}", dto);
         return dto;
     }
 
-
+    /**
+     * 郵便番号を「〒1234567」形式に整形する。未登録の場合は空文字を返す。
+     */
+    private String formatYubin(String yubinNo) {
+        return yubinNo != null && !yubinNo.isEmpty() ? "〒" + yubinNo : "";
+    }
 }
