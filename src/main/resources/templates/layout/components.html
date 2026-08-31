@@ -39,10 +39,6 @@
 					<p class="mb-0" th:text="${message}">よろしいですか？</p>
 				</div>
 				<div class="modal-footer justify-content-center">
-					<button type="button" class="btn btn-outline-secondary"
-						data-bs-dismiss="modal">
-						<i class="bi bi-x-lg me-1"></i>キャンセル
-					</button>
 					<button type="button" class="btn" th:classappend="${btnClass}"
 						th:data-form-id="${formId}"
 						onclick="
@@ -55,8 +51,11 @@
 							}
 						">
 						<i
-							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>
-						<span th:text="${btnLabel}">実行</span>
+							th:class="${btnClass == 'btn-danger'} ? 'bi bi-trash me-1' : 'bi bi-check-lg me-1'"></i>はい
+					</button>
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>いいえ
 					</button>
 				</div>
 			</div>
@@ -95,14 +94,13 @@
 					<p class="mb-0" th:text="${message}">よろしいですか？</p>
 				</div>
 				<div class="modal-footer justify-content-center">
+					<a class="btn btn-primary" th:href="${href}">
+						<i class="bi bi-check-lg me-1"></i>はい
+					</a>
 					<button type="button" class="btn btn-outline-secondary"
 						data-bs-dismiss="modal">
-						<i class="bi bi-x-lg me-1"></i>キャンセル
+						<i class="bi bi-x-lg me-1"></i>いいえ
 					</button>
-					<a class="btn btn-primary" th:href="${href}">
-						<i class="bi bi-check-lg me-1"></i>
-						<span th:text="${btnLabel}">実行</span>
-					</a>
 				</div>
 			</div>
 		</div>
@@ -186,7 +184,7 @@
 					</div>
 					<div class="d-flex justify-content-end mb-3">
 						<button type="button" id="addrSearchBtn"
-							class="btn btn-primary btn-sm px-4">
+							class="btn btn-primary px-4">
 							<i class="bi bi-search me-1"></i>検索
 						</button>
 					</div>
@@ -196,7 +194,7 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-outline-secondary btn-sm px-4"
+					<button type="button" class="btn btn-outline-secondary px-4"
 						data-bs-dismiss="modal">
 						<i class="bi bi-x-lg me-1"></i>閉じる
 					</button>
@@ -206,11 +204,52 @@
 	</div>
 
 	<!--
-  特別徴収義務者情報表示 フラグメント（セッションから取得）
+  エラー通知モーダル フラグメント
+  引数:
+    modalId - モーダルのHTML id属性値
+    title   - モーダルのタイトル
+    message - モーダルの本文メッセージ
+
   使用例:
-    <div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
+    <div th:replace="~{layout/components :: errorModal('hankakuErrorModal','入力エラー','半角数字で入力してください')}"></div>
 -->
-	<div th:fragment="selectedTokugimuInfo"
+	<div
+		th:fragment="errorModal(modalId, title, message)"
+		class="modal fade" th:id="${modalId}" tabindex="-1"
+		data-bs-backdrop="static" data-bs-keyboard="false"
+		th:aria-labelledby="${modalId + 'Label'}" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content shadow">
+				<div class="modal-header bg-primary text-white">
+					<h5 class="modal-title" th:id="${modalId + 'Label'}">
+						<i class="bi bi-exclamation-triangle me-2"></i>
+						<span th:text="${title}">エラー</span>
+					</h5>
+					<button type="button" class="btn-close btn-close-white"
+						data-bs-dismiss="modal" aria-label="閉じる"></button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-0" th:text="${message}">エラーが発生しました。</p>
+				</div>
+				<div class="modal-footer justify-content-center">
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">
+						<i class="bi bi-x-lg me-1"></i>閉じる
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<!--
+  特別徴収義務者情報表示 フラグメント（セッションから取得）
+  引数:
+    showButton - 特別徴収義務者指定ボタンを表示するか（照会時: true, 編集時: false）
+  使用例:
+    <div th:replace="~{layout/components :: selectedTokugimuInfo(${isView})}"></div>
+-->
+	<div th:fragment="selectedTokugimuInfo(showButton)"
 		class="mt-2 mb-2 ps-3 d-flex align-items-center">
 		<span class="fw-semibold flex-shrink-0">指定番号：</span>
 		<span class="tokugimu-info-value me-4"
@@ -230,7 +269,7 @@
 			data-bs-toggle="tooltip" data-bs-placement="bottom"
 			th:attr="title=${selectedShiteiGassan?.shisetsuName}"
 			th:text="${selectedShiteiGassan?.shisetsuName}"></span>
-		<button type="button" class="btn btn-outline-primary btn-sm flex-shrink-0"
+		<button th:if="${showButton}" type="button" class="btn btn-outline-primary flex-shrink-0"
 			data-bs-toggle="modal" data-bs-target="#shiteiGassanSearchModal">
 			<i class="bi bi-search me-1"></i>特別徴収義務者指定
 		</button>
@@ -344,7 +383,7 @@
 					</div>
 					<div class="d-flex justify-content-end mb-3">
 						<button type="button" id="sgSearchBtn"
-							class="btn btn-primary btn-sm px-4">
+							class="btn btn-primary px-4">
 							<i class="bi bi-search me-1"></i>検索する
 						</button>
 					</div>

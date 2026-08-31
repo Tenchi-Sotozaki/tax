@@ -3,6 +3,11 @@ package jp.lg.asp.accommodation.controller;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -92,6 +97,77 @@ class ShoreikinConfigControllerTest {
         String view = controller.calculate(form, model);
 
         assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+    }
+
+    @Test
+    void calculate_交付率が取得できない場合は交付率をクリアする() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setMode("edit");
+        form.setKofuRitsu(new BigDecimal("10.00"));
+        when(shoreikinConfigService.calculateShoreikin(form))
+                .thenThrow(new IllegalStateException("交付率が設定されていません。交付率設定画面で登録してください。"));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.calculate(form, model);
+
+        assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+        // 交付率が null であることが、テンプレートが誘導モーダルを描画する条件
+        assertThat(form.getKofuRitsu()).isNull();
+        assertThat(model.asMap()).containsEntry("configForm", form);
+        // 文言はモーダル側に持たせているため、上部の alert は出さない
+        assertThat(model.asMap()).doesNotContainKey("errorMessage");
+    }
+
+    @Test
+    void calculate_想定外の例外は従来どおり画面上部にエラーを出す() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setKofuRitsu(new BigDecimal("10.00"));
+        when(shoreikinConfigService.calculateShoreikin(form))
+                .thenThrow(new RuntimeException("DB接続エラー"));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.calculate(form, model);
+
+        assertThat(view).isEqualTo("shoreikin/shoreikinConfig");
+        // 交付率はクリアしない（誘導モーダルの対象ではない）
+        assertThat(form.getKofuRitsu()).isEqualByComparingTo("10.00");
+        assertThat(model.asMap()).containsKey("errorMessage");
+    }
+
+    @Test
+    void create_主キー重複はSQLの文面を出さず利用者向けメッセージにする() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setShiteiNo("00100007");
+        form.setNendo("2026");
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
+        doThrow(new DataIntegrityViolationException("t_shoreikin_pkey"))
+                .when(shoreikinConfigService).createShoreikin(form);
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String view = controller.create(form, bindingResult, new ExtendedModelMap(), redirectAttributes);
+
+        assertThat(view).isEqualTo("redirect:/shoreikin/list");
+        String message = (String) redirectAttributes.getFlashAttributes().get("errorMessage");
+        assertThat(message).isEqualTo("この年度の交付金情報は既に登録されています。一覧から対象を選び直してください。");
+        // 内部情報が画面に漏れないこと
+        assertThat(message).doesNotContain("insert into", "t_shoreikin_pkey", "Exception");
+    }
+
+    @Test
+    void update_更新に失敗したらSQLの文面を出さず利用者向けメッセージにする() {
+        ShoreikinConfigDto form = new ShoreikinConfigDto();
+        form.setShiteiNo("00100007");
+        form.setNendo("2026");
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "configForm");
+        doThrow(new OptimisticLockingFailureException("version"))
+                .when(shoreikinConfigService).updateShoreikin(form);
+        RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
+
+        String view = controller.update(form, bindingResult, new ExtendedModelMap(), redirectAttributes);
+
+        assertThat(view).isEqualTo("redirect:/shoreikin/list");
+        assertThat((String) redirectAttributes.getFlashAttributes().get("errorMessage"))
+                .isEqualTo("交付金情報の更新に失敗しました。時間をおいて再度お試しください。");
     }
 
     @Test

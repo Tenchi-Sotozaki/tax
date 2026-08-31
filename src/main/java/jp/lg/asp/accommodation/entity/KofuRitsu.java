@@ -39,7 +39,7 @@ public class KofuRitsu extends BaseEntity {
 	private BigDecimal saiteigaku;
 
 	@Column(name = "tekiyo_st_nendo")
-	private Integer tekiyoStNendo;
+	private String tekiyoStNendo;
 
 	@Column(name = "new_flg", length = 1)
 	private String newFlg;

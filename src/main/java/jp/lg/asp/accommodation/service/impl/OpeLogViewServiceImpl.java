@@ -35,11 +35,10 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 				form.getSousa(),
 				form.getOpeUser(),
 				form.getOpeDtFrom(),
-				form.getOpeDtTo(),
-				form.getParam());
+				form.getOpeDtTo());
 
 		// screen_id → screen_name マッピング用
-		List<Screen> screens = screenRepository.findByJichitaiCdOrderByScreenId(jichitaiCd);
+		List<Screen> screens = screenRepository.findAllByOrderByScreenIdAsc();
 
 		List<OpeLogViewDto> results = new ArrayList<>();
 		for (OperationLog log : logList) {
@@ -48,12 +47,8 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 			dto.setScreenId(log.getScreenId());
 			dto.setScreenName(resolveScreenName(screens, log.getScreenId()));
 			dto.setSousa(log.getSousa());
-			dto.setMethod(log.getMethod());
-			dto.setPath(log.getPath());
-			dto.setStatus(log.getStatus());
 			dto.setOpeUser(log.getOpeUser());
 			dto.setOpeDt(log.getOpeDt());
-			dto.setParam(log.getParam());
 			results.add(dto);
 		}
 		return results;
@@ -62,8 +57,7 @@ public class OpeLogViewServiceImpl implements OpeLogViewService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Screen> findAllScreens() {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return screenRepository.findByJichitaiCdOrderByScreenId(jichitaiCd);
+		return screenRepository.findAllByOrderByScreenIdAsc();
 	}
 
 	private String resolveScreenName(List<Screen> screens, String screenId) {
