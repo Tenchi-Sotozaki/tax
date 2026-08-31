@@ -5,9 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +37,7 @@ import jp.lg.asp.accommodation.repository.ShoyushaRepository;
 import jp.lg.asp.accommodation.repository.ShunoRirekiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TokugimuServiceImpl;
+import jp.lg.asp.accommodation.util.HashUtil;
 
 @ExtendWith(MockitoExtension.class)
 class TokugimuServiceImplTest {
@@ -54,6 +52,7 @@ class TokugimuServiceImplTest {
     @Mock FukaRepository fukaRepository;
     @Mock ShunoRirekiRepository shunoRirekiRepository;
     @Mock JichitaiContext jichitaiContext;
+    @Mock HashUtil hashUtil;
     @InjectMocks TokugimuServiceImpl service;
 
     private static final String JICHITAI_CD = "012345";
@@ -81,23 +80,6 @@ class TokugimuServiceImplTest {
         return a;
     }
 
-    private String sha256Hex(String value) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedhash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : encodedhash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Nested
     @DisplayName("search メソッドのテスト")
@@ -142,7 +124,8 @@ class TokugimuServiceImplTest {
             String rawKojinNo = "test_kojin_no_12345";
             form.setKojinNo(rawKojinNo);
 
-            String expectedHashedKojinNo = sha256Hex(rawKojinNo);
+            String expectedHashedKojinNo = "hashed_kojin_no";
+            when(hashUtil.sha256(rawKojinNo)).thenReturn(expectedHashedKojinNo);
             Tokugimu t = buildTokugimu(SHITEI_NO);
 
             when(tokugimuRepository.findBySearchConditions(
