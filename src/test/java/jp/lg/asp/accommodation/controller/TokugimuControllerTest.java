@@ -398,6 +398,7 @@ class TokugimuControllerTest {
         @DisplayName("境界値：セッションに指定番号が存在しない場合に、指定番号選択モーダルを開いた状態で帳票画面が返却されること")
         void boundary_noShiteiNo() {
             sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
+            sessionHelperMock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
 
             String viewName = tokugimuController.showReport(session, model);
 
