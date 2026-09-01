@@ -16,7 +16,7 @@ public interface FukaService {
 	/**
 	 * 納入金額管理台帳のデータを取得する。
 	 */
-	FukaDaichoForm getDaichoData(String shiteiNo, String nendo, String status);
+	FukaDaichoForm getDaichoData(String shiteiNo, String nendo);
 
 	/**
 	 * 新規登録用の初期表示データを取得する。
