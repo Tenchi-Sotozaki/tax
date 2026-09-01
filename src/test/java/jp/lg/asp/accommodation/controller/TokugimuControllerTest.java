@@ -432,7 +432,7 @@ class TokugimuControllerTest {
             String viewName = tokugimuController.showGassanReport(session, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("redirect:/tokugimu/report");
-            verify(redirectAttributes).addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
+            verify(redirectAttributes).addFlashAttribute("errorMessage", "合算指定番号を選択してください");
         }
     }
 
