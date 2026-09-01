@@ -1128,18 +1128,7 @@
 		<script th:src="@{/js/tFukaConfig.js}"></script>
 		<!-- 入れ子フィールドのエラー欄に赤枚を付ける -->
 		<script th:if="${errorFields != null and !errorFields.isEmpty()}" th:inline="javascript">
-			(function () {
-				const errorFields = /*[[${errorFields}]]*/ [];
-				errorFields.forEach(function (field) {
-					const el = document.querySelector('[name="' + field + '"]');
-					if (el) el.classList.add('is-invalid');
-				});
-				// 月計表モーダルを開く
-				if (errorFields.some(f => f.startsWith('monthlyTally.'))) {
-					const modal = document.getElementById('monthlyTallyModal');
-					if (modal) new bootstrap.Modal(modal).show();
-				}
-			})();
+			window._errorFields = /*[[${errorFields}]]*/ [];
 		</script>
 	</th:block>
 </body>
