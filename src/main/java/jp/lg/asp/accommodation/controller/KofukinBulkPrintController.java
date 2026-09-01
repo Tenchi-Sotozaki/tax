@@ -81,6 +81,17 @@ public class KofukinBulkPrintController {
 				byte[] errorBytes = "交付申請または交付決定通知のいずれかを選択してください。".getBytes(StandardCharsets.UTF_8);
 				return ResponseEntity.badRequest().body(errorBytes);
 			}
+			
+			if (form.getHakkoYmd() == null || form.getHakkoYmd().isEmpty()) {
+				byte[] errorBytes = "発行年月日は必須です。".getBytes(StandardCharsets.UTF_8);
+				return ResponseEntity.badRequest().body(errorBytes);
+			}
+			try {
+				LocalDate.parse(form.getHakkoYmd());
+			} catch (Exception e) {
+				byte[] errorBytes = "発行年月日の形式が不正です。".getBytes(StandardCharsets.UTF_8);
+				return ResponseEntity.badRequest().body(errorBytes);
+			}
 
 			List<KofuKetteiTsuchiShinseiDto> dtoList = kofuKetteiTsuchiShinseiService.getAllReportData(form.getNendo());
 			if (dtoList == null || dtoList.isEmpty()) {

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -162,6 +163,7 @@ class KofukinBulkPrintControllerTest {
 		@DisplayName("境界値：交付申請と交付決定通知の双方がfalseの場合に不正リクエスト（400）とエラーメッセージが返却されること")
 		void badRequest_whenBothFlagsAreFalse() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
+			form.setHakkoYmd("2026-04-01");
 			form.setKofuShinsei(false);
 			form.setKofuKetteiTsuchi(false);
 			Model model = new ConcurrentModel();
@@ -169,7 +171,7 @@ class KofukinBulkPrintControllerTest {
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
-			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+			assertThat(new String(response.getBody(), StandardCharsets.UTF_8))
 					.contains("交付申請または交付決定通知のいずれかを選択してください。");
 			verify(kofuKetteiTsuchiShinseiService, never()).getAllReportData(anyString());
 		}
@@ -178,18 +180,18 @@ class KofukinBulkPrintControllerTest {
 		@DisplayName("境界値：取得したレポートデータリストがnullの場合に不正リクエスト（400）とエラーメッセージが返却されること")
 		void badRequest_whenDtoListIsNull() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
+			form.setHakkoYmd("2026-04-01");
 			form.setNendo("2026");
 			form.setKofuShinsei(true);
-			form.setKofuKetteiTsuchi(true); // どちらもtrue、または要件に合わせて設定
+			form.setKofuKetteiTsuchi(true);
 			Model model = new ConcurrentModel();
 
-			// 引数をanyString()にして、どんなnendoが渡されてもnullを返すようにする
 			when(kofuKetteiTsuchiShinseiService.getAllReportData(anyString())).thenReturn(null);
 
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
-			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+			assertThat(new String(response.getBody(), StandardCharsets.UTF_8))
 					.contains("対象年度のデータが存在しません。");
 		}
 
@@ -197,47 +199,43 @@ class KofukinBulkPrintControllerTest {
 		@DisplayName("境界値：取得したレポートデータリストが空の場合に不正リクエスト（400）とエラーメッセージが返却されること")
 		void badRequest_whenDtoListIsEmpty() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
+			form.setHakkoYmd("2026-04-01");
 			form.setNendo("2026");
 			form.setKofuShinsei(true);
 			form.setKofuKetteiTsuchi(true);
 			Model model = new ConcurrentModel();
 
-			// 引数をanyString()にする
 			when(kofuKetteiTsuchiShinseiService.getAllReportData(anyString())).thenReturn(Collections.emptyList());
 
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
-			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+			assertThat(new String(response.getBody(), StandardCharsets.UTF_8))
 					.contains("対象年度のデータが存在しません。");
 		}
 
 		@Test
-		@DisplayName("境界値：発行年月日が不正なフォーマットやnull・空の場合にそのまま保持されてPDF生成が行われること")
-		void success_withInvalidOrNullHakkoYmd() {
+		@DisplayName("異常系：発行年月日が不正なフォーマットやnull・空の場合に400エラーが返却されること")
+		void error_withInvalidOrNullHakkoYmd() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
-			form.setHakkoYmd("invalid-date"); // パースエラーを起こす文字列
+			form.setHakkoYmd("invalid-date");
 			form.setNendo("2026");
 			form.setKofuShinsei(true);
 			form.setKofuKetteiTsuchi(true);
 			Model model = new ConcurrentModel();
 
-			List<KofuKetteiTsuchiShinseiDto> dtoList = List.of(new KofuKetteiTsuchiShinseiDto());
-			byte[] dummyPdf = new byte[] { 1, 2 };
-
-			when(kofuKetteiTsuchiShinseiService.getAllReportData("2026")).thenReturn(dtoList);
-			when(kofuKetteiTsuchiShinseiReportsService.generateBulkPdf(dtoList)).thenReturn(dummyPdf);
-
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
-			assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-			assertThat(dtoList.get(0).getHakkoYmd()).isEqualTo("invalid-date");
+			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
+			assertThat(new String(response.getBody(), StandardCharsets.UTF_8))
+					.contains("発行年月日の形式が不正です。");
 		}
 
 		@Test
 		@DisplayName("異常系：サービス処理中に例外が発生した場合に内部サーバーエラー（500）とエラーメッセージが返却されること")
 		void internalServerError_whenExceptionThrown() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
+			form.setHakkoYmd("2026-04-01");
 			form.setNendo("2026");
 			form.setKofuShinsei(true);
 			form.setKofuKetteiTsuchi(true);
@@ -249,7 +247,7 @@ class KofukinBulkPrintControllerTest {
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is5xxServerError()).isTrue();
-			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+			assertThat(new String(response.getBody(), StandardCharsets.UTF_8))
 					.contains("帳票一括発行処理でエラーが発生しました。");
 		}
 	}
