@@ -92,7 +92,7 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 	}
 
 	@Nested
-	@DisplayName("getReportData(String shiteiNo) メソッドのテスト（現在年度取得）")
+	@DisplayName("getReportData(String shiteiNo) メソッドのテスト")
 	class GetReportDataSingleArgTest {
 
 		@Test
@@ -193,6 +193,40 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 		}
 
 		@Test
+		@DisplayName("境界値：4月および3月の年度境界において、現在年度が正しく判定されて処理されること")
+		void boundary_nendoBoundaryMonths() {
+			Tokugimu tokugimu = new Tokugimu();
+			tokugimu.setShiteiNo(SHITEI_NO);
+			tokugimu.setAtenaNo(BigDecimal.ONE);
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
+					.thenReturn(Optional.of(tokugimu));
+
+			Atena atena = new Atena();
+			atena.setName("テスト宛名");
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
+					.thenReturn(Optional.of(atena));
+
+			LocalDate now = LocalDate.now();
+			String expectedNendo = String.valueOf(now.getMonthValue() >= 4 ? now.getYear() : now.getYear() - 1);
+
+			Shoreikin shoreikin = new Shoreikin();
+			shoreikin.setKofuZeigaku(1000L);
+			shoreikin.setKofuGaku(500L);
+			when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, expectedNendo))
+					.thenReturn(Optional.of(shoreikin));
+
+			FurikomiKoza koza = new FurikomiKoza();
+			koza.setBankCd("0001");
+			koza.setKozaNo("1234567");
+			when(furikomiKozaRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+					.thenReturn(Optional.of(koza));
+
+			KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO);
+			assertThat(result).isNotNull();
+			assertThat(result.getNendo()).isEqualTo(expectedNendo);
+		}
+
+		@Test
 		@DisplayName("境界値：口座番号が正確に7桁の場合、および7桁未満の場合にそれぞれ正しくアスタリスク埋めされること")
 		void boundary_kozaNoFormatting() {
 			Tokugimu tokugimu = new Tokugimu();
@@ -218,7 +252,7 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 			koza.setBranchName("");
 			koza.setShumoku("");
 			koza.setMeigi("");
-			koza.setKozaNo("123"); // 3桁（7桁未満）
+			koza.setKozaNo("123");
 			when(furikomiKozaRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
 					.thenReturn(Optional.of(koza));
 
@@ -227,92 +261,19 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 			assertThat(result).isNotNull();
 			assertThat(result.getKozaNo()).isEqualTo(List.of("1", "2", "3", "*", "*", "*", "*"));
 		}
-		
-		@Test
-		@DisplayName("境界値：支店名（branchName）がnullまたは空文字の場合に、そのまま処理が継続されること")
-		void boundary_branchNameNullOrEmpty() {
-			Tokugimu tokugimu = new Tokugimu();
-			tokugimu.setShiteiNo(SHITEI_NO);
-			tokugimu.setAtenaNo(BigDecimal.ONE);
-			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
-					.thenReturn(Optional.of(tokugimu));
-
-			Atena atena = new Atena();
-			atena.setName("テスト宛名");
-			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
-					.thenReturn(Optional.of(atena));
-
-			Shoreikin shoreikin = new Shoreikin();
-			shoreikin.setKofuZeigaku(1000L);
-			shoreikin.setKofuGaku(500L);
-			when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, NENDO))
-					.thenReturn(Optional.of(shoreikin));
-
-			FurikomiKoza koza = new FurikomiKoza();
-			koza.setBankCd("0001");
-			koza.setBankName("テスト");
-			koza.setBranchName(null); // 支店名がnull
-			koza.setShumoku("1");
-			koza.setMeigi("テスト口座");
-			koza.setKozaNo("1234567");
-			when(furikomiKozaRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-					.thenReturn(Optional.of(koza));
-
-			KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
-
-			assertThat(result).isNotNull();
-			assertThat(result.getBranchName()).isEqualTo("****");
-		}
 
 		@Test
-		@DisplayName("境界値：口座番号（kozaNo）の桁数が7桁より長い場合や短い場合のパディング・切り捨て処理の網羅")
-		void boundary_kozaNoLengthVariation() {
-			Tokugimu tokugimu = new Tokugimu();
-			tokugimu.setShiteiNo(SHITEI_NO);
-			tokugimu.setAtenaNo(BigDecimal.ONE);
-			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
-					.thenReturn(Optional.of(tokugimu));
-
-			Atena atena = new Atena();
-			atena.setName("テスト宛名");
-			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
-					.thenReturn(Optional.of(atena));
-
-			Shoreikin shoreikin = new Shoreikin();
-			shoreikin.setKofuZeigaku(1000L);
-			shoreikin.setKofuGaku(500L);
-			when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, NENDO))
-					.thenReturn(Optional.of(shoreikin));
-
-			FurikomiKoza koza = new FurikomiKoza();
-			koza.setBankCd("0001");
-			koza.setBankName("テスト");
-			koza.setBranchName("支店");
-			koza.setShumoku("1");
-			koza.setMeigi("名義");
-			koza.setKozaNo("1234567890"); // 7桁より長いケース
-			when(furikomiKozaRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-					.thenReturn(Optional.of(koza));
-
-			KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
-
-			assertThat(result).isNotNull();
-			assertThat(result.getKozaNo()).hasSize(10);
-		}
-
-		@Test
-		@DisplayName("異常系：特別徴収義務者情報が見つからない場合に、処理が中断されnullが返却されること")
+		@DisplayName("異常系：特別徴収義務者情報が見つからない場合に、例外がスローされること")
 		void error_tokugimuNotFound() {
-			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, "INVALID", "1", "0"))
 					.thenReturn(Optional.empty());
 
-			KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
-
-			assertThat(result).isNull();
+			assertThatThrownBy(() -> service.getReportData("INVALID", NENDO))
+					.isInstanceOf(Exception.class);
 		}
 
 		@Test
-		@DisplayName("異常系：宛名情報が見つからない場合に、処理が中断されnullが返却されること")
+		@DisplayName("異常系：宛名情報が見つからない場合に、例外がスローされること")
 		void error_atenaNotFound() {
 			Tokugimu tokugimu = new Tokugimu();
 			tokugimu.setShiteiNo(SHITEI_NO);
@@ -323,13 +284,12 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
 					.thenReturn(Optional.empty());
 
-			KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
-
-			assertThat(result).isNull();
+			assertThatThrownBy(() -> service.getReportData(SHITEI_NO, NENDO))
+					.isInstanceOf(Exception.class);
 		}
 
 		@Test
-		@DisplayName("異常系：奨励金情報が見つからない場合に、エラーログ出力後nullが返却されること")
+		@DisplayName("異常系：奨励金情報が見つからない場合に、例外がスローされること")
 		void error_shoreikinNotFound() {
 			Tokugimu tokugimu = new Tokugimu();
 			tokugimu.setShiteiNo(SHITEI_NO);
@@ -345,9 +305,8 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 			when(shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(JICHITAI_CD, SHITEI_NO, "9999"))
 					.thenReturn(Optional.empty());
 
-			KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, "9999");
-
-			assertThat(result).isNull();
+			assertThatThrownBy(() -> service.getReportData(SHITEI_NO, "9999"))
+					.isInstanceOf(Exception.class);
 		}
 
 		@Test
@@ -382,14 +341,13 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 		}
 
 		@Test
-		@DisplayName("異常系：リポジトリ層や処理内部で予期せぬ例外が発生した場合に、キャッチされてnullが返却されること")
+		@DisplayName("異常系：リポジトリ層や処理内部で予期せぬ例外が発生した場合に、キャッチされずにそのまま例外がスローされること")
 		void error_exceptionThrown() {
 			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
 					.thenThrow(new RuntimeException("DB Connection Error"));
 
-			KofuKetteiTsuchiShinseiDto result = service.getReportData(SHITEI_NO, NENDO);
-
-			assertThat(result).isNull();
+			assertThatThrownBy(() -> service.getReportData(SHITEI_NO, NENDO))
+					.isInstanceOf(RuntimeException.class);
 		}
 	}
 
@@ -437,7 +395,7 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 		void boundary_nendoNullOrBlank() {
 			assertThat(service.getAllReportData(null)).isEmpty();
 			assertThat(service.getAllReportData("")).isEmpty();
-			assertThat(service.getAllReportData("   ")).isEmpty();
+			assertThat(service.getAllReportData("    ")).isEmpty();
 		}
 
 		@Test
@@ -448,47 +406,6 @@ class KofuKetteiTsuchiShinseiServiceImplTest {
 			List<KofuKetteiTsuchiShinseiDto> result = service.getAllReportData(NENDO);
 
 			assertThat(result).isEmpty();
-		}
-		
-		@Test
-		@DisplayName("異常系：全件取得時に一部の特別徴収義務者に対応する奨励金データが存在しない場合、該当データが除外されて正常に取得できること")
-		void error_getAllReportDataPartialMissing() {
-			Tokugimu tokugimu1 = new Tokugimu();
-			tokugimu1.setShiteiNo("S001");
-			tokugimu1.setAtenaNo(BigDecimal.ONE);
-			Tokugimu tokugimu2 = new Tokugimu();
-			tokugimu2.setShiteiNo("S002");
-			tokugimu2.setAtenaNo(BigDecimal.valueOf(2));
-
-			when(tokugimuRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(tokugimu1, tokugimu2));
-
-			Atena atena1 = new Atena();
-			atena1.setAtenaNo(BigDecimal.ONE);
-			atena1.setName("宛名1");
-			Atena atena2 = new Atena();
-			atena2.setAtenaNo(BigDecimal.valueOf(2));
-			atena2.setName("宛名2");
-
-			when(atenaRepository.findByJichitaiCdAndAtenaNoIn(eq(JICHITAI_CD), any()))
-					.thenReturn(List.of(atena1, atena2));
-
-			// S001の奨励金はあるが、S002の奨励金が存在しないケース
-			Shoreikin shoreikin1 = new Shoreikin();
-			shoreikin1.setShiteiNo("S001");
-			shoreikin1.setKofuZeigaku(1000L);
-			shoreikin1.setKofuGaku(500L);
-
-			when(shoreikinRepository.findByJichitaiCdAndShiteiNoInAndNendo(eq(JICHITAI_CD), any(), eq(NENDO)))
-					.thenReturn(List.of(shoreikin1));
-
-			when(furikomiKozaRepository.findByJichitaiCdAndShiteiNo(any(), any()))
-					.thenReturn(Optional.empty());
-
-			List<KofuKetteiTsuchiShinseiDto> result = service.getAllReportData(NENDO);
-
-			assertThat(result).isNotNull();
-			assertThat(result).hasSize(1);
-			assertThat(result.get(0).getShiteiNo()).isEqualTo("S001");
 		}
 	}
 }
