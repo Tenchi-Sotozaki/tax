@@ -40,6 +40,28 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 	@Override
 	public byte[] generateTsuchiPdf(TokureiShiteiCancelDto dto) {
 		try {
+			// 必須チェック等
+			if (dto == null) {
+				throw new IllegalArgumentException("DTOがnullです。");
+			}
+			if (dto.getHakkoYmd() == null) {
+				throw new IllegalArgumentException("発行年月日は必須です。");
+			}
+			if (dto.getTekiyoYmd() == null || dto.getTekiyoYmd().isEmpty()) {
+				throw new IllegalArgumentException("適用年月日は必須です。");
+			}
+			if (dto.getJorei() == null || dto.getCity() == null || dto.getRiyu() == null) {
+				throw new IllegalArgumentException("必須のテキスト項目がnullです。");
+			}
+			if (dto.getTokuYubin() == null || dto.getTokuJusho() == null || dto.getTokuName() == null ||
+				dto.getShisetsuYubin() == null || dto.getShisetsuJusho() == null || dto.getShisetsuName() == null ||
+				dto.getShiteiNo() == null || dto.getBiko() == null) {
+				throw new IllegalArgumentException("データソース用の必須項目がnullです。");
+			}
+			if (dto.getKoin() == null || dto.getKoin().length == 0) {
+				throw new IllegalArgumentException("記章（koin）は必須です。");
+			}
+
 			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
 
@@ -50,8 +72,11 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 
 			return JasperExportManager.exportReportToPdf(jasperPrint);
 
+		} catch (IllegalArgumentException e) {
+			log.error("特例適用者指定取消通知PDF生成バリデーションエラー: shiteiNo={}", dto != null ? dto.getShiteiNo() : null, e);
+			throw e;
 		} catch (Exception e) {
-			log.error("特例適用者指定取消通知PDF生成エラー: shiteiNo={}", dto.getShiteiNo(), e);
+			log.error("特例適用者指定取消通知PDF生成エラー: shiteiNo={}", dto != null ? dto.getShiteiNo() : null, e);
 			throw new RuntimeException("PDF生成に失敗しました: " + e.getMessage(), e);
 		}
 	}

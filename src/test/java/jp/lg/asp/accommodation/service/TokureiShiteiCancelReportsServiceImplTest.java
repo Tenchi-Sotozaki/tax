@@ -53,108 +53,131 @@ class TokureiShiteiCancelReportsServiceImplTest {
 		}
 
 		@Test
-		@DisplayName("境界値：発行年月日（hakkoYmd）がnullの場合に空文字として処理されPDF生成処理が実行されること")
+		@DisplayName("境界値：DTO自体がnullの場合にエラーがスローされること")
+		void boundaryDtoIsNull() {
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(null))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("DTOがnullです。");
+		}
+
+		@Test
+		@DisplayName("境界値：発行年月日（hakkoYmd）がnullの場合にエラーがスローされること")
 		void boundaryHakkoYmdIsNull() {
 			TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
 			dto.setHakkoYmd(null);
 			dto.setTekiyoYmd("2026-05");
 
-			byte[] resultPdf = reportsService.generateTsuchiPdf(dto);
-
-			assertThat(resultPdf).isNotNull();
-			assertThat(resultPdf).isNotEmpty();
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
+					.isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test
-		@DisplayName("境界値：適用年月日（tekiyoYmd）がnullの場合に空文字として処理されPDF生成処理が実行されること")
+		@DisplayName("境界値：適用年月日（tekiyoYmd）がnullの場合にエラーがスローされること")
 		void boundaryTekiyoYmdIsNull() {
 			TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
 			dto.setHakkoYmd(LocalDate.of(2026, 4, 1));
 			dto.setTekiyoYmd(null);
 
-			byte[] resultPdf = reportsService.generateTsuchiPdf(dto);
-
-			assertThat(resultPdf).isNotNull();
-			assertThat(resultPdf).isNotEmpty();
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
+					.isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test
-		@DisplayName("境界値：適用年月日（tekiyoYmd）が空文字の場合に空文字として処理されPDF生成処理が実行されること")
+		@DisplayName("境界値：適用年月日（tekiyoYmd）が空文字の場合にエラーがスローされること")
 		void boundaryTekiyoYmdIsEmpty() {
 			TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
 			dto.setHakkoYmd(LocalDate.of(2026, 4, 1));
 			dto.setTekiyoYmd("");
 
-			byte[] resultPdf = reportsService.generateTsuchiPdf(dto);
-
-			assertThat(resultPdf).isNotNull();
-			assertThat(resultPdf).isNotEmpty();
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
+					.isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test
-		@DisplayName("境界値：条例・市区町村・理由などのテキスト項目がnullの場合に空文字として処理されること")
+		@DisplayName("境界値：テキスト項目（jorei, city, riyu）のいずれかがnullの場合にエラーがスローされること")
 		void boundaryTextFieldsAreNull() {
-			TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
-			dto.setHakkoYmd(LocalDate.of(2026, 4, 1));
-			dto.setJorei(null);
-			dto.setCity(null);
-			dto.setRiyu(null);
+			// joreiがnull
+			TokureiShiteiCancelDto dto1 = createValidDto();
+			dto1.setJorei(null);
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto1)).isInstanceOf(IllegalArgumentException.class);
 
-			byte[] resultPdf = reportsService.generateTsuchiPdf(dto);
+			// cityがnull
+			TokureiShiteiCancelDto dto2 = createValidDto();
+			dto2.setCity(null);
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto2)).isInstanceOf(IllegalArgumentException.class);
 
-			assertThat(resultPdf).isNotNull();
-			assertThat(resultPdf).isNotEmpty();
+			// riyuがnull
+			TokureiShiteiCancelDto dto3 = createValidDto();
+			dto3.setRiyu(null);
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto3)).isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test
-		@DisplayName("境界値：データソース用の各種DTO項目（郵便番号・住所・名称・指定番号・備考）がnullの場合に空文字として設定されること")
+		@DisplayName("境界値：データソース用の各種項目がnullの場合にエラーがスローされること")
 		void boundaryDataSourceFieldsAreNull() {
-			TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
-			dto.setHakkoYmd(LocalDate.of(2026, 4, 1));
-			dto.setTokuYubin(null);
-			dto.setTokuJusho(null);
-			dto.setTokuName(null);
-			dto.setShisetsuYubin(null);
-			dto.setShisetsuJusho(null);
-			dto.setShisetsuName(null);
-			dto.setShiteiNo(null);
-			dto.setBiko(null);
+			String[] fields = {"tokuYubin", "tokuJusho", "tokuName", "shisetsuYubin", "shisetsuJusho", "shisetsuName", "shiteiNo", "biko"};
+			
+			for (String field : fields) {
+				TokureiShiteiCancelDto dto = createValidDto();
+				if ("tokuYubin".equals(field)) dto.setTokuYubin(null);
+				if ("tokuJusho".equals(field)) dto.setTokuJusho(null);
+				if ("tokuName".equals(field)) dto.setTokuName(null);
+				if ("shisetsuYubin".equals(field)) dto.setShisetsuYubin(null);
+				if ("shisetsuJusho".equals(field)) dto.setShisetsuJusho(null);
+				if ("shisetsuName".equals(field)) dto.setShisetsuName(null);
+				if ("shiteiNo".equals(field)) dto.setShiteiNo(null);
+				if ("biko".equals(field)) dto.setBiko(null);
 
-			byte[] resultPdf = reportsService.generateTsuchiPdf(dto);
-
-			assertThat(resultPdf).isNotNull();
-			assertThat(resultPdf).isNotEmpty();
+				assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
+						.isInstanceOf(IllegalArgumentException.class);
+			}
 		}
 
 		@Test
-		@DisplayName("境界値：記章（koin）がnullまたは空配列の場合にnullとして設定されること")
+		@DisplayName("境界値：記章（koin）がnullまたは空配列の場合にエラーがスローされること")
 		void boundaryKoinIsNullOrEmpty() {
-			TokureiShiteiCancelDto dtoNull = new TokureiShiteiCancelDto();
-			dtoNull.setHakkoYmd(LocalDate.of(2026, 4, 1));
+			TokureiShiteiCancelDto dtoNull = createValidDto();
 			dtoNull.setKoin(null);
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dtoNull))
+					.isInstanceOf(IllegalArgumentException.class);
 
-			byte[] resultPdfNull = reportsService.generateTsuchiPdf(dtoNull);
-			assertThat(resultPdfNull).isNotNull();
-
-			TokureiShiteiCancelDto dtoEmpty = new TokureiShiteiCancelDto();
-			dtoEmpty.setHakkoYmd(LocalDate.of(2026, 4, 1));
+			TokureiShiteiCancelDto dtoEmpty = createValidDto();
 			dtoEmpty.setKoin(new byte[0]);
-
-			byte[] resultPdfEmpty = reportsService.generateTsuchiPdf(dtoEmpty);
-			assertThat(resultPdfEmpty).isNotNull();
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dtoEmpty))
+					.isInstanceOf(IllegalArgumentException.class);
 		}
 
 		@Test
 		@DisplayName("異常系：JasperReportsのコンパイルや処理中にエラーが発生した場合にRuntimeExceptionがスローされること")
 		void exceptionHandlingThrowsRuntimeException() {
-			TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
-			// 不正なフォーマットを渡してYearMonthのパースエラー等で例外を誘発する
-			dto.setHakkoYmd(LocalDate.of(2026, 4, 1));
+			TokureiShiteiCancelDto dto = createValidDto();
 			dto.setTekiyoYmd("INVALID_DATE_FORMAT");
 
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
 					.isInstanceOf(RuntimeException.class)
 					.hasMessageContaining("PDF生成に失敗しました");
+		}
+
+		/**
+		 * テスト用の有効なDTOを生成するヘルパーメソッド
+		 */
+		private TokureiShiteiCancelDto createValidDto() {
+			TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
+			dto.setHakkoYmd(LocalDate.of(2026, 4, 1));
+			dto.setTekiyoYmd("2026-05");
+			dto.setJorei("条例テキスト");
+			dto.setCity("テスト市");
+			dto.setRiyu("取消理由");
+			dto.setTokuYubin("123-4567");
+			dto.setTokuJusho("テスト住所1");
+			dto.setTokuName("テスト特例者");
+			dto.setShisetsuYubin("765-4321");
+			dto.setShisetsuJusho("テスト住所2");
+			dto.setShisetsuName("テスト施設");
+			dto.setShiteiNo("12345");
+			dto.setBiko("備考テキスト");
+			dto.setKoin(new byte[]{1, 2, 3});
+			return dto;
 		}
 	}
 }
