@@ -416,10 +416,16 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 					jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
 
 			boolean isKosei = FukaConstants.KOSEI.getValue().equals(henkoKbn);
-			List<FukaUchi> prevUchiList = (isKosei && rno > 1)
-					? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-							jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
-					: Collections.emptyList();
+			List<FukaUchi> prevUchiList = Collections.emptyList();
+			if (isKosei) {
+				Optional<Integer> shinkokuRno = fukaRepository.findMaxRnoByHenkoKbn(
+						jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu(),
+						FukaConstants.SHINKOKU.getValue());
+				if (shinkokuRno.isPresent()) {
+					prevUchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+							jichitaiCd, fuka.getShiteiNo(), shinkokuRno.get(), fuka.getNendo(), fuka.getKibetsu());
+				}
+			}
 
 			long blockSashihikiSum = 0L;
 			for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
