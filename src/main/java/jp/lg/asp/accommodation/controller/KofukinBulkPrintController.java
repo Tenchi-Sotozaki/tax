@@ -84,7 +84,7 @@ public class KofukinBulkPrintController {
 
 			List<KofuKetteiTsuchiShinseiDto> dtoList = kofuKetteiTsuchiShinseiService.getAllReportData(form.getNendo());
 			if (dtoList == null || dtoList.isEmpty()) {
-				byte[] errorBytes = "対象年度のレポートデータが存在しません。".getBytes(StandardCharsets.UTF_8);
+				byte[] errorBytes = "対象年度のデータが存在しません。".getBytes(StandardCharsets.UTF_8);
 				return ResponseEntity.badRequest().body(errorBytes);
 			}
 
