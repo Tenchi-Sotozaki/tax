@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,11 +23,15 @@ import jp.lg.asp.accommodation.dto.NonyushoDataResponse;
 import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Jichitai;
-import jp.lg.asp.accommodation.entity.ReportsDef;
+import jp.lg.asp.accommodation.entity.Nokigen;
+import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.ReportsDefId;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
+import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.service.impl.NonyushoReportsServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +41,8 @@ class NonyushoReportsServiceImplTest {
     @Mock FukaRepository fukaRepository;
     @Mock JichitaiRepository jichitaiRepository;
     @Mock ReportsDefRepository reportsDefRepository;
+    @Mock NokigenRepository nokigenRepository;
+    @Mock TokureiTekiyoRepository tokureiTekiyoRepository;
     @Mock JichitaiContext jichitaiContext;
     @Mock TokugimuService tokugimuService;
     @InjectMocks NonyushoReportsServiceImpl service;
@@ -50,7 +55,13 @@ class NonyushoReportsServiceImplTest {
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
         when(reportsDefRepository.findById(any(ReportsDefId.class))).thenReturn(Optional.empty());
-        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
+        when(nokigenRepository.findById(any(NokigenId.class))).thenReturn(Optional.empty());
+        when(tokureiTekiyoRepository.findActiveByJichitaiCdAndShiteiNo(any(), any()))
+                .thenReturn(Collections.emptyList());
+
+        // デフォルト自治体設定：nendoStMonth=3, nozeiShuki=1
+        Jichitai defaultJichitai = buildJichitai("3", "1");
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(defaultJichitai));
     }
 
     // ===== getNonyushoData =====
@@ -68,24 +79,30 @@ class NonyushoReportsServiceImplTest {
         assertThat(result.getZeigaku()).isEqualTo("10000");
     }
 
-    // No.21 正常系: 賦課データあり・nokigenなし・shinkokuYmdあり の場合、翌月末を返す
+    // No.21 正常系: 賦課データあり・nokigenなし・特例適用外・shinkokuYmdあり の場合、翌月末を返す
     @Test
-    void getNonyushoData_賦課データあり_nokigenなし_shinkokuYmdあり_翌月末を返す() {
+    void getNonyushoData_賦課データあり_nokigenなし_特例適用外_shinkokuYmdあり_翌月末を返す() {
         Fuka fuka = buildFuka(10000L, 0L, 0L, 0L, null, LocalDate.of(2024, 4, 10));
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(List.of(fuka));
+        // 特例適用外（空リスト）
+        when(tokureiTekiyoRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Collections.emptyList());
 
-        NonyushoDataResponse result = service.getNonyushoData(SHITEI_NO, NENDO, null);
+        NonyushoDataResponse result = service.getNonyushoData(SHITEI_NO, NENDO, "2024-04");
 
         assertThat(result.getNokigen()).isEqualTo("2024-05-31");
     }
 
-    // No.22 正常系: 賦課データあり・nokigenなし・shinkokuYmdなし の場合、nokigenは空文字を返す
+    // No.22 正常系: 賦課データあり・nokigenなし・特例適用外・shinkokuYmdなし の場合、空文字を返す
     @Test
-    void getNonyushoData_賦課データあり_nokigenなし_shinkokuYmdなし_空文字を返す() {
+    void getNonyushoData_賦課データあり_nokigenなし_特例適用外_shinkokuYmdなし_空文字を返す() {
         Fuka fuka = buildFuka(10000L, 0L, 0L, 0L, null, null);
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(List.of(fuka));
+        // 特例適用外（空リスト）
+        when(tokureiTekiyoRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Collections.emptyList());
 
         NonyushoDataResponse result = service.getNonyushoData(SHITEI_NO, NENDO, null);
 
@@ -117,9 +134,9 @@ class NonyushoReportsServiceImplTest {
         assertThat(result.getNokigen()).isEqualTo("");
     }
 
-    // No.25 正常系: shinkokuYmあり の場合、taishoYmで絞り込んだ賦課データを返す
+    // No.25 正常系: taishoYmあり の場合、taishoYmで絞り込んだ賦課データを返す
     @Test
-    void getNonyushoData_shinkokuYmあり_taishoYmで絞り込んだ賦課データを返す() {
+    void getNonyushoData_taishoYmあり_taishoYmで絞り込んだ賦課データを返す() {
         Fuka fuka = buildFuka(20000L, 0L, 0L, 0L, LocalDate.of(2024, 5, 31), null);
         fuka.setTaishoYm("202404");
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
@@ -130,9 +147,9 @@ class NonyushoReportsServiceImplTest {
         assertThat(result.getZeigaku()).isEqualTo("20000");
     }
 
-    // No.26 正常系: shinkokuYmあり・対象年月不一致 の場合、zeigaku=0を返す
+    // No.26 正常系: taishoYmあり・対象年月不一致 の場合、zeigaku=0を返す
     @Test
-    void getNonyushoData_shinkokuYmあり_対象年月不一致_zeigaku0を返す() {
+    void getNonyushoData_taishoYmあり_対象年月不一致_zeigaku0を返す() {
         Fuka fuka = buildFuka(20000L, 0L, 0L, 0L, LocalDate.of(2024, 5, 31), null);
         fuka.setTaishoYm("202403");
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
@@ -143,11 +160,34 @@ class NonyushoReportsServiceImplTest {
         assertThat(result.getZeigaku()).isEqualTo("0");
     }
 
-    // No.27 正常系（未実装）: 特例適用中の場合、特例用nokigenを返す
-    @Disabled("NonyushoReportsServiceImplに特例適用時のnokigen取得処理が未実装のためスキップ")
+    // No.27 正常系: 特例適用中・nokigenなし の場合、四半期末のm_nokigenを返す
+    // nendoStMonth=3, taishoYm="2024-05"（5月）
+    // 3月=1st, 4月=2nd, 5月=3rd → index=3 → 四半期末index=3 → nokigen3rd="20240531"
     @Test
-    void getNonyushoData_特例適用中_特例用nokigenを返す() {
-        // 特例適用時のnokigen取得処理が実装されたら有効化する
+    void getNonyushoData_特例適用中_nokigenなし_四半期末のm_nokigenを返す() {
+        Fuka fuka = buildFuka(10000L, 0L, 0L, 0L, null, null);
+        fuka.setTaishoYm("202405");
+        when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
+                .thenReturn(List.of(fuka));
+
+        // 特例適用中：tekiyoStYmd=2024-04-01, tekiyoEdYmd=2024-06-30（2024-05-01が期間内）
+        TokureiTekiyo tekiyo = new TokureiTekiyo();
+        tekiyo.setJichitaiCd(JICHITAI_CD);
+        tekiyo.setShiteiNo(SHITEI_NO);
+        tekiyo.setRno(1);
+        tekiyo.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
+        tekiyo.setTekiyoEdYmd(LocalDate.of(2024, 6, 30));
+        tekiyo.setDelFlg("0");
+        when(tokureiTekiyoRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(tekiyo));
+
+        // nendoStMonth=3 → 3月=1st, 4月=2nd, 5月=3rd → 四半期末index=3 → nokigen3rd
+        Nokigen nokigen = buildNokigen(null, null, "20240531", null, null, null, null, null, null, null, null, null);
+        when(nokigenRepository.findById(new NokigenId(JICHITAI_CD, NENDO))).thenReturn(Optional.of(nokigen));
+
+        NonyushoDataResponse result = service.getNonyushoData(SHITEI_NO, NENDO, "2024-05");
+
+        assertThat(result.getNokigen()).isEqualTo("2024-05-31");
     }
 
     // No.28 正常系: 自治体情報あり の場合、cityNameを返す
@@ -155,7 +195,7 @@ class NonyushoReportsServiceImplTest {
     void getNonyushoData_自治体情報あり_cityNameを返す() {
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(Collections.emptyList());
-        Jichitai jichitai = new Jichitai();
+        Jichitai jichitai = buildJichitai("3", "1");
         jichitai.setName("札幌市");
         when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai));
 
@@ -203,9 +243,9 @@ class NonyushoReportsServiceImplTest {
         assertThat(result).isTrue();
     }
 
-    // No.32 正常系: shinkokuYmdがnullの場合、trueを返す
+    // No.32 正常系: taishoYmがnullの場合、trueを返す
     @Test
-    void dataCheck_shinkokuYmdがnull_trueを返す() {
+    void dataCheck_taishoYmがnull_trueを返す() {
         NonyushoDto dto = buildDto(SHITEI_NO, null);
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndTaishoYmOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, null))
                 .thenReturn(Collections.emptyList());
@@ -234,10 +274,38 @@ class NonyushoReportsServiceImplTest {
         return fuka;
     }
 
-    private NonyushoDto buildDto(String shiteiNo, String shinkokuYmd) {
+    private Nokigen buildNokigen(String n1, String n2, String n3, String n4, String n5, String n6,
+            String n7, String n8, String n9, String n10, String n11, String n12) {
+        Nokigen nokigen = new Nokigen();
+        nokigen.setJichitaiCd(JICHITAI_CD);
+        nokigen.setNendo(NENDO);
+        nokigen.setNokigen1st(n1 != null ? n1 : "");
+        nokigen.setNokigen2nd(n2 != null ? n2 : "");
+        nokigen.setNokigen3rd(n3 != null ? n3 : "");
+        nokigen.setNokigen4th(n4 != null ? n4 : "");
+        nokigen.setNokigen5th(n5 != null ? n5 : "");
+        nokigen.setNokigen6th(n6 != null ? n6 : "");
+        nokigen.setNokigen7th(n7 != null ? n7 : "");
+        nokigen.setNokigen8th(n8 != null ? n8 : "");
+        nokigen.setNokigen9th(n9 != null ? n9 : "");
+        nokigen.setNokigen10th(n10 != null ? n10 : "");
+        nokigen.setNokigen11th(n11 != null ? n11 : "");
+        nokigen.setNokigen12th(n12 != null ? n12 : "");
+        return nokigen;
+    }
+
+    private Jichitai buildJichitai(String nendoStMonth, String nozeiShuki) {
+        Jichitai jichitai = new Jichitai();
+        jichitai.setJichitaiCd(JICHITAI_CD);
+        jichitai.setNendoStMonth(nendoStMonth);
+        jichitai.setNozeiShuki(nozeiShuki);
+        return jichitai;
+    }
+
+    private NonyushoDto buildDto(String shiteiNo, String taishoYm) {
         NonyushoDto dto = new NonyushoDto();
         dto.setShiteiNo(shiteiNo);
-        dto.setShinkokuYmd(shinkokuYmd);
+        dto.setShinkokuYmd(taishoYm);
         dto.setNendo(NENDO);
         return dto;
     }

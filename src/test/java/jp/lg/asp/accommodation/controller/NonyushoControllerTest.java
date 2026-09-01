@@ -145,9 +145,9 @@ class NonyushoControllerTest {
         assertThat(result.getBody()).isEqualTo(response);
     }
 
-    // No.6 正常系: shinkokuYmがnullの場合、HTTP 200とNonyushoDataResponseを返す
+    // No.6 正常系: taishoYmがnullの場合、HTTP 200とNonyushoDataResponseを返す
     @Test
-    void getNonyushoData_shinkokuYmがnull_HTTP200とNonyushoDataResponseを返す() {
+    void getNonyushoData_taishoYmがnull_HTTP200とNonyushoDataResponseを返す() {
         NonyushoDataResponse response = new NonyushoDataResponse();
         when(nonyushoReportsService.getNonyushoData(SHITEI_NO, "2024", null)).thenReturn(response);
 
