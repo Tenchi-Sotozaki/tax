@@ -5,17 +5,16 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.servlet.http.HttpSession;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoForm;
 import jp.lg.asp.accommodation.dto.TokureiTekiyoHistoryDto;
 import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
-import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TokureiTekiyoService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
 
     private final TokureiTekiyoRepository tekiyoNozeiShukiRepository;
-    private final TokugimuRepository tokugimuRepository;
     private final JichitaiContext jichitaiContext;
     private final HttpSession session;
 
@@ -63,23 +61,17 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("指定されたレコードが見つかりません。"));
 
-        TokureiTekiyoForm form = buildBaseForm(shiteiNo, jichitaiCd);
+        TokureiTekiyoForm form = new TokureiTekiyoForm();
         form.setRno(record.getRno());
-        if (record.getTekiyoStYmd() != null) {
-            form.setTekiyoStMonth(record.getTekiyoStYmd().format(MONTH_FMT));
-        }
-        if (record.getTekiyoEdYmd() != null) {
-            form.setTekiyoEdMonth(record.getTekiyoEdYmd().format(MONTH_FMT));
-        }
+        if (record.getTekiyoStYmd() != null) form.setTekiyoStMonth(record.getTekiyoStYmd().format(MONTH_FMT));
+        if (record.getTekiyoEdYmd() != null) form.setTekiyoEdMonth(record.getTekiyoEdYmd().format(MONTH_FMT));
         return form;
     }
 
     @Override
     @Transactional(readOnly = true)
     public TokureiTekiyoForm getForRegister() {
-        String shiteiNo = resolveShiteiNo();
-        String jichitaiCd = jichitaiContext.getJichitaiCd();
-        return buildBaseForm(shiteiNo, jichitaiCd);
+        return new TokureiTekiyoForm();
     }
 
     @Override
@@ -156,17 +148,6 @@ public class TokureiTekiyoServiceImpl implements TokureiTekiyoService {
             throw new IllegalStateException("指定番号がセッションに存在しません。");
         }
         return shiteiNo;
-    }
-
-    private TokureiTekiyoForm buildBaseForm(String shiteiNo, String jichitaiCd) {
-        TokureiTekiyoForm form = new TokureiTekiyoForm();
-        form.setShiteiNo(shiteiNo);
-        tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-                .stream().findFirst().ifPresent(t -> {
-                    form.setObligorName(t.getKyokaName());
-                    form.setFacilityName(t.getShisetsuName());
-                });
-        return form;
     }
 
     private void validate(LocalDate stYmd, LocalDate edYmd) {
