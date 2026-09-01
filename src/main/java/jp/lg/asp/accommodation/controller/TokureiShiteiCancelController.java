@@ -60,14 +60,12 @@ public class TokureiShiteiCancelController {
 			return "tokugimu/tTokugimuReport";
 		}
 		
-		TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
-
 		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(shiteiNo);
 		if (shiteiDto == null) {
 			throw new IllegalArgumentException("特例情報が存在しません。");
 		}
 		
-		dto = convertToCancel(shiteiDto);
+		TokureiShiteiCancelDto dto = convertToCancel(shiteiDto);
 
 		if (dto.getHakkoYmd() == null) {
 			dto.setHakkoYmd(LocalDate.now());
