@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,10 +13,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,8 +26,10 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.GassanDaichoItem;
 import jp.lg.asp.accommodation.dto.GassanDaichoSearchForm;
 import jp.lg.asp.accommodation.dto.GassanForm;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.GassanDaichoService;
 import jp.lg.asp.accommodation.service.GassanService;
+import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,8 +50,10 @@ public class GassanController {
 
 	@GetMapping("/registration")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
-	public String showRegistrationForm(Model model) {
+	public String showRegistrationForm(Model model, HttpSession session) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+
+		session.removeAttribute(SessionHelper.SHITEI_GASSAN_KEY);
 
 		model.addAttribute("GassanForm", new GassanForm());
 		model.addAttribute("isEdit", false);
@@ -68,27 +74,22 @@ public class GassanController {
 		return DAICHO_VIEW;
 	}
 
-	@GetMapping("/view/{gassanShiteiNo}")
-	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "初期表示")
-	public String showView(@PathVariable String gassanShiteiNo, Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
-
-		GassanDaichoItem item = gassanDaichoService.getByGassanShiteiNo(gassanShiteiNo);
-		if (item == null) {
-			model.addAttribute("errorMessage", "指定された合算申告情報が見つかりません。");
-			return "redirect:/gassan/list";
-		}
-		model.addAttribute("item", item);
-		model.addAttribute("isView", true);
-		return "gassan/tGassanView";
-	}
-
-	@GetMapping("/view-form/{gassanShiteiNo}")
+	@GetMapping("/view-form")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "照会")
-	public String showViewForm(@PathVariable String gassanShiteiNo,
-			@org.springframework.web.bind.annotation.RequestParam(required = false) java.math.BigDecimal rno,
-			Model model) {
+	public String showViewForm(
+			@RequestParam(required = false) BigDecimal rno,
+			Model model,
+			HttpSession session) {
 		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+		if (gassanShiteiNo == null) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("GassanForm", new GassanForm());
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", true);
+			return FORM_VIEW;
+		}
 
 		try {
 			GassanForm form = (rno != null)
@@ -106,10 +107,35 @@ public class GassanController {
 		}
 	}
 
-	@GetMapping("/edit/{gassanShiteiNo}")
+	@PostMapping("/select")
+	public String select(
+			@RequestParam String gassanShiteiNo,
+			@RequestParam(required = false) String shiteiNo,
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false) String shisetsuName,
+			HttpSession session) {
+		ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+		dto.setGassanShiteiNo(gassanShiteiNo);
+		dto.setShiteiNo(shiteiNo);
+		dto.setName(name);
+		dto.setShisetsuName(shisetsuName);
+		SessionHelper.saveShiteiGassan(session, dto);
+		return "redirect:/gassan/view-form";
+	}
+
+	@GetMapping("/edit")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
-	public String showEditForm(@PathVariable String gassanShiteiNo, Model model) {
+	public String showEditForm(Model model, HttpSession session) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+		if (gassanShiteiNo == null) {
+			model.addAttribute("showShiteiGassanModal", true);
+			model.addAttribute("GassanForm", new GassanForm());
+			model.addAttribute("isEdit", true);
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
+		}
 
 		try {
 			GassanForm form = gassanService.getByGassanShiteiNo(gassanShiteiNo);
@@ -117,6 +143,10 @@ public class GassanController {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("editId", gassanShiteiNo);
+			model.addAttribute("tekiyoStYmdEditable",
+					form.getTekiyoStYmd() != null && form.getTekiyoStYmd().isAfter(java.time.LocalDate.now()));
+			model.addAttribute("editable",
+					form.getTekiyoEdYmd() == null || form.getTekiyoEdYmd().isAfter(java.time.LocalDate.now()));
 			return FORM_VIEW;
 		} catch (Exception e) {
 			log.error("合算申告情報編集エラー", e);
@@ -125,22 +155,32 @@ public class GassanController {
 		}
 	}
 
-	@PostMapping("/edit/{gassanShiteiNo}")
+	@PostMapping("/edit")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String updateGassan(
-			@PathVariable String gassanShiteiNo,
 			@Validated @ModelAttribute("GassanForm") GassanForm form,
 			BindingResult bindingResult,
 			Model model,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes,
+			HttpSession session) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
+
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+		if (gassanShiteiNo == null) {
+			redirectAttributes.addFlashAttribute("errorMessage", "合算指定番号が未選択です。");
+			return "redirect:/gassan/edit";
+		}
 
 		if (bindingResult.hasErrors()) {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("editId", gassanShiteiNo);
-			model.addAttribute("validationErrors", GassanForm.validate(form).values());
+			model.addAttribute("tekiyoStYmdEditable",
+					form.getTekiyoStYmd() != null && form.getTekiyoStYmd().isAfter(java.time.LocalDate.now()));
+			model.addAttribute("editable",
+					form.getTekiyoEdYmd() == null || form.getTekiyoEdYmd().isAfter(java.time.LocalDate.now()));
+			model.addAttribute("validationErrors", GassanForm.validateForEdit(form).values());
 			return FORM_VIEW;
 		}
 
@@ -154,7 +194,19 @@ public class GassanController {
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
 			model.addAttribute("editId", gassanShiteiNo);
-			model.addAttribute("errorMessage", e.getMessage());
+			model.addAttribute("tekiyoStYmdEditable",
+					form.getTekiyoStYmd() != null && form.getTekiyoStYmd().isAfter(java.time.LocalDate.now()));
+			// エラー時は editable を DB の値ではなくフォーム送信値で判定しない（常に編集可能にする）
+			model.addAttribute("editable", true);
+			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
+				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else if (e.getMessage() != null && e.getMessage().contains("適用終了年月")) {
+				bindingResult.rejectValue("tekiyoEdYmd", "error.tekiyoEdYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else {
+				model.addAttribute("errorMessage", e.getMessage());
+			}
 			return FORM_VIEW;
 		}
 	}
@@ -172,21 +224,27 @@ public class GassanController {
 	@PostMapping("/registration")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String register(
-			@Validated @ModelAttribute("GassanForm") GassanForm form,
+			@Validated(GassanForm.RegisterGroup.class) @ModelAttribute("GassanForm") GassanForm form,
 			BindingResult bindingResult,
 			Model model,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes,
+			HttpSession session) {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
+		boolean isReRegister = SessionHelper.getGassanShiteiNo(session) != null;
 		if (bindingResult.hasErrors()) {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
+			model.addAttribute("isReRegister", isReRegister);
 			model.addAttribute("validationErrors", GassanForm.validate(form).values());
 			return FORM_VIEW;
 		}
 		try {
-			gassanService.register(form);
+			String registeredGassanShiteiNo = gassanService.register(form, SessionHelper.getGassanShiteiNo(session));
+			ShiteiGassanSearchDto dto = new ShiteiGassanSearchDto();
+			dto.setGassanShiteiNo(registeredGassanShiteiNo);
+			SessionHelper.saveShiteiGassan(session, dto);
 			redirectAttributes.addFlashAttribute("successMessage", "合算申告の登録が完了しました。");
 			return "redirect:/gassan/list";
 		} catch (Exception e) {
@@ -194,11 +252,20 @@ public class GassanController {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
-			model.addAttribute("errorMessage", e.getMessage());
+			model.addAttribute("isReRegister", isReRegister);
+			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
+				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else if (e.getMessage() != null && e.getMessage().contains("適用終了年月")) {
+				bindingResult.rejectValue("tekiyoEdYmd", "error.tekiyoEdYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else {
+				model.addAttribute("errorMessage", e.getMessage());
+			}
 			return FORM_VIEW;
 		}
 	}
-	
+
 	/**
 	 * 合算申告の削除
 	 * @author Atsumu Kuboichi
@@ -210,31 +277,31 @@ public class GassanController {
 	 */
 	@PostMapping("/delete")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "削除")
-	public String delete(@Validated @ModelAttribute("GassanForm") GassanForm form,
+	public String delete(@Validated(GassanForm.RegisterGroup.class) @ModelAttribute("GassanForm") GassanForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-		
+
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
-		
+
 		if (form.getGassanShiteiNo() == null || form.getGassanShiteiNo().isEmpty()) {
 			redirectAttributes.addFlashAttribute("errorMessage", "削除対象の指定がありません。");
 			return "redirect:/gassan/list";
 		}
-		
+
 		try {
 			// 指定番号を指定して削除
 			gassanService.deleteByGassanShiteiNo(form.getGassanShiteiNo());
-			
+
 			// 削除成功のメッセージを設定
 			redirectAttributes.addFlashAttribute("successMessage", "合算申告の削除が完了しました。");
-			
+
 			return "redirect:/gassan/list";
-			
+
 		} catch (Exception e) {
 			log.error("合算申告削除エラー", e);
 			redirectAttributes.addFlashAttribute("errorMessage", "削除に失敗しました: " + e.getMessage());
-			return "redirect:/gassan/edit/" + form.getGassanShiteiNo();
+			return "redirect:/gassan/edit";
 		}
 	}
 }

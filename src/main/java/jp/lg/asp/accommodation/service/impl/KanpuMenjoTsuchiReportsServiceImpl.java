@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiDto;
 import jp.lg.asp.accommodation.dto.KanpuMenjoTsuchiReportsDto;
+import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.KanpuMenjoTsuchiReportsService;
 import jp.lg.asp.accommodation.service.ReportsCommonService;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
 
     private static final String JRXML_PATH = "reports/kanpuMenjoTsuchi.jrxml";
     private final ReportsCommonService reportsCommonService;
+    private final JichitaiRepository jichitaiRepository;
 
     @Override
     public byte[] generateTsuchiPdf(KanpuMenjoTsuchiDto dto) {
@@ -141,6 +144,11 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
         JRDataSource params = new JRBeanCollectionDataSource(dataSourceList);
 
         return params;
+    }
+
+    @Override
+    public Jichitai findJichitai(String jichitaiCd) {
+        return jichitaiRepository.findById(jichitaiCd).orElse(null);
     }
 
     /**

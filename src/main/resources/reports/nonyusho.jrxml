@@ -20,6 +20,7 @@
 	<field name="shiteiKinyuName" class="java.lang.String"/>
 	<field name="torimatome" class="java.lang.String"/>
 	<field name="shinkokuKubun" class="java.lang.String"/>
+	<field name="tokuYubin" class="java.lang.String"/>
 	<background splitType="Stretch"/>
 	<title splitType="Stretch"/>
 	<detail>
@@ -414,7 +415,7 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="fa76cff2-b4f1-463c-9789-c6308c82753d" x="0" y="315" width="250" height="20" fontName="IPAex明朝" fontSize="9.0" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{tokuJusho}+" "]]></expression>
+				<expression><![CDATA[" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -799,9 +800,12 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="160ac4c4-2f98-4414-b5ed-d41ebaae4417" x="270" y="315" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{tokuJusho}+" "]]></expression>
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -821,9 +825,12 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="55510743-2bb8-4dbb-bb15-10c78a91a4fb" x="270" y="350" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{tokuName}+" "]]></expression>
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{tokuName}]]></expression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
@@ -1197,7 +1204,7 @@
 				</box>
 			</element>
 			<element kind="textField" uuid="9a653673-80ba-45a7-a7e8-e7cf4695bdbe" x="540" y="315" width="250" height="20" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
-				<expression><![CDATA[$F{tokuJusho}+" "]]></expression>
+				<expression><![CDATA[" "]]></expression>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<box>
@@ -1343,6 +1350,90 @@
 				<printWhenExpression><![CDATA["3".equals($F{shinkokuKubun})]]></printWhenExpression>
 				<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			</element>
+			<element kind="textField" uuid="fbd28e91-9953-4e4f-bc64-b830870cb6d2" x="270" y="320" width="250" height="15" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{tokuJusho}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="9076f17e-25ab-4805-acb6-0fb788335065" x="270" y="305" width="250" height="15" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{tokuYubin}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="45ed8fcd-143d-48bf-81f5-0bb32f29b718" x="0" y="320" width="250" height="15" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{tokuJusho}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="7ea0170e-3af0-465e-b00d-14a28f52409f" x="0" y="305" width="250" height="15" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{tokuYubin}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="f0f702b1-3c84-4990-ac64-d2ec66ab88a3" x="540" y="320" width="250" height="15" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{tokuJusho}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+			</element>
+			<element kind="textField" uuid="1ee118f0-231e-4fa0-ad39-2d167f1db04c" x="540" y="305" width="250" height="15" fontName="IPAex明朝" hTextAlign="Right" vTextAlign="Middle">
+				<paragraph leftIndent="10" rightIndent="10"/>
+				<expression><![CDATA[$F{tokuYubin}]]></expression>
+				<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				<property name="com.jaspersoft.studio.unit.rightIndent" value="px"/>
+				<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
 			</element>
 		</band>
 	</detail>

@@ -3,8 +3,6 @@ package jp.lg.asp.accommodation.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,21 +32,6 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JichitaiContext jichitaiContext;
-
-    @Override
-    public Page<User> search(UserSearchForm form) {
-
-        String jichitaiCd = jichitaiContext.getJichitaiCd();
-
-        return userRepository.searchPage(
-                jichitaiCd,
-                emptyToNull(form.getId()),
-                toLikePattern(form.getName(), form.getNameMatchType()),
-                toLikePattern(form.getNameKana(), form.getNameKanaMatchType()),
-                toLikePattern(form.getBusho(), form.getBushoMatchType()),
-                form.getRoleId(),
-                PageRequest.of(form.getPage(), form.getPageSize()));
-    }
 
     @Override
     public java.util.List<User> searchAll(UserSearchForm form) {
