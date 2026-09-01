@@ -383,6 +383,7 @@ class TokugimuControllerTest {
             form.setFacilityName("テスト施設");
 
             sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(shiteiNo);
+            sessionHelperMock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
             sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
             when(tokugimuService.getTokugimuByShiteiNo(shiteiNo)).thenReturn(form);
 

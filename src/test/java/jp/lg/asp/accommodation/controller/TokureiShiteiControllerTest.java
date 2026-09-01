@@ -105,17 +105,21 @@ class TokureiShiteiControllerTest {
     // ------------------------------------------------------------------
 
     /**
-     * ※現行実装は合算指定番号を参照しないため、合算のみの場合もモーダル表示となる
+     * ※今回の修正で合算指定番号のみの場合も正常遷移するよう変更した
      */
     @Test
-    @DisplayName("#3 index 正常系 セッションに合算指定番号のみあり（指定番号なし）：検索モーダルを表示する")
-    void index_合算指定番号のみの場合はモーダル表示() {
+    @DisplayName("#3 index 正常系 セッションに合算指定番号のみあり（指定番号なし）：通知書画面を返す")
+    void index_合算指定番号のみの場合は正常遷移() {
+        TokureiShiteiDto expected = dto("G001");
+        expected.setHakkoYmd(LocalDate.of(2026, 4, 1));
+        when(tokureiShiteiService.getTokugimuInfo("G001")).thenReturn(expected);
+
         Model model = new ExtendedModelMap();
         String view = controller.index(sessionWith(null, "G001"), model);
 
-        assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
-        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
-        verify(tokureiShiteiService, never()).getTokugimuInfo(org.mockito.ArgumentMatchers.any());
+        assertThat(view).isEqualTo("reports/tokureiShitei");
+        assertThat(model.asMap()).containsEntry("dto", expected);
+        verify(tokureiShiteiService, times(1)).getTokugimuInfo("G001");
         verify(accessChecker, times(1)).checkAccess(ScreenManagement.TOKUREI_SHITEI);
     }
 
