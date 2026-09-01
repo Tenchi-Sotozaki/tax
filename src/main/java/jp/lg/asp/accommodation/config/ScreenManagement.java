@@ -180,6 +180,9 @@ public final class ScreenManagement {
 	// 金融機関コード取込
 	public static final String BANK_IMPORT = "sc00000012";
 
+	// 自治体情報一覧
+	public static final String JICHITAI_LIST = "sc00000013";
+
 	// 自治体情報設定
 	public static final String JICHITAI_CONFIG = "sc00000008";
 

@@ -11,15 +11,21 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h5 class="mb-0 fw-bold text-dark">
-				<i class="bi bi-building me-2 text-primary"></i>自治体情報設定
+				<i class="bi bi-building me-2 text-primary"></i>
+				<span th:text="${mode == 'view'} ? '自治体情報照会' : (${mode == 'edit'} ? '自治体情報編集' : '自治体情報登録')"></span>
 			</h5>
+			<a th:if="${mode == 'view'}"
+				th:href="@{/admin/jichitai-config/edit/{cd}(cd=${configForm.jichitaiCd})}"
+				class="btn btn-primary">
+				<i class="bi bi-pencil-square me-2"></i>編集する
+			</a>
 		</div>
 
 		<!-- メッセージ表示 -->
-		<div th:if="${validationErrors != null and !validationErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show" role="alert">
-			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${validationErrors.size()}"></span> 件のエラーがあります。
+		<div th:if="${fieldErrors != null and !fieldErrors.isEmpty()}" class="alert alert-danger alert-dismissible fade show" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i> 入力内容に <span th:text="${fieldErrors.size()}"></span> 件のエラーがあります。
 			<ul class="mb-0 mt-1">
-				<li th:each="err : ${validationErrors}" th:text="${err}" class="small"></li>
+				<li th:each="entry : ${fieldErrors}" th:text="${entry.value}" class="small"></li>
 			</ul>
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
@@ -32,8 +38,9 @@
 			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
-		<form th:action="@{/admin/jichitai-config/save}" method="post" th:object="${configForm}" novalidate>
-			
+		<form id="jichitaiConfigForm" th:action="@{/admin/jichitai-config/save}" method="post" th:object="${configForm}" novalidate>
+			<input type="hidden" name="mode" th:value="${mode}">
+
 			<!-- 自治体情報エリア -->
 			<div class="card shadow-sm mb-4">
 				<div class="card-header">
@@ -44,32 +51,31 @@
 						<div class="col-md-3">
 							<label for="jichitaiCd" class="form-label fw-medium">自治体コード <span class="text-danger">*</span></label>
 							<input type="text" id="jichitaiCd" th:field="*{jichitaiCd}" class="form-control"
-								th:classappend="${#fields.hasErrors('jichitaiCd')} ? 'is-invalid' : ''"
-								maxlength="5">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('jichitaiCd')}" th:errors="*{jichitaiCd}"></div>
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('jichitaiCd')} ? 'is-invalid' : (${mode != 'register'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode != 'register'}" maxlength="5">
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('jichitaiCd')}" th:text="${fieldErrors['jichitaiCd']}"></div>
 						</div>
 						<div class="col-md-3">
 							<label for="name" class="form-label fw-medium">自治体名称 <span class="text-danger">*</span></label>
 							<input type="text" id="name" th:field="*{name}" class="form-control"
-								th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"
-								maxlength="20">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('name')} ? 'is-invalid' : (${mode == 'view'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode == 'view'}">
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('name')}" th:text="${fieldErrors['name']}"></div>
 						</div>
 						<div class="col-md-3">
 							<label for="kbnName" class="form-label fw-medium">自治体種別名 <span class="text-danger">*</span></label>
 							<input type="text" id="kbnName" th:field="*{kbnName}" class="form-control"
-								th:classappend="${#fields.hasErrors('kbnName')} ? 'is-invalid' : ''"
-								maxlength="10">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('kbnName')}" th:errors="*{kbnName}"></div>
-						</div>						
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('kbnName')} ? 'is-invalid' : (${mode == 'view'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode == 'view'}">
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('kbnName')}" th:text="${fieldErrors['kbnName']}"></div>
+						</div>
 						<div class="col-md-3">
 						    <label for="param" class="form-label fw-medium">自治体識別名<span class="text-danger">*</span></label>
-						    <input type="text" id="param" th:field="*{param}" class="form-control" 
-								th:classappend="${#fields.hasErrors('param')} ? 'is-invalid' : ''" 
-								maxlength="10">
-						    <div class="invalid-feedback" th:if="${#fields.hasErrors('param')}" th:errors="*{param}">
-						    </div>
-						</div>						
+						    <input type="text" id="param" th:field="*{param}" class="form-control"
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('param')} ? 'is-invalid' : (${mode != 'register'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode != 'register'}">
+						    <div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('param')}" th:text="${fieldErrors['param']}"></div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -83,30 +89,28 @@
 					<div class="row g-3">
 						<div class="col-md-3">
 							<label for="nendoStMonth" class="form-label fw-medium">年度開始月 <span class="text-danger">*</span></label>
-							<select id="nendoStMonth"
-							        th:field="*{nendoStMonth}"
-							        class="form-select">
-
+							<select id="nendoStMonth" th:field="*{nendoStMonth}" class="form-select"
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('nendoStMonth')} ? 'is-invalid' : ''"
+								th:disabled="${mode == 'view'}">
 							    <option value="">選択してください</option>
-
 							    <option th:each="m : ${#numbers.sequence(1,12)}"
 							            th:value="${m}"
 							            th:text="${m + '月'}"
 							            th:selected="${nendoStMonth == #strings.toString(m)}">
 							    </option>
-
 							</select>
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('nendoStMonth')}" th:errors="*{nendoStMonth}"></div>
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('nendoStMonth')}" th:text="${fieldErrors['nendoStMonth']}"></div>
 						</div>
 						<div class="col-md-3">
 							<label for="nozeiShuki" class="form-label fw-medium">デフォルト納税周期 <span class="text-danger">*</span></label>
 							<select id="nozeiShuki" th:field="*{nozeiShuki}" class="form-select"
-								th:classappend="${#fields.hasErrors('nozeiShuki')} ? 'is-invalid' : ''">
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('nozeiShuki')} ? 'is-invalid' : ''"
+								th:disabled="${mode == 'view'}">
 								<option value="">選択してください</option>
 								<option value="1">毎月</option>
 								<option value="3">3ヶ月</option>
 							</select>
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('nozeiShuki')}" th:errors="*{nozeiShuki}"></div>
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('nozeiShuki')}" th:text="${fieldErrors['nozeiShuki']}"></div>
 						</div>
 					</div>
 				</div>
@@ -122,54 +126,91 @@
 						<div class="col-md-3">
 							<label for="shiteiStChar" class="form-label fw-medium">指定番号 <span class="text-danger">*</span></label>
 							<input type="text" id="shiteiStChar" th:field="*{shiteiStChar}" class="form-control"
-								th:classappend="${#fields.hasErrors('shiteiStChar')} ? 'is-invalid' : ''"
-								maxlength="3" placeholder="例：001">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('shiteiStChar')}" th:errors="*{shiteiStChar}"></div>
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('shiteiStChar')} ? 'is-invalid' : (${mode == 'view'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode == 'view'}" maxlength="3" placeholder="例：001">
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('shiteiStChar')}" th:text="${fieldErrors['shiteiStChar']}"></div>
 						</div>
 						<div class="col-md-3">
 							<label for="gassanStChar" class="form-label fw-medium">合算指定番号 <span class="text-danger">*</span></label>
 							<input type="text" id="gassanStChar" th:field="*{gassanStChar}" class="form-control"
-								th:classappend="${#fields.hasErrors('gassanStChar')} ? 'is-invalid' : ''"
-								maxlength="3" placeholder="例：001">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('gassanStChar')}" th:errors="*{gassanStChar}"></div>
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('gassanStChar')} ? 'is-invalid' : (${mode == 'view'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode == 'view'}" maxlength="3" placeholder="例：901">
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('gassanStChar')}" th:text="${fieldErrors['gassanStChar']}"></div>
 						</div>
 						<div class="col-md-3">
 							<label for="atenaStNo" class="form-label fw-medium">宛名番号 <span class="text-danger">*</span></label>
 							<input type="text" id="atenaStNo" th:field="*{atenaStNo}" class="form-control"
-								th:classappend="${#fields.hasErrors('atenaStNo')} ? 'is-invalid' : ''"
-								placeholder="例：1">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('atenaStNo')}" th:errors="*{atenaStNo}"></div>
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('atenaStNo')} ? 'is-invalid' : (${mode == 'view'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode == 'view'}" maxlength="15" placeholder="15桁以内で入力してください">
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('atenaStNo')}" th:text="${fieldErrors['atenaStNo']}"></div>
 						</div>
 					</div>
 				</div>
 			</div>
-			
+
 			<!-- ユーザー情報エリア -->
 			<div class="card shadow-sm mb-4">
 				<div class="card-header">
-					<h6 class="mb-0"><i class="bi bi-hash me-2"></i>ユーザー情報</h6>
+					<h6 class="mb-0"><i class="bi bi-person me-2"></i>ユーザー情報</h6>
 				</div>
 				<div class="card-body">
 					<div class="row g-3">
 						<div class="col-md-3">
-							<label for="shiteiStChar" class="form-label fw-medium">ユーザーID <span class="text-danger">*</span></label>
+							<label for="userId" class="form-label fw-medium">初期ユーザーID <span class="text-danger">*</span></label>
 							<input type="text" id="userId" th:field="*{userId}" class="form-control"
-								th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''" placeholder="例：user">
-							<div class="invalid-feedback" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">
-							</div>
+								th:classappend="${fieldErrors != null and fieldErrors.containsKey('userId')} ? 'is-invalid' : (${mode == 'view'} ? ' form-control-readonly' : '')"
+								th:readonly="${mode == 'view'}" placeholder="例：user">
+							<div class="invalid-feedback" th:if="${fieldErrors != null and fieldErrors.containsKey('userId')}" th:text="${fieldErrors['userId']}"></div>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- ボタンエリア -->
-			<div class="d-flex justify-content-center">
-				<button type="submit" class="btn btn-success px-5">
-					<i class="bi bi-check-circle me-1"></i>登録する
+			<div class="d-flex justify-content-center gap-3 py-4">
+				<!-- 照会時：一覧に戻る -->
+				<a th:if="${mode == 'view'}" th:href="@{/admin/jichitai-list}"
+					class="btn btn-outline-secondary px-4">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<!-- 編集時：戻る（確認モーダル経由で照会画面へ） -->
+				<a th:if="${mode == 'edit'}" href="#"
+					class="btn btn-outline-secondary px-4"
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal">
+					<i class="bi bi-arrow-left me-2"></i>戻る
+				</a>
+				<!-- 登録時：一覧に戻る（確認モーダル経由で一覧へ） -->
+				<a th:if="${mode == 'register'}" href="#"
+					class="btn btn-outline-secondary px-4"
+					data-bs-toggle="modal" data-bs-target="#backConfirmModal">
+					<i class="bi bi-arrow-left me-2"></i>一覧に戻る
+				</a>
+				<!-- 登録ボタン -->
+				<button th:unless="${mode == 'view'}" type="button"
+					class="btn btn-success px-5"
+					data-bs-toggle="modal" data-bs-target="#saveConfirmModal">
+					<i class="bi bi-check-circle me-1"></i>
+					<span th:text="${mode == 'edit'} ? '更新する' : '登録する'"></span>
 				</button>
 			</div>
 
 		</form>
+
+		<!-- 登録/更新確認モーダル -->
+		<div th:unless="${mode == 'view'}">
+			<div th:replace="~{layout/components :: confirmModal('saveConfirmModal', ${mode == 'edit'} ? '更新確認' : '登録確認', ${mode == 'edit'} ? '自治体情報を更新します。よろしいですか？' : '自治体情報を登録します。よろしいですか？', 'jichitaiConfigForm', 'btn-primary', ${mode == 'edit'} ? '更新する' : '登録する')}">
+			</div>
+		</div>
+		<!-- 編集時：照会画面へ戻る確認モーダル -->
+		<div th:if="${mode == 'edit'}">
+			<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/jichitai-config/view/{cd}(cd=${configForm.jichitaiCd})}, '戻る')}">
+			</div>
+		</div>
+		<!-- 登録時：一覧へ戻る確認モーダル -->
+		<div th:if="${mode == 'register'}">
+			<div th:replace="~{layout/components :: linkConfirmModal('backConfirmModal', '確認', '入力内容が破棄されます。よろしいですか？', @{/admin/jichitai-list}, '戻る')}">
+			</div>
+		</div>
 
 	</div>
 </body>
