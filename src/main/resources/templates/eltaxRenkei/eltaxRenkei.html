@@ -43,6 +43,22 @@
         </div>
 
         <!-- 取込済みファイル一覧エリア -->
+        <div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+            <span class="text-muted small"></span>
+            <!-- ======== ページネーション ======== -->
+            <nav class="position-absolute start-50 translate-middle-x">
+                <ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".eltax-row"></ul>
+            </nav>
+            <!-- ======== 表示件数 ======== -->
+            <div class="d-flex align-items-center gap-2">
+                <label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
+                <select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+                    <option value="10">10件</option>
+                    <option value="50">50件</option>
+                    <option value="100">100件</option>
+                </select>
+            </div>
+        </div>
         <div class="card shadow-sm">
             <div class="card-header fw-bold">取込済みファイル一覧</div>
             <div class="card-body">
@@ -60,7 +76,7 @@
                         <tr th:if="${#lists.isEmpty(eltaxRenkeiList)}">
                             <td colspan="5" class="text-center">取込済みのファイルがありません</td>
                         </tr>
-                        <tr th:each="item : ${eltaxRenkeiList}">
+                        <tr class="eltax-row" th:each="item : ${eltaxRenkeiList}">
                             <td th:text="${item.fileName}"></td>
                             <td th:text="${shubetsuNameMap.getOrDefault(item.shubetsu, item.shubetsu)}"></td>
                             <td th:text="${item.shoriDt != null ? #temporals.format(item.shoriDt, 'yyyy/MM/dd HH:mm:ss') : ''}"></td>
@@ -70,7 +86,7 @@
                                 <span th:if="${item.shoriKekka != '1' and item.shoriKekka != '9'}" class="badge bg-secondary" th:text="${item.shoriKekka}"></span>
                             </td>
                             <td>
-                                <a th:href="@{/eltax-renkei/download/{seq}(seq=${item.seq})}" class="btn btn-sm btn-outline-primary">
+                                <a th:href="@{/eltax-renkei/download/{seq}(seq=${item.seq})}" class="btn btn-outline-primary">
                                     <i class="bi bi-download me-1"></i>ダウンロード
                                 </a>
                             </td>

@@ -1,0 +1,9 @@
+.form-control-edited {
+	border: 3px solid #ffeb3b;
+	background-color: #fdf6d9;
+}
+
+.form-control.form-control-edited:focus {
+	border-color: #ffeb3b;
+	background-color: #fdf6d9;
+}

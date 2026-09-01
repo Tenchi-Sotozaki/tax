@@ -3,8 +3,9 @@ package jp.lg.asp.accommodation.dto;
 import java.time.LocalDate;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -19,6 +20,7 @@ public class FukaDeclarationForm {
 	// ========== 制御用フィールド ==========
 	private boolean edit;
 	private boolean view;
+	private boolean gassanTarget;
 	private Long declarationId;
 	private String shiteiNo;
 	private String nendo;
@@ -49,27 +51,41 @@ public class FukaDeclarationForm {
 
 	// ========== 加算金額入力エリア ==========
 	private String additionalCategory1;
+	/** 0〜100、小数点以下2桁まで。kasan_ritsu numeric(5,2) に収まる範囲 */
+	@Pattern(regexp = "^$|^(100(\\.0{1,2})?|[0-9]{1,2}(\\.[0-9]{1,2})?)$",
+			message = "加算割合1は0〜100の半角数字（小数点以下2桁まで）で入力してください")
 	private String additionalRate1;
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long additionalAmount1;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate1;
 	private String additionalCategory2;
+	/** 0〜100、小数点以下2桁まで。kasan_ritsu numeric(5,2) に収まる範囲 */
+	@Pattern(regexp = "^$|^(100(\\.0{1,2})?|[0-9]{1,2}(\\.[0-9]{1,2})?)$",
+			message = "加算割合2は0〜100の半角数字（小数点以下2桁まで）で入力してください")
 	private String additionalRate2;
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long additionalAmount2;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate2;
 	private String additionalCategory3;
+	/** 0〜100、小数点以下2桁まで。kasan_ritsu numeric(5,2) に収まる範囲 */
+	@Pattern(regexp = "^$|^(100(\\.0{1,2})?|[0-9]{1,2}(\\.[0-9]{1,2})?)$",
+			message = "加算割合3は0〜100の半角数字（小数点以下2桁まで）で入力してください")
 	private String additionalRate3;
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long additionalAmount3;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate additionalDueDate3;
 
 	// 延滞金・納入期限（テーブル定義書2026-06-18：加算の納期限を1本化）
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long entaikin;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate nokigen;
 
 	// 徴収原簿
+	@Valid
 	private FukaMonthlyTallyDto monthlyTally = new FukaMonthlyTallyDto();
 
 	// ========== 納入情報エリア ==========
@@ -81,33 +97,4 @@ public class FukaDeclarationForm {
 	// ========== バリデーション制御用フィールド ==========
 	private boolean taxCheckBypassed = false;
 	private Boolean showTaxWarningModal = false;
-
-	// ========== 相関チェック ==========
-
-	/**
-	 * 加算金額区分が選択されている場合、加算金額の入力を必須とする。
-	 */
-	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
-	public boolean isAdditionalAmountValid1() {
-		if (additionalCategory1 == null || additionalCategory1.isEmpty()) {
-			return true;
-		}
-		return additionalAmount1 != null && additionalAmount1 > 0;
-	}
-
-	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
-	public boolean isAdditionalAmountValid2() {
-		if (additionalCategory2 == null || additionalCategory2.isEmpty()) {
-			return true;
-		}
-		return additionalAmount2 != null && additionalAmount2 > 0;
-	}
-
-	@AssertTrue(message = "区分を選択した場合は、加算金額を入力してください")
-	public boolean isAdditionalAmountValid3() {
-		if (additionalCategory3 == null || additionalCategory3.isEmpty()) {
-			return true;
-		}
-		return additionalAmount3 != null && additionalAmount3 > 0;
-	}
 }

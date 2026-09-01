@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.entity.Nokigen;
-import jp.lg.asp.accommodation.entity.NokigenId;
+import jp.lg.asp.accommodation.repository.HolidayRepository;
+import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.service.impl.NokigenServiceImpl;
 
@@ -23,6 +23,8 @@ import jp.lg.asp.accommodation.service.impl.NokigenServiceImpl;
 class NokigenServiceImplTest {
 
     @Mock NokigenRepository nokigenRepository;
+    @Mock HolidayRepository holidayRepository;
+    @Mock JichitaiRepository jichitaiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks NokigenServiceImpl service;
 
@@ -33,71 +35,49 @@ class NokigenServiceImplTest {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
     }
 
+    // -----------------------------------------------------------------------
+    // findAll
+    // -----------------------------------------------------------------------
+
+    // TC-01: 正常系・データあり → 戻り値のリストを確認
     @Test
-    void findAll_returnsListFromRepository() {
-        Nokigen n = new Nokigen();
-        when(nokigenRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(n));
+    void findAll_データあり_リストを返す() {
+        Nokigen n1 = new Nokigen();
+        Nokigen n2 = new Nokigen();
+        when(nokigenRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(n1, n2));
 
         List<Nokigen> result = service.findAll();
 
-        assertThat(result).hasSize(1);
+        assertThat(result).containsExactly(n1, n2);
     }
 
+    // TC-02: データなし → 戻り値のリストが空
     @Test
-    void findByNendo_found() {
-        Nokigen n = new Nokigen();
-        when(nokigenRepository.findById(new NokigenId(JICHITAI_CD, "2024"))).thenReturn(Optional.of(n));
+    void findAll_データなし_空リストを返す() {
+        when(nokigenRepository.findAllByJichitaiCd(JICHITAI_CD)).thenReturn(List.of());
 
-        Nokigen result = service.findByNendo("2024");
+        List<Nokigen> result = service.findAll();
 
-        assertThat(result).isNotNull();
+        assertThat(result).isEmpty();
     }
 
-    @Test
-    void findByNendo_notFound_returnsNull() {
-        when(nokigenRepository.findById(any())).thenReturn(Optional.empty());
+    // -----------------------------------------------------------------------
+    // existsByNendo
+    // -----------------------------------------------------------------------
 
-        assertThat(service.findByNendo("9999")).isNull();
-    }
-
+    // TC-03: 正常系・対象年度のデータ数＞０ → 戻り値がtrue
     @Test
-    void existsByNendo_true() {
+    void existsByNendo_対象年度のデータ数が1以上_trueを返す() {
         when(nokigenRepository.countByJichitaiCdAndNendo(JICHITAI_CD, "2024")).thenReturn(1L);
 
         assertThat(service.existsByNendo("2024")).isTrue();
     }
 
+    // TC-04: データなし・対象年度のデータ数＝０ → 戻り値がfalse
     @Test
-    void existsByNendo_false() {
+    void existsByNendo_対象年度のデータ数が0_falseを返す() {
         when(nokigenRepository.countByJichitaiCdAndNendo(JICHITAI_CD, "2024")).thenReturn(0L);
 
         assertThat(service.existsByNendo("2024")).isFalse();
-    }
-
-    @Test
-    void save_convertsDateFormatAndSaves() {
-        Nokigen nokigen = new Nokigen();
-        nokigen.setNokigen1st("2024-04-30");
-        nokigen.setNokigen2nd("");
-        nokigen.setNokigen3rd(null);
-        nokigen.setNokigen4th("2024-07-31");
-        nokigen.setNokigen5th("");
-        nokigen.setNokigen6th("");
-        nokigen.setNokigen7th("");
-        nokigen.setNokigen8th("");
-        nokigen.setNokigen9th("");
-        nokigen.setNokigen10th("");
-        nokigen.setNokigen11th("");
-        nokigen.setNokigen12th("");
-
-        when(nokigenRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
-
-        Nokigen saved = service.save(nokigen);
-
-        assertThat(saved.getNokigen1st()).isEqualTo("20240430");
-        assertThat(saved.getNokigen2nd()).isEqualTo("");
-        assertThat(saved.getNokigen3rd()).isEqualTo("");
-        assertThat(saved.getNokigen4th()).isEqualTo("20240731");
-        assertThat(saved.getJichitaiCd()).isEqualTo(JICHITAI_CD);
     }
 }

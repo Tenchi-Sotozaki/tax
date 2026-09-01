@@ -1,4 +1,17 @@
-const appConfig    = document.getElementById('appConfig').dataset;
+function validateForm() {
+    const b1Ym = document.getElementById('b1Ym');
+    b1Ym.classList.remove('is-invalid');
+    document.getElementById('b1YmError').textContent = '';
+
+    if (!b1Ym.value) {
+        b1Ym.classList.add('is-invalid');
+        document.getElementById('b1YmError').textContent = '対象月１を選択してください。';
+        b1Ym.focus();
+        return false;
+    }
+    return true;
+}
+
 const ctxPath      = appConfig.ctxPath;
 const taishoYmList = JSON.parse(appConfig.taishoYmList).map(String);
 

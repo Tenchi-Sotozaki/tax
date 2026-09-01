@@ -22,8 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 変化があれば黄色の枠を付与、戻ればスタイルをクリア
         if (isChanged) {
-            input.style.border = '2px solid #ffeb3b';
+			input.classList.add('form-control-edited');
         } else {
+			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }
