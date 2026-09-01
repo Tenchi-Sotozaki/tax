@@ -1,7 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
@@ -159,8 +158,8 @@ class GassanNonyuTsuchiControllerTest {
 		}
 
 		@Test
-		@DisplayName("境界値：合算指定番号（gassanShiteiNo）がnullの場合にサービス呼び出しを行わず画面表示されること")
-		void success_gassanShiteiNoIsNull() {
+		@DisplayName("異常系：合算指定番号（gassanShiteiNo）がnullの場合に例外がスローされること")
+		void error_gassanShiteiNoIsNull() {
 			MockHttpSession session = new MockHttpSession();
 			Model model = new ConcurrentModel();
 
@@ -172,10 +171,8 @@ class GassanNonyuTsuchiControllerTest {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(searchDto);
 
-				String viewName = gassanNonyuTsuchiController.index(session, model);
-
-				assertThat(viewName).isEqualTo("reports/gassanNonyuTsuchi");
-				verify(gassanNonyuTsuchiService, never()).getGassanNonyuTsuchiInfo(anyString());
+				assertThatThrownBy(() -> gassanNonyuTsuchiController.index(session, model))
+						.isInstanceOf(IllegalArgumentException.class);
 				verify(accessChecker).checkAccess(ScreenManagement.GASSAN_NONYU_TSUCHI);
 			}
 		}
