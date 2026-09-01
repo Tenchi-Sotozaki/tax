@@ -1,5 +1,6 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -77,12 +78,14 @@ public class KofukinBulkPrintController {
 			boolean download, String operation) {
 		try {
 			if (!form.isKofuShinsei() && !form.isKofuKetteiTsuchi()) {
-				return ResponseEntity.badRequest().build();
+				byte[] errorBytes = "交付申請または交付決定通知のいずれかを選択してください。".getBytes(StandardCharsets.UTF_8);
+				return ResponseEntity.badRequest().body(errorBytes);
 			}
 
 			List<KofuKetteiTsuchiShinseiDto> dtoList = kofuKetteiTsuchiShinseiService.getAllReportData(form.getNendo());
 			if (dtoList == null || dtoList.isEmpty()) {
-				return ResponseEntity.badRequest().build();
+				byte[] errorBytes = "対象年度のレポートデータが存在しません。".getBytes(StandardCharsets.UTF_8);
+				return ResponseEntity.badRequest().body(errorBytes);
 			}
 
 			String formattedDate = formatDate(form.getHakkoYmd());
@@ -104,11 +107,10 @@ public class KofukinBulkPrintController {
 			}
 			return ResponseEntity.ok().headers(headers).body(pdfData);
 
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			log.error("帳票一括発行エラー", e);
-			return ResponseEntity.internalServerError().build();
+			byte[] errorBytes = "帳票一括発行処理でエラーが発生しました。".getBytes(StandardCharsets.UTF_8);
+			return ResponseEntity.internalServerError().body(errorBytes);
 		}
 	}
 

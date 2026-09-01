@@ -159,7 +159,7 @@ class KofukinBulkPrintControllerTest {
 	class GenerateResponseEdgeAndErrorTest {
 
 		@Test
-		@DisplayName("境界値：交付申請と交付決定通知の双方がfalseの場合に不正リクエスト（400）が返却されること")
+		@DisplayName("境界値：交付申請と交付決定通知の双方がfalseの場合に不正リクエスト（400）とエラーメッセージが返却されること")
 		void badRequest_whenBothFlagsAreFalse() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
 			form.setKofuShinsei(false);
@@ -169,11 +169,13 @@ class KofukinBulkPrintControllerTest {
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
+			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+					.contains("交付申請または交付決定通知のいずれかを選択してください。");
 			verify(kofuKetteiTsuchiShinseiService, never()).getAllReportData(anyString());
 		}
 
 		@Test
-		@DisplayName("境界値：取得したレポートデータリストがnullの場合に不正リクエスト（400）が返却されること")
+		@DisplayName("境界値：取得したレポートデータリストがnullの場合に不正リクエスト（400）とエラーメッセージが返却されること")
 		void badRequest_whenDtoListIsNull() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
 			form.setNendo("2026");
@@ -186,10 +188,12 @@ class KofukinBulkPrintControllerTest {
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
+			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+					.contains("対象年度のレポートデータが存在しません。");
 		}
 
 		@Test
-		@DisplayName("境界値：取得したレポートデータリストが空の場合に不正リクエスト（400）が返却されること")
+		@DisplayName("境界値：取得したレポートデータリストが空の場合に不正リクエスト（400）とエラーメッセージが返却されること")
 		void badRequest_whenDtoListIsEmpty() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
 			form.setNendo("2026");
@@ -202,6 +206,8 @@ class KofukinBulkPrintControllerTest {
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
+			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+					.contains("対象年度のレポートデータが存在しません。");
 		}
 
 		@Test
@@ -227,7 +233,7 @@ class KofukinBulkPrintControllerTest {
 		}
 
 		@Test
-		@DisplayName("異常系：サービス処理中に例外が発生した場合に内部サーバーエラー（500）が返却されること")
+		@DisplayName("異常系：サービス処理中に例外が発生した場合に内部サーバーエラー（500）とエラーメッセージが返却されること")
 		void internalServerError_whenExceptionThrown() {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
 			form.setNendo("2026");
@@ -241,6 +247,8 @@ class KofukinBulkPrintControllerTest {
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is5xxServerError()).isTrue();
+			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
+					.contains("帳票一括発行処理でエラーが発生しました。");
 		}
 	}
 }
