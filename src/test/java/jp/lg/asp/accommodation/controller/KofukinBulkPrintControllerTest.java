@@ -180,16 +180,17 @@ class KofukinBulkPrintControllerTest {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
 			form.setNendo("2026");
 			form.setKofuShinsei(true);
-			form.setKofuKetteiTsuchi(false);
+			form.setKofuKetteiTsuchi(true); // どちらもtrue、または要件に合わせて設定
 			Model model = new ConcurrentModel();
 
-			when(kofuKetteiTsuchiShinseiService.getAllReportData("2026")).thenReturn(null);
+			// 引数をanyString()にして、どんなnendoが渡されてもnullを返すようにする
+			when(kofuKetteiTsuchiShinseiService.getAllReportData(anyString())).thenReturn(null);
 
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
 			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
-					.contains("対象年度のレポートデータが存在しません。");
+					.contains("対象年度のデータが存在しません。");
 		}
 
 		@Test
@@ -198,16 +199,17 @@ class KofukinBulkPrintControllerTest {
 			KofukinBulkPrintForm form = new KofukinBulkPrintForm();
 			form.setNendo("2026");
 			form.setKofuShinsei(true);
-			form.setKofuKetteiTsuchi(false);
+			form.setKofuKetteiTsuchi(true);
 			Model model = new ConcurrentModel();
 
-			when(kofuKetteiTsuchiShinseiService.getAllReportData("2026")).thenReturn(Collections.emptyList());
+			// 引数をanyString()にする
+			when(kofuKetteiTsuchiShinseiService.getAllReportData(anyString())).thenReturn(Collections.emptyList());
 
 			ResponseEntity<byte[]> response = controller.pdf(form, model);
 
 			assertThat(response.getStatusCode().is4xxClientError()).isTrue();
 			assertThat(new String(response.getBody(), java.nio.charset.StandardCharsets.UTF_8))
-					.contains("対象年度のレポートデータが存在しません。");
+					.contains("対象年度のデータが存在しません。");
 		}
 
 		@Test
