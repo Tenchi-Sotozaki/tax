@@ -145,17 +145,12 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 				log.debug("設定した税額: zeigaku={}, kasan={}", response.getZeigaku(), response.getKasan());
 
-				// nokigenの設定（null値を除外して処理）
-				List<LocalDate> dates = Arrays.asList(fuka.getNokigen())
-						.stream()
-						.filter(date -> date != null)
-						.collect(java.util.stream.Collectors.toList());
-
-				Optional<LocalDate> minDate = dates.stream().min(Comparator.naturalOrder());
-				if (minDate.isPresent()) {
+				// nokigenの設定
+				LocalDate nokigenDate = fuka.getNokigen();
+				if (nokigenDate != null) {
 					// ① fuka.nokigen あり → そのまま返す
-					response.setNokigen(minDate.get().toString());
-					log.debug("納期限設定（最早日）: {}", minDate.get());
+					response.setNokigen(nokigenDate.toString());
+					log.debug("納期限設定: {}", nokigenDate);
 				} else {
 					// ② fuka.nokigen なし → 特例適用判定
 					String nokigenValue = resolveNokigenFromMaster(
