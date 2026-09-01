@@ -217,11 +217,9 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             dto.setFukaKbn(FukaConstants.TEIGAKU.getValue());
         }
 
-        // 施設情報設定
-        setShisetsuInfo(dto, shiteiNo);
-
-        // 納入税額・加算金・納期限の設定
+        // 施設情報設定・納入税額・加算金・納期限の設定（賦課データが存在する場合のみ）
         if (firstFuka != null) {
+            setShisetsuInfo(dto, shiteiNo);
             setNofuAndKasan(dto, shiteiNo, firstFuka, ymArr);
             dto.setHenko_kbn(henkoKbn != null && !henkoKbn.isEmpty() ? henkoKbn : firstFuka.getHenkoKbn());
         }
