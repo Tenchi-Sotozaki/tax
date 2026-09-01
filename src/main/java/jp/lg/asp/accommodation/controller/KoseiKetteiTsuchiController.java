@@ -43,22 +43,22 @@ public class KoseiKetteiTsuchiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		
-		// 指定番号が存在しない場合
+
+		// 指定番号または合算指定番号が存在しない場合
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+		if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
 			// 画面を戻して検索モーダルを表示
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
-		
+
 		// 指定番号を取得
-		String shiteiNo = SessionHelper.getShiteiNo(session);
+		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
 
 		model.addAttribute("taishoYmList",
-				!shiteiNo.isEmpty()
-						? reportsService.findTaishoYmList(shiteiNo)
-						: java.util.Collections.emptyList());
+				reportsService.findTaishoYmList(effectiveShiteiNo));
 
 		return "reports/koseiKetteiTsuchi";
 	}
