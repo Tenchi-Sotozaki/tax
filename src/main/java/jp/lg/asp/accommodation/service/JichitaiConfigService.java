@@ -17,6 +17,11 @@ public interface JichitaiConfigService {
 	Jichitai getCurrentJichitai();
 
 	/**
+	 * 指定した自治体コードの設定DTOを取得
+	 */
+	JichitaiConfigDto getJichitaiConfigDtoById(String jichitaiCd);
+
+	/**
 	 * 初期表示用の設定DTOを取得
 	 */
 	JichitaiConfigDto getJichitaiConfigDto();
