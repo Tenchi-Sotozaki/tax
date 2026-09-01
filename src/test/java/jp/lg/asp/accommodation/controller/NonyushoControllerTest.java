@@ -63,6 +63,7 @@ class NonyushoControllerTest {
 
         try (var mock = mockStatic(SessionHelper.class)) {
             mock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+            mock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
             mock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(selected);
             when(tokugimuService.getTokugimuByShiteiNo(SHITEI_NO)).thenReturn(tokugimuForm);
 
@@ -84,6 +85,7 @@ class NonyushoControllerTest {
 
         try (var mock = mockStatic(SessionHelper.class)) {
             mock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+            mock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
             mock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(selected);
             when(tokugimuService.getTokugimuByShiteiNo(SHITEI_NO)).thenThrow(new RuntimeException("取得失敗"));
 
@@ -101,6 +103,7 @@ class NonyushoControllerTest {
     void index_セッションにShiteiGassanSearchDtoなし_tTokugimuReport画面を返す() {
         try (var mock = mockStatic(SessionHelper.class)) {
             mock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
+            mock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
             mock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
 
             Model model = new ExtendedModelMap();
@@ -118,7 +121,9 @@ class NonyushoControllerTest {
         selected.setShiteiNo("");
 
         try (var mock = mockStatic(SessionHelper.class)) {
-            mock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn("");
+            // SessionHelperの実装は空文字のnullを返すため、nullを返すようにモック
+            mock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
+            mock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
             mock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(selected);
 
             Model model = new ExtendedModelMap();
