@@ -75,8 +75,8 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
         System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
         Jichitai jichitai = reportsCommonService.getJichitaiInfo();
-        cityName     = jichitai.getName();
-        todoufuken   = jichitai.getKbnName();
+        cityName     = jichitai != null ? jichitai.getName() + jichitai.getKbnName() : "";
+        todoufuken   = jichitai != null ? jichitai.getKbnName() : "";
         horeiInyou1  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
         horeiInyou2  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
         koin         = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
@@ -94,7 +94,12 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
             log.debug("PDF生成開始 - 指定番号: {}, b1Ym: {}, b2Ym: {}, b3Ym: {}", shiteiNo, b1Ym, b2Ym, b3Ym);
 
-            String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(dto.getFukaKbn())
+            String fukaKbn = dto.getFukaKbn();
+            if (!FukaConstants.TEIRITSU.getValue().equals(fukaKbn)
+                    && !FukaConstants.TEIGAKU.getValue().equals(fukaKbn)) {
+                throw new RuntimeException("未知の賦課区分です: " + fukaKbn);
+            }
+            String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(fukaKbn)
                     ? JRXML_TEIRITSU
                     : JRXML_TEIGAKU;
 
@@ -178,9 +183,6 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         dto.setTsuchi_tsuki(String.valueOf(today.getMonthValue()));
         dto.setTsuchi_hi(String.valueOf(today.getDayOfMonth()));
 
-        // 施設情報設定
-        setShisetsuInfo(dto, shiteiNo);
-
         // b1/b2/b3 各月のブロック設定
         String[] ymArr   = { b1Ym, b2Ym, b3Ym };
         boolean fukaKbnSet = false;
@@ -214,6 +216,9 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         if (!fukaKbnSet) {
             dto.setFukaKbn(FukaConstants.TEIGAKU.getValue());
         }
+
+        // 施設情報設定
+        setShisetsuInfo(dto, shiteiNo);
 
         // 納入税額・加算金・納期限の設定
         if (firstFuka != null) {
@@ -330,12 +335,18 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
                 jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
 
-        // 更正の場合は前回rno分を取得して差引計算に使用
-        boolean isKosei          = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
-        List<FukaUchi> prevUchiList = (isKosei && rno > 1)
-                ? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-                        jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
-                : Collections.emptyList();
+        // 更正の場合は変更区分「申告」の最新rnoを取得して差引計算に使用
+        boolean isKosei = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
+        List<FukaUchi> prevUchiList = Collections.emptyList();
+        if (isKosei) {
+            Optional<Integer> shinkokuRno = fukaRepository.findMaxRnoByHenkoKbn(
+                    jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu(),
+                    FukaConstants.SHINKOKU.getValue());
+            if (shinkokuRno.isPresent()) {
+                prevUchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+                        jichitaiCd, fuka.getShiteiNo(), shinkokuRno.get(), fuka.getNendo(), fuka.getKibetsu());
+            }
+        }
         long prevFukaZeigaku = prevUchiList.stream()
                 .mapToLong(u -> u.getZeigaku() != null ? u.getZeigaku() : 0L).sum();
 
@@ -388,7 +399,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                 .mapToLong(u -> u.getHakusu() != null ? u.getHakusu() : 0L).sum();
         setField(dto, blockNo == 1 ? "b1_hakusu_sum" : prefix + "hakusu_sum", String.valueOf(hakusuSum));
 
-        // 定率の場合: 税率（zei_ritsu1〜5）をb1のみセット
+        // 定率の場合: 税率（zei_ritsu1〜5）・区分名をb1のみセット
         if (blockNo == 1 && FukaConstants.TEIRITSU.getValue().equals(fuka.getFukaKbn())) {
             for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
                 final int k = kbn;
@@ -403,7 +414,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
             .map(FukaUchi::getZeiritsuSeq)
             .filter(seq -> seq != null)
             .findFirst()
-            .ifPresent(zeiritsuSeq -> {
+            .ifPresentOrElse(zeiritsuSeq -> {
                 List<ZeiritsuTeiritsu> teiritsuList =
                     zeiritsuTeiritsuRepository.findActiveBySeq(
                         jichitaiCd, zeiritsuSeq);
@@ -414,7 +425,7 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                             nvl(t.getKbnName()).trim());
                     }
                 }
-            });
+            }, () -> zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, null));
         }
     }
 

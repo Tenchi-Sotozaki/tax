@@ -17,7 +17,6 @@ import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KoseiKetteiTsuchiReportsService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
@@ -44,22 +43,19 @@ public class KoseiKetteiTsuchiController {
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 		
-		// 指定番号が存在しない場合
-		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
-			// 画面を戻して検索モーダルを表示
+		// 指定番号・合算指定番号を取得し、どちらかがあれば処理継続
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+		String targetNo = org.springframework.util.StringUtils.hasText(shiteiNo) ? shiteiNo
+				: org.springframework.util.StringUtils.hasText(gassanShiteiNo) ? gassanShiteiNo : null;
+
+		if (targetNo == null) {
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
-		
-		// 指定番号を取得
-		String shiteiNo = SessionHelper.getShiteiNo(session);
 
-		model.addAttribute("dto", reportsService.buildDtoForDisplay(shiteiNo));
-		model.addAttribute("taishoYmList",
-				!shiteiNo.isEmpty()
-						? reportsService.findTaishoYmList(shiteiNo)
-						: java.util.Collections.emptyList());
+		model.addAttribute("shiteiNo", targetNo);
+		model.addAttribute("taishoYmList", reportsService.findTaishoYmList(targetNo));
 
 		return "reports/koseiKetteiTsuchi";
 	}
