@@ -5,99 +5,145 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
-import org.springframework.ui.ExtendedModelMap;
+import org.mockito.quality.Strictness;
+import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
+import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinBulkDto;
-import jp.lg.asp.accommodation.repository.KofuRitsuRepository;
 import jp.lg.asp.accommodation.service.ShoreikinBulkService;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ShoreikinBulkControllerTest {
 
-    @Mock ShoreikinBulkService shoreikinBulkService;
-    @Mock ScreenAccessChecker accessChecker;
-    @Mock KofuRitsuRepository kofuRitsuRepository;
-    @Mock JichitaiContext jichitaiContext;
+	@Mock
+	private ShoreikinBulkService shoreikinBulkService;
 
-    @InjectMocks ShoreikinBulkController controller;
+	@Mock
+	private ScreenAccessChecker accessChecker;
 
-    @BeforeEach
-    void setUp() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(kofuRitsuRepository.findKofuRitsuByJichitaiCd(eq("011002"), any(Integer.class)))
-                .thenReturn(List.of(BigDecimal.valueOf(50)));
-    }
+	@Mock
+	private JichitaiContext jichitaiContext;
 
-    @Test
-    void bulk_初期表示() {
-        Model model = new ExtendedModelMap();
+	@Mock
+	private Model model;
 
-        String view = controller.bulk("2024", model);
+	@Mock
+	private BindingResult bindingResult;
 
-        assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
-        assertThat(model.asMap()).containsKey("bulkForm");
-    }
+	@InjectMocks
+	private ShoreikinBulkController controller;
 
-    @Test
-    void executeBulk_バリデーションエラー() {
-        ShoreikinBulkDto form = new ShoreikinBulkDto();
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "bulkForm");
-        bindingResult.rejectValue("nendo", "NotBlank", "必須です");
-        Model model = new ExtendedModelMap();
+	private static final String JICHITAI_CD = "011002";
+	private static final String SCREEN_ID = ScreenManagement.SHOREIKIN_BULK;
+	private static final String BULK_VIEW = "shoreikin/shoreikinBulk";
 
-        String view = controller.executeBulk(form, bindingResult, model);
+	@Nested
+	@DisplayName("bulk メソッドのテスト")
+	class BulkTest {
 
-        assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
-        verifyNoInteractions(shoreikinBulkService);
-    }
+		@Test
+        @DisplayName("正常系：初期表示時、年度未指定でデータが取得できる場合にフォームと交付率が設定されること")
+        void bulk_success() {
+            Model model = new ConcurrentModel();
+            when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+            when(shoreikinBulkService.findKofuRitsuList(eq(JICHITAI_CD), anyInt()))
+                    .thenReturn(List.of(BigDecimal.valueOf(0.5)));
 
-    @Test
-    void executeBulk_正常実行() {
-        ShoreikinBulkDto form = new ShoreikinBulkDto();
-        form.setNendo("2024");
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "bulkForm");
-        ShoreikinBulkDto result = new ShoreikinBulkDto();
-        result.setFailureCount(0);
-        when(shoreikinBulkService.executeBulkSanshutsu(form)).thenReturn(result);
-        Model model = new ExtendedModelMap();
+            String viewName = controller.bulk(null, model);
 
-        String view = controller.executeBulk(form, bindingResult, model);
+            assertThat(viewName).isEqualTo(BULK_VIEW);
+            assertThat(model.containsAttribute("bulkForm")).isTrue();
+            ShoreikinBulkDto form = (ShoreikinBulkDto) model.getAttribute("bulkForm");
+            assertThat(form.getKofuRitsu()).isEqualByComparingTo(BigDecimal.valueOf(0.5));
+            assertThat(model.containsAttribute("errorMessage")).isFalse();
+            verify(accessChecker, times(1)).checkAccess(any());
+        }
 
-        assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
-        assertThat(model.asMap()).containsKey("bulkForm");
-        assertThat(model.asMap()).doesNotContainKey("successMessage");
-        assertThat(model.asMap()).doesNotContainKey("warningMessage");
-    }
+        @Test
+        @DisplayName("異常系：交付率が未登録の場合、エラーメッセージがモデルに追加されること")
+        void bulk_noKofuRitsu_setsErrorMessage() {
+            Model model = new ConcurrentModel();
+            when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+            when(shoreikinBulkService.findKofuRitsuList(eq(JICHITAI_CD), anyInt()))
+                    .thenReturn(Collections.emptyList());
 
-    @Test
-    void executeBulk_失敗あり() {
-        ShoreikinBulkDto form = new ShoreikinBulkDto();
-        form.setNendo("2024");
-        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "bulkForm");
-        ShoreikinBulkDto result = new ShoreikinBulkDto();
-        result.setFailureCount(2);
-        when(shoreikinBulkService.executeBulkSanshutsu(form)).thenReturn(result);
-        Model model = new ExtendedModelMap();
+            String viewName = controller.bulk(null, model);
 
-        String view = controller.executeBulk(form, bindingResult, model);
+            assertThat(viewName).isEqualTo(BULK_VIEW);
+            assertThat(model.getAttribute("errorMessage"))
+                    .isEqualTo("交付率のシステム設定値が登録されていません。システム設定から交付率を設定してください。");
+            assertThat(model.containsAttribute("bulkForm")).isTrue();
+        }
+	}
 
-        assertThat(view).isEqualTo("shoreikin/shoreikinBulk");
-        assertThat(model.asMap()).containsKey("bulkForm");
-        assertThat(model.asMap()).doesNotContainKey("warningMessage");
-    }
+	@Nested
+	@DisplayName("executeBulk メソッドのテスト")
+	class ExecuteBulkTest {
+
+		@Test
+		@DisplayName("正常系：バリデーションエラーなくサービス処理が成功した場合、結果がモデルに設定されて画面が返却されること")
+		void executeBulk_success_returnsView() {
+			ShoreikinBulkDto dto = new ShoreikinBulkDto();
+			dto.setNendo("2026");
+
+			doNothing().when(accessChecker).checkWriteAccess(SCREEN_ID);
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(shoreikinBulkService.executeBulkSanshutsu(dto)).thenReturn(dto);
+
+			String viewName = controller.executeBulk(dto, bindingResult, model);
+
+			assertThat(viewName).isEqualTo(BULK_VIEW);
+			verify(model, times(1)).addAttribute("bulkForm", dto);
+			verify(model, never()).addAttribute(eq("errorMessage"), any());
+		}
+
+		@Test
+		@DisplayName("境界値：バリデーションエラーがある場合、サービスを呼び出さずにフォームを保持して画面が返却されること")
+		void executeBulk_validationHasErrors_returnsViewWithoutServiceCall() {
+			ShoreikinBulkDto dto = new ShoreikinBulkDto();
+
+			doNothing().when(accessChecker).checkWriteAccess(SCREEN_ID);
+			when(bindingResult.hasErrors()).thenReturn(true);
+
+			String viewName = controller.executeBulk(dto, bindingResult, model);
+
+			assertThat(viewName).isEqualTo(BULK_VIEW);
+			verify(shoreikinBulkService, never()).executeBulkSanshutsu(any());
+			verify(model, times(1)).addAttribute("bulkForm", dto);
+		}
+
+		@Test
+		@DisplayName("異常系：サービス処理中に例外が発生した場合、エラーメッセージと詳細がモデルに設定されて画面が返却されること")
+		void executeBulk_serviceThrowsException_setsErrorAttributes() {
+			ShoreikinBulkDto dto = new ShoreikinBulkDto();
+			dto.setNendo("2026");
+
+			doNothing().when(accessChecker).checkWriteAccess(SCREEN_ID);
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(shoreikinBulkService.executeBulkSanshutsu(dto)).thenThrow(new RuntimeException("DB Error"));
+
+			String viewName = controller.executeBulk(dto, bindingResult, model);
+
+			assertThat(viewName).isEqualTo(BULK_VIEW);
+			verify(model, times(1)).addAttribute(eq("errorMessage"), eq("一括算出処理中にエラーが発生しました。システム管理者にお問い合わせください。"));
+			verify(model, times(1)).addAttribute(eq("errorDetail"), anyString());
+			verify(model, times(1)).addAttribute("bulkForm", dto);
+		}
+	}
 }

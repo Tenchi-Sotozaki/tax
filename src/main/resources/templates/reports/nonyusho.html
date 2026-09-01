@@ -30,14 +30,7 @@
 						<input type="hidden" id="tokuJusho" name="tokuJusho" th:value="${tokuJusho}" />
 						
 						<!-- 特別徴収義務者情報 -->
-						<div th:replace="~{layout/components :: selectedTokugimuInfo}"></div>
-						
-						<!-- エラーメッセージ -->
-						<div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert" id="errorAlert"
-							style="display: none;">
-							<i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="errorMessageText"></span>
-							<button type="button" class="btn-close btn-sm" onclick="hideErrorMessage()"></button>
-						</div>
+						<div th:replace="~{layout/components :: selectedTokugimuInfo(true)}"></div>
 						
 						<!-- 内容エリア -->
 						<div class="card mb-4">
@@ -48,8 +41,9 @@
 								<div class="row g-3">
 									<div class="col-md-4">
 										<label for="taishoYm" class="form-label">対象年月 <span
-												class="text-danger">*</span></label> <input type="month"
-											class="form-control" id="taishoYm" name="shinkokuYmd" required>
+												class="text-danger">*</span></label>
+										<input type="month" class="form-control" id="taishoYm" name="shinkokuYmd">
+										<div class="invalid-feedback" id="taishoYmError"></div>
 									</div>
 								</div>
 							</div>
@@ -61,15 +55,15 @@
 							<a th:href="@{/tokugimu/report}" class="btn btn-outline-secondary">
 								<i class="bi bi-arrow-left me-1"></i> 戻る
 							</a>
+							
+							<!-- プレビュー -->
+							<button type="button" onclick="submitReport('preview')" class="btn btn-primary">
+								<i class="bi bi-eye me-1"></i> プレビュー
+							</button>
 
 							<!-- PDF発行 -->
 							<button type="button" onclick="submitReport('pdf')" class="btn btn-primary">
 								<i class="bi bi-file-earmark-pdf me-1"></i> PDF
-							</button>
-							
-							<!-- プレビュー -->
-							<button type="button" onclick="submitReport('preview')" class="btn btn-outline-primary">
-								<i class="bi bi-eye me-1"></i> プレビュー
 							</button>
 						    
 						    <!-- 印刷 -->
@@ -81,11 +75,14 @@
 				</div>
 			</div>
 		</div>
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
 	</div>
 
 	<th:block layout:fragment="scripts">
 		<script th:src="@{/js/nonyusho.js}"></script>
 		<script th:src="@{/js/reportForm.js}"></script>
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
 	</th:block>
 </body>
 

@@ -23,8 +23,8 @@ public interface TokugimuService {
 	// 指定番号・履歴番号で1件取得してフォームに変換する
 	TokugimuForm getTokugimuByShiteiNoAndRno(String shiteiNo, int rno);
 
-	// 特別徴収義務者を登録する
-	void register(TokugimuForm form);
+	// 特別徴収義務者を登録する（登録した指定番号を返す）
+	String register(TokugimuForm form);
 
 	// 指定番号をキーに特別徴収義務者を更新する
 	void updateByShiteiNo(String shiteiNo, TokugimuForm form);

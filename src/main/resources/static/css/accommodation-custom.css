@@ -182,6 +182,44 @@
     background-color: var(--acomo-navy) !important;
 }
 
+/* フォーム(編集不可) */
+.form-control-readonly {
+	background-color: #f2f2f2;
+	caret-color: transparent;
+	cursor: default;
+}
+
+.form-control.form-control-readonly:focus {
+	background-color: #f2f2f2;
+	border-color: var(--acomo-border);
+	box-shadow: none;
+	outline: none;
+}
+
+.form-control-edited {
+    border: 3px solid #ffeb3b;
+    background-color: #fdf6d9;
+}
+
+.form-control.form-control-edited:focus {
+    border-color: #ffeb3b;
+    background-color: #fdf6d9;
+}
+
+/* テーブル(編集不可) */
+.table-readonly {
+    background-color: #f2f2f2;
+}
+
+.table-readonly td,
+.table-readonly th {
+    background-color: #f2f2f2;
+}
+
+.table-readonly tr.table-primary td {
+    background-color: var(--bs-table-bg);
+}
+
 /* ==========================================
    テーブル
 ========================================== */
@@ -215,6 +253,24 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/*
+  読み取り専用の入力欄
+  readonly 属性だけでは入力できるように見えるため、見た目でも区別する
+*/
+.form-control-readonly {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+    cursor: default;
+}
+
+/* フォーカスしても入力できるようには見せない */
+.form-control-readonly:focus {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-secondary-color);
+    border-color: var(--acomo-border);
+    box-shadow: none;
 }
 
 /*
