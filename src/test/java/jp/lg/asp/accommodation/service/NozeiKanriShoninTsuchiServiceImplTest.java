@@ -34,7 +34,7 @@ import jp.lg.asp.accommodation.service.impl.NozeiKanriShoninTsuchiServiceImpl;
 /**
  * 納税管理人承認(不承認)通知書 単体テスト（サービス）
  *
- * <p>チェックリストの #15〜#25 に1対1で対応する。</p>
+ * <p>チェックリストの #19〜#29 に1対1で対応する。</p>
  */
 @ExtendWith(MockitoExtension.class)
 class NozeiKanriShoninTsuchiServiceImplTest {
@@ -122,11 +122,11 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #15 getNozeiKanriInfo
+    // #19 getNozeiKanriInfo
     // ==================================================================
 
     @Test
-    @DisplayName("#15 getNozeiKanriInfo 正常系 全情報が正常に取得できる場合")
+    @DisplayName("#19 getNozeiKanriInfo 正常系 全情報が正常に取得できる場合")
     void getNozeiKanriInfo_全情報が正常に取得できる場合() {
         Jichitai j = jichitai("札幌");
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
@@ -147,14 +147,14 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #16 getNozeiKanriInfo
+    // #20 getNozeiKanriInfo
     // ==================================================================
 
     /**
      * ※現行実装は ifPresent で読み飛ばし、納税管理人の項目が null のまま DTO を返すため、実装側の修正が必要
      */
     @Test
-    @DisplayName("#16 getNozeiKanriInfo 異常系 nokanRepository が Optional.empty() を返す場合（納税管理人未登録）：例外となる")
+    @DisplayName("#20 getNozeiKanriInfo 異常系 nokanRepository が Optional.empty() を返す場合（納税管理人未登録）：例外となる")
     void getNozeiKanriInfo_nokanが存在しない場合は例外がスローされる() {
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
         Atena a = atena("山田太郎", "1234567", "東京都千代田区1-1");
@@ -171,11 +171,11 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #17 getNozeiKanriInfo
+    // #21 getNozeiKanriInfo
     // ==================================================================
 
     @Test
-    @DisplayName("#17 getNozeiKanriInfo 正常系 reportsCommonService.getReportsDefText が null を返す場合：条例は空欄となる")
+    @DisplayName("#21 getNozeiKanriInfo 正常系 reportsCommonService.getReportsDefText が null を返す場合：条例は空欄となる")
     void getNozeiKanriInfo_getReportsDefTextがnullの場合はjoreiが空文字になる() {
         Jichitai j = jichitai("札幌");
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
@@ -191,11 +191,11 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #18 getNozeiKanriInfo
+    // #22 getNozeiKanriInfo
     // ==================================================================
 
     @Test
-    @DisplayName("#18 getNozeiKanriInfo 正常系 reportsCommonService.getReportsDefText が空文字を返す場合：条例は空欄となる")
+    @DisplayName("#22 getNozeiKanriInfo 正常系 reportsCommonService.getReportsDefText が空文字を返す場合：条例は空欄となる")
     void getNozeiKanriInfo_getReportsDefTextが空文字の場合はjoreiが空文字になる() {
         Jichitai j = jichitai("札幌");
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
@@ -211,11 +211,11 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #19 getNozeiKanriInfo
+    // #23 getNozeiKanriInfo
     // ==================================================================
 
     @Test
-    @DisplayName("#19 getNozeiKanriInfo 正常系 jichitaiRepository.findById が Optional.empty() を返す場合")
+    @DisplayName("#23 getNozeiKanriInfo 正常系 jichitaiRepository.findById が Optional.empty() を返す場合")
     void getNozeiKanriInfo_jichitaiが存在しない場合はcityNameが空文字になる() {
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
         Atena a = atena("山田太郎", "1234567", "東京都千代田区1-1");
@@ -234,11 +234,11 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #20 getNozeiKanriInfo
+    // #24 getNozeiKanriInfo
     // ==================================================================
 
     @Test
-    @DisplayName("#20 getNozeiKanriInfo 異常系 tokugimuRepository.findByJichitaiCdAndShiteiNo が空リストを返す場合")
+    @DisplayName("#24 getNozeiKanriInfo 異常系 tokugimuRepository.findByJichitaiCdAndShiteiNo が空リストを返す場合")
     void getNozeiKanriInfo_tokugimuが存在しない場合はRuntimeExceptionがスローされる() {
         lenient().when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai("札幌")));
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S999"))
@@ -250,11 +250,11 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #21 getNozeiKanriInfo
+    // #25 getNozeiKanriInfo
     // ==================================================================
 
     @Test
-    @DisplayName("#21 getNozeiKanriInfo 異常系 atenaRepository.findByJichitaiCdAndAtenaNo が Optional.empty() を返す場合")
+    @DisplayName("#25 getNozeiKanriInfo 異常系 atenaRepository.findByJichitaiCdAndAtenaNo が Optional.empty() を返す場合")
     void getNozeiKanriInfo_atenaが存在しない場合はRuntimeExceptionがスローされる() {
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
         lenient().when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai("札幌")));
@@ -269,11 +269,11 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #22 getNozeiKanriInfo
+    // #26 getNozeiKanriInfo
     // ==================================================================
 
     @Test
-    @DisplayName("#22 getNozeiKanriInfo 正常系 atena.getYubinNo() が値あり（\"1234567\"）の場合")
+    @DisplayName("#26 getNozeiKanriInfo 正常系 atena.getYubinNo() が値あり（\"1234567\"）の場合")
     void getNozeiKanriInfo_atenaYubinNoありの場合は郵便番号記号付きで設定される() {
         Jichitai j = jichitai("札幌");
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
@@ -287,14 +287,14 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #23 getNozeiKanriInfo
+    // #27 getNozeiKanriInfo
     // ==================================================================
 
     /**
      * ※現行実装は null チェックなしで連結しているため、実装側の修正が必要
      */
     @Test
-    @DisplayName("#23 getNozeiKanriInfo 正常系 atena.getYubinNo() が null の場合")
+    @DisplayName("#27 getNozeiKanriInfo 正常系 atena.getYubinNo() が null の場合")
     void getNozeiKanriInfo_atenaYubinNoがnullの場合はtokuYubinが空文字になる() {
         Jichitai j = jichitai("札幌");
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");
@@ -308,14 +308,14 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #24 getNozeiKanriInfo
+    // #28 getNozeiKanriInfo
     // ==================================================================
 
     /**
      * ※現行実装は null チェックなしで連結しているため、実装側の修正が必要
      */
     @Test
-    @DisplayName("#24 getNozeiKanriInfo 正常系 tokugimu.getShisetsuYubinNo() が null の場合")
+    @DisplayName("#28 getNozeiKanriInfo 正常系 tokugimu.getShisetsuYubinNo() が null の場合")
     void getNozeiKanriInfo_shisetsuYubinNoがnullの場合はshisetsuYubinが空文字になる() {
         Jichitai j = jichitai("札幌");
         Tokugimu t = tokugimu("テストホテル", null, "東京都千代田区1-1");
@@ -329,14 +329,14 @@ class NozeiKanriShoninTsuchiServiceImplTest {
     }
 
     // ==================================================================
-    // #25 getNozeiKanriInfo
+    // #29 getNozeiKanriInfo
     // ==================================================================
 
     /**
      * ※現行実装は null チェックなしで連結しているため、実装側の修正が必要
      */
     @Test
-    @DisplayName("#25 getNozeiKanriInfo 正常系 nokan.getYubinNo() が null の場合")
+    @DisplayName("#29 getNozeiKanriInfo 正常系 nokan.getYubinNo() が null の場合")
     void getNozeiKanriInfo_nokanYubinNoがnullの場合はnozeiKanriYubinが空文字になる() {
         Jichitai j = jichitai("札幌");
         Tokugimu t = tokugimu("テストホテル", "1234567", "東京都千代田区1-1");

@@ -37,7 +37,7 @@ import jp.lg.asp.accommodation.util.SessionHelper;
 /**
  * 納税管理人承認(不承認)通知書 単体テスト（コントローラ）
  *
- * <p>チェックリストの #1〜#14 に1対1で対応する。</p>
+ * <p>チェックリストの #1〜#18 に1対1で対応する。</p>
  */
 @ExtendWith(MockitoExtension.class)
 class NozeiKanriShoninTsuchiControllerTest {
@@ -312,11 +312,43 @@ class NozeiKanriShoninTsuchiControllerTest {
     }
 
     // ==================================================================
-    // #14 print
+    // #14 preview
     // ==================================================================
 
     @Test
-    @DisplayName("#14 print 正常系 hakkoYmd が設定されている場合")
+    @DisplayName("#14 preview 異常系 hakkoYmd が null の場合")
+    void preview_hakkoYmdがnullの場合は400を返す() {
+        NozeiKanriShoninTsuchiDto input = dto(null);
+
+        ResponseEntity<byte[]> response = controller.preview(input);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        verify(reportsService, never()).generateTsuchiPdf(any());
+        verify(accessChecker, times(1)).checkAccess(ScreenManagement.NOZEI_KANRININ_SHONIN_TSUCHI);
+    }
+
+    // ==================================================================
+    // #15 preview
+    // ==================================================================
+
+    @Test
+    @DisplayName("#15 preview 異常系 reportsService.generateTsuchiPdf が例外をスローした場合")
+    void preview_reportsServiceが例外をスローした場合は500を返す() {
+        NozeiKanriShoninTsuchiDto input = dto(LocalDate.now());
+        when(reportsService.generateTsuchiPdf(input)).thenThrow(new RuntimeException("PDF生成失敗"));
+
+        ResponseEntity<byte[]> response = controller.preview(input);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        verify(accessChecker, times(1)).checkAccess(ScreenManagement.NOZEI_KANRININ_SHONIN_TSUCHI);
+    }
+
+    // ==================================================================
+    // #16 print
+    // ==================================================================
+
+    @Test
+    @DisplayName("#16 print 正常系 hakkoYmd が設定されている場合")
     void print_hakkoYmdが設定されている場合はPDFとX_Print_Actionヘッダーを返す() {
         NozeiKanriShoninTsuchiDto input = dto(LocalDate.now());
         when(reportsService.generateTsuchiPdf(input)).thenReturn(new byte[]{1, 2, 3});
@@ -325,6 +357,38 @@ class NozeiKanriShoninTsuchiControllerTest {
 
         assertThat(response.getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_PDF);
         assertThat(response.getHeaders().getFirst("X-Print-Action")).isEqualTo("true");
+        verify(accessChecker, times(1)).checkAccess(ScreenManagement.NOZEI_KANRININ_SHONIN_TSUCHI);
+    }
+
+    // ==================================================================
+    // #17 print
+    // ==================================================================
+
+    @Test
+    @DisplayName("#17 print 異常系 hakkoYmd が null の場合")
+    void print_hakkoYmdがnullの場合は400を返す() {
+        NozeiKanriShoninTsuchiDto input = dto(null);
+
+        ResponseEntity<byte[]> response = controller.print(input);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        verify(reportsService, never()).generateTsuchiPdf(any());
+        verify(accessChecker, times(1)).checkAccess(ScreenManagement.NOZEI_KANRININ_SHONIN_TSUCHI);
+    }
+
+    // ==================================================================
+    // #18 print
+    // ==================================================================
+
+    @Test
+    @DisplayName("#18 print 異常系 reportsService.generateTsuchiPdf が例外をスローした場合")
+    void print_reportsServiceが例外をスローした場合は500を返す() {
+        NozeiKanriShoninTsuchiDto input = dto(LocalDate.now());
+        when(reportsService.generateTsuchiPdf(input)).thenThrow(new RuntimeException("PDF生成失敗"));
+
+        ResponseEntity<byte[]> response = controller.print(input);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         verify(accessChecker, times(1)).checkAccess(ScreenManagement.NOZEI_KANRININ_SHONIN_TSUCHI);
     }
 }
