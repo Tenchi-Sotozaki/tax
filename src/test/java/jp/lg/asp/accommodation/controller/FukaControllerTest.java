@@ -321,7 +321,6 @@ class FukaControllerTest {
     void showEdit_合算指定番号あり適用期間外_errorMessageを設定してリダイレクト() {
         MockHttpSession session = sessionWithGassan("00100001", "901001");
         when(fukaService.getNendoStMonth()).thenReturn(4);
-        when(fukaService.resolveGassanTekiyoPeriod(any(), any())).thenReturn(null);
         when(fukaService.isGassanTargetMonth(eq("901001"), any())).thenReturn(false);
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
@@ -336,7 +335,6 @@ class FukaControllerTest {
     @Test
     void showEdit_セッション未設定_モーダル表示() {
         MockHttpSession session = new MockHttpSession();
-        when(fukaService.getNendoStMonth()).thenReturn(4);
         Model model = new ExtendedModelMap();
 
         String view = controller.showEdit("2024", 1, session, new RedirectAttributesModelMap(), model);
@@ -416,7 +414,6 @@ class FukaControllerTest {
     void showView_合算指定番号あり適用期間外_errorMessageを設定してリダイレクト() {
         MockHttpSession session = sessionWithGassan("00100001", "901001");
         when(fukaService.getNendoStMonth()).thenReturn(4);
-        when(fukaService.resolveGassanTekiyoPeriod(any(), any())).thenReturn(null);
         when(fukaService.isGassanTargetMonth(eq("901001"), any())).thenReturn(false);
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
@@ -431,7 +428,6 @@ class FukaControllerTest {
     @Test
     void showView_セッション未設定_モーダル表示() {
         MockHttpSession session = new MockHttpSession();
-        when(fukaService.getNendoStMonth()).thenReturn(4);
         Model model = new ExtendedModelMap();
 
         String view = controller.showView("2024", 1, null, session, new RedirectAttributesModelMap(), model);
@@ -555,7 +551,6 @@ class FukaControllerTest {
         form.setShinkokuDate(LocalDate.now());
         form.setTaxCheckBypassed(true);
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
-        when(fukaValidatorService.getDiscrepancyMessages(form)).thenReturn(List.of("ズレあり"));
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
         String view = controller.save(form, bindingResult, new ExtendedModelMap(), redirectAttributes);
@@ -574,7 +569,6 @@ class FukaControllerTest {
         form.setEdit(true);
         form.setModificationCategory(null);
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(form, "fukaDeclarationForm");
-        when(fukaValidatorService.getDiscrepancyMessages(form)).thenReturn(List.of());
 
         String view = controller.save(form, bindingResult, new ExtendedModelMap(), new RedirectAttributesModelMap());
 

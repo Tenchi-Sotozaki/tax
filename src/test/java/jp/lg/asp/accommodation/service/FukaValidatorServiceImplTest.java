@@ -259,6 +259,8 @@ class FukaValidatorServiceImplTest {
         form.getMonthlyDetail().setExemptStayCount(0L);
         FukaMonthlyTallyDto tally = new FukaMonthlyTallyDto();
         tally.initialize(1);
+        // hasCountData=trueにするため宿泊数を設定
+        tally.getDailyItems().get(0).getHakusu().set(0, 1);
         // 1日目の免除泊数を5に設定（合計5 vs 入力値0で不一致）
         tally.getDailyItems().get(0).setMenjoHakusu(5);
         form.setMonthlyTally(tally);
@@ -275,6 +277,8 @@ class FukaValidatorServiceImplTest {
         FukaDeclarationForm form = buildTeigakuForm(1L, 200L, 1L, 200L);
         FukaMonthlyTallyDto tally = new FukaMonthlyTallyDto();
         tally.initialize(1);
+        // hasCountData=trueにするため宿泊数を設定
+        tally.getDailyItems().get(0).getHakusu().set(0, 1);
         // 1日目の税額を999に設定（合計999 vs 入力値200で不一致）
         tally.getDailyItems().get(0).setZeigaku(999L);
         form.setMonthlyTally(tally);
