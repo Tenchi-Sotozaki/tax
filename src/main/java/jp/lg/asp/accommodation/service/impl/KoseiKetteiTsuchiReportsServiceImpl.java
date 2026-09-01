@@ -409,11 +409,9 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 			}
 
 			Fuka fuka = fukaOpt.get();
-			Integer rno = fukaRepository.findMaxRno(
-					jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu()).orElse(1);
 
 			List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-					jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
+					jichitaiCd, fuka.getShiteiNo(), fuka.getRno(), fuka.getNendo(), fuka.getKibetsu());
 
 			boolean isKosei = FukaConstants.KOSEI.getValue().equals(henkoKbn);
 			List<FukaUchi> prevUchiList = Collections.emptyList();
