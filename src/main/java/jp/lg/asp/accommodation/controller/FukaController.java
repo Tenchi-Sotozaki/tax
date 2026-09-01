@@ -197,6 +197,16 @@ public class FukaController {
 			return DAICHO_VIEW;
 		}
 
+		// month未指定・形式不正チェック
+		if (!StringUtils.hasText(month)) {
+			redirectAttributes.addFlashAttribute("errorMessage", "対象年度が選択されていません。");
+			return "redirect:/declaration/payment-ledger";
+		}
+		if (month.length() != 6) {
+			redirectAttributes.addFlashAttribute("errorMessage", "対象年度の形式が不正です。");
+			return "redirect:/declaration/payment-ledger";
+		}
+
 		// 合算指定番号がセッションにない場合、指定番号が合算対象月かチェック
 		if (!StringUtils.hasText(selected.getGassanShiteiNo()) && StringUtils.hasText(month) && month.length() == 6) {
 			int y = Integer.parseInt(month.substring(0, 4));
