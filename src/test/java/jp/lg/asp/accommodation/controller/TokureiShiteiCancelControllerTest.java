@@ -140,8 +140,8 @@ class TokureiShiteiCancelControllerTest {
 		}
 
 		@Test
-		@DisplayName("境界値：特例情報（shiteiDto）が取得できない（null）場合に初期状態のDTOで画面が表示されること")
-		void boundaryShiteiDtoIsNull() {
+		@DisplayName("異常系：特例情報（shiteiDto）が取得できない（null）場合にエラーがスローされること")
+		void error_whenShiteiDtoIsNull() {
 			ShiteiGassanSearchDto selected = new ShiteiGassanSearchDto();
 			selected.setShiteiNo("12345");
 
@@ -149,10 +149,9 @@ class TokureiShiteiCancelControllerTest {
 			sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(selected);
 			when(tokureiShiteiService.getTokugimuInfo("12345")).thenReturn(null);
 
-			String viewName = tokureiShiteiCancelController.index(session, model);
-
-			assertThat(viewName).isEqualTo("reports/tokureiShiteiCancel");
-			verify(model).addAttribute(eq("dto"), any(TokureiShiteiCancelDto.class));
+			assertThatThrownBy(() -> tokureiShiteiCancelController.index(session, model))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("特例情報が存在しません。");
 		}
 
 		@Test

@@ -42,24 +42,24 @@ public class TokureiShiteiCancelReportsServiceImpl implements TokureiShiteiCance
 		try {
 			// 必須チェック等
 			if (dto == null) {
-				throw new IllegalArgumentException("DTOがnullです。");
+				throw new IllegalArgumentException("値が取得できませんでした。");
 			}
 			if (dto.getHakkoYmd() == null) {
 				throw new IllegalArgumentException("発行年月日は必須です。");
 			}
 			if (dto.getTekiyoYmd() == null || dto.getTekiyoYmd().isEmpty()) {
-				throw new IllegalArgumentException("適用年月日は必須です。");
+				throw new IllegalArgumentException("適用年月は必須です。");
 			}
 			if (dto.getJorei() == null || dto.getCity() == null || dto.getRiyu() == null) {
-				throw new IllegalArgumentException("必須のテキスト項目がnullです。");
+				throw new IllegalArgumentException("帳票出力項目が設定されていません。管理者にお問い合わせください。");
 			}
 			if (dto.getTokuYubin() == null || dto.getTokuJusho() == null || dto.getTokuName() == null ||
 				dto.getShisetsuYubin() == null || dto.getShisetsuJusho() == null || dto.getShisetsuName() == null ||
 				dto.getShiteiNo() == null || dto.getBiko() == null) {
-				throw new IllegalArgumentException("データソース用の必須項目がnullです。");
+				throw new IllegalArgumentException("該当するデータが見つかりませんでした。");
 			}
 			if (dto.getKoin() == null || dto.getKoin().length == 0) {
-				throw new IllegalArgumentException("記章（koin）は必須です。");
+				throw new IllegalArgumentException("公印が設定されていません。管理者にお問い合わせください。");
 			}
 
 			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();

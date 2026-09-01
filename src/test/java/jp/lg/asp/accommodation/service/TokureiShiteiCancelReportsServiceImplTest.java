@@ -57,7 +57,7 @@ class TokureiShiteiCancelReportsServiceImplTest {
 		void boundaryDtoIsNull() {
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(null))
 					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("DTOがnullです。");
+					.hasMessage("値が取得できませんでした。");
 		}
 
 		@Test
@@ -68,7 +68,8 @@ class TokureiShiteiCancelReportsServiceImplTest {
 			dto.setTekiyoYmd("2026-05");
 
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
-					.isInstanceOf(IllegalArgumentException.class);
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("発行年月日は必須です。");
 		}
 
 		@Test
@@ -79,7 +80,8 @@ class TokureiShiteiCancelReportsServiceImplTest {
 			dto.setTekiyoYmd(null);
 
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
-					.isInstanceOf(IllegalArgumentException.class);
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("適用年月は必須です。");
 		}
 
 		@Test
@@ -90,7 +92,8 @@ class TokureiShiteiCancelReportsServiceImplTest {
 			dto.setTekiyoYmd("");
 
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
-					.isInstanceOf(IllegalArgumentException.class);
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("適用年月は必須です。");
 		}
 
 		@Test
@@ -99,17 +102,23 @@ class TokureiShiteiCancelReportsServiceImplTest {
 			// joreiがnull
 			TokureiShiteiCancelDto dto1 = createValidDto();
 			dto1.setJorei(null);
-			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto1)).isInstanceOf(IllegalArgumentException.class);
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto1))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("帳票出力項目が設定されていません。管理者にお問い合わせください。");
 
 			// cityがnull
 			TokureiShiteiCancelDto dto2 = createValidDto();
 			dto2.setCity(null);
-			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto2)).isInstanceOf(IllegalArgumentException.class);
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto2))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("帳票出力項目が設定されていません。管理者にお問い合わせください。");
 
 			// riyuがnull
 			TokureiShiteiCancelDto dto3 = createValidDto();
 			dto3.setRiyu(null);
-			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto3)).isInstanceOf(IllegalArgumentException.class);
+			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto3))
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("帳票出力項目が設定されていません。管理者にお問い合わせください。");
 		}
 
 		@Test
@@ -129,7 +138,8 @@ class TokureiShiteiCancelReportsServiceImplTest {
 				if ("biko".equals(field)) dto.setBiko(null);
 
 				assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
-						.isInstanceOf(IllegalArgumentException.class);
+						.isInstanceOf(IllegalArgumentException.class)
+						.hasMessage("該当するデータが見つかりませんでした。");
 			}
 		}
 
@@ -139,12 +149,14 @@ class TokureiShiteiCancelReportsServiceImplTest {
 			TokureiShiteiCancelDto dtoNull = createValidDto();
 			dtoNull.setKoin(null);
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dtoNull))
-					.isInstanceOf(IllegalArgumentException.class);
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("公印が設定されていません。管理者にお問い合わせください。");
 
 			TokureiShiteiCancelDto dtoEmpty = createValidDto();
 			dtoEmpty.setKoin(new byte[0]);
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dtoEmpty))
-					.isInstanceOf(IllegalArgumentException.class);
+					.isInstanceOf(IllegalArgumentException.class)
+					.hasMessage("公印が設定されていません。管理者にお問い合わせください。");
 		}
 
 		@Test
