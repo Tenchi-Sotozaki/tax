@@ -47,24 +47,28 @@ public class GassanNonyuTsuchiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		String shiteiNo = SessionHelper.getShiteiNo(session);
-		GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
-
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+
+		// 合算指定番号・指定番号どちらも存在しない場合
+		if (selected == null || (gassanShiteiNo == null && SessionHelper.getShiteiNo(session) == null)) {
 			model.addAttribute("showShiteiGassanModal", true);
-			model.addAttribute("errorMessage", "特別徴収義務者を指定してください。");
 			return "tokugimu/tTokugimuReport";
 		}
 
-		if (selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
-			GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(shiteiNo);
-			if (info != null) {
-				dto = info;
-			}
-			if (dto.getHakkoYmd() == null) {
-				dto.setHakkoYmd(LocalDate.now());
-			}
+		// 合算指定番号がない場合（指定番号のみ）はエラー
+		if (gassanShiteiNo == null) {
+			model.addAttribute("errorMessage", "合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
+			return "tokugimu/tTokugimuReport";
+		}
+
+		GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
+		GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(gassanShiteiNo);
+		if (info != null) {
+			dto = info;
+		}
+		if (dto.getHakkoYmd() == null) {
+			dto.setHakkoYmd(LocalDate.now());
 		}
 
 		model.addAttribute("dto", dto);
