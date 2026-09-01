@@ -58,7 +58,6 @@ public class JichitaiConfigController {
 		    return "admin/jichitaiConfig";
 		}
 
-
 		try {
 			jichitaiConfigService.saveJichitaiConfig(configForm);
 			redirectAttributes.addFlashAttribute("successMessage", "自治体情報を保存しました。");

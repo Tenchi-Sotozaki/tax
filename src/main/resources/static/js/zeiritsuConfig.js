@@ -70,6 +70,27 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('input[name="fukaKbn"]').forEach(r => r.addEventListener('change', updateLabel));
     updateLabel();
 
+    // 区分が都道府県の場合、賦課方式を定額のみに制限
+    function updateFukaKbnByTaisho() {
+        if (isView) return;
+        const isEdit = document.getElementById('zeiritsuConfigRoot').dataset.isEdit === 'true';
+        const isHeaderEditable = document.getElementById('fukaTeigaku') && !document.getElementById('fukaTeigaku').disabled;
+        if (isEdit && !isHeaderEditable) return;
+        const taishoChecked = document.querySelector('input[name="taishoKbn"]:checked');
+        const fukaTeiritsu = document.getElementById('fukaTeiritsu');
+        const fukaTeigaku = document.getElementById('fukaTeigaku');
+        if (!fukaTeiritsu || !fukaTeigaku) return;
+        const isKen = taishoChecked && taishoChecked.value === '2';
+        fukaTeiritsu.disabled = isKen;
+        if (isKen) {
+            fukaTeigaku.checked = true;
+            updateLabel();
+        }
+    }
+
+    document.querySelectorAll('input[name="taishoKbn"]').forEach(r => r.addEventListener('change', updateFukaKbnByTaisho));
+    updateFukaKbnByTaisho();
+
     // 編集モードでなければ処理を行わない
     const contentContainer = document.querySelector('[data-is-edit]');
     const isEdit = contentContainer ? contentContainer.getAttribute('data-is-edit') === 'true' : false;
@@ -107,8 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 変更があれば黄色い枠を付与
         if (isChanged) {
-            input.style.border = '3px solid #ffeb3b';
+			input.classList.add('form-control-edited');
         } else {
+			input.classList.remove('form-control-edited');
             input.style.border = '';
         }
     }

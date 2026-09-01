@@ -1,10 +1,18 @@
 package jp.lg.asp.accommodation.service.impl;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.chrono.JapaneseChronology;
+import java.time.chrono.JapaneseDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,11 +26,16 @@ import jp.lg.asp.accommodation.dto.NonyushoDto;
 import jp.lg.asp.accommodation.dto.NonyushoReportsDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Jichitai;
+import jp.lg.asp.accommodation.entity.Nokigen;
+import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.ReportsDef;
 import jp.lg.asp.accommodation.entity.ReportsDefId;
+import jp.lg.asp.accommodation.entity.TokureiTekiyo;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
+import jp.lg.asp.accommodation.repository.NokigenRepository;
 import jp.lg.asp.accommodation.repository.ReportsDefRepository;
+import jp.lg.asp.accommodation.repository.TokureiTekiyoRepository;
 import jp.lg.asp.accommodation.service.NonyushoReportsService;
 import jp.lg.asp.accommodation.service.TokugimuService;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +61,9 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	private final TokugimuService tokugimuService;
 	private final FukaRepository fukaRepository;
 	private final JichitaiRepository jichitaiRepository;
+	private final NokigenRepository nokigenRepository;
 	private final ReportsDefRepository reportsDefRepository;
+	private final TokureiTekiyoRepository tokureiTekiyoRepository;
 
 	private final JichitaiContext jichitaiContext;
 
@@ -60,12 +75,12 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 			Map<String, Object> parameters = new HashMap<>();
 			JRDataSource dataSource = buildParams(dto);
-			
+
 			// 賦課情報が見つからない
 			if (dataSource == null) {
 				throw new RuntimeException("賦課情報が見つかりません。");
 			}
-			
+
 			JasperPrint jasperPrint = JasperFillManager.fillReport(
 					jasperReport, parameters, dataSource);
 
@@ -79,7 +94,7 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	}
 
 	/**
-	 * 納入書動的データ取得（新メソッド）
+	 * 納入書動的データ取得
 	 */
 	@Override
 	public NonyushoDataResponse getNonyushoData(String shiteiNo, String nendo, String shinkokuYm) {
@@ -98,58 +113,52 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 			} else {
 				taishoYm = null;
 			}
-			
+
 			// t_fukaテーブルからデータ取得（対象年月で絞り込み）
-			log.debug("賆課データ検索開始: jichitaiCode={}, shiteiNo={}, nendo={}, taishoYm={}", jichitaiCode, shiteiNo, nendo, taishoYm);
-			
-			// 最新の賆課データを取得
+			log.debug("賦課データ検索開始: jichitaiCode={}, shiteiNo={}, nendo={}, taishoYm={}", jichitaiCode, shiteiNo, nendo, taishoYm);
+
+			// 最新の賦課データを取得
 			List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCode, shiteiNo, nendo);
-			
+
 			// 対象年月が指定されている場合、その条件でフィルタリング
 			if (taishoYm != null) {
 				fukaList = fukaList.stream()
 						.filter(f -> taishoYm.equals(f.getTaishoYm()))
 						.collect(java.util.stream.Collectors.toList());
 			}
-			
-			log.debug("取得した賆課データ件数: {}", fukaList.size());
-			
+
+			log.debug("取得した賦課データ件数: {}", fukaList.size());
+
 			if (!fukaList.isEmpty()) {
 				// 最新のレコードを取得（rno最大）
 				Fuka fuka = fukaList.stream()
 						.max(Comparator.comparing(Fuka::getRno))
 						.orElse(fukaList.get(0));
-				log.debug("取得した賆課情報: rno={}, totalZeigaku={}, kasanGaku1={}, kasanGaku2={}, kasanGaku3={}", 
+				log.debug("取得した賦課情報: rno={}, totalZeigaku={}, kasanGaku1={}, kasanGaku2={}, kasanGaku3={}",
 						fuka.getRno(), fuka.getTotalZeigaku(), fuka.getKasanGaku1(), fuka.getKasanGaku2(), fuka.getKasanGaku3());
-				
+
 				response.setZeigaku(fuka.getTotalZeigaku() != null ? fuka.getTotalZeigaku().toString() : "0");
 				Long kasanGaku = (fuka.getKasanGaku1() != null ? fuka.getKasanGaku1() : 0L)
 						+ (fuka.getKasanGaku2() != null ? fuka.getKasanGaku2() : 0L)
 						+ (fuka.getKasanGaku3() != null ? fuka.getKasanGaku3() : 0L);
 				response.setKasan(kasanGaku.toString());
-				
+
 				log.debug("設定した税額: zeigaku={}, kasan={}", response.getZeigaku(), response.getKasan());
 
-				// nokigenの設定（null値を除外して処理）
-				List<LocalDate> dates = Arrays.asList(
-						fuka.getNokigen())
-						.stream()
-						.filter(date -> date != null) // null値を除外
-						.collect(java.util.stream.Collectors.toList());
-						
-				Optional<LocalDate> minDate = dates.stream().min(Comparator.naturalOrder());
-				if (minDate.isPresent()) {
-					response.setNokigen(minDate.get().toString());
-					log.debug("納期限設定（最早日）: {}", minDate.get());
-				} else if (fuka.getShinkokuYmd() != null) {
-					// shinkoku_Ymdの翌月末を計算
-					LocalDate nextMonthEnd = fuka.getShinkokuYmd().plusMonths(1)
-							.withDayOfMonth(fuka.getShinkokuYmd().plusMonths(1).lengthOfMonth());
-					response.setNokigen(nextMonthEnd.toString());
-					log.debug("納期限設定（申告日基準）: {}", nextMonthEnd);
+				// nokigenの設定
+				LocalDate nokigenDate = fuka.getNokigen();
+				if (nokigenDate != null) {
+					// ① fuka.nokigen あり → そのまま返す
+					response.setNokigen(nokigenDate.toString());
+					log.debug("納期限設定: {}", nokigenDate);
 				} else {
-					response.setNokigen("");
-					log.error("納期限が設定できませんでした");
+					// ② fuka.nokigen なし → 特例適用判定
+					String nokigenValue = resolveNokigenFromMaster(
+							shiteiNo, shinkokuYm, nendo, fuka.getShinkokuYmd());
+					response.setNokigen(nokigenValue);
+					if (nokigenValue.isEmpty()) {
+						log.error("納期限が設定できませんでした");
+					}
 				}
 			} else {
 				response.setZeigaku("0");
@@ -179,7 +188,6 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 
 		} catch (Exception e) {
 			log.error("納入書動的データ取得エラー: shiteiNo={}, nendo={}", shiteiNo, nendo, e);
-			// エラー時はデフォルト値を返す
 			response.setZeigaku("0");
 			response.setKasan("0");
 			response.setNokigen("");
@@ -191,6 +199,85 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 			response.setTorimatome("");
 			return response;
 		}
+	}
+
+	/**
+	 * fuka.nokigenがnullの場合の納期限解決
+	 * 特例適用中 → 四半期末のm_nokigenを返す
+	 * 特例適用外 → fukaShinkokuYmdの翌月末を返す（nullなら空文字）
+	 */
+	private String resolveNokigenFromMaster(String shiteiNo, String shinkokuYm,
+			String nendo, LocalDate fukaShinkokuYmd) {
+		try {
+			String jichitaiCd = jichitaiContext.getJichitaiCd();
+
+			// 自治体設定から年度開始月・defaultShukiを取得
+			Optional<Jichitai> jichitaiOpt = jichitaiRepository.findById(jichitaiCd);
+			int nendoStMonth = jichitaiOpt
+					.map(j -> Integer.parseInt(j.getNendoStMonth().trim()))
+					.orElse(3);
+			int defaultShuki = jichitaiOpt
+					.map(j -> Integer.parseInt(j.getNozeiShuki().trim()))
+					.orElse(1);
+
+			// 特例適用判定（defaultShuki==1 かつ taishoDateが期間内レコードあり）
+			boolean isTokurei = false;
+			if (defaultShuki == 1 && shinkokuYm != null && !shinkokuYm.isEmpty()) {
+				LocalDate taishoDate = LocalDate.parse(shinkokuYm + "-01");
+				List<TokureiTekiyo> tekiyoList =
+						tokureiTekiyoRepository.findActiveByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+				isTokurei = tekiyoList.stream().anyMatch(t ->
+						t.getTekiyoStYmd() != null && t.getTekiyoEdYmd() != null &&
+						!taishoDate.isBefore(t.getTekiyoStYmd()) &&
+						!taishoDate.isAfter(t.getTekiyoEdYmd()));
+			}
+
+			if (isTokurei) {
+				// 特例適用中：四半期末月のm_nokigenインデックスを算出
+				int month = Integer.parseInt(shinkokuYm.replace("-", "").substring(4, 6));
+				// 年度開始月を基準にインデックスを算出（例：nendoStMonth=3 → 3月=1st）
+				int index = (month - nendoStMonth + 12) % 12 + 1;
+				// 四半期末に丸める（1,2,3→3 / 4,5,6→6 / 7,8,9→9 / 10,11,12→12）
+				int quarterEndIndex = ((index - 1) / 3 + 1) * 3;
+				log.debug("特例適用中: month={}, index={}, quarterEndIndex={}", month, index, quarterEndIndex);
+
+				Optional<Nokigen> nokigenOpt =
+						nokigenRepository.findById(new NokigenId(jichitaiCd, nendo));
+				if (nokigenOpt.isEmpty()) return "";
+				String dbValue = getNokigenByIndex(nokigenOpt.get(), quarterEndIndex);
+				if (dbValue == null || dbValue.isBlank()) return "";
+				return LocalDate.parse(dbValue, DateTimeFormatter.ofPattern("yyyyMMdd"))
+						.format(DateTimeFormatter.ISO_LOCAL_DATE);
+			} else {
+				// 特例適用外：fukaShinkokuYmdの翌月末
+				if (fukaShinkokuYmd == null) return "";
+				LocalDate nextMonthEnd = fukaShinkokuYmd.plusMonths(1)
+						.withDayOfMonth(fukaShinkokuYmd.plusMonths(1).lengthOfMonth());
+				log.debug("特例適用外: fukaShinkokuYmd={}, nextMonthEnd={}", fukaShinkokuYmd, nextMonthEnd);
+				return nextMonthEnd.toString();
+			}
+		} catch (Exception e) {
+			log.error("納期限解決エラー", e);
+			return "";
+		}
+	}
+
+	private String getNokigenByIndex(Nokigen nokigen, int index) {
+		return switch (index) {
+			case 1  -> nokigen.getNokigen1st();
+			case 2  -> nokigen.getNokigen2nd();
+			case 3  -> nokigen.getNokigen3rd();
+			case 4  -> nokigen.getNokigen4th();
+			case 5  -> nokigen.getNokigen5th();
+			case 6  -> nokigen.getNokigen6th();
+			case 7  -> nokigen.getNokigen7th();
+			case 8  -> nokigen.getNokigen8th();
+			case 9  -> nokigen.getNokigen9th();
+			case 10 -> nokigen.getNokigen10th();
+			case 11 -> nokigen.getNokigen11th();
+			case 12 -> nokigen.getNokigen12th();
+			default -> "";
+		};
 	}
 
 	/**
@@ -220,101 +307,107 @@ public class NonyushoReportsServiceImpl implements NonyushoReportsService {
 	private JRDataSource buildParams(NonyushoDto dto) {
 		NonyushoReportsDto reportsDto = new NonyushoReportsDto();
 
-		// 自治体コードを取得
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		
-		// 指定番号を取得
 		String shiteiNo = dto.getShiteiNo();
-		
-		// 年度を取得
 		String nendo = dto.getNendo();
-		
-		// 最新の賦課データを取得
-		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo,
-				nendo);
 
-		// 賦課情報が存在しない場合は null を返す
+		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
+
 		if (fukaList.isEmpty()) {
 			return null;
 		}
-		
-		// 基本情報
+
 		reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
 		reportsDto.setJichitaiCd(jichitaiCd);
 		reportsDto.setKozaNo(dto.getKozaNo() != null ? dto.getKozaNo() : "");
 		reportsDto.setKozaName(dto.getKozaName() != null ? dto.getKozaName() : "");
-		reportsDto.setNendo(nendo != null ? nendo : "");
 		reportsDto.setShiteiNo(shiteiNo != null ? shiteiNo : "");
-		reportsDto.setZeigaku(dto.getZeigaku() != null ? dto.getZeigaku() : "0");
-		reportsDto.setEntai(dto.getEntai() != null ? dto.getEntai() : "0");
-		reportsDto.setKasan(dto.getKasan() != null ? dto.getKasan() : "0");
-		reportsDto.setGokei(dto.getGokei() != null ? dto.getGokei() : "0");
-
-		// 住所に郵便番号を連結
-		String tokuJusho = dto.getTokuJusho() != null ? dto.getTokuJusho().trim() : "";
-		String tokuYubinNo = dto.getTokuYubinNo() != null ? dto.getTokuYubinNo().trim() : "";
-
-		log.debug("郵便番号連結前: 郵便番号=[{}], 住所=[{}]", tokuYubinNo, tokuJusho);
-
-		// 郵便番号がある場合は住所の先頭に付加
-		if (!tokuYubinNo.isEmpty()) {
-			// 郵便番号のフォーマットを確認し、必要に応じてハイフンを追加
-			if (tokuYubinNo.matches("\\d{7}")) {
-				tokuYubinNo = tokuYubinNo.substring(0, 3) + "-" + tokuYubinNo.substring(3);
-			}
-			// 郵便番号を先頭に追加（住所が空でも郵便番号は表示）
-			tokuJusho = "〒" + tokuYubinNo + (tokuJusho.isEmpty() ? "" : " " + tokuJusho);
-			log.debug("郵便番号連結後: [{}]", tokuJusho);
-		} else {
-			log.debug("郵便番号が空のため連結処理をスキップしました");
-		}
-		reportsDto.setTokuJusho(tokuJusho);
-
+		reportsDto.setZeigaku(formatToCommaString(dto.getZeigaku()));
+		reportsDto.setEntai(formatToCommaString(dto.getEntai()));
+		reportsDto.setKasan(formatToCommaString(dto.getKasan()));
+		reportsDto.setGokei(formatToCommaString(dto.getGokei()));
+		reportsDto.setTokuYubin(dto.getTokuYubinNo() != null ? "〒" + dto.getTokuYubinNo().trim() : "");
+		reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho().trim() : "");
 		reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
 		reportsDto.setNonyuBasho(dto.getNonyuBasho() != null ? dto.getNonyuBasho() : "");
 		reportsDto.setShiteiKinyuName(dto.getShiteiKinyuName() != null ? dto.getShiteiKinyuName() : "");
 		reportsDto.setTorimatome(dto.getTorimatome() != null ? dto.getTorimatome() : "");
 
+		// 年度（和暦）を設定
+		String nendoStr = "";
+		if (dto.getNendo() != null && !dto.getNendo().isEmpty()) {
+			try {
+				int year = Integer.parseInt(nendo);
+				LocalDate localDate = LocalDate.of(year, 1, 1);
+				JapaneseDate japaneseDate = JapaneseDate.from(localDate);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年", Locale.JAPANESE);
+				nendoStr = japaneseDate.format(formatter);
+			} catch (NumberFormatException | java.time.format.DateTimeParseException e) {
+				nendoStr = dto.getNendo();
+			}
+		}
+		reportsDto.setNendo(nendoStr);
+
 		// 申告年月
 		if (dto.getShinkokuYmd() != null) {
-			reportsDto.setShinkokuYm(dto.getShinkokuYmd());
+			try {
+				YearMonth yearMonth = YearMonth.parse(dto.getShinkokuYmd(), DateTimeFormatter.ofPattern("yyyyMM"));
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)
+						.withChronology(JapaneseChronology.INSTANCE);
+				reportsDto.setShinkokuYm(yearMonth.atDay(1).format(formatter));
+			} catch (DateTimeParseException e) {
+				reportsDto.setShinkokuYm("");
+			}
 		} else {
 			reportsDto.setShinkokuYm("");
 		}
 
 		// 納期限
 		if (dto.getNokigen() != null) {
-			reportsDto.setNokigen(dto.getNokigen());
+			try {
+				LocalDate localDate = LocalDate.parse(dto.getNokigen(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+				JapaneseDate japaneseDate = JapaneseDate.from(localDate);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE);
+				reportsDto.setNokigen(japaneseDate.format(formatter));
+			} catch (DateTimeParseException e) {
+				reportsDto.setNokigen("");
+			}
 		} else {
 			reportsDto.setNokigen("");
 		}
-		
-		// 最新の賦課情報を取得
+
 		Fuka fuka = fukaList.stream()
 				.max(Comparator.comparing(Fuka::getRno))
 				.orElse(fukaList.get(0));
-		
-		// 申告区分を設定
 		reportsDto.setShinkokuKubun(fuka.getHenkoKbn());
-		
-		List<NonyushoReportsDto> dataSourceList = Arrays.asList(reportsDto);
-		JRDataSource params = new JRBeanCollectionDataSource(dataSourceList);
 
-		return params;
+		List<NonyushoReportsDto> dataSourceList = Arrays.asList(reportsDto);
+		return new JRBeanCollectionDataSource(dataSourceList);
 	}
-	
+
 	public boolean dataCheck(NonyushoDto dto) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		String shiteiNo = dto.getShiteiNo();
 		String shinkokuYmd = dto.getShinkokuYmd();
 		log.debug("dataCheck: jichitaiCd={}, shiteiNo={}, shinkokuYmd={}", jichitaiCd, shiteiNo, shinkokuYmd);
-		
-		// 最新の賆課データを取得
+
 		List<Fuka> fukaList = fukaRepository.findByJichitaiCdAndShiteiNoAndTaishoYmOrderByKibetsuAsc(
 				jichitaiCd, shiteiNo, shinkokuYmd);
 		log.debug("dataCheck result: {} 件", fukaList.size());
-		
-		// データが存在するかどうかを返す
+
 		return fukaList.isEmpty();
+	}
+
+	private String formatToCommaString(Object value) {
+		if (value == null) {
+			return "0";
+		}
+		try {
+			BigDecimal val = new BigDecimal(value.toString());
+			DecimalFormat formatter = new DecimalFormat("#,##0");
+			return formatter.format(val);
+		} catch (NumberFormatException e) {
+			return value.toString();
+		}
 	}
 }

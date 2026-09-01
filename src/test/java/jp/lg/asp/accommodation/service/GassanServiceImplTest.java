@@ -8,8 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.persistence.EntityManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +36,6 @@ class GassanServiceImplTest {
     @Mock AtenaRepository atenaRepository;
     @Mock TokugimuRepository tokugimuRepository;
     @Mock JichitaiRepository jichitaiRepository;
-    @Mock EntityManager entityManager;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks GassanServiceImpl service;
 
@@ -51,13 +48,18 @@ class GassanServiceImplTest {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
     }
 
-    private Gassan buildGassan() {
+    private Gassan buildGassan(BigDecimal rno, LocalDate tekiyoEdYmd) {
         Gassan g = new Gassan();
+        g.setJichitaiCd(JICHITAI_CD);
         g.setGassanShiteiNo(GASSAN_SHITEI_NO);
         g.setAtenaNo(BigDecimal.ONE);
-        g.setRno(BigDecimal.ONE);
+        g.setRno(rno);
         g.setTorokuYmd(LocalDate.now());
         g.setShinkokuYmd(LocalDate.now());
+        g.setTekiyoStYmd(LocalDate.now().minusMonths(1));
+        g.setTekiyoEdYmd(tekiyoEdYmd);
+        g.setNewFlg("1");
+        g.setDelFlg("0");
         return g;
     }
 
@@ -73,9 +75,12 @@ class GassanServiceImplTest {
         return t;
     }
 
+    //=====================================================
+    // getByGassanShiteiNo
+    //=====================================================
     @Test
     void getByGassanShiteiNo_found() {
-        Gassan gassan = buildGassan();
+        Gassan gassan = buildGassan(BigDecimal.ONE, null);
         when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
                 .thenReturn(List.of(gassan));
         when(gassanUchiRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
@@ -84,10 +89,16 @@ class GassanServiceImplTest {
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
         when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
                 .thenReturn(Optional.of(new Atena()));
-        when(gassanRepository.findMaxRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+        when(gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
                 .thenReturn(BigDecimal.ONE);
         when(gassanRepository.findMinRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
                 .thenReturn(BigDecimal.ONE);
+        when(gassanRepository.countValidRnoByJichitaiCdAndGassanShiteiNoAndRnoLe(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(BigDecimal.ONE);
+        when(gassanRepository.findPrevRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(BigDecimal.ZERO);
+        when(gassanRepository.findNextRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(BigDecimal.ZERO);
 
         GassanForm form = service.getByGassanShiteiNo(GASSAN_SHITEI_NO);
 
@@ -103,59 +114,198 @@ class GassanServiceImplTest {
                 .isInstanceOf(RuntimeException.class);
     }
 
+    //=====================================================
+    // register ①新規登録
+    //=====================================================
     @Test
-    void register_noDaihyoShiteiNo_throwsException() {
+    void register_代表施設なし_例外() {
         GassanForm form = new GassanForm();
         form.setShiteiNoList(List.of());
 
-        assertThatThrownBy(() -> service.register(form))
+        assertThatThrownBy(() -> service.register(form, null))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("代表施設");
     }
 
     @Test
-    void register_alreadyAssigned_throwsException() {
+    void register_新規登録() {
         GassanForm form = new GassanForm();
         form.setShiteiNoList(List.of(SHITEI_NO));
         form.setDaihyoShiteiNo(SHITEI_NO);
         form.setAtenaNo(BigDecimal.ONE);
+        form.setTorokuYmd(LocalDate.now());
+        form.setShinkokuYmd(LocalDate.now());
+        form.setTekiyoStYmd(LocalDate.now());
 
-        GassanUchi existing = new GassanUchi();
-        existing.setShiteiNo(SHITEI_NO);
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(JICHITAI_CD, List.of(SHITEI_NO)))
-                .thenReturn(List.of(existing));
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(JICHITAI_CD, List.of(SHITEI_NO), null))
+                .thenReturn(List.of());
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
+        when(gassanRepository.findMaxGassanShiteiNoByJichitaiCdAndPrefix(eq(JICHITAI_CD), any()))
+                .thenReturn(Optional.of(0));
 
-        assertThatThrownBy(() -> service.register(form))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("既に合算申告に登録");
+        String result = service.register(form, null);
+
+        assertThat(result).isNotNull();
+        verify(gassanRepository).save(any(Gassan.class));
+    }
+
+    //=====================================================
+    // register ③再登録
+    //=====================================================
+    @Test
+    void register_再登録() {
+        GassanForm form = new GassanForm();
+        form.setShiteiNoList(List.of(SHITEI_NO));
+        form.setDaihyoShiteiNo(SHITEI_NO);
+        form.setAtenaNo(BigDecimal.ONE);
+        form.setTorokuYmd(LocalDate.now());
+        form.setShinkokuYmd(LocalDate.now());
+        form.setTekiyoStYmd(LocalDate.now());
+
+        Gassan prev = buildGassan(BigDecimal.ONE, LocalDate.now().minusMonths(1));
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(List.of(prev));
+        when(gassanRepository.findMaxRnoIncludingDeletedByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(BigDecimal.ONE);
+
+        String result = service.register(form, GASSAN_SHITEI_NO);
+
+        assertThat(result).isEqualTo(GASSAN_SHITEI_NO);
+        verify(gassanRepository).clearNewFlgByRno(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE);
+        verify(gassanRepository).save(any(Gassan.class));
     }
 
     @Test
-    void deleteByGassanShiteiNo_callsLogicalDelete() {
+    void register_再登録_適用開始年月が前履歴終了年月前_例外() {
+        GassanForm form = new GassanForm();
+        form.setShiteiNoList(List.of(SHITEI_NO));
+        form.setDaihyoShiteiNo(SHITEI_NO);
+        form.setAtenaNo(BigDecimal.ONE);
+        form.setTekiyoStYmd(LocalDate.now().minusMonths(2));
+
+        Gassan prev = buildGassan(BigDecimal.ONE, LocalDate.now().minusMonths(1));
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(List.of(prev));
+
+        assertThatThrownBy(() -> service.register(form, GASSAN_SHITEI_NO))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("適用開始年月");
+    }
+
+    //=====================================================
+    // updateByGassanShiteiNo
+    //=====================================================
+    @Test
+    void updateByGassanShiteiNo_rno1_前履歴なし_更新成功() {
+        Gassan gassan = buildGassan(BigDecimal.ONE, null);
+        gassan.setTekiyoStYmd(LocalDate.now().minusMonths(1));
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        GassanForm form = new GassanForm();
+        form.setTekiyoStYmd(LocalDate.now().minusMonths(1));
+        form.setTekiyoEdYmd(null);
+        form.setTorokuYmd(LocalDate.now());
+        form.setShinkokuYmd(LocalDate.now());
+
+        service.updateByGassanShiteiNo(GASSAN_SHITEI_NO, form);
+
+        verify(gassanRepository).save(gassan);
+    }
+
+    @Test
+    void updateByGassanShiteiNo_rno2_前履歴終了年月より後_更新成功() {
+        Gassan gassan = buildGassan(BigDecimal.valueOf(2), null);
+        gassan.setTekiyoStYmd(LocalDate.now().plusMonths(1));
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        Gassan prev = buildGassan(BigDecimal.ONE, LocalDate.now().minusMonths(1));
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNoAndRno(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(Optional.of(prev));
+
+        GassanForm form = new GassanForm();
+        form.setTekiyoStYmd(LocalDate.now().plusMonths(1));
+        form.setTekiyoEdYmd(null);
+        form.setTorokuYmd(LocalDate.now());
+        form.setShinkokuYmd(LocalDate.now());
+
+        service.updateByGassanShiteiNo(GASSAN_SHITEI_NO, form);
+
+        verify(gassanRepository).save(gassan);
+    }
+
+    @Test
+    void updateByGassanShiteiNo_rno2_前履歴終了年月以前_例外() {
+        Gassan gassan = buildGassan(BigDecimal.valueOf(2), null);
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        Gassan prev = buildGassan(BigDecimal.ONE, LocalDate.now().plusMonths(1));
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNoAndRno(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE))
+                .thenReturn(Optional.of(prev));
+
+        GassanForm form = new GassanForm();
+        form.setTekiyoStYmd(LocalDate.now());
+
+        assertThatThrownBy(() -> service.updateByGassanShiteiNo(GASSAN_SHITEI_NO, form))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("適用開始年月");
+    }
+
+    //=====================================================
+    // deleteByGassanShiteiNo ④削除
+    //=====================================================
+    @Test
+    void deleteByGassanShiteiNo_最新履歴のみ削除() {
+        Gassan latest = buildGassan(BigDecimal.valueOf(2), null);
+        Gassan prev = buildGassan(BigDecimal.ONE, null);
+        when(gassanRepository.findAllRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(List.of(latest, prev));
+
         service.deleteByGassanShiteiNo(GASSAN_SHITEI_NO);
 
-        verify(gassanRepository).deleteLogicallyByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO);
+        verify(gassanRepository).deleteLogicallyByRno(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.valueOf(2));
+        verify(gassanRepository).setNewFlgByRno(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE);
     }
 
     @Test
-    void validateNotAlreadyAssigned_emptyList_noException() {
-        assertThatCode(() -> service.validateNotAlreadyAssigned(List.of()))
+    void deleteByGassanShiteiNo_前履歴なし_前履歴復元しない() {
+        Gassan latest = buildGassan(BigDecimal.ONE, null);
+        when(gassanRepository.findAllRnoByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, GASSAN_SHITEI_NO))
+                .thenReturn(List.of(latest));
+
+        service.deleteByGassanShiteiNo(GASSAN_SHITEI_NO);
+
+        verify(gassanRepository).deleteLogicallyByRno(JICHITAI_CD, GASSAN_SHITEI_NO, BigDecimal.ONE);
+        verify(gassanRepository, never()).setNewFlgByRno(any(), any(), any());
+    }
+
+    //=====================================================
+    // validateNotAlreadyAssigned
+    //=====================================================
+    @Test
+    void validateNotAlreadyAssigned_空リスト_例外なし() {
+        assertThatCode(() -> service.validateNotAlreadyAssigned(List.of(), null))
                 .doesNotThrowAnyException();
     }
 
     @Test
-    void validateNotAlreadyAssigned_duplicate_throwsException() {
+    void validateNotAlreadyAssigned_重複あり_例外() {
         GassanUchi uchi = new GassanUchi();
         uchi.setShiteiNo(SHITEI_NO);
-        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(JICHITAI_CD, List.of(SHITEI_NO)))
+        when(gassanUchiRepository.findByJichitaiCdAndShiteiNoIn(JICHITAI_CD, List.of(SHITEI_NO), null))
                 .thenReturn(List.of(uchi));
 
-        assertThatThrownBy(() -> service.validateNotAlreadyAssigned(List.of(SHITEI_NO)))
+        assertThatThrownBy(() -> service.validateNotAlreadyAssigned(List.of(SHITEI_NO), null))
                 .isInstanceOf(RuntimeException.class);
     }
 
+    //=====================================================
+    // getFacilitiesByAtenaNo
+    //=====================================================
     @Test
-    void getFacilitiesByAtenaNo_returnsFacilityItems() {
+    void getFacilitiesByAtenaNo_施設一覧を返す() {
         when(tokugimuRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
                 .thenReturn(List.of(buildTokugimu(SHITEI_NO)));
 

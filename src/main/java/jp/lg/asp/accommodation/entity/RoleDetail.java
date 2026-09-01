@@ -43,9 +43,6 @@ public class RoleDetail extends BaseEntity {
     private Role role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-        @JoinColumn(name = "jichitai_cd", referencedColumnName = "jichitai_cd", insertable = false, updatable = false),
-        @JoinColumn(name = "screen_id", referencedColumnName = "screen_id", insertable = false, updatable = false)
-    })
+    @JoinColumn(name = "screen_id", referencedColumnName = "screen_id", insertable = false, updatable = false)
     private Screen screen;
 }

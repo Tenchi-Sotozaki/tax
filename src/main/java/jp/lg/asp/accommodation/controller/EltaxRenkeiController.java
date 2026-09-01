@@ -37,19 +37,19 @@ public class EltaxRenkeiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		
+
 		// 納入期限が未登録の場合
 		if (nokigenService.findAll().isEmpty()) {
 			model.addAttribute("errorMessage", "納入期限が登録されていません。");
 		}
-		
+
 		model.addAttribute("eltaxRenkeiList", eltaxRenkeiService.findAll());
 		model.addAttribute("shubetsuNameMap", EltaxConstants.SHUBETSU_NAME_MAP);
 		return "eltaxRenkei/eltaxRenkei";
 	}
 
 	@GetMapping("/download/{seq}")
-	@OpeLog(screenId = SCREEN_ID, operation = "取込確認")
+	@OpeLog(screenId = SCREEN_ID, operation = "ダウンロード")
 	public ResponseEntity<byte[]> download(@PathVariable BigDecimal seq) {
 		accessChecker.checkAccess(SCREEN_ID);
 

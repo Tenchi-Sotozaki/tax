@@ -54,8 +54,15 @@ public class KoseiKetteiTsuchiController {
 			return "tokugimu/tTokugimuReport";
 		}
 
+<<<<<<< HEAD
 		model.addAttribute("shiteiNo", targetNo);
 		model.addAttribute("taishoYmList", reportsService.findTaishoYmList(targetNo));
+=======
+		model.addAttribute("taishoYmList",
+				!shiteiNo.isEmpty()
+						? reportsService.findTaishoYmList(shiteiNo)
+						: java.util.Collections.emptyList());
+>>>>>>> refs/remotes/origin/master
 
 		return "reports/koseiKetteiTsuchi";
 	}

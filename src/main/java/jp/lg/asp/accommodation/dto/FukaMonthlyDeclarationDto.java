@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Digits;
 
 import lombok.Data;
 
@@ -20,27 +21,35 @@ public class FukaMonthlyDeclarationDto {
 	private List<FukaTaxDetailDto> taxDetails = new ArrayList<>();
 
 	// 免除料金
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long exemptRyokin;
 
 	// 免除宿泊数
+	@Digits(integer = 9, fraction = 0, message = "9桁以内で入力してください")
 	private Long exemptStayCount;
 
 	// 宿泊料金総額合計
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long totalSogaku;
 
 	// 宿泊数合計
+	@Digits(integer = 9, fraction = 0, message = "9桁以内で入力してください")
 	private Long totalStayCount;
 
 	// 宿泊料金合計
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long kazeiRyokin;
 
 	// 宿泊税額合計
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long totalPaymentAmount;
 
 	// 市区町村税額合計
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long totalCityZeigaku;
 
 	// 都道府県税額合計
+	@Digits(integer = 13, fraction = 0, message = "13桁以内で入力してください")
 	private Long totalKenZeigaku;
 
 	// ==========================================
