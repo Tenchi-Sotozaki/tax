@@ -83,6 +83,7 @@ class NonyushoReportsServiceImplTest {
     @Test
     void getNonyushoData_賦課データあり_nokigenなし_特例適用外_shinkokuYmdあり_翌月末を返す() {
         Fuka fuka = buildFuka(10000L, 0L, 0L, 0L, null, LocalDate.of(2024, 4, 10));
+        fuka.setTaishoYm("202404");
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(List.of(fuka));
         // 特例適用外（空リスト）
