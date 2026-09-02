@@ -155,10 +155,10 @@ public class FukaController {
 	                                       .toList();
 
 		// サービスを呼び出して表示用データを生成
-		FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo, status);
+		FukaDaichoForm form = fukaService.getDaichoData(shiteiNo, nendo);
 		
 		// 納入期限が未登録の場合
-		if(nokigenService.findAll().isEmpty()) {
+		if(nokigenService.findByNendo(nendo) == null) {
 			model.addAttribute("errorMessage", "納入期限が登録されていません。");
 		}
 

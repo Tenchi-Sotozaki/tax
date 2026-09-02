@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+<head>
+<title>自治体情報一覧</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-building me-2 text-primary"></i>自治体情報一覧
+			</h5>
+			<span th:if="${searched}" class="text-muted small">検索結果：<span
+				th:text="${#lists.size(items)}">0</span> 件
+			</span>
+		</div>
+
+		<!-- 検索条件アコーディオン -->
+		<div class="accordion mb-3 shadow-sm" id="searchAccordion">
+			<div class="accordion-item border">
+				<h2 class="accordion-header">
+					<button class="accordion-button py-2 fw-semibold" type="button"
+						data-bs-toggle="collapse" data-bs-target="#searchPanel">
+						<i class="bi bi-funnel me-2 text-primary"></i>検索条件
+					</button>
+				</h2>
+				<div id="searchPanel" class="accordion-collapse collapse" th:classappend="${!searched} ? 'show'">
+					<div class="accordion-body pt-3 pb-2 px-3">
+						<form th:action="@{/admin/jichitai-list}" th:object="${jichitaiListSearchForm}" method="get">
+							<input type="hidden" name="searched" value="true">
+							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2 mb-2">
+								<div class="col">
+									<label class="form-label form-label-sm fw-medium mb-1">自治体コード</label>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{jichitaiCd}" placeholder="自治体コードを入力">
+								</div>
+								<div class="col">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">自治体名称</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="prefix" id="namePrefix">
+											<label class="form-check-label small" for="namePrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="partial" id="namePartial">
+											<label class="form-check-label small" for="namePartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{nameMatchType}" value="exact" id="nameExact">
+											<label class="form-check-label small" for="nameExact">完全</label>
+										</div>
+									</div>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{name}" placeholder="自治体名称を入力">
+								</div>
+								<div class="col">
+									<div class="d-flex align-items-center gap-2 mb-1" style="white-space: nowrap;">
+										<label class="form-label form-label-sm fw-medium mb-0">自治体種別</label>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{kbnNameMatchType}" value="prefix" id="kbnNamePrefix">
+											<label class="form-check-label small" for="kbnNamePrefix">前方</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{kbnNameMatchType}" value="partial" id="kbnNamePartial">
+											<label class="form-check-label small" for="kbnNamePartial">部分</label>
+										</div>
+										<div class="form-check form-check-inline me-0">
+											<input class="form-check-input" type="radio" th:field="*{kbnNameMatchType}" value="exact" id="kbnNameExact">
+											<label class="form-check-label small" for="kbnNameExact">完全</label>
+										</div>
+									</div>
+									<input type="text" class="form-control form-control-sm"
+										th:field="*{kbnName}" placeholder="自治体種別を入力">
+								</div>
+							</div>
+							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
+								<a th:href="@{/admin/jichitai-list}" class="btn btn-outline-secondary">
+									<i class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
+								</a>
+								<button type="submit" class="btn btn-primary px-4">
+									<i class="bi bi-search me-1"></i>検索する
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 操作ボタン＆ページネーション＆表示件数 -->
+		<div th:if="${searched}" class="d-flex justify-content-between align-items-center mb-1 position-relative">
+			<a th:if="${canWrite}" th:href="@{/admin/jichitai-config/register}" class="btn btn-success">
+				<i class="bi bi-plus-circle me-1"></i>新規登録
+			</a>
+			<span th:unless="${canWrite}"></span>
+			<nav class="position-absolute start-50 translate-middle-x">
+				<ul class="pagination pagination-sm mb-0" id="pagination" data-pagination-rows=".jichitai-row"></ul>
+			</nav>
+			<div class="d-flex align-items-center gap-2">
+				<label class="form-label form-label-sm fw-medium mb-0">表示件数</label>
+				<select id="pageSizeSelect" class="form-select form-select-sm" style="width: auto;">
+					<option value="10">10件</option>
+					<option value="50">50件</option>
+					<option value="100">100件</option>
+				</select>
+			</div>
+		</div>
+
+		<!-- 一覧テーブル -->
+		<div th:if="${searched}" class="card shadow-sm mb-5">
+			<div class="card-body p-0">
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover align-middle mb-0">
+						<thead class="table-primary text-center">
+							<tr>
+								<th style="width: 120px;">自治体コード</th>
+								<th style="width: 200px;">自治体名称</th>
+								<th style="width: 150px;">自治体種別</th>
+								<th style="width: 150px;">自治体識別名</th>
+								<th style="width: 160px;">登録年月日</th>
+								<th style="width: 150px;">登録者</th>
+								<th style="width: 80px;"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${#lists.isEmpty(items)}">
+								<td colspan="7" class="text-center text-muted py-4">該当する自治体が見つかりません</td>
+							</tr>
+							<tr class="jichitai-row" th:each="jichitai : ${items}">
+								<td th:text="${jichitai.jichitaiCd}"></td>
+								<td th:text="${jichitai.name}"></td>
+								<td th:text="${jichitai.kbnName}"></td>
+								<td th:text="${jichitai.param}"></td>
+								<td class="text-center" th:text="${#temporals.format(jichitai.addDt, 'yyyy/MM/dd')}"></td>
+								<td th:text="${jichitai.addUser}"></td>
+								<td class="text-center">
+									<a th:href="@{/admin/jichitai-config/view/{cd}(cd=${jichitai.jichitaiCd})}"
+										class="btn btn-outline-primary btn-sm">
+										<i class="bi bi-eye me-1"></i>照会
+									</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

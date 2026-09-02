@@ -52,18 +52,22 @@ public class KanpuMenjoTsuchiController {
                        @AuthenticationPrincipal User userDetails,
                        Model model) {
     	String jichitaiCode = jichitaiContext.getJichitaiCd();
+    	ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
     	String shiteiNo = SessionHelper.getShiteiNo(session);
+    	String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
 
-		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		// 指定番号または合算指定番号が存在しない場合
+		if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
 
-        try {
-            log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", shiteiNo);
+		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
 
-            TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
+        try {
+            log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", effectiveShiteiNo);
+
+            TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(effectiveShiteiNo);
 
             if (tokugimuForm == null) {
                 model.addAttribute("errorMessage", "指定された特別徴収義務者が見つかりません。");
@@ -74,7 +78,7 @@ public class KanpuMenjoTsuchiController {
             String cityName = jichitai != null ? jichitai.getName() : "";
 
             KanpuMenjoTsuchiDto dto = new KanpuMenjoTsuchiDto();
-            dto.setShiteiNo(shiteiNo);
+            dto.setShiteiNo(effectiveShiteiNo);
             dto.setCityName(cityName);
             dto.setHakkoYmd(LocalDate.now());
             dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));

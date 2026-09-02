@@ -15,6 +15,4 @@ public class UserSearchForm {
     private String bushoMatchType = "partial";
     /** 権限（未選択の場合は絞り込まない） */
     private BigDecimal roleId;
-    private int page = 0;
-    private int pageSize = 10;
 }

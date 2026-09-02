@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ class TokureiShiteiReportsServiceImplTest {
         TokureiShiteiDto dto = new TokureiShiteiDto();
         dto.setShiteiNo("0001");
         dto.setHakkoYmd(LocalDate.of(2025, 4, 1));
-        dto.setTekiyoYmd(LocalDate.of(2025, 4, 1));
+        dto.setTekiyoYmd(YearMonth.of(2025, 4));
         dto.setShonin("1");
         dto.setRiyu("理由テスト");
         dto.setTokuName("山田太郎");
