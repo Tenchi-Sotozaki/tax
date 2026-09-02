@@ -60,12 +60,6 @@ public class TokureiShiteiCancelController {
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
-<<<<<<< HEAD
-		
-		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(shiteiNo);
-		if (shiteiDto == null) {
-			throw new IllegalArgumentException("特例情報が存在しません。");
-=======
 
 		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
 
@@ -74,10 +68,9 @@ public class TokureiShiteiCancelController {
 		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(effectiveShiteiNo);
 		if (shiteiDto != null) {
 			dto = convertToCancel(shiteiDto);
->>>>>>> master
+		} else {
+			throw new IllegalArgumentException("特例情報が存在しません。");
 		}
-		
-		TokureiShiteiCancelDto dto = convertToCancel(shiteiDto);
 
 		if (dto.getHakkoYmd() == null) {
 			dto.setHakkoYmd(LocalDate.now());

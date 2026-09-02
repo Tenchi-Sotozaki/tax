@@ -115,12 +115,14 @@ class TokureiShiteiCancelControllerTest {
 			ShiteiGassanSearchDto selected = new ShiteiGassanSearchDto();
 			selected.setShiteiNo(null);
 
-			sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn("12345");
+			sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
+			sessionHelperMock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
 			sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(selected);
 
 			String viewName = tokureiShiteiCancelController.index(session, model);
 
 			assertThat(viewName).isEqualTo("tokugimu/tTokugimuReport");
+			verify(accessChecker).checkAccess(SCREEN_ID);
 			verify(model).addAttribute("showShiteiGassanModal", true);
 		}
 
@@ -130,12 +132,14 @@ class TokureiShiteiCancelControllerTest {
 			ShiteiGassanSearchDto selected = new ShiteiGassanSearchDto();
 			selected.setShiteiNo("");
 
-			sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn("12345");
+			sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
+			sessionHelperMock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
 			sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(selected);
 
 			String viewName = tokureiShiteiCancelController.index(session, model);
 
 			assertThat(viewName).isEqualTo("tokugimu/tTokugimuReport");
+			verify(accessChecker).checkAccess(SCREEN_ID);
 			verify(model).addAttribute("showShiteiGassanModal", true);
 		}
 
