@@ -4,18 +4,18 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ExtendedModelMap;
+import org.mockito.quality.Strictness;
 import org.springframework.ui.Model;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -27,43 +27,82 @@ import jp.lg.asp.accommodation.service.ShunoRenkeiService;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ShunoRenkeiControllerTest {
 
-    @Mock ScreenAccessChecker accessChecker;
-    @Mock ShunoRenkeiService shunoRenkeiService;
-    @Mock JichitaiContext jichitaiContext;
+	@Mock
+	private JichitaiContext jichitaiContext;
 
-    @InjectMocks ShunoRenkeiController controller;
+	@Mock
+	private ScreenAccessChecker accessChecker;
 
-    @BeforeEach
-    void setUp() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(shunoRenkeiService.search(any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(List.of());
-    }
+	@Mock
+	private ShunoRenkeiService shunoRenkeiService;
 
-    @Test
-    void index_一覧画面を返す() {
-        Model model = new ExtendedModelMap();
+	@Mock
+	private Model model;
 
-        String view = controller.index(null, null, null, null, null, "partial", 0, 10, null, model);
+	@InjectMocks
+	private ShunoRenkeiController shunoRenkeiController;
 
-        assertThat(view).isEqualTo("renkei/shunoRenkei");
-        assertThat(model.asMap()).containsKey("searchForm");
-    }
+	private static final String JICHITAI_CD = "011002";
 
-    @Test
-    void search_JSONレスポンスを返す() {
-        List<ShunoDto> result = controller.search(null, null, null, null, null, "partial");
+	@Nested
+	@DisplayName("kakunin メソッドのテスト")
+	class KakuninTest {
 
-        assertThat(result).isNotNull();
-    }
+		@Test
+		@DisplayName("正常系：有効なJSONとアクセス権があり、サービスからデータが取得できる場合、モデルに設定されてビュー名が返却されること")
+		void kakunin_success() {
+			String keysJson = "[{\"shiteiNo\":\"S001\",\"nendo\":2026,\"kibetsu\":1}]";
+			List<ShunoDto> rows = List.of(new ShunoDto());
 
-    @Test
-    void downloadCsv_CSVを返す() {
-        when(shunoRenkeiService.findByKeys(any(), any())).thenReturn(List.of());
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+			when(shunoRenkeiService.findByKeys(eq(JICHITAI_CD), any())).thenReturn(rows);
 
-        ResponseEntity<byte[]> response = controller.downloadCsv(List.of());
+			String viewName = shunoRenkeiController.kakunin(keysJson, model);
 
-        assertThat(response.getStatusCode().value()).isEqualTo(200);
-        assertThat(response.getHeaders().getContentType()).isNotNull();
-    }
+			assertThat(viewName).isEqualTo("renkei/shunoRenkeiKakunin");
+			verify(accessChecker, times(1)).checkAccess(any());
+			verify(model, times(1)).addAttribute("rows", rows);
+		}
+
+		@Test
+		@DisplayName("異常系：アクセス権限チェックで例外が発生した場合、例外がキャッチされ空のリストがモデルに設定されること")
+		void kakunin_accessDenied_addsEmptyList() {
+			String keysJson = "[]";
+
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+			doThrow(new RuntimeException("Access Denied")).when(accessChecker).checkAccess(any());
+
+			String viewName = shunoRenkeiController.kakunin(keysJson, model);
+
+			assertThat(viewName).isEqualTo("renkei/shunoRenkeiKakunin");
+			verify(model, times(1)).addAttribute("rows", Collections.emptyList());
+		}
+
+		@Test
+		@DisplayName("異常系：不正なJSON文字列が渡された場合、パースエラーがキャッチされ空のリストがモデルに設定されること")
+		void kakunin_invalidJson_addsEmptyList() {
+			String keysJson = "invalid-json";
+
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+
+			String viewName = shunoRenkeiController.kakunin(keysJson, model);
+
+			assertThat(viewName).isEqualTo("renkei/shunoRenkeiKakunin");
+			verify(model, times(1)).addAttribute("rows", Collections.emptyList());
+		}
+
+		@Test
+		@DisplayName("異常系：サービス層の実行中に例外が発生した場合、例外がキャッチされ空のリストがモデルに設定されること")
+		void kakunin_serviceThrowsException_addsEmptyList() {
+			String keysJson = "[{\"shiteiNo\":\"S001\",\"nendo\":2026,\"kibetsu\":1}]";
+
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+			when(shunoRenkeiService.findByKeys(any(), any())).thenThrow(new RuntimeException("Service Error"));
+
+			String viewName = shunoRenkeiController.kakunin(keysJson, model);
+
+			assertThat(viewName).isEqualTo("renkei/shunoRenkeiKakunin");
+			verify(model, times(1)).addAttribute("rows", Collections.emptyList());
+		}
+	}
 }

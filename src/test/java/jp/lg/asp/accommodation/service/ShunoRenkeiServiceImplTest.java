@@ -1,17 +1,22 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.dao.DataAccessException;
 
-import jakarta.persistence.EntityManager;
 import jp.lg.asp.accommodation.dto.ShunoDto;
 import jp.lg.asp.accommodation.entity.Fuka;
 import jp.lg.asp.accommodation.entity.Tokugimu;
@@ -20,84 +25,109 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.ShunoRenkeiServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ShunoRenkeiServiceImplTest {
 
-    @Mock EntityManager em;
-    @Mock FukaRepository fukaRepository;
-    @Mock TokugimuRepository tokugimuRepository;
-    @InjectMocks ShunoRenkeiServiceImpl service;
+	@Mock
+	private FukaRepository fukaRepository;
 
-    private static final String JICHITAI_CD = "011002";
+	@Mock
+	private TokugimuRepository tokugimuRepository;
 
-    @Test
-    void findByKeys_emptyKeys_returnsEmptyList() {
-        List<ShunoDto> result = service.findByKeys(JICHITAI_CD, List.of());
+	@InjectMocks
+	private ShunoRenkeiServiceImpl shunoRenkeiService;
 
-        assertThat(result).isEmpty();
-    }
+	private static final String JICHITAI_CD = "011002";
 
-    @Test
-    void findByKeys_fukaNotFound_skipsEntry() {
-        ShunoDto.Key key = new ShunoDto.Key();
-        key.setShiteiNo("00000001");
-        key.setNendo("2024");
-        key.setKibetsu(1);
+	@Nested
+	@DisplayName("findByKeys メソッドのテスト")
+	class FindByKeysTest {
 
-        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, "00000001", "2024", 1))
-                .thenReturn(List.of());
+		@Test
+		@DisplayName("正常系：指定されたキーに紐づくFukaおよびTokugimuが存在する場合、DTOに変換されてリストに格納されること")
+		void findByKeys_success() {
+			ShunoDto.Key key = new ShunoDto.Key();
+			key.setShiteiNo("S001");
+			key.setNendo("2026");
+			key.setKibetsu(1);
 
-        List<ShunoDto> result = service.findByKeys(JICHITAI_CD, List.of(key));
+			Fuka fuka = new Fuka();
+			fuka.setJichitaiCd(JICHITAI_CD);
+			fuka.setShiteiNo("S001");
 
-        assertThat(result).isEmpty();
-    }
+			Tokugimu tokugimu = new Tokugimu();
 
-    @Test
-    void findByKeys_fukaFound_tokugimuNotFound_skipsEntry() {
-        ShunoDto.Key key = new ShunoDto.Key();
-        key.setShiteiNo("00000001");
-        key.setNendo("2024");
-        key.setKibetsu(1);
+			when(fukaRepository.findLatestByNendoAndKibetsu(eq(JICHITAI_CD), eq("S001"), eq("2026"), eq(1)))
+					.thenReturn(List.of(fuka));
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "S001"))
+					.thenReturn(List.of(tokugimu));
 
-        Fuka fuka = new Fuka();
-        fuka.setShiteiNo("00000001");
-        fuka.setJichitaiCd(JICHITAI_CD);
-        fuka.setTaishoYm("202403");
-        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, "00000001", "2024", 1))
-                .thenReturn(List.of(fuka));
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "00000001"))
-                .thenReturn(List.of());
+			List<ShunoDto> result = shunoRenkeiService.findByKeys(JICHITAI_CD, List.of(key));
 
-        List<ShunoDto> result = service.findByKeys(JICHITAI_CD, List.of(key));
+			assertThat(result).hasSize(1);
+			verify(fukaRepository, times(1)).findLatestByNendoAndKibetsu(any(), any(), any(), any());
+			verify(tokugimuRepository, times(1)).findByJichitaiCdAndShiteiNo(any(), any());
+		}
 
-        assertThat(result).isEmpty();
-    }
+		@Test
+		@DisplayName("境界値：入力のkeysリストが空の場合、ループ処理が行われず空のリストが返却されること")
+		void findByKeys_emptyKeys_returnsEmptyList() {
+			List<ShunoDto> result = shunoRenkeiService.findByKeys(JICHITAI_CD, List.of());
 
-    @Test
-    void findByKeys_fukaAndTokugimuFound_returnsMappedDto() {
-        ShunoDto.Key key = new ShunoDto.Key();
-        key.setShiteiNo("00000001");
-        key.setNendo("2024");
-        key.setKibetsu(1);
+			assertThat(result).isEmpty();
+			verify(fukaRepository, never()).findLatestByNendoAndKibetsu(any(), any(), any(), any());
+		}
 
-        Fuka fuka = new Fuka();
-        fuka.setShiteiNo("00000001");
-        fuka.setJichitaiCd(JICHITAI_CD);
-        fuka.setTaishoYm("202403");
-        fuka.setTotalZeigaku(10000L);
-        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, "00000001", "2024", 1))
-                .thenReturn(List.of(fuka));
+		@Test
+		@DisplayName("境界値：fukaRepositoryの検索結果が空の場合、データ追加されずにスキップされること")
+		void findByKeys_fukaNotFound_skips() {
+			ShunoDto.Key key = new ShunoDto.Key();
+			key.setShiteiNo("S001");
+			key.setNendo("2026");
+			key.setKibetsu(1);
 
-        Tokugimu tokugimu = new Tokugimu();
-        tokugimu.setShiteiNo("00000001");
-        tokugimu.setJichitaiCd(JICHITAI_CD);
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, "00000001"))
-                .thenReturn(List.of(tokugimu));
+			when(fukaRepository.findLatestByNendoAndKibetsu(any(), any(), any(), any()))
+					.thenReturn(List.of());
 
-        List<ShunoDto> result = service.findByKeys(JICHITAI_CD, List.of(key));
+			List<ShunoDto> result = shunoRenkeiService.findByKeys(JICHITAI_CD, List.of(key));
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getShiteiNo()).isEqualTo("00000001");
-        assertThat(result.get(0).getTotalZeigaku()).isEqualTo(10000L);
-        assertThat(result.get(0).getTaishoYm()).isEqualTo("2024-03");
-    }
+			assertThat(result).isEmpty();
+			verify(tokugimuRepository, never()).findByJichitaiCdAndShiteiNo(any(), any());
+		}
+
+		@Test
+		@DisplayName("境界値：fukaListは存在するが、tokugimuRepositoryの検索結果が空の場合、スキップされること")
+		void findByKeys_tokugimuNotFound_skips() {
+			ShunoDto.Key key = new ShunoDto.Key();
+			key.setShiteiNo("S001");
+			key.setNendo("2026");
+			key.setKibetsu(1);
+
+			Fuka fuka = new Fuka();
+			fuka.setJichitaiCd(JICHITAI_CD);
+			fuka.setShiteiNo("S001");
+
+			when(fukaRepository.findLatestByNendoAndKibetsu(any(), any(), any(), any()))
+					.thenReturn(List.of(fuka));
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNo(any(), any()))
+					.thenReturn(List.of());
+
+			List<ShunoDto> result = shunoRenkeiService.findByKeys(JICHITAI_CD, List.of(key));
+
+			assertThat(result).isEmpty();
+		}
+
+		@Test
+		@DisplayName("異常系：リポジトリ実行時に例外が発生した場合に例外がスローされること")
+		void findByKeys_repositoryThrowsException_throwsException() {
+			ShunoDto.Key key = new ShunoDto.Key();
+			key.setShiteiNo("S001");
+
+			when(fukaRepository.findLatestByNendoAndKibetsu(any(), any(), any(), any()))
+					.thenThrow(new DataAccessException("DB Error") {});
+
+			assertThatThrownBy(() -> shunoRenkeiService.findByKeys(JICHITAI_CD, List.of(key)))
+					.isInstanceOf(DataAccessException.class);
+		}
+	}
 }

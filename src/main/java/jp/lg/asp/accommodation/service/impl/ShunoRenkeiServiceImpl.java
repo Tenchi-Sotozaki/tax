@@ -124,8 +124,6 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 		TypedQuery<Tokugimu> q = em.createQuery(cq);
 		List<Tokugimu> tokugimuList = q.getResultList();
 
-		// 同一指定番号の重複を排除（rno違いで複数件取得されるため）
-		// 賦課情報がある場合のみ表示
 		return tokugimuList.stream()
 				.filter(new java.util.function.Predicate<Tokugimu>() {
 					private final java.util.Set<String> seen = new java.util.HashSet<>();
@@ -140,8 +138,7 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 					if (fukaList.isEmpty()) {
 						return null;
 					} else {
-						// 最新の賦課情報を使用
-						Fuka latestFuka = fukaList.get(0); // ORDER BY で最新が先頭
+						Fuka latestFuka = fukaList.get(0);
 						return toDtoFromTokugimuAndFuka(tokugimu, latestFuka);
 					}
 				})
@@ -162,8 +159,9 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 	public List<ShunoDto> findByKeys(String jichitaiCd, List<ShunoDto.Key> keys) {
 		List<ShunoDto> result = new ArrayList<>();
 		for (ShunoDto.Key k : keys) {
+			String nendoStr = k.getNendo() != null ? String.valueOf(k.getNendo()) : null;
 			List<Fuka> fukaList = fukaRepository.findLatestByNendoAndKibetsu(jichitaiCd, k.getShiteiNo(),
-					k.getNendo(), k.getKibetsu());
+					nendoStr, k.getKibetsu());
 			if (!fukaList.isEmpty()) {
 				Fuka f = fukaList.get(0);
 				List<Tokugimu> toks = tokugimuRepository.findByJichitaiCdAndShiteiNo(f.getJichitaiCd(),
