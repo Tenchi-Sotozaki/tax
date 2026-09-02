@@ -228,7 +228,7 @@ public class AdminUserController {
                         jichitaiCd,
                         form.getRoleId()));
 
-        model.addAttribute("isEdit", true);
+        model.addAttribute("isEdit", false);
         model.addAttribute("isView", true);
 
         model.addAttribute(
