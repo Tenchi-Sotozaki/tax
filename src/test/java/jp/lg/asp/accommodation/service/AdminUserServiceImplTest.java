@@ -456,8 +456,10 @@ class AdminUserServiceImplTest {
                 new jp.lg.asp.accommodation.config.AppUserDetails(
                         "U001", "password", List.of(), false);
         principal.setDisplayName("旧名前");
-        SecurityContextHolder.getContext().setAuthentication(
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(
                 new UsernamePasswordAuthenticationToken(principal, "password", List.of()));
+        SecurityContextHolder.setContext(context);
 
         UserForm form = userForm("U001", null);
         form.setName("新しい名前");
