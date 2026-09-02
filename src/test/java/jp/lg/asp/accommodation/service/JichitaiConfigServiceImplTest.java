@@ -82,6 +82,36 @@ class JichitaiConfigServiceImplTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
+    // ===== getJichitaiConfigDtoById =====
+
+    // No.5a 正常系: 指定した自治体コードが存在する場合、全フィールドが設定されたDtoを返す
+    @Test
+    void getJichitaiConfigDtoById_存在する場合_全フィールドが設定されたDtoを返す() {
+        Jichitai jichitai = new Jichitai();
+        jichitai.setJichitaiCd(JICHITAI_CD);
+        jichitai.setName("札幌市");
+        jichitai.setKbnName("市");
+        jichitai.setNendoStMonth("4");
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai));
+
+        JichitaiConfigDto result = service.getJichitaiConfigDtoById(JICHITAI_CD);
+
+        assertThat(result.getJichitaiCd()).isEqualTo(JICHITAI_CD);
+        assertThat(result.getName()).isEqualTo("札幌市");
+        assertThat(result.getNendoStMonth()).isEqualTo("4");
+    }
+
+    // No.5b 正常系: 指定した自治体コードが存在しない場合、デフォルトDtoを返す
+    @Test
+    void getJichitaiConfigDtoById_存在しない場合_デフォルトDtoを返す() {
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
+
+        JichitaiConfigDto result = service.getJichitaiConfigDtoById(JICHITAI_CD);
+
+        assertThat(result.getNendoStMonth()).isEqualTo("3");
+        assertThat(result.getJichitaiCd()).isNull();
+    }
+
     // ===== getJichitaiConfigDto =====
 
     // No.5 正常系: 自治体情報が存在する場合、全フィールドが設定されたDtoを返す
