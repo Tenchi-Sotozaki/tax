@@ -432,7 +432,6 @@ class FukaControllerTest {
         MockHttpSession session = sessionWithGassan("00100001", "901001");
         when(fukaService.getNendoStMonth()).thenReturn(4);
         when(fukaService.isGassanTargetMonth(eq("901001"), any())).thenReturn(false);
-        when(fukaService.resolveGassanTekiyoPeriod(any(), any())).thenReturn(null);
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
         String view = controller.showEdit("2024", 1, session, redirectAttributes, new ExtendedModelMap());
@@ -528,7 +527,6 @@ class FukaControllerTest {
         MockHttpSession session = sessionWithGassan("00100001", "901001");
         when(fukaService.getNendoStMonth()).thenReturn(4);
         when(fukaService.isGassanTargetMonth(eq("901001"), any())).thenReturn(false);
-        when(fukaService.resolveGassanTekiyoPeriod(any(), any())).thenReturn(null);
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
 
         String view = controller.showView("2024", 1, null, session, redirectAttributes, new ExtendedModelMap());
