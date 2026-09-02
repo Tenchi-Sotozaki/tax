@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -152,5 +153,79 @@ class TopPageServiceImplTest {
         service.delete(1);
 
         verify(repository).delete(content);
+    }
+
+    // =====================================================================
+    // トップページ_単体テストチェックリスト（#5〜#8）
+    // =====================================================================
+
+    private static final String SHARED_JICHITAI_CD = "99999";
+
+    @Test
+    @DisplayName("#5 findShared 正常系 共有自治体コードと本日日付で掲載中のものを取得する")
+    void findShared_共有自治体コードと本日日付で取得する() {
+        LocalDate today = LocalDate.now();
+        TopPageContent content = new TopPageContent();
+        content.setSeq(1);
+        content.setTitle("お知らせ");
+        when(repository.findByJichitaiCdAndPostingStartDateLessThanEqualAndPostingEndDateGreaterThanEqual(
+                SHARED_JICHITAI_CD, today, today)).thenReturn(List.of(content));
+
+        List<TopPageContent> result = service.findShared();
+
+        assertEquals(1, result.size());
+        assertEquals(1, result.get(0).getSeq());
+
+        ArgumentCaptor<String> jichitaiCdCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<LocalDate> startCaptor = ArgumentCaptor.forClass(LocalDate.class);
+        ArgumentCaptor<LocalDate> endCaptor = ArgumentCaptor.forClass(LocalDate.class);
+        verify(repository).findByJichitaiCdAndPostingStartDateLessThanEqualAndPostingEndDateGreaterThanEqual(
+                jichitaiCdCaptor.capture(), startCaptor.capture(), endCaptor.capture());
+
+        // 全自治体共有の固定値。ログイン自治体のコードを使わないこと
+        assertEquals(SHARED_JICHITAI_CD, jichitaiCdCaptor.getValue());
+        assertEquals(today, startCaptor.getValue());
+        assertEquals(today, endCaptor.getValue());
+    }
+
+    @Test
+    @DisplayName("#6 findShared 異常系 掲載中のコンテンツが無い場合")
+    void findShared_掲載中のコンテンツが無い() {
+        LocalDate today = LocalDate.now();
+        when(repository.findByJichitaiCdAndPostingStartDateLessThanEqualAndPostingEndDateGreaterThanEqual(
+                SHARED_JICHITAI_CD, today, today)).thenReturn(List.of());
+
+        List<TopPageContent> result = service.findShared();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("#7 findShared 異常系 掲載終了日NULLのレコードを取得できること")
+    void findShared_掲載終了日がNULLのレコードを取得できる() {
+        LocalDate today = LocalDate.now();
+        TopPageContent content = new TopPageContent();
+        content.setSeq(1);
+        content.setPostingStartDate(today.minusDays(1));
+        content.setPostingEndDate(null);
+        when(repository.findByJichitaiCdAndPostingStartDateLessThanEqualAndPostingEndDateGreaterThanEqual(
+                SHARED_JICHITAI_CD, today, today)).thenReturn(List.of(content));
+
+        List<TopPageContent> result = service.findShared();
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getPostingEndDate());
+    }
+
+    @Test
+    @DisplayName("#8 findShared 異常系 リポジトリが例外をスローした場合")
+    void findShared_リポジトリが例外をスロー() {
+        LocalDate today = LocalDate.now();
+        when(repository.findByJichitaiCdAndPostingStartDateLessThanEqualAndPostingEndDateGreaterThanEqual(
+                SHARED_JICHITAI_CD, today, today)).thenThrow(new RuntimeException("DB error"));
+
+        RuntimeException e = assertThrows(RuntimeException.class, () -> service.findShared());
+        assertEquals("DB error", e.getMessage());
     }
 }
