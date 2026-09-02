@@ -63,9 +63,8 @@ public class TokureiShiteiCancelController {
 
 		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
 
-		TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
-
 		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(effectiveShiteiNo);
+		TokureiShiteiCancelDto dto;
 		if (shiteiDto != null) {
 			dto = convertToCancel(shiteiDto);
 		} else {
