@@ -1,29 +1,41 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.controller.InitialPasswordController;
+import jp.lg.asp.accommodation.dto.UserForm;
 import jp.lg.asp.accommodation.dto.UserSearchForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.User;
+import jp.lg.asp.accommodation.entity.UserId;
 import jp.lg.asp.accommodation.repository.RoleRepository;
 import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.impl.AdminUserServiceImpl;
@@ -242,5 +254,245 @@ class AdminUserServiceImplTest {
                 JICHITAI_CD, BigDecimal.valueOf(UserRepository.DEFAULT_USER_ROLE_ID));
 
         assertThat(result).containsExactly(defaultRole);
+    }
+
+    // ==================================================================
+    // ユーザー登録編集削除
+    // ==================================================================
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
+
+    /** ログイン中ユーザーをSecurityContextに設定する */
+    private void setLoginUser(String id) {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(id, "password"));
+        SecurityContextHolder.setContext(context);
+    }
+
+    private User user(String id, String delFlg) {
+        User user = user(id);
+        user.setDelFlg(delFlg);
+        return user;
+    }
+
+    private UserForm userForm(String id, String password) {
+        UserForm form = new UserForm();
+        form.setId(id);
+        form.setName("山田太郎");
+        form.setNameKana("ヤマダタロウ");
+        form.setBusho("総務課");
+        form.setRoleId(BigDecimal.ONE);
+        form.setPassword(password);
+        return form;
+    }
+
+    /** save() に渡された User を取得する */
+    private User captureSavedUser() {
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository, times(1)).save(captor.capture());
+        return captor.getValue();
+    }
+
+    @Test
+    @DisplayName("#登録編集削除13 findById 正常系 存在するIDの場合：該当Userエンティティが返される")
+    void findById_存在するIDはユーザーが返る() {
+        User user = user("U001");
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user));
+
+        assertThat(service.findById("U001")).isSameAs(user);
+    }
+
+    @Test
+    @DisplayName("#登録編集削除14 findById 異常系 存在しないIDの場合：RuntimeExceptionがスローされる")
+    void findById_存在しないIDは例外() {
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.findById("U999"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("ユーザーが見つかりません: U999");
+    }
+
+    @Test
+    @DisplayName("#登録編集削除15 existsActiveUser 正常系 delFlg=\"0\"のユーザーが存在する場合：trueを返す")
+    void existsActiveUser_有効ユーザーはtrue() {
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user("U001", "0")));
+
+        assertThat(service.existsActiveUser("U001")).isTrue();
+    }
+
+    @Test
+    @DisplayName("#登録編集削除16 existsActiveUser 正常系 delFlg=\"1\"（削除済み）の場合：falseを返す")
+    void existsActiveUser_削除済みはfalse() {
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user("U001", "1")));
+
+        assertThat(service.existsActiveUser("U001")).isFalse();
+    }
+
+    @Test
+    @DisplayName("#登録編集削除17 existsActiveUser 正常系 ユーザーが存在しない場合：falseを返す")
+    void existsActiveUser_存在しないユーザーはfalse() {
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
+
+        assertThat(service.existsActiveUser("U999")).isFalse();
+    }
+
+    @Test
+    @DisplayName("#登録編集削除18 register 正常系 新規ユーザー登録：新しいエンティティが生成されパスワード暗号化・initialPasswordFlg=\"1\"・jichitaiCd=\"01100\"が設定されsave()が1回呼ばれる")
+    void register_新規登録() {
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("pass")).thenReturn("encoded");
+
+        service.register(userForm("U001", "pass"));
+
+        User saved = captureSavedUser();
+        assertThat(saved.getJichitaiCd()).isEqualTo(JICHITAI_CD);
+        assertThat(saved.getId()).isEqualTo("U001");
+        assertThat(saved.getPassword()).isEqualTo("encoded");
+        assertThat(saved.getInitialPasswordFlg()).isEqualTo("1");
+        assertThat(saved.getName()).isEqualTo("山田太郎");
+    }
+
+    @Test
+    @DisplayName("#登録編集削除19 register 正常系 削除済みユーザーの再登録：既存エンティティのdelFlgが\"0\"に更新されsave()が1回呼ばれる")
+    void register_削除済みユーザーの再登録() {
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user("U001", "1")));
+        when(passwordEncoder.encode("pass")).thenReturn("encoded");
+
+        service.register(userForm("U001", "pass"));
+
+        User saved = captureSavedUser();
+        assertThat(saved.getDelFlg()).isEqualTo("0");
+        assertThat(saved.getInitialPasswordFlg()).isEqualTo("1");
+        assertThat(saved.getPassword()).isEqualTo("encoded");
+    }
+
+    @Test
+    @DisplayName("#登録編集削除20 update 正常系 一般ユーザーの更新：氏名・カナ・部署・ロールが更新されsave()が1回呼ばれる")
+    void update_一般ユーザーの更新() {
+        setLoginUser("OTHER");
+        User user = user("U001");
+        user.setRoleId(BigDecimal.ONE);
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user));
+
+        UserForm form = userForm("U001", null);
+        form.setName("鈴木");
+        form.setNameKana("スズキ");
+        form.setBusho("企画課");
+        form.setRoleId(BigDecimal.valueOf(2));
+
+        service.update("U001", form);
+
+        User saved = captureSavedUser();
+        assertThat(saved.getName()).isEqualTo("鈴木");
+        assertThat(saved.getNameKana()).isEqualTo("スズキ");
+        assertThat(saved.getBusho()).isEqualTo("企画課");
+        assertThat(saved.getRoleId()).isEqualByComparingTo(BigDecimal.valueOf(2));
+    }
+
+    @Test
+    @DisplayName("#登録編集削除21 update 正常系 パスワード入力ありの更新：パスワードが暗号化されinitialPasswordFlg=\"1\"が設定される")
+    void update_パスワード入力ありの更新() {
+        setLoginUser("OTHER");
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user("U001")));
+        when(passwordEncoder.encode("newpass")).thenReturn("encoded");
+
+        service.update("U001", userForm("U001", "newpass"));
+
+        User saved = captureSavedUser();
+        assertThat(saved.getPassword()).isEqualTo("encoded");
+        assertThat(saved.getInitialPasswordFlg()).isEqualTo("1");
+        verify(passwordEncoder, times(1)).encode("newpass");
+    }
+
+    @Test
+    @DisplayName("#登録編集削除22 update 正常系 パスワード未入力の更新：passwordEncoder.encode()が呼ばれない")
+    void update_パスワード未入力の更新() {
+        setLoginUser("OTHER");
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user("U001")));
+
+        service.update("U001", userForm("U001", null));
+
+        verify(passwordEncoder, never()).encode(any());
+        captureSavedUser();
+    }
+
+    @Test
+    @DisplayName("#登録編集削除23 update 正常系 ADMIN_IDユーザーの更新：roleIdが変更されない")
+    void update_ADMIN_IDはロールが変更されない() {
+        setLoginUser("OTHER");
+        User user = user(InitialPasswordController.ADMIN_ID);
+        user.setRoleId(BigDecimal.ONE);
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user));
+
+        UserForm form = userForm(InitialPasswordController.ADMIN_ID, null);
+        form.setRoleId(BigDecimal.valueOf(99));
+
+        service.update(InitialPasswordController.ADMIN_ID, form);
+
+        User saved = captureSavedUser();
+        assertThat(saved.getRoleId()).isEqualByComparingTo(BigDecimal.ONE);
+    }
+
+    @Test
+    @DisplayName("#登録編集削除24 delete 正常系 論理削除：delFlg=\"1\"に更新されsave()が1回呼ばれる")
+    void delete_論理削除() {
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(user("U001", "0")));
+
+        service.delete("U001");
+
+        assertThat(captureSavedUser().getDelFlg()).isEqualTo("1");
+    }
+
+    @Test
+    @DisplayName("#登録編集削除25 update 正常系 ログイン中のユーザーを更新した場合、SecurityContext上のユーザー情報も更新される")
+    void update_ログイン中ユーザー更新でSecurityContextも更新される() {
+        User existing = user("U001");
+        existing.setName("旧名前");
+        // m_user.password は NOT NULL のため、DBから取得した User には必ず値が入っている。
+        // AppUserDetails（Spring Security の User）は password が null だと例外になる。
+        existing.setPassword("encoded");
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(existing));
+
+        var authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        jp.lg.asp.accommodation.config.AppUserDetails principal =
+                new jp.lg.asp.accommodation.config.AppUserDetails(
+                        "U001", "password", authorities, false);
+        principal.setDisplayName("旧名前");
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, "password", authorities));
+        SecurityContextHolder.setContext(context);
+
+        UserForm form = userForm("U001", null);
+        form.setName("新しい名前");
+
+        service.update("U001", form);
+
+        verify(userRepository, times(1)).save(any());
+
+        Object updatedPrincipal = SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        assertThat(updatedPrincipal).isInstanceOf(jp.lg.asp.accommodation.config.AppUserDetails.class);
+        assertThat(((jp.lg.asp.accommodation.config.AppUserDetails) updatedPrincipal).getDisplayName())
+                .isEqualTo("新しい名前");
+    }
+
+    @Test
+    @DisplayName("#登録編集削除26 isLoginUser 正常系 ログイン中ユーザーIDと一致する場合：trueを返す")
+    void isLoginUser_一致する場合はtrue() {
+        setLoginUser("U001");
+
+        assertThat(service.isLoginUser("U001")).isTrue();
+    }
+
+    @Test
+    @DisplayName("#登録編集削除27 isLoginUser 正常系 ログイン中ユーザーIDと一致しない場合：falseを返す")
+    void isLoginUser_一致しない場合はfalse() {
+        setLoginUser("U001");
+
+        assertThat(service.isLoginUser("U002")).isFalse();
     }
 }
