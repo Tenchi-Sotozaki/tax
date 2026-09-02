@@ -37,7 +37,8 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
-			jichitaiName = jichitaiInfo.getName();
+			// 通知書には「○○市長」のように自治体名＋区分名を印字する
+			jichitaiName = jichitaiInfo.getName() + jichitaiInfo.getKbnName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
 		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
