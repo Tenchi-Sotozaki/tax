@@ -134,7 +134,7 @@ public class KofuKetteiTsuchiShinseiController {
 	 * @param errorMessage：エラーメッセージ
 	 * @return 処理の結果
 	 */
-	private ResponseEntity<byte[]> processReport(KofuKetteiTsuchiShinseiDto dto, String operation, HttpHeaders headers, String errorMessage) {
+	public ResponseEntity<byte[]> processReport(KofuKetteiTsuchiShinseiDto dto, String operation, HttpHeaders headers, String errorMessage) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
 
