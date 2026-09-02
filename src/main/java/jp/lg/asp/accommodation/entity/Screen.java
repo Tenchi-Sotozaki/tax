@@ -15,7 +15,7 @@ import lombok.Setter;
 public class Screen extends BaseEntity {
 
 	@Id
-	@Column(name = "screen_id")
+	@Column(name = "screen_id", length = 10)
 	private String screenId;
 
 	@Column(name = "screen_name", nullable = false)
@@ -28,5 +28,9 @@ public class Screen extends BaseEntity {
 	/** 表示順 */
 	@Column(name = "dsp_odr", nullable = false)
 	private Integer dspOdr;
+
+	/** 表示区分 */
+	@Column(name = "dsp_kbn", nullable = false, length = 1)
+	private String dspKbn;
 
 }
