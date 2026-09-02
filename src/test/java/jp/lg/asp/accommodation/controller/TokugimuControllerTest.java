@@ -383,6 +383,7 @@ class TokugimuControllerTest {
             form.setFacilityName("テスト施設");
 
             sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(shiteiNo);
+            sessionHelperMock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
             sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
             when(tokugimuService.getTokugimuByShiteiNo(shiteiNo)).thenReturn(form);
 
@@ -397,6 +398,7 @@ class TokugimuControllerTest {
         @DisplayName("境界値：セッションに指定番号が存在しない場合に、指定番号選択モーダルを開いた状態で帳票画面が返却されること")
         void boundary_noShiteiNo() {
             sessionHelperMock.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
+            sessionHelperMock.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
 
             String viewName = tokugimuController.showReport(session, model);
 
@@ -430,7 +432,7 @@ class TokugimuControllerTest {
             String viewName = tokugimuController.showGassanReport(session, model, redirectAttributes);
 
             assertThat(viewName).isEqualTo("redirect:/tokugimu/report");
-            verify(redirectAttributes).addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
+            verify(redirectAttributes).addFlashAttribute("errorMessage", "合算指定番号を選択してください");
         }
     }
 

@@ -94,7 +94,8 @@ public class SofusakiCsvServiceImpl implements SofusakiCsvService {
     }
 
     private String quoteForced(String value) {
-        if (value == null) return "";
+        // nullと空文字はいずれも空文字とする（="" を出力しない）
+        if (value == null || value.isEmpty()) return "";
         return "=\"" + value.replace("\"", "\"\"") + "\"";
     }
 
