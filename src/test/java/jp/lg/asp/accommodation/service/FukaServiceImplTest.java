@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.mockito.quality.Strictness;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.FukaDaichoForm;
 import jp.lg.asp.accommodation.entity.Fuka;
+import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Nokigen;
 import jp.lg.asp.accommodation.entity.NokigenId;
@@ -99,7 +101,6 @@ class FukaServiceImplTest {
             "20250131", "20250228", "20250331");
     }
 
-    /** nendoStMonth=3, nozeiShuki=shuki でベースのスタブを設定する */
     private void stubDaichoBase(String nendoStMonth, String nozeiShuki) {
         when(jichitaiRepository.findById(JICHITAI_CD))
                 .thenReturn(Optional.of(jichitaiWith(nendoStMonth, nozeiShuki)));
@@ -129,7 +130,7 @@ class FukaServiceImplTest {
 
     // TC-01: 自治体マスタに年度開始月が未設定 → デフォルト値3が使われてitemsが正常に生成される
     @Test
-    void getDaichoData_年度開始月未設定_デフォルト値3が使われitemsが正常に生成される() {
+    void getDaichoData_年度開始月未設定_デフォルト値3が使われItemsが正常に生成される() {
         when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
         when(fukaRepository.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(JICHITAI_CD, SHITEI_NO, NENDO))
                 .thenReturn(List.of());
@@ -398,4 +399,219 @@ class FukaServiceImplTest {
 
         assertThat(result).containsExactly(2024);
     }
+
+    // -----------------------------------------------------------------------
+    // isGassanTargetMonth
+    // -----------------------------------------------------------------------
+
+    // No.70 対象日が合算適用期間内の場合、trueを返す
+    @Test
+    void isGassanTargetMonth_適用期間内_trueを返す() {
+        Gassan gassan = new Gassan();
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, "901001"))
+                .thenReturn(List.of(gassan));
+
+        assertThat(service.isGassanTargetMonth("901001", LocalDate.of(2024, 4, 1))).isTrue();
+    }
+
+    // No.71 対象日が合算適用期間外の場合、falseを返す
+    @Test
+    void isGassanTargetMonth_適用期間外_falseを返す() {
+        Gassan gassan = new Gassan();
+        gassan.setTekiyoStYmd(LocalDate.of(2024, 1, 1));
+        gassan.setTekiyoEdYmd(LocalDate.of(2024, 3, 31));
+        when(gassanRepository.findByJichitaiCdAndGassanShiteiNo(JICHITAI_CD, "901001"))
+                .thenReturn(List.of(gassan));
+
+        assertThat(service.isGassanTargetMonth("901001", LocalDate.of(2024, 4, 1))).isFalse();
+    }
+
+    // No.72 gassanShiteiNoがnullの場合、falseを返す
+    @Test
+    void isGassanTargetMonth_gassanShiteiNoがnull_falseを返す() {
+        assertThat(service.isGassanTargetMonth(null, LocalDate.of(2024, 4, 1))).isFalse();
+    }
+
+    // -----------------------------------------------------------------------
+    // isShiteiNoGassanTargetMonth
+    // -----------------------------------------------------------------------
+
+    // No.73 対象日が合算適用期間内の場合、trueを返す
+    @Test
+    void isShiteiNoGassanTargetMonth_適用期間内_trueを返す() {
+        Gassan gassan = new Gassan();
+        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        assertThat(service.isShiteiNoGassanTargetMonth(SHITEI_NO, LocalDate.of(2024, 4, 1))).isTrue();
+    }
+
+    // No.74 shiteiNoがnullの場合、falseを返す
+    @Test
+    void isShiteiNoGassanTargetMonth_shiteiNoがnull_falseを返す() {
+        assertThat(service.isShiteiNoGassanTargetMonth(null, LocalDate.of(2024, 4, 1))).isFalse();
+    }
+
+    // -----------------------------------------------------------------------
+    // resolveGassanTekiyoPeriod
+    // -----------------------------------------------------------------------
+
+    // No.75 開始日のみ設定の場合、"yyyy年M月以降"を返す
+    @Test
+    void resolveGassanTekiyoPeriod_開始日のみ_yyyy年M月以降を返す() {
+        Gassan gassan = new Gassan();
+        gassan.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
+        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        String result = service.resolveGassanTekiyoPeriod(SHITEI_NO, LocalDate.of(2024, 4, 1));
+
+        assertThat(result).isEqualTo("2024年4月以降");
+    }
+
+    // No.76 終了日のみ設定の場合、"yyyy年M月まで"を返す
+    @Test
+    void resolveGassanTekiyoPeriod_終了日のみ_yyyy年M月までを返す() {
+        Gassan gassan = new Gassan();
+        gassan.setTekiyoEdYmd(LocalDate.of(2024, 6, 30));
+        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        String result = service.resolveGassanTekiyoPeriod(SHITEI_NO, LocalDate.of(2024, 4, 1));
+
+        assertThat(result).isEqualTo("2024年6月まで");
+    }
+
+    // No.77 開始日・終了日両方設定の場合、"yyyy年M月～yyyy年M月"を返す
+    @Test
+    void resolveGassanTekiyoPeriod_開始日終了日両方_yyyy年M月からyyyy年M月を返す() {
+        Gassan gassan = new Gassan();
+        gassan.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
+        gassan.setTekiyoEdYmd(LocalDate.of(2024, 6, 30));
+        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        String result = service.resolveGassanTekiyoPeriod(SHITEI_NO, LocalDate.of(2024, 4, 1));
+
+        assertThat(result).isEqualTo("2024年4月～2024年6月");
+    }
+
+    // No.78 対象日が期間外の場合、nullを返す
+    @Test
+    void resolveGassanTekiyoPeriod_対象日が期間外_nullを返す() {
+        Gassan gassan = new Gassan();
+        gassan.setTekiyoStYmd(LocalDate.of(2024, 1, 1));
+        gassan.setTekiyoEdYmd(LocalDate.of(2024, 3, 31));
+        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(gassan));
+
+        String result = service.resolveGassanTekiyoPeriod(SHITEI_NO, LocalDate.of(2024, 4, 1));
+
+        assertThat(result).isNull();
+    }
+
+    // No.79 shiteiNoがnullの場合、nullを返す
+    @Test
+    void resolveGassanTekiyoPeriod_shiteiNoがnull_nullを返す() {
+        String result = service.resolveGassanTekiyoPeriod(null, LocalDate.of(2024, 4, 1));
+        assertThat(result).isNull();
+    }
+
+    // -----------------------------------------------------------------------
+    // getNendoStMonth
+    // -----------------------------------------------------------------------
+
+    // No.80 自治体情報が存在する場合、nendoStMonthを返す
+    @Test
+    void getNendoStMonth_自治体情報あり_nendoStMonthを返す() {
+        Jichitai jichitai = new Jichitai();
+        jichitai.setNendoStMonth("4");
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.of(jichitai));
+
+        assertThat(service.getNendoStMonth()).isEqualTo(4);
+    }
+
+    // No.81 自治体情報が存在しない場合、デフォルト値3を返す
+    @Test
+    void getNendoStMonth_自治体情報なし_デフォルト値3を返す() {
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
+
+        assertThat(service.getNendoStMonth()).isEqualTo(3);
+    }
+
+    // -----------------------------------------------------------------------
+    // getExistingNendoList (No.82-84 はTC-16〜TC-18と同内容のため割愛)
+    // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // isAlreadyRegistered
+    // -----------------------------------------------------------------------
+
+    // No.63 申告データが存在する場合、trueを返す
+    @Test
+    void isAlreadyRegistered_申告データあり_trueを返す() {
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
+        when(fukaRepository.findLatestByNendoAndKibetsu(eq(JICHITAI_CD), eq(SHITEI_NO), any(), anyInt()))
+                .thenReturn(List.of(new Fuka()));
+
+        assertThat(service.isAlreadyRegistered(SHITEI_NO, "202404")).isTrue();
+    }
+
+    // No.64 申告データが存在しない場合、falseを返す
+    @Test
+    void isAlreadyRegistered_申告データなし_falseを返す() {
+        when(jichitaiRepository.findById(JICHITAI_CD)).thenReturn(Optional.empty());
+        when(fukaRepository.findLatestByNendoAndKibetsu(eq(JICHITAI_CD), eq(SHITEI_NO), any(), anyInt()))
+                .thenReturn(List.of());
+
+        assertThat(service.isAlreadyRegistered(SHITEI_NO, "202404")).isFalse();
+    }
+
+    // -----------------------------------------------------------------------
+    // isAlreadyRegisteredByKibetsu
+    // -----------------------------------------------------------------------
+
+    // No.65 申告データが存在する場合、trueを返す
+    @Test
+    void isAlreadyRegisteredByKibetsu_申告データあり_trueを返す() {
+        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 1))
+                .thenReturn(List.of(new Fuka()));
+
+        assertThat(service.isAlreadyRegisteredByKibetsu(SHITEI_NO, "2024", 1)).isTrue();
+    }
+
+    // No.66 申告データが存在しない場合、falseを返す
+    @Test
+    void isAlreadyRegisteredByKibetsu_申告データなし_falseを返す() {
+        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, SHITEI_NO, "2024", 1))
+                .thenReturn(List.of());
+
+        assertThat(service.isAlreadyRegisteredByKibetsu(SHITEI_NO, "2024", 1)).isFalse();
+    }
+
+    // -----------------------------------------------------------------------
+    // calculateTax
+    // -----------------------------------------------------------------------
+
+    // No.67 定額制の場合、宿泊数×（市税率+県税率）を返す
+    @Test
+    void calculateTax_定額制_宿泊数に市税率プラス県税率を掛けた値を返す() {
+        long result = service.calculateTax("1", 3L, java.math.BigDecimal.valueOf(200), java.math.BigDecimal.valueOf(100));
+        assertThat(result).isEqualTo(900L);
+    }
+
+    // No.68 定率制の場合、宿泊料金×税率/100（端数切り捨て）を返す
+    @Test
+    void calculateTax_定率制_宿泊料金に税率を掛けて100で割り端数切り捨て() {
+        long result = service.calculateTax("2", 15000L, java.math.BigDecimal.valueOf(2.0), null);
+        assertThat(result).isEqualTo(300L);
+    }
+
+    // No.69 cityRate・kenRateがnullの場合、0を返す
+    @Test
+    void calculateTax_cityRateとkenRateがnull_0を返す() {
+        long result = service.calculateTax("1", 3L, null, null);
+        assertThat(result).isEqualTo(0L);
+    }
+
 }
