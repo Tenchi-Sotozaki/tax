@@ -1,12 +1,15 @@
 package jp.lg.asp.accommodation.controller;
 
+import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap;
+
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -15,15 +18,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
-
 import jp.lg.asp.accommodation.annotation.OpeLog;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
+import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.dto.TokugimuForm;
 import jp.lg.asp.accommodation.dto.TokugimuSearchForm;
 import jp.lg.asp.accommodation.service.NozeiShukiService;
@@ -56,8 +56,7 @@ public class TokugimuController {
 			new AbstractMap.SimpleEntry<>("businessStartDate", "宿泊施設情報の営業開始(予定)日は正しい日付を入力してください"),
 			new AbstractMap.SimpleEntry<>("suspensionStartDate", "施設営業休止/再開/廃止情報の休止開始年月日は正しい日付を入力してください"),
 			new AbstractMap.SimpleEntry<>("suspensionEndDate", "施設営業休止/再開/廃止情報の休止終了年月日は正しい日付を入力してください"),
-			new AbstractMap.SimpleEntry<>("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は正しい日付を入力してください")
-	);
+			new AbstractMap.SimpleEntry<>("resumptionOrAbolitionDate", "施設営業休止/再開/廃止情報の再開または廃止年月日は正しい日付を入力してください"));
 
 	private static final String TYPE_MISMATCH_DEFAULT_MESSAGE = "入力形式が正しくない項目があります";
 
@@ -254,7 +253,7 @@ public class TokugimuController {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
 		if (selected == null || selected.getGassanShiteiNo() == null || selected.getGassanShiteiNo().isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", "合算対象外の特別徴収義務者です");
+			redirectAttributes.addFlashAttribute("errorMessage", "合算指定番号を選択してください");
 			return "redirect:/tokugimu/report";
 		}
 		return "redirect:/reports/gassanNonyuTsuchi";
@@ -266,7 +265,8 @@ public class TokugimuController {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
 		if (selected != null && selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。指定通知書は合算申告対象外の特別徴収義務者を指定してください。");
+			redirectAttributes.addFlashAttribute("errorMessage",
+					"合算申告の特別徴収義務者が指定されています。指定通知書は合算申告対象外の特別徴収義務者を指定してください。");
 			return "redirect:/tokugimu/report";
 		}
 		return "redirect:/reports/tokugimuShiteiTsuchi";
@@ -278,7 +278,8 @@ public class TokugimuController {
 		accessChecker.checkAccess(ScreenManagement.TOKUGIMU_REPORT);
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
 		if (selected != null && selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
-			redirectAttributes.addFlashAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。受理通知書は合算申告対象外の特別徴収義務者を指定してください。");
+			redirectAttributes.addFlashAttribute("errorMessage",
+					"合算申告の特別徴収義務者が指定されています。受理通知書は合算申告対象外の特別徴収義務者を指定してください。");
 			return "redirect:/tokugimu/report";
 		}
 		return "redirect:/reports/tokugimuJuriTsuchi";

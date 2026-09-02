@@ -19,6 +19,7 @@ import jp.lg.asp.accommodation.repository.ReportsRepository;
 import jp.lg.asp.accommodation.repository.RptStatusRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.RptStatusService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,6 +30,7 @@ public class RptStatusServiceImpl implements RptStatusService {
 	private final ReportsRepository reportsRepository;
 	private final RptStatusRepository rptStatusRepository;
 	private final TokugimuRepository tokugimuRepository;
+	private final HashUtil hashUtil;
 
 	@Override
 	public List<Reports> findAllReports() {
@@ -42,6 +44,9 @@ public class RptStatusServiceImpl implements RptStatusService {
 	public List<RptStatusListItem> search(RptStatusSearchForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
+		String searchKojinNo = org.springframework.util.StringUtils.hasText(form.getKojinNo())
+				? hashUtil.sha256(form.getKojinNo()) : form.getKojinNo();
+
 		List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
 				jichitaiCd,
 				form.getShiteiNo(),
@@ -50,7 +55,7 @@ public class RptStatusServiceImpl implements RptStatusService {
 				form.getShisetsuName(),
 				toLikePattern(form.getShisetsuName(), form.getShisetsuNameMatchType()),
 				"999",
-				form.getKojinNo(),
+				searchKojinNo,
 				form.getHojinNo());
 
 		List<RptStatus> rptStatusList = rptStatusRepository.findByJichitaiCd(jichitaiCd);

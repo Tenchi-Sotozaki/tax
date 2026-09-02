@@ -65,6 +65,26 @@ public class JichitaiConfigServiceImpl implements JichitaiConfigService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public JichitaiConfigDto getJichitaiConfigDtoById(String jichitaiCd) {
+	    return jichitaiRepository.findById(jichitaiCd)
+	            .map(j -> {
+	                JichitaiConfigDto form = new JichitaiConfigDto();
+	                form.setJichitaiCd(j.getJichitaiCd());
+	                form.setName(j.getName());
+	                form.setKbnName(j.getKbnName());
+	                form.setParam(j.getParam());
+	                form.setUserId(j.getUserName());
+	                form.setNendoStMonth(j.getNendoStMonth() == null ? "3" : j.getNendoStMonth().trim());
+	                form.setNozeiShuki(j.getNozeiShuki());
+	                form.setShiteiStChar(j.getShiteiStChar());
+	                form.setGassanStChar(j.getGassanStChar());
+	                form.setAtenaStNo(j.getAtenaStNo());
+	                return form;
+	            }).orElseGet(this::getJichitaiConfigDto);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public JichitaiConfigDto getJichitaiConfigDto() {
 
 	    JichitaiConfigDto form = new JichitaiConfigDto();

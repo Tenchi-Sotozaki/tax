@@ -70,16 +70,18 @@ public class KofuKetteiTsuchiShinseiController {
 		// YYYY形式の年度をDTOにセット
 		dto.setNendo(targetNendo);
 		
-		// 指定番号が存在しない場合
+		// 指定番号または合算指定番号が存在しない場合
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+		if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
 			// 画面を戻して検索モーダルを表示
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
 
 		// 指定番号を設定
-		dto.setShiteiNo(SessionHelper.getShiteiNo(session));
+		dto.setShiteiNo(shiteiNo != null ? shiteiNo : gassanShiteiNo);
 
 		model.addAttribute("dto", dto);
 		return "reports/kofuKetteiTsuchiShinsei";
