@@ -96,7 +96,7 @@ class GassanNonyuTsuchiReportsServiceImplTest {
 
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
 					.isInstanceOf(RuntimeException.class)
-					.hasMessageContaining("必須項目が設定されていません");
+					.hasMessageContaining("帳票出力項目が設定されていません。管理者にお問い合わせください。");
 		}
 
 		@Test
@@ -117,7 +117,7 @@ class GassanNonyuTsuchiReportsServiceImplTest {
 
 			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
 					.isInstanceOf(RuntimeException.class)
-					.hasMessageContaining("公印が設定されていません");
+					.hasMessageContaining("公印が設定されていません。管理者にお問い合わせください。");
 		}
 
 		@Test

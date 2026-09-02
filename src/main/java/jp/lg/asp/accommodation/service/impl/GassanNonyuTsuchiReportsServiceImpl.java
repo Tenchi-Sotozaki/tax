@@ -43,12 +43,12 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 				|| dto.getNonyuKigen() == null || dto.getTokuJusho() == null
 				|| dto.getTokuName() == null || dto.getGassanShiteiNo() == null
 				|| dto.getTekiyoStYmd() == null) {
-			throw new RuntimeException("必須項目が設定されていません。");
+			throw new RuntimeException("帳票出力項目が設定されていません。管理者にお問い合わせください。");
 		}
 
 		// 公印の未設定チェック（null または 長さ0）
 		if (dto.getKoin() == null || dto.getKoin().length == 0) {
-			throw new RuntimeException("公印が設定されていません。");
+			throw new RuntimeException("公印が設定されていません。管理者にお問い合わせください。");
 		}
 
 		try {
