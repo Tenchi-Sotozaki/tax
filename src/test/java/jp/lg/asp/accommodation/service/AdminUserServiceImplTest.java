@@ -451,6 +451,9 @@ class AdminUserServiceImplTest {
     void update_ログイン中ユーザー更新でSecurityContextも更新される() {
         User existing = user("U001");
         existing.setName("旧名前");
+        // m_user.password は NOT NULL のため、DBから取得した User には必ず値が入っている。
+        // AppUserDetails（Spring Security の User）は password が null だと例外になる。
+        existing.setPassword("encoded");
         when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(existing));
 
         var authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
