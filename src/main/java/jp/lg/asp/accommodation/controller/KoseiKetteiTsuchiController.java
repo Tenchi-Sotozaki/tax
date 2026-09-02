@@ -42,7 +42,7 @@ public class KoseiKetteiTsuchiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		
+
 		// 指定番号・合算指定番号を取得し、どちらかがあれば処理継続
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
