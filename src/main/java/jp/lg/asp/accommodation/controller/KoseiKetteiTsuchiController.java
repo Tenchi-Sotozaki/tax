@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,6 @@ import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
-import jp.lg.asp.accommodation.dto.ShiteiGassanSearchDto;
 import jp.lg.asp.accommodation.service.KoseiKetteiTsuchiReportsService;
 import jp.lg.asp.accommodation.util.SessionHelper;
 import lombok.RequiredArgsConstructor;
@@ -44,21 +44,19 @@ public class KoseiKetteiTsuchiController {
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
 
-		// 指定番号または合算指定番号が存在しない場合
-		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		// 指定番号・合算指定番号を取得し、どちらかがあれば処理継続
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
-		if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
-			// 画面を戻して検索モーダルを表示
+		String targetNo = StringUtils.hasText(shiteiNo) ? shiteiNo
+				: StringUtils.hasText(gassanShiteiNo) ? gassanShiteiNo : null;
+
+		if (targetNo == null) {
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
 
-		// 指定番号を取得
-		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
-
-		model.addAttribute("taishoYmList",
-				reportsService.findTaishoYmList(effectiveShiteiNo));
+		model.addAttribute("shiteiNo", targetNo);
+		model.addAttribute("taishoYmList", reportsService.findTaishoYmList(targetNo));
 
 		return "reports/koseiKetteiTsuchi";
 	}

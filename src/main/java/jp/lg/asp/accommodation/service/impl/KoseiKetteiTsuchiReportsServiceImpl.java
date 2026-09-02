@@ -74,17 +74,14 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 	 * 起動時初期化（フォント設定・自治体情報・法令引用文キャッシュ）
 	 */
 	private void init() {
-		// JasperReportsで使用するフォントや欠落フォントの無視設定
 		System.setProperty("net.sf.jasperreports.default.font.name", "IPAex明朝");
 		System.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
-		
-		// 共通サービスから自治体情報を取得しメンバ変数にキャッシュ
 		Jichitai jichitai = reportsCommonService.getJichitaiInfo();
-		cityName = jichitai.getName() + jichitai.getKbnName();
-		todoufuken = jichitai.getKbnName();
-		horeiInyou1 = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
-		horeiInyou2 = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
-		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
+		cityName     = jichitai != null ? jichitai.getName() + jichitai.getKbnName() : "";
+		todoufuken   = jichitai != null ? jichitai.getKbnName() : "";
+		horeiInyou1  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU1);
+		horeiInyou2  = reportsCommonService.getReportsDefText(ReportsConstants.KOSEI_KETTEI_HOREI_INYOU2);
+		koin         = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
 	}
 
 	/**
@@ -100,8 +97,12 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 			dto = buildDtoByTaishoYm(shiteiNo, b1Ym, b2Ym, b3Ym, henkoKbn);
 			log.debug("PDF生成開始 - 指定番号: {}, b1Ym: {}, b2Ym: {}, b3Ym: {}", shiteiNo, b1Ym, b2Ym, b3Ym);
 
-			// 課税区分（定率か定額か）によって使用するJRXMLテンプレートを切り替える
-			String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(dto.getFukaKbn())
+			String fukaKbn = dto.getFukaKbn();
+			if (!FukaConstants.TEIRITSU.getValue().equals(fukaKbn)
+					&& !FukaConstants.TEIGAKU.getValue().equals(fukaKbn)) {
+				throw new RuntimeException("未知の賦課区分です: " + fukaKbn);
+			}
+			String jrxmlPath = FukaConstants.TEIRITSU.getValue().equals(fukaKbn)
 					? JRXML_TEIRITSU
 					: JRXML_TEIGAKU;
 
@@ -259,14 +260,19 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
         List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
                 jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
 
-        // 更正の場合、前回（rno - 1）の内訳リストを比較用として取得
-        boolean isKosei = FukaConstants.KOSEI.getValue().equals(henkoKbn);
-      
-        List<FukaUchi> prevUchiList = (isKosei && rno > 1)
-                ? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-                        jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
-                : Collections.emptyList();
-        
+        // 更正の場合は変更区分「申告」の最新rnoを取得して差引計算に使用
+        boolean isKosei = FukaConstants.KOSEI.getValue().equals(fuka.getHenkoKbn());
+        List<FukaUchi> prevUchiList = Collections.emptyList();
+        if (isKosei) {
+            Optional<Integer> shinkokuRno = fukaRepository.findMaxRnoByHenkoKbn(
+                    jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu(),
+                    FukaConstants.SHINKOKU.getValue());
+            if (shinkokuRno.isPresent()) {
+                prevUchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+                        jichitaiCd, fuka.getShiteiNo(), shinkokuRno.get(), fuka.getNendo(), fuka.getKibetsu());
+            }
+        }
+
         // 課税区分（1〜5）ごとの内訳項目をセット
         for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
             final int k = kbn;
@@ -349,15 +355,16 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
                 .map(FukaUchi::getZeiritsuSeq)
                 .filter(seq -> seq != null)
                 .findFirst()
-                .ifPresent(zeiritsuSeq -> {
-                    List<ZeiritsuTeiritsu> teiritsuList = zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, zeiritsuSeq);
+                .ifPresentOrElse(zeiritsuSeq -> {
+                    List<ZeiritsuTeiritsu> teiritsuList =
+                        zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, zeiritsuSeq);
                     for (ZeiritsuTeiritsu t : teiritsuList) {
                         int tSeq = t.getTeiritsuSeq().intValue();
                         if (tSeq >= 1 && tSeq <= MAX_KBN) {
                             setField(dto, "kbn_name" + tSeq, nvl(t.getKbnName()).trim());
                         }
                     }
-                });
+                }, () -> zeiritsuTeiritsuRepository.findActiveBySeq(jichitaiCd, null));
         }
         
 		// 特別徴収義務者情報を取得してDTOにセット
@@ -402,17 +409,21 @@ public class KoseiKetteiTsuchiReportsServiceImpl implements KoseiKetteiTsuchiRep
 			}
 
 			Fuka fuka = fukaOpt.get();
-			Integer rno = fukaRepository.findMaxRno(
-					jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu()).orElse(1);
 
 			List<FukaUchi> uchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-					jichitaiCd, fuka.getShiteiNo(), rno, fuka.getNendo(), fuka.getKibetsu());
+					jichitaiCd, fuka.getShiteiNo(), fuka.getRno(), fuka.getNendo(), fuka.getKibetsu());
 
 			boolean isKosei = FukaConstants.KOSEI.getValue().equals(henkoKbn);
-			List<FukaUchi> prevUchiList = (isKosei && rno > 1)
-					? fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
-							jichitaiCd, fuka.getShiteiNo(), rno - 1, fuka.getNendo(), fuka.getKibetsu())
-					: Collections.emptyList();
+			List<FukaUchi> prevUchiList = Collections.emptyList();
+			if (isKosei) {
+				Optional<Integer> shinkokuRno = fukaRepository.findMaxRnoByHenkoKbn(
+						jichitaiCd, fuka.getShiteiNo(), fuka.getNendo(), fuka.getKibetsu(),
+						FukaConstants.SHINKOKU.getValue());
+				if (shinkokuRno.isPresent()) {
+					prevUchiList = fukaUchiRepository.findByJichitaiCdAndShiteiNoAndRnoAndNendoAndKibetsu(
+							jichitaiCd, fuka.getShiteiNo(), shinkokuRno.get(), fuka.getNendo(), fuka.getKibetsu());
+				}
+			}
 
 			long blockSashihikiSum = 0L;
 			for (int kbn = 1; kbn <= MAX_KBN; kbn++) {
