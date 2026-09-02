@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,8 +47,8 @@ public class KoseiKetteiTsuchiController {
 		// 指定番号・合算指定番号を取得し、どちらかがあれば処理継続
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
-		String targetNo = org.springframework.util.StringUtils.hasText(shiteiNo) ? shiteiNo
-				: org.springframework.util.StringUtils.hasText(gassanShiteiNo) ? gassanShiteiNo : null;
+		String targetNo = StringUtils.hasText(shiteiNo) ? shiteiNo
+				: StringUtils.hasText(gassanShiteiNo) ? gassanShiteiNo : null;
 
 		if (targetNo == null) {
 			model.addAttribute("showShiteiGassanModal", true);
