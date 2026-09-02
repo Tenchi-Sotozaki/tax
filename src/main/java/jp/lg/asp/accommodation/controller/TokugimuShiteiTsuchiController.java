@@ -47,8 +47,7 @@ public class TokugimuShiteiTsuchiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		TokugimuShiteiTsuchiDto dto = new TokugimuShiteiTsuchiDto();
-		
+
 		// 指定番号が存在しない場合
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
 		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
@@ -64,12 +63,14 @@ public class TokugimuShiteiTsuchiController {
 		if (selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
 			model.addAttribute("errorMessage", "合算申告の特別徴収義務者が指定されています。指定通知書は合算申告対象外の特別徴収義務者を指定してください。");
 		}
-		
-		TokugimuShiteiTsuchiDto tokugimuInfo = tokugimuShiteiTsuchiService.getTokugimuInfo(shiteiNo);
-		if (tokugimuInfo != null) {
-			dto = tokugimuInfo;
+
+		// 特別徴収義務者情報が取得できない場合はエラー
+		TokugimuShiteiTsuchiDto dto = tokugimuShiteiTsuchiService.getTokugimuInfo(shiteiNo);
+		if (dto == null) {
+			model.addAttribute("errorMessage", "指定番号: " + shiteiNo + " の情報が見つかりません。");
+			return "tokugimu/tTokugimuReport";
 		}
-		
+
 		// 発行日のデフォルト値を今日に設定
 		if (dto.getHakkoYmd() == null) {
 			dto.setHakkoYmd(LocalDate.now());
