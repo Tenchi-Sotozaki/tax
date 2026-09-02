@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -281,7 +282,7 @@ class BankImportServiceImplTest {
     @DisplayName("#19 importFromZip 正常系 ログイン中ユーザーがいる場合：登録者・更新者にユーザーIDが設定される")
     void 確認19_ログインユーザーが設定される() throws IOException, SQLException {
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("U001", "password"));
+                new UsernamePasswordAuthenticationToken("U001", "password", List.of()));
 
         MockMultipartFile file = zipOf("zengin-code-master/data/banks.json", BANKS_1);
 
