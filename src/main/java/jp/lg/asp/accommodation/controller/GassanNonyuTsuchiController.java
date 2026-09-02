@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -57,7 +57,7 @@ public class GassanNonyuTsuchiController {
 		}
 
 		// 合算指定番号がない場合（指定番号のみ）はエラー
-		if (gassanShiteiNo == null) {
+		if (gassanShiteiNo == null || gassanShiteiNo.isEmpty()) {
 			model.addAttribute("errorMessage", "合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
 			return "tokugimu/tTokugimuReport";
 		}

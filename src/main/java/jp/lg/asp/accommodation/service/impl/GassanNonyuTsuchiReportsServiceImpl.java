@@ -37,6 +37,20 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 
 	@Override
 	public byte[] generateTsuchiPdf(GassanNonyuTsuchiDto dto) {
+		// 必須項目の null チェック
+		if (dto == null || dto.getHakkoYmd() == null || dto.getJorei() == null
+				|| dto.getCity() == null || dto.getBiko() == null
+				|| dto.getNonyuKigen() == null || dto.getTokuJusho() == null
+				|| dto.getTokuName() == null || dto.getGassanShiteiNo() == null
+				|| dto.getTekiyoStYmd() == null) {
+			throw new RuntimeException("帳票出力項目が設定されていません。管理者にお問い合わせください。");
+		}
+
+		// 公印の未設定チェック（null または 長さ0）
+		if (dto.getKoin() == null || dto.getKoin().length == 0) {
+			throw new RuntimeException("公印が設定されていません。管理者にお問い合わせください。");
+		}
+
 		try {
 			InputStream jrxmlStream = new ClassPathResource(JRXML_PATH).getInputStream();
 			JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
@@ -49,6 +63,11 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 			return JasperExportManager.exportReportToPdf(jasperPrint);
 
 		} catch (Exception e) {
+			// バリデーション例外はそのままスロー、それ以外はラップする
+			if (e instanceof RuntimeException && 
+					(e.getMessage().contains("必須項目") || e.getMessage().contains("公印"))) {
+				throw (RuntimeException) e;
+			}
 			log.error("合算申告納入承認通知書PDF生成エラー: shiteiNo={}", dto.getShiteiNo(), e);
 			throw new RuntimeException("PDF生成に失敗しました: " + e.getMessage(), e);
 		}
@@ -58,11 +77,11 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 		Map<String, Object> parameters = new HashMap<>();
 		
 		if (dto.getHakkoYmd() != null) {
-		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE)
-		            .withChronology(JapaneseChronology.INSTANCE);
-		    parameters.put("hakkoYmd", dto.getHakkoYmd().format(formatter));
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE)
+					.withChronology(JapaneseChronology.INSTANCE);
+			parameters.put("hakkoYmd", dto.getHakkoYmd().format(formatter));
 		} else {
-		    parameters.put("hakkoYmd", "");
+			parameters.put("hakkoYmd", "");
 		}
 		
 		parameters.put("jorei", dto.getJorei() != null ? dto.getJorei() : "");
@@ -80,15 +99,15 @@ public class GassanNonyuTsuchiReportsServiceImpl implements GassanNonyuTsuchiRep
 		reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
 		
 		if (dto.getTekiyoStYmd() != null) {
-		    // 和暦のフォーマッタを作成
-		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)
-		            .withChronology(JapaneseChronology.INSTANCE);
-		            
-		    // 和暦の文字列に変換
-		    String warekiYm = dto.getTekiyoStYmd().format(formatter);
-		    reportsDto.setTekiyo_st_ymd(warekiYm);
+			// 和暦のフォーマッタを作成
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)
+					.withChronology(JapaneseChronology.INSTANCE);
+					
+			// 和暦の文字列に変換
+			String warekiYm = dto.getTekiyoStYmd().format(formatter);
+			reportsDto.setTekiyo_st_ymd(warekiYm);
 		} else {
-		    reportsDto.setTekiyo_st_ymd("");
+			reportsDto.setTekiyo_st_ymd("");
 		}
 
 		List<GassanNonyuTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
