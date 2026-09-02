@@ -49,7 +49,11 @@ public class RoleServiceImpl implements RoleService {
 
 		// m_screen を表示順に取得し、区分ごとにまとめる
 		// 表示順で並んでいるため、区分の並び順も表示順に従う
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		for (Screen screen : screenRepository.findAllByOrderByDspOdrAsc()) {
+			String dspKbn = screen.getDspKbn();
+			if ("3".equals(dspKbn)) continue;
+			if ("2".equals(dspKbn) && !"99999".equals(jichitaiCd)) continue;
 			grouped.computeIfAbsent(screen.getKbn(), key -> new ArrayList<>()).add(screen);
 		}
 
