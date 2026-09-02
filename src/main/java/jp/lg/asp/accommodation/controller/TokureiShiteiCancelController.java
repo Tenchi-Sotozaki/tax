@@ -64,12 +64,11 @@ public class TokureiShiteiCancelController {
 		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
 
 		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(effectiveShiteiNo);
-		TokureiShiteiCancelDto dto;
-		if (shiteiDto != null) {
-			dto = convertToCancel(shiteiDto);
-		} else {
-			throw new IllegalArgumentException("特例情報が存在しません。");
+		if (shiteiDto == null) {
+			model.addAttribute("errorMessage", "特例情報が登録されていません。");
+			return "tokugimu/tTokugimuReport";
 		}
+		TokureiShiteiCancelDto dto = convertToCancel(shiteiDto);
 
 		if (dto.getHakkoYmd() == null) {
 			dto.setHakkoYmd(LocalDate.now());
