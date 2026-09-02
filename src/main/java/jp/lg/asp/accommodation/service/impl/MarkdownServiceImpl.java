@@ -1,11 +1,15 @@
 package jp.lg.asp.accommodation.service.impl;
 
+import java.util.List;
+
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Service;
 
+import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 
 import jp.lg.asp.accommodation.service.MarkdownService;
 
@@ -17,8 +21,12 @@ public class MarkdownServiceImpl implements MarkdownService {
     private final Safelist safelist;
 
     public MarkdownServiceImpl() {
-        this.parser = Parser.builder().build();
-        this.renderer = HtmlRenderer.builder().build();
+        // 表（GFM tables）を有効にする。Parser / HtmlRenderer の双方に同じ options を渡す
+        MutableDataSet options = new MutableDataSet();
+        options.set(Parser.EXTENSIONS, List.of(TablesExtension.create()));
+
+        this.parser = Parser.builder(options).build();
+        this.renderer = HtmlRenderer.builder(options).build();
 
         /*
          * relaxed:
