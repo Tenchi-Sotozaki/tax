@@ -4,9 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import jp.lg.asp.accommodation.entity.Reports;
-import jp.lg.asp.accommodation.entity.ReportsId;
 
 @Repository
-public interface ReportsRepository extends JpaRepository<Reports, ReportsId> {
+public interface ReportsRepository extends JpaRepository<Reports, String> {
 
 }

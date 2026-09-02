@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -34,10 +33,7 @@ public class RptStatusServiceImpl implements RptStatusService {
 
 	@Override
 	public List<Reports> findAllReports() {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return reportsRepository.findAll().stream()
-				.filter(r -> jichitaiCd.equals(r.getJichitaiCd()))
-				.collect(Collectors.toList());
+		return reportsRepository.findAll();
 	}
 
 	@Override

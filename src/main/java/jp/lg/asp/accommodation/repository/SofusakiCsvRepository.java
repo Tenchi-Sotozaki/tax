@@ -27,7 +27,7 @@ public interface SofusakiCsvRepository extends JpaRepository<ReportsLog, Reports
 
     @Query("""
             SELECT r.rptId, rp.rptName FROM ReportsLog r
-            LEFT JOIN Reports rp ON rp.jichitaiCd = r.jichitaiCd AND TRIM(rp.rptId) = TRIM(r.rptId)
+            LEFT JOIN Reports rp ON TRIM(rp.rptId) = TRIM(r.rptId)
             WHERE r.jichitaiCd = :jichitaiCd
             AND r.shiteiNo IS NOT NULL
             AND r.opeDt >= :twoWeeksAgo

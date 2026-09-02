@@ -136,31 +136,27 @@ class RptLogViewServiceImplTest {
 	class FindAllReportsTest {
 
 		@Test
-		@DisplayName("正常系：自自治体コードと一致する帳票定義のみがフィルタリングされて返却されること")
+		@DisplayName("正常系：全帳票定義が返却されること")
 		void success() {
 			Reports r1 = new Reports();
-			r1.setJichitaiCd(JICHITAI_CD);
 			r1.setRptId("R1");
 
 			Reports r2 = new Reports();
-			r2.setJichitaiCd("OTHER_CD");
 			r2.setRptId("R2");
 
 			when(reportsRepository.findAll()).thenReturn(List.of(r1, r2));
 
 			List<Reports> results = rptLogViewService.findAllReports();
 
-			assertThat(results).hasSize(1);
+			assertThat(results).hasSize(2);
 			assertThat(results.get(0).getRptId()).isEqualTo("R1");
+			assertThat(results.get(1).getRptId()).isEqualTo("R2");
 		}
 
 		@Test
-		@DisplayName("境界値：一致する自治体コードが存在しない場合、空のリストが返却されること")
-		void noMatch() {
-			Reports r2 = new Reports();
-			r2.setJichitaiCd("OTHER_CD");
-
-			when(reportsRepository.findAll()).thenReturn(List.of(r2));
+		@DisplayName("境界値：帳票定義が存在しない場合、空のリストが返却されること")
+		void empty() {
+			when(reportsRepository.findAll()).thenReturn(List.of());
 
 			List<Reports> results = rptLogViewService.findAllReports();
 
