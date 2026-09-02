@@ -172,7 +172,9 @@ public class AdminUserServiceImpl implements AdminUserService {
                         details.getPassword(),
                         details.getAuthorities());
 
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
+        var ctx = SecurityContextHolder.getContext();
+        ctx.setAuthentication(newAuth);
+        SecurityContextHolder.setContext(ctx);
     }
 
     private UserId buildUserId(String id) {
