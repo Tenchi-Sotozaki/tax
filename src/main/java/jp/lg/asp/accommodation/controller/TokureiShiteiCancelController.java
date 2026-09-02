@@ -50,19 +50,31 @@ public class TokureiShiteiCancelController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		String shiteiNo = SessionHelper.getShiteiNo(session);
-		
-		// 指定番号が存在しない場合
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+
+		// 指定番号または合算指定番号が存在しない場合
+		if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
 			// 画面を戻して検索モーダルを表示
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
+<<<<<<< HEAD
 		
 		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(shiteiNo);
 		if (shiteiDto == null) {
 			throw new IllegalArgumentException("特例情報が存在しません。");
+=======
+
+		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
+
+		TokureiShiteiCancelDto dto = new TokureiShiteiCancelDto();
+
+		TokureiShiteiDto shiteiDto = tokureiShiteiService.getTokugimuInfo(effectiveShiteiNo);
+		if (shiteiDto != null) {
+			dto = convertToCancel(shiteiDto);
+>>>>>>> master
 		}
 		
 		TokureiShiteiCancelDto dto = convertToCancel(shiteiDto);

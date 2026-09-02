@@ -1311,9 +1311,14 @@ public class FukaServiceImpl implements FukaService {
 		if (gassanShiteiNo == null || taishoDate == null)
 			return false;
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		LocalDate taishoFirst = taishoDate.withDayOfMonth(1);
 		return gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo).stream()
-				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
-						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+				.anyMatch(g -> {
+					LocalDate stFirst = g.getTekiyoStYmd() != null ? g.getTekiyoStYmd().withDayOfMonth(1) : null;
+					LocalDate edFirst = g.getTekiyoEdYmd() != null ? g.getTekiyoEdYmd().withDayOfMonth(1) : null;
+					return (stFirst == null || !taishoFirst.isBefore(stFirst))
+							&& (edFirst == null || !taishoFirst.isAfter(edFirst));
+				});
 	}
 
 	@Override
@@ -1321,9 +1326,14 @@ public class FukaServiceImpl implements FukaService {
 		if (shiteiNo == null || taishoDate == null)
 			return false;
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		LocalDate taishoFirst = taishoDate.withDayOfMonth(1);
 		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
-				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
-						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+				.anyMatch(g -> {
+					LocalDate stFirst = g.getTekiyoStYmd() != null ? g.getTekiyoStYmd().withDayOfMonth(1) : null;
+					LocalDate edFirst = g.getTekiyoEdYmd() != null ? g.getTekiyoEdYmd().withDayOfMonth(1) : null;
+					return (stFirst == null || !taishoFirst.isBefore(stFirst))
+							&& (edFirst == null || !taishoFirst.isAfter(edFirst));
+				});
 	}
 
 	@Override
@@ -1331,9 +1341,14 @@ public class FukaServiceImpl implements FukaService {
 		if (shiteiNo == null || taishoDate == null)
 			return null;
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		LocalDate taishoFirst = taishoDate.withDayOfMonth(1);
 		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
-				.filter(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
-						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())))
+				.filter(g -> {
+					LocalDate stFirst = g.getTekiyoStYmd() != null ? g.getTekiyoStYmd().withDayOfMonth(1) : null;
+					LocalDate edFirst = g.getTekiyoEdYmd() != null ? g.getTekiyoEdYmd().withDayOfMonth(1) : null;
+					return (stFirst == null || !taishoFirst.isBefore(stFirst))
+							&& (edFirst == null || !taishoFirst.isAfter(edFirst));
+				})
 				.findFirst()
 				.map(g -> {
 					String st = g.getTekiyoStYmd() != null

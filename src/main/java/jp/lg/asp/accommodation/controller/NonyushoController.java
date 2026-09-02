@@ -51,29 +51,32 @@ public class NonyushoController {
      */
     @GetMapping
     public String index(Model model, HttpSession session) {
-        String shiteiNo = SessionHelper.getShiteiNo(session);
-        
-		// 指定番号が存在しない場合
+        // 指定番号または合算指定番号が存在しない場合
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+		if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
 			// 画面を戻して検索モーダルを表示
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
-        
-        log.debug("納入書発行画面表示: shiteiNo={}", shiteiNo);
+
+		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
+        log.debug("納入書発行画面表示: shiteiNo={}", effectiveShiteiNo);
         
         try {
-            TokugimuForm tokugimuForm = tokugimuService.getTokugimuByShiteiNo(shiteiNo);
-            model.addAttribute("shiteiNo", shiteiNo);
+            TokugimuForm tokugimuForm = shiteiNo != null
+                    ? tokugimuService.getTokugimuByShiteiNo(effectiveShiteiNo)
+                    : tokugimuService.getTokugimuByGassanShiteiNo(effectiveShiteiNo);
+            model.addAttribute("shiteiNo", effectiveShiteiNo);
             model.addAttribute("shisetsuName", tokugimuForm.getFacilityName());
             model.addAttribute("tokuName", tokugimuForm.getName());
             model.addAttribute("tokuJusho", tokugimuForm.getTokugimuAddress());
             model.addAttribute("tokuYubinNo", tokugimuForm.getTokugimuYubinNo());
             model.addAttribute("shisetsuJusho", tokugimuForm.getFacilityAddress());
         } catch (Exception e) {
-            log.error("特別徴収義務者情報の取得に失敗: shiteiNo={}", shiteiNo, e);
-            model.addAttribute("shiteiNo", shiteiNo);
+            log.error("特別徴収義務者情報の取得に失敗: shiteiNo={}", effectiveShiteiNo, e);
+            model.addAttribute("shiteiNo", effectiveShiteiNo);
         }
         return "reports/nonyusho";
     }
