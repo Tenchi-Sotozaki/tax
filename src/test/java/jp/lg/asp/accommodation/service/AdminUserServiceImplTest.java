@@ -460,4 +460,32 @@ class AdminUserServiceImplTest {
 
         assertThat(service.isLoginUser("U002")).isFalse();
     }
+
+    @Test
+    @DisplayName("#登録編集削除27 update 正常系 ログイン中のユーザーを更新した場合、SecurityContext上のユーザー情報も更新される")
+    void update_ログイン中ユーザー更新でSecurityContextも更新される() {
+        User existing = user("U001");
+        existing.setName("旧名前");
+        when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(existing));
+
+        jp.lg.asp.accommodation.config.AppUserDetails principal =
+                new jp.lg.asp.accommodation.config.AppUserDetails(
+                        "U001", "password", List.of(), false);
+        principal.setDisplayName("旧名前");
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(principal, "password", List.of()));
+
+        UserForm form = userForm("U001", null);
+        form.setName("新しい名前");
+
+        service.update("U001", form);
+
+        verify(userRepository, times(1)).save(any());
+
+        Object updatedPrincipal = SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        assertThat(updatedPrincipal).isInstanceOf(jp.lg.asp.accommodation.config.AppUserDetails.class);
+        assertThat(((jp.lg.asp.accommodation.config.AppUserDetails) updatedPrincipal).getDisplayName())
+                .isEqualTo("新しい名前");
+    }
 }
