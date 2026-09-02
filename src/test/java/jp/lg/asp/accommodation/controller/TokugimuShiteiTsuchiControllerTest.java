@@ -34,8 +34,7 @@ import jp.lg.asp.accommodation.util.SessionHelper;
  * 特別徴収義務者指定通知 単体テスト（コントローラ）
  *
  * <p>チェックリストの #1〜#10 に1対1で対応する。
- * チェックリストはあるべき仕様で書かれているため、現行実装では落ちるケースがある
- * （#2・#7）。テストが通るように期待値を実装へ寄せないこと。</p>
+ * チェックリストはあるべき仕様で書かれている。テストが通るように期待値を実装へ寄せないこと。</p>
  */
 @ExtendWith(MockitoExtension.class)
 class TokugimuShiteiTsuchiControllerTest {
@@ -92,12 +91,9 @@ class TokugimuShiteiTsuchiControllerTest {
         verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_SHITEI_TSUCHI);
     }
 
-    /**
-     * ※現行実装は合算指定番号があると errorMessage を設定するため、実装側の修正が必要
-     */
     @Test
-    @DisplayName("#2 index 正常系 セッションに指定番号あり＋合算指定番号あり：エラーメッセージを出力せず通知書画面を返す")
-    void index_合算指定番号ありでもエラーメッセージを出さない() {
+    @DisplayName("#2 index 正常系 セッションに指定番号あり＋合算指定番号あり：エラーメッセージを設定したうえで通知書画面を返す")
+    void index_合算指定番号ありはエラーメッセージを設定して画面を表示する() {
         TokugimuShiteiTsuchiDto serviceDto = dto(LocalDate.of(2026, 8, 31));
         when(tokugimuShiteiTsuchiService.getTokugimuInfo(SHITEI_NO)).thenReturn(serviceDto);
 
@@ -106,10 +102,12 @@ class TokugimuShiteiTsuchiControllerTest {
         String view = controller.index(session(SHITEI_NO, "G001"), model);
 
         assertThat(view).isEqualTo(VIEW_TSUCHI);
-        assertThat(model.asMap())
-                .as("合算指定番号があってもエラーとせず処理を継続すること")
-                .doesNotContainKey("errorMessage");
-        assertThat(model.asMap().get("dto")).isSameAs(serviceDto);
+        assertThat(model.asMap().get("errorMessage"))
+                .isEqualTo("合算申告の特別徴収義務者が指定されています。"
+                        + "指定通知書は合算申告対象外の特別徴収義務者を指定してください。");
+        assertThat(model.asMap().get("dto"))
+                .as("エラーメッセージを出しつつ画面自体は表示すること")
+                .isSameAs(serviceDto);
         verify(tokugimuShiteiTsuchiService, times(1)).getTokugimuInfo(SHITEI_NO);
         verify(accessChecker).checkAccess(ScreenManagement.TOKUGIMU_SHITEI_TSUCHI);
     }
