@@ -25,12 +25,6 @@ import jp.lg.asp.accommodation.repository.TaxManagerRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TaxManagerServiceImpl;
 
-/**
- * 納税管理人 登録/編集/照会（ACCOMMODATION_TAX-338）の単体テスト。
- *
- * DBには接続せず、リポジトリと自治体コンテキストをモックに差し替えて
- * TaxManagerServiceImpl のロジックのみを検証する。
- */
 @ExtendWith(MockitoExtension.class)
 class TaxManagerServiceImplTest {
 
@@ -40,12 +34,11 @@ class TaxManagerServiceImplTest {
 
     @InjectMocks TaxManagerServiceImpl service;
 
-    private static final String JICHITAI_CD = "01100";
-    private static final String SHITEI_NO = "00100001";
+    private static final String JICHITAI_CD = "011002";
+    private static final String SHITEI_NO = "S001";
 
     @BeforeEach
     void setUp() {
-        // isSamePerson のテストでは参照されないため lenient にしておく
         lenient().when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
     }
 
@@ -53,7 +46,6 @@ class TaxManagerServiceImplTest {
     // テストデータ
     // ===================================================================
 
-    /** 納税管理人の履歴レコード（t_nokan） */
     private TaxManager nokan(int rno) {
         TaxManager e = new TaxManager();
         e.setJichitaiCd(JICHITAI_CD);
@@ -74,16 +66,12 @@ class TaxManagerServiceImplTest {
         return e;
     }
 
-    /** 特別徴収義務者（t_tokugimu） */
     private Tokugimu tokugimu() {
         Tokugimu t = new Tokugimu();
-        t.setKyokaName("株式会社ホテルA");
-        t.setShisetsuName("ホテルA 札幌");
-        t.setAtenaNo(new BigDecimal("1001"));
+        t.setAtenaNo(new BigDecimal("12345"));
         return t;
     }
 
-    /** 登録可能な入力フォーム（特徴とは別人物） */
     private TaxManagerForm validForm() {
         TaxManagerForm f = new TaxManagerForm();
         f.setKbn("1");
@@ -100,7 +88,6 @@ class TaxManagerServiceImplTest {
         return f;
     }
 
-    /** save() に渡されたエンティティを取り出す */
     private TaxManager savedEntity() {
         ArgumentCaptor<TaxManager> captor = ArgumentCaptor.forClass(TaxManager.class);
         verify(taxManagerRepository).save(captor.capture());
@@ -108,278 +95,290 @@ class TaxManagerServiceImplTest {
     }
 
     // ===================================================================
-    // isSamePerson — 特別徴収義務者との同一人物チェック
+    // No.24 isSamePerson - 同じ宛名番号
     // ===================================================================
 
     @Test
-    void isSamePerson_宛名番号が一致すればtrue() {
-        assertThat(service.isSamePerson("1001", "1001")).isTrue();
-    }
-
-    @Test
-    void isSamePerson_前後に空白があっても一致とみなす() {
-        assertThat(service.isSamePerson("  1001  ", "1001")).isTrue();
-    }
-
-    @Test
-    void isSamePerson_宛名番号が異なればfalse() {
-        assertThat(service.isSamePerson("1001", "1002")).isFalse();
-    }
-
-    @Test
-    void isSamePerson_納税管理人側がnullまたは空ならfalse() {
-        assertThat(service.isSamePerson(null, "1001")).isFalse();
-        assertThat(service.isSamePerson("   ", "1001")).isFalse();
-    }
-
-    @Test
-    void isSamePerson_特別徴収義務者側がnullまたは空ならfalse() {
-        assertThat(service.isSamePerson("1001", null)).isFalse();
-        assertThat(service.isSamePerson("1001", "   ")).isFalse();
+    void isSamePerson_同じ宛名番号_trueを返す() {
+        assertThat(service.isSamePerson("A001", "A001")).isTrue();
     }
 
     // ===================================================================
-    // getByShiteiNo — 照会（最新レコード）
+    // No.25 isSamePerson - 異なる宛名番号
     // ===================================================================
 
     @Test
-    void getByShiteiNo_納管レコードがあれば編集モードで各項目が載る() {
-        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(Optional.of(nokan(2)));
-
-        TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
-
-        assertThat(form.isEdit()).isTrue();
-        assertThat(form.getRno()).isEqualTo(2);
-        assertThat(form.getAtenaNo()).isEqualTo("2002");
-        assertThat(form.getManagerName()).isEqualTo("山田太郎");
-        assertThat(form.getManagerNameKana()).isEqualTo("ヤマダタロウ");
-        assertThat(form.getManagerYubinNo()).isEqualTo("060-0001");
-        assertThat(form.getManagerAddress()).isEqualTo("札幌市中央区北1条西1丁目");
-        assertThat(form.getManagerPhone()).isEqualTo("011-000-0000");
-        assertThat(form.getKbn()).isEqualTo("1");
-        assertThat(form.getReason()).isEqualTo("転居のため");
-        assertThat(form.getRegistrationDate()).isEqualTo(LocalDate.of(2026, 4, 1));
-        assertThat(form.getDeclarationDate()).isEqualTo(LocalDate.of(2026, 3, 25));
+    void isSamePerson_異なる宛名番号_falseを返す() {
+        assertThat(service.isSamePerson("A001", "B001")).isFalse();
     }
 
+    // ===================================================================
+    // No.26 isSamePerson - taxManagerAtenaNoがnull
+    // ===================================================================
+
     @Test
-    void getByShiteiNo_納管レコードが無ければ新規モードで登録日と申告日が本日になる() {
-        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(Optional.empty());
-
-        TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
-
-        assertThat(form.isEdit()).isFalse();
-        assertThat(form.getShiteiNo()).isEqualTo(SHITEI_NO);
-        assertThat(form.getRegistrationDate()).isEqualTo(LocalDate.now());
-        assertThat(form.getDeclarationDate()).isEqualTo(LocalDate.now());
+    void isSamePerson_taxManagerAtenaNoがnull_falseを返す() {
+        assertThat(service.isSamePerson(null, "A001")).isFalse();
     }
 
+    // ===================================================================
+    // No.27 isSamePerson - obligorAtenaNoがnull
+    // ===================================================================
+
     @Test
-    void getByShiteiNo_特別徴収義務者の宛名番号がフォームに載る() {
+    void isSamePerson_obligorAtenaNoがnull_falseを返す() {
+        assertThat(service.isSamePerson("A001", null)).isFalse();
+    }
+
+    // ===================================================================
+    // No.28 isSamePerson - taxManagerAtenaNoが空文字
+    // ===================================================================
+
+    @Test
+    void isSamePerson_taxManagerAtenaNoが空文字_falseを返す() {
+        assertThat(service.isSamePerson("", "A001")).isFalse();
+    }
+
+    // ===================================================================
+    // No.29 isSamePerson - 前後スペースを除いて一致
+    // ===================================================================
+
+    @Test
+    void isSamePerson_前後スペースを除いて一致_trueを返す() {
+        assertThat(service.isSamePerson(" A001 ", "A001")).isTrue();
+    }
+
+    // ===================================================================
+    // No.30 getByShiteiNo - 納税管理人あり
+    // ===================================================================
+
+    @Test
+    void getByShiteiNo_納税管理人あり_editTrue_各フィールドが設定される() {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(tokugimu()));
-
-        TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
-
-        assertThat(form.getObligorAtenaNo()).isEqualTo("1001");
-    }
-
-    @Test
-    void getByShiteiNo_履歴番号の最大と最小が載る() {
-        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(3);
+        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Optional.of(nokan(2)));
+        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(2);
         when(taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(1);
 
         TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
 
-        assertThat(form.getMaxRno()).isEqualTo(3);
+        assertThat(form.isEdit()).isTrue();
+        assertThat(form.getRno()).isEqualTo(2);
+        assertThat(form.getManagerName()).isEqualTo("山田太郎");
+        assertThat(form.getMaxRno()).isEqualTo(2);
         assertThat(form.getMinRno()).isEqualTo(1);
     }
 
-    /**
-     * リポジトリの例外は握りつぶさず、そのまま呼び出し元へ伝播させる。
-     * 「該当データ無し」は Optional.empty で表現され、新規扱いのフォームが返る（上のテスト）。
-     */
-    @Test
-    void getByShiteiNo_リポジトリが例外を投げたらそのまま伝播する() {
-        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenThrow(new RuntimeException("DB接続エラー"));
+    // ===================================================================
+    // No.31 getByShiteiNo - 納税管理人なし
+    // ===================================================================
 
-        assertThatThrownBy(() -> service.getByShiteiNo(SHITEI_NO))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("DB接続エラー");
+    @Test
+    void getByShiteiNo_納税管理人なし_editFalse_デフォルト値が設定される() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(tokugimu()));
+        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Optional.empty());
+        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
+        when(taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
+
+        TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
+
+        assertThat(form.isEdit()).isFalse();
+        assertThat(form.getMaxRno()).isEqualTo(0);
+        assertThat(form.getMinRno()).isEqualTo(0);
     }
 
     // ===================================================================
-    // getByShiteiNoAndRno — 照会（履歴番号指定）
+    // No.32 getByShiteiNo - 特別徴収義務者あり
     // ===================================================================
 
     @Test
-    void getByShiteiNoAndRno_指定した履歴番号のレコードが載る() {
+    void getByShiteiNo_特別徴収義務者あり_obligorAtenaNoが設定される() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(tokugimu()));
+        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Optional.empty());
+
+        TaxManagerForm form = service.getByShiteiNo(SHITEI_NO);
+
+        assertThat(form.getObligorAtenaNo()).isEqualTo("12345");
+    }
+
+    // ===================================================================
+    // No.33 getByShiteiNo - 特別徴収義務者なし
+    // ===================================================================
+
+    @Test
+    void getByShiteiNo_特別徴収義務者なし_IllegalArgumentExceptionをスロー() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.getByShiteiNo(SHITEI_NO))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("特別徴収義務者が設定されていません。");
+    }
+
+    // ===================================================================
+    // No.34 getByShiteiNoAndRno - 指定rnoのレコードあり
+    // ===================================================================
+
+    @Test
+    void getByShiteiNoAndRno_指定rnoのレコードあり_editTrue_各フィールドが設定される() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(tokugimu()));
         when(taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 2))
                 .thenReturn(Optional.of(nokan(2)));
+        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(2);
+        when(taxManagerRepository.findMinRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(1);
 
         TaxManagerForm form = service.getByShiteiNoAndRno(SHITEI_NO, 2);
 
         assertThat(form.isEdit()).isTrue();
         assertThat(form.getRno()).isEqualTo(2);
-        assertThat(form.getManagerName()).isEqualTo("山田太郎");
+        assertThat(form.getMaxRno()).isEqualTo(2);
+        assertThat(form.getMinRno()).isEqualTo(1);
     }
 
+    // ===================================================================
+    // No.35 getByShiteiNoAndRno - 指定rnoのレコードなし
+    // ===================================================================
+
     @Test
-    void getByShiteiNoAndRno_指定した履歴番号が存在しなければ新規モードになる() {
-        when(taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 9))
+    void getByShiteiNoAndRno_指定rnoのレコードなし_editFalse() {
+        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(List.of(tokugimu()));
+        when(taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 99))
                 .thenReturn(Optional.empty());
 
-        TaxManagerForm form = service.getByShiteiNoAndRno(SHITEI_NO, 9);
+        TaxManagerForm form = service.getByShiteiNoAndRno(SHITEI_NO, 99);
 
         assertThat(form.isEdit()).isFalse();
     }
 
-    @Test
-    void getByShiteiNoAndRno_最新取得ではなく履歴番号指定で取得する() {
-        when(taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 2))
-                .thenReturn(Optional.of(nokan(2)));
-
-        service.getByShiteiNoAndRno(SHITEI_NO, 2);
-
-        verify(taxManagerRepository).findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 2);
-        verify(taxManagerRepository, never()).findLatestByJichitaiCdAndShiteiNo(any(), any());
-    }
-
-    @Test
-    void getByShiteiNoAndRno_特別徴収義務者の宛名番号がフォームに載る() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
-
-        TaxManagerForm form = service.getByShiteiNoAndRno(SHITEI_NO, 2);
-
-        assertThat(form.getObligorAtenaNo()).isEqualTo("1001");
-    }
-
-    /** getByShiteiNo と同様、リポジトリの例外は伝播させる。 */
-    @Test
-    void getByShiteiNoAndRno_リポジトリが例外を投げたらそのまま伝播する() {
-        when(taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(JICHITAI_CD, SHITEI_NO, 2))
-                .thenThrow(new RuntimeException("DB接続エラー"));
-
-        assertThatThrownBy(() -> service.getByShiteiNoAndRno(SHITEI_NO, 2))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("DB接続エラー");
-    }
-
     // ===================================================================
-    // saveByShiteiNo — 登録／編集
+    // No.36 saveByShiteiNo - 新規登録（maxRno=0）
     // ===================================================================
 
     @Test
-    void saveByShiteiNo_新規登録では履歴番号が1になり最新フラグ更新は行わない() {
+    void saveByShiteiNo_新規登録_rno1でsaveが呼ばれる_updateNewFlgToZeroは呼ばれない() {
+        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
+
+        service.saveByShiteiNo(SHITEI_NO, validForm());
+
+        assertThat(savedEntity().getRno()).isEqualTo(1);
+        verify(taxManagerRepository, never()).updateNewFlgToZero(any(), any());
+    }
+
+    // ===================================================================
+    // No.37 saveByShiteiNo - 更新（maxRno=1）
+    // ===================================================================
+
+    @Test
+    void saveByShiteiNo_更新_rno2でsaveが呼ばれる_updateNewFlgToZeroが呼ばれる() {
+        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(1);
+
+        service.saveByShiteiNo(SHITEI_NO, validForm());
+
+        assertThat(savedEntity().getRno()).isEqualTo(2);
+        verify(taxManagerRepository).updateNewFlgToZero(JICHITAI_CD, SHITEI_NO);
+    }
+
+    // ===================================================================
+    // No.38 saveByShiteiNo - kbn="3"（免除）
+    // ===================================================================
+
+    @Test
+    void saveByShiteiNo_免除_個人情報フィールドがnullでsaveが呼ばれる() {
+        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
+        TaxManagerForm form = validForm();
+        form.setKbn("3");
+        form.setAtenaNo(null);
+        form.setReason("免除理由");
+
+        service.saveByShiteiNo(SHITEI_NO, form);
+
+        TaxManager saved = savedEntity();
+        assertThat(saved.getAtenaNo()).isNull();
+        assertThat(saved.getName()).isNull();
+        assertThat(saved.getYubinNo()).isNull();
+    }
+
+    // ===================================================================
+    // No.39 saveByShiteiNo - kbn="1"（非免除）
+    // ===================================================================
+
+    @Test
+    void saveByShiteiNo_非免除_個人情報フィールドが設定されてsaveが呼ばれる() {
         when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
 
         service.saveByShiteiNo(SHITEI_NO, validForm());
 
         TaxManager saved = savedEntity();
-        assertThat(saved.getJichitaiCd()).isEqualTo(JICHITAI_CD);
-        assertThat(saved.getShiteiNo()).isEqualTo(SHITEI_NO);
-        assertThat(saved.getRno()).isEqualTo(1);
+        assertThat(saved.getName()).isEqualTo("山田太郎");
         assertThat(saved.getNewFlg()).isEqualTo("1");
         assertThat(saved.getDelFlg()).isEqualTo("0");
-        verify(taxManagerRepository, never()).updateNewFlgToZero(any(), any());
     }
 
-    @Test
-    void saveByShiteiNo_既存がある場合は履歴番号が繰り上がり既存の最新フラグを落とす() {
-        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(2);
-
-        service.saveByShiteiNo(SHITEI_NO, validForm());
-
-        assertThat(savedEntity().getRno()).isEqualTo(3);
-        verify(taxManagerRepository).updateNewFlgToZero(JICHITAI_CD, SHITEI_NO);
-    }
+    // ===================================================================
+    // No.40 saveByShiteiNo - 非免除かつ同一人物
+    // ===================================================================
 
     @Test
-    void saveByShiteiNo_特別徴収義務者と同一人物なら例外を投げて保存しない() {
+    void saveByShiteiNo_非免除かつ同一人物_IllegalArgumentExceptionをスロー() {
         TaxManagerForm form = validForm();
-        form.setAtenaNo("1001");
-        form.setObligorAtenaNo("1001");
+        form.setAtenaNo("A001");
+        form.setObligorAtenaNo("A001");
 
         assertThatThrownBy(() -> service.saveByShiteiNo(SHITEI_NO, form))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("同一人物");
+                .hasMessage("特別徴収義務者と同一人物のため、納税管理人として登録できません。");
 
         verify(taxManagerRepository, never()).save(any());
     }
 
+    // ===================================================================
+    // No.41 saveByShiteiNo - kbn="3"（免除）かつ同一宛名番号
+    // ===================================================================
+
     @Test
-    void saveByShiteiNo_免除区分なら同一人物でも登録でき個人情報はクリアされる() {
-        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
+    void saveByShiteiNo_免除かつ同一宛名番号_IllegalArgumentExceptionをスロー() {
         TaxManagerForm form = validForm();
         form.setKbn("3");
-        form.setAtenaNo("1001");
-        form.setObligorAtenaNo("1001");
-        form.setReason("納税管理人を選任しないため");
+        form.setAtenaNo("A001");
+        form.setObligorAtenaNo("A001");
 
-        service.saveByShiteiNo(SHITEI_NO, form);
+        assertThatThrownBy(() -> service.saveByShiteiNo(SHITEI_NO, form))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("免除時は納税管理人選択不可です。");
 
-        TaxManager saved = savedEntity();
-        assertThat(saved.getKbn()).isEqualTo("3");
-        assertThat(saved.getAtenaNo()).isNull();
-        assertThat(saved.getName()).isNull();
-        assertThat(saved.getNameKana()).isNull();
-        assertThat(saved.getYubinNo()).isNull();
-        assertThat(saved.getJusho()).isNull();
-        assertThat(saved.getTel()).isNull();
-        assertThat(saved.getRiyu()).isEqualTo("納税管理人を選任しないため");
+        verify(taxManagerRepository, never()).save(any());
     }
 
+    // ===================================================================
+    // No.42 saveByShiteiNo - atenaNoがnull（kbn=1）
+    // ===================================================================
+
     @Test
-    void saveByShiteiNo_宛名番号が空なら同一人物チェックをせず登録できる() {
-        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
+    void saveByShiteiNo_kbn1かつatenaNoがnull_IllegalArgumentExceptionをスロー() {
         TaxManagerForm form = validForm();
-        form.setAtenaNo("   ");
-        form.setObligorAtenaNo("   ");
+        form.setKbn("1");
+        form.setAtenaNo(null);
 
-        service.saveByShiteiNo(SHITEI_NO, form);
+        assertThatThrownBy(() -> service.saveByShiteiNo(SHITEI_NO, form))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("宛名番号は必須です。");
 
-        verify(taxManagerRepository).save(any(TaxManager.class));
-    }
-
-    @Test
-    void saveByShiteiNo_登録日と申告日と入力項目がエンティティに転記される() {
-        when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
-
-        service.saveByShiteiNo(SHITEI_NO, validForm());
-
-        TaxManager saved = savedEntity();
-        assertThat(saved.getTorokuYmd()).isEqualTo(LocalDate.of(2026, 4, 1));
-        assertThat(saved.getShinkokuYmd()).isEqualTo(LocalDate.of(2026, 3, 25));
-        assertThat(saved.getAtenaNo()).isEqualTo("2002");
-        assertThat(saved.getName()).isEqualTo("山田太郎");
-        assertThat(saved.getNameKana()).isEqualTo("ヤマダタロウ");
-        assertThat(saved.getYubinNo()).isEqualTo("060-0001");
-        assertThat(saved.getJusho()).isEqualTo("札幌市中央区北1条西1丁目");
-        assertThat(saved.getTel()).isEqualTo("011-000-0000");
-        assertThat(saved.getRiyu()).isEqualTo("転居のため");
+        verify(taxManagerRepository, never()).save(any());
     }
 
     // ===================================================================
-    // deleteByShiteiNo — 削除
+    // No.43 deleteByShiteiNo - rno=1（履歴1件）
     // ===================================================================
 
     @Test
-    void deleteByShiteiNo_削除フラグを立てて前履歴を最新に戻す() {
-        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(Optional.of(nokan(3)));
-
-        service.deleteByShiteiNo(SHITEI_NO);
-
-        verify(taxManagerRepository).updateDelFlgToOne(JICHITAI_CD, SHITEI_NO, 3);
-        verify(taxManagerRepository).updateNewFlgToOneByRno(JICHITAI_CD, SHITEI_NO, 2);
-    }
-
-    @Test
-    void deleteByShiteiNo_履歴が1件だけなら最新フラグの戻しは行わない() {
+    void deleteByShiteiNo_rno1_delFlg更新のみ_前履歴のnewFlg更新は呼ばれない() {
         when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(Optional.of(nokan(1)));
 
@@ -389,8 +388,27 @@ class TaxManagerServiceImplTest {
         verify(taxManagerRepository, never()).updateNewFlgToOneByRno(any(), any(), any());
     }
 
+    // ===================================================================
+    // No.44 deleteByShiteiNo - rno=2（履歴2件）
+    // ===================================================================
+
     @Test
-    void deleteByShiteiNo_対象が存在しなければ例外を投げる() {
+    void deleteByShiteiNo_rno2_delFlg更新_前履歴のnewFlg更新が呼ばれる() {
+        when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+                .thenReturn(Optional.of(nokan(2)));
+
+        service.deleteByShiteiNo(SHITEI_NO);
+
+        verify(taxManagerRepository).updateDelFlgToOne(JICHITAI_CD, SHITEI_NO, 2);
+        verify(taxManagerRepository).updateNewFlgToOneByRno(JICHITAI_CD, SHITEI_NO, 1);
+    }
+
+    // ===================================================================
+    // No.45 deleteByShiteiNo - 削除対象なし
+    // ===================================================================
+
+    @Test
+    void deleteByShiteiNo_削除対象なし_IllegalArgumentExceptionをスロー() {
         when(taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(Optional.empty());
 

@@ -93,6 +93,7 @@ public class ShoreikinRenkeiServiceImpl implements ShoreikinRenkeiService {
 
     private String toLikePattern(String value, String matchType) {
         if (value == null || value.isBlank()) return "%";
+        if (matchType == null) return "%" + value + "%";
         return switch (matchType) {
             case "prefix" -> value + "%";
             case "exact"  -> value;

@@ -37,7 +37,8 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 	private void init() {
 		Jichitai jichitaiInfo = reportsCommonService.getJichitaiInfo();
 		if (jichitaiInfo != null) {
-			jichitaiName = jichitaiInfo.getName();
+			// 通知書には「○○市長」のように自治体名＋区分名を印字する
+			jichitaiName = jichitaiInfo.getName() + jichitaiInfo.getKbnName();
 		}
 		jorei = reportsCommonService.getReportsDefText(ReportsConstants.TOKUGIMU_JURI_JOREI);
 		koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
@@ -75,7 +76,7 @@ public class TokugimuJuriTsuchiServiceImpl implements TokugimuJuriTsuchiService 
 		dto.setShiteiNo(tokugimu.getShiteiNo());
 		dto.setTokuName(atena.getName());
 		dto.setShisetsuName(tokugimu.getShisetsuName());
-		dto.setBiko(tokugimu.getBiko().isEmpty() ? "" : tokugimu.getBiko());
+		dto.setBiko(tokugimu.getBiko() != null ? tokugimu.getBiko() : "");
 
 		// 住所を郵便番号と住所に分けて設定
 		String tokuYubin = "";
