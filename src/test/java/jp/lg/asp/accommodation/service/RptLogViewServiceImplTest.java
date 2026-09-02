@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,10 +40,7 @@ class RptLogViewServiceImplTest {
 
 	private static final String JICHITAI_CD = "123456";
 
-	@BeforeEach
-	void setUp() {
-		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-	}
+
 
 	@Nested
 	@DisplayName("search メソッドのテスト")
@@ -53,6 +49,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("正常系：条件に一致するログが存在し、帳票名・操作名が正常に解決されてDTOリストが返却されること")
 		void success() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			ReportsLog log = new ReportsLog();
@@ -81,6 +78,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("境界値：検索条件に一致するログが0件の場合、空のリストが返却されること")
 		void emptyLogs() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			when(reportsLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any()))
@@ -95,6 +93,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("境界値：ログの rptId が null の場合、帳票名が空文字に解決されること")
 		void rptIdNull() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			ReportsLog log = new ReportsLog();
@@ -114,6 +113,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("境界値：ログの rptId に一致する帳票定義が存在しない場合、IDがそのままフォールバックされること")
 		void rptIdNotFound() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			ReportsLog log = new ReportsLog();
