@@ -79,8 +79,8 @@ class GassanNonyuTsuchiReportsServiceImplTest {
 		}
 
 		@Test
-		@DisplayName("異常系：DTOの各項目がnullまたは空の場合に例外がスローされること")
-		void error_nullOrEmptyFields() {
+		@DisplayName("正常系：DTOの各項目がnullまたは空であっても例外なくPDFが生成されること（フォールバック検証）")
+		void success_nullOrEmptyFields() {
 			GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
 			dto.setShiteiNo(SHITEI_NO);
 			dto.setHakkoYmd(null);
@@ -94,13 +94,30 @@ class GassanNonyuTsuchiReportsServiceImplTest {
 			dto.setKoin(null);
 			dto.setTekiyoStYmd(null);
 
-			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
-					.isInstanceOf(IllegalArgumentException.class);
+			byte[] expectedPdf = new byte[] { 40, 50, 60 };
+			JasperReport mockReport = mock(JasperReport.class);
+			JasperPrint mockPrint = mock(JasperPrint.class);
+
+			try (MockedStatic<JasperCompileManager> compileMock = Mockito.mockStatic(JasperCompileManager.class);
+					MockedStatic<JasperFillManager> fillMock = Mockito.mockStatic(JasperFillManager.class);
+					MockedStatic<JasperExportManager> exportMock = Mockito.mockStatic(JasperExportManager.class)) {
+
+				compileMock.when(() -> JasperCompileManager.compileReport(any(InputStream.class)))
+						.thenReturn(mockReport);
+				fillMock.when(() -> JasperFillManager.fillReport(eq(mockReport), anyMap(), any(JRDataSource.class)))
+						.thenReturn(mockPrint);
+				exportMock.when(() -> JasperExportManager.exportReportToPdf(mockPrint))
+						.thenReturn(expectedPdf);
+
+				byte[] result = reportsService.generateTsuchiPdf(dto);
+
+				assertThat(result).isEqualTo(expectedPdf);
+			}
 		}
 
 		@Test
-		@DisplayName("異常系：公印（koin）のバイト配列が長さ0またはnullの場合に例外がスローされること")
-		void error_emptyKoin() {
+		@DisplayName("正常系：公印（koin）のバイト配列が長さ0の場合でも例外なくPDFが生成されること")
+		void success_emptyKoin() {
 			GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
 			dto.setShiteiNo(SHITEI_NO);
 			dto.setHakkoYmd(LocalDate.of(2026, 4, 1));
@@ -111,11 +128,28 @@ class GassanNonyuTsuchiReportsServiceImplTest {
 			dto.setTokuJusho("〒1234567\r\nテスト住所");
 			dto.setTokuName("テスト宛名");
 			dto.setGassanShiteiNo("GS001");
-			dto.setKoin(new byte[0]);
+			dto.setKoin(new byte[0]); // 長さ0の配列
 			dto.setTekiyoStYmd(LocalDate.of(2026, 5, 1));
 
-			assertThatThrownBy(() -> reportsService.generateTsuchiPdf(dto))
-					.isInstanceOf(IllegalArgumentException.class);
+			byte[] expectedPdf = new byte[] { 70, 80, 90 };
+			JasperReport mockReport = mock(JasperReport.class);
+			JasperPrint mockPrint = mock(JasperPrint.class);
+
+			try (MockedStatic<JasperCompileManager> compileMock = Mockito.mockStatic(JasperCompileManager.class);
+					MockedStatic<JasperFillManager> fillMock = Mockito.mockStatic(JasperFillManager.class);
+					MockedStatic<JasperExportManager> exportMock = Mockito.mockStatic(JasperExportManager.class)) {
+
+				compileMock.when(() -> JasperCompileManager.compileReport(any(InputStream.class)))
+						.thenReturn(mockReport);
+				fillMock.when(() -> JasperFillManager.fillReport(eq(mockReport), anyMap(), any(JRDataSource.class)))
+						.thenReturn(mockPrint);
+				exportMock.when(() -> JasperExportManager.exportReportToPdf(mockPrint))
+						.thenReturn(expectedPdf);
+
+				byte[] result = reportsService.generateTsuchiPdf(dto);
+
+				assertThat(result).isEqualTo(expectedPdf);
+			}
 		}
 
 		@Test

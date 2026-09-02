@@ -137,17 +137,6 @@ class GassanNonyuTsuchiControllerTest {
 		}
 
 		@Test
-		@DisplayName("境界値：指定番号のみが存在し合算指定情報がnullまたは空の場合にエラーメッセージが設定されてレポート画面に遷移すること")
-		void test24_shiteiNoOnlyWithoutGassanSearch() {
-			MockHttpSession session = new MockHttpSession();
-
-			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
-				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
-				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
-			}
-		}
-
-		@Test
 		@DisplayName("境界値：初期遷移時に合算指定番号が選択されていない場合に、メッセージ「合算指定番号を選択してください。」が設定されて画面遷移すること")
 		void test25_initialTransitionWithoutGassanShiteiNo() {
 			MockHttpSession session = new MockHttpSession();
