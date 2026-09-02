@@ -1,4 +1,4 @@
-﻿package jp.lg.asp.accommodation.service;
+package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
