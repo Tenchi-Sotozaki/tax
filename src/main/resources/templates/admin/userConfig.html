@@ -63,9 +63,9 @@
 							<label for="id" class="form-label fw-medium"> ID <span
 								class="text-danger">*</span>
 							</label> <input type="text" class="form-control" id="id" th:field="*{id}"
-								th:errorclass="is-invalid" th:readonly="${isEdit}"
+								th:errorclass="is-invalid" th:readonly="${isEdit or isView}"
 								th:data-initial-value="*{id}"
-								th:classappend="${isEdit} ? ' form-control-readonly' : ''">
+								th:classappend="${isEdit or isView} ? ' form-control-readonly' : ''">
 
 							<div class="invalid-feedback" th:if="${#fields.hasErrors('id')}"
 								th:errors="*{id}"></div>
