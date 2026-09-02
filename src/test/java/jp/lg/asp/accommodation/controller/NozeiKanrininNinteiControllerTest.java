@@ -236,7 +236,7 @@ class NozeiKanrininNinteiControllerTest {
         doThrow(new RuntimeException("access error")).when(accessChecker).checkAccess(any());
         Model model = new ExtendedModelMap();
 
-        String view = controller.index(emptySession(), model);
+        String view = controller.index(mock(HttpSession.class), model);
 
         assertThat(view).isEqualTo("reports/nozeiKanrininNintei");
         assertThat(model.asMap()).containsEntry("errorMessage", "システムエラーが発生しました。");
