@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -452,13 +453,14 @@ class AdminUserServiceImplTest {
         existing.setName("旧名前");
         when(userRepository.findById(any(UserId.class))).thenReturn(Optional.of(existing));
 
+        var authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         jp.lg.asp.accommodation.config.AppUserDetails principal =
                 new jp.lg.asp.accommodation.config.AppUserDetails(
-                        "U001", "password", List.of(), false);
+                        "U001", "password", authorities, false);
         principal.setDisplayName("旧名前");
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(
-                new UsernamePasswordAuthenticationToken(principal, "password", List.of()));
+                new UsernamePasswordAuthenticationToken(principal, "password", authorities));
         SecurityContextHolder.setContext(context);
 
         UserForm form = userForm("U001", null);
