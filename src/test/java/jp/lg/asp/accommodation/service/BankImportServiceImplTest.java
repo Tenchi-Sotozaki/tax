@@ -14,6 +14,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,8 +39,12 @@ class BankImportServiceImplTest {
 
     @Mock JdbcTemplate jdbcTemplate;
 
-    // ObjectMapper は実物を使用するためコンストラクタで直接渡す
-    private final BankImportServiceImpl service = new BankImportServiceImpl(jdbcTemplate, new ObjectMapper());
+    BankImportServiceImpl service;
+
+    @BeforeEach
+    void setUp() {
+        service = new BankImportServiceImpl(jdbcTemplate, new ObjectMapper());
+    }
 
     @AfterEach
     void tearDown() {

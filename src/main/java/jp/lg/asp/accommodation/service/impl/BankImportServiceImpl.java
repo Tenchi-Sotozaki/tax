@@ -110,6 +110,17 @@ public class BankImportServiceImpl implements BankImportService {
 		Map<String, List<BranchRow>> branches = new LinkedHashMap<>();
 		String updatedAt = null;
 
+		try {
+			byte[] header = file.getBytes();
+			if (header.length < 4
+					|| header[0] != 0x50 || header[1] != 0x4B
+					|| header[2] != 0x03 || header[3] != 0x04) {
+				throw new IllegalStateException("zipファイルの読み取りに失敗しました。ファイルが壊れていないか確認してください。");
+			}
+		} catch (IOException e) {
+			throw new IllegalStateException("zipファイルの読み取りに失敗しました。ファイルが壊れていないか確認してください。");
+		}
+
 		try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(file.getInputStream()),
 				StandardCharsets.UTF_8)) {
 			ZipEntry entry;
