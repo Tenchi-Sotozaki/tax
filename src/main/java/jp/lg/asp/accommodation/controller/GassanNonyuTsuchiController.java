@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -55,30 +56,14 @@ public class GassanNonyuTsuchiController {
 			return "tokugimu/tTokugimuReport";
 		}
 
-<<<<<<< HEAD
-		String gassanShiteiNo = selected.getGassanShiteiNo();
-		if (gassanShiteiNo == null || gassanShiteiNo.isEmpty()) {
-			if (shiteiNo == null || shiteiNo.isEmpty()) {
-				model.addAttribute("errorMessage", "合算指定番号を選択してください。");
-			} else {
-				model.addAttribute("errorMessage", "合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
-			}
-			model.addAttribute("disableButtons", true);
-			model.addAttribute("dto", dto);
-			return "reports/gassanNonyuTsuchi";
-		}
-
-		GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(shiteiNo);
-=======
 		// 合算指定番号がない場合（指定番号のみ）はエラー
-		if (gassanShiteiNo == null) {
+		if (gassanShiteiNo == null || gassanShiteiNo.isEmpty()) {
 			model.addAttribute("errorMessage", "合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
 			return "tokugimu/tTokugimuReport";
 		}
 
 		GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
 		GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(gassanShiteiNo);
->>>>>>> master
 		if (info != null) {
 			dto = info;
 		}

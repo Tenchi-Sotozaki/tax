@@ -76,10 +76,11 @@ class GassanNonyuTsuchiControllerTest {
 			
 			GassanNonyuTsuchiDto infoDto = new GassanNonyuTsuchiDto();
 			infoDto.setHakkoYmd(LocalDate.of(2026, 4, 1));
-			when(gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(SHITEI_NO)).thenReturn(infoDto);
+			when(gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(GASSAN_SHITEI_NO)).thenReturn(infoDto);
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+				mockedSessionHelper.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(GASSAN_SHITEI_NO);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(searchDto);
 
 				String viewName = gassanNonyuTsuchiController.index(session, model);
@@ -102,10 +103,11 @@ class GassanNonyuTsuchiControllerTest {
 
 			GassanNonyuTsuchiDto infoDto = new GassanNonyuTsuchiDto();
 			infoDto.setHakkoYmd(null);
-			when(gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(SHITEI_NO)).thenReturn(infoDto);
+			when(gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(GASSAN_SHITEI_NO)).thenReturn(infoDto);
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+				mockedSessionHelper.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(GASSAN_SHITEI_NO);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(searchDto);
 
 				String viewName = gassanNonyuTsuchiController.index(session, model);
@@ -125,19 +127,19 @@ class GassanNonyuTsuchiControllerTest {
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+				mockedSessionHelper.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
 
 				String viewName = gassanNonyuTsuchiController.index(session, model);
 
 				assertThat(viewName).isEqualTo("tokugimu/tTokugimuReport");
 				assertThat(model.getAttribute("showShiteiGassanModal")).isEqualTo(true);
-				assertThat(model.getAttribute("errorMessage")).isEqualTo("特別徴収義務者を指定してください。");
 				verify(accessChecker).checkAccess(ScreenManagement.GASSAN_NONYU_TSUCHI);
 			}
 		}
 
 		@Test
-		@DisplayName("境界値：初期遷移時に合算指定番号が選択されていない場合に、メッセージ「合算指定番号を選択してください。」が設定されて画面遷移すること")
+		@DisplayName("境界値：初期遷移時に合算指定番号が選択されていない場合にモーダル表示へ遷移すること")
 		void test25_initialTransitionWithoutGassanShiteiNo() {
 			MockHttpSession session = new MockHttpSession();
 			Model model = new ConcurrentModel();
@@ -148,17 +150,17 @@ class GassanNonyuTsuchiControllerTest {
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
+				mockedSessionHelper.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(searchDto);
 
 				String viewName = gassanNonyuTsuchiController.index(session, model);
 
-				// セッションの指定番号等がないためモーダル表示へ行く場合のテスト例
 				assertThat(viewName).isEqualTo("tokugimu/tTokugimuReport");
 			}
 		}
 
 		@Test
-		@DisplayName("境界値：遷移後に指定番号が選択されたが合算指定番号が未選択の場合に警告メッセージおよびボタン不活性化フラグが設定されること")
+		@DisplayName("境界値：合算指定番号が未選択の場合に警告メッセージが設定されてモーダル画面へ遷移すること")
 		void test26_shiteiNoSelectedButGassanShiteiNoIsNull() {
 			MockHttpSession session = new MockHttpSession();
 			Model model = new ConcurrentModel();
@@ -169,13 +171,13 @@ class GassanNonyuTsuchiControllerTest {
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+				mockedSessionHelper.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(null);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(searchDto);
 
 				String viewName = gassanNonyuTsuchiController.index(session, model);
 
-				assertThat(viewName).isEqualTo("reports/gassanNonyuTsuchi");
+				assertThat(viewName).isEqualTo("tokugimu/tTokugimuReport");
 				assertThat(model.getAttribute("errorMessage")).isEqualTo("合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
-				assertThat(model.getAttribute("disableButtons")).isEqualTo(true);
 				verify(accessChecker).checkAccess(ScreenManagement.GASSAN_NONYU_TSUCHI);
 			}
 		}
@@ -262,6 +264,7 @@ class GassanNonyuTsuchiControllerTest {
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+				mockedSessionHelper.when(() -> SessionHelper.getGassanShiteiNo(session)).thenReturn(GASSAN_SHITEI_NO);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(new ShiteiGassanSearchDto());
 
 				assertThatThrownBy(() -> gassanNonyuTsuchiController.index(session, model))
