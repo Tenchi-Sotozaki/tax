@@ -113,6 +113,25 @@ public interface FukaRepository extends JpaRepository<Fuka, FukaId> {
 			String jichitaiCd, String shiteiNo, String nendo, String newFlg, String delFlg);
 
 	/**
+	 * 変更区分が指定値のレコードのうち最大rnoを取得する
+	 */
+	@Query("""
+			SELECT MAX(f.rno) FROM Fuka f
+			WHERE f.jichitaiCd = :jichitaiCd
+			AND f.shiteiNo = :shiteiNo
+			AND f.nendo = :nendo
+			AND f.kibetsu = :kibetsu
+			AND f.henkoKbn = :henkoKbn
+			AND f.delFlg = '0'
+			""")
+	Optional<Integer> findMaxRnoByHenkoKbn(
+			@Param("jichitaiCd") String jichitaiCd,
+			@Param("shiteiNo") String shiteiNo,
+			@Param("nendo") String nendo,
+			@Param("kibetsu") Integer kibetsu,
+			@Param("henkoKbn") String henkoKbn);
+
+	/**
 	 * 指定番号の taisho_ym 一覧を重複なし星順で取得
 	 */
 	@Query("""
