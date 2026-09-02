@@ -263,8 +263,6 @@ class TaxManagerServiceImplTest {
 
     @Test
     void saveByShiteiNo_新規登録_rno1でsaveが呼ばれる_updateNewFlgToZeroは呼ばれない() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
         when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
 
         service.saveByShiteiNo(SHITEI_NO, validForm());
@@ -279,8 +277,6 @@ class TaxManagerServiceImplTest {
 
     @Test
     void saveByShiteiNo_更新_rno2でsaveが呼ばれる_updateNewFlgToZeroが呼ばれる() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
         when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(1);
 
         service.saveByShiteiNo(SHITEI_NO, validForm());
@@ -295,8 +291,6 @@ class TaxManagerServiceImplTest {
 
     @Test
     void saveByShiteiNo_免除_個人情報フィールドがnullでsaveが呼ばれる() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
         when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
         TaxManagerForm form = validForm();
         form.setKbn("3");
@@ -317,8 +311,6 @@ class TaxManagerServiceImplTest {
 
     @Test
     void saveByShiteiNo_非免除_個人情報フィールドが設定されてsaveが呼ばれる() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
         when(taxManagerRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(0);
 
         service.saveByShiteiNo(SHITEI_NO, validForm());
@@ -335,8 +327,6 @@ class TaxManagerServiceImplTest {
 
     @Test
     void saveByShiteiNo_非免除かつ同一人物_IllegalArgumentExceptionをスロー() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
         TaxManagerForm form = validForm();
         form.setAtenaNo("A001");
         form.setObligorAtenaNo("A001");
@@ -354,8 +344,6 @@ class TaxManagerServiceImplTest {
 
     @Test
     void saveByShiteiNo_免除かつ同一宛名番号_IllegalArgumentExceptionをスロー() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
         TaxManagerForm form = validForm();
         form.setKbn("3");
         form.setAtenaNo("A001");
@@ -374,8 +362,6 @@ class TaxManagerServiceImplTest {
 
     @Test
     void saveByShiteiNo_kbn1かつatenaNoがnull_IllegalArgumentExceptionをスロー() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(tokugimu()));
         TaxManagerForm form = validForm();
         form.setKbn("1");
         form.setAtenaNo(null);
