@@ -124,19 +124,15 @@ class NozeiKanriShoninTsuchiControllerTest {
     // ==================================================================
 
     @Test
-    @DisplayName("#3 index 正常系 セッションに合算指定番号のみあり（指定番号なし）：合算指定番号を指定番号として通知書画面を返す")
-    void index_合算指定番号のみの場合は合算指定番号を指定番号として使用する() {
-        NozeiKanriShoninTsuchiDto expected = dto(LocalDate.of(2025, 4, 1));
-        when(nokanService.findByJichitaiCdAndShiteiNo("G001")).thenReturn(Optional.of(nokan("1")));
-        when(nozeiKanriShoninTsuchiService.getNozeiKanriInfo("G001")).thenReturn(expected);
-
+    @DisplayName("#3 index 正常系 セッションに合算指定番号のみあり（指定番号なし）：検索モーダルを表示する")
+    void index_合算指定番号のみの場合は検索モーダルを表示する() {
         Model model = new ExtendedModelMap();
         String view = controller.index(sessionWith(null, "G001"), model);
 
-        assertThat(view).isEqualTo("reports/nozeiKanrininShoninTsuchi");
-        assertThat(model.asMap()).containsEntry("dto", expected);
-        assertThat(model.asMap()).doesNotContainKey("showShiteiGassanModal");
-        verify(nozeiKanriShoninTsuchiService, times(1)).getNozeiKanriInfo("G001");
+        assertThat(view).isEqualTo("tokugimu/tTokugimuReport");
+        assertThat(model.asMap()).containsEntry("showShiteiGassanModal", true);
+        verify(nokanService, never()).findByJichitaiCdAndShiteiNo(any());
+        verify(nozeiKanriShoninTsuchiService, never()).getNozeiKanriInfo(any());
         verify(accessChecker, times(1)).checkAccess(ScreenManagement.NOZEI_KANRININ_SHONIN_TSUCHI);
     }
 
