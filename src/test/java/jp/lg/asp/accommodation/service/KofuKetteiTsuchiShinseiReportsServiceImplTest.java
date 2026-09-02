@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -107,9 +108,9 @@ class KofuKetteiTsuchiShinseiReportsServiceImplTest {
 		}
 
 		@Test
-		@DisplayName("正常系（匿名ユーザー）：認証情報がnullの場合でも匿名ユーザーとして処理されPDFが生成されること")
-		void success_anonymousUser() {
-			SecurityContextHolder.clearContext();
+		@DisplayName("異常系（匿名ユーザー）：認証情報がnullまたは未認証の場合にアクセス権限エラーとなること")
+		void error_anonymousUser() {
+			SecurityContextHolder.clearContext(); // 認証情報をクリア（匿名状態）
 
 			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
 			dto.setShiteiNo(SHITEI_NO);
@@ -118,8 +119,8 @@ class KofuKetteiTsuchiShinseiReportsServiceImplTest {
 			dto.setShinsei(false);
 			dto.setBankCd("123");
 
-			byte[] result = service.generatekofuKetteiTsuchiShinseiPdf(dto);
-			assertThat(result).isNotNull();
+			assertThatThrownBy(() -> service.generatekofuKetteiTsuchiShinseiPdf(dto))
+					.isInstanceOf(AccessDeniedException.class);
 		}
 	}
 
