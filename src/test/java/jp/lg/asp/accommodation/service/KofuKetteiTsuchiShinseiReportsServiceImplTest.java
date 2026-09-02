@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -50,38 +52,41 @@ class KofuKetteiTsuchiShinseiReportsServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-		when(reportsLogRepository.findNextSeq(JICHITAI_CD)).thenReturn(1L);
-		when(rptStatusRepository.findByJichitaiCdAndShiteiNoAndRptId(any(), any(), any()))
+		when(reportsLogRepository.findNextSeq(anyString())).thenReturn(1L);
+		when(rptStatusRepository.findByJichitaiCdAndShiteiNoAndRptId(anyString(), anyString(), anyString()))
 				.thenReturn(Optional.empty());
+		
+		setValidAuthentication();
+	}
 
+	private void setValidAuthentication() {
 		SecurityContextHolder.getContext().setAuthentication(
-				new UsernamePasswordAuthenticationToken("testUser", "password", Collections.emptyList())
-		);
+				new UsernamePasswordAuthenticationToken("testUser", "password", Collections.emptyList()));
 	}
 
 	@Nested
 	@DisplayName("generatekofuKetteiTsuchiShinseiPdf メソッドのテスト")
-	class GenerateSinglePdfTest {
+	class GeneratePdfTest {
 
 		@Test
-		@DisplayName("正常系：JRXMLファイルが存在し有効なデータの場合にPDFのバイト配列が返却されること")
-		void success_singlePdf() {
+		@DisplayName("異常系：認証情報がnullまたは未認証の場合にAccessDeniedExceptionがスローされること")
+		void error_unauthenticatedUser() {
+			SecurityContextHolder.clearContext();
+
 			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
 			dto.setShiteiNo(SHITEI_NO);
-			dto.setOperation("PRINT");
 			dto.setKetteiTsuchi(true);
 			dto.setShinsei(false);
-			dto.setBankCd("123");
 
-			byte[] result = service.generatekofuKetteiTsuchiShinseiPdf(dto);
-
-			assertThat(result).isNotNull();
+			assertThatThrownBy(() -> service.generatekofuKetteiTsuchiShinseiPdf(dto))
+					.isInstanceOf(AccessDeniedException.class);
 		}
 
 		@Test
-		@DisplayName("境界値：印刷対象フラグが両方ともfalseの場合に例外がスローされること")
-		void error_bothFlagsFalse() {
+		@DisplayName("異常系：印刷対象が選択されていない場合にRuntimeExceptionがスローされること")
+		void error_targetNotSelected() {
 			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
+			dto.setShiteiNo(SHITEI_NO);
 			dto.setKetteiTsuchi(false);
 			dto.setShinsei(false);
 
@@ -91,36 +96,65 @@ class KofuKetteiTsuchiShinseiReportsServiceImplTest {
 		}
 
 		@Test
-		@DisplayName("正常系：ログ保存時に例外が発生した場合でも、内部でキャッチされ正常にPDF生成処理が継続・完了すること")
-		void success_saveLogExceptionHandling() {
-			when(reportsLogRepository.findNextSeq(any())).thenThrow(new RuntimeException("DB Error"));
-
+		@DisplayName("正常系：決定通知書のみ選択された場合にPDFが生成されること")
+		void success_ketteiOnly() {
 			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
 			dto.setShiteiNo(SHITEI_NO);
-			dto.setOperation("PRINT");
 			dto.setKetteiTsuchi(true);
 			dto.setShinsei(false);
-			dto.setBankCd("123");
+			dto.setOperation("PRINT");
 
-			// saveLog内の例外はcatchされるため、PDF生成が成功することを検証
 			byte[] result = service.generatekofuKetteiTsuchiShinseiPdf(dto);
 			assertThat(result).isNotNull();
 		}
 
 		@Test
-		@DisplayName("異常系（匿名ユーザー）：認証情報がnullまたは未認証の場合にアクセス権限エラーとなること")
-		void error_anonymousUser() {
-			SecurityContextHolder.clearContext(); // 認証情報をクリア（匿名状態）
+		@DisplayName("正常系：交付申請書のみ選択された場合にPDFが生成されること")
+		void success_shinseiOnly() {
+			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
+			dto.setShiteiNo(SHITEI_NO);
+			dto.setKetteiTsuchi(false);
+			dto.setShinsei(true);
+			dto.setBankCd("123"); // JasperReportsの評価用エラー回避
+			dto.setOperation("PRINT");
+
+			byte[] result = service.generatekofuKetteiTsuchiShinseiPdf(dto);
+			assertThat(result).isNotNull();
+		}
+
+		@Test
+		@DisplayName("正常系：両方選択された場合にPDFが生成されること")
+		void success_bothSelected() {
+			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
+			dto.setShiteiNo(SHITEI_NO);
+			dto.setKetteiTsuchi(true);
+			dto.setShinsei(true);
+			dto.setBankCd("123"); // JasperReportsの評価用エラー回避
+			dto.setOperation("PRINT");
+
+			byte[] result = service.generatekofuKetteiTsuchiShinseiPdf(dto);
+			assertThat(result).isNotNull();
+		}
+
+		@Test
+		@DisplayName("正常系：ログ保存時に例外が発生した場合でもキャッチされて正常終了すること（getCurrentUserIdの認証nullも含めてカバー）")
+		void success_whenLogSaveFailsAndAuthNull() {
+			Authentication auth = mock(Authentication.class);
+			when(auth.isAuthenticated()).thenReturn(true);
+			when(auth.getPrincipal()).thenReturn("testUser");
+			when(auth.getName()).thenReturn(null);
+			SecurityContextHolder.getContext().setAuthentication(auth);
+
+			doThrow(new RuntimeException("DB Error")).when(reportsLogRepository).save(any());
 
 			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
 			dto.setShiteiNo(SHITEI_NO);
-			dto.setOperation("PRINT");
 			dto.setKetteiTsuchi(true);
 			dto.setShinsei(false);
-			dto.setBankCd("123");
+			dto.setOperation("PRINT");
 
-			assertThatThrownBy(() -> service.generatekofuKetteiTsuchiShinseiPdf(dto))
-					.isInstanceOf(AccessDeniedException.class);
+			byte[] result = service.generatekofuKetteiTsuchiShinseiPdf(dto);
+			assertThat(result).isNotNull();
 		}
 	}
 
@@ -129,41 +163,55 @@ class KofuKetteiTsuchiShinseiReportsServiceImplTest {
 	class GenerateBulkPdfTest {
 
 		@Test
-		@DisplayName("境界値：引数のDTOリストがnullまたは空の場合に例外がスローされること")
-		void error_dtoListNullOrEmpty() {
+		@DisplayName("異常系：認証情報が未認証の場合にAccessDeniedExceptionがスローされること")
+		void error_unauthenticatedUser() {
+			SecurityContextHolder.clearContext();
+
+			List<KofuKetteiTsuchiShinseiDto> dtoList = Arrays.asList(new KofuKetteiTsuchiShinseiDto());
+
+			assertThatThrownBy(() -> service.generateBulkPdf(dtoList))
+					.isInstanceOf(AccessDeniedException.class);
+		}
+
+		@Test
+		@DisplayName("異常系：一括帳票データがnullまたは空の場合に例外がスローされること")
+		void error_dtoListIsNull() {
 			assertThatThrownBy(() -> service.generateBulkPdf(null))
 					.isInstanceOf(RuntimeException.class)
 					.hasMessageContaining("帳票データがありません。");
+		}
 
+		@Test
+		@DisplayName("異常系：一括帳票データのリストが空の場合に例外がスローされること")
+		void error_dtoListIsEmpty() {
 			assertThatThrownBy(() -> service.generateBulkPdf(Collections.emptyList()))
 					.isInstanceOf(RuntimeException.class)
 					.hasMessageContaining("帳票データがありません。");
 		}
 
 		@Test
-		@DisplayName("異常系：リスト内の全要素のフラグがfalseの場合に例外がスローされること")
+		@DisplayName("異常系：一括リスト内の全要素のフラグがfalseで印刷対象がない場合に例外がスローされること")
 		void error_allFlagsFalseInList() {
 			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
 			dto.setKetteiTsuchi(false);
 			dto.setShinsei(false);
 
-			assertThatThrownBy(() -> service.generateBulkPdf(List.of(dto)))
+			assertThatThrownBy(() -> service.generateBulkPdf(Arrays.asList(dto)))
 					.isInstanceOf(RuntimeException.class)
 					.hasMessageContaining("印刷対象がありません。");
 		}
 
 		@Test
-		@DisplayName("正常系：一括生成時に有効なリストが渡された場合にPDFのバイト配列が返却されること")
-		void success_generateBulkPdf() {
+		@DisplayName("正常系：一括生成時に交付申請書フラグが有効なリストが渡された場合にPDFが返却されること")
+		void success_bulkPdfShinseiGeneration() {
 			KofuKetteiTsuchiShinseiDto dto = new KofuKetteiTsuchiShinseiDto();
-			dto.setKetteiTsuchi(true);
-			dto.setShinsei(true);
-			dto.setBankCd("123");
 			dto.setShiteiNo(SHITEI_NO);
+			dto.setKetteiTsuchi(false);
+			dto.setShinsei(true);
+			dto.setBankCd("123"); // JasperReportsの評価用エラー回避
 			dto.setOperation("PRINT");
 
-			byte[] result = service.generateBulkPdf(List.of(dto));
-
+			byte[] result = service.generateBulkPdf(Arrays.asList(dto));
 			assertThat(result).isNotNull();
 		}
 	}
