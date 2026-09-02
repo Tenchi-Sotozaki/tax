@@ -446,23 +446,7 @@ class AdminUserServiceImplTest {
     }
 
     @Test
-    @DisplayName("#登録編集削除25 isLoginUser 正常系 ログイン中ユーザーIDと一致する場合：trueを返す")
-    void isLoginUser_一致する場合はtrue() {
-        setLoginUser("U001");
-
-        assertThat(service.isLoginUser("U001")).isTrue();
-    }
-
-    @Test
-    @DisplayName("#登録編集削除26 isLoginUser 正常系 ログイン中ユーザーIDと一致しない場合：falseを返す")
-    void isLoginUser_一致しない場合はfalse() {
-        setLoginUser("U001");
-
-        assertThat(service.isLoginUser("U002")).isFalse();
-    }
-
-    @Test
-    @DisplayName("#登録編集削除27 update 正常系 ログイン中のユーザーを更新した場合、SecurityContext上のユーザー情報も更新される")
+    @DisplayName("#登録編集削除25 update 正常系 ログイン中のユーザーを更新した場合、SecurityContext上のユーザー情報も更新される")
     void update_ログイン中ユーザー更新でSecurityContextも更新される() {
         User existing = user("U001");
         existing.setName("旧名前");
@@ -487,5 +471,21 @@ class AdminUserServiceImplTest {
         assertThat(updatedPrincipal).isInstanceOf(jp.lg.asp.accommodation.config.AppUserDetails.class);
         assertThat(((jp.lg.asp.accommodation.config.AppUserDetails) updatedPrincipal).getDisplayName())
                 .isEqualTo("新しい名前");
+    }
+
+    @Test
+    @DisplayName("#登録編集削除26 isLoginUser 正常系 ログイン中ユーザーIDと一致する場合：trueを返す")
+    void isLoginUser_一致する場合はtrue() {
+        setLoginUser("U001");
+
+        assertThat(service.isLoginUser("U001")).isTrue();
+    }
+
+    @Test
+    @DisplayName("#登録編集削除27 isLoginUser 正常系 ログイン中ユーザーIDと一致しない場合：falseを返す")
+    void isLoginUser_一致しない場合はfalse() {
+        setLoginUser("U001");
+
+        assertThat(service.isLoginUser("U002")).isFalse();
     }
 }
