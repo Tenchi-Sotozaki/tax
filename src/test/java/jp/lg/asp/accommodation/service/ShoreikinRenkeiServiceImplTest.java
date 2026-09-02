@@ -162,12 +162,12 @@ class ShoreikinRenkeiServiceImplTest {
         when(typedQuery.getResultList()).thenReturn(List.of());
 
         Predicate predicate = mock(Predicate.class);
-        when(cb.equal(any(), any())).thenReturn(predicate);
-        when(cb.like(any(Expression.class), any(Expression.class))).thenReturn(predicate);
-        when(cq.where(any(Predicate[].class))).thenReturn(cq);
-        when(cq.orderBy(any(Order[].class))).thenReturn(cq);
-        when(cb.desc(any())).thenReturn(mock(Order.class));
-        when(cb.asc(any())).thenReturn(mock(Order.class));
+        lenient().when(cb.equal(any(), any())).thenReturn(predicate);
+        lenient().when(cb.like(any(Expression.class), any(Expression.class))).thenReturn(predicate);
+        lenient().when(cq.where(any(Predicate[].class))).thenReturn(cq);
+        lenient().when(cq.orderBy(any(Order[].class))).thenReturn(cq);
+        lenient().when(cb.desc(any())).thenReturn(mock(Order.class));
+        lenient().when(cb.asc(any())).thenReturn(mock(Order.class));
         when(root.get(anyString())).thenReturn(mock(Path.class));
 
         return cb;
@@ -195,13 +195,13 @@ class ShoreikinRenkeiServiceImplTest {
         when(subquery.where(any(Predicate.class))).thenReturn(subquery);
 
         Predicate predicate = mock(Predicate.class);
-        when(cb.equal(any(), any())).thenReturn(predicate);
-        when(cb.and(any(Predicate[].class))).thenReturn(predicate);
-        when(cb.exists(any())).thenReturn(predicate);
-        when(cq.where(any(Predicate[].class))).thenReturn(cq);
-        when(cq.orderBy(any(Order[].class))).thenReturn(cq);
-        when(cb.desc(any())).thenReturn(mock(Order.class));
-        when(cb.asc(any())).thenReturn(mock(Order.class));
+        lenient().when(cb.equal(any(), any())).thenReturn(predicate);
+        lenient().when(cb.and(any(Predicate[].class))).thenReturn(predicate);
+        lenient().when(cb.exists(any())).thenReturn(predicate);
+        lenient().when(cq.where(any(Predicate[].class))).thenReturn(cq);
+        lenient().when(cq.orderBy(any(Order[].class))).thenReturn(cq);
+        lenient().when(cb.desc(any())).thenReturn(mock(Order.class));
+        lenient().when(cb.asc(any())).thenReturn(mock(Order.class));
         when(root.get(anyString())).thenReturn(mock(Path.class));
         when(tRoot.get(anyString())).thenReturn(mock(Path.class));
         when(atenaJoin.get(anyString())).thenReturn(mock(Path.class));
