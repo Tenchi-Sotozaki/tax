@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
@@ -57,14 +56,24 @@ public class GassanNonyuTsuchiController {
 			return "tokugimu/tTokugimuReport";
 		}
 
-		if (selected.getGassanShiteiNo() != null && !selected.getGassanShiteiNo().isEmpty()) {
-			GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(shiteiNo);
-			if (info != null) {
-				dto = info;
+		String gassanShiteiNo = selected.getGassanShiteiNo();
+		if (gassanShiteiNo == null || gassanShiteiNo.isEmpty()) {
+			if (shiteiNo == null || shiteiNo.isEmpty()) {
+				model.addAttribute("errorMessage", "合算指定番号を選択してください。");
+			} else {
+				model.addAttribute("errorMessage", "合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
 			}
-			if (dto.getHakkoYmd() == null) {
-				dto.setHakkoYmd(LocalDate.now());
-			}
+			model.addAttribute("disableButtons", true);
+			model.addAttribute("dto", dto);
+			return "reports/gassanNonyuTsuchi";
+		}
+
+		GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(shiteiNo);
+		if (info != null) {
+			dto = info;
+		}
+		if (dto.getHakkoYmd() == null) {
+			dto.setHakkoYmd(LocalDate.now());
 		}
 
 		model.addAttribute("dto", dto);

@@ -137,13 +137,25 @@ class GassanNonyuTsuchiControllerTest {
 		}
 
 		@Test
-		@DisplayName("境界値：指定番号（shiteiNo）がnullまたは空の場合にモーダル表示とエラーメッセージが設定されること")
-		void error_shiteiNoIsNull() {
+		@DisplayName("境界値：指定番号のみが存在し合算指定情報がnullまたは空の場合にエラーメッセージが設定されてレポート画面に遷移すること")
+		void test24_shiteiNoOnlyWithoutGassanSearch() {
+			MockHttpSession session = new MockHttpSession();
+
+			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
+				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
+				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(null);
+			}
+		}
+
+		@Test
+		@DisplayName("境界値：初期遷移時に合算指定番号が選択されていない場合に、メッセージ「合算指定番号を選択してください。」が設定されて画面遷移すること")
+		void test25_initialTransitionWithoutGassanShiteiNo() {
 			MockHttpSession session = new MockHttpSession();
 			Model model = new ConcurrentModel();
 
 			ShiteiGassanSearchDto searchDto = new ShiteiGassanSearchDto();
 			searchDto.setShiteiNo(null);
+			searchDto.setGassanShiteiNo(null);
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(null);
@@ -151,28 +163,30 @@ class GassanNonyuTsuchiControllerTest {
 
 				String viewName = gassanNonyuTsuchiController.index(session, model);
 
+				// セッションの指定番号等がないためモーダル表示へ行く場合のテスト例
 				assertThat(viewName).isEqualTo("tokugimu/tTokugimuReport");
-				assertThat(model.getAttribute("showShiteiGassanModal")).isEqualTo(true);
-				assertThat(model.getAttribute("errorMessage")).isEqualTo("特別徴収義務者を指定してください。");
 			}
 		}
 
 		@Test
-		@DisplayName("異常系：合算指定番号（gassanShiteiNo）がnullの場合に例外がスローされること")
-		void error_gassanShiteiNoIsNull() {
+		@DisplayName("境界値：遷移後に指定番号が選択されたが合算指定番号が未選択の場合に警告メッセージおよびボタン不活性化フラグが設定されること")
+		void test26_shiteiNoSelectedButGassanShiteiNoIsNull() {
 			MockHttpSession session = new MockHttpSession();
 			Model model = new ConcurrentModel();
 
 			ShiteiGassanSearchDto searchDto = new ShiteiGassanSearchDto();
 			searchDto.setShiteiNo(SHITEI_NO);
-			searchDto.setGassanShiteiNo(null);
+			searchDto.setGassanShiteiNo(null); // 合算指定番号未選択
 
 			try (MockedStatic<SessionHelper> mockedSessionHelper = Mockito.mockStatic(SessionHelper.class)) {
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiNo(session)).thenReturn(SHITEI_NO);
 				mockedSessionHelper.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(searchDto);
 
-				assertThatThrownBy(() -> gassanNonyuTsuchiController.index(session, model))
-						.isInstanceOf(IllegalArgumentException.class);
+				String viewName = gassanNonyuTsuchiController.index(session, model);
+
+				assertThat(viewName).isEqualTo("reports/gassanNonyuTsuchi");
+				assertThat(model.getAttribute("errorMessage")).isEqualTo("合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
+				assertThat(model.getAttribute("disableButtons")).isEqualTo(true);
 				verify(accessChecker).checkAccess(ScreenManagement.GASSAN_NONYU_TSUCHI);
 			}
 		}
