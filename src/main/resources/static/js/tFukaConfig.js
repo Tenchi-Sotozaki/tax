@@ -515,6 +515,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+(function () {
+    const errorFields = window._errorFields || [];
+    errorFields.forEach(function (field) {
+        const el = document.querySelector('[name="' + field + '"]');
+        if (el) el.classList.add('is-invalid');
+    });
+    if (errorFields.some(f => f.startsWith('monthlyTally.'))) {
+        const modal = document.getElementById('monthlyTallyModal');
+        if (modal) new bootstrap.Modal(modal).show();
+    }
+})();
+
 // 入力欄の赤枠は「半角数字エラー」と「桁数エラー」の2種類が付きうる。
 // どちらか一方が解消しただけで赤枠が消えないよう、種類ごとのマーカーで管理する
 const setInputError = (input, marker, hasError) => {

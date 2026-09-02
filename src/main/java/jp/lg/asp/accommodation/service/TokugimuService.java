@@ -20,6 +20,9 @@ public interface TokugimuService {
 	// 指定番号で1件取得してフォームに変換する
 	TokugimuForm getTokugimuByShiteiNo(String shiteiNo);
 
+	// 合算指定番号で1件取得してフォームに変換する（t_gassanのatena_noから宛名情報を取得）
+	TokugimuForm getTokugimuByGassanShiteiNo(String gassanShiteiNo);
+
 	// 指定番号・履歴番号で1件取得してフォームに変換する
 	TokugimuForm getTokugimuByShiteiNoAndRno(String shiteiNo, int rno);
 

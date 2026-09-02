@@ -79,9 +79,6 @@ public class FukaServiceImpl implements FukaService {
 	private final GassanRepository gassanRepository;
 
 	// 定数定義（マジックナンバーの排除）
-	private static final String STATUS_ALL = "999";
-	private static final String STATUS_ZUMI = "1";
-	private static final String STATUS_MI = "2";
 	private static final int MAX_KIBETSU = 12;
 	private static final int MAX_DAYS = 31;
 	private static final String DEFAULT_NEW_FLG = "1";
@@ -93,12 +90,11 @@ public class FukaServiceImpl implements FukaService {
 	 * 納入金額管理台帳のデータを取得する。
 	 */
 	@Transactional(readOnly = true)
-	public FukaDaichoForm getDaichoData(String shiteiNo, String nendo, String status) {
+	public FukaDaichoForm getDaichoData(String shiteiNo, String nendo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		FukaDaichoForm form = new FukaDaichoForm();
 		form.setShiteiNo(shiteiNo);
 		form.setNendo(nendo);
-		form.setStatus(status != null ? status : STATUS_ALL);
 
 		List<Fuka> fukaList = fukaRepository
 				.findByJichitaiCdAndShiteiNoAndNendoOrderByKibetsuAsc(jichitaiCd, shiteiNo, nendo);
@@ -145,12 +141,6 @@ public class FukaServiceImpl implements FukaService {
 			FukaDaichoListItem item = buildDaichoItem(nendo, i, fukaMap, tekiyoList, nokigen, nendoStMonth, defaultShuki, shiteiNo,
 					gassanList);
 
-			if (STATUS_ZUMI.equals(filterStatus) && !item.isShinkokuZumi()) {
-				continue;
-			}
-			if (STATUS_MI.equals(filterStatus) && item.isShinkokuZumi()) {
-				continue;
-			}
 			item.setNendo(nendo);
 			item.setKibetsu(i);
 			items.add(item);
@@ -181,11 +171,6 @@ public class FukaServiceImpl implements FukaService {
 		item.setNonyuKigenInRange(isNonyuKigenInRange(nokigen, kibetsu, shuki));
 		item.setTargetYearMonth(taishoYm);
 
-		// 合算適用期間の判定：対象月がいずれかの合算レコードの適用期間内であれば合算対象
-		boolean gassanTarget = gassanList != null && gassanList.stream()
-				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
-						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
-		item.setGassanTarget(gassanTarget);
 
 		if (fukaMap.containsKey(taishoYm)) {
 			Fuka dbData = fukaMap.get(taishoYm);
@@ -298,10 +283,10 @@ public class FukaServiceImpl implements FukaService {
 	private int resolveShuki(List<TokureiTekiyo> tekiyoList, LocalDate taishoDate, int defaultShuki) {
 		if (defaultShuki != 1 || tekiyoList.isEmpty())
 			return defaultShuki;
-		LocalDate today = LocalDate.now();
+		
 		boolean hasActive = tekiyoList.stream()
-				.anyMatch(t -> (t.getTekiyoStYmd() == null || !today.isBefore(t.getTekiyoStYmd()))
-						&& (t.getTekiyoEdYmd() == null || !today.isAfter(t.getTekiyoEdYmd())));
+				.anyMatch(t -> (t.getTekiyoStYmd() == null || !taishoDate.isBefore(t.getTekiyoStYmd()))
+						&& (t.getTekiyoEdYmd() == null || !taishoDate.isAfter(t.getTekiyoEdYmd())));
 		return hasActive ? 3 : defaultShuki;
 	}
 
@@ -1326,9 +1311,14 @@ public class FukaServiceImpl implements FukaService {
 		if (gassanShiteiNo == null || taishoDate == null)
 			return false;
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		LocalDate taishoFirst = taishoDate.withDayOfMonth(1);
 		return gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo).stream()
-				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
-						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+				.anyMatch(g -> {
+					LocalDate stFirst = g.getTekiyoStYmd() != null ? g.getTekiyoStYmd().withDayOfMonth(1) : null;
+					LocalDate edFirst = g.getTekiyoEdYmd() != null ? g.getTekiyoEdYmd().withDayOfMonth(1) : null;
+					return (stFirst == null || !taishoFirst.isBefore(stFirst))
+							&& (edFirst == null || !taishoFirst.isAfter(edFirst));
+				});
 	}
 
 	@Override
@@ -1336,9 +1326,14 @@ public class FukaServiceImpl implements FukaService {
 		if (shiteiNo == null || taishoDate == null)
 			return false;
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		LocalDate taishoFirst = taishoDate.withDayOfMonth(1);
 		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
-				.anyMatch(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
-						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())));
+				.anyMatch(g -> {
+					LocalDate stFirst = g.getTekiyoStYmd() != null ? g.getTekiyoStYmd().withDayOfMonth(1) : null;
+					LocalDate edFirst = g.getTekiyoEdYmd() != null ? g.getTekiyoEdYmd().withDayOfMonth(1) : null;
+					return (stFirst == null || !taishoFirst.isBefore(stFirst))
+							&& (edFirst == null || !taishoFirst.isAfter(edFirst));
+				});
 	}
 
 	@Override
@@ -1346,9 +1341,14 @@ public class FukaServiceImpl implements FukaService {
 		if (shiteiNo == null || taishoDate == null)
 			return null;
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		LocalDate taishoFirst = taishoDate.withDayOfMonth(1);
 		return gassanRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).stream()
-				.filter(g -> (g.getTekiyoStYmd() == null || !taishoDate.isBefore(g.getTekiyoStYmd()))
-						&& (g.getTekiyoEdYmd() == null || !taishoDate.isAfter(g.getTekiyoEdYmd())))
+				.filter(g -> {
+					LocalDate stFirst = g.getTekiyoStYmd() != null ? g.getTekiyoStYmd().withDayOfMonth(1) : null;
+					LocalDate edFirst = g.getTekiyoEdYmd() != null ? g.getTekiyoEdYmd().withDayOfMonth(1) : null;
+					return (stFirst == null || !taishoFirst.isBefore(stFirst))
+							&& (edFirst == null || !taishoFirst.isAfter(edFirst));
+				})
 				.findFirst()
 				.map(g -> {
 					String st = g.getTekiyoStYmd() != null

@@ -320,6 +320,32 @@ public class TokugimuServiceImpl implements TokugimuService {
 	}
 
 	/**
+	 * 合算指定番号（gassanShiteiNo）で1件取得してフォームに変換する
+	 * t_gassanのatena_noから宛名情報を取得し、施設情報は空とする
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public TokugimuForm getTokugimuByGassanShiteiNo(String gassanShiteiNo) {
+		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		Gassan gassan = gassanRepository.findByJichitaiCdAndGassanShiteiNo(jichitaiCd, gassanShiteiNo)
+				.stream().findFirst()
+				.orElseThrow(() -> new RuntimeException("合算情報が見つかりません: " + gassanShiteiNo));
+
+		Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, gassan.getAtenaNo())
+				.orElseThrow(() -> new RuntimeException("特別徴収義務者が見つかりません: " + gassan.getAtenaNo()));
+
+		TokugimuForm form = new TokugimuForm();
+		form.setAtenaNo(gassan.getAtenaNo().longValue());
+		form.setShiteiNo(gassanShiteiNo);
+		form.setTokugimuAddressNo(atena.getYubinNo());
+		form.setTokugimuAddress(atena.getJusho());
+		form.setName(atena.getName());
+		form.setNameKana(atena.getNameKana());
+		form.setTokugimuPhone(atena.getTel1());
+		return form;
+	}
+
+	/**
 	 * 指定番号（shiteiNo）で1件取得してフォームに変換する
 	 */
 	@Override

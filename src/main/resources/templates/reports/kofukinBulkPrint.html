@@ -83,26 +83,30 @@
 
 			<!-- アクションボタン -->
 			<div class="d-flex justify-content-center gap-3 py-4 mb-5">
-				
-				<button type="submit" form="bulkPrintForm" th:formaction="@{/reports/kofukinBulkPrint/preview}" formtarget="_blank"
-					class="btn btn-primary px-4">
-					<i class="bi bi-eye me-2"></i>プレビュー
-				</button>
+			    
+			    <button type="button" class="btn btn-primary px-4" 
+			        th:onclick="submitForm([[@{/reports/kofukinBulkPrint/preview}]], true)">
+			        <i class="bi bi-eye me-2"></i>プレビュー
+			    </button>
 
-				<button type="submit" form="bulkPrintForm" th:formaction="@{/reports/kofukinBulkPrint/pdf}"
-					class="btn btn-primary px-4">
-					<i class="bi bi-file-earmark-pdf me-2"></i>PDF
-				</button>
+			    <button type="button" class="btn btn-primary px-4" 
+			        th:onclick="submitForm([[@{/reports/kofukinBulkPrint/pdf}]], true)">
+			        <i class="bi bi-file-earmark-pdf me-2"></i>PDF
+			    </button>
 
-				<button type="submit" form="bulkPrintForm" th:formaction="@{/reports/kofukinBulkPrint/print}" formtarget="_blank"
-					class="btn btn-primary px-4">
-					<i class="bi bi-printer me-2"></i>印刷
-				</button>
+			    <button type="button" class="btn btn-primary px-4" 
+			        th:onclick="submitForm([[@{/reports/kofukinBulkPrint/print}]], true)">
+			        <i class="bi bi-printer me-2"></i>印刷
+			    </button>
 
 			</div>
 
 		</form>
 
 	</div>
+	
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/kofukinBulkPrint.js}"></script>
+	</th:block>
 </body>
 </html>

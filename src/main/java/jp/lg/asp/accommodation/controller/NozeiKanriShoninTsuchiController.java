@@ -50,19 +50,21 @@ public class NozeiKanriShoninTsuchiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		String shiteiNo = SessionHelper.getShiteiNo(session);
-
-		// 指定番号が存在しない場合
 		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		String shiteiNo = SessionHelper.getShiteiNo(session);
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
 
-		if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+		// 指定番号または合算指定番号が存在しない場合
+		if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
 			// 画面を戻して検索モーダルを表示
 			model.addAttribute("showShiteiGassanModal", true);
 			return "tokugimu/tTokugimuReport";
 		}
 
+		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
+
 		// 納税管理人情報が未登録
-		Nokan nokan = nokanService.findByJichitaiCdAndShiteiNo(shiteiNo).orElse(null);
+		Nokan nokan = nokanService.findByJichitaiCdAndShiteiNo(effectiveShiteiNo).orElse(null);
 		if (nokan == null) {
 			model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
 			return "tokugimu/tTokugimuReport";
@@ -77,15 +79,15 @@ public class NozeiKanriShoninTsuchiController {
 		NozeiKanriShoninTsuchiDto dto = new NozeiKanriShoninTsuchiDto();
 
 		try {
-			log.debug("納税管理人情報取得開始: shiteiNo={}", shiteiNo);
-			NozeiKanriShoninTsuchiDto nozeiKanriInfo = nozeiKanriShoninTsuchiService.getNozeiKanriInfo(shiteiNo);
+			log.debug("納税管理人情報取得開始: shiteiNo={}", effectiveShiteiNo);
+			NozeiKanriShoninTsuchiDto nozeiKanriInfo = nozeiKanriShoninTsuchiService.getNozeiKanriInfo(effectiveShiteiNo);
 			if (nozeiKanriInfo != null) {
 				dto = nozeiKanriInfo;
 				log.debug("納税管理人情報取得成功");
 			}
 		} catch (RuntimeException e) {
 			log.error("納税管理人情報取得エラー: {}", e.getMessage(), e);
-			model.addAttribute("errorMessage", "指定番号: " + shiteiNo + " の情報が見つかりません。");
+			model.addAttribute("errorMessage", "指定番号: " + effectiveShiteiNo + " の情報が見つかりません。");
 		}
 
 		if (dto.getHakkoYmd() == null) {
