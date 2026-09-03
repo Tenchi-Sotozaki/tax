@@ -57,7 +57,8 @@ public class TopPageServiceImpl implements TopPageService {
 	                new TopPageContentId("99999", form.getSeq());
 
 	        content = repository.findById(id)
-	                .orElseThrow();
+	                .orElseThrow(() ->
+	                        new IllegalArgumentException("データが存在しません。"));
 
 	    } else {
 
