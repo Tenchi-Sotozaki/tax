@@ -53,9 +53,8 @@ class RptStatusServiceImplTest {
     // ヘルパー
     // =====================================================================
 
-    private Reports reports(String jichitaiCd, String rptId) {
+    private Reports reports(String rptId) {
         Reports r = new Reports();
-        r.setJichitaiCd(jichitaiCd);
         r.setRptId(rptId);
         return r;
     }
@@ -91,19 +90,18 @@ class RptStatusServiceImplTest {
     // =====================================================================
 
     @Test
-    @DisplayName("#8 findAllReports 正常系 自治体コードが一致する帳票だけ返る")
-    void findAllReports_自治体コードが一致する帳票だけ返る() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn("01100");
+    @DisplayName("#8 findAllReports 正常系 帳票マスタの全件を返す")
+    void findAllReports_帳票マスタの全件を返す() {
         when(reportsRepository.findAll()).thenReturn(List.of(
-                reports("01100", "R001"),
-                reports("01200", "R002"),
-                reports("01100", "R003")));
+                reports("R001"),
+                reports("R002"),
+                reports("R003")));
 
         List<Reports> result = service.findAllReports();
 
-        assertEquals(2, result.size());
+        assertEquals(3, result.size());
         assertEquals("R001", result.get(0).getRptId());
-        assertEquals("R003", result.get(1).getRptId());
+        assertEquals("R003", result.get(2).getRptId());
     }
 
     // =====================================================================
@@ -111,12 +109,11 @@ class RptStatusServiceImplTest {
     // =====================================================================
 
     @Test
-    @DisplayName("#9 findAllReports 正常系 全件が自治体コード一致の場合")
-    void findAllReports_全件が自治体コード一致() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn("01100");
+    @DisplayName("#9 findAllReports 正常系 2件返る場合")
+    void findAllReports_2件返る() {
         when(reportsRepository.findAll()).thenReturn(List.of(
-                reports("01100", "R001"),
-                reports("01100", "R002")));
+                reports("R001"),
+                reports("R002")));
 
         List<Reports> result = service.findAllReports();
 
@@ -132,7 +129,6 @@ class RptStatusServiceImplTest {
     @Test
     @DisplayName("#10 findAllReports 異常系 帳票マスタが0件の場合")
     void findAllReports_帳票マスタが0件() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn("01100");
         when(reportsRepository.findAll()).thenReturn(List.of());
 
         List<Reports> result = service.findAllReports();
@@ -146,14 +142,14 @@ class RptStatusServiceImplTest {
     // =====================================================================
 
     @Test
-    @DisplayName("#11 findAllReports 異常系 自治体コードが一致するものが0件の場合")
-    void findAllReports_自治体コードが一致するものが0件() {
+    @DisplayName("#11 findAllReports 異常系 帳票マスタが0件の場合")
+    void findAllReports_帳票マスタが0件() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("01100");
-        when(reportsRepository.findAll()).thenReturn(List.of(
-                reports("01200", "R002")));
+        when(reportsRepository.findAll()).thenReturn(List.of());
 
         List<Reports> result = service.findAllReports();
 
+        assertNotNull(result);
         assertTrue(result.isEmpty());
     }
 
