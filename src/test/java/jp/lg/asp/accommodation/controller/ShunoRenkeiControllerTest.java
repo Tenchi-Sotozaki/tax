@@ -4,12 +4,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-<<<<<<< HEAD
-import java.util.Collections;
-=======
 import java.math.BigDecimal;
 import java.time.LocalDate;
->>>>>>> fix-370_shunoRenkei
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -21,10 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-<<<<<<< HEAD
-=======
 import org.springframework.http.ResponseEntity;
->>>>>>> fix-370_shunoRenkei
 import org.springframework.ui.Model;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -35,9 +29,7 @@ import jp.lg.asp.accommodation.service.ShunoRenkeiService;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ShunoRenkeiControllerTest {
-
 	@Mock
-<<<<<<< HEAD
 	private JichitaiContext jichitaiContext;
 
 	@Mock
@@ -45,15 +37,6 @@ class ShunoRenkeiControllerTest {
 
 	@Mock
 	private ShunoRenkeiService shunoRenkeiService;
-=======
-	private ScreenAccessChecker accessChecker;
-
-	@Mock
-	private ShunoRenkeiService shunoRenkeiService;
-
-	@Mock
-	private JichitaiContext jichitaiContext;
->>>>>>> fix-370_shunoRenkei
 
 	@Mock
 	private Model model;
@@ -64,7 +47,6 @@ class ShunoRenkeiControllerTest {
 	private static final String JICHITAI_CD = "011002";
 
 	@Nested
-<<<<<<< HEAD
 	@DisplayName("kakunin メソッドのテスト")
 	class KakuninTest {
 
@@ -123,7 +105,10 @@ class ShunoRenkeiControllerTest {
 
 			assertThat(viewName).isEqualTo("renkei/shunoRenkeiKakunin");
 			verify(model, times(1)).addAttribute("rows", Collections.emptyList());
-=======
+		}
+	}
+			
+	@Nested
 	@DisplayName("index メソッドのテスト")
 	class IndexTest {
 
@@ -320,7 +305,6 @@ class ShunoRenkeiControllerTest {
 
 			assertThatThrownBy(() -> shunoRenkeiController.downloadCsv(List.of()))
 					.isInstanceOf(RuntimeException.class);
->>>>>>> fix-370_shunoRenkei
 		}
-	}
+	}	
 }

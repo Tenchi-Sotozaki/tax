@@ -64,7 +64,7 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 			predicates.add(cb.equal(f.get("taishoYm"), ym));
 		}
 		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			predicates.add(cb.like(f.get("shiteiNo"), cb.literal('%' + shiteiNo + '%')));
+			predicates.add(cb.like(f.<String>get("shiteiNo"), (String) ("%" + shiteiNo + "%")));
 		}
 
 		// 氏名検索条件
@@ -73,12 +73,11 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 			jakarta.persistence.criteria.Subquery<Tokugimu> subquery = cq.subquery(Tokugimu.class);
 			Root<Tokugimu> t = subquery.from(Tokugimu.class);
 			Join<Tokugimu, Atena> atenaJoin = t.join("atena", JoinType.INNER);
-
 			subquery.select(t)
-					.where(cb.and(
+					.where(
 							cb.equal(t.get("jichitaiCd"), f.get("jichitaiCd")),
 							cb.equal(t.get("shiteiNo"), f.get("shiteiNo")),
-							cb.like(atenaJoin.get("name"), cb.literal(namePattern))));
+							cb.like(atenaJoin.<String>get("name"), (String) namePattern));
 
 			predicates.add(cb.exists(subquery));
 		}
@@ -108,14 +107,14 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 		predicates.add(cb.equal(t.get("jichitaiCd"), jichitaiCd));
 
 		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			predicates.add(cb.like(t.get("shiteiNo"), cb.literal('%' + shiteiNo + '%')));
+			predicates.add(cb.like(t.<String>get("shiteiNo"), (String) ("%" + shiteiNo + "%")));
 		}
 
 		// 氏名検索条件
 		if (name != null && !name.isEmpty()) {
 			String namePattern = toLikePattern(name, nameMatchType);
 			Join<Tokugimu, Atena> atenaJoin = t.join("atena", JoinType.INNER);
-			predicates.add(cb.like(atenaJoin.get("name"), cb.literal(namePattern)));
+			predicates.add(cb.like(atenaJoin.<String>get("name"), (String) namePattern));
 		}
 
 		cq.where(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
