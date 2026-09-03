@@ -84,6 +84,9 @@ public class ShoreikinRenkeiServiceImpl implements ShoreikinRenkeiService {
     @Transactional(readOnly = true)
     public List<ShoreikinRenkeiDto> findByKeys(String jichitaiCd, List<ShoreikinRenkeiDto.Key> keys) {
         List<ShoreikinRenkeiDto> result = new ArrayList<>();
+        if (keys == null) {
+            return result;
+        }
         for (ShoreikinRenkeiDto.Key k : keys) {
             shoreikinRepository.findByJichitaiCdAndShiteiNoAndNendo(jichitaiCd, k.getShiteiNo(), k.getNendo())
                     .ifPresent(shoreikin -> result.add(toDto(shoreikin)));
