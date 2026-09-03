@@ -138,37 +138,6 @@ class RptStatusServiceImplTest {
     }
 
     // =====================================================================
-    // #11 findAllReports 異常系
-    // =====================================================================
-    //
-    // チェックリスト #11「自治体コードが一致するものが0件の場合」は成立しないため、
-    // 有効化せずコメントとして残している。
-    //
-    // 帳票は自治体ごとに持たず全自治体で同じ内容とする方針に変更されており
-    // （2026-09-02 の会議）、帳票管理マスタ m_reports に jichitai_cd カラムは無い。
-    //
-    //   ・PRIMARY KEY は rpt_id 単独
-    //   ・jichitai_cd を持たないのは m_screen / m_reports / m_bank / m_branch の4つのみ
-    //   ・Reports エンティティにも該当フィールドが無く、setJichitaiCd が存在しない
-    //   ・findAllReports() も絞り込みを行わず findAll() をそのまま返している
-    //
-    // チェックリストは方針変更前に作成されたもので、#8 / #9 / #11 が旧方針のまま残っていた。
-    // チェックリスト側を修正する（バックログで報告済み）。
-    //
-    // @Test
-    // @DisplayName("#11 findAllReports 異常系 自治体コードが一致するものが0件の場合")
-    // void findAllReports_自治体コードが一致するものが0件() {
-    //     when(jichitaiContext.getJichitaiCd()).thenReturn("01100");
-    //     when(reportsRepository.findAll()).thenReturn(List.of(
-    //             reports("01200", "R002")));
-    //
-    //     List<Reports> result = service.findAllReports();
-    //
-    //     assertNotNull(result);
-    //     assertTrue(result.isEmpty());
-    // }
-
-    // =====================================================================
     // #12 search 正常系
     // =====================================================================
 
