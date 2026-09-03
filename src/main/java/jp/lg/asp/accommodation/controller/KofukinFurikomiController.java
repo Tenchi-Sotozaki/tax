@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +26,9 @@ import jp.lg.asp.accommodation.config.ScreenManagement;
 import jp.lg.asp.accommodation.dto.ShoreikinRenkeiDto;
 import jp.lg.asp.accommodation.service.ShoreikinRenkeiService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/kofukinFurikomi")
 @RequiredArgsConstructor
@@ -48,18 +51,16 @@ public class KofukinFurikomiController {
 			@RequestParam(required = false, defaultValue = "partial") String nameMatchType,
 			Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-
 		accessChecker.checkAccess(SCREEN_ID);
 
+		List<ShoreikinRenkeiDto> items;
 		try {
-			List<ShoreikinRenkeiDto> items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name,
-					nameMatchType);
-			model.addAttribute("items", items);
+			items = shoreikinRenkeiService.search(jichitaiCd, nendo, shiteiNo, name, nameMatchType);
 		} catch (Exception e) {
-			System.out.println("Error in service call: " + e.getMessage());
-			e.printStackTrace();
-			model.addAttribute("items", new ArrayList<ShoreikinRenkeiDto>());
+			log.error("Error in service call: {}", e.getMessage(), e);
+			items = new ArrayList<>();
 		}
+		model.addAttribute("items", items);
 
 		Map<String, Object> searchForm = new HashMap<>();
 		searchForm.put("nendo", nendo);
@@ -143,17 +144,23 @@ public class KofukinFurikomiController {
 
 	@PostMapping("/kakunin")
 	@OpeLog(screenId = SCREEN_ID_KAKUNIN, operation = "確認")
-	public String kakunin(@RequestParam("keysJson") String keysJson, Model model) {
+	public String kakunin(@RequestParam(value = "keysJson", required = false) String keysJson, Model model) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+		accessChecker.checkAccess(SCREEN_ID_KAKUNIN);
+
+		if (!StringUtils.hasText(keysJson)) {
+			model.addAttribute("rows", java.util.Collections.emptyList());
+			return "renkei/kofukinFurikomiKakunin";
+		}
+
 		com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
 		try {
-			accessChecker.checkAccess(SCREEN_ID_KAKUNIN);
 			List<ShoreikinRenkeiDto.Key> keys = om.readValue(keysJson,
 					om.getTypeFactory().constructCollectionType(List.class, ShoreikinRenkeiDto.Key.class));
 			List<ShoreikinRenkeiDto> rows = shoreikinRenkeiService.findByKeys(jichitaiCd, keys);
 			model.addAttribute("rows", rows);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("kakuninエラー: {}", e.getMessage(), e);
 			model.addAttribute("rows", java.util.Collections.emptyList());
 		}
 		return "renkei/kofukinFurikomiKakunin";

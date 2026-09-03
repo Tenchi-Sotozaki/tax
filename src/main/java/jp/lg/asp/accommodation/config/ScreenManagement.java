@@ -135,6 +135,9 @@ public final class ScreenManagement {
 	// 適用納税周期登録/編集/照会
 	public static final String TEKIYO_NOZEI_SHUKI_CONFIG = "ms00000024";
 
+	// 特例適用登録/編集/照会
+	public static final String TOKUREI_TEKIYO = "ms00000024";
+
 	// 徴収不能額の還付又は納入義務の免除決定通知書
 	public static final String KANPU_MENJO_TSUCHI = "ms00000027";
 
@@ -176,6 +179,9 @@ public final class ScreenManagement {
 
 	// 金融機関コード取込
 	public static final String BANK_IMPORT = "sc00000012";
+
+	// 自治体情報一覧
+	public static final String JICHITAI_LIST = "sc00000013";
 
 	// 自治体情報設定
 	public static final String JICHITAI_CONFIG = "sc00000008";

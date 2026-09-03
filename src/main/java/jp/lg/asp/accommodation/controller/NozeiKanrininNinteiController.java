@@ -50,18 +50,21 @@ public class NozeiKanrininNinteiController {
 	public String index(HttpSession session, Model model) {
 		try {
 			accessChecker.checkAccess(SCREEN_ID);
-			String shiteiNo = SessionHelper.getShiteiNo(session);
-			
-			// 指定番号が存在しない場合
 			ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
-			if (selected == null || selected.getShiteiNo() == null || selected.getShiteiNo().isEmpty()) {
+			String shiteiNo = SessionHelper.getShiteiNo(session);
+			String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
+
+			// 指定番号または合算指定番号が存在しない場合
+			if (selected == null || (shiteiNo == null && gassanShiteiNo == null)) {
 				// 画面を戻して検索モーダルを表示
 				model.addAttribute("showShiteiGassanModal", true);
 				return "tokugimu/tTokugimuReport";
 			}
-			
+
+			String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
+
 			// 納税管理人情報が未登録
-			if (nokanService.findByJichitaiCdAndShiteiNo(shiteiNo).isEmpty()) {
+			if (nokanService.findByJichitaiCdAndShiteiNo(effectiveShiteiNo).isEmpty()) {
 				model.addAttribute("errorMessage", "納税管理人情報が登録されていません。");
 				return "tokugimu/tTokugimuReport";
 			}
@@ -69,14 +72,14 @@ public class NozeiKanrininNinteiController {
 			NozeiKanrininNinteiDto dto = new NozeiKanrininNinteiDto();
 
 			try {
-				log.debug("納税管理人選任免除認定情報取得開始: shiteiNo={}", shiteiNo);
-				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(shiteiNo);
+				log.debug("納税管理人選任免除認定情報取得開始: shiteiNo={}", effectiveShiteiNo);
+				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(effectiveShiteiNo);
 				if (info != null) {
 					dto = info;
 				}
 			} catch (RuntimeException e) {
 				log.error("納税管理人選任免除認定情報取得エラー: {}", e.getMessage(), e);
-				model.addAttribute("errorMessage", "指定番号: " + shiteiNo + " の情報が見つかりません。");
+				model.addAttribute("errorMessage", "指定番号: " + effectiveShiteiNo + " の情報が見つかりません。");
 			}
 
 			if (dto.getHakkoYmd() == null) {
@@ -113,6 +116,11 @@ public class NozeiKanrininNinteiController {
 				return ResponseEntity.badRequest().build();
 			}
 
+			if (dto.getKoin() == null && dto.getShiteiNo() != null) {
+				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(dto.getShiteiNo());
+				if (info != null) dto.setKoin(info.getKoin());
+			}
+
 			log.debug("PDF生成開始: shiteiNo={}, hakkoYmd={}", dto.getShiteiNo(), dto.getHakkoYmd());
 			byte[] pdfData = reportsService.generatePdf(dto);
 
@@ -139,6 +147,11 @@ public class NozeiKanrininNinteiController {
 
 			if (dto.getHakkoYmd() == null) {
 				return ResponseEntity.badRequest().build();
+			}
+
+			if (dto.getKoin() == null && dto.getShiteiNo() != null) {
+				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(dto.getShiteiNo());
+				if (info != null) dto.setKoin(info.getKoin());
 			}
 
 			byte[] pdfData = reportsService.generatePdf(dto);
@@ -169,6 +182,11 @@ public class NozeiKanrininNinteiController {
 
 			if (dto.getHakkoYmd() == null) {
 				return ResponseEntity.badRequest().build();
+			}
+
+			if (dto.getKoin() == null && dto.getShiteiNo() != null) {
+				NozeiKanrininNinteiDto info = nozeiKanrininNinteiService.getNinteiInfo(dto.getShiteiNo());
+				if (info != null) dto.setKoin(info.getKoin());
 			}
 
 			byte[] pdfData = reportsService.generatePdf(dto);

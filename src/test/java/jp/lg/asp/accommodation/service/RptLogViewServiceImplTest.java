@@ -1,11 +1,14 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,73 +26,141 @@ import jp.lg.asp.accommodation.service.impl.RptLogViewServiceImpl;
 @ExtendWith(MockitoExtension.class)
 class RptLogViewServiceImplTest {
 
-    @Mock ReportsRepository reportsRepository;
-    @Mock ReportsLogRepository reportsLogRepository;
-    @Mock JichitaiContext jichitaiContext;
-    @InjectMocks RptLogViewServiceImpl service;
+	@InjectMocks
+	private RptLogViewServiceImpl rptLogViewService;
 
-    private static final String JICHITAI_CD = "011002";
+	@Mock
+	private ReportsRepository reportsRepository;
 
-    @BeforeEach
-    void setUp() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-    }
+	@Mock
+	private ReportsLogRepository reportsLogRepository;
 
-    @Test
-    void search_mapsLogToDto() {
-        ReportsLog log = new ReportsLog();
-        log.setSeq(1L);
-        log.setRptId("RPT001");
-        log.setSousa("1");
-        log.setOpeUser("user01");
-        log.setShiteiNo("00000001");
+	@Mock
+	private JichitaiContext jichitaiContext;
 
-        Reports reports = new Reports();
-        reports.setRptId("RPT001");
-        reports.setRptName("特別徴収義務者指定通知書");
-        reports.setJichitaiCd(JICHITAI_CD);
+	private static final String JICHITAI_CD = "123456";
 
-        when(reportsLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any()))
-                .thenReturn(List.of(log));
-        when(reportsRepository.findAll()).thenReturn(List.of(reports));
 
-        RptLogViewDto form = new RptLogViewDto();
-        List<RptLogViewDto> result = service.search(form);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getRptId()).isEqualTo("RPT001");
-        assertThat(result.get(0).getRptName()).isEqualTo("特別徴収義務者指定通知書");
-    }
+	@Nested
+	@DisplayName("search メソッドのテスト")
+	class SearchTest {
 
-    @Test
-    void search_unknownRptId_fallsBackToId() {
-        ReportsLog log = new ReportsLog();
-        log.setRptId("UNKNOWN");
+		@Test
+		@DisplayName("正常系：条件に一致するログが存在し、帳票名・操作名が正常に解決されてDTOリストが返却されること")
+		void success() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+			RptLogViewDto form = new RptLogViewDto();
 
-        when(reportsLogRepository.findByConditions(any(), any(), any(), any(), any(), any(), any()))
-                .thenReturn(List.of(log));
-        when(reportsRepository.findAll()).thenReturn(List.of());
+			ReportsLog log = new ReportsLog();
+			log.setSeq(1L);
+			log.setRptId("RPT001");
+			log.setSousa("1");
+			log.setOpeUser("user1");
+			log.setOpeDt(LocalDateTime.now());
+			log.setShiteiNo("S01");
 
-        List<RptLogViewDto> result = service.search(new RptLogViewDto());
+			Reports report = new Reports();
+			report.setRptId("RPT001");
+			report.setRptName("テスト帳票");
 
-        assertThat(result.get(0).getRptName()).isEqualTo("UNKNOWN");
-    }
+			when(reportsLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any()))
+					.thenReturn(List.of(log));
+			when(reportsRepository.findAll()).thenReturn(List.of(report));
 
-    @Test
-    void findAllReports_filtersbyJichitaiCd() {
-        Reports r1 = new Reports();
-        r1.setRptId("RPT001");
-        r1.setJichitaiCd(JICHITAI_CD);
+			List<RptLogViewDto> results = rptLogViewService.search(form);
 
-        Reports r2 = new Reports();
-        r2.setRptId("RPT002");
-        r2.setJichitaiCd("999999");
+			assertThat(results).hasSize(1);
+			assertThat(results.get(0).getRptName()).isEqualTo("テスト帳票");
+			assertThat(results.get(0).getSousaName()).isNotNull();
+		}
 
-        when(reportsRepository.findAll()).thenReturn(List.of(r1, r2));
+		@Test
+		@DisplayName("境界値：検索条件に一致するログが0件の場合、空のリストが返却されること")
+		void emptyLogs() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+			RptLogViewDto form = new RptLogViewDto();
 
-        List<Reports> result = service.findAllReports();
+			when(reportsLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any()))
+					.thenReturn(List.of());
+			when(reportsRepository.findAll()).thenReturn(List.of());
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getRptId()).isEqualTo("RPT001");
-    }
+			List<RptLogViewDto> results = rptLogViewService.search(form);
+
+			assertThat(results).isEmpty();
+		}
+
+		@Test
+		@DisplayName("境界値：ログの rptId が null の場合、帳票名が空文字に解決されること")
+		void rptIdNull() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+			RptLogViewDto form = new RptLogViewDto();
+
+			ReportsLog log = new ReportsLog();
+			log.setRptId(null);
+			log.setSousa("1");
+
+			when(reportsLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any()))
+					.thenReturn(List.of(log));
+			when(reportsRepository.findAll()).thenReturn(List.of());
+
+			List<RptLogViewDto> results = rptLogViewService.search(form);
+
+			assertThat(results).hasSize(1);
+			assertThat(results.get(0).getRptName()).isEqualTo("");
+		}
+
+		@Test
+		@DisplayName("境界値：ログの rptId に一致する帳票定義が存在しない場合、IDがそのままフォールバックされること")
+		void rptIdNotFound() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+			RptLogViewDto form = new RptLogViewDto();
+
+			ReportsLog log = new ReportsLog();
+			log.setRptId("UNKNOWN");
+			log.setSousa("1");
+
+			when(reportsLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any()))
+					.thenReturn(List.of(log));
+			when(reportsRepository.findAll()).thenReturn(List.of());
+
+			List<RptLogViewDto> results = rptLogViewService.search(form);
+
+			assertThat(results).hasSize(1);
+			assertThat(results.get(0).getRptName()).isEqualTo("UNKNOWN");
+		}
+	}
+
+	@Nested
+	@DisplayName("findAllReports メソッドのテスト")
+	class FindAllReportsTest {
+
+		@Test
+		@DisplayName("正常系：全帳票定義が返却されること")
+		void success() {
+			Reports r1 = new Reports();
+			r1.setRptId("R1");
+
+			Reports r2 = new Reports();
+			r2.setRptId("R2");
+
+			when(reportsRepository.findAll()).thenReturn(List.of(r1, r2));
+
+			List<Reports> results = rptLogViewService.findAllReports();
+
+			assertThat(results).hasSize(2);
+			assertThat(results.get(0).getRptId()).isEqualTo("R1");
+			assertThat(results.get(1).getRptId()).isEqualTo("R2");
+		}
+
+		@Test
+		@DisplayName("境界値：帳票定義が存在しない場合、空のリストが返却されること")
+		void empty() {
+			when(reportsRepository.findAll()).thenReturn(List.of());
+
+			List<Reports> results = rptLogViewService.findAllReports();
+
+			assertThat(results).isEmpty();
+		}
+	}
 }

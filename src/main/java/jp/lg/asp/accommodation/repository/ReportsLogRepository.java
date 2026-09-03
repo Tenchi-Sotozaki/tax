@@ -19,7 +19,7 @@ public interface ReportsLogRepository extends JpaRepository<ReportsLog, ReportsL
 	@Query("""
 			SELECT r FROM ReportsLog r
 			WHERE r.jichitaiCd = :jichitaiCd
-			AND (:rptId IS NULL OR :rptId = '' OR r.rptId = :rptId)
+			AND (:rptId IS NULL OR :rptId = '' OR TRIM(r.rptId) = TRIM(:rptId))
 			AND (:sousa IS NULL OR :sousa = '' OR r.sousa = :sousa)
 			AND (:opeUser IS NULL OR :opeUser = '' OR r.opeUser LIKE CONCAT(:opeUser, '%'))
 			AND (:opeDtFrom IS NULL OR :opeDtFrom = '' OR r.opeDt >= TO_TIMESTAMP(:opeDtFrom, 'YYYY-MM-DD"T"HH24:MI'))

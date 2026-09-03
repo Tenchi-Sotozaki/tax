@@ -29,6 +29,49 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
 
     @Query("""
             SELECT g FROM Gassan g
+            WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo
+            AND g.delFlg = '0'
+            ORDER BY g.rno DESC
+            """)
+    List<Gassan> findAllRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Modifying
+    @Query("""
+            UPDATE Gassan g SET g.newFlg = '0'
+            WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo
+            AND g.rno = :rno
+            """)
+    void clearNewFlgByRno(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
+    @Modifying
+    @Query("""
+            UPDATE Gassan g SET g.newFlg = '1'
+            WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo
+            AND g.rno = :rno
+            """)
+    void setNewFlgByRno(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
+    @Modifying
+    @Query("""
+            UPDATE Gassan g SET g.delFlg = '1', g.newFlg = '0'
+            WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo
+            AND g.rno = :rno
+            """)
+    void deleteLogicallyByRno(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
+    @Query("""
+            SELECT g FROM Gassan g
             WHERE g.jichitaiCd = :jichitaiCd AND g.atenaNo = :atenaNo
             AND g.newFlg = '1' AND g.delFlg = '0'
             ORDER BY g.gassanShiteiNo
@@ -45,7 +88,7 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
             """)
     List<Gassan> findAllByJichitaiCd(@Param("jichitaiCd") String jichitaiCd);
 
-    @Query(value = "SELECT MAX(CAST(SUBSTRING(gassan_shitei_no, 4) AS INTEGER)) FROM t_gassan WHERE jichitai_cd = :jichitaiCd AND gassan_shitei_no ~ '^[0-9]+$' AND SUBSTRING(gassan_shitei_no, 1, 3) = :prefix", nativeQuery = true)
+    @Query(value = "SELECT MAX(CAST(SUBSTRING(gassan_shitei_no, LENGTH(:prefix) + 1) AS INTEGER)) FROM t_gassan WHERE jichitai_cd = :jichitaiCd AND SUBSTRING(gassan_shitei_no, 1, LENGTH(:prefix)) = :prefix AND gassan_shitei_no ~ ('^' || :prefix || '[0-9]+$')", nativeQuery = true)
     Optional<Integer> findMaxGassanShiteiNoByJichitaiCdAndPrefix(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("prefix") String prefix);
@@ -95,8 +138,36 @@ public interface GassanRepository extends JpaRepository<Gassan, GassanId> {
             @Param("jichitaiCd") String jichitaiCd,
             @Param("gassanShiteiNo") String gassanShiteiNo);
 
+    @Query("SELECT COUNT(g) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.delFlg = '0'")
+    BigDecimal countValidRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Query("SELECT COUNT(g) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.rno <= :rno AND g.delFlg = '0'")
+    BigDecimal countValidRnoByJichitaiCdAndGassanShiteiNoAndRnoLe(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
+    @Query("SELECT COALESCE(MAX(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo")
+    BigDecimal findMaxRnoIncludingDeletedByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo);
+
     @Query("SELECT COALESCE(MIN(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.delFlg = '0'")
     BigDecimal findMinRnoByJichitaiCdAndGassanShiteiNo(
             @Param("jichitaiCd") String jichitaiCd,
             @Param("gassanShiteiNo") String gassanShiteiNo);
+
+    @Query("SELECT COALESCE(MAX(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.rno < :rno AND g.delFlg = '0'")
+    BigDecimal findPrevRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
+
+    @Query("SELECT COALESCE(MIN(g.rno), 0) FROM Gassan g WHERE g.jichitaiCd = :jichitaiCd AND g.gassanShiteiNo = :gassanShiteiNo AND g.rno > :rno AND g.delFlg = '0'")
+    BigDecimal findNextRnoByJichitaiCdAndGassanShiteiNo(
+            @Param("jichitaiCd") String jichitaiCd,
+            @Param("gassanShiteiNo") String gassanShiteiNo,
+            @Param("rno") BigDecimal rno);
 }

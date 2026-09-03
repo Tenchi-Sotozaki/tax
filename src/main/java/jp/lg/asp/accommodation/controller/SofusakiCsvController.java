@@ -31,6 +31,9 @@ public class SofusakiCsvController {
 	private final ScreenAccessChecker accessChecker;
 	private static final String SCREEN_ID = ScreenManagement.SOFUSAKI_CSV;
 
+	/** 未選択でダウンロードされたときのメッセージ */
+	private static final String MSG_NOT_SELECTED = "出力対象が選択されていません。";
+
 	@GetMapping
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String init(Model model) {
@@ -45,17 +48,18 @@ public class SofusakiCsvController {
 			@RequestParam(value = "selectedIndexes", required = false) List<Integer> selectedIndexes)
 			throws IOException {
 		accessChecker.checkAccess(SCREEN_ID);
-		List<SofusakiCsvDto> allItems = sofusakiCsvService.findAll();
 
-		List<SofusakiCsvDto> targets;
+		// 未選択でのダウンロードは不可（全件出力にはしない）
 		if (selectedIndexes == null || selectedIndexes.isEmpty()) {
-			targets = allItems;
-		} else {
-			targets = selectedIndexes.stream()
-					.filter(i -> i >= 0 && i < allItems.size())
-					.map(allItems::get)
-					.collect(Collectors.toList());
+			return ResponseEntity.badRequest()
+					.body(MSG_NOT_SELECTED.getBytes(StandardCharsets.UTF_8));
 		}
+
+		List<SofusakiCsvDto> allItems = sofusakiCsvService.findAll();
+		List<SofusakiCsvDto> targets = selectedIndexes.stream()
+				.filter(i -> i >= 0 && i < allItems.size())
+				.map(allItems::get)
+				.collect(Collectors.toList());
 
 		// BOM付きUTF-8でExcelでも文字化けしないように出力
 		byte[] bom = new byte[] { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };

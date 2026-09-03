@@ -3,16 +3,12 @@ package jp.lg.asp.accommodation.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-
 import jp.lg.asp.accommodation.dto.UserForm;
 import jp.lg.asp.accommodation.dto.UserSearchForm;
 import jp.lg.asp.accommodation.entity.Role;
 import jp.lg.asp.accommodation.entity.User;
 
 public interface AdminUserService {
-
-    Page<User> search(UserSearchForm form);
 
     List<User> searchAll(UserSearchForm form);
 

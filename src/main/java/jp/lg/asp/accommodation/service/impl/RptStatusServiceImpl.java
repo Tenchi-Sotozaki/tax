@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.RptStatusListItem;
@@ -19,6 +19,7 @@ import jp.lg.asp.accommodation.repository.ReportsRepository;
 import jp.lg.asp.accommodation.repository.RptStatusRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.RptStatusService;
+import jp.lg.asp.accommodation.util.HashUtil;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,18 +30,19 @@ public class RptStatusServiceImpl implements RptStatusService {
 	private final ReportsRepository reportsRepository;
 	private final RptStatusRepository rptStatusRepository;
 	private final TokugimuRepository tokugimuRepository;
+	private final HashUtil hashUtil;
 
 	@Override
 	public List<Reports> findAllReports() {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return reportsRepository.findAll().stream()
-				.filter(r -> jichitaiCd.equals(r.getJichitaiCd()))
-				.collect(Collectors.toList());
+		return reportsRepository.findAll();
 	}
 
 	@Override
 	public List<RptStatusListItem> search(RptStatusSearchForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
+
+		String searchKojinNo = StringUtils.hasText(form.getKojinNo())
+				? hashUtil.sha256(form.getKojinNo()) : form.getKojinNo();
 
 		List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
 				jichitaiCd,
@@ -50,7 +52,7 @@ public class RptStatusServiceImpl implements RptStatusService {
 				form.getShisetsuName(),
 				toLikePattern(form.getShisetsuName(), form.getShisetsuNameMatchType()),
 				"999",
-				form.getKojinNo(),
+				searchKojinNo,
 				form.getHojinNo());
 
 		List<RptStatus> rptStatusList = rptStatusRepository.findByJichitaiCd(jichitaiCd);
@@ -78,6 +80,8 @@ public class RptStatusServiceImpl implements RptStatusService {
 	private String toLikePattern(String value, String matchType) {
 		if (value == null || value.isBlank())
 			return null;
+		if (matchType == null)
+			return "%" + value + "%";
 		return switch (matchType) {
 		case "prefix" -> value + "%";
 		case "exact" -> value;

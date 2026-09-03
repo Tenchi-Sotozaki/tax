@@ -1,9 +1,8 @@
 package jp.lg.asp.accommodation.service.impl;
-import jp.lg.asp.accommodation.config.JichitaiContext;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.NozeiKanrininNinteiDto;
 import jp.lg.asp.accommodation.entity.Atena;
@@ -39,12 +38,17 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         log.debug("納税管理人選任免除認定通知書情報取得開始: shiteiNo={}", shiteiNo);
 
         Jichitai jichitai = jichitaiRepository.findById(jichitaiCd).orElse(null);
-        String cityName = jichitai != null ? jichitai.getName() : "";
+        String cityName = jichitai != null ? jichitai.getName() + jichitai.getKbnName() : "自治体名不明";
         // 条項を含む条例文は自治体ごとに異なるため設定値を優先し、
         // 未設定の場合のみ従来どおり自治体名からの組み立てにフォールバックする
         String jorei = reportsCommonService.getReportsDefText(ReportsConstants.NOZEI_KANRININ_NINTEI_JOREI);
         if (jorei == null || jorei.isEmpty()) {
-            jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
+            throw new RuntimeException("帳票出力項目が未設定です。管理者にお問い合わせください。");
+        }
+
+        byte[] koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
+        if (koin == null || koin.length == 0) {
+            throw new RuntimeException("公印が未設定です。管理者にお問い合わせください。");
         }
 
         NozeiKanrininNinteiDto dto = new NozeiKanrininNinteiDto();
@@ -52,7 +56,7 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         dto.setCityName(cityName);
         dto.setJorei(jorei);
         dto.setNintei("認定");
-        dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
+        dto.setKoin(koin);
 
         // 特別徴収義務者情報を取得
         Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
@@ -63,22 +67,14 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         Atena atena = atenaRepository.findByJichitaiCdAndAtenaNo(jichitaiCd, tokugimu.getAtenaNo())
                 .orElseThrow(() -> new RuntimeException("宛名情報が見つかりません: " + tokugimu.getAtenaNo()));
 
-        dto.setTokuJusho(buildAddress(atena.getYubinNo(), atena.getJusho()));
-        dto.setTokuName(atena.getName());
-        dto.setShisetsuJusho(buildAddress(tokugimu.getShisetsuYubinNo(), tokugimu.getShisetsuJusho()));
-        dto.setShisetsuName(tokugimu.getShisetsuName());
+		dto.setTokuYubin("〒" + atena.getYubinNo());
+		dto.setTokuJusho(atena.getJusho());
+		dto.setTokuName(atena.getName());
+		dto.setShisetsuYubin("〒" + tokugimu.getShisetsuYubinNo());
+		dto.setShisetsuJusho(tokugimu.getShisetsuJusho());
+		dto.setShisetsuName(tokugimu.getShisetsuName());
 
         log.debug("納税管理人選任免除認定通知書情報取得完了: {}", dto);
         return dto;
-    }
-
-    private String buildAddress(String yubinNo, String jusho) {
-        if (yubinNo != null && !yubinNo.isEmpty() && jusho != null && !jusho.isEmpty()) {
-            return "〒" + yubinNo + " " + jusho;
-        } else if (jusho != null && !jusho.isEmpty()) {
-            return jusho;
-        } else {
-            return "";
-        }
     }
 }

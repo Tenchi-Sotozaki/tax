@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -86,7 +87,7 @@ class NozeiShukiServiceImplTest {
     @Test
     void findBySeq_found() {
         NozeiShuki entity = shukiEntity(BigDecimal.ONE, BigDecimal.valueOf(3));
-        when(nozeiShukiRepository.findById(new NozeiShukiId(JICHITAI_CD, BigDecimal.ONE)))
+        when(nozeiShukiRepository.findById(new NozeiShukiId(JICHITAI_CD)))
                 .thenReturn(Optional.of(entity));
 
         assertThat(service.findBySeq(BigDecimal.ONE)).isNotNull();
@@ -142,7 +143,7 @@ class NozeiShukiServiceImplTest {
     void delete_setsDelFlg1() {
         NozeiShuki entity = shukiEntity(BigDecimal.ONE, BigDecimal.valueOf(3));
         entity.setDelFlg("0");
-        when(nozeiShukiRepository.findById(new NozeiShukiId(JICHITAI_CD, BigDecimal.ONE)))
+        when(nozeiShukiRepository.findById(new NozeiShukiId(JICHITAI_CD)))
                 .thenReturn(Optional.of(entity));
         when(nozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 

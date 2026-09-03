@@ -6,14 +6,16 @@
  * フォームバリデーション
  */
 function validateForm() {
-    const hakkoYmd = document.getElementById('hakkoYmd').value;
+    const hakkoYmd = document.getElementById('hakkoYmd');
+    hakkoYmd.classList.remove('is-invalid');
+    document.getElementById('hakkoYmdError').textContent = '';
 
-    if (!hakkoYmd) {
-        alert('発行日を入力してください。');
-        document.getElementById('hakkoYmd').focus();
+    if (!hakkoYmd.value) {
+        hakkoYmd.classList.add('is-invalid');
+        document.getElementById('hakkoYmdError').textContent = '発行年月日を入力してください。';
+        hakkoYmd.focus();
         return false;
     }
-
     return true;
 }
 

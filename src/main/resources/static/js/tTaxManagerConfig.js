@@ -216,7 +216,12 @@ function initChangeHighlight() {
         const isChanged = input.type === 'checkbox'
             ? (input.checked ? 'true' : 'false') !== initialValue
             : input.value !== initialValue;
-        input.style.border = isChanged ? '3px solid #ffeb3b' : '';
+        if (isChanged) {
+            input.classList.add('form-control-edited');
+        } else {
+			input.classList.remove('form-control-edited');
+            input.style.border = '';
+        }
     }
 
     inputs.forEach(input => {

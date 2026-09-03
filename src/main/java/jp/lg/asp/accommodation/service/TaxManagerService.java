@@ -12,5 +12,5 @@ public interface TaxManagerService {
 
 	void saveByShiteiNo(String shiteiNo, TaxManagerForm form);
 
-	void deleteByShiteiNo(String shiteiNo);
+	boolean deleteByShiteiNo(String shiteiNo);
 }

@@ -27,7 +27,7 @@ public interface ZeiritsuTeigakuRepository extends JpaRepository<ZeiritsuTeigaku
 			@Param("tekiyoYm") String tekiyoYm);
 
 	@Query("SELECT t FROM Zeiritsu z INNER JOIN ZeiritsuTeigaku t ON z.jichitaiCd = t.jichitaiCd AND z.seq = t.seq WHERE z.jichitaiCd = :jichitaiCd AND z.taishoKbn = :taishoKbn AND TO_DATE(z.tekiyoStYm, 'YYYYMM') <= TO_DATE(:tekiyoYm, 'YYYYMM') AND TO_DATE(:tekiyoYm, 'YYYYMM') <= TO_DATE(COALESCE(z.tekiyoEdYm, '999912'), 'YYYYMM') AND t.ryokinSt <= :ryokin AND :ryokin <= COALESCE(t.ryokinEd, 9999999999999) AND z.delFlg = '0' AND t.delFlg = '0'")
-	Optional<ZeiritsuTeigaku> findActiveByTaishoKbnAndTekiyoYmAndRyokin(
+	List<ZeiritsuTeigaku> findActiveByTaishoKbnAndTekiyoYmAndRyokin(
 			@Param("jichitaiCd") String jichitaiCd,
 			@Param("taishoKbn") String taishoKbn,
 			@Param("tekiyoYm") String tekiyoYm,

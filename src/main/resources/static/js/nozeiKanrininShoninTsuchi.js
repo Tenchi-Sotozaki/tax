@@ -7,15 +7,15 @@
  */
 function validateForm() {
     const hakkoYmd = document.getElementById('hakkoYmd');
-    
+    hakkoYmd.classList.remove('is-invalid');
+    document.getElementById('hakkoYmdError').textContent = '';
+
     if (!hakkoYmd || !hakkoYmd.value.trim()) {
-        alert('発行日を入力してください。');
-        if (hakkoYmd) {
-            hakkoYmd.focus();
-        }
+        hakkoYmd.classList.add('is-invalid');
+        document.getElementById('hakkoYmdError').textContent = '発行年月日を入力してください。';
+        hakkoYmd.focus();
         return false;
     }
-    
     return true;
 }
 

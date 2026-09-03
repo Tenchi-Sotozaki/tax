@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ public class KofuKetteiTsuchiShinseiReportsServiceImpl implements KofuKetteiTsuc
 
 	@Override
 	public byte[] generatekofuKetteiTsuchiShinseiPdf(KofuKetteiTsuchiShinseiDto dto) {
+		checkAuthentication();
 		log.debug("PDF生成開始 - 指定番号: {}", dto.getShiteiNo());
 
 		boolean isKettei = dto.isKetteiTsuchi();
@@ -91,6 +93,9 @@ public class KofuKetteiTsuchiShinseiReportsServiceImpl implements KofuKetteiTsuc
 			}
 
 		} catch (Exception e) {
+			if (e instanceof AccessDeniedException) {
+				throw (AccessDeniedException) e;
+			}
 			log.error("PDF生成に失敗しました - 指定番号: {}", dto.getShiteiNo(), e);
 			throw new RuntimeException("PDF生成に失敗しました: " + e.getMessage(), e);
 		}
@@ -98,6 +103,7 @@ public class KofuKetteiTsuchiShinseiReportsServiceImpl implements KofuKetteiTsuc
 
 	@Override
 	public byte[] generateBulkPdf(List<KofuKetteiTsuchiShinseiDto> dtoList) {
+		checkAuthentication();
 		if (dtoList == null || dtoList.isEmpty()) {
 			throw new RuntimeException("帳票データがありません。");
 		}
@@ -137,8 +143,21 @@ public class KofuKetteiTsuchiShinseiReportsServiceImpl implements KofuKetteiTsuc
 			return out.toByteArray();
 
 		} catch (Exception e) {
+			if (e instanceof AccessDeniedException) {
+				throw (AccessDeniedException) e;
+			}
 			log.error("一括PDF生成に失敗しました", e);
 			throw new RuntimeException("一括PDF生成に失敗しました: " + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 認証情報の検証を行うプライベートメソッド
+	 */
+	private void checkAuthentication() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+			throw new AccessDeniedException("認証情報が存在しないため、処理を実行できません。");
 		}
 	}
 
