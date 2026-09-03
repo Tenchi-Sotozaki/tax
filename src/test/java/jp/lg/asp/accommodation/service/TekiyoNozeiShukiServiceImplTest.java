@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
@@ -16,9 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TekiyoNozeiShukiForm;
-import jp.lg.asp.accommodation.entity.NozeiShuki;
 import jp.lg.asp.accommodation.entity.TekiyoNozeiShuki;
-import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.TekiyoNozeiShukiServiceImpl;
@@ -29,7 +28,6 @@ class TekiyoNozeiShukiServiceImplTest {
 
     @Mock TekiyoNozeiShukiRepository tekiyoNozeiShukiRepository;
     @Mock TokugimuRepository tokugimuRepository;
-    @Mock NozeiShukiRepository nozeiShukiRepository;
     @Mock JichitaiContext jichitaiContext;
     @InjectMocks TekiyoNozeiShukiServiceImpl service;
 
@@ -42,19 +40,9 @@ class TekiyoNozeiShukiServiceImplTest {
     }
 
     @Test
-    void getNozeiShukiOptions_returnsMappedList() {
-        NozeiShuki n = new NozeiShuki();
-        n.setSeq(BigDecimal.ONE);
-        n.setShuki(BigDecimal.valueOf(3));
-        when(nozeiShukiRepository.findActiveByJichitaiCd(JICHITAI_CD)).thenReturn(List.of(n));
-
-        assertThat(service.getNozeiShukiOptions()).hasSize(1);
-    }
-
-    @Test
     void getByShiteiNo_noHistory_returnsEmptyForm() {
         when(tokugimuRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
         TekiyoNozeiShukiForm form = service.getByShiteiNo(SHITEI_NO);
@@ -66,7 +54,6 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_startAfterEnd_throwsException() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setSeq(BigDecimal.ONE);
         form.setTekiyoStMonth("2024-06");
         form.setTekiyoEdMonth("2024-03");
 
@@ -81,7 +68,6 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_overlappingPeriod_throwsException() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setSeq(BigDecimal.ONE);
         form.setTekiyoStMonth("2024-04");
         form.setTekiyoEdMonth("2024-09");
 
@@ -99,26 +85,25 @@ class TekiyoNozeiShukiServiceImplTest {
     @Test
     void save_validPeriod_savesEntity() {
         TekiyoNozeiShukiForm form = new TekiyoNozeiShukiForm();
-        form.setSeq(BigDecimal.ONE);
         form.setTekiyoStMonth("2024-10");
 
         when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
-        when(tekiyoNozeiShukiRepository.findMaxIdxByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findMaxRnoByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(0);
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         service.save(SHITEI_NO, form);
 
-        verify(tekiyoNozeiShukiRepository).save(argThat(e -> e.getIdx() == 1));
+        verify(tekiyoNozeiShukiRepository).save(argThat(e -> e.getRno() == 1));
     }
 
     @Test
     void delete_setsDelFlg1() {
         TekiyoNozeiShuki entity = new TekiyoNozeiShuki();
         entity.setDelFlg("0");
-        entity.setIdx(1);
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        entity.setRno(1);
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of(entity));
         when(tekiyoNozeiShukiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -129,10 +114,22 @@ class TekiyoNozeiShukiServiceImplTest {
 
     @Test
     void delete_notFound_throwsException() {
-        when(tekiyoNozeiShukiRepository.findLatestByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+        when(tekiyoNozeiShukiRepository.findActiveByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
                 .thenReturn(List.of());
 
         assertThatThrownBy(() -> service.delete(SHITEI_NO))
                 .isInstanceOf(IllegalStateException.class);
+    }
+    
+    @Test
+    void getNozeiShukiOptions_returnsMappedList() {
+
+        var result = service.getNozeiShukiOptions();
+
+        assertThat(result)
+                .extracting("shuki")
+                .containsExactly(
+                        BigDecimal.ONE,
+                        BigDecimal.valueOf(3));
     }
 }

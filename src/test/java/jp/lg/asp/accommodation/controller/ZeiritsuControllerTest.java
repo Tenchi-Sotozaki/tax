@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,18 +25,13 @@ import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.ZeiritsuForm;
 import jp.lg.asp.accommodation.dto.ZeiritsuSearchForm;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
-import jp.lg.asp.accommodation.entity.ZeiritsuId;
-import jp.lg.asp.accommodation.repository.ZeiritsuRepository;
-import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
-import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
+import jp.lg.asp.accommodation.service.ZeiritsuService;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ZeiritsuControllerTest {
 
-    @Mock ZeiritsuRepository zeiritsuRepository;
-    @Mock ZeiritsuTeigakuRepository zeiritsuTeigakuRepository;
-    @Mock ZeiritsuTeiritsuRepository zeiritsuTeiritsuRepository;
+    @Mock ZeiritsuService zeiritsuService;
     @Mock ScreenAccessChecker accessChecker;
     @Mock JichitaiContext jichitaiContext;
 
@@ -46,7 +40,8 @@ class ZeiritsuControllerTest {
     @BeforeEach
     void setUp() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011002");
-        when(zeiritsuRepository.findActiveByJichitaiCd("011002")).thenReturn(List.of());
+        when(zeiritsuService.findActiveByJichitaiCd("011002")).thenReturn(List.of());
+        when(zeiritsuService.search(eq("011002"), any())).thenReturn(List.of());
     }
 
     @Test
@@ -79,9 +74,8 @@ class ZeiritsuControllerTest {
         z.setFukaKbn("1");
         z.setTaishoKbn("1");
         z.setTekiyoStYm("202401");
-        when(zeiritsuRepository.findById(new ZeiritsuId("011002", BigDecimal.ONE)))
-                .thenReturn(Optional.of(z));
-        when(zeiritsuTeigakuRepository.findActiveBySeq("011002", BigDecimal.ONE)).thenReturn(List.of());
+        when(zeiritsuService.findOrThrow("011002", BigDecimal.ONE)).thenReturn(z);
+        when(zeiritsuService.toForm(eq(z), eq("011002"))).thenReturn(new ZeiritsuForm());
         Model model = new ExtendedModelMap();
 
         String view = controller.view(1L, model);
@@ -102,18 +96,9 @@ class ZeiritsuControllerTest {
 
     @Test
     void delete_論理削除後リダイレクト() {
-        Zeiritsu z = new Zeiritsu();
-        z.setJichitaiCd("011002");
-        z.setSeq(BigDecimal.ONE);
-        z.setFukaKbn("1");
-        z.setDelFlg("0");
-        when(zeiritsuRepository.findById(new ZeiritsuId("011002", BigDecimal.ONE)))
-                .thenReturn(Optional.of(z));
-        when(zeiritsuTeigakuRepository.findActiveBySeq("011002", BigDecimal.ONE)).thenReturn(List.of());
-
         String view = controller.delete(1L, new RedirectAttributesModelMap());
 
         assertThat(view).isEqualTo("redirect:/admin/zeiritsu/list");
-        assertThat(z.getDelFlg()).isEqualTo("1");
+        verify(zeiritsuService).delete("011002", BigDecimal.ONE);
     }
 }

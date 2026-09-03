@@ -7,11 +7,13 @@ import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "t_furikomi_koza")
 @IdClass(FurikomiKozaId.class)
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class FurikomiKoza extends BaseEntity {
 
 	@Id

@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,8 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.web.multipart.MultipartFile;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -24,8 +23,8 @@ import jp.lg.asp.accommodation.repository.EltaxRenkeiRepository;
 import jp.lg.asp.accommodation.repository.FukaRepository;
 import jp.lg.asp.accommodation.repository.FukaUchiRepository;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
-import jp.lg.asp.accommodation.repository.NozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.ShoyushaRepository;
+import jp.lg.asp.accommodation.repository.TekiyoNozeiShukiRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeigakuRepository;
 import jp.lg.asp.accommodation.repository.ZeiritsuTeiritsuRepository;
@@ -38,7 +37,7 @@ class EltaxRenkeiKakuninServiceImplTest {
     @Mock EltaxRenkeiRepository eltaxRenkeiRepository;
     @Mock TokugimuRepository tokugimuRepository;
     @Mock ShoyushaRepository shoyushaRepository;
-    @Mock NozeiShukiRepository nozeiShukiRepository;
+    @Mock TekiyoNozeiShukiRepository nozeiShukiRepository;
     @Mock FukaRepository fukaRepository;
     @Mock FukaUchiRepository fukaUchiRepository;
     @Mock ZeiritsuTeigakuRepository zeiritsuTeigakuRepository;
@@ -58,7 +57,7 @@ class EltaxRenkeiKakuninServiceImplTest {
 
     @Test
     void preview_空ファイルは例外() throws Exception {
-        when(file.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        when(file.getBytes()).thenReturn(new byte[0]);
         when(file.getOriginalFilename()).thenReturn("test.csv");
 
         assertThatThrownBy(() -> service.preview(file))
@@ -84,7 +83,7 @@ class EltaxRenkeiKakuninServiceImplTest {
         when(eltaxRenkeiRepository.findNextSeq(JICHITAI_CD)).thenReturn(BigDecimal.ONE);
         when(eltaxRenkeiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        assertThatCode(() -> service.commit(new byte[0], "test.csv", null))
+        assertThatCode(() -> service.commit(new byte[0], "test.csv", null, null))
                 .doesNotThrowAnyException();
 
         verify(eltaxRenkeiRepository).save(any(EltaxRenkei.class));
@@ -95,7 +94,7 @@ class EltaxRenkeiKakuninServiceImplTest {
         when(eltaxRenkeiRepository.findNextSeq(JICHITAI_CD)).thenReturn(BigDecimal.valueOf(5));
         when(eltaxRenkeiRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        service.commit(new byte[0], "upload.csv", null);
+        service.commit(new byte[0], "upload.csv", null, null);
 
         verify(eltaxRenkeiRepository).save(argThat(e ->
                 "011002".equals(e.getJichitaiCd()) &&

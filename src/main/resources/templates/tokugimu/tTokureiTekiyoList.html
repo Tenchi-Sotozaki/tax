@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}" lang="ja">
+
+<head>
+<title>特例適用一覧</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container-fluid p-4">
+
+		<div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+			<h5 class="mb-0 fw-bold text-dark">
+				<i class="bi bi-calendar-check me-2 text-success"></i>特例適用一覧
+			</h5>
+		</div>
+
+		<div th:replace="~{layout/components :: selectedTokugimuInfo(true)}"></div>
+
+		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+			<i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+			<i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${errorMessage}"></span>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		</div>
+
+		<div th:if="${showShiteiGassanModal != true}" class="d-flex justify-content-end mb-3 mt-3">
+			<a th:href="@{/tokurei-tekiyo/register}" class="btn btn-primary">
+				<i class="bi bi-plus-circle me-1"></i>新規登録
+			</a>
+		</div>
+
+		<div th:if="${showShiteiGassanModal != true}" class="card shadow-sm">
+			<div class="card-body p-0">
+				<table class="table table-bordered table-sm align-middle mb-0">
+					<thead class="table-light text-center">
+						<tr>
+							<th style="width: 40%;">適用開始年月</th>
+							<th style="width: 40%;">適用終了年月</th>
+							<th style="width: 20%;"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="h : ${histories}">
+							<td class="text-center" th:text="${h.tekiyoStMonth}"></td>
+							<td class="text-center" th:text="${h.tekiyoEdMonth}"></td>
+							<td class="text-center">
+								<a th:href="@{/tokurei-tekiyo/view/{rno}(rno=${h.idx})}"
+									class="btn btn-sm btn-outline-primary">照会</a>
+							</td>
+						</tr>
+						<tr th:if="${histories.isEmpty()}">
+							<td colspan="3" class="text-center text-muted py-4">
+								<i class="bi bi-inbox fs-4 d-block mb-1"></i>登録されていません
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- 特別徴収義務者指定モーダル -->
+		<div th:replace="~{layout/components :: shiteiGassanSearchModal}"></div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<script th:src="@{/js/shiteiGassanSearch.js}"></script>
+	</th:block>
+</body>
+</html>
