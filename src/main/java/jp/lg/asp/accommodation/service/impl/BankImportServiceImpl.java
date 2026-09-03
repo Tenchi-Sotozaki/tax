@@ -115,9 +115,11 @@ public class BankImportServiceImpl implements BankImportService {
 			if (header.length < 4
 					|| header[0] != 0x50 || header[1] != 0x4B
 					|| header[2] != 0x03 || header[3] != 0x04) {
+				log.error("zipマジックバイトが不正です: ファイル名={}", file.getOriginalFilename());
 				throw new IllegalStateException("zipファイルの読み取りに失敗しました。ファイルが壊れていないか確認してください。");
 			}
 		} catch (IOException e) {
+			log.error("zipファイルのヘッダ読み取りに失敗しました: ファイル名={}", file.getOriginalFilename(), e);
 			throw new IllegalStateException("zipファイルの読み取りに失敗しました。ファイルが壊れていないか確認してください。");
 		}
 
