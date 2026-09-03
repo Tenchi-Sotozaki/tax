@@ -114,7 +114,7 @@ class NozeiKanrininNinteiServiceImplTest {
 
         assertThatThrownBy(() -> service.getNinteiInfo(SHITEI_NO))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("条例文の設定が未完了です。管理者にお問い合わせください。");
+                .hasMessageContaining("帳票出力項目が未設定です。管理者にお問い合わせください。");
     }
 
     // =======================================================================
@@ -128,7 +128,7 @@ class NozeiKanrininNinteiServiceImplTest {
 
         assertThatThrownBy(() -> service.getNinteiInfo(SHITEI_NO))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("条例文の設定が未完了です。管理者にお問い合わせください。");
+                .hasMessageContaining("帳票出力項目が未設定です。管理者にお問い合わせください。");
     }
 
     // =======================================================================
@@ -142,7 +142,7 @@ class NozeiKanrininNinteiServiceImplTest {
 
         assertThatThrownBy(() -> service.getNinteiInfo(SHITEI_NO))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("条例文の設定が未完了です。管理者にお問い合わせください。");
+                .hasMessageContaining("帳票出力項目が未設定です。管理者にお問い合わせください。");
     }
 
     // =======================================================================

@@ -94,7 +94,7 @@ class NozeiKanrininNinteiReportsServiceImplTest {
 
         assertThatThrownBy(() -> service.generatePdf(dto))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("条例文の設定が未完了です。");
+                .hasMessageContaining("帳票出力項目が未設定です。管理者にお問い合わせください。");
     }
 
     // =======================================================================
@@ -108,7 +108,7 @@ class NozeiKanrininNinteiReportsServiceImplTest {
 
         assertThatThrownBy(() -> service.generatePdf(dto))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("条例文の設定が未完了です。");
+                .hasMessageContaining("帳票出力項目が未設定です。管理者にお問い合わせください。");
     }
 
     // =======================================================================
@@ -182,7 +182,7 @@ class NozeiKanrininNinteiReportsServiceImplTest {
 
         assertThatThrownBy(() -> service.generatePdf(dto))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("公印が未設定です。");
+                .hasMessageContaining("公印が未設定です。管理者にお問い合わせください。");
     }
 
     // =======================================================================
@@ -196,7 +196,7 @@ class NozeiKanrininNinteiReportsServiceImplTest {
 
         assertThatThrownBy(() -> service.generatePdf(dto))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("公印が未設定です。");
+                .hasMessageContaining("公印が未設定です。管理者にお問い合わせください。");
     }
 
     // =======================================================================

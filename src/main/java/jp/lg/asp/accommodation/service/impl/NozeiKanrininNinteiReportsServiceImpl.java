@@ -46,10 +46,10 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 			throw new IllegalArgumentException("発行日は必須です。");
 		}
 		if (dto.getJorei() == null) {
-			throw new IllegalArgumentException("条例文の設定が未完了です。管理者にお問い合わせください。");
+			throw new IllegalArgumentException("帳票出力項目が未設定です。管理者にお問い合わせください。");
 		}
 		if (dto.getCityName() == null) {
-			throw new IllegalArgumentException("条例文の設定が未完了です。管理者にお問い合わせください。");
+			throw new IllegalArgumentException("帳票出力項目が未設定です。管理者にお問い合わせください。");
 		}
 		if (dto.getNintei() == null) {
 			throw new IllegalArgumentException("認定区分は必須です。");
@@ -76,7 +76,7 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 	        parameters.put("net.sf.jasperreports.default.pdf.encoding", "Identity-H");
 	        parameters.put("net.sf.jasperreports.default.pdf.embedded", "true");
 
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月dd日", Locale.JAPANESE)
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年MM月dd日", Locale.JAPANESE)
 					.withChronology(JapaneseChronology.INSTANCE);
 			parameters.put("hakkoYmd", dto.getHakkoYmd().format(formatter));
 	        parameters.put("jorei", dto.getJorei());

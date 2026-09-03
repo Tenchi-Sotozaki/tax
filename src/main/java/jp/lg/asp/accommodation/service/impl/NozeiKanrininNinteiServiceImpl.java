@@ -43,7 +43,7 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         // 未設定の場合のみ従来どおり自治体名からの組み立てにフォールバックする
         String jorei = reportsCommonService.getReportsDefText(ReportsConstants.NOZEI_KANRININ_NINTEI_JOREI);
         if (jorei == null || jorei.isEmpty()) {
-            throw new RuntimeException("条例文の設定が未完了です。管理者にお問い合わせください。");
+            throw new RuntimeException("帳票出力項目が未設定です。管理者にお問い合わせください。");
         }
 
         byte[] koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
