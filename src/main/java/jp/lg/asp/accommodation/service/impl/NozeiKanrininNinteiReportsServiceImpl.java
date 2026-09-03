@@ -43,7 +43,7 @@ public class NozeiKanrininNinteiReportsServiceImpl implements NozeiKanrininNinte
 	        throw new IllegalArgumentException("帳票データ（DTO）がnullです。");
 	    }
 		if (dto.getHakkoYmd() == null) {
-			throw new IllegalArgumentException("発行日は必須です。");
+			throw new IllegalArgumentException("発行年月日は必須です。");
 		}
 		if (dto.getJorei() == null) {
 			throw new IllegalArgumentException("帳票出力項目が未設定です。管理者にお問い合わせください。");

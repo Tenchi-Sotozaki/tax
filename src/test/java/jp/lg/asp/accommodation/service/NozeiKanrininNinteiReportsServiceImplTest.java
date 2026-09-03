@@ -66,7 +66,7 @@ class NozeiKanrininNinteiReportsServiceImplTest {
 
         assertThatThrownBy(() -> service.generatePdf(dto))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("発行日は必須です。");
+                .hasMessage("発行年月日は必須です。");
     }
 
     // =======================================================================
