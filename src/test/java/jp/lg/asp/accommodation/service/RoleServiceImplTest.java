@@ -191,7 +191,23 @@ class RoleServiceImplTest {
     }
 
     @Test
-    @DisplayName("#10 saveRole 正常系 roleIdあり（更新）：既存Roleの名前が更新されること、RoleDetailがクリアされ新しい内容で保存されること")
+    @DisplayName("#10 saveRole 正常系 roleIdがnullかつscreenPermissionsにvalue=0以外が含まれる（新規登録）：value=0以外のエントリがRoleDetailに追加されること")
+    void saveRole_新規登録でvalue0以外のエントリがRoleDetailに追加される() {
+        when(roleRepository.findMaxRoleIdByJichitaiCd(JICHITAI_CD)).thenReturn(5L);
+        when(roleRepository.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(roleRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        RoleForm form = new RoleForm();
+        form.setName("新規ロール");
+        form.setScreenPermissions(Map.of("sc001", 1, "sc002", 2));
+
+        service.saveRole(form, JICHITAI_CD, "admin");
+
+        verify(roleRepository).save(argThat(r -> r.getRoleDetails().size() == 2));
+    }
+
+    @Test
+    @DisplayName("#11 saveRole 正常系 roleIdあり（更新）：既存Roleの名前が更新されること、RoleDetailがクリアされ新しい内容で保存されること")
     void saveRole_更新時に名前が更新されRoleDetailが再設定される() {
         RoleDetail existingDetail = new RoleDetail();
         existingDetail.setScreenId("sc001");
@@ -218,7 +234,7 @@ class RoleServiceImplTest {
     }
 
     @Test
-    @DisplayName("#11 saveRole 正常系 screenPermissionsにvalue=0以外が含まれる：RoleDetailに追加されること")
+    @DisplayName("#12 saveRole 正常系 screenPermissionsにvalue=0以外が含まれる：RoleDetailに追加されること")
     void saveRole_value0以外のエントリはRoleDetailに追加される() {
         Role existing = role(1L);
         when(roleRepository.findByIdWithDetails(JICHITAI_CD, 1L)).thenReturn(Optional.of(existing));
@@ -236,7 +252,7 @@ class RoleServiceImplTest {
     }
 
     @Test
-    @DisplayName("#12 saveRole 正常系 screenPermissionsにvalue=0が含まれる：value=0のエントリはRoleDetailに追加されないこと")
+    @DisplayName("#13 saveRole 正常系 screenPermissionsにvalue=0が含まれる：value=0のエントリはRoleDetailに追加されないこと")
     void saveRole_value0のエントリはRoleDetailに追加されない() {
         Role existing = role(1L);
         when(roleRepository.findByIdWithDetails(JICHITAI_CD, 1L)).thenReturn(Optional.of(existing));
@@ -255,7 +271,7 @@ class RoleServiceImplTest {
     }
 
     @Test
-    @DisplayName("#13 saveRole 正常系 screenPermissionsがnull：RoleDetailが空のまま保存されること")
+    @DisplayName("#14 saveRole 正常系 screenPermissionsがnull：RoleDetailが空のまま保存されること")
     void saveRole_screenPermissionsがnullの場合はRoleDetailが空のまま保存される() {
         Role existing = role(1L);
         when(roleRepository.findByIdWithDetails(JICHITAI_CD, 1L)).thenReturn(Optional.of(existing));
@@ -274,7 +290,7 @@ class RoleServiceImplTest {
     }
 
     @Test
-    @DisplayName("#14 saveRole 異常系 更新時に対象Roleが存在しない：NoSuchElementExceptionがスローされること")
+    @DisplayName("#15 saveRole 異常系 更新時に対象Roleが存在しない：NoSuchElementExceptionがスローされること")
     void saveRole_更新対象が存在しない場合はNoSuchElementExceptionがスローされる() {
         when(roleRepository.findByIdWithDetails(JICHITAI_CD, 99L)).thenReturn(Optional.empty());
 
@@ -291,7 +307,7 @@ class RoleServiceImplTest {
     // ==================================================================
 
     @Test
-    @DisplayName("#15 findAssignedUsers 正常系 付与ユーザーが複数：findAssignedUsersが呼ばれユーザーリストが返ること")
+    @DisplayName("#16 findAssignedUsers 正常系 付与ユーザーが複数：findAssignedUsersが呼ばれユーザーリストが返ること")
     void findAssignedUsers_複数ユーザーが返る() {
         User u1 = new User();
         User u2 = new User();
@@ -305,7 +321,7 @@ class RoleServiceImplTest {
     }
 
     @Test
-    @DisplayName("#16 findAssignedUsers 正常系 付与ユーザーが0件：空リストが返ること")
+    @DisplayName("#17 findAssignedUsers 正常系 付与ユーザーが0件：空リストが返ること")
     void findAssignedUsers_0件の場合は空リストが返る() {
         when(userRepository.findAssignedUsers(JICHITAI_CD, BigDecimal.valueOf(1L)))
                 .thenReturn(List.of());
@@ -318,7 +334,7 @@ class RoleServiceImplTest {
     // ==================================================================
 
     @Test
-    @DisplayName("#17 deleteRole 正常系 正常に削除：roleRepository.deleteByIdがRoleId(jichitaiCd, roleId)で1回呼ばれること")
+    @DisplayName("#18 deleteRole 正常系 正常に削除：roleRepository.deleteByIdがRoleId(jichitaiCd, roleId)で1回呼ばれること")
     void deleteRole_deleteByIdがRoleIdで1回呼ばれる() {
         service.deleteRole(JICHITAI_CD, 1L);
 

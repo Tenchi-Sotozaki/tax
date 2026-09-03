@@ -188,26 +188,12 @@ class RoleControllerTest {
         verify(accessChecker).checkWriteAccess(SCREEN_ID);
     }
 
-    @Test
-    @DisplayName("#9 saveRole 正常系 roleIdがnullかつscreenPermissionsにvalue=0以外が含まれる：success:trueが設定されること、roleService.saveRoleが1回呼ばれること")
-    void saveRole_roleIdがnullかつscreenPermissionsにvalue0以外が含まれる場合は正常登録() {
-        RoleForm form = new RoleForm();
-        form.setName("一般ユーザー");
-        form.setScreenPermissions(Map.of("sc001", 1, "sc002", 2));
-
-        Map<String, Object> result = controller.saveRole(form);
-
-        assertThat(result).containsEntry("success", true);
-        verify(roleService, times(1)).saveRole(eq(form), eq(JICHITAI_CD), eq("admin"));
-        verify(accessChecker).checkWriteAccess(SCREEN_ID);
-    }
-
     // ==================================================================
     // getRoleDetail
     // ==================================================================
 
     @Test
-    @DisplayName("#10 getRoleDetail 正常系 存在する権限IDを指定：戻り値にrole・permissions・editableが設定されること")
+    @DisplayName("#9 getRoleDetail 正常系 存在する権限IDを指定：戻り値にrole・permissions・editableが設定されること")
     void getRoleDetail_存在する権限IDはroleとpermissionsとeditableが返る() {
         RoleDetail detail = new RoleDetail();
         detail.setScreenId("sc00000001");
@@ -226,7 +212,7 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("#11 getRoleDetail 正常系 デフォルト権限IDを指定：戻り値にeditable:falseが設定されること")
+    @DisplayName("#10 getRoleDetail 正常系 デフォルト権限IDを指定：戻り値にeditable:falseが設定されること")
     void getRoleDetail_デフォルト権限IDはeditableがfalse() {
         long defaultId = UserRepository.DEFAULT_USER_ROLE_ID;
         Role role = role(defaultId, "デフォルト");
@@ -240,7 +226,7 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("#12 getRoleDetail 異常系 存在しない権限IDを指定：戻り値に空のマップが設定されること")
+    @DisplayName("#11 getRoleDetail 異常系 存在しない権限IDを指定：戻り値に空のマップが設定されること")
     void getRoleDetail_存在しない権限IDは空マップが返る() {
         when(roleService.findById(JICHITAI_CD, 99L)).thenReturn(null);
 
@@ -255,7 +241,7 @@ class RoleControllerTest {
     // ==================================================================
 
     @Test
-    @DisplayName("#13 getAssignedUsers 正常系 付与ユーザーが存在：roleNameとusers（各id・name含む）が返ること")
+    @DisplayName("#12 getAssignedUsers 正常系 付与ユーザーが存在：roleNameとusers（各id・name含む）が返ること")
     void getAssignedUsers_付与ユーザーが存在する場合はroleNameとusersが返る() {
         Role role = role(3L, "一般");
         User u1 = user("U001", "山田太郎");
@@ -274,7 +260,7 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("#14 getAssignedUsers 正常系 付与ユーザーが0件：roleNameが設定されること、usersが空リストで返ること")
+    @DisplayName("#13 getAssignedUsers 正常系 付与ユーザーが0件：roleNameが設定されること、usersが空リストで返ること")
     void getAssignedUsers_付与ユーザーが0件の場合はusersが空リスト() {
         Role role = role(3L, "一般");
         when(roleService.findById(JICHITAI_CD, 3L)).thenReturn(role);
@@ -288,7 +274,7 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("#15 getAssignedUsers 正常系 roleが存在しない：roleNameが空文字で返ること")
+    @DisplayName("#14 getAssignedUsers 正常系 roleが存在しない：roleNameが空文字で返ること")
     void getAssignedUsers_roleが存在しない場合はroleNameが空文字() {
         when(roleService.findById(JICHITAI_CD, 99L)).thenReturn(null);
         when(roleService.findAssignedUsers(JICHITAI_CD, 99L)).thenReturn(Collections.emptyList());
@@ -304,7 +290,7 @@ class RoleControllerTest {
     // ==================================================================
 
     @Test
-    @DisplayName("#16 deleteRole 正常系 付与ユーザーなし・削除成功の場合：roleService.deleteRoleが1回呼ばれること、success:trueが返ること")
+    @DisplayName("#15 deleteRole 正常系 付与ユーザーなし・削除成功の場合：roleService.deleteRoleが1回呼ばれること、success:trueが返ること")
     void deleteRole_正常削除() {
         when(roleService.findAssignedUsers(JICHITAI_CD, 3L)).thenReturn(Collections.emptyList());
 
@@ -315,7 +301,7 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("#17 deleteRole 異常系 roleIdがDEFAULT_USER_ROLE_ID：roleService.deleteRoleが呼ばれないこと、success:falseとmessage「デフォルト権限のため削除できません」が返ること")
+    @DisplayName("#16 deleteRole 異常系 roleIdがDEFAULT_USER_ROLE_ID：roleService.deleteRoleが呼ばれないこと、success:falseとmessage「デフォルト権限のため削除できません」が返ること")
     void deleteRole_デフォルト権限IDは削除不可() {
         Map<String, Object> result = controller.deleteRole((long) UserRepository.DEFAULT_USER_ROLE_ID);
 
@@ -325,7 +311,7 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("#18 deleteRole 異常系 付与ユーザーが1件以上存在：roleService.deleteRoleが呼ばれないこと、success:falseとmessageに「ユーザーがいるため削除できません」が含まれること")
+    @DisplayName("#17 deleteRole 異常系 付与ユーザーが1件以上存在：roleService.deleteRoleが呼ばれないこと、success:falseとmessageに「ユーザーがいるため削除できません」が含まれること")
     void deleteRole_付与ユーザーがいる場合は削除不可() {
         when(roleService.findAssignedUsers(JICHITAI_CD, 3L)).thenReturn(List.of(new User()));
 
@@ -337,7 +323,7 @@ class RoleControllerTest {
     }
 
     @Test
-    @DisplayName("#19 deleteRole 異常系 サービスが例外をスロー：success:falseと例外メッセージがmessageに設定されること")
+    @DisplayName("#18 deleteRole 異常系 サービスが例外をスロー：success:falseと例外メッセージがmessageに設定されること")
     void deleteRole_サービス例外時はエラーメッセージが設定される() {
         when(roleService.findAssignedUsers(JICHITAI_CD, 3L)).thenReturn(Collections.emptyList());
         doThrow(new RuntimeException("削除失敗")).when(roleService).deleteRole(JICHITAI_CD, 3L);
