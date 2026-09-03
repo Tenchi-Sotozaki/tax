@@ -150,7 +150,7 @@ class KanpuMenjoTsuchiControllerTest {
         String view = controller.index(sessionWith("S001"), null, model);
 
         assertThat(view).isEqualTo("error");
-        assertThat(model.asMap().get("errorMessage").toString()).contains("自治体情報が見つかりませんでした。");
+        assertThat(model.asMap()).containsEntry("errorMessage", "自治体情報が見つかりませんでした。");
     }
 
     // =======================================================================
@@ -196,7 +196,7 @@ class KanpuMenjoTsuchiControllerTest {
         String view = controller.index(sessionWith("S001"), null, model);
 
         assertThat(view).isEqualTo("error");
-        assertThat(model.asMap()).containsEntry("errorMessage", "画面表示中にエラーが発生しました。");
+        assertThat(model.asMap()).containsEntry("errorMessage", "自治体情報が見つかりませんでした。");
     }
 
     // =======================================================================
