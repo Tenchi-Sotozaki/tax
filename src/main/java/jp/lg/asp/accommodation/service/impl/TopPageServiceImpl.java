@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TopPageConfigForm;
 import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.entity.TopPageContentId;
@@ -24,7 +23,6 @@ public class TopPageServiceImpl implements TopPageService {
 	private static final String KBN_CUSTOM = "1";
 
 	private final TopPageContentRepository repository;
-	private final JichitaiContext jichitaiContext;
 
 	@Override
 	@Transactional(readOnly = true)

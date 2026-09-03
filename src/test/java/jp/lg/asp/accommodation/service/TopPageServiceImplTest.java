@@ -21,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TopPageConfigForm;
 import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.entity.TopPageContentId;
@@ -39,7 +38,6 @@ class TopPageServiceImplTest {
     @InjectMocks TopPageServiceImpl service;
 
     @Mock TopPageContentRepository repository;
-    @Mock JichitaiContext jichitaiContext;
 
     // ─── findShared ──────────────────────────────────────────────────────────
 
@@ -266,7 +264,6 @@ class TopPageServiceImplTest {
         ArgumentCaptor<TopPageContent> captor = ArgumentCaptor.forClass(TopPageContent.class);
         verify(repository).save(captor.capture());
         assertThat(captor.getValue().getJichitaiCd()).isEqualTo(JICHITAI_CD);
-        verify(jichitaiContext, never()).getJichitaiCd();
     }
 
     // ─── delete ──────────────────────────────────────────────────────────────
