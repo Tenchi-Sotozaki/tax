@@ -2,6 +2,7 @@ package jp.lg.asp.accommodation.aspect;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -31,6 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class OpeLogAspect {
+
+	private static final Set<String> EXCLUDED_PARAMS = Set.of(
+			"_csrf", "password", "nowPassword", "newPassword", "newPasswordConfirm");
 
 	private final OperationLogRepository operationLogRepository;
 	private final ObjectMapper objectMapper;
@@ -96,7 +100,7 @@ public class OpeLogAspect {
 		try {
 			Map<String, Object> parameterMap = new java.util.LinkedHashMap<>();
 			request.getParameterMap().entrySet().stream()
-					.filter(e -> !e.getKey().equalsIgnoreCase("_csrf"))
+					.filter(e -> EXCLUDED_PARAMS.stream().noneMatch(p -> p.equalsIgnoreCase(e.getKey())))
 					.forEach(e -> parameterMap.put(e.getKey(), e.getValue()));
 			return objectMapper.writeValueAsString(parameterMap);
 		} catch (Exception e) {

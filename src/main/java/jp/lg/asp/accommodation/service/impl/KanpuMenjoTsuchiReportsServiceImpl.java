@@ -52,8 +52,14 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
 
             Map<String, Object> parameters = new HashMap<>();
             // 帳票で丸印の表示に使用するため、データソースとは別に、パラメータマップへ格納
-            parameters.put("shinsei_kbn", dto.getShinsei_kbn() != null ? dto.getShinsei_kbn() : "");
-            parameters.put("kettei_naiyou", dto.getKettei_naiyou() != null ? dto.getKettei_naiyou() : "");
+            if (dto.getShinsei_kbn() == null) {
+                throw new IllegalArgumentException("申請の区分は必須です。");
+            }
+            if (dto.getKettei_naiyou() == null) {
+                throw new IllegalArgumentException("決定の内容は必須です。");
+            }
+            parameters.put("shinsei_kbn", dto.getShinsei_kbn());
+            parameters.put("kettei_naiyou", dto.getKettei_naiyou());
             
             JRDataSource dataSource = buildParams(dto);
             JasperPrint jasperPrint = JasperFillManager.fillReport(
@@ -76,8 +82,17 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
         KanpuMenjoTsuchiReportsDto reportsDto = new KanpuMenjoTsuchiReportsDto();
 
         // 基本情報
+        if (jorei == null) {
+            throw new IllegalArgumentException("帳票出力項目が未設定です。管理者にお問い合わせください。");
+        }
+        if (dto.getKoin() == null || dto.getKoin().length == 0) {
+            throw new IllegalArgumentException("公印が未設定です。管理者にお問い合わせください。");
+        }
+        if (dto.getZeigaku() == null || dto.getZeigaku().isEmpty()) {
+            throw new IllegalArgumentException("申請した税額は必須です。");
+        }
         reportsDto.setCityName(dto.getCityName() != null ? dto.getCityName() : "");
-        reportsDto.setJorei(jorei != null ? jorei : "");
+        reportsDto.setJorei(jorei);
         reportsDto.setTokuName(dto.getTokuName() != null ? dto.getTokuName() : "");
         reportsDto.setTokuYubin(dto.getTokuYubin() != null ? dto.getTokuYubin() : "");
         reportsDto.setTokuJusho(dto.getTokuJusho() != null ? dto.getTokuJusho() : "");
@@ -88,57 +103,30 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
         reportsDto.setKanpuMenjoGaku(formatMoney(dto.getKanpuMenjoGaku()));
         reportsDto.setRiyu(dto.getRiyu() != null ? dto.getRiyu() : "");
         reportsDto.setBiko(dto.getBiko() != null ? dto.getBiko() : "");
-        reportsDto.setKoin(dto.getKoin() != null && dto.getKoin().length > 0 ? dto.getKoin() : null);
+        reportsDto.setKoin(dto.getKoin());
 
         // 申請の年月
-        if (dto.getShinseiYm() != null && !dto.getShinseiYm().isEmpty()) {
-        	// YearMonth型に変換
-        	YearMonth yearMonth = java.time.YearMonth.parse(dto.getShinseiYm());
-        	
-        	// 仮で日付を代入
-            LocalDate shinseiYm = yearMonth.atDay(1);
-        	
-        	// 和暦形式に変換
-        	JapaneseDate japaneseDate = JapaneseDate.from(shinseiYm);
-        	
-        	// フォーマット定義
-        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE);
-        	String strDate = japaneseDate.format(formatter);
-        	
-        	// 和暦形式の申請年月を設定
-            reportsDto.setShinseiYm(strDate);
-        } else {
-            reportsDto.setShinseiYm("");
+        if (dto.getShinseiYm() == null || dto.getShinseiYm().isEmpty()) {
+            throw new IllegalArgumentException("対象年月は必須です。");
         }
+        YearMonth yearMonth = java.time.YearMonth.parse(dto.getShinseiYm());
+        LocalDate shinseiYm = yearMonth.atDay(1);
+        JapaneseDate shinseiJapaneseDate = JapaneseDate.from(shinseiYm);
+        reportsDto.setShinseiYm(shinseiJapaneseDate.format(DateTimeFormatter.ofPattern("Gy年M月", Locale.JAPANESE)));
 
         // 発行日
-        if (dto.getHakkoYmd() != null) {
-        	// 和暦形式に変換
-        	JapaneseDate japaneseDate = JapaneseDate.from(dto.getHakkoYmd());
-        	
-        	// フォーマット定義
-        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE);
-        	String strDate = japaneseDate.format(formatter);
-        	
-            reportsDto.setHakkoYmd(strDate);
-        } else {
-            reportsDto.setHakkoYmd("");
+        if (dto.getHakkoYmd() == null) {
+            throw new IllegalArgumentException("発行年月日は必須です。");
         }
+        JapaneseDate hakkoJapaneseDate = JapaneseDate.from(dto.getHakkoYmd());
+        reportsDto.setHakkoYmd(hakkoJapaneseDate.format(DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE)));
 
         // 申請受理日
-        if (dto.getJuriYmd() != null) {
-        	// 和暦形式に変換
-        	JapaneseDate japaneseDate = JapaneseDate.from(dto.getJuriYmd());
-        	
-        	// フォーマット定義
-        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE);
-        	String strDate = japaneseDate.format(formatter);
-        	
-        	// 和暦形式の申請受理日を設定
-        	reportsDto.setJuriYmd(strDate);
-        } else {
-            reportsDto.setJuriYmd("");
+        if (dto.getJuriYmd() == null) {
+            throw new IllegalArgumentException("申請受理年月日は必須です。");
         }
+        JapaneseDate juriJapaneseDate = JapaneseDate.from(dto.getJuriYmd());
+        reportsDto.setJuriYmd(juriJapaneseDate.format(DateTimeFormatter.ofPattern("Gy年M月d日", Locale.JAPANESE)));
 
         List<KanpuMenjoTsuchiReportsDto> dataSourceList = Arrays.asList(reportsDto);
         JRDataSource params = new JRBeanCollectionDataSource(dataSourceList);
@@ -148,7 +136,8 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
 
     @Override
     public Jichitai findJichitai(String jichitaiCd) {
-        return jichitaiRepository.findById(jichitaiCd).orElse(null);
+        return jichitaiRepository.findById(jichitaiCd)
+            .orElseThrow(() -> new IllegalArgumentException("自治体情報が見つかりませんでした。"));
     }
 
     /**
@@ -201,8 +190,7 @@ public class KanpuMenjoTsuchiReportsServiceImpl implements KanpuMenjoTsuchiRepor
             long amount = Long.parseLong(money);
             return nf.format(amount);
         } catch (NumberFormatException e) {
-            // 数値変換できない場合はそのまま返す
-            return money;
+            throw new IllegalArgumentException("申請した税額が不正です。");
         }
     }
 }

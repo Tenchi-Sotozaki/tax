@@ -144,7 +144,7 @@ class TokureiShiteiCancelControllerTest {
 		}
 
 		@Test
-		@DisplayName("異常系：特例情報（shiteiDto）が取得できない（null）場合にエラーがスローされること")
+		@DisplayName("異常系：特例情報（shiteiDto）が取得できない（null）場合にエラーメッセージが設定され検索画面に戻ること")
 		void error_whenShiteiDtoIsNull() {
 			ShiteiGassanSearchDto selected = new ShiteiGassanSearchDto();
 			selected.setShiteiNo("12345");
@@ -153,9 +153,10 @@ class TokureiShiteiCancelControllerTest {
 			sessionHelperMock.when(() -> SessionHelper.getShiteiGassan(session)).thenReturn(selected);
 			when(tokureiShiteiService.getTokugimuInfo("12345")).thenReturn(null);
 
-			assertThatThrownBy(() -> tokureiShiteiCancelController.index(session, model))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessage("特例情報が存在しません。");
+			String viewName = tokureiShiteiCancelController.index(session, model);
+
+			assertThat(viewName).isEqualTo("tokugimu/tTokugimuReport");
+			verify(model).addAttribute(eq("errorMessage"), anyString());
 		}
 
 		@Test

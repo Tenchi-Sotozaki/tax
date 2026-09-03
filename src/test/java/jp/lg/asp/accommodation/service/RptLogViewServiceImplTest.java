@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,10 +40,7 @@ class RptLogViewServiceImplTest {
 
 	private static final String JICHITAI_CD = "123456";
 
-	@BeforeEach
-	void setUp() {
-		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-	}
+
 
 	@Nested
 	@DisplayName("search メソッドのテスト")
@@ -53,6 +49,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("正常系：条件に一致するログが存在し、帳票名・操作名が正常に解決されてDTOリストが返却されること")
 		void success() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			ReportsLog log = new ReportsLog();
@@ -81,6 +78,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("境界値：検索条件に一致するログが0件の場合、空のリストが返却されること")
 		void emptyLogs() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			when(reportsLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any(), any()))
@@ -95,6 +93,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("境界値：ログの rptId が null の場合、帳票名が空文字に解決されること")
 		void rptIdNull() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			ReportsLog log = new ReportsLog();
@@ -114,6 +113,7 @@ class RptLogViewServiceImplTest {
 		@Test
 		@DisplayName("境界値：ログの rptId に一致する帳票定義が存在しない場合、IDがそのままフォールバックされること")
 		void rptIdNotFound() {
+			when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 			RptLogViewDto form = new RptLogViewDto();
 
 			ReportsLog log = new ReportsLog();
@@ -136,31 +136,27 @@ class RptLogViewServiceImplTest {
 	class FindAllReportsTest {
 
 		@Test
-		@DisplayName("正常系：自自治体コードと一致する帳票定義のみがフィルタリングされて返却されること")
+		@DisplayName("正常系：全帳票定義が返却されること")
 		void success() {
 			Reports r1 = new Reports();
-			r1.setJichitaiCd(JICHITAI_CD);
 			r1.setRptId("R1");
 
 			Reports r2 = new Reports();
-			r2.setJichitaiCd("OTHER_CD");
 			r2.setRptId("R2");
 
 			when(reportsRepository.findAll()).thenReturn(List.of(r1, r2));
 
 			List<Reports> results = rptLogViewService.findAllReports();
 
-			assertThat(results).hasSize(1);
+			assertThat(results).hasSize(2);
 			assertThat(results.get(0).getRptId()).isEqualTo("R1");
+			assertThat(results.get(1).getRptId()).isEqualTo("R2");
 		}
 
 		@Test
-		@DisplayName("境界値：一致する自治体コードが存在しない場合、空のリストが返却されること")
-		void noMatch() {
-			Reports r2 = new Reports();
-			r2.setJichitaiCd("OTHER_CD");
-
-			when(reportsRepository.findAll()).thenReturn(List.of(r2));
+		@DisplayName("境界値：帳票定義が存在しない場合、空のリストが返却されること")
+		void empty() {
+			when(reportsRepository.findAll()).thenReturn(List.of());
 
 			List<Reports> results = rptLogViewService.findAllReports();
 

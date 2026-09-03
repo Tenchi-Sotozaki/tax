@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -23,73 +24,175 @@ import jp.lg.asp.accommodation.service.impl.OpeLogViewServiceImpl;
 @ExtendWith(MockitoExtension.class)
 class OpeLogViewServiceImplTest {
 
-	@Mock
-	ScreenRepository screenRepository;
-	@Mock
-	OperationLogRepository operationLogRepository;
-	@Mock
-	JichitaiContext jichitaiContext;
-	@InjectMocks
-	OpeLogViewServiceImpl service;
+    @Mock ScreenRepository screenRepository;
+    @Mock OperationLogRepository operationLogRepository;
+    @Mock JichitaiContext jichitaiContext;
 
-	private static final String JICHITAI_CD = "011002";
+    @InjectMocks OpeLogViewServiceImpl service;
 
-	@Test
-	void search_mapsLogToDto() {
-		OperationLog log = new OperationLog();
-		log.setSeq(1L);
-		log.setScreenId("SCR001");
-		log.setSousa("登録");
-		log.setOpeUser("user01");
+    private static final String JICHITAI_CD = "011002";
 
-		Screen screen = new Screen();
-		screen.setScreenId("SCR001");
-		screen.setScreenName("特別徴収義務者管理");
+    private Screen screen(String screenId, String screenName) {
+        Screen s = new Screen();
+        s.setScreenId(screenId);
+        s.setScreenName(screenName);
+        return s;
+    }
 
-		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-		when(operationLogRepository.findByConditions(eq(JICHITAI_CD), any(), any(), any(), any(), any()))
-				.thenReturn(List.of(log));
-		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen));
+    private OperationLog log(Long seq, String screenId, String sousa, String opeUser, LocalDateTime opeDt) {
+        OperationLog log = new OperationLog();
+        log.setSeq(seq);
+        log.setScreenId(screenId);
+        log.setSousa(sousa);
+        log.setOpeUser(opeUser);
+        log.setOpeDt(opeDt);
+        return log;
+    }
 
-		OpeLogViewDto form = new OpeLogViewDto();
-		List<OpeLogViewDto> result = service.search(form);
+    // ===== No.8: search 正常系 - 全条件指定・結果あり → 全フィールドがDTOにマッピングされる =====
+    @Test
+    void search_全条件指定_全フィールドがDTOにマッピングされる() {
+        LocalDateTime opeDt = LocalDateTime.of(2024, 6, 1, 10, 0);
+        OperationLog log = log(1L, "S001", "検索", "user01", opeDt);
+        Screen screen = screen("S001", "操作ログ照会");
 
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getScreenId()).isEqualTo("SCR001");
-		assertThat(result.get(0).getScreenName()).isEqualTo("特別徴収義務者管理");
-		assertThat(result.get(0).getSousa()).isEqualTo("登録");
-	}
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(eq(JICHITAI_CD), eq("S001"), eq("検索"), eq("user01"),
+                eq("2024-01-01T00:00"), eq("2024-12-31T23:59"))).thenReturn(List.of(log));
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen));
 
-	@Test
-	void search_unknownScreenId_fallsBackToId() {
-		OperationLog log = new OperationLog();
-		log.setScreenId("UNKNOWN");
+        OpeLogViewDto form = new OpeLogViewDto();
+        form.setScreenId("S001");
+        form.setSousa("検索");
+        form.setOpeUser("user01");
+        form.setOpeDtFrom("2024-01-01T00:00");
+        form.setOpeDtTo("2024-12-31T23:59");
 
-		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-		when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
-				.thenReturn(List.of(log));
-		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
+        List<OpeLogViewDto> results = service.search(form);
 
-		List<OpeLogViewDto> result = service.search(new OpeLogViewDto());
+        assertThat(results).hasSize(1);
+        OpeLogViewDto dto = results.get(0);
+        assertThat(dto.getSeq()).isEqualTo(1L);
+        assertThat(dto.getScreenId()).isEqualTo("S001");
+        assertThat(dto.getScreenName()).isEqualTo("操作ログ照会");
+        assertThat(dto.getSousa()).isEqualTo("検索");
+        assertThat(dto.getOpeUser()).isEqualTo("user01");
+        assertThat(dto.getOpeDt()).isEqualTo(opeDt);
+    }
 
-		assertThat(result.get(0).getScreenName()).isEqualTo("UNKNOWN");
-	}
+    // ===== No.9: search 正常系 - 全条件null → findByConditionsにnullが渡される =====
+    @Test
+    void search_全条件null_findByConditionsにnullが渡される() {
+        OperationLog log = log(1L, "S001", "検索", "user01", null);
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(JICHITAI_CD, null, null, null, null, null))
+                .thenReturn(List.of(log));
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
 
-	@Test
-	void search_emptyLogs_returnsEmptyList() {
-		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-		when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
-				.thenReturn(List.of());
-		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
+        List<OpeLogViewDto> results = service.search(new OpeLogViewDto());
 
-		assertThat(service.search(new OpeLogViewDto())).isEmpty();
-	}
+        assertThat(results).hasSize(1);
+        verify(operationLogRepository).findByConditions(JICHITAI_CD, null, null, null, null, null);
+    }
 
-	@Test
-	void findAllScreens_delegatesToRepository() {
-		Screen screen = new Screen();
-		when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen));
+    // ===== No.10: search 正常系 - 検索結果が0件 → 空リストを返す =====
+    @Test
+    void search_検索結果が0件_空リストを返す() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of());
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
 
-		assertThat(service.findAllScreens()).hasSize(1);
-	}
+        assertThat(service.search(new OpeLogViewDto())).isEmpty();
+    }
+
+    // ===== No.11: search 正常系 - screenIdがマスタに一致 → screenNameが解決される =====
+    @Test
+    void search_screenIdがマスタに一致_screenNameが解決される() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(log(1L, "S001", "", "", null)));
+        when(screenRepository.findAllByOrderByScreenIdAsc())
+                .thenReturn(List.of(screen("S001", "操作ログ照会")));
+
+        List<OpeLogViewDto> results = service.search(new OpeLogViewDto());
+
+        assertThat(results.get(0).getScreenName()).isEqualTo("操作ログ照会");
+    }
+
+    // ===== No.12: search 正常系 - screenIdがマスタに不一致 → screenIdをそのままscreenNameに使用 =====
+    @Test
+    void search_screenIdがマスタに不一致_screenIdをscreenNameに使用() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(log(1L, "S999", "", "", null)));
+        when(screenRepository.findAllByOrderByScreenIdAsc())
+                .thenReturn(List.of(screen("S001", "操作ログ照会")));
+
+        List<OpeLogViewDto> results = service.search(new OpeLogViewDto());
+
+        assertThat(results.get(0).getScreenName()).isEqualTo("S999");
+    }
+
+    // ===== No.13: search 正常系 - log.screenIdがnull → screenNameが空文字 =====
+    @Test
+    void search_screenIdがnull_screenNameが空文字() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(log(1L, null, "", "", null)));
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
+
+        List<OpeLogViewDto> results = service.search(new OpeLogViewDto());
+
+        assertThat(results.get(0).getScreenName()).isEqualTo("");
+    }
+
+    // ===== No.14: search 正常系 - screenIdの前後に空白あり → strip()で一致してscreenNameが解決される =====
+    @Test
+    void search_screenIdの前後に空白あり_strip後に一致してscreenNameが解決される() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(log(1L, " S001 ", "", "", null)));
+        when(screenRepository.findAllByOrderByScreenIdAsc())
+                .thenReturn(List.of(screen("S001", "操作ログ照会")));
+
+        List<OpeLogViewDto> results = service.search(new OpeLogViewDto());
+
+        assertThat(results.get(0).getScreenName()).isEqualTo("操作ログ照会");
+    }
+
+    // ===== No.15: search 正常系 - 複数件ログあり → 全件DTOに変換される =====
+    @Test
+    void search_複数件ログあり_全件DTOに変換される() {
+        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
+        when(operationLogRepository.findByConditions(any(), any(), any(), any(), any(), any()))
+                .thenReturn(List.of(
+                        log(1L, "S001", "", "", null),
+                        log(2L, "S001", "", "", null),
+                        log(3L, "S001", "", "", null)));
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
+
+        assertThat(service.search(new OpeLogViewDto())).hasSize(3);
+    }
+
+    // ===== No.16: findAllScreens 正常系 - 画面マスタあり → リストを返す =====
+    @Test
+    void findAllScreens_画面マスタあり_リストを返す() {
+        Screen screen1 = screen("S001", "操作ログ照会");
+        Screen screen2 = screen("S002", "帳票ログ照会");
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of(screen1, screen2));
+
+        List<Screen> result = service.findAllScreens();
+
+        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(screen1, screen2);
+    }
+
+    // ===== No.17: findAllScreens 正常系 - 画面マスタが0件 → 空リストを返す =====
+    @Test
+    void findAllScreens_画面マスタが0件_空リストを返す() {
+        when(screenRepository.findAllByOrderByScreenIdAsc()).thenReturn(List.of());
+
+        assertThat(service.findAllScreens()).isEmpty();
+    }
 }

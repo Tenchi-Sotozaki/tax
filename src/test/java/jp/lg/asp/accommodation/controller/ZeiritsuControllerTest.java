@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
 import jp.lg.asp.accommodation.dto.ZeiritsuForm;
+import jp.lg.asp.accommodation.dto.ZeiritsuListItem;
 import jp.lg.asp.accommodation.dto.ZeiritsuSearchForm;
 import jp.lg.asp.accommodation.entity.Zeiritsu;
 import jp.lg.asp.accommodation.service.ZeiritsuService;
@@ -64,6 +65,72 @@ class ZeiritsuControllerTest {
         assertThat(view).isEqualTo("admin/zeiritsuDaicho");
         assertThat(model.asMap()).containsKey("items");
         assertThat(model.asMap()).containsEntry("isSearched", true);
+    }
+
+    // --- 追加テストケース ---
+
+    @Test
+    void list_tekiyoYmFromなし_checkAccessが呼ばれisSearchedFalseでitemsが空リストでsearchFormがmodelに設定されLIST_VIEWが返る() {
+        ZeiritsuSearchForm searchForm = new ZeiritsuSearchForm();
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(searchForm, null, model);
+
+        verify(accessChecker).checkAccess(any());
+        assertThat(view).isEqualTo("admin/zeiritsuDaicho");
+        assertThat(model.asMap()).containsEntry("isSearched", false);
+        assertThat((List<?>) model.asMap().get("items")).isEmpty();
+        assertThat(model.asMap()).containsEntry("searchForm", searchForm);
+        verify(zeiritsuService, never()).search(any(), any());
+    }
+
+    @Test
+    void list_tekiyoYmFromあり_checkAccessが呼ばれisSearchedTrueでsearchが呼ばれitemsがmodelに設定されLIST_VIEWが返る() {
+        ZeiritsuSearchForm searchForm = new ZeiritsuSearchForm();
+        ZeiritsuListItem item = new ZeiritsuListItem(
+                BigDecimal.ONE, "1", "定額", "202401", "202412", "1", "市");
+        when(zeiritsuService.search(eq("011002"), eq(searchForm))).thenReturn(List.of(item));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(searchForm, "2024-01", model);
+
+        verify(accessChecker).checkAccess(any());
+        verify(zeiritsuService).search(eq("011002"), eq(searchForm));
+        assertThat(view).isEqualTo("admin/zeiritsuDaicho");
+        assertThat(model.asMap()).containsEntry("isSearched", true);
+        assertThat((List<ZeiritsuListItem>) model.asMap().get("items")).containsExactly(item);
+    }
+
+    @Test
+    void list_検索結果0件_checkAccessが呼ばれisSearchedTrueでitemsが空リストでLIST_VIEWが返る() {
+        ZeiritsuSearchForm searchForm = new ZeiritsuSearchForm();
+        when(zeiritsuService.search(eq("011002"), eq(searchForm))).thenReturn(List.of());
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(searchForm, "2024-01", model);
+
+        verify(accessChecker).checkAccess(any());
+        assertThat(view).isEqualTo("admin/zeiritsuDaicho");
+        assertThat(model.asMap()).containsEntry("isSearched", true);
+        assertThat((List<?>) model.asMap().get("items")).isEmpty();
+    }
+
+    @Test
+    void list_検索結果複数件_checkAccessが呼ばれisSearchedTrueでitems全件がmodelに設定されLIST_VIEWが返る() {
+        ZeiritsuSearchForm searchForm = new ZeiritsuSearchForm();
+        ZeiritsuListItem item1 = new ZeiritsuListItem(
+                BigDecimal.ONE, "1", "定額", "202401", "202412", "1", "市");
+        ZeiritsuListItem item2 = new ZeiritsuListItem(
+                BigDecimal.valueOf(2), "2", "定率", "202501", null, "2", "県");
+        when(zeiritsuService.search(eq("011002"), eq(searchForm))).thenReturn(List.of(item1, item2));
+        Model model = new ExtendedModelMap();
+
+        String view = controller.list(searchForm, "2024-01", model);
+
+        verify(accessChecker).checkAccess(any());
+        assertThat(view).isEqualTo("admin/zeiritsuDaicho");
+        assertThat(model.asMap()).containsEntry("isSearched", true);
+        assertThat((List<ZeiritsuListItem>) model.asMap().get("items")).containsExactly(item1, item2);
     }
 
     @Test

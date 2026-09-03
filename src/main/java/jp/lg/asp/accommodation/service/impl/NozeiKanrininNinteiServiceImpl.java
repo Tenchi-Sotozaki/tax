@@ -43,7 +43,12 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         // 未設定の場合のみ従来どおり自治体名からの組み立てにフォールバックする
         String jorei = reportsCommonService.getReportsDefText(ReportsConstants.NOZEI_KANRININ_NINTEI_JOREI);
         if (jorei == null || jorei.isEmpty()) {
-            jorei = jichitai != null ? jichitai.getName() + "宿泊税条例" : "宿泊税条例";
+            throw new RuntimeException("帳票出力項目が未設定です。管理者にお問い合わせください。");
+        }
+
+        byte[] koin = reportsCommonService.getReportsDefData(ReportsConstants.KOIN);
+        if (koin == null || koin.length == 0) {
+            throw new RuntimeException("公印が未設定です。管理者にお問い合わせください。");
         }
 
         NozeiKanrininNinteiDto dto = new NozeiKanrininNinteiDto();
@@ -51,7 +56,7 @@ public class NozeiKanrininNinteiServiceImpl implements NozeiKanrininNinteiServic
         dto.setCityName(cityName);
         dto.setJorei(jorei);
         dto.setNintei("認定");
-        dto.setKoin(reportsCommonService.getReportsDefData(ReportsConstants.KOIN));
+        dto.setKoin(koin);
 
         // 特別徴収義務者情報を取得
         Tokugimu tokugimu = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)

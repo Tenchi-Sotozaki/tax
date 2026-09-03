@@ -194,4 +194,7 @@ public final class ScreenManagement {
 
 	// 送付先CSV出力
 	public static final String SOFUSAKI_CSV = "mo00000005";
+
+	// ユーザーパスワード変更
+	public static final String USER_PASSWORD_CHANGE = "sc00000015";
 }

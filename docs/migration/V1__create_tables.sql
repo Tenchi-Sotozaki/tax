@@ -723,30 +723,6 @@ COMMENT ON COLUMN t_eltax_renkei.upd_user IS '更新者';
 COMMENT ON COLUMN t_eltax_renkei.version IS 'バージョン';
 
 ------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS m_nozei_shuki (
-  jichitai_cd char(5) NOT NULL,
-  seq numeric(3) NOT NULL,
-  shuki numeric(2) NOT NULL,
-  del_flg char(1) NOT NULL,
-  add_dt timestamp NOT NULL,
-  add_user text NOT NULL,
-  upd_dt timestamp NOT NULL,
-  upd_user text NOT NULL,
-  version integer NOT NULL,
-  CONSTRAINT m_nozei_shuki_pkey PRIMARY KEY (jichitai_cd, seq)
-);
-COMMENT ON TABLE m_nozei_shuki IS '納税周期マスタ';
-COMMENT ON COLUMN m_nozei_shuki.jichitai_cd IS '自治体コード';
-COMMENT ON COLUMN m_nozei_shuki.seq IS '管理番号';
-COMMENT ON COLUMN m_nozei_shuki.shuki IS '納税周期';
-COMMENT ON COLUMN m_nozei_shuki.del_flg IS '削除フラグ';
-COMMENT ON COLUMN m_nozei_shuki.add_dt IS '作成日時';
-COMMENT ON COLUMN m_nozei_shuki.add_user IS '作成者';
-COMMENT ON COLUMN m_nozei_shuki.upd_dt IS '更新日時';
-COMMENT ON COLUMN m_nozei_shuki.upd_user IS '更新者';
-COMMENT ON COLUMN m_nozei_shuki.version IS 'バージョン';
-
-------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_zeiritsu (
   jichitai_cd char(5) NOT NULL,
   seq numeric(5) NOT NULL,
@@ -916,24 +892,24 @@ COMMENT ON COLUMN m_role_dtl.version IS 'バージョン';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_screen (
-  jichitai_cd char(5) NOT NULL,
   screen_id char(10) NOT NULL,
   screen_name text NOT NULL,
   kbn text NOT NULL,
   dsp_odr integer NOT NULL,
+  dsp_kbn char(1) NOT NULL,
   add_dt timestamp NOT NULL,
   add_user text NOT NULL,
   upd_dt timestamp NOT NULL,
   upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT m_screen_pkey PRIMARY KEY (jichitai_cd, screen_id)
+  CONSTRAINT m_screen_pkey PRIMARY KEY (screen_id)
 );
 COMMENT ON TABLE m_screen IS '画面管理マスタ';
-COMMENT ON COLUMN m_screen.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_screen.screen_id IS '画面ＩＤ';
 COMMENT ON COLUMN m_screen.screen_name IS '画面名称';
 COMMENT ON COLUMN m_screen.kbn IS '区分';
 COMMENT ON COLUMN m_screen.dsp_odr IS '表示順';
+COMMENT ON COLUMN m_screen.dsp_kbn IS '表示区分';
 COMMENT ON COLUMN m_screen.add_dt IS '作成日時';
 COMMENT ON COLUMN m_screen.add_user IS '作成者';
 COMMENT ON COLUMN m_screen.upd_dt IS '更新日時';
@@ -1200,7 +1176,6 @@ COMMENT ON COLUMN t_koin_torikomi.version IS 'バージョン';
 
 ------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS m_reports (
-  jichitai_cd char(5) NOT NULL,
   rpt_id char(10) NOT NULL,
   rpt_name text NOT NULL,
   add_dt timestamp NOT NULL,
@@ -1208,10 +1183,9 @@ CREATE TABLE IF NOT EXISTS m_reports (
   upd_dt timestamp NOT NULL,
   upd_user text NOT NULL,
   version integer NOT NULL,
-  CONSTRAINT m_reports_pkey PRIMARY KEY (jichitai_cd, rpt_id)
+  CONSTRAINT m_reports_pkey PRIMARY KEY (rpt_id)
 );
 COMMENT ON TABLE m_reports IS '帳票管理マスタ';
-COMMENT ON COLUMN m_reports.jichitai_cd IS '自治体コード';
 COMMENT ON COLUMN m_reports.rpt_id IS '帳票ＩＤ';
 COMMENT ON COLUMN m_reports.rpt_name IS '帳票名称';
 COMMENT ON COLUMN m_reports.add_dt IS '作成日時';
