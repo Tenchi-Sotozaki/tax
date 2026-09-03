@@ -64,6 +64,15 @@ public class KanpuMenjoTsuchiController {
 
 		String effectiveShiteiNo = shiteiNo != null ? shiteiNo : gassanShiteiNo;
 
+        Jichitai jichitai;
+        try {
+            jichitai = kanpuMenjoTsuchiReportsService.findJichitai(jichitaiCode);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "error";
+        }
+        String cityName = jichitai.getName();
+
         try {
             log.debug("徴収不能額の還付又は納入義務の免除決定通知書画面表示開始: shiteiNo={}", effectiveShiteiNo);
 
@@ -73,9 +82,6 @@ public class KanpuMenjoTsuchiController {
                 model.addAttribute("errorMessage", "指定された特別徴収義務者が見つかりません。");
                 return "error";
             }
-
-            Jichitai jichitai = kanpuMenjoTsuchiReportsService.findJichitai(jichitaiCode);
-            String cityName = jichitai != null ? jichitai.getName() : "";
 
             KanpuMenjoTsuchiDto dto = new KanpuMenjoTsuchiDto();
             dto.setShiteiNo(effectiveShiteiNo);
@@ -88,13 +94,12 @@ public class KanpuMenjoTsuchiController {
 			dto.setTokuJusho(tokugimuForm.getTokugimuAddress());
 			dto.setShisetsuName(tokugimuForm.getFacilityName());
 
-			if (tokugimuForm.getFacilityAddressNo() != null && !tokugimuForm.getFacilityAddressNo().isEmpty()) {
-				dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
+			if (tokugimuForm.getFacilityAddressNo() == null || tokugimuForm.getFacilityAddressNo().isEmpty()) {
+				model.addAttribute("errorMessage", "施設情報が見つかりませんでした。");
+				return "error";
 			}
-
-			if (tokugimuForm.getFacilityAddress() != null && !tokugimuForm.getFacilityAddress().isEmpty()) {
-				dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
-			}
+			dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
+			dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
 
             model.addAttribute("dto", dto);
 

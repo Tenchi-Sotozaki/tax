@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.controller;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -27,9 +28,6 @@ import jp.lg.asp.accommodation.dto.TopPageConfigForm;
 import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.service.MarkdownService;
 import jp.lg.asp.accommodation.service.TopPageService;
-
-@ExtendWith(MockitoExtension.class)
-class TopPageControllerTest {
 
     private static final String SCREEN_ID_CONFIG = ScreenManagement.TOP_PAGE_CONFIG;
 
@@ -59,7 +57,7 @@ class TopPageControllerTest {
         assertThat(content.getTitleHtml()).isEqualTo("<h1>タイトル</h1>");
         assertThat(content.getContentHtml()).isEqualTo("<p>本文</p>");
         verify(topPageService).findShared();
-        verify(model).addAttribute("sharedList", sharedList);
+        assertThat(((List<TopPageContent>) model.getAttribute("sharedList"))).isEqualTo(sharedList);
     }
 
     @Test
@@ -577,5 +575,91 @@ class TopPageControllerTest {
         c.setPostingStartDate(start);
         c.setPostingEndDate(end);
         return c;
+    }
+
+    private TopPageContent content(Integer seq, String title, String htmlContent) {
+        TopPageContent c = new TopPageContent();
+        c.setSeq(seq);
+        c.setTitle(title);
+        c.setHtmlContent(htmlContent);
+        return c;
+    }
+
+    // ─── index (#1〜#4) ──────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("#1 index 正常系 掲載中の共有コンテンツがHTML変換されて画面に渡る")
+    void index_掲載中の共有コンテンツがHTML変換されて画面に渡る() {
+        TopPageContent content1 = content(1, "# お知らせ", "**本文1**");
+        TopPageContent content2 = content(2, "## 更新情報", "本文2");
+        when(topPageService.findShared()).thenReturn(List.of(content1, content2));
+        when(markdownService.toHtml("# お知らせ")).thenReturn("<h1>お知らせ</h1>");
+        when(markdownService.toHtml("**本文1**")).thenReturn("<p><strong>本文1</strong></p>");
+        when(markdownService.toHtml("## 更新情報")).thenReturn("<h2>更新情報</h2>");
+        when(markdownService.toHtml("本文2")).thenReturn("<p>本文2</p>");
+
+        Model model = new ExtendedModelMap();
+        String result = controller.index(model);
+
+        assertEquals("top/topPage", result);
+
+        @SuppressWarnings("unchecked")
+        List<TopPageContent> sharedList = (List<TopPageContent>) model.asMap().get("sharedList");
+        assertEquals(2, sharedList.size());
+        assertEquals("<h1>お知らせ</h1>", sharedList.get(0).getTitleHtml());
+        assertEquals("<p><strong>本文1</strong></p>", sharedList.get(0).getContentHtml());
+        assertEquals("<h2>更新情報</h2>", sharedList.get(1).getTitleHtml());
+        assertEquals("<p>本文2</p>", sharedList.get(1).getContentHtml());
+        assertEquals("# お知らせ", sharedList.get(0).getTitle());
+        assertEquals("**本文1**", sharedList.get(0).getHtmlContent());
+        assertEquals("## 更新情報", sharedList.get(1).getTitle());
+        assertEquals("本文2", sharedList.get(1).getHtmlContent());
+        ArgumentCaptor<String> markdownCaptor = ArgumentCaptor.forClass(String.class);
+        verify(markdownService, times(4)).toHtml(markdownCaptor.capture());
+        assertEquals(List.of("# お知らせ", "**本文1**", "## 更新情報", "本文2"),
+                markdownCaptor.getAllValues());
+    }
+
+    @Test
+    @DisplayName("#2 index 異常系 掲載中のコンテンツが0件の場合")
+    void index_掲載中のコンテンツが0件() {
+        when(topPageService.findShared()).thenReturn(List.of());
+
+        Model model = new ExtendedModelMap();
+        String result = controller.index(model);
+
+        assertEquals("top/topPage", result);
+        List<?> sharedList = (List<?>) model.asMap().get("sharedList");
+        assertNotNull(sharedList);
+        assertTrue(sharedList.isEmpty());
+        verify(markdownService, never()).toHtml(any());
+    }
+
+    @Test
+    @DisplayName("#3 index 異常系 タイトル・本文が null のコンテンツがある場合")
+    void index_タイトルと本文がnull() {
+        TopPageContent target = content(1, null, null);
+        when(topPageService.findShared()).thenReturn(List.of(target));
+        when(markdownService.toHtml(null)).thenReturn("");
+
+        Model model = new ExtendedModelMap();
+        assertDoesNotThrow(() -> controller.index(model));
+
+        @SuppressWarnings("unchecked")
+        List<TopPageContent> sharedList = (List<TopPageContent>) model.asMap().get("sharedList");
+        assertEquals("", sharedList.get(0).getTitleHtml());
+        assertEquals("", sharedList.get(0).getContentHtml());
+        verify(markdownService, times(2)).toHtml(null);
+    }
+
+    @Test
+    @DisplayName("#4 index 異常系 サービスが例外をスローした場合")
+    void index_サービスが例外をスロー() {
+        when(topPageService.findShared()).thenThrow(new RuntimeException("DB error"));
+
+        Model model = new ExtendedModelMap();
+        RuntimeException e = assertThrows(RuntimeException.class, () -> controller.index(model));
+        assertEquals("DB error", e.getMessage());
+        verify(markdownService, never()).toHtml(any());
     }
 }
