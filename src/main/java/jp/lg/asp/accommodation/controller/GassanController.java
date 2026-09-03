@@ -158,7 +158,7 @@ public class GassanController {
 	@PostMapping("/edit")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集")
 	public String updateGassan(
-			@Validated @ModelAttribute("GassanForm") GassanForm form,
+			@ModelAttribute("GassanForm") GassanForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes,
@@ -171,7 +171,8 @@ public class GassanController {
 			return "redirect:/gassan/edit";
 		}
 
-		if (bindingResult.hasErrors()) {
+		Map<String, String> editErrors = GassanForm.validateForEdit(form);
+		if (editErrors.containsKey("tekiyoStYmd")) {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", true);
 			model.addAttribute("isView", false);
@@ -180,7 +181,7 @@ public class GassanController {
 					form.getTekiyoStYmd() != null && form.getTekiyoStYmd().isAfter(java.time.LocalDate.now()));
 			model.addAttribute("editable",
 					form.getTekiyoEdYmd() == null || form.getTekiyoEdYmd().isAfter(java.time.LocalDate.now()));
-			model.addAttribute("validationErrors", GassanForm.validateForEdit(form).values());
+			model.addAttribute("validationErrors", editErrors.values());
 			return FORM_VIEW;
 		}
 
@@ -198,11 +199,11 @@ public class GassanController {
 					form.getTekiyoStYmd() != null && form.getTekiyoStYmd().isAfter(java.time.LocalDate.now()));
 			// エラー時は editable を DB の値ではなくフォーム送信値で判定しない（常に編集可能にする）
 			model.addAttribute("editable", true);
-			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
-				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
-				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
-			} else if (e.getMessage() != null && e.getMessage().contains("適用終了年月")) {
+			if (e.getMessage() != null && e.getMessage().contains("適用終了年月は適用開始年月")) {
 				bindingResult.rejectValue("tekiyoEdYmd", "error.tekiyoEdYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
+				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
 				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
 			} else {
 				model.addAttribute("errorMessage", e.getMessage());
@@ -224,7 +225,7 @@ public class GassanController {
 	@PostMapping("/registration")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "登録")
 	public String register(
-			@Validated(GassanForm.RegisterGroup.class) @ModelAttribute("GassanForm") GassanForm form,
+			@ModelAttribute("GassanForm") GassanForm form,
 			BindingResult bindingResult,
 			Model model,
 			RedirectAttributes redirectAttributes,
@@ -232,12 +233,13 @@ public class GassanController {
 		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 		boolean isReRegister = SessionHelper.getGassanShiteiNo(session) != null;
-		if (bindingResult.hasErrors()) {
+		Map<String, String> registerErrors = GassanForm.validate(form);
+		if (!registerErrors.isEmpty()) {
 			gassanService.reloadFacilityList(form);
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
 			model.addAttribute("isReRegister", isReRegister);
-			model.addAttribute("validationErrors", GassanForm.validate(form).values());
+			model.addAttribute("validationErrors", registerErrors.values());
 			return FORM_VIEW;
 		}
 		try {
@@ -253,11 +255,11 @@ public class GassanController {
 			model.addAttribute("isEdit", false);
 			model.addAttribute("isView", false);
 			model.addAttribute("isReRegister", isReRegister);
-			if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
-				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
-				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
-			} else if (e.getMessage() != null && e.getMessage().contains("適用終了年月")) {
+			if (e.getMessage() != null && e.getMessage().contains("適用終了年月は適用開始年月")) {
 				bindingResult.rejectValue("tekiyoEdYmd", "error.tekiyoEdYmd", e.getMessage());
+				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
+			} else if (e.getMessage() != null && e.getMessage().contains("適用開始年月")) {
+				bindingResult.rejectValue("tekiyoStYmd", "error.tekiyoStYmd", e.getMessage());
 				model.addAttribute("validationErrors", java.util.List.of(e.getMessage()));
 			} else {
 				model.addAttribute("errorMessage", e.getMessage());
