@@ -140,7 +140,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			shisetsuNoIdx = findIndexByName(yoshikiMap, "施設情報【施設番号（宿泊施設番号、指定番号）】");
 			break;
 		default:
-			throw new RuntimeException("システム対応外の手続き種別です: " + shubetsu);
+			throw new RuntimeException("システム対応外の手続き種別です: " + tetsuzukiId);
 		}
 		String shiteiNo = overrideShiteiNo != null ? overrideShiteiNo : getDataValue(dataRow, shisetsuNoIdx);
 
@@ -228,7 +228,7 @@ public class EltaxRenkeiKakuninServiceImpl implements EltaxRenkeiKakuninService 
 			diffRows = buildDiffRowsFuka(dataRow, yoshikiMap, shiteiNo, shubetsu);
 			break;
 		default:
-			throw new RuntimeException("システム対応外の手続き種別です: " + shubetsu);
+			throw new RuntimeException("システム対応外の手続き種別です: " + tetsuzukiId);
 		}
 
 		EltaxRenkeiKakuninDto dto = new EltaxRenkeiKakuninDto(

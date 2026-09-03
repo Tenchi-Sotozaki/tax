@@ -162,6 +162,11 @@ class KofuKetteiTsuchiShinseiReportsServiceImplTest {
 	@DisplayName("generateBulkPdf メソッドのテスト")
 	class GenerateBulkPdfTest {
 
+		@BeforeEach
+		void setUp() {
+			setValidAuthentication();
+		}
+
 		@Test
 		@DisplayName("異常系：認証情報が未認証の場合にAccessDeniedExceptionがスローされること")
 		void error_unauthenticatedUser() {
