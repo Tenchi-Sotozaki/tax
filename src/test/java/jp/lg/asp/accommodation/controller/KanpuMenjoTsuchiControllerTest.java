@@ -142,7 +142,6 @@ class KanpuMenjoTsuchiControllerTest {
     @Test
     void index_正常系_findJichitaiがnull_エラー画面を返す() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011001");
-        when(tokugimuService.getTokugimuByShiteiNo("S001")).thenReturn(fullTokugimuForm());
         when(kanpuMenjoTsuchiReportsService.findJichitai(any()))
                 .thenThrow(new IllegalArgumentException("自治体情報が見つかりませんでした。"));
         Model model = new ExtendedModelMap();
@@ -174,6 +173,7 @@ class KanpuMenjoTsuchiControllerTest {
     @Test
     void index_異常系_tokugimuFormがnull_エラー画面() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011001");
+        when(kanpuMenjoTsuchiReportsService.findJichitai(any())).thenReturn(jichitai("大阪市"));
         when(tokugimuService.getTokugimuByShiteiNo("S001")).thenReturn(null);
         Model model = new ExtendedModelMap();
 
@@ -190,13 +190,14 @@ class KanpuMenjoTsuchiControllerTest {
     @Test
     void index_異常系_サービスがRuntimeException_エラー画面() {
         when(jichitaiContext.getJichitaiCd()).thenReturn("011001");
+        when(kanpuMenjoTsuchiReportsService.findJichitai(any())).thenReturn(jichitai("大阪市"));
         when(tokugimuService.getTokugimuByShiteiNo(any())).thenThrow(new RuntimeException("DBエラー"));
         Model model = new ExtendedModelMap();
 
         String view = controller.index(sessionWith("S001"), null, model);
 
         assertThat(view).isEqualTo("error");
-        assertThat(model.asMap()).containsEntry("errorMessage", "自治体情報が見つかりませんでした。");
+        assertThat(model.asMap()).containsEntry("errorMessage", "画面表示中にエラーが発生しました。");
     }
 
     // =======================================================================
