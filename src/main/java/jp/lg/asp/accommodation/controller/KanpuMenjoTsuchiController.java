@@ -75,7 +75,7 @@ public class KanpuMenjoTsuchiController {
             }
 
             Jichitai jichitai = kanpuMenjoTsuchiReportsService.findJichitai(jichitaiCode);
-            String cityName = jichitai != null ? jichitai.getName() : "";
+            String cityName = jichitai.getName();
 
             KanpuMenjoTsuchiDto dto = new KanpuMenjoTsuchiDto();
             dto.setShiteiNo(effectiveShiteiNo);
@@ -88,13 +88,12 @@ public class KanpuMenjoTsuchiController {
 			dto.setTokuJusho(tokugimuForm.getTokugimuAddress());
 			dto.setShisetsuName(tokugimuForm.getFacilityName());
 
-			if (tokugimuForm.getFacilityAddressNo() != null && !tokugimuForm.getFacilityAddressNo().isEmpty()) {
-				dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
+			if (tokugimuForm.getFacilityAddressNo() == null || tokugimuForm.getFacilityAddressNo().isEmpty()) {
+				model.addAttribute("errorMessage", "施設情報が見つかりませんでした。");
+				return "error";
 			}
-
-			if (tokugimuForm.getFacilityAddress() != null && !tokugimuForm.getFacilityAddress().isEmpty()) {
-				dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
-			}
+			dto.setShisetsuYubin("〒" + tokugimuForm.getFacilityAddressNo());
+			dto.setShisetsuJusho(tokugimuForm.getFacilityAddress());
 
             model.addAttribute("dto", dto);
 
