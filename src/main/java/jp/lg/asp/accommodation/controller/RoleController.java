@@ -25,7 +25,9 @@ import jp.lg.asp.accommodation.entity.User;
 import jp.lg.asp.accommodation.repository.UserRepository;
 import jp.lg.asp.accommodation.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin/role")
 @RequiredArgsConstructor
@@ -55,7 +57,7 @@ public class RoleController {
 			model.addAttribute("defaultRoleId", UserRepository.DEFAULT_USER_ROLE_ID);
 			return "admin/roleManagement";
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("ロール一覧取得中にエラーが発生しました", e);
 			model.addAttribute("roles", java.util.Collections.emptyList());
 			model.addAttribute("screenGroups", java.util.Collections.emptyMap());
 			model.addAttribute("defaultRoleId", UserRepository.DEFAULT_USER_ROLE_ID);
