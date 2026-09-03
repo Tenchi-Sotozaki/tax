@@ -64,6 +64,8 @@ public class TopPageController {
 	        @RequestParam(defaultValue = "10") int pageSize,
 	        Model model) {
 
+	    accessChecker.checkAccess(SCREEN_ID_CONFIG);
+
 	    List<TopPageContent> items =
 	            topPageService.findAll();
 
@@ -76,7 +78,7 @@ public class TopPageController {
 	@GetMapping("/config")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String config(Model model) {
-		accessChecker.checkAccess(SCREEN_ID_CONFIG);
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		model.addAttribute("form", topPageService.loadForm());
 		return "top/topPageConfig";
 	}
@@ -84,13 +86,14 @@ public class TopPageController {
 	@PostMapping("/config/preview")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "プレビュー")
 	public String preview(@ModelAttribute("form") TopPageConfigForm form, Model model) {
+		accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 		String previewTitle = markdownService.toHtml(form.getTitle());
 		String previewHtml = markdownService.toHtml(form.getHtmlContent());
-	
-		model.addAttribute("previewTitle", previewTitle);	
-		model.addAttribute("previewHtml", previewHtml);	
-		
-		model.addAttribute("form", form);	
+
+		model.addAttribute("previewTitle", previewTitle);
+		model.addAttribute("previewHtml", previewHtml);
+
+		model.addAttribute("form", form);
 		model.addAttribute("preview", true);
 		return "top/topPageConfig";
 	}
@@ -103,6 +106,8 @@ public class TopPageController {
 	        BindingResult bindingResult,
 	        Model model,
 	        RedirectAttributes redirectAttributes) {
+
+	    accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 	    // 掲載開始日・終了日の整合性チェック
 	    if (form.getPostingStartDate() != null
@@ -142,16 +147,16 @@ public class TopPageController {
 			return "top/topPageConfig";
 		}
 
-		return "redirect:/top/config";
+		return "redirect:/top/topPageConfigDaicho";
 	}
-	
+
 	@GetMapping("/config/{seq}")
 	@OpeLog(screenId = SCREEN_ID_CONFIG, operation = "編集画面表示")
 	public String edit(
 	        @PathVariable Integer seq,
 	        Model model) {
 
-	    accessChecker.checkAccess(SCREEN_ID_CONFIG);
+	    accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 	    TopPageContent content =
 	            topPageService.findBySeq(seq);
@@ -175,7 +180,7 @@ public class TopPageController {
 	        @PathVariable Integer seq,
 	        RedirectAttributes redirectAttributes) {
 
-	    accessChecker.checkAccess(SCREEN_ID_CONFIG);
+	    accessChecker.checkWriteAccess(SCREEN_ID_CONFIG);
 
 	    topPageService.delete(seq);
 
