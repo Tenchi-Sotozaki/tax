@@ -20,8 +20,8 @@ public interface GassanService {
     /** 指定番号から登録フォームの初期値を生成する */
     GassanForm buildFormByShiteiNo(String shiteiNo);
 
-    /** 合算申告を新規登録する */
-    void register(GassanForm form);
+    /** 合算申告を新規登録する（gassanShiteiNo が非nullなら再登録）。登録した合算指定番号を返す */
+    String register(GassanForm form, String gassanShiteiNo);
 
     /** 合算指定番号をキーに合算申告を更新する */
     void updateByGassanShiteiNo(String gassanShiteiNo, GassanForm form);
@@ -38,6 +38,6 @@ public interface GassanService {
     /** 宛名番号に紐づく施設一覧を取得する */
     List<GassanForm.FacilityItem> getFacilitiesByAtenaNo(BigDecimal atenaNo);
 
-    /** 指定番号がすでに合算指定済みかチェックする */
-    void validateNotAlreadyAssigned(List<String> shiteiNoList);
+    /** 指定番号がすでに合算指定済みかチェックする（excludeGassanShiteiNo は除外対象） */
+    void validateNotAlreadyAssigned(List<String> shiteiNoList, String excludeGassanShiteiNo);
 }

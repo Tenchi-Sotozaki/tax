@@ -3,7 +3,7 @@
 	layout:decorate="~{layout/layout}">
 
 <head>
-	<title>特別徴収事務交付金一括算出</title>
+	<title>交付金一括算出</title>
 </head>
 
 <body>
@@ -11,7 +11,7 @@
 		<div class="container-fluid p-4">
 			<div
 				class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-				<h5 class="mb-0 fw-bold text-dark">特別徴収事務交付金一括算出</h5>
+				<h5 class="mb-0 fw-bold text-dark">交付金一括算出</h5>
 			</div>
 
 			<!-- システム設定エラーメッセージ -->
@@ -43,7 +43,7 @@
 							<div class="col-md-3">
 								<label for="kofuRitsu" class="form-label">交付率</label>
 								<div class="input-group">
-									<input type="number" class="form-control" id="kofuRitsu" th:field="*{kofuRitsu}"
+									<input type="number" class="form-control form-control-readonly" id="kofuRitsu" th:field="*{kofuRitsu}"
 										step="0.01" readonly>
 									<span class="input-group-text">%</span>
 								</div>
@@ -70,7 +70,7 @@
 									data-bs-toggle="modal" data-bs-target="#bulkConfirmModal">
 									<i class="bi bi-calculator"></i> 一括算出実行
 								</button>
-								<a th:href="@{/shoreikin/list}" class="btn btn-outline-primary">
+								<a th:href="@{/shoreikin/list}" class="btn btn-outline-secondary">
 									<i class="bi bi-arrow-left"></i> 戻る
 								</a>
 								<ul class="mt-2 mb-0 small text-muted">

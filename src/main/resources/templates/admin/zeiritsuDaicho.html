@@ -17,7 +17,7 @@
 
 		<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
 			<i class="bi bi-check-circle-fill me-2"></i><span th:text="${successMessage}"></span>
-			<button type="button" class="btn-close btn-sm" data-bs-dismiss="alert"></button>
+			<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 		</div>
 
 		<!-- 検索条件 -->
@@ -61,10 +61,10 @@
 
 							</div>
 							<div class="d-flex justify-content-end gap-2 pt-1 border-top">
-								<a th:href="@{/admin/zeiritsu/list}" class="btn btn-outline-secondary btn-sm">
+								<a th:href="@{/admin/zeiritsu/list}" class="btn btn-outline-secondary">
 									<i class="bi bi-arrow-counterclockwise me-1"></i>検索条件初期化
 								</a>
-								<button type="submit" class="btn btn-primary btn-sm px-4">
+								<button type="submit" class="btn btn-primary px-4">
 									<i class="bi bi-search me-1"></i>検索する
 								</button>
 							</div>
@@ -78,7 +78,7 @@
 		<div class="card shadow-sm mb-2">
 			<div class="card-body py-2 px-3">
 				<div class="d-flex gap-2">
-					<a th:href="@{/admin/zeiritsu/register}" class="btn btn-success btn-sm">
+					<a th:href="@{/admin/zeiritsu/register}" class="btn btn-success">
 						<i class="bi bi-plus-lg me-1"></i>新規登録
 					</a>
 				</div>
@@ -110,7 +110,7 @@
 								<td th:text="${item.tekiyoEdYm == null or item.tekiyoEdYm == ''} ? '-' : ${#strings.substring(item.tekiyoEdYm,0,4) + '/' + #strings.substring(item.tekiyoEdYm,4,6)}"></td>
 								<td th:text="${item.taishoKbnName}"></td>
 								<td class="text-center">
-									<a class="btn btn-outline-primary btn-sm" th:href="@{/admin/zeiritsu/view/} + ${item.seq.toBigInteger()}"><i class="bi bi-eye me-1"></i>照会</a>
+									<a class="btn btn-outline-primary" th:href="@{/admin/zeiritsu/view/} + ${item.seq.toBigInteger()}"><i class="bi bi-eye me-1"></i>照会</a>
 								</td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(items)}">

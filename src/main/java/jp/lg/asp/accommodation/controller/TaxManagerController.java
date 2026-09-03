@@ -49,6 +49,13 @@ public class TaxManagerController {
 			String trimmedObligorAtenaNo = obligorAtenaNo != null ? obligorAtenaNo.trim() : "";
 			log.debug("API同一人物チェック: 納税管理人={}, 特徴={}", trimmedTaxManagerAtenaNo, trimmedObligorAtenaNo);
 			
+			if (trimmedObligorAtenaNo.isEmpty()) {
+				return ResponseEntity.ok(Map.of(
+					"isDuplicate", false,
+					"message", "チェック中にエラーが発生しました。"
+				));
+			}
+			
 			boolean isDuplicate = taxManagerService.isSamePerson(trimmedTaxManagerAtenaNo, trimmedObligorAtenaNo);
 			log.debug("API同一人物チェック結果: {}", isDuplicate);
 			
@@ -77,7 +84,16 @@ public class TaxManagerController {
 			model.addAttribute("isView", false);
 			return FORM_VIEW;
 		}
-		TaxManagerForm form = taxManagerService.getByShiteiNo(shiteiNo);
+		TaxManagerForm form;
+		try {
+			form = taxManagerService.getByShiteiNo(shiteiNo);
+		} catch (Exception e) {
+			model.addAttribute("taxManagerForm", new TaxManagerForm());
+			model.addAttribute("errorMessage", e.getMessage());
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
+		}
 
 		// 登録済みの場合は照会画面にリダイレクト
 		if (form.isEdit()) {
@@ -103,7 +119,16 @@ public class TaxManagerController {
 			model.addAttribute("isView", false);
 			return FORM_VIEW;
 		}
-		TaxManagerForm form = taxManagerService.getByShiteiNo(shiteiNo);
+		TaxManagerForm form;
+		try {
+			form = taxManagerService.getByShiteiNo(shiteiNo);
+		} catch (Exception e) {
+			model.addAttribute("taxManagerForm", new TaxManagerForm());
+			model.addAttribute("errorMessage", e.getMessage());
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", false);
+			return FORM_VIEW;
+		}
 
 		// 未登録の場合は登録画面にリダイレクト
 		if (!form.isEdit()) {
@@ -131,9 +156,18 @@ public class TaxManagerController {
 			model.addAttribute("isView", true);
 			return FORM_VIEW;
 		}
-		TaxManagerForm form = (rno != null)
-				? taxManagerService.getByShiteiNoAndRno(shiteiNo, rno)
-				: taxManagerService.getByShiteiNo(shiteiNo);
+		TaxManagerForm form;
+		try {
+			form = (rno != null)
+					? taxManagerService.getByShiteiNoAndRno(shiteiNo, rno)
+					: taxManagerService.getByShiteiNo(shiteiNo);
+		} catch (Exception e) {
+			model.addAttribute("taxManagerForm", new TaxManagerForm());
+			model.addAttribute("errorMessage", e.getMessage());
+			model.addAttribute("isEdit", false);
+			model.addAttribute("isView", true);
+			return FORM_VIEW;
+		}
 
 		// 未登録の場合は登録画面にリダイレクト
 		if (!form.isEdit()) {
@@ -158,11 +192,8 @@ public class TaxManagerController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 		if (shiteiNo == null) {
-			model.addAttribute("taxManagerForm", new TaxManagerForm());
-			model.addAttribute("showShiteiModal", true);
-			model.addAttribute("isEdit", false);
-			model.addAttribute("isView", false);
-			return FORM_VIEW;
+			redirectAttributes.addFlashAttribute("errorMessage", "指定番号がセッションに存在しません。");
+			return "redirect:/tax-manager/register";
 		}
 
 		log.debug("納税管理人保存処理: shiteiNo={}, atenaNo={}, managerName={}, kbn={}", 
@@ -179,7 +210,7 @@ public class TaxManagerController {
 			taxManagerService.saveByShiteiNo(shiteiNo, form);
 			log.debug("納税管理人情報を保存しました。shiteiNo: {}", shiteiNo);
 			redirectAttributes.addFlashAttribute("successMessage", "納税管理人情報を保存しました。");
-			return "redirect:/tokugimu/list";
+			return "redirect:/tax-manager/view";
 		} catch (Exception e) {
 			log.error("納税管理人登録エラー: {}", e.getMessage());
 			model.addAttribute("errorMessage", e.getMessage());
@@ -194,16 +225,17 @@ public class TaxManagerController {
 		accessChecker.checkWriteAccess(SCREEN_ID);
 		String shiteiNo = SessionHelper.getShiteiNo(session);
 		if (shiteiNo == null) {
+			redirectAttributes.addFlashAttribute("errorMessage", "指定番号がセッションに存在しません。");
 			return "redirect:/tax-manager/edit";
 		}
 
 		log.debug("納税管理人削除処理: shiteiNo={}", shiteiNo);
 
 		try {
-			taxManagerService.deleteByShiteiNo(shiteiNo);
+			boolean hasHistory = taxManagerService.deleteByShiteiNo(shiteiNo);
 			log.debug("納税管理人を削除しました。shiteiNo: {}", shiteiNo);
 			redirectAttributes.addFlashAttribute("successMessage", "納税管理人を削除しました。");
-			return "redirect:/tokugimu/list";
+			return hasHistory ? "redirect:/tax-manager/view" : "redirect:/tokugimu/list";
 		} catch (Exception e) {
 			log.error("納税管理人削除エラー: {}", e.getMessage());
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

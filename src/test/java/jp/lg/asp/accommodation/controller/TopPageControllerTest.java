@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
@@ -171,8 +173,15 @@ class TopPageControllerTest {
 
         TopPageConfigForm form = new TopPageConfigForm();
 
+        BindingResult bindingResult =
+                new BeanPropertyBindingResult(form, "form");
+
         String result =
-                controller.save(form, model, redirectAttributes);
+                controller.save(
+                        form,
+                        bindingResult,
+                        model,
+                        redirectAttributes);
 
         assertEquals("redirect:/top/config", result);
 
@@ -186,23 +195,24 @@ class TopPageControllerTest {
     
     @Test
     void save_保存失敗時は編集画面を表示する() {
-
+        // 1. テストデータの準備（バリデーションエラーにならない正常な値をセット）
         TopPageConfigForm form = new TopPageConfigForm();
+        // 必要に応じて form に title 等をセットしてバリデーションを通過させる
+        form.setTitle("テストタイトル"); 
 
+        // 2. モックの設定（any を使用して確実に例外を発生させる）
         doThrow(new RuntimeException("DBエラー"))
                 .when(topPageService)
-                .save(form);
+                .save(any(TopPageConfigForm.class));
 
-        String result =
-                controller.save(form, model, redirectAttributes);
+        BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
 
+        // 3. 実行
+        String result = controller.save(form, bindingResult, model, redirectAttributes);
+
+        // 4. 検証
         assertEquals("top/topPageConfig", result);
-
-        verify(model).addAttribute("form", form);
-
-        verify(model).addAttribute(
-                eq("errorMessage"),
-                eq("保存に失敗しました: DBエラー"));
+        verify(model).addAttribute("errorMessage", "保存に失敗しました: DBエラー");
     }
     
     @Test
@@ -253,6 +263,7 @@ class TopPageControllerTest {
                 .addFlashAttribute(
                         "successMessage",
                         "削除しました。");
+<<<<<<< HEAD
     }
 
     // =====================================================================
@@ -353,3 +364,61 @@ class TopPageControllerTest {
         verify(markdownService, never()).toHtml(any());
     }
 }
+=======
+    }   
+    
+    @Test
+    void save_タイトル未入力の場合() {
+
+        TopPageConfigForm form = new TopPageConfigForm();
+
+        BindingResult bindingResult =
+                new BeanPropertyBindingResult(form, "form");
+        bindingResult.rejectValue(
+                "title",
+                "NotBlank",
+                "タイトルを入力してください");
+
+        String result =
+                controller.save(
+                        form,
+                        bindingResult,
+                        model,
+                        redirectAttributes);
+
+        assertEquals("top/topPageConfig", result);
+
+        verify(topPageService, never()).save(any());
+    }
+    
+    @Test
+    void save_内容未入力の場合() {
+
+        TopPageConfigForm form = new TopPageConfigForm();
+        form.setTitle("テストタイトル");
+        form.setHtmlContent(""); // 未入力
+
+        BindingResult bindingResult =
+                new BeanPropertyBindingResult(form, "form");
+
+        bindingResult.rejectValue(
+                "htmlContent",
+                "NotBlank",
+                "内容を入力してください");
+
+        String result =
+                controller.save(
+                        form,
+                        bindingResult,
+                        model,
+                        redirectAttributes);
+
+        assertEquals("top/topPageConfig", result);
+
+        verify(topPageService, never()).save(any());
+
+        verifyNoInteractions(redirectAttributes);
+    }
+    
+}
+>>>>>>> refs/remotes/origin/master

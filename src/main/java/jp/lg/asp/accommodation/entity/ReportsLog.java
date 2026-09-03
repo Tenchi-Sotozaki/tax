@@ -32,7 +32,7 @@ public class ReportsLog extends BaseEntity {
 	private Long seq;
 
 	/** 帳票ＩＤ */
-	@Column(name = "rpt_id", nullable = false, length = 10)
+	@Column(name = "rpt_id", nullable = false, columnDefinition = "char(10)")
 	private String rptId;
 
 	/** 操作 */
