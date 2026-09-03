@@ -64,7 +64,7 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 			predicates.add(cb.equal(f.get("taishoYm"), ym));
 		}
 		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			predicates.add(cb.like(f.get("shiteiNo"), cb.literal('%' + shiteiNo + '%')));
+			predicates.add(cb.like(f.<String>get("shiteiNo"), (String) ("%" + shiteiNo + "%")));
 		}
 
 		// 氏名検索条件
@@ -73,12 +73,11 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 			jakarta.persistence.criteria.Subquery<Tokugimu> subquery = cq.subquery(Tokugimu.class);
 			Root<Tokugimu> t = subquery.from(Tokugimu.class);
 			Join<Tokugimu, Atena> atenaJoin = t.join("atena", JoinType.INNER);
-
 			subquery.select(t)
-					.where(cb.and(
+					.where(
 							cb.equal(t.get("jichitaiCd"), f.get("jichitaiCd")),
 							cb.equal(t.get("shiteiNo"), f.get("shiteiNo")),
-							cb.like(atenaJoin.get("name"), cb.literal(namePattern))));
+							cb.like(atenaJoin.<String>get("name"), (String) namePattern));
 
 			predicates.add(cb.exists(subquery));
 		}
@@ -108,14 +107,14 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 		predicates.add(cb.equal(t.get("jichitaiCd"), jichitaiCd));
 
 		if (shiteiNo != null && !shiteiNo.isEmpty()) {
-			predicates.add(cb.like(t.get("shiteiNo"), cb.literal('%' + shiteiNo + '%')));
+			predicates.add(cb.like(t.<String>get("shiteiNo"), (String) ("%" + shiteiNo + "%")));
 		}
 
 		// 氏名検索条件
 		if (name != null && !name.isEmpty()) {
 			String namePattern = toLikePattern(name, nameMatchType);
 			Join<Tokugimu, Atena> atenaJoin = t.join("atena", JoinType.INNER);
-			predicates.add(cb.like(atenaJoin.get("name"), cb.literal(namePattern)));
+			predicates.add(cb.like(atenaJoin.<String>get("name"), (String) namePattern));
 		}
 
 		cq.where(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
@@ -124,8 +123,6 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 		TypedQuery<Tokugimu> q = em.createQuery(cq);
 		List<Tokugimu> tokugimuList = q.getResultList();
 
-		// 同一指定番号の重複を排除（rno違いで複数件取得されるため）
-		// 賦課情報がある場合のみ表示
 		return tokugimuList.stream()
 				.filter(new java.util.function.Predicate<Tokugimu>() {
 					private final java.util.Set<String> seen = new java.util.HashSet<>();
@@ -140,8 +137,7 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 					if (fukaList.isEmpty()) {
 						return null;
 					} else {
-						// 最新の賦課情報を使用
-						Fuka latestFuka = fukaList.get(0); // ORDER BY で最新が先頭
+						Fuka latestFuka = fukaList.get(0);
 						return toDtoFromTokugimuAndFuka(tokugimu, latestFuka);
 					}
 				})
@@ -162,8 +158,9 @@ public class ShunoRenkeiServiceImpl implements ShunoRenkeiService {
 	public List<ShunoDto> findByKeys(String jichitaiCd, List<ShunoDto.Key> keys) {
 		List<ShunoDto> result = new ArrayList<>();
 		for (ShunoDto.Key k : keys) {
+			String nendoStr = k.getNendo() != null ? String.valueOf(k.getNendo()) : null;
 			List<Fuka> fukaList = fukaRepository.findLatestByNendoAndKibetsu(jichitaiCd, k.getShiteiNo(),
-					k.getNendo(), k.getKibetsu());
+					nendoStr, k.getKibetsu());
 			if (!fukaList.isEmpty()) {
 				Fuka f = fukaList.get(0);
 				List<Tokugimu> toks = tokugimuRepository.findByJichitaiCdAndShiteiNo(f.getJichitaiCd(),

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.RptStatusListItem;
@@ -40,7 +41,7 @@ public class RptStatusServiceImpl implements RptStatusService {
 	public List<RptStatusListItem> search(RptStatusSearchForm form) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 
-		String searchKojinNo = org.springframework.util.StringUtils.hasText(form.getKojinNo())
+		String searchKojinNo = StringUtils.hasText(form.getKojinNo())
 				? hashUtil.sha256(form.getKojinNo()) : form.getKojinNo();
 
 		List<Tokugimu> tokugimuList = tokugimuRepository.findBySearchConditions(
@@ -79,6 +80,8 @@ public class RptStatusServiceImpl implements RptStatusService {
 	private String toLikePattern(String value, String matchType) {
 		if (value == null || value.isBlank())
 			return null;
+		if (matchType == null)
+			return "%" + value + "%";
 		return switch (matchType) {
 		case "prefix" -> value + "%";
 		case "exact" -> value;
