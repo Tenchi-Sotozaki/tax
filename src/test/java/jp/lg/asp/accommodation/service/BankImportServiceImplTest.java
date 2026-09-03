@@ -29,6 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -351,5 +352,39 @@ class BankImportServiceImplTest {
                 .isInstanceOf(DataAccessResourceFailureException.class);
         verify(jdbcTemplate, never()).execute("TRUNCATE TABLE m_bank");
         verify(jdbcTemplate, never()).execute("TRUNCATE TABLE m_branch");
+    }
+
+    @Test
+    @DisplayName("#23 importFromZip 異常系 file.getBytes()がIOExceptionをスローする場合：例外となるDBは更新されない")
+    void 確認23_getBytesIOException() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getBytes()).thenThrow(new IOException("read error"));
+        when(file.getOriginalFilename()).thenReturn("broken.zip");
+
+        assertThatThrownBy(() -> service.importFromZip(file))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("zipファイルの読み取りに失敗しました。ファイルが壊れていないか確認してください。");
+        verify(jdbcTemplate, never()).execute(anyString());
+        verify(jdbcTemplate, never()).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
+    }
+
+    @Test
+    @DisplayName("#24 importFromZip 異常系 ZipInputStreamの読み取りでIOExceptionをスローする場合：例外となるDBは更新されない")
+    void 確認24_ZipInputStream読み取りIOException() throws IOException {
+        // 有効なzipマジックバイトだが内容が壊れているzipを渡す
+        // ZipInputStreamはgetNextEntry()時にIOExceptionをスローする
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.isEmpty()).thenReturn(false);
+        // マジックバイトは正常だがその後のデータが壊れている
+        byte[] corruptedZip = new byte[] { 0x50, 0x4B, 0x03, 0x04, 0x00, 0x00 };
+        when(file.getBytes()).thenReturn(corruptedZip);
+        when(file.getInputStream()).thenThrow(new IOException("stream error"));
+
+        assertThatThrownBy(() -> service.importFromZip(file))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("zipファイルの読み取りに失敗しました。ファイルが壊れていないか確認してください。");
+        verify(jdbcTemplate, never()).execute(anyString());
+        verify(jdbcTemplate, never()).batchUpdate(anyString(), any(BatchPreparedStatementSetter.class));
     }
 }
