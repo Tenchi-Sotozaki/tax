@@ -4,6 +4,7 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class EltaxRenkeiServiceImpl implements EltaxRenkeiService {
 	@Transactional(readOnly = true)
 	public List<EltaxRenkeiDto> findAll() {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return eltaxRenkeiRepository.findByJichitaiCd(jichitaiCd)
+		return eltaxRenkeiRepository.findByJichitaiCd(jichitaiCd, PageRequest.of(0, 1000))
 				.stream()
 				.map(e -> new EltaxRenkeiDto(e.getSeq(), e.getFileName(), e.getShubetsu(), e.getShoriDt(),
 						e.getShoriKekka()))

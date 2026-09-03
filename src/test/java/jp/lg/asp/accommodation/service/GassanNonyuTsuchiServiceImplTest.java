@@ -1,27 +1,31 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import jp.lg.asp.accommodation.config.JichitaiContext;
+import jp.lg.asp.accommodation.constant.ReportsConstants;
 import jp.lg.asp.accommodation.dto.GassanNonyuTsuchiDto;
 import jp.lg.asp.accommodation.entity.Atena;
 import jp.lg.asp.accommodation.entity.Gassan;
 import jp.lg.asp.accommodation.entity.Jichitai;
 import jp.lg.asp.accommodation.entity.Nokigen;
-import jp.lg.asp.accommodation.entity.NokigenId;
 import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.AtenaRepository;
 import jp.lg.asp.accommodation.repository.GassanRepository;
@@ -30,180 +34,195 @@ import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.GassanNonyuTsuchiServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class GassanNonyuTsuchiServiceImplTest {
 
-    @Mock TokugimuRepository tokugimuRepository;
-    @Mock AtenaRepository atenaRepository;
-    @Mock GassanRepository gassanRepository;
-    @Mock NokigenRepository nokigenRepository;
-    @Mock ReportsCommonService reportsCommonService;
-    @Mock JichitaiContext jichitaiContext;
-    @InjectMocks GassanNonyuTsuchiServiceImpl service;
+	@InjectMocks
+	private GassanNonyuTsuchiServiceImpl service;
 
-    private static final String JICHITAI_CD = "011002";
-    private static final String SHITEI_NO = "00000001";
+	@Mock
+	private TokugimuRepository tokugimuRepository;
 
-    @BeforeEach
-    void setUp() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-        Jichitai jichitai = new Jichitai();
-        jichitai.setName("占冠村");
-        jichitai.setNendoStMonth("4");
-        when(reportsCommonService.getJichitaiInfo()).thenReturn(jichitai);
-        when(reportsCommonService.getReportsDefText(any())).thenReturn("宿泊税条例");
-        when(reportsCommonService.getReportsDefData(any())).thenReturn(new byte[0]);
-    }
+	@Mock
+	private AtenaRepository atenaRepository;
 
-    private Nokigen buildNokigen(String... dates) {
-        Nokigen nokigen = new Nokigen();
-        nokigen.setNokigen1st(dates[0]);
-        nokigen.setNokigen2nd(dates[1]);
-        nokigen.setNokigen3rd(dates[2]);
-        nokigen.setNokigen4th(dates[3]);
-        nokigen.setNokigen5th(dates[4]);
-        nokigen.setNokigen6th(dates[5]);
-        nokigen.setNokigen7th(dates[6]);
-        nokigen.setNokigen8th(dates[7]);
-        nokigen.setNokigen9th(dates[8]);
-        nokigen.setNokigen10th(dates[9]);
-        nokigen.setNokigen11th(dates[10]);
-        nokigen.setNokigen12th(dates[11]);
-        return nokigen;
-    }
+	@Mock
+	private GassanRepository gassanRepository;
 
-    @Test
-    void getGassanNonyuTsuchiInfo_success_withGassan() {
-        Tokugimu tokugimu = new Tokugimu();
-        tokugimu.setShiteiNo(SHITEI_NO);
-        tokugimu.setAtenaNo(BigDecimal.ONE);
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
-                .thenReturn(Optional.of(tokugimu));
+	@Mock
+	private NokigenRepository nokigenRepository;
 
-        Atena atena = new Atena();
-        atena.setName("テスト事業者");
-        atena.setYubinNo("060-0001");
-        atena.setJusho("北海道");
-        when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
-                .thenReturn(Optional.of(atena));
+	@Mock
+	private ReportsCommonService reportsCommonService;
 
-        // 適用開始年月: 2024年4月 → 年度開始月4月なので1期
-        Gassan gassan = new Gassan();
-        gassan.setGassanShiteiNo("90000001");
-        gassan.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
-        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(gassan));
+	@Mock
+	private JichitaiContext jichitaiContext;
 
-        // 2024年度の納入期限マスタ: 1期=20240531
-        Nokigen nokigen = buildNokigen(
-                "20240531", "20240630", "20240731", "20240831",
-                "20240930", "20241031", "20241130", "20241231",
-                "20250131", "20250228", "20250331", "20250430");
-        when(nokigenRepository.findById(new NokigenId(JICHITAI_CD, "2024")))
-                .thenReturn(Optional.of(nokigen));
+	private static final String JICHITAI_CD = "123456";
+	private static final String SHITEI_NO = "S001";
 
-        GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
+	@BeforeEach
+	void setUp() {
+		when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getTokuName()).isEqualTo("テスト事業者");
-        assertThat(result.getGassanShiteiNo()).isEqualTo("90000001");
-        assertThat(result.getCity()).isEqualTo("占冠村");
-        assertThat(result.getNonyuKigen()).isEqualTo("5月31日");
-    }
+		Jichitai jichitai = new Jichitai();
+		jichitai.setName("テスト市");
+		jichitai.setNendoStMonth("4"); // デフォルトで4月を設定
+		when(reportsCommonService.getJichitaiInfo()).thenReturn(jichitai);
+		when(reportsCommonService.getReportsDefText(ReportsConstants.GASSAN_NONYU_JOREI)).thenReturn("テスト条例");
+		when(reportsCommonService.getReportsDefData(ReportsConstants.KOIN)).thenReturn(new byte[]{1, 2, 3});
+	}
 
-    @Test
-    void getGassanNonyuTsuchiInfo_nonyuKigen_12ki() {
-        // 適用開始年月: 2025年3月 → 年度開始月4月なので12期、年度は2024
-        Tokugimu tokugimu = new Tokugimu();
-        tokugimu.setShiteiNo(SHITEI_NO);
-        tokugimu.setAtenaNo(BigDecimal.ONE);
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
-                .thenReturn(Optional.of(tokugimu));
+	@Nested
+	@DisplayName("getGassanNonyuTsuchiInfo(String shiteiNo) メソッドのテスト")
+	class GetGassanNonyuTsuchiInfoTest {
 
-        Atena atena = new Atena();
-        atena.setName("テスト事業者");
-        when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
-                .thenReturn(Optional.of(atena));
+		@Test
+		@DisplayName("正常系：指定番号に紐づく合算申告納入通知書情報が正常に取得できること（4月以降の適用開始日）")
+		void success_normalCase() {
+			Tokugimu tokugimu = new Tokugimu();
+			tokugimu.setShiteiNo(SHITEI_NO);
+			tokugimu.setAtenaNo(java.math.BigDecimal.ONE);
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
+					.thenReturn(Optional.of(tokugimu));
 
-        Gassan gassan = new Gassan();
-        gassan.setGassanShiteiNo("90000001");
-        gassan.setTekiyoStYmd(LocalDate.of(2025, 3, 1));
-        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(gassan));
+			Atena atena = new Atena();
+			atena.setName("テスト宛名");
+			atena.setYubinNo("123-4567");
+			atena.setJusho("テスト住所");
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, java.math.BigDecimal.ONE))
+					.thenReturn(Optional.of(atena));
 
-        Nokigen nokigen = buildNokigen(
-                "20240531", "20240630", "20240731", "20240831",
-                "20240930", "20241031", "20241130", "20241231",
-                "20250131", "20250228", "20250331", "20250430");
-        when(nokigenRepository.findById(new NokigenId(JICHITAI_CD, "2024")))
-                .thenReturn(Optional.of(nokigen));
+			Gassan gassan = new Gassan();
+			gassan.setGassanShiteiNo("G999");
+			gassan.setTekiyoStYmd(LocalDate.of(2025, 6, 15)); // 6月（ki = 3）
+			when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+					.thenReturn(List.of(gassan));
 
-        GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
+			Nokigen nokigen = new Nokigen();
+			nokigen.setNokigen3rd("20250731"); // 第3期の納入期限
+			when(nokigenRepository.findById(any())).thenReturn(Optional.of(nokigen));
 
-        assertThat(result.getNonyuKigen()).isEqualTo("4月30日");
-    }
+			GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
 
-    @Test
-    void getGassanNonyuTsuchiInfo_nokigenNotFound_nonyuKigenIsNull() {
-        Tokugimu tokugimu = new Tokugimu();
-        tokugimu.setShiteiNo(SHITEI_NO);
-        tokugimu.setAtenaNo(BigDecimal.ONE);
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
-                .thenReturn(Optional.of(tokugimu));
+			assertThat(result).isNotNull();
+			assertThat(result.getShiteiNo()).isEqualTo(SHITEI_NO);
+			assertThat(result.getTokuName()).isEqualTo("テスト宛名");
+			assertThat(result.getTokuJusho()).contains("〒123-4567").contains("テスト住所");
+			assertThat(result.getGassanShiteiNo()).isEqualTo("G999");
+			assertThat(result.getNonyuKigen()).isEqualTo("7月31日");
+			assertThat(result.getCity()).isEqualTo("テスト市");
+			assertThat(result.getJorei()).isEqualTo("テスト条例");
+		}
 
-        Atena atena = new Atena();
-        atena.setName("テスト事業者");
-        when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, BigDecimal.ONE))
-                .thenReturn(Optional.of(atena));
+		@Test
+		@DisplayName("正常系：適用開始月が年度開始月より前（例：3月）の場合の年度計算分岐の検証")
+		void success_targetMonthBeforeNendoStMonth() {
+			Tokugimu tokugimu = new Tokugimu();
+			tokugimu.setShiteiNo(SHITEI_NO);
+			tokugimu.setAtenaNo(java.math.BigDecimal.ONE);
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
+					.thenReturn(Optional.of(tokugimu));
 
-        Gassan gassan = new Gassan();
-        gassan.setGassanShiteiNo("90000001");
-        gassan.setTekiyoStYmd(LocalDate.of(2024, 4, 1));
-        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
-                .thenReturn(List.of(gassan));
+			Atena atena = new Atena();
+			atena.setName("テスト宛名");
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, java.math.BigDecimal.ONE))
+					.thenReturn(Optional.of(atena));
 
-        when(nokigenRepository.findById(any())).thenReturn(Optional.empty());
+			Gassan gassan = new Gassan();
+			gassan.setGassanShiteiNo("G999");
+			gassan.setTekiyoStYmd(LocalDate.of(2025, 3, 15)); // 3月（targetMonth < nendoStMonth）
+			when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+					.thenReturn(List.of(gassan));
 
-        GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
+			Nokigen nokigen = new Nokigen();
+			nokigen.setNokigen12th("20250331");
+			when(nokigenRepository.findById(any())).thenReturn(Optional.of(nokigen));
 
-        assertThat(result.getNonyuKigen()).isNull();
-    }
+			GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
 
-    @Test
-    void getGassanNonyuTsuchiInfo_tokugimuNotFound_returnsNull() {
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
-                .thenReturn(Optional.empty());
+			assertThat(result).isNotNull();
+			assertThat(result.getNonyuKigen()).isEqualTo("3月31日");
+		}
 
-        assertThat(service.getGassanNonyuTsuchiInfo(SHITEI_NO)).isNull();
-    }
+		@Test
+		@DisplayName("正常系：郵便番号がnullの場合の住所組み立て分岐の検証")
+		void success_yubinNoNull() {
+			Tokugimu tokugimu = new Tokugimu();
+			tokugimu.setShiteiNo(SHITEI_NO);
+			tokugimu.setAtenaNo(java.math.BigDecimal.ONE);
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(JICHITAI_CD, SHITEI_NO, "1", "0"))
+					.thenReturn(Optional.of(tokugimu));
 
-    @Test
-    void getGassanNonyuTsuchiInfo_atenaNotFound_returnsNull() {
-        Tokugimu tokugimu = new Tokugimu();
-        tokugimu.setAtenaNo(BigDecimal.ONE);
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
-                .thenReturn(Optional.of(tokugimu));
-        when(atenaRepository.findByJichitaiCdAndAtenaNo(any(), any())).thenReturn(Optional.empty());
+			Atena atena = new Atena();
+			atena.setName("テスト宛名");
+			atena.setYubinNo(null); // 郵便番号 null
+			atena.setJusho("テスト住所のみ");
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(JICHITAI_CD, java.math.BigDecimal.ONE))
+					.thenReturn(Optional.of(atena));
 
-        assertThat(service.getGassanNonyuTsuchiInfo(SHITEI_NO)).isNull();
-    }
+			when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO))
+					.thenReturn(List.of()); // 合算情報なし
 
-    @Test
-    void getGassanNonyuTsuchiInfo_noGassan_gassanShiteiNoIsNull() {
-        Tokugimu tokugimu = new Tokugimu();
-        tokugimu.setShiteiNo(SHITEI_NO);
-        tokugimu.setAtenaNo(BigDecimal.ONE);
-        when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
-                .thenReturn(Optional.of(tokugimu));
+			GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
 
-        Atena atena = new Atena();
-        atena.setName("事業者");
-        when(atenaRepository.findByJichitaiCdAndAtenaNo(any(), any())).thenReturn(Optional.of(atena));
-        when(gassanRepository.findByJichitaiCdAndShiteiNo(JICHITAI_CD, SHITEI_NO)).thenReturn(List.of());
+			assertThat(result).isNotNull();
+			assertThat(result.getTokuJusho()).isEqualTo("テスト住所のみ");
+		}
 
-        GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
+		@Test
+		@DisplayName("異常系：特別徴収義務者が見つからない場合にnullが返却されること")
+		void error_tokugimuNotFound() {
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
+					.thenReturn(Optional.empty());
 
-        assertThat(result.getGassanShiteiNo()).isNull();
-        assertThat(result.getNonyuKigen()).isNull();
-    }
+			GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo("INVALID");
+			assertThat(result).isNull();
+		}
+
+		@Test
+		@DisplayName("異常系：宛名情報が見つからない場合にnullが返却されること")
+		void error_atenaNotFound() {
+			Tokugimu tokugimu = new Tokugimu();
+			tokugimu.setShiteiNo(SHITEI_NO);
+			tokugimu.setAtenaNo(java.math.BigDecimal.ONE);
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
+					.thenReturn(Optional.of(tokugimu));
+
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(any(), any()))
+					.thenReturn(Optional.empty());
+
+			GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
+			assertThat(result).isNull();
+		}
+
+		@Test
+		@DisplayName("境界値：納入期限の日付文字列の長さが8桁以外の場合に納入期限が設定されないこと")
+		void error_nokigenYmdInvalidLength() {
+			Tokugimu tokugimu = new Tokugimu();
+			tokugimu.setShiteiNo(SHITEI_NO);
+			tokugimu.setAtenaNo(java.math.BigDecimal.ONE);
+			when(tokugimuRepository.findByJichitaiCdAndShiteiNoAndNewFlgAndDelFlg(any(), any(), any(), any()))
+					.thenReturn(Optional.of(tokugimu));
+
+			Atena atena = new Atena();
+			atena.setName("テスト宛名");
+			when(atenaRepository.findByJichitaiCdAndAtenaNo(any(), any()))
+					.thenReturn(Optional.of(atena));
+
+			Gassan gassan = new Gassan();
+			gassan.setTekiyoStYmd(LocalDate.of(2025, 4, 15)); // ki = 1
+			when(gassanRepository.findByJichitaiCdAndShiteiNo(any(), any()))
+					.thenReturn(List.of(gassan));
+
+			Nokigen nokigen = new Nokigen();
+			nokigen.setNokigen1st("202504"); // 8桁未満の不正な長さ
+			when(nokigenRepository.findById(any())).thenReturn(Optional.of(nokigen));
+
+			GassanNonyuTsuchiDto result = service.getGassanNonyuTsuchiInfo(SHITEI_NO);
+
+			assertThat(result).isNotNull();
+			assertThat(result.getNonyuKigen()).isNull();
+		}
+	}
 }

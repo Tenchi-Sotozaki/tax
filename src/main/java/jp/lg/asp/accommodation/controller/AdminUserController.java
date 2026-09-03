@@ -56,9 +56,6 @@ public class AdminUserController {
 
         accessChecker.checkAccess(SCREEN_ID);
 
-        searchForm.setPage(0);
-        searchForm.setPageSize(Integer.MAX_VALUE);
-
         java.util.List<User> items = searched
                 ? adminUserService.searchAll(searchForm)
                 : java.util.List.of();
@@ -231,7 +228,7 @@ public class AdminUserController {
                         jichitaiCd,
                         form.getRoleId()));
 
-        model.addAttribute("isEdit", true);
+        model.addAttribute("isEdit", false);
         model.addAttribute("isView", true);
 
         model.addAttribute(

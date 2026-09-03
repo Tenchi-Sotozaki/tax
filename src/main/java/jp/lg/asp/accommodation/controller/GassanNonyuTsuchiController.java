@@ -2,6 +2,8 @@ package jp.lg.asp.accommodation.controller;
 
 import java.time.LocalDate;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import jakarta.servlet.http.HttpSession;
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.annotation.RptLog;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -47,20 +47,26 @@ public class GassanNonyuTsuchiController {
 	@OpeLog(screenId = SCREEN_ID, operation = "初期表示")
 	public String index(HttpSession session, Model model) {
 		accessChecker.checkAccess(SCREEN_ID);
-		String shiteiNo = SessionHelper.getShiteiNo(session);
-		GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
+		ShiteiGassanSearchDto selected = SessionHelper.getShiteiGassan(session);
+		String gassanShiteiNo = SessionHelper.getGassanShiteiNo(session);
 
-		if (shiteiNo == null || shiteiNo.isEmpty()) {
+		// 合算指定番号・指定番号どちらも存在しない場合
+		if (selected == null || (gassanShiteiNo == null && SessionHelper.getShiteiNo(session) == null)) {
 			model.addAttribute("showShiteiGassanModal", true);
-			model.addAttribute("dto", dto);
-			return "reports/gassanNonyuTsuchi";
+			return "tokugimu/tTokugimuReport";
 		}
 
-		GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(shiteiNo);
+		// 合算指定番号がない場合（指定番号のみ）はエラー
+		if (gassanShiteiNo == null || gassanShiteiNo.isEmpty()) {
+			model.addAttribute("errorMessage", "合算申告納入承認通知書は合算指定番号が選択されている場合のみ発行できます。");
+			return "tokugimu/tTokugimuReport";
+		}
+
+		GassanNonyuTsuchiDto dto = new GassanNonyuTsuchiDto();
+		GassanNonyuTsuchiDto info = gassanNonyuTsuchiService.getGassanNonyuTsuchiInfo(gassanShiteiNo);
 		if (info != null) {
 			dto = info;
 		}
-
 		if (dto.getHakkoYmd() == null) {
 			dto.setHakkoYmd(LocalDate.now());
 		}

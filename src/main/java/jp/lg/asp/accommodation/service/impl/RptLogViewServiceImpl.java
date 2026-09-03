@@ -59,10 +59,7 @@ public class RptLogViewServiceImpl implements RptLogViewService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Reports> findAllReports() {
-		String jichitaiCd = jichitaiContext.getJichitaiCd();
-		return reportsRepository.findAll().stream()
-				.filter(r -> jichitaiCd.equals(r.getJichitaiCd()))
-				.toList();
+		return reportsRepository.findAll();
 	}
 
 	private String resolveRptName(List<Reports> reportsList, String rptId) {

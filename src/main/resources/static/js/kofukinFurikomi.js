@@ -71,15 +71,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('照会する項目を選択してください。');
                 return;
             }
-            if (checkedItems.length > 1) {
-                alert('照会は1件ずつ行ってください。');
-                return;
-            }
             
-            const shiteiNo = checkedItems[0].getAttribute('data-shiteiNo');
-            const nendo = checkedItems[0].getAttribute('data-nendo');
-            
-            const keys = [{ shiteiNo: shiteiNo, nendo: nendo }];
+            const keys = Array.from(checkedItems).map(item => ({
+                shiteiNo: item.getAttribute('data-shiteiNo'),
+                nendo: item.getAttribute('data-nendo')
+            }));
             const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
             const form = document.createElement('form');

@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service.impl;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TaxManagerForm;
 import jp.lg.asp.accommodation.entity.TaxManager;
+import jp.lg.asp.accommodation.entity.Tokugimu;
 import jp.lg.asp.accommodation.repository.TaxManagerRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.TaxManagerService;
@@ -48,9 +50,11 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 		form.setRegistrationDate(LocalDate.now());
 		form.setDeclarationDate(LocalDate.now());
 
-		tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-				.stream().findFirst()
-				.ifPresent(tokugimu -> form.setObligorAtenaNo(tokugimu.getAtenaNo().toString()));
+		List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		if (tokugimuList.isEmpty()) {
+			throw new IllegalArgumentException("特別徴収義務者が設定されていません。");
+		}
+		form.setObligorAtenaNo(tokugimuList.get(0).getAtenaNo().toString());
 
 		taxManagerRepository.findByJichitaiCdAndShiteiNoAndRno(jichitaiCd, shiteiNo, rno).ifPresent(nokan -> {
 			form.setEdit(true);
@@ -83,9 +87,11 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 		form.setRegistrationDate(LocalDate.now());
 		form.setDeclarationDate(LocalDate.now());
 
-		tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo)
-				.stream().findFirst()
-				.ifPresent(tokugimu -> form.setObligorAtenaNo(tokugimu.getAtenaNo().toString()));
+		List<Tokugimu> tokugimuList = tokugimuRepository.findByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo);
+		if (tokugimuList.isEmpty()) {
+			throw new IllegalArgumentException("特別徴収義務者が設定されていません。");
+		}
+		form.setObligorAtenaNo(tokugimuList.get(0).getAtenaNo().toString());
 
 		taxManagerRepository.findLatestByJichitaiCdAndShiteiNo(jichitaiCd, shiteiNo).ifPresent(nokan -> {
 			form.setEdit(true);
@@ -115,6 +121,12 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 		log.debug("納税管理人保存処理開始: shiteiNo={}, atenaNo={}", shiteiNo, form.getAtenaNo());
 
 		boolean isExemption = "3".equals(form.getKbn());
+		if (isExemption && form.getAtenaNo() != null && !form.getAtenaNo().trim().isEmpty()) {
+			throw new IllegalArgumentException("免除時は納税管理人選択不可です。");
+		}
+		if ("1".equals(form.getKbn()) && (form.getAtenaNo() == null || form.getAtenaNo().trim().isEmpty())) {
+			throw new IllegalArgumentException("宛名番号は必須です。");
+		}
 		if (!isExemption && form.getAtenaNo() != null && !form.getAtenaNo().trim().isEmpty()) {
 			if (isSamePerson(form.getAtenaNo(), form.getObligorAtenaNo())) {
 				log.warn("特別徴収義務者と同一人物のため登録拒否: 納税管理人宛名番号={}, 特徴宛名番号={}",
@@ -164,7 +176,7 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 
 	@Override
 	@Transactional
-	public void deleteByShiteiNo(String shiteiNo) {
+	public boolean deleteByShiteiNo(String shiteiNo) {
 		String jichitaiCd = jichitaiContext.getJichitaiCd();
 		log.debug("納税管理人削除処理開始: shiteiNo={}", shiteiNo);
 
@@ -181,5 +193,6 @@ public class TaxManagerServiceImpl implements TaxManagerService {
 		}
 
 		log.debug("納税管理人削除完了: shiteiNo={}", shiteiNo);
+		return currentRno > 1;
 	}
 }
