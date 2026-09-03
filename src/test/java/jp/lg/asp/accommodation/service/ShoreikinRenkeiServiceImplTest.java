@@ -147,7 +147,6 @@ class ShoreikinRenkeiServiceImplTest {
     }
 
     // =====================================================================
-<<<<<<< HEAD
     // 交付金振込情報出力確認_単体テストチェックリスト（#確認15〜#確認30）
     // =====================================================================
 
@@ -469,7 +468,9 @@ class ShoreikinRenkeiServiceImplTest {
         assertThat(result.get(0).getKofuRitsu()).isNull();
         assertThat(result.get(0).getKofuGaku()).isNull();
         assertThat(result.get(0).getKofuYmd()).isNull();
-=======
+    }
+
+    // =====================================================================
     // ヘルパー（search テスト用）
     // =====================================================================
 
@@ -691,6 +692,5 @@ class ShoreikinRenkeiServiceImplTest {
 
         verify(tokugimuRepository, never()).findByJichitaiCdAndShiteiNo(any(), any());
         verify(furikomiKozaRepository, never()).findByJichitaiCdAndShiteiNo(any(), any());
->>>>>>> refs/remotes/origin/master
     }
 }

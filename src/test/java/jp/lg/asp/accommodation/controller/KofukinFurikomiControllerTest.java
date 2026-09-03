@@ -371,62 +371,6 @@ class KofukinFurikomiControllerTest {
         assertTrue(rows.isEmpty());
 
         verify(accessChecker, times(1)).checkAccess(SCREEN_ID_KAKUNIN);
-=======
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
-
-import jp.lg.asp.accommodation.config.JichitaiContext;
-import jp.lg.asp.accommodation.config.ScreenAccessChecker;
-import jp.lg.asp.accommodation.config.ScreenManagement;
-import jp.lg.asp.accommodation.dto.ShoreikinRenkeiDto;
-import jp.lg.asp.accommodation.exception.AccessDeniedException;
-import jp.lg.asp.accommodation.service.ShoreikinRenkeiService;
-
-@ExtendWith(MockitoExtension.class)
-class KofukinFurikomiControllerTest {
-
-    private static final String SCREEN_ID = ScreenManagement.KOFUKIN_FURIKOMI;
-
-    @InjectMocks
-    private KofukinFurikomiController controller;
-
-    @Mock
-    private ScreenAccessChecker accessChecker;
-
-    @Mock
-    private ShoreikinRenkeiService shoreikinRenkeiService;
-
-    @Mock
-    private JichitaiContext jichitaiContext;
-
-    // =====================================================================
-    // ヘルパー
-    // =====================================================================
-
-    private ShoreikinRenkeiDto dto(String shiteiNo) {
-        ShoreikinRenkeiDto d = new ShoreikinRenkeiDto();
-        d.setShiteiNo(shiteiNo);
-        return d;
-    }
-
-    private ShoreikinRenkeiDto.Key key(String shiteiNo, String nendo) {
-        ShoreikinRenkeiDto.Key k = new ShoreikinRenkeiDto.Key();
-        k.setShiteiNo(shiteiNo);
-        k.setNendo(nendo);
-        return k;
     }
 
     // =====================================================================
@@ -998,6 +942,5 @@ class KofukinFurikomiControllerTest {
                 () -> controller.downloadCsv(List.of(key("S001", "2024"))));
 
         verify(shoreikinRenkeiService, never()).findByKeys(any(), any());
->>>>>>> refs/remotes/origin/master
     }
 }
