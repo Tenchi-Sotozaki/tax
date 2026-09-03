@@ -29,6 +29,9 @@ import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.service.MarkdownService;
 import jp.lg.asp.accommodation.service.TopPageService;
 
+@ExtendWith(MockitoExtension.class)
+class TopPageControllerTest {
+
     private static final String SCREEN_ID_CONFIG = ScreenManagement.TOP_PAGE_CONFIG;
 
     @Mock ScreenAccessChecker accessChecker;

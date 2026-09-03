@@ -1,6 +1,7 @@
 package jp.lg.asp.accommodation.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -24,7 +25,6 @@ import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.dto.TopPageConfigForm;
 import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.entity.TopPageContentId;
-import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TopPageContentRepository;
 import jp.lg.asp.accommodation.service.impl.TopPageServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +39,6 @@ class TopPageServiceImplTest {
     @InjectMocks TopPageServiceImpl service;
 
     @Mock TopPageContentRepository repository;
-    @Mock JichitaiRepository jichitaiRepository;
     @Mock JichitaiContext jichitaiContext;
 
     // ─── findShared ──────────────────────────────────────────────────────────
