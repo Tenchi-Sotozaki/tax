@@ -140,18 +140,31 @@ class RptStatusServiceImplTest {
     // =====================================================================
     // #11 findAllReports 異常系
     // =====================================================================
-
-    @Test
-    @DisplayName("#11 findAllReports 異常系 帳票マスタが0件の場合")
-    void findAllReports_帳票マスタが0件() {
-        when(jichitaiContext.getJichitaiCd()).thenReturn("01100");
-        when(reportsRepository.findAll()).thenReturn(List.of());
-
-        List<Reports> result = service.findAllReports();
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
+    //
+    // チェックリスト #11「自治体コードが一致するものが0件の場合」は実装できないため、
+    // 有効化せずコメントとして残している。
+    //
+    //   ・帳票管理マスタ m_reports に jichitai_cd カラムが無い
+    //     （PRIMARY KEY は rpt_id 単独。jichitai_cd を持たないのは
+    //       m_screen / m_reports / m_bank / m_branch の4つのみで、いずれも全自治体共通マスタ）
+    //   ・Reports エンティティにも該当フィールドが無く、setJichitaiCd が存在しない
+    //   ・findAllReports() も絞り込みを行わず findAll() をそのまま返している
+    //
+    // チェックリスト側の誤りと判断した。バックログで確認中。
+    // 帳票マスタを自治体ごとに持つ方針であれば、エンティティと実装の修正のうえ有効化する。
+    //
+    // @Test
+    // @DisplayName("#11 findAllReports 異常系 自治体コードが一致するものが0件の場合")
+    // void findAllReports_自治体コードが一致するものが0件() {
+    //     when(jichitaiContext.getJichitaiCd()).thenReturn("01100");
+    //     when(reportsRepository.findAll()).thenReturn(List.of(
+    //             reports("01200", "R002")));
+    //
+    //     List<Reports> result = service.findAllReports();
+    //
+    //     assertNotNull(result);
+    //     assertTrue(result.isEmpty());
+    // }
 
     // =====================================================================
     // #12 search 正常系
