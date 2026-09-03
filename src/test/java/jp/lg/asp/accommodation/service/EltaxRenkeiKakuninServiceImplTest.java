@@ -2183,6 +2183,58 @@ class EltaxRenkeiKakuninServiceImplTest {
         assertThat(saved.getKenZeigaku()).isNull();
     }
 
+    // No.74b: 既存Fukaが見つかった場合、新しいFuka（rno+1）が登録され、既存FukaのnewFlgが0に更新される
+    @Test
+    void commit_既存Fukaが見つかった場合新しいFukaがrno_plus_1で登録され既存FukaのnewFlgが0に更新される() {
+        // 既存Fuka: rno=2, newFlg="1" ("202506" → nendo="2025", kibetsu=4)
+        Fuka prevFuka = new Fuka();
+        prevFuka.setJichitaiCd(JICHITAI_CD);
+        prevFuka.setShiteiNo("shi00001");
+        prevFuka.setRno(2);
+        prevFuka.setNendo("2025");
+        prevFuka.setKibetsu(4);
+        prevFuka.setTotalZeigaku(3000L);
+        prevFuka.setNewFlg("1");
+        prevFuka.setDelFlg("0");
+        when(fukaRepository.findLatestByNendoAndKibetsu(JICHITAI_CD, "shi00001", "2025", 4))
+                .thenReturn(List.of(prevFuka));
+
+        ZeiritsuTeigaku zt = new ZeiritsuTeigaku();
+        zt.setTeigakuSeq(BigDecimal.ONE);
+        zt.setZeigaku(500L);
+        when(zeiritsuTeigakuRepository.findActiveByTaishoKbnAndTekiyoYm(any(), any(), any()))
+                .thenReturn(List.of(zt));
+
+        byte[] csv = teigakuCsv(Map.ofEntries(
+                Map.entry(13, "2026-01-10"),
+                Map.entry(25, "shi00001"),
+                Map.entry(29, "202506"),
+                Map.entry(30, "1"),
+                Map.entry(32, "10"),
+                Map.entry(33, "5000"),
+                Map.entry(70, "10"),
+                Map.entry(71, "5000"),
+                Map.entry(72, "0"),
+                Map.entry(73, "10"),
+                Map.entry(74, "5000")
+        ));
+
+        service.commit(csv, "test.csv", null, "shi00001");
+
+        // saveFuka内: 新規保存(1回目) → 既存FukaのnewFlg更新(2回目) → kenZeigaku更新後再保存(3回目)
+        ArgumentCaptor<Fuka> captor = ArgumentCaptor.forClass(Fuka.class);
+        verify(fukaRepository, times(3)).save(captor.capture());
+        List<Fuka> allSaved = captor.getAllValues();
+
+        // 1回目: 新規分 rno=3, newFlg="1"
+        assertThat(allSaved.get(0).getRno()).isEqualTo(3);
+        assertThat(allSaved.get(0).getNewFlg()).isEqualTo("1");
+
+        // 2回目: 既存分のnewFlg更新 rno=2, newFlg="0"
+        assertThat(allSaved.get(1).getRno()).isEqualTo(2);
+        assertThat(allSaved.get(1).getNewFlg()).isEqualTo("0");
+    }
+
     // =========================================================================
     // commit - 税率マスタ・期別・その他
     // =========================================================================
