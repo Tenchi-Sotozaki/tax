@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jp.lg.asp.accommodation.constant.ReportsConstants.ReportsOutputField;
+
 import jp.lg.asp.accommodation.annotation.OpeLog;
 import jp.lg.asp.accommodation.config.JichitaiContext;
 import jp.lg.asp.accommodation.config.ScreenAccessChecker;
@@ -32,7 +34,7 @@ public class ReportsOutputConfigController {
 	@GetMapping("/view")
 	@OpeLog(screenId = SCREEN_ID, operation = "照会")
 	public String view(Model model) {
-//		accessChecker.checkAccess(SCREEN_ID);
+		accessChecker.checkAccess(SCREEN_ID);
 		model.addAttribute("defTextMap", reportsOutputConfigService.getDefTextMap(jichitaiContext.getJichitaiCd()));
 		model.addAttribute("mode", "view");
 		return "admin/reportsOutputConfig";
@@ -41,7 +43,7 @@ public class ReportsOutputConfigController {
 	@GetMapping("/edit")
 	@OpeLog(screenId = SCREEN_ID, operation = "編集画面表示")
 	public String edit(Model model) {
-//		accessChecker.checkWriteAccess(SCREEN_ID);
+		accessChecker.checkWriteAccess(SCREEN_ID);
 		model.addAttribute("defTextMap", reportsOutputConfigService.getDefTextMap(jichitaiContext.getJichitaiCd()));
 		model.addAttribute("mode", "edit");
 		return "admin/reportsOutputConfig";
@@ -50,8 +52,20 @@ public class ReportsOutputConfigController {
 	@PostMapping("/save")
 	@OpeLog(screenId = SCREEN_ID, operation = "登録")
 	public String save(@RequestParam Map<String, String> params, Authentication authentication,
-			RedirectAttributes redirectAttributes) {
-//		accessChecker.checkWriteAccess(SCREEN_ID);
+			Model model, RedirectAttributes redirectAttributes) {
+		accessChecker.checkWriteAccess(SCREEN_ID);
+		boolean hasBlank = false;
+		for (ReportsOutputField field : ReportsOutputField.values()) {
+			if (!org.springframework.util.StringUtils.hasText(params.get(field.getId()))) {
+				hasBlank = true;
+				break;
+			}
+		}
+		if (hasBlank) {
+			model.addAttribute("defTextMap", reportsOutputConfigService.getDefTextMap(jichitaiContext.getJichitaiCd()));
+			model.addAttribute("mode", "edit");
+			return "admin/reportsOutputConfig";
+		}
 		try {
 			reportsOutputConfigService.saveDefText(jichitaiContext.getJichitaiCd(), authentication.getName(), params);
 			redirectAttributes.addFlashAttribute("successMessage", "帳票出力項目を登録しました。");

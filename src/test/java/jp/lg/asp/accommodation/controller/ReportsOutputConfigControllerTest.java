@@ -89,12 +89,13 @@ class ReportsOutputConfigControllerTest {
         when(authentication.getName()).thenReturn("U001");
         doNothing().when(reportsOutputConfigService).saveDefText(any(), any(), any());
 
-        Map<String, String> params = new LinkedHashMap<>();
+        Map<String, String> params = allFilledParams();
         params.put("RPT0000002", "第1条");
         params.put("RPT0000003", "第2条");
 
+        ExtendedModelMap model = new ExtendedModelMap();
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
-        String result = controller.save(params, authentication, redirectAttributes);
+        String result = controller.save(params, authentication, model, redirectAttributes);
 
         assertThat(result).isEqualTo("redirect:/admin/reports-output-config/view");
         assertThat(redirectAttributes.getFlashAttributes().get("successMessage"))
@@ -108,18 +109,18 @@ class ReportsOutputConfigControllerTest {
     @DisplayName("#4 save 正常系 params が空の場合：空の Map がそのままサービスに渡る")
     void 確認4_save_paramsが空() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-        when(authentication.getName()).thenReturn("U001");
-        doNothing().when(reportsOutputConfigService).saveDefText(any(), any(), any());
+        // 空Mapはバリデーションエラーになるためサービスは呼ばれない
+        LinkedHashMap<ReportsOutputField, String> defTextMap = new LinkedHashMap<>();
+        lenient().when(reportsOutputConfigService.getDefTextMap(JICHITAI_CD)).thenReturn(defTextMap);
 
         Map<String, String> params = new LinkedHashMap<>();
 
+        ExtendedModelMap model = new ExtendedModelMap();
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
-        String result = controller.save(params, authentication, redirectAttributes);
+        String result = controller.save(params, authentication, model, redirectAttributes);
 
-        assertThat(result).isEqualTo("redirect:/admin/reports-output-config/view");
-        verify(reportsOutputConfigService, times(1)).saveDefText(JICHITAI_CD, "U001", params);
-        assertThat(redirectAttributes.getFlashAttributes().get("successMessage"))
-                .isEqualTo("帳票出力項目を登録しました。");
+        assertThat(result).isEqualTo("admin/reportsOutputConfig");
+        verify(reportsOutputConfigService, never()).saveDefText(any(), any(), any());
     }
 
     @Test
@@ -130,11 +131,12 @@ class ReportsOutputConfigControllerTest {
         doThrow(new RuntimeException("DB error"))
                 .when(reportsOutputConfigService).saveDefText(any(), any(), any());
 
-        Map<String, String> params = new LinkedHashMap<>();
+        Map<String, String> params = allFilledParams();
         params.put("RPT0000002", "第1条");
 
+        ExtendedModelMap model = new ExtendedModelMap();
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
-        String result = controller.save(params, authentication, redirectAttributes);
+        String result = controller.save(params, authentication, model, redirectAttributes);
 
         assertThat(result).isEqualTo("redirect:/admin/reports-output-config/edit");
         assertThat(redirectAttributes.getFlashAttributes().get("errorMessage"))
@@ -147,20 +149,29 @@ class ReportsOutputConfigControllerTest {
     @DisplayName("#6 save 異常系 いずれかの定義テキストが未入力（空文字・null）の場合：バリデーションエラーとなり編集画面に戻る")
     void 確認6_save_バリデーションエラー() {
         when(jichitaiContext.getJichitaiCd()).thenReturn(JICHITAI_CD);
-        when(authentication.getName()).thenReturn("U001");
-        doNothing().when(reportsOutputConfigService).saveDefText(any(), any(), any());
+        LinkedHashMap<ReportsOutputField, String> defTextMap = new LinkedHashMap<>();
+        when(reportsOutputConfigService.getDefTextMap(JICHITAI_CD)).thenReturn(defTextMap);
 
         Map<String, String> params = new LinkedHashMap<>();
-        params.put("TOKUGIMU_SHITEI_JOREI", "");
+        params.put(ReportsOutputField.TOKUGIMU_SHITEI_JOREI.getId(), "");
 
+        ExtendedModelMap model = new ExtendedModelMap();
         RedirectAttributesModelMap redirectAttributes = new RedirectAttributesModelMap();
-        // コントローラにバリデーション処理がある場合は編集画面に戻ること
-        // 現状の実装ではサービスに委譲するため、チェックリスト通りに記述
-        String result = controller.save(params, authentication, redirectAttributes);
+        String result = controller.save(params, authentication, model, redirectAttributes);
 
-        // チェックリスト期待値：バリデーションエラーで編集画面に戻る
-        // 実装にバリデーションがない場合はこのテストは失敗する（意図的）
         assertThat(result).isEqualTo("admin/reportsOutputConfig");
+        assertThat(model.get("mode")).isEqualTo("edit");
         verify(reportsOutputConfigService, never()).saveDefText(any(), any(), any());
+    }
+
+    // ─── helper ──────────────────────────────────────────────────────────────
+
+    /** 全 ReportsOutputField に非空文字を設定した params を返す */
+    private Map<String, String> allFilledParams() {
+        Map<String, String> params = new LinkedHashMap<>();
+        for (ReportsOutputField field : ReportsOutputField.values()) {
+            params.put(field.getId(), "定義テキスト");
+        }
+        return params;
     }
 }

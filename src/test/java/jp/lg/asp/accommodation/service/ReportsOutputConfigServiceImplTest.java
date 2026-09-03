@@ -119,13 +119,12 @@ class ReportsOutputConfigServiceImplTest {
     @Test
     @DisplayName("#12 saveDefText 正常系 既存レコードがある場合：定義テキスト・区分が更新される")
     void 確認12_saveDefText_既存レコード更新() {
-        ReportsDef existing = def(JICHITAI_CD, "RPT0000002", "旧テキスト");
-        existing.setKbn("1");
-        existing.setAddUser("OLD");
-        existing.setAddDt(LocalDateTime.of(2026, 1, 1, 0, 0));
-
-        when(reportsDefRepository.findById(any(ReportsDefId.class)))
-                .thenReturn(Optional.of(existing));
+        when(reportsDefRepository.findById(new ReportsDefId(JICHITAI_CD, "RPT0000002")))
+                .thenReturn(Optional.of(defWithKbn(JICHITAI_CD, "RPT0000002", "旧テキスト", "1", "OLD",
+                        LocalDateTime.of(2026, 1, 1, 0, 0))));
+        when(reportsDefRepository.findById(argThat(id ->
+                id != null && !"RPT0000002".equals(id.getId()))))
+                .thenReturn(Optional.of(def(JICHITAI_CD, "OTHER", "その他")));
         when(reportsDefRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Map<String, String> defTextMap = new LinkedHashMap<>();
@@ -276,6 +275,15 @@ class ReportsOutputConfigServiceImplTest {
         d.setJichitaiCd(jichitaiCd);
         d.setId(id);
         d.setDefText(defText);
+        return d;
+    }
+
+    private ReportsDef defWithKbn(String jichitaiCd, String id, String defText, String kbn,
+            String addUser, LocalDateTime addDt) {
+        ReportsDef d = def(jichitaiCd, id, defText);
+        d.setKbn(kbn);
+        d.setAddUser(addUser);
+        d.setAddDt(addDt);
         return d;
     }
 }
