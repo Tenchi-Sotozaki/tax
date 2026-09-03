@@ -1,20 +1,13 @@
 package jp.lg.asp.accommodation.service.impl;
 
-<<<<<<< HEAD
-import java.util.List;
-=======
 import java.util.Arrays;
->>>>>>> refs/remotes/origin/master
 
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Service;
 
-<<<<<<< HEAD
-=======
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
->>>>>>> refs/remotes/origin/master
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
@@ -30,14 +23,6 @@ public class MarkdownServiceImpl implements MarkdownService {
     private final Safelist safelist;
 
     public MarkdownServiceImpl() {
-<<<<<<< HEAD
-        // 表（GFM tables）を有効にする。Parser / HtmlRenderer の双方に同じ options を渡す
-        MutableDataSet options = new MutableDataSet();
-        options.set(Parser.EXTENSIONS, List.of(TablesExtension.create()));
-
-        this.parser = Parser.builder(options).build();
-        this.renderer = HtmlRenderer.builder(options).build();
-=======
         // 1. Flexmarkの拡張機能（GFM機能）を有効化
         MutableDataSet options = new MutableDataSet();
         options.set(Parser.EXTENSIONS, Arrays.asList(
@@ -45,7 +30,6 @@ public class MarkdownServiceImpl implements MarkdownService {
                 StrikethroughExtension.create(), // 打ち消し線 (~~text~~)
                 TaskListExtension.create()       // タスクリスト (- [x])
         ));
->>>>>>> refs/remotes/origin/master
 
         this.parser = Parser.builder(options).build();
         this.renderer = HtmlRenderer.builder(options).build();

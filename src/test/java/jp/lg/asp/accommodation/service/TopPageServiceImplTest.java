@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +21,7 @@ import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.repository.TopPageContentRepository;
 import jp.lg.asp.accommodation.service.impl.TopPageServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 
 @ExtendWith(MockitoExtension.class)
 class TopPageServiceImplTest {
@@ -115,7 +115,6 @@ class TopPageServiceImplTest {
 
         verify(repository).delete(content);
     }
-<<<<<<< HEAD
 
     // =====================================================================
     // トップページ_単体テストチェックリスト（#5〜#8）
@@ -190,6 +189,4 @@ class TopPageServiceImplTest {
         RuntimeException e = assertThrows(RuntimeException.class, () -> service.findShared());
         assertEquals("DB error", e.getMessage());
     }
-=======
->>>>>>> refs/remotes/origin/master
 }

@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +36,8 @@ import jp.lg.asp.accommodation.repository.FurikomiKozaRepository;
 import jp.lg.asp.accommodation.repository.ShoreikinRepository;
 import jp.lg.asp.accommodation.repository.TokugimuRepository;
 import jp.lg.asp.accommodation.service.impl.ShoreikinRenkeiServiceImpl;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @ExtendWith(MockitoExtension.class)
 class ShoreikinRenkeiServiceImplTest {
@@ -147,7 +147,230 @@ class ShoreikinRenkeiServiceImplTest {
     }
 
     // =====================================================================
-<<<<<<< HEAD
+    // ヘルパー（search テスト用）
+    // =====================================================================
+
+    @SuppressWarnings("unchecked")
+    private CriteriaBuilder mockCriteria() {
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+        CriteriaQuery<Shoreikin> cq = mock(CriteriaQuery.class);
+        Root<Shoreikin> root = mock(Root.class);
+        TypedQuery<Shoreikin> typedQuery = mock(TypedQuery.class);
+
+        when(em.getCriteriaBuilder()).thenReturn(cb);
+        when(cb.createQuery(Shoreikin.class)).thenReturn(cq);
+        when(cq.from(Shoreikin.class)).thenReturn(root);
+        when(em.createQuery(cq)).thenReturn(typedQuery);
+        when(typedQuery.getResultList()).thenReturn(List.of());
+
+        Predicate predicate = mock(Predicate.class);
+        lenient().when(cb.equal(any(), any())).thenReturn(predicate);
+        lenient().when(cb.like(any(Expression.class), any(Expression.class))).thenReturn(predicate);
+        lenient().when(cq.where(any(Predicate[].class))).thenReturn(cq);
+        lenient().when(cq.orderBy(any(Order[].class))).thenReturn(cq);
+        lenient().when(cb.desc(any())).thenReturn(mock(Order.class));
+        lenient().when(cb.asc(any())).thenReturn(mock(Order.class));
+        when(root.get(anyString())).thenReturn(mock(Path.class));
+
+        return cb;
+    }
+
+    @SuppressWarnings("unchecked")
+    private CriteriaBuilder mockCriteriaWithName() {
+        CriteriaBuilder cb = mock(CriteriaBuilder.class);
+        CriteriaQuery<Shoreikin> cq = mock(CriteriaQuery.class);
+        Root<Shoreikin> root = mock(Root.class);
+        TypedQuery<Shoreikin> typedQuery = mock(TypedQuery.class);
+        Subquery<Tokugimu> subquery = mock(Subquery.class);
+        Root<Tokugimu> tRoot = mock(Root.class);
+        Join<Object, Object> atenaJoin = mock(Join.class);
+
+        when(em.getCriteriaBuilder()).thenReturn(cb);
+        when(cb.createQuery(Shoreikin.class)).thenReturn(cq);
+        when(cq.from(Shoreikin.class)).thenReturn(root);
+        when(em.createQuery(cq)).thenReturn(typedQuery);
+        when(typedQuery.getResultList()).thenReturn(List.of());
+        when(cq.subquery(Tokugimu.class)).thenReturn(subquery);
+        when(subquery.from(Tokugimu.class)).thenReturn(tRoot);
+        when(tRoot.join(eq("atena"), any())).thenReturn(atenaJoin);
+        when(subquery.select(any())).thenReturn(subquery);
+        when(subquery.where(any(Predicate.class))).thenReturn(subquery);
+
+        Predicate predicate = mock(Predicate.class);
+        lenient().when(cb.equal(any(), any())).thenReturn(predicate);
+        lenient().when(cb.and(any(Predicate[].class))).thenReturn(predicate);
+        lenient().when(cb.exists(any())).thenReturn(predicate);
+        lenient().when(cq.where(any(Predicate[].class))).thenReturn(cq);
+        lenient().when(cq.orderBy(any(Order[].class))).thenReturn(cq);
+        lenient().when(cb.desc(any())).thenReturn(mock(Order.class));
+        lenient().when(cb.asc(any())).thenReturn(mock(Order.class));
+        when(root.get(anyString())).thenReturn(mock(Path.class));
+        when(tRoot.get(anyString())).thenReturn(mock(Path.class));
+        when(atenaJoin.get(anyString())).thenReturn(mock(Path.class));
+
+        return cb;
+    }
+
+    // =====================================================================
+    // #24 search 正常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#24 search 正常系 shiteiNo が完全一致で絞り込まれること")
+    void search_shiteiNoで絞り込まれる() {
+        mockCriteriaWithName();
+
+        List<ShoreikinRenkeiDto> result = service.search("01100", "2024", "00100001", "山田", "partial");
+
+        assertNotNull(result);
+        verify(em).getCriteriaBuilder();
+    }
+
+    // =====================================================================
+    // #25 search 正常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#25 search 正常系 検索条件がすべて null の場合")
+    void search_検索条件がすべてnull() {
+        mockCriteria();
+
+        List<ShoreikinRenkeiDto> result = service.search("01100", null, null, null, "partial");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    // =====================================================================
+    // #26 search 異常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#26 search 異常系 検索条件が空文字の場合")
+    void search_検索条件が空文字() {
+        mockCriteria();
+
+        List<ShoreikinRenkeiDto> result = service.search("01100", "", "", "", "partial");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    // =====================================================================
+    // #27 search 正常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#27 search 正常系 氏名の一致区分 partial：LIKE が \"%山田%\" になる")
+    @SuppressWarnings("unchecked")
+    void search_氏名一致区分partial() {
+        CriteriaBuilder cb = mockCriteriaWithName();
+
+        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
+        Expression<String> literalExpr = mock(Expression.class);
+        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
+
+        service.search("01100", null, null, "山田", "partial");
+
+        assertTrue(literalCaptor.getAllValues().contains("%山田%"));
+    }
+
+    // =====================================================================
+    // #28 search 正常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#28 search 正常系 氏名の一致区分 prefix：LIKE が \"山田%\" になる")
+    @SuppressWarnings("unchecked")
+    void search_氏名一致区分prefix() {
+        CriteriaBuilder cb = mockCriteriaWithName();
+
+        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
+        Expression<String> literalExpr = mock(Expression.class);
+        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
+
+        service.search("01100", null, null, "山田", "prefix");
+
+        assertTrue(literalCaptor.getAllValues().contains("山田%"));
+    }
+
+    // =====================================================================
+    // #29 search 正常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#29 search 正常系 氏名の一致区分 exact：LIKE が \"山田\" になる")
+    @SuppressWarnings("unchecked")
+    void search_氏名一致区分exact() {
+        CriteriaBuilder cb = mockCriteriaWithName();
+
+        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
+        Expression<String> literalExpr = mock(Expression.class);
+        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
+
+        service.search("01100", null, null, "山田", "exact");
+
+        assertTrue(literalCaptor.getAllValues().contains("山田"));
+    }
+
+    // =====================================================================
+    // #30 search 異常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#30 search 異常系 未定義の一致区分が渡された場合は部分一致になる")
+    @SuppressWarnings("unchecked")
+    void search_未定義の一致区分は部分一致() {
+        CriteriaBuilder cb = mockCriteriaWithName();
+
+        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
+        Expression<String> literalExpr = mock(Expression.class);
+        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
+
+        service.search("01100", null, null, "山田", "unknown");
+
+        assertTrue(literalCaptor.getAllValues().contains("%山田%"));
+    }
+
+    // =====================================================================
+    // #31 search 異常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#31 search 異常系 氏名の一致区分が null の場合は部分一致として扱われる")
+    @SuppressWarnings("unchecked")
+    void search_氏名一致区分がnullは部分一致() {
+        // 現行実装は switch(null) で NullPointerException となるため失敗する（実装修正が必要）
+        CriteriaBuilder cb = mockCriteriaWithName();
+
+        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
+        Expression<String> literalExpr = mock(Expression.class);
+        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
+
+        service.search("01100", null, null, "山田", null);
+
+        assertTrue(literalCaptor.getAllValues().contains("%山田%"));
+    }
+
+    // =====================================================================
+    // #32 search 異常系
+    // =====================================================================
+
+    @Test
+    @DisplayName("#32 search 異常系 該当0件の場合")
+    void search_該当0件() {
+        mockCriteria();
+
+        List<ShoreikinRenkeiDto> result = service.search("01100", "9999", null, null, "partial");
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+
+        verify(tokugimuRepository, never()).findByJichitaiCdAndShiteiNo(any(), any());
+        verify(furikomiKozaRepository, never()).findByJichitaiCdAndShiteiNo(any(), any());
+    }
+
+    // =====================================================================
     // 交付金振込情報出力確認_単体テストチェックリスト（#確認15〜#確認30）
     // =====================================================================
 
@@ -469,228 +692,5 @@ class ShoreikinRenkeiServiceImplTest {
         assertThat(result.get(0).getKofuRitsu()).isNull();
         assertThat(result.get(0).getKofuGaku()).isNull();
         assertThat(result.get(0).getKofuYmd()).isNull();
-=======
-    // ヘルパー（search テスト用）
-    // =====================================================================
-
-    @SuppressWarnings("unchecked")
-    private CriteriaBuilder mockCriteria() {
-        CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        CriteriaQuery<Shoreikin> cq = mock(CriteriaQuery.class);
-        Root<Shoreikin> root = mock(Root.class);
-        TypedQuery<Shoreikin> typedQuery = mock(TypedQuery.class);
-
-        when(em.getCriteriaBuilder()).thenReturn(cb);
-        when(cb.createQuery(Shoreikin.class)).thenReturn(cq);
-        when(cq.from(Shoreikin.class)).thenReturn(root);
-        when(em.createQuery(cq)).thenReturn(typedQuery);
-        when(typedQuery.getResultList()).thenReturn(List.of());
-
-        Predicate predicate = mock(Predicate.class);
-        lenient().when(cb.equal(any(), any())).thenReturn(predicate);
-        lenient().when(cb.like(any(Expression.class), any(Expression.class))).thenReturn(predicate);
-        lenient().when(cq.where(any(Predicate[].class))).thenReturn(cq);
-        lenient().when(cq.orderBy(any(Order[].class))).thenReturn(cq);
-        lenient().when(cb.desc(any())).thenReturn(mock(Order.class));
-        lenient().when(cb.asc(any())).thenReturn(mock(Order.class));
-        when(root.get(anyString())).thenReturn(mock(Path.class));
-
-        return cb;
-    }
-
-    @SuppressWarnings("unchecked")
-    private CriteriaBuilder mockCriteriaWithName() {
-        CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        CriteriaQuery<Shoreikin> cq = mock(CriteriaQuery.class);
-        Root<Shoreikin> root = mock(Root.class);
-        TypedQuery<Shoreikin> typedQuery = mock(TypedQuery.class);
-        Subquery<Tokugimu> subquery = mock(Subquery.class);
-        Root<Tokugimu> tRoot = mock(Root.class);
-        Join<Object, Object> atenaJoin = mock(Join.class);
-
-        when(em.getCriteriaBuilder()).thenReturn(cb);
-        when(cb.createQuery(Shoreikin.class)).thenReturn(cq);
-        when(cq.from(Shoreikin.class)).thenReturn(root);
-        when(em.createQuery(cq)).thenReturn(typedQuery);
-        when(typedQuery.getResultList()).thenReturn(List.of());
-        when(cq.subquery(Tokugimu.class)).thenReturn(subquery);
-        when(subquery.from(Tokugimu.class)).thenReturn(tRoot);
-        when(tRoot.join(eq("atena"), any())).thenReturn(atenaJoin);
-        when(subquery.select(any())).thenReturn(subquery);
-        when(subquery.where(any(Predicate.class))).thenReturn(subquery);
-
-        Predicate predicate = mock(Predicate.class);
-        lenient().when(cb.equal(any(), any())).thenReturn(predicate);
-        lenient().when(cb.and(any(Predicate[].class))).thenReturn(predicate);
-        lenient().when(cb.exists(any())).thenReturn(predicate);
-        lenient().when(cq.where(any(Predicate[].class))).thenReturn(cq);
-        lenient().when(cq.orderBy(any(Order[].class))).thenReturn(cq);
-        lenient().when(cb.desc(any())).thenReturn(mock(Order.class));
-        lenient().when(cb.asc(any())).thenReturn(mock(Order.class));
-        when(root.get(anyString())).thenReturn(mock(Path.class));
-        when(tRoot.get(anyString())).thenReturn(mock(Path.class));
-        when(atenaJoin.get(anyString())).thenReturn(mock(Path.class));
-
-        return cb;
-    }
-
-    // =====================================================================
-    // #24 search 正常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#24 search 正常系 shiteiNo が完全一致で絞り込まれること")
-    void search_shiteiNoで絞り込まれる() {
-        mockCriteriaWithName();
-
-        List<ShoreikinRenkeiDto> result = service.search("01100", "2024", "00100001", "山田", "partial");
-
-        assertNotNull(result);
-        verify(em).getCriteriaBuilder();
-    }
-
-    // =====================================================================
-    // #25 search 正常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#25 search 正常系 検索条件がすべて null の場合")
-    void search_検索条件がすべてnull() {
-        mockCriteria();
-
-        List<ShoreikinRenkeiDto> result = service.search("01100", null, null, null, "partial");
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    // =====================================================================
-    // #26 search 異常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#26 search 異常系 検索条件が空文字の場合")
-    void search_検索条件が空文字() {
-        mockCriteria();
-
-        List<ShoreikinRenkeiDto> result = service.search("01100", "", "", "", "partial");
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    // =====================================================================
-    // #27 search 正常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#27 search 正常系 氏名の一致区分 partial：LIKE が \"%山田%\" になる")
-    @SuppressWarnings("unchecked")
-    void search_氏名一致区分partial() {
-        CriteriaBuilder cb = mockCriteriaWithName();
-
-        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
-        Expression<String> literalExpr = mock(Expression.class);
-        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
-
-        service.search("01100", null, null, "山田", "partial");
-
-        assertTrue(literalCaptor.getAllValues().contains("%山田%"));
-    }
-
-    // =====================================================================
-    // #28 search 正常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#28 search 正常系 氏名の一致区分 prefix：LIKE が \"山田%\" になる")
-    @SuppressWarnings("unchecked")
-    void search_氏名一致区分prefix() {
-        CriteriaBuilder cb = mockCriteriaWithName();
-
-        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
-        Expression<String> literalExpr = mock(Expression.class);
-        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
-
-        service.search("01100", null, null, "山田", "prefix");
-
-        assertTrue(literalCaptor.getAllValues().contains("山田%"));
-    }
-
-    // =====================================================================
-    // #29 search 正常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#29 search 正常系 氏名の一致区分 exact：LIKE が \"山田\" になる")
-    @SuppressWarnings("unchecked")
-    void search_氏名一致区分exact() {
-        CriteriaBuilder cb = mockCriteriaWithName();
-
-        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
-        Expression<String> literalExpr = mock(Expression.class);
-        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
-
-        service.search("01100", null, null, "山田", "exact");
-
-        assertTrue(literalCaptor.getAllValues().contains("山田"));
-    }
-
-    // =====================================================================
-    // #30 search 異常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#30 search 異常系 未定義の一致区分が渡された場合は部分一致になる")
-    @SuppressWarnings("unchecked")
-    void search_未定義の一致区分は部分一致() {
-        CriteriaBuilder cb = mockCriteriaWithName();
-
-        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
-        Expression<String> literalExpr = mock(Expression.class);
-        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
-
-        service.search("01100", null, null, "山田", "unknown");
-
-        assertTrue(literalCaptor.getAllValues().contains("%山田%"));
-    }
-
-    // =====================================================================
-    // #31 search 異常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#31 search 異常系 氏名の一致区分が null の場合は部分一致として扱われる")
-    @SuppressWarnings("unchecked")
-    void search_氏名一致区分がnullは部分一致() {
-        // 現行実装は switch(null) で NullPointerException となるため失敗する（実装修正が必要）
-        CriteriaBuilder cb = mockCriteriaWithName();
-
-        ArgumentCaptor<String> literalCaptor = ArgumentCaptor.forClass(String.class);
-        Expression<String> literalExpr = mock(Expression.class);
-        when(cb.literal(literalCaptor.capture())).thenReturn(literalExpr);
-
-        service.search("01100", null, null, "山田", null);
-
-        assertTrue(literalCaptor.getAllValues().contains("%山田%"));
-    }
-
-    // =====================================================================
-    // #32 search 異常系
-    // =====================================================================
-
-    @Test
-    @DisplayName("#32 search 異常系 該当0件の場合")
-    void search_該当0件() {
-        mockCriteria();
-
-        List<ShoreikinRenkeiDto> result = service.search("01100", "9999", null, null, "partial");
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-
-        verify(tokugimuRepository, never()).findByJichitaiCdAndShiteiNo(any(), any());
-        verify(furikomiKozaRepository, never()).findByJichitaiCdAndShiteiNo(any(), any());
->>>>>>> refs/remotes/origin/master
     }
 }

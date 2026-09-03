@@ -7,14 +7,12 @@ import static org.mockito.Mockito.*;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -28,6 +26,8 @@ import jp.lg.asp.accommodation.entity.TopPageContent;
 import jp.lg.asp.accommodation.repository.JichitaiRepository;
 import jp.lg.asp.accommodation.service.MarkdownService;
 import jp.lg.asp.accommodation.service.TopPageService;
+import org.junit.jupiter.api.DisplayName;
+import org.springframework.ui.ExtendedModelMap;
 
 @ExtendWith(MockitoExtension.class)
 class TopPageControllerTest {
@@ -263,7 +263,59 @@ class TopPageControllerTest {
                 .addFlashAttribute(
                         "successMessage",
                         "削除しました。");
-<<<<<<< HEAD
+    }   
+    
+    @Test
+    void save_タイトル未入力の場合() {
+
+        TopPageConfigForm form = new TopPageConfigForm();
+
+        BindingResult bindingResult =
+                new BeanPropertyBindingResult(form, "form");
+        bindingResult.rejectValue(
+                "title",
+                "NotBlank",
+                "タイトルを入力してください");
+
+        String result =
+                controller.save(
+                        form,
+                        bindingResult,
+                        model,
+                        redirectAttributes);
+
+        assertEquals("top/topPageConfig", result);
+
+        verify(topPageService, never()).save(any());
+    }
+    
+    @Test
+    void save_内容未入力の場合() {
+
+        TopPageConfigForm form = new TopPageConfigForm();
+        form.setTitle("テストタイトル");
+        form.setHtmlContent(""); // 未入力
+
+        BindingResult bindingResult =
+                new BeanPropertyBindingResult(form, "form");
+
+        bindingResult.rejectValue(
+                "htmlContent",
+                "NotBlank",
+                "内容を入力してください");
+
+        String result =
+                controller.save(
+                        form,
+                        bindingResult,
+                        model,
+                        redirectAttributes);
+
+        assertEquals("top/topPageConfig", result);
+
+        verify(topPageService, never()).save(any());
+
+        verifyNoInteractions(redirectAttributes);
     }
 
     // =====================================================================
@@ -364,61 +416,3 @@ class TopPageControllerTest {
         verify(markdownService, never()).toHtml(any());
     }
 }
-=======
-    }   
-    
-    @Test
-    void save_タイトル未入力の場合() {
-
-        TopPageConfigForm form = new TopPageConfigForm();
-
-        BindingResult bindingResult =
-                new BeanPropertyBindingResult(form, "form");
-        bindingResult.rejectValue(
-                "title",
-                "NotBlank",
-                "タイトルを入力してください");
-
-        String result =
-                controller.save(
-                        form,
-                        bindingResult,
-                        model,
-                        redirectAttributes);
-
-        assertEquals("top/topPageConfig", result);
-
-        verify(topPageService, never()).save(any());
-    }
-    
-    @Test
-    void save_内容未入力の場合() {
-
-        TopPageConfigForm form = new TopPageConfigForm();
-        form.setTitle("テストタイトル");
-        form.setHtmlContent(""); // 未入力
-
-        BindingResult bindingResult =
-                new BeanPropertyBindingResult(form, "form");
-
-        bindingResult.rejectValue(
-                "htmlContent",
-                "NotBlank",
-                "内容を入力してください");
-
-        String result =
-                controller.save(
-                        form,
-                        bindingResult,
-                        model,
-                        redirectAttributes);
-
-        assertEquals("top/topPageConfig", result);
-
-        verify(topPageService, never()).save(any());
-
-        verifyNoInteractions(redirectAttributes);
-    }
-    
-}
->>>>>>> refs/remotes/origin/master
